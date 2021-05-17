@@ -12,9 +12,11 @@ public class SplunkRum {
     private static SplunkRum INSTANCE;
 
     private final Config config;
+    private final SessionId sessionId;
 
     private SplunkRum(Config config) {
         this.config = config;
+        this.sessionId = new SessionId();
     }
 
     /**
