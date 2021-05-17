@@ -40,7 +40,9 @@ public class SplunkRum {
             return INSTANCE;
         }
         INSTANCE = new SplunkRum(config);
-        Log.i(LOG_TAG, "Splunk RUM monitoring initialized with session ID: " + INSTANCE.sessionId);
+        if (config.isDebugEnabled()) {
+            Log.i(LOG_TAG, "Splunk RUM monitoring initialized with session ID: " + INSTANCE.sessionId);
+        }
         return INSTANCE;
     }
 
