@@ -47,4 +47,9 @@ class SessionId {
         Random random = new Random();
         return TraceId.fromLongs(random.nextLong(), random.nextLong());
     }
+
+    @Override
+    public String toString() {
+        return value.get();
+    }
 }
