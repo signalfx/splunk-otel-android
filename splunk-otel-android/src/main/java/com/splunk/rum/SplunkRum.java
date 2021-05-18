@@ -5,6 +5,7 @@ import android.util.Log;
 
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
@@ -57,6 +58,7 @@ public class SplunkRum {
         SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
                 .addSpanProcessor(BatchSpanProcessor.builder(zipkinExporter).build())
                 .addSpanProcessor(new RumAttributeAppender(config, sessionId))
+                .setResource(Resource.getDefault().toBuilder().put("service.name", config.getApplicationName()).build())
                 .build();
         OpenTelemetrySdk openTelemetrySdk = OpenTelemetrySdk.builder()
                 .setTracerProvider(sdkTracerProvider)

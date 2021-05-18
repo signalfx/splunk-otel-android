@@ -18,7 +18,6 @@ public class Config {
         this.rumAuthToken = builder.rumAuthToken;
         this.debugEnabled = builder.debugEnabled;
         this.applicationName = builder.applicationName;
-        ;
     }
 
     /**

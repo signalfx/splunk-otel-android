@@ -31,7 +31,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
             activityTracer = new ActivityTracer(activity, appStartupComplete, tracer);
             tracersByActivityClassName.put(activity.getClass().getName(), activityTracer);
         }
-        activityTracer.startCreation();
+        activityTracer.startActivityCreation();
         addEvent(activity, "activityPreCreated");
     }
 
@@ -75,7 +75,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
         addEvent(activity, "activityPostResumed");
         ActivityTracer activityTracer = getActivityTracer(activity);
         if (activityTracer != null) {
-            activityTracer.endCreation();
+            activityTracer.endActivityCreation();
         }
     }
 

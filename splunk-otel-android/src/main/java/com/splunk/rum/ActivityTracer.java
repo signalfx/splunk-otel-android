@@ -25,8 +25,10 @@ class ActivityTracer {
         this.tracer = tracer;
     }
 
-    void startCreation() {
+    void startActivityCreation() {
         String spanName;
+        //If the application has never loaded an activity, we name this span specially to show that
+        //it's the application starting up. Otherwise, use the activity class name as the span name.
         if (!appStartupComplete.get()) {
             spanName = "App Startup";
         } else {
@@ -38,7 +40,7 @@ class ActivityTracer {
         scope = span.makeCurrent();
     }
 
-    void endCreation() {
+    void endActivityCreation() {
         appStartupComplete.set(true);
         if (scope != null) {
             scope.close();
@@ -48,10 +50,9 @@ class ActivityTracer {
             span.end();
             span = null;
         }
-
     }
 
-    public void addEvent(String eventName) {
+    void addEvent(String eventName) {
         if (span != null) {
             span.addEvent(eventName);
         }
