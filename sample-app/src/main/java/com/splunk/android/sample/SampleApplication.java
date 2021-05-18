@@ -15,6 +15,6 @@ public class SampleApplication extends Application {
                 .rumAuthToken("authTokenGoesHere")
                 .enableDebug(true)
                 .build();
-        SplunkRum.initialize(config);
+        SplunkRum.initialize(config, this);
     }
 }
