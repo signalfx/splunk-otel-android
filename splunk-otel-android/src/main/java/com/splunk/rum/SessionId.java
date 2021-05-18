@@ -22,7 +22,15 @@ class SessionId {
     //for testing
     SessionId(Clock clock) {
         this.clock = clock;
-        getSessionId();
+        value.set(createNewId());
+        createTimeNanos = clock.now();
+    }
+
+    private static String createNewId() {
+        Random random = new Random();
+        //The OTel TraceId has exactly the same format as a RUM SessionId, so let's re-use it here, rather
+        //than re-inventing the wheel.
+        return TraceId.fromLongs(random.nextLong(), random.nextLong());
     }
 
     String getSessionId() {
@@ -41,11 +49,6 @@ class SessionId {
     private boolean sessionExpired() {
         long elapsedTime = clock.now() - createTimeNanos;
         return elapsedTime >= SESSION_LIFETIME_NANOS;
-    }
-
-    private String createNewId() {
-        Random random = new Random();
-        return TraceId.fromLongs(random.nextLong(), random.nextLong());
     }
 
     @Override
