@@ -5,7 +5,6 @@ import android.app.Application;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter;
 import io.opentelemetry.sdk.trace.data.EventData;
@@ -47,8 +46,8 @@ public class RumInitializerTest {
     }
 
     private void checkEventExists(List<EventData> events, String eventName) {
-        Optional<EventData> event = events.stream().filter(e -> e.getName().equals(eventName)).findAny();
-        assertTrue("Event with name " + eventName + " not found", event.isPresent());
+        assertTrue("Event with name " + eventName + " not found",
+                events.stream().map(EventData::getName).anyMatch(name -> name.equals(eventName)));
     }
 
 }
