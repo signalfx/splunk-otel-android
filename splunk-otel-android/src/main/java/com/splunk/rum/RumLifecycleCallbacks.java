@@ -26,13 +26,18 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+        ActivityTracer activityTracer = getOrCreateTracer(activity);
+        activityTracer.startActivityCreation();
+        activityTracer.addEvent("activityPreCreated");
+    }
+
+    private ActivityTracer getOrCreateTracer(Activity activity) {
         ActivityTracer activityTracer = getActivityTracer(activity);
         if (activityTracer == null) {
             activityTracer = new ActivityTracer(activity, appStartupComplete, tracer);
             tracersByActivityClassName.put(activity.getClass().getName(), activityTracer);
         }
-        activityTracer.startActivityCreation();
-        activityTracer.addEvent("activityPreCreated");
+        return activityTracer;
     }
 
     @Override
@@ -47,6 +52,8 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreStarted(@NonNull Activity activity) {
+        ActivityTracer activityTracer = getOrCreateTracer(activity);
+        activityTracer.startSpanIfNoneInProgress("Restarted");
         addEvent(activity, "activityPreStarted");
     }
 
@@ -62,6 +69,8 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreResumed(@NonNull Activity activity) {
+        ActivityTracer activityTracer = getOrCreateTracer(activity);
+        activityTracer.startSpanIfNoneInProgress("Resumed");
         addEvent(activity, "activityPreResumed");
     }
 
@@ -75,38 +84,50 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
         addEvent(activity, "activityPostResumed");
         ActivityTracer activityTracer = getActivityTracer(activity);
         if (activityTracer != null) {
-            activityTracer.endActivityCreation();
+            activityTracer.endActivityResumtionSpan();
         }
     }
 
     @Override
     public void onActivityPrePaused(@NonNull Activity activity) {
-
+        ActivityTracer activityTracer = getOrCreateTracer(activity);
+        activityTracer.startSpanIfNoneInProgress("Paused");
+        activityTracer.addEvent("activityPrePaused");
     }
 
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
-
+        addEvent(activity, "activityPaused");
     }
 
     @Override
     public void onActivityPostPaused(@NonNull Activity activity) {
-
+        ActivityTracer activityTracer = getActivityTracer(activity);
+        if (activityTracer != null) {
+            activityTracer.addEvent("activityPostPaused");
+            activityTracer.endActiveSpan();
+        }
     }
 
     @Override
     public void onActivityPreStopped(@NonNull Activity activity) {
-
+        ActivityTracer activityTracer = getOrCreateTracer(activity);
+        activityTracer.startSpanIfNoneInProgress("Stopped");
+        activityTracer.addEvent("activityPreStopped");
     }
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-
+        addEvent(activity, "activityStopped");
     }
 
     @Override
     public void onActivityPostStopped(@NonNull Activity activity) {
-
+        ActivityTracer activityTracer = getActivityTracer(activity);
+        if (activityTracer != null) {
+            activityTracer.addEvent("activityPostStopped");
+            activityTracer.endActiveSpan();
+        }
     }
 
     @Override
@@ -126,17 +147,23 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreDestroyed(@NonNull Activity activity) {
-
+        ActivityTracer activityTracer = getOrCreateTracer(activity);
+        activityTracer.startSpanIfNoneInProgress("Destroyed");
+        activityTracer.addEvent("activityPreDestroyed");
     }
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-
+        addEvent(activity, "activityDestroyed");
     }
 
     @Override
     public void onActivityPostDestroyed(@NonNull Activity activity) {
-
+        ActivityTracer activityTracer = getActivityTracer(activity);
+        if (activityTracer != null) {
+            activityTracer.addEvent("activityPostDestroyed");
+            activityTracer.endActiveSpan();
+        }
     }
 
     private void addEvent(@NonNull Activity activity, String eventName) {

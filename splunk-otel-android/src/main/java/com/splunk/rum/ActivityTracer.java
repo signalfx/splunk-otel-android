@@ -25,23 +25,38 @@ class ActivityTracer {
         this.tracer = tracer;
     }
 
+    public void startSpanIfNoneInProgress(String action) {
+        if (span != null) {
+            return;
+        }
+        startSpan(activity.getClass().getSimpleName() + " " + action);
+    }
+
     void startActivityCreation() {
         String spanName;
         //If the application has never loaded an activity, we name this span specially to show that
-        //it's the application starting up. Otherwise, use the activity class name as the span name.
+        //it's the application starting up. Otherwise, use the activity class name as the base of the span name.
         if (!appStartupComplete.get()) {
             spanName = "App Startup";
         } else {
-            spanName = activity.getClass().getSimpleName();
+            spanName = activity.getClass().getSimpleName() + " Created";
         }
+        startSpan(spanName);
+    }
+
+    private void startSpan(String spanName) {
         span = tracer.spanBuilder(spanName)
                 .setAttribute(ACTIVITY_NAME_KEY, activity.getClass().getSimpleName())
                 .startSpan();
         scope = span.makeCurrent();
     }
 
-    void endActivityCreation() {
+    void endActivityResumtionSpan() {
         appStartupComplete.set(true);
+        endActiveSpan();
+    }
+
+    void endActiveSpan() {
         if (scope != null) {
             scope.close();
             scope = null;
