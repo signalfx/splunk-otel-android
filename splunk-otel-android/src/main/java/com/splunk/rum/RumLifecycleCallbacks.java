@@ -32,7 +32,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
             tracersByActivityClassName.put(activity.getClass().getName(), activityTracer);
         }
         activityTracer.startActivityCreation();
-        addEvent(activity, "activityPreCreated");
+        activityTracer.addEvent("activityPreCreated");
     }
 
     @Override
