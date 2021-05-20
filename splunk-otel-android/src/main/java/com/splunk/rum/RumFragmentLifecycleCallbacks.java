@@ -55,7 +55,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onFragmentViewCreated(fm, f, v, savedInstanceState);
         getOrCreateTracer(f)
-                .startSpanIfNoneInProgress("FragmentViewCreated")
+                .startSpanIfNoneInProgress("Restored")
                 .addEvent("fragmentViewCreated");
     }
 

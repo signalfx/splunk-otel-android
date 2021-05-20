@@ -13,10 +13,12 @@ import io.opentelemetry.context.Scope;
 
 class NamedTrackableTracer implements TrackableTracer {
     static final AttributeKey<String> ACTIVITY_NAME_KEY = AttributeKey.stringKey("activityName");
+    static final AttributeKey<String> FRAGMENT_NAME_KEY = AttributeKey.stringKey("activityName");
 
     private final AtomicBoolean appStartupComplete;
     private final Tracer tracer;
     private final String trackableName;
+    private final AttributeKey<String> nameKey;
 
     private Span span;
     private Scope scope;
@@ -25,12 +27,14 @@ class NamedTrackableTracer implements TrackableTracer {
         this.appStartupComplete = appStartupComplete;
         this.tracer = tracer;
         this.trackableName = activity.getClass().getSimpleName();
+        this.nameKey = ACTIVITY_NAME_KEY;
     }
 
     NamedTrackableTracer(Fragment activity, Tracer tracer) {
         this.appStartupComplete = new AtomicBoolean(true);
         this.tracer = tracer;
         this.trackableName = activity.getClass().getSimpleName();
+        this.nameKey = FRAGMENT_NAME_KEY;
     }
 
     @Override
@@ -58,7 +62,7 @@ class NamedTrackableTracer implements TrackableTracer {
 
     private void startSpan(String spanName) {
         span = tracer.spanBuilder(spanName)
-                .setAttribute(ACTIVITY_NAME_KEY, trackableName)
+                .setAttribute(nameKey, trackableName)
                 .startSpan();
         scope = span.makeCurrent();
     }

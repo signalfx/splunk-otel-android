@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,8 +30,8 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
                 .startTrackableCreation()
                 .addEvent("activityPreCreated");
 
-        if (activity instanceof AppCompatActivity) {
-            ((AppCompatActivity) activity).getSupportFragmentManager()
+        if (activity instanceof FragmentActivity) {
+            ((FragmentActivity) activity).getSupportFragmentManager()
                     .registerFragmentLifecycleCallbacks(new RumFragmentLifecycleCallbacks(tracer), true);
         }
     }
@@ -118,17 +118,14 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreSaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
     }
 
     @Override
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
     }
 
     @Override
     public void onActivityPostSaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
     }
 
     @Override
