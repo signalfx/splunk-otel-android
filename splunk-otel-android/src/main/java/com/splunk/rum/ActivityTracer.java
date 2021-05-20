@@ -25,6 +25,7 @@ class ActivityTracer implements TrackableTracer {
         this.tracer = tracer;
     }
 
+    @Override
     public ActivityTracer startSpanIfNoneInProgress(String action) {
         if (span != null) {
             return this;
@@ -33,6 +34,7 @@ class ActivityTracer implements TrackableTracer {
         return this;
     }
 
+    @Override
     public ActivityTracer startActivityCreation() {
         String spanName;
         //If the application has never loaded an activity, we name this span specially to show that
@@ -53,11 +55,13 @@ class ActivityTracer implements TrackableTracer {
         scope = span.makeCurrent();
     }
 
+    @Override
     public void endSpanForActivityResumed() {
         appStartupComplete.set(true);
         endActiveSpan();
     }
 
+    @Override
     public void endActiveSpan() {
         if (scope != null) {
             scope.close();
@@ -69,6 +73,7 @@ class ActivityTracer implements TrackableTracer {
         }
     }
 
+    @Override
     public ActivityTracer addEvent(String eventName) {
         if (span != null) {
             span.addEvent(eventName);
