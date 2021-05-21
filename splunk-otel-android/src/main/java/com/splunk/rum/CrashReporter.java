@@ -42,7 +42,7 @@ class CrashReporter {
                     .startSpan()
                     .setStatus(StatusCode.ERROR)
                     .end();
-            //to our best to make sure the crash makes it out of the VM
+            //do our best to make sure the crash makes it out of the VM
             sdkTracerProvider.forceFlush();
             //preserve any existing behavior:
             if (existingHandler != null) {
