@@ -10,13 +10,16 @@ import java.util.concurrent.TimeUnit;
 
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.common.Clock;
 import io.opentelemetry.sdk.internal.SystemClock;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 
 class RumInitializer {
@@ -42,7 +45,7 @@ class RumInitializer {
         SessionId sessionId = new SessionId();
         initializationEvents.add(new RumInitializer.InitializationEvent("sessionIdInitialized", clock.now()));
 
-        SdkTracerProvider sdkTracerProvider = buildTracerProvider(clock, zipkinExporter, sessionId, rumVersion);
+        SdkTracerProvider sdkTracerProvider = buildTracerProvider(clock, zipkinExporter, sessionId, rumVersion, config);
         initializationEvents.add(new RumInitializer.InitializationEvent("tracerProviderInitialized", clock.now()));
 
         OpenTelemetrySdk openTelemetrySdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).build();
@@ -77,12 +80,16 @@ class RumInitializer {
         span.end();
     }
 
-    private SdkTracerProvider buildTracerProvider(Clock clock, SpanExporter zipkinExporter, SessionId sessionId, String rumVersion) {
-        return SdkTracerProvider.builder()
-                .addSpanProcessor(BatchSpanProcessor.builder(zipkinExporter).build())
-                .addSpanProcessor(new RumAttributeAppender(config, sessionId, rumVersion))
+    private SdkTracerProvider buildTracerProvider(Clock clock, SpanExporter zipkinExporter, SessionId sessionId, String rumVersion, Config config) {
+        SdkTracerProviderBuilder tracerProviderBuilder = SdkTracerProvider.builder()
                 .setClock(clock)
-                .setResource(Resource.getDefault().toBuilder().put("service.name", config.getApplicationName()).build())
+                .addSpanProcessor(BatchSpanProcessor.builder(zipkinExporter).build())
+                .addSpanProcessor(new RumAttributeAppender(this.config, sessionId, rumVersion))
+                .setResource(Resource.getDefault().toBuilder().put("service.name", this.config.getApplicationName()).build());
+        if (config.isDebugEnabled()) {
+            tracerProviderBuilder.addSpanProcessor(SimpleSpanProcessor.create(new LoggingSpanExporter()));
+        }
+        return tracerProviderBuilder
                 .build();
     }
 
