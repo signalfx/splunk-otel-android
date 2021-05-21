@@ -18,8 +18,8 @@ public class MailDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflate = LayoutInflater.from(activity);
-        View alertView = inflate.inflate(R.layout.sample_mail_dialog, null);
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        View alertView = inflater.inflate(R.layout.sample_mail_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setView(alertView)
                 .setNegativeButton(R.string.cancel, (dialog, id) -> {
