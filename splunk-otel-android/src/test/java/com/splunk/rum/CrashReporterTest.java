@@ -50,7 +50,11 @@ public class CrashReporterTest {
         assertEquals(crashThread.getId(), (long) crashSpan.getAttributes().get(SemanticAttributes.THREAD_ID));
         assertEquals("badThread", crashSpan.getAttributes().get(SemanticAttributes.THREAD_NAME));
         assertTrue(crashSpan.getAttributes().get(SemanticAttributes.EXCEPTION_ESCAPED));
+
         assertNotNull(crashSpan.getAttributes().get(SemanticAttributes.EXCEPTION_STACKTRACE));
+        assertTrue(crashSpan.getAttributes().get(SemanticAttributes.EXCEPTION_STACKTRACE).contains("NullPointerException"));
+        assertTrue(crashSpan.getAttributes().get(SemanticAttributes.EXCEPTION_STACKTRACE).contains("oopsie"));
+
         assertEquals(StatusCode.ERROR, crashSpan.getStatus().getStatusCode());
 
         assertTrue(existingHandler.wasDelegatedTo.get());
