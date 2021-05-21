@@ -45,7 +45,7 @@ class RumInitializer {
         SessionId sessionId = new SessionId();
         initializationEvents.add(new RumInitializer.InitializationEvent("sessionIdInitialized", clock.now()));
 
-        SdkTracerProvider sdkTracerProvider = buildTracerProvider(clock, zipkinExporter, sessionId, rumVersion, config);
+        SdkTracerProvider sdkTracerProvider = buildTracerProvider(clock, zipkinExporter, sessionId, rumVersion);
         initializationEvents.add(new RumInitializer.InitializationEvent("tracerProviderInitialized", clock.now()));
 
         OpenTelemetrySdk openTelemetrySdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).build();
@@ -80,12 +80,12 @@ class RumInitializer {
         span.end();
     }
 
-    private SdkTracerProvider buildTracerProvider(Clock clock, SpanExporter zipkinExporter, SessionId sessionId, String rumVersion, Config config) {
+    private SdkTracerProvider buildTracerProvider(Clock clock, SpanExporter zipkinExporter, SessionId sessionId, String rumVersion) {
         SdkTracerProviderBuilder tracerProviderBuilder = SdkTracerProvider.builder()
                 .setClock(clock)
                 .addSpanProcessor(BatchSpanProcessor.builder(zipkinExporter).build())
-                .addSpanProcessor(new RumAttributeAppender(this.config, sessionId, rumVersion))
-                .setResource(Resource.getDefault().toBuilder().put("service.name", this.config.getApplicationName()).build());
+                .addSpanProcessor(new RumAttributeAppender(config, sessionId, rumVersion))
+                .setResource(Resource.getDefault().toBuilder().put("service.name", config.getApplicationName()).build());
         if (config.isDebugEnabled()) {
             tracerProviderBuilder.addSpanProcessor(SimpleSpanProcessor.create(new LoggingSpanExporter()));
         }
