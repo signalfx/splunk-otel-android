@@ -23,7 +23,9 @@ public class ServerTimingHeaderParserTest {
     @Test
     public void parsableHeader() {
         ServerTimingHeaderParser parser = new ServerTimingHeaderParser();
-        assertArrayEquals(new String[]{"9499195c502eb217c448a68bfe0f967c", "fe16eca542cd5d86"},
-                parser.parse("traceparent;desc=\"00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01\""));
+        String traceId = "9499195c502eb217c448a68bfe0f967c";
+        String spanId = "fe16eca542cd5d86";
+        assertArrayEquals(new String[]{traceId, spanId},
+                parser.parse("traceparent;desc=\"00-" + traceId + "-" + spanId + "-01\""));
     }
 }
