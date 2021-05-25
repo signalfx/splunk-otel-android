@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.splunk.android.sample.databinding.FragmentFirstBinding;
@@ -17,12 +19,8 @@ import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -39,25 +37,27 @@ import static org.apache.http.conn.ssl.SSLSocketFactory.SSL;
 
 public class FirstFragment extends Fragment {
 
+    private final ExecutorService backgrounder = Executors.newSingleThreadExecutor();
+    private final MutableLiveData<String> httpResponse = new MutableLiveData<>();
+
     private FragmentFirstBinding binding;
     private OkHttpClient okHttpClient;
-    private ExecutorService backgrounder = Executors.newSingleThreadExecutor();
-
-    public FirstFragment() {
-        okHttpClient = buildOkHttpClient();
-    }
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
+        okHttpClient = buildOkHttpClient();
         binding = FragmentFirstBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
+    @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.setLifecycleOwner(getViewLifecycleOwner());
+        binding.setFirstFragment(this);
 
         binding.buttonFirst.setOnClickListener(v ->
                 NavHostFragment.findNavController(FirstFragment.this)
@@ -67,34 +67,26 @@ public class FirstFragment extends Fragment {
             throw new IllegalStateException("Crashing due to a bug!");
         });
 
-
         binding.httpMe.setOnClickListener(v -> {
-            //this is NOT how you're supposed to do http/UI updates in Android.
-            // TODO: fix this to use LiveData to update the UI
-            Future<String> result = backgrounder.submit(() -> {
+            backgrounder.submit(() -> {
                 Call call = okHttpClient.newCall(new Request.Builder().url("https://ssidhu.o11ystore.com/").get().build());
                 try (Response r = call.execute()) {
                     int responseCode = r.code();
-                    System.out.println("responseCode = " + responseCode);
-                    return "" + responseCode;
+                    httpResponse.postValue("" + responseCode);
                 } catch (IOException e) {
                     //todo SplunkRum.noticeError(...)
                     Span.current().setAttribute("error", true);
                     Span.current().setAttribute("exception.kind", e.getClass().getSimpleName());
 
                     e.printStackTrace();
-                    return "error!";
+                    httpResponse.postValue("error");
                 }
             });
-            try {
-                binding.httpResult.setText(result.get(400, TimeUnit.MILLISECONDS));
-            } catch (ExecutionException | InterruptedException e) {
-                binding.httpResult.setText(e.getMessage());
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                binding.httpResult.setText("timeout");
-            }
         });
+    }
+
+    public LiveData<String> getHttpResponse() {
+        return httpResponse;
     }
 
     @Override
