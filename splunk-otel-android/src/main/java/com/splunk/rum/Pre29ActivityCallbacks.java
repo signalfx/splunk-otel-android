@@ -21,7 +21,7 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     private final Map<String, NamedTrackableTracer> tracersByActivityClassName = new HashMap<>();
     private final AtomicBoolean appStartupComplete = new AtomicBoolean();
 
-    public Pre29ActivityCallbacks(Tracer tracer, VisibleScreenTracker visibleScreenTracker) {
+    Pre29ActivityCallbacks(Tracer tracer, VisibleScreenTracker visibleScreenTracker) {
         this.tracer = tracer;
         this.visibleScreenTracker = visibleScreenTracker;
     }
@@ -67,7 +67,7 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     public void onActivityStopped(@NonNull Activity activity) {
         getOrCreateTracer(activity)
                 .startSpanIfNoneInProgress("Stopped")
-                .addEvent("activityPreStopped")
+                .addEvent("activityStopped")
                 .endActiveSpan();
     }
 
@@ -80,7 +80,7 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     public void onActivityDestroyed(@NonNull Activity activity) {
         getOrCreateTracer(activity)
                 .startSpanIfNoneInProgress("Destroyed")
-                .addEvent("activityPreDestroyed")
+                .addEvent("activityDestroyed")
                 .endActiveSpan();
     }
 
