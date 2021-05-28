@@ -20,42 +20,38 @@ import java.util.concurrent.atomic.AtomicReference;
  * the launching screen never leaves visibility.
  */
 class VisibleScreenTracker {
-    private final AtomicReference<Activity> lastResumedActivity = new AtomicReference<>();
-    private final AtomicReference<Activity> previouslyLastResumedActivity = new AtomicReference<>();
-    private final AtomicReference<Fragment> lastResumedFragment = new AtomicReference<>();
-    private final AtomicReference<Fragment> previouslyLastResumedFragment = new AtomicReference<>();
+    private final AtomicReference<String> lastResumedActivity = new AtomicReference<>();
+    private final AtomicReference<String> previouslyLastResumedActivity = new AtomicReference<>();
+    private final AtomicReference<String> lastResumedFragment = new AtomicReference<>();
+    private final AtomicReference<String> previouslyLastResumedFragment = new AtomicReference<>();
 
     String getPreviouslyVisibleScreen() {
-        Fragment previouslyLastFragment = previouslyLastResumedFragment.get();
+        String previouslyLastFragment = previouslyLastResumedFragment.get();
         if (previouslyLastFragment != null) {
-            return previouslyLastFragment.getClass().getSimpleName();
+            return previouslyLastFragment;
         }
-        Activity previouslyLastActivity = previouslyLastResumedActivity.get();
-        if (previouslyLastActivity != null) {
-            return previouslyLastActivity.getClass().getSimpleName();
-        }
-        return null;
+        return previouslyLastResumedActivity.get();
     }
 
     String getCurrentlyVisibleScreen() {
-        Fragment lastFragment = lastResumedFragment.get();
+        String lastFragment = lastResumedFragment.get();
         if (lastFragment != null) {
-            return lastFragment.getClass().getSimpleName();
+            return lastFragment;
         }
-        Activity lastActivity = lastResumedActivity.get();
+        String lastActivity = lastResumedActivity.get();
         if (lastActivity != null) {
-            return lastActivity.getClass().getSimpleName();
+            return lastActivity;
         }
         return "unknown";
     }
 
     void activityResumed(Activity activity) {
-        lastResumedActivity.set(activity);
+        lastResumedActivity.set(activity.getClass().getSimpleName());
     }
 
     void activityPaused(Activity activity) {
-        previouslyLastResumedActivity.set(activity);
-        lastResumedActivity.compareAndSet(activity, null);
+        previouslyLastResumedActivity.set(activity.getClass().getSimpleName());
+        lastResumedActivity.compareAndSet(activity.getClass().getSimpleName(), null);
     }
 
     void fragmentResumed(Fragment fragment) {
@@ -67,7 +63,7 @@ class VisibleScreenTracker {
         if (fragment instanceof DialogFragment) {
             previouslyLastResumedFragment.set(lastResumedFragment.get());
         }
-        lastResumedFragment.set(fragment);
+        lastResumedFragment.set(fragment.getClass().getSimpleName());
     }
 
     void fragmentPaused(Fragment fragment) {
@@ -78,8 +74,8 @@ class VisibleScreenTracker {
         if (fragment instanceof DialogFragment) {
             lastResumedFragment.set(previouslyLastResumedFragment.get());
         } else {
-            lastResumedFragment.compareAndSet(fragment, null);
+            lastResumedFragment.compareAndSet(fragment.getClass().getSimpleName(), null);
         }
-        previouslyLastResumedFragment.set(fragment);
+        previouslyLastResumedFragment.set(fragment.getClass().getSimpleName());
     }
 }
