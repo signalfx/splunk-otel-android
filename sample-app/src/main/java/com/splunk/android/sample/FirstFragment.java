@@ -68,6 +68,7 @@ public class FirstFragment extends Fragment {
 
         binding.httpMe.setOnClickListener(v -> backgrounder.submit(() -> makeCall("https://ssidhu.o11ystore.com/")));
         binding.httpMeBad.setOnClickListener(v -> backgrounder.submit(() -> makeCall("https://asdlfkjasd.asdfkjasdf.ifi")));
+        binding.httpMeNotFound.setOnClickListener(v -> backgrounder.submit(() -> makeCall("https://ssidhu.o11ystore.com/foobarbaz")));
     }
 
     private void makeCall(String url) {

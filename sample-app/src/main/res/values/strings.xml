@@ -15,4 +15,5 @@
     <string name="clippy">clippy</string>
     <string name="http_me_up">HTTP me up!</string>
     <string name="http_me_bad">Http Error</string>
+    <string name="http_not_found">HTTP Not Found</string>
 </resources>
