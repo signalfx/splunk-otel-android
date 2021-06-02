@@ -14,4 +14,5 @@
     <string name="cancel">NO!</string>
     <string name="clippy">clippy</string>
     <string name="http_me_up">HTTP me up!</string>
+    <string name="http_me_bad">Http Error</string>
 </resources>
