@@ -39,7 +39,7 @@ public class Config {
         this.debugEnabled = builder.debugEnabled;
         this.applicationName = builder.applicationName;
         this.crashReportingEnabled = builder.crashReportingEnabled;
-        this.globalAttributes = builder.globalAttributes == null ? Attributes.empty() : builder.globalAttributes;
+        this.globalAttributes = builder.globalAttributes;
     }
 
     /**
@@ -172,7 +172,7 @@ public class Config {
          * @return this.
          */
         public Builder globalAttributes(Attributes attributes) {
-            this.globalAttributes = attributes;
+            this.globalAttributes = attributes == null ? Attributes.empty() : attributes;
             return this;
         }
     }
