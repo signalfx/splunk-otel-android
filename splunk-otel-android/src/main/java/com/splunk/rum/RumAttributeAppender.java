@@ -19,7 +19,6 @@ package com.splunk.rum;
 import android.os.Build;
 
 import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
@@ -40,14 +39,12 @@ class RumAttributeAppender implements SpanProcessor {
     private final SessionId sessionId;
     private final String rumVersion;
     private final VisibleScreenTracker visibleScreenTracker;
-    private final Attributes globalAttributes;
 
-    RumAttributeAppender(Config config, SessionId sessionId, String rumVersion, VisibleScreenTracker visibleScreenTracker, Attributes globalAttributes) {
+    RumAttributeAppender(Config config, SessionId sessionId, String rumVersion, VisibleScreenTracker visibleScreenTracker) {
         this.config = config;
         this.sessionId = sessionId;
         this.rumVersion = rumVersion;
         this.visibleScreenTracker = visibleScreenTracker;
-        this.globalAttributes = globalAttributes;
     }
 
     @Override
@@ -60,7 +57,7 @@ class RumAttributeAppender implements SpanProcessor {
         span.setAttribute(OS_VERSION_KEY, Build.VERSION.RELEASE);
         span.setAttribute(RUM_VERSION_KEY, rumVersion);
         span.setAttribute(OS_TYPE, "Android");
-        span.setAllAttributes(globalAttributes);
+        span.setAllAttributes(config.getGlobalAttributes());
 
         String currentScreen = visibleScreenTracker.getCurrentlyVisibleScreen();
         span.setAttribute(SplunkRum.SCREEN_NAME_KEY, currentScreen);

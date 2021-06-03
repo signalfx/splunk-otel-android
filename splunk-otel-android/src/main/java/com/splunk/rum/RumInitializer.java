@@ -112,7 +112,7 @@ class RumInitializer {
         SdkTracerProviderBuilder tracerProviderBuilder = SdkTracerProvider.builder()
                 .setClock(clock)
                 .addSpanProcessor(BatchSpanProcessor.builder(zipkinExporter).build())
-                .addSpanProcessor(new RumAttributeAppender(config, sessionId, rumVersion, visibleScreenTracker, config.getGlobalAttributes()))
+                .addSpanProcessor(new RumAttributeAppender(config, sessionId, rumVersion, visibleScreenTracker))
                 .setResource(Resource.getDefault().toBuilder().put("service.name", config.getApplicationName()).build());
         if (config.isDebugEnabled()) {
             tracerProviderBuilder.addSpanProcessor(SimpleSpanProcessor.create(new LoggingSpanExporter()));
