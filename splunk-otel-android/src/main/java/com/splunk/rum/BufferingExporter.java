@@ -64,12 +64,8 @@ class BufferingExporter implements SpanExporter {
 
     @NonNull
     private List<SpanData> fillFromBacklog() {
-        List<SpanData> retries = new ArrayList<>();
-        SpanData item = backlog.poll();
-        while (item != null) {
-            retries.add(item);
-            item = backlog.poll();
-        }
+        List<SpanData> retries = new ArrayList<>(backlog);
+        backlog.clear();
         return retries;
     }
 

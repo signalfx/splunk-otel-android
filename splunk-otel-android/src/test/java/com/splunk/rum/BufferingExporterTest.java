@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
@@ -49,9 +48,7 @@ public class BufferingExporterTest {
         when(delegate.export(spans)).thenReturn(CompletableResultCode.ofSuccess());
 
         CompletableResultCode result = bufferingExporter.export(spans);
-
-        result.whenComplete(() -> assertTrue(result.isSuccess()));
-        result.join(1, TimeUnit.SECONDS);
+        assertTrue(result.isSuccess());
     }
 
     @Test
@@ -69,12 +66,10 @@ public class BufferingExporterTest {
                 .thenReturn(CompletableResultCode.ofSuccess());
 
         CompletableResultCode firstResult = bufferingExporter.export(spans);
-
-        firstResult.whenComplete(() -> assertFalse(firstResult.isSuccess()));
+        assertFalse(firstResult.isSuccess());
 
         CompletableResultCode secondResult = bufferingExporter.export(Collections.singletonList(three));
-        secondResult.join(1, TimeUnit.SECONDS)
-                .whenComplete(() -> assertTrue(secondResult.isSuccess()));
+        assertTrue(secondResult.isSuccess());
     }
 
     @Test
@@ -90,12 +85,10 @@ public class BufferingExporterTest {
                 .thenReturn(CompletableResultCode.ofSuccess());
 
         CompletableResultCode firstResult = bufferingExporter.export(spans);
-
-        firstResult.whenComplete(() -> assertFalse(firstResult.isSuccess()));
+        assertFalse(firstResult.isSuccess());
 
         CompletableResultCode secondResult = bufferingExporter.flush();
-        secondResult.join(1, TimeUnit.SECONDS)
-                .whenComplete(() -> assertTrue(secondResult.isSuccess()));
+        assertTrue(secondResult.isSuccess());
         //2 times...once from the failure, and once from the flush with success
         verify(delegate, times(2)).export(spans);
     }
@@ -107,8 +100,7 @@ public class BufferingExporterTest {
         when(delegate.flush()).thenReturn(CompletableResultCode.ofSuccess());
 
         CompletableResultCode secondResult = bufferingExporter.flush();
-        secondResult.join(1, TimeUnit.SECONDS)
-                .whenComplete(() -> assertTrue(secondResult.isSuccess()));
+        assertTrue(secondResult.isSuccess());
         verify(delegate).flush();
     }
 
@@ -121,10 +113,10 @@ public class BufferingExporterTest {
         for (int i = 0; i < 110; i++) {
             firstSet.add(mock(SpanData.class));
         }
-        when(delegate.export(firstSet))
-                .thenReturn(CompletableResultCode.ofFailure());
+        when(delegate.export(firstSet)).thenReturn(CompletableResultCode.ofFailure());
+
         CompletableResultCode firstResult = bufferingExporter.export(firstSet);
-        firstResult.whenComplete(() -> assertFalse(firstResult.isSuccess()));
+        assertFalse(firstResult.isSuccess());
 
         List<SpanData> secondSet = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -136,8 +128,7 @@ public class BufferingExporterTest {
                 .thenReturn(CompletableResultCode.ofSuccess());
 
         CompletableResultCode secondResult = bufferingExporter.export(secondSet);
-        secondResult.join(1, TimeUnit.SECONDS)
-                .whenComplete(() -> assertTrue(secondResult.isSuccess()));
+        assertTrue(secondResult.isSuccess());
 
         List<SpanData> value = argumentCaptor.getValue();
         //we keep only 100 of the first 110 that failed.
