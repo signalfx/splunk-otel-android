@@ -24,7 +24,10 @@ import java.util.concurrent.TimeUnit;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTracing;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import okhttp3.Interceptor;
+
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
 /**
  * Entrypoint for Splunk's Android RUM (Real User Monitoring) support.
@@ -36,8 +39,11 @@ public class SplunkRum {
     static final String COMPONENT_APPSTART = "appstart";
     static final String COMPONENT_ERROR = "error";
     static final String COMPONENT_UI = "ui";
+    static final AttributeKey<String> ERROR_TYPE_KEY = stringKey("error.type");
+    static final AttributeKey<String> ERROR_MESSAGE_KEY = stringKey("error.message");
 
     private static final String LOG_TAG = "SplunkRum";
+    static final String RUM_TRACER_NAME = "SplunkRum";
 
     private static SplunkRum INSTANCE;
 
@@ -90,6 +96,10 @@ public class SplunkRum {
             throw new IllegalStateException("SplunkRum has not been initialized.");
         }
         return INSTANCE;
+    }
+
+    public Interceptor createOkHttpRumInterceptor() {
+        return new OkHttpRumInterceptor(OkHttpTracing.create(openTelemetrySdk).newInterceptor(), new ServerTimingHeaderParser());
     }
 
     //for testing only
