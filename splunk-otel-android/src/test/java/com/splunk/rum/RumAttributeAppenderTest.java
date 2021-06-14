@@ -30,6 +30,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -38,6 +39,8 @@ import static org.mockito.Mockito.when;
 public class RumAttributeAppenderTest {
 
     private VisibleScreenTracker visibleScreenTracker;
+    private final NetworkMonitor networkMonitor = mock(NetworkMonitor.class, RETURNS_DEEP_STUBS);
+    private final ConnectionUtil connectionUtil = mock(ConnectionUtil.class, RETURNS_DEEP_STUBS);
 
     @Before
     public void setUp() {
@@ -48,7 +51,7 @@ public class RumAttributeAppenderTest {
     public void interfaceMethods() {
         Config config = mock(Config.class);
         when(config.getGlobalAttributes()).thenReturn(Attributes.empty());
-        RumAttributeAppender rumAttributeAppender = new RumAttributeAppender(config, mock(SessionId.class), "rumVersion", visibleScreenTracker);
+        RumAttributeAppender rumAttributeAppender = new RumAttributeAppender(config, mock(SessionId.class), "rumVersion", visibleScreenTracker, connectionUtil);
 
         assertTrue(rumAttributeAppender.isStartRequired());
         assertFalse(rumAttributeAppender.isEndRequired());
@@ -70,7 +73,7 @@ public class RumAttributeAppenderTest {
 
         ReadWriteSpan span = mock(ReadWriteSpan.class);
 
-        RumAttributeAppender rumAttributeAppender = new RumAttributeAppender(config, sessionId, "rumVersion", visibleScreenTracker);
+        RumAttributeAppender rumAttributeAppender = new RumAttributeAppender(config, sessionId, "rumVersion", visibleScreenTracker, connectionUtil);
 
         rumAttributeAppender.onStart(Context.current(), span);
         verify(span).setAttribute(RumAttributeAppender.RUM_VERSION_KEY, "rumVersion");
@@ -98,7 +101,7 @@ public class RumAttributeAppenderTest {
 
         ReadWriteSpan span = mock(ReadWriteSpan.class);
 
-        RumAttributeAppender rumAttributeAppender = new RumAttributeAppender(config, sessionId, "rumVersion", visibleScreenTracker);
+        RumAttributeAppender rumAttributeAppender = new RumAttributeAppender(config, sessionId, "rumVersion", visibleScreenTracker, connectionUtil);
 
         rumAttributeAppender.onStart(Context.current(), span);
         verify(span).setAttribute(SplunkRum.SCREEN_NAME_KEY, "unknown");
