@@ -39,12 +39,12 @@ import static org.mockito.Mockito.when;
 public class RumAttributeAppenderTest {
 
     private VisibleScreenTracker visibleScreenTracker;
-    private final NetworkMonitor networkMonitor = mock(NetworkMonitor.class, RETURNS_DEEP_STUBS);
     private final ConnectionUtil connectionUtil = mock(ConnectionUtil.class, RETURNS_DEEP_STUBS);
 
     @Before
     public void setUp() {
         visibleScreenTracker = mock(VisibleScreenTracker.class);
+        when(connectionUtil.getActiveNetwork()).thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"));
     }
 
     @Test
@@ -81,6 +81,8 @@ public class RumAttributeAppenderTest {
         verify(span).setAttribute(RumAttributeAppender.SESSION_ID_KEY, "rumSessionId");
         verify(span).setAttribute(ResourceAttributes.OS_TYPE, "Android");
         verify(span).setAttribute(SplunkRum.SCREEN_NAME_KEY, "ScreenOne");
+        verify(span).setAttribute(RumAttributeAppender.NETWORK_TYPE_KEY, "CELLULAR");
+        verify(span).setAttribute(RumAttributeAppender.NETWORK_SUBTYPE_KEY, "LTE");
 
         //these values don't seem to be available in unit tests, so just assert that something was set.
         verify(span).setAttribute(eq(RumAttributeAppender.DEVICE_MODEL_KEY), any());
