@@ -125,7 +125,7 @@ public class PostApi29NetworkDetectorTest {
 
         PostApi29NetworkDetector networkDetector = new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null), currentNetwork);
+        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null), currentNetwork);
     }
 
     @Test

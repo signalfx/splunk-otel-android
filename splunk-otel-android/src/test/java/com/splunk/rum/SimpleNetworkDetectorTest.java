@@ -67,7 +67,7 @@ public class SimpleNetworkDetectorTest {
 
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
 
-        assertEquals(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null), currentNetwork);
+        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null), currentNetwork);
     }
 
     @Test

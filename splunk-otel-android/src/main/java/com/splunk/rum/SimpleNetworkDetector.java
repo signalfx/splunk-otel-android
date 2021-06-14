@@ -20,6 +20,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import static com.splunk.rum.ConnectionUtil.NO_NETWORK;
+import static com.splunk.rum.ConnectionUtil.UNKNOWN_NETWORK;
 
 class SimpleNetworkDetector implements NetworkDetector {
     private final ConnectivityManager connectivityManager;
@@ -41,9 +42,9 @@ class SimpleNetworkDetector implements NetworkDetector {
                 return new CurrentNetwork(NetworkState.TRANSPORT_WIFI, activeNetwork.getSubtypeName());
             case ConnectivityManager.TYPE_VPN:
                 return new CurrentNetwork(NetworkState.TRANSPORT_VPN, activeNetwork.getSubtypeName());
-            //todo: what about other misc. types, like WIMAX, ETHERNET, etc?
         }
-        return NO_NETWORK;
+        //there is an active network, but it doesn't fall into the neat buckets above
+        return UNKNOWN_NETWORK;
     }
 
 }

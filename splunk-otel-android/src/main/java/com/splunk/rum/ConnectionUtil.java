@@ -33,6 +33,7 @@ import java.util.function.Supplier;
 class ConnectionUtil {
 
     static final CurrentNetwork NO_NETWORK = new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null);
+    static final CurrentNetwork UNKNOWN_NETWORK = new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null);
 
     private final ConnectionMonitor connectionMonitor;
     private final NetworkDetector networkDetector;

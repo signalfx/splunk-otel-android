@@ -29,6 +29,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
 import static com.splunk.rum.ConnectionUtil.NO_NETWORK;
+import static com.splunk.rum.ConnectionUtil.UNKNOWN_NETWORK;
 
 @RequiresApi(api = Build.VERSION_CODES.Q)
 class PostApi29NetworkDetector implements NetworkDetector {
@@ -61,7 +62,8 @@ class PostApi29NetworkDetector implements NetworkDetector {
         } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
             return new CurrentNetwork(NetworkState.TRANSPORT_VPN, null);
         }
-        return NO_NETWORK;
+        //there is an active network, but it doesn't fall into the neat buckets above
+        return UNKNOWN_NETWORK;
     }
 
     //visible for testing

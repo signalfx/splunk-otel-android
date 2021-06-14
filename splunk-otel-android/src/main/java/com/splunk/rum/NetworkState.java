@@ -20,7 +20,8 @@ enum NetworkState {
     NO_NETWORK_AVAILABLE("NONE"),
     TRANSPORT_CELLULAR("CELLULAR"),
     TRANSPORT_WIFI("WIFI"),
-    TRANSPORT_VPN("VPN");
+    TRANSPORT_VPN("VPN"),
+    TRANSPORT_UNKNOWN("UNKNOWN");
 
     private final String humanName;
 
