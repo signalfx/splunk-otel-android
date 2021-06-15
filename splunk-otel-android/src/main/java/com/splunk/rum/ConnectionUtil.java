@@ -58,7 +58,7 @@ class ConnectionUtil {
         refreshNetworkStatus();
     }
 
-    private CurrentNetwork refreshNetworkStatus() {
+    CurrentNetwork refreshNetworkStatus() {
         CurrentNetwork activeNetwork = networkDetector.detectCurrentNetwork();
         currentNetwork.set(activeNetwork);
         return activeNetwork;

@@ -46,7 +46,7 @@ class BufferingExporter implements SpanExporter {
     @Override
     public CompletableResultCode export(Collection<SpanData> spans) {
         backlog.addAll(spans);
-        if (!connectionUtil.isOnline()) {
+        if (!connectionUtil.refreshNetworkStatus().isOnline()) {
             Log.i(SplunkRum.LOG_TAG, "Network offline, buffering " + spans.size() + " spans for eventual export.");
             return CompletableResultCode.ofSuccess();
         }

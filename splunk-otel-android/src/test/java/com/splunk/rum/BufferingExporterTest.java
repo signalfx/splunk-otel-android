@@ -44,8 +44,9 @@ public class BufferingExporterTest {
     private final ConnectionUtil connectionUtil = mock(ConnectionUtil.class);
 
     @Before
-    public void setUp() throws Exception {
-        when(connectionUtil.isOnline()).thenReturn(true);
+    public void setUp() {
+        when(connectionUtil.refreshNetworkStatus())
+                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, null));
     }
 
     @Test
@@ -62,7 +63,9 @@ public class BufferingExporterTest {
 
     @Test
     public void offlinePath() {
-        when(connectionUtil.isOnline()).thenReturn(false, true);
+        when(connectionUtil.refreshNetworkStatus())
+                .thenReturn(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null))
+                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null));
 
         SpanExporter delegate = mock(SpanExporter.class);
         BufferingExporter bufferingExporter = new BufferingExporter(connectionUtil, delegate);
