@@ -76,7 +76,7 @@ class ConnectionUtil {
     }
 
     boolean isOnline() {
-        return currentNetwork.get().getState() != NetworkState.NO_NETWORK_AVAILABLE;
+        return currentNetwork.get().isOnline();
     }
 
     CurrentNetwork getActiveNetwork() {
@@ -108,11 +108,14 @@ class ConnectionUtil {
         @Override
         public void onLost(@NonNull Network network) {
             Log.d(SplunkRum.LOG_TAG, "onLost: ");
-            CurrentNetwork activeNetwork = refreshNetworkStatus();
+            //it seems that the "currentActiveNetwork" is still the one that is being lost, so for
+            //this method, we'll force it to be NO_NETWORK, rather than relying on the ConnectivityManager to have the right
+            //state at the right time during this event.
+            CurrentNetwork activeNetwork = NO_NETWORK;
+            currentNetwork.set(activeNetwork);
             if (connectionStateListener != null) {
-                boolean online = isOnline();
-                connectionStateListener.onAvailable(online, activeNetwork);
-                Log.d(SplunkRum.LOG_TAG, "  onLost: isConnected:" + online + ", activeNetwork: " + activeNetwork);
+                connectionStateListener.onAvailable(false, activeNetwork);
+                Log.d(SplunkRum.LOG_TAG, "  onLost: isConnected:" + false + ", activeNetwork: " + activeNetwork);
             }
         }
     }

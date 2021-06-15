@@ -30,7 +30,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -39,7 +38,7 @@ import static org.mockito.Mockito.when;
 public class RumAttributeAppenderTest {
 
     private VisibleScreenTracker visibleScreenTracker;
-    private final ConnectionUtil connectionUtil = mock(ConnectionUtil.class, RETURNS_DEEP_STUBS);
+    private final ConnectionUtil connectionUtil = mock(ConnectionUtil.class);
 
     @Before
     public void setUp() {

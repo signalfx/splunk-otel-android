@@ -50,8 +50,7 @@ public class ConnectionUtilTest {
 
         when(networkDetector.detectCurrentNetwork())
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null)) //called on init
-                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"))
-                .thenReturn(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null));
+                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"));
 
         ConnectionUtil connectionUtil = new ConnectionUtil(() -> networkRequest, networkDetector, connectivityManager);
 
@@ -88,8 +87,7 @@ public class ConnectionUtilTest {
 
         when(networkDetector.detectCurrentNetwork())
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null))
-                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"))
-                .thenReturn(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null));
+                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"));
 
         ConnectionUtil connectionUtil = new ConnectionUtil(() -> networkRequest, networkDetector, connectivityManager);
 

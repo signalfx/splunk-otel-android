@@ -28,6 +28,10 @@ class CurrentNetwork {
         this.subType = subType;
     }
 
+    boolean isOnline() {
+        return getState() != NetworkState.NO_NETWORK_AVAILABLE;
+    }
+
     public NetworkState getState() {
         return state;
     }
