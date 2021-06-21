@@ -92,7 +92,7 @@ public class SplunkRumTest {
         when(config.getBeaconUrl()).thenReturn("http://backend");
 
         SplunkRum splunkRum = SplunkRum.initialize(config, application, () -> mock(ConnectionUtil.class, RETURNS_DEEP_STUBS));
-        assertNotNull(splunkRum.getOpenTelemetryApi());
+        assertNotNull(splunkRum.getOpenTelemetry());
         assertNotNull(splunkRum.getRumSessionId());
     }
 

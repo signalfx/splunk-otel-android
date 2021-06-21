@@ -117,7 +117,7 @@ public class SplunkRum {
     /**
      * Get a handle to the instance of the OpenTelemetry API that this instance is using for instrumentation.
      */
-    public OpenTelemetry getOpenTelemetryApi() {
+    public OpenTelemetry getOpenTelemetry() {
         return openTelemetrySdk;
     }
 

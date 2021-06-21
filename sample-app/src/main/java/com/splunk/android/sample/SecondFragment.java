@@ -39,7 +39,7 @@ public class SecondFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        sampleAppTracer = SplunkRum.getInstance().getOpenTelemetryApi().getTracer("sampleAppTracer");
+        sampleAppTracer = SplunkRum.getInstance().getOpenTelemetry().getTracer("sampleAppTracer");
         binding = FragmentSecondBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
