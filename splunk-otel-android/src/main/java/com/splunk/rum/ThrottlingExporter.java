@@ -16,6 +16,8 @@
 
 package com.splunk.rum;
 
+import android.util.Log;
+
 import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -59,6 +61,10 @@ class ThrottlingExporter implements SpanExporter {
             if (!window.aboveLimit(span)) {
                 spansBelowLimit.add(span);
             }
+        }
+        int dropped = spans.size() - spansBelowLimit.size();
+        if (dropped > 0) {
+            Log.d(SplunkRum.LOG_TAG, "Dropped " + dropped + " spans because of throttling");
         }
         return delegate.export(spansBelowLimit);
     }
