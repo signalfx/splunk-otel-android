@@ -138,7 +138,7 @@ public class ThrottlingExporterTest {
                 spanData.get(5),
                 spanData.get(6),
                 spanData.get(7),
-                // idx = 8 will be skipped because it's the 4th no-component span in the 2-span, 15s window
+                // idx = 8 will be skipped because it's the 3rd no-component span in the 2-span, 15s window
                 spanData.get(9)
         ));
     }
