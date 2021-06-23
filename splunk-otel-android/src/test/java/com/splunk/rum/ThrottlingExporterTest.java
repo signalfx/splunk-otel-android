@@ -209,12 +209,8 @@ public class ThrottlingExporterTest {
     }
 
     private static SpanData span(String component, Instant endTime) {
-        return span(component, endTime, "");
-    }
-
-    private static SpanData span(String component, Instant endTime, String additionalName) {
         return TestSpanData.builder()
-                .setName("test" + additionalName)
+                .setName("test")
                 .setKind(SpanKind.INTERNAL)
                 .setStatus(StatusData.unset())
                 .setHasEnded(true)
@@ -223,4 +219,5 @@ public class ThrottlingExporterTest {
                 .setAttributes(Attributes.of(SplunkRum.COMPONENT_KEY, component))
                 .build();
     }
+
 }
