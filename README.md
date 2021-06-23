@@ -42,7 +42,8 @@ two options for bringing in this library as a dependency for your Android app:
 
 #### Use as a gradle dependency via jitpack.io:
 
-Add jitpack.io as a maven repository to the `respositories` section of your main build.gradle:
+Add [jitpack.io](https://jitpack.io/#signalfx/splunk-otel-android/) as a maven repository to the 
+`repositories` section of your main build.gradle:
 
 ```
 allprojects {
