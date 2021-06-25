@@ -39,5 +39,7 @@ release:
     - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+.*/'
   script:
     - touch local.properties
-    - ./gradlew --info build publish -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD -PsigningInMemoryKey=$GPG_SECRET_KEY -PsigningInMemoryKeyPassword=$GPG_PASSWORD
+    - ./gradlew build
+    - ./gradlew --info signMavenPublication -PsigningInMemoryKey=$GPG_SECRET_KEY -PsigningInMemoryKeyPassword=$GPG_PASSWORD
+    - ./gradlew --info publish -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD -PsigningInMemoryKey=$GPG_SECRET_KEY -PsigningInMemoryKeyPassword=$GPG_PASSWORD
     - ./gradlew closeAndReleaseRepository -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD
