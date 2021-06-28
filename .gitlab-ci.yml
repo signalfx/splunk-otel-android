@@ -40,6 +40,6 @@ release:
   script:
     - touch local.properties
     - ./gradlew build
-    - ./gradlew --info signMavenPublication -PsigningInMemoryKey=$GPG_SECRET_KEY -PsigningInMemoryKeyPassword=$GPG_PASSWORD
+    - ./gradlew --debug signMavenPublication -PsigningInMemoryKey=$GPG_SECRET_KEY -PsigningInMemoryKeyPassword=$GPG_PASSWORD
     - ./gradlew --info publish -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD -PsigningInMemoryKey=$GPG_SECRET_KEY -PsigningInMemoryKeyPassword=$GPG_PASSWORD
     - ./gradlew closeAndReleaseRepository -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD
