@@ -6,7 +6,6 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.2.1"
-        //classpath 'com.vanniktech:gradle-maven-publish-plugin:0.16.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -50,12 +49,9 @@ publishing {
 }
 
 signing {
-    //def signingKeyId = findProperty("signingKeyId")
+    useGpgCmd()
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
-    useGpgCmd()
-    //useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     useInMemoryPgpKeys(signingKey, signingPassword)
-    //sign stuffZip
     sign publishing.publications["maven"]
 }

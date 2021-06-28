@@ -2,7 +2,6 @@ plugins {
     id 'com.android.library'
     id 'maven-publish'
     id 'signing'
-    //id "com.vanniktech.maven.publish"
 }
 
 android {
