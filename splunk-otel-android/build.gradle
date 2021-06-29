@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
-    id "com.vanniktech.maven.publish"
+    id "maven-publish"
+    id "signing"
 }
 
 android {
@@ -66,21 +67,30 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 }
 
-//publishing {
-//    publications {
-//        maven(MavenPublication) {
-//            groupId = 'com.splunk'
-//            artifactId = 'splunk-otel-android'
-//            //artifact(android)
-//            //from components.java
-//            //artifact aar
-//        }
-//    }
-//}
-//signing {
-//    useGpgCmd()
-//    def signingKey = findProperty("signingKey")
-//    def signingPassword = findProperty("signingPassword")
-//    useInMemoryPgpKeys(signingKey, signingPassword)
-//    sign publishing.publications["maven"]
-//}
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.splunk'
+            artifactId = 'splunk-otel-android'
+        }
+    }
+}
+
+project.afterEvaluate {
+    def component = project.components.findByName("release")
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from component
+            }
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications["maven"]
+}

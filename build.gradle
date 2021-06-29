@@ -13,10 +13,10 @@ buildscript {
     }
 }
 
-//plugins {
-//    id "signing"
-//    id "maven-publish"
-//}
+plugins {
+    id "signing"
+    id "maven-publish"
+}
 
 allprojects {
     repositories {
@@ -25,6 +25,6 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
+//task clean(type: Delete) {
+//    delete rootProject.buildDir
+//}
