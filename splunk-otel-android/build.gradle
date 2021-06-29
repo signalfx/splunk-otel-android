@@ -81,8 +81,34 @@ publishing {
     }
     publications {
         maven(MavenPublication) {
-            groupId = 'com.splunk'
-            artifactId = 'splunk-otel-android'
+            groupId = "com.splunk"
+            artifactId = "splunk-otel-android"
+
+            pom {
+                name = "Splunk Otel Android"
+                description = "A library for instrumenting Android applications for Splunk RUM"
+                url = "https://github.com/signalfx/splunk-otel-android"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "splunk"
+                        name = "Splunk Instrumentation Authors"
+                        email = "support+sonatype@signalfx.com"
+                        organization = "Splunk"
+                        organizationUrl = "https://www.splunk.com"
+                    }
+                }
+                scm {
+                    connection = "https://github.com/signalfx/splunk-otel-android.git"
+                    developerConnection = "https://github.com/signalfx/splunk-otel-android.git"
+                    url = "https://github.com/signalfx/splunk-otel-android"
+                }
+            }
         }
     }
 }
@@ -99,6 +125,7 @@ project.afterEvaluate {
 }
 
 signing {
+    required { project.hasProperty('release') }
     useGpgCmd()
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
