@@ -65,3 +65,11 @@ dependencies {
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 }
+
+signing {
+    useGpgCmd()
+    def signingKey = findProperty("signingInMemoryKey")
+    def signingPassword = findProperty("signingInMemoryPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications["maven"]
+}
