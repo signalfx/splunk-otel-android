@@ -42,4 +42,3 @@ release:
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
     - ./gradlew -Prelease=true --no-build-cache -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD build signMavenPublication publish
-#    - ./gradlew -Prelease=true -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD closeAndReleaseSonatypeStagingRepository
