@@ -14,7 +14,8 @@ buildscript {
 }
 
 plugins {
-    id "com.vanniktech.maven.publish" version("0.16.0")
+    id "signing"
+//    id "com.vanniktech.maven.publish" version("0.16.0")
 }
 
 allprojects {
