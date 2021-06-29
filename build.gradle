@@ -13,11 +13,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "signing"
-    id "maven-publish"
-}
-
 allprojects {
     repositories {
         google()

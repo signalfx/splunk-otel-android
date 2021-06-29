@@ -68,6 +68,13 @@ dependencies {
 }
 
 publishing {
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshot"
+            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
+        }
+    }
     publications {
         maven(MavenPublication) {
             groupId = 'com.splunk'
