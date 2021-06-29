@@ -41,7 +41,5 @@ release:
     - touch local.properties
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
-    - ./gradlew -Prelease=true build
-    - ./gradlew -Prelease=true signMavenPublication
     - ./gradlew -Prelease=true -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD publish
-    - ./gradlew -Prelease=true -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD closeAndReleaseSonatypeStagingRepository
+#    - ./gradlew -Prelease=true -PmavenCentralUsername=$SONATYPE_USERNAME -PmavenCentralPassword=$SONATYPE_PASSWORD closeAndReleaseSonatypeStagingRepository

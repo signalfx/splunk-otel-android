@@ -19,6 +19,6 @@ allprojects {
         mavenCentral()
     }
     if (findProperty("release") != "true") {
-        project.version += "-SNAPSHOT";
+        project.version += "-SNAPSHOT"
     }
 }
