@@ -102,9 +102,8 @@ dependencies {
 ### Configuration
 
 In order to configure the Splunk RUM library, you will need to know three things:
-* Your RUM beacon URL. 
-  * This value looks like `"https://rum-ingest.<realm>.signalfx.com/v1/rum"` where
-the `<realm>` can be found in your Splunk Observability UI in the Account Settings page.
+* Your Splunk realm. 
+  * The realm can be found in your Splunk Observability UI in the Account Settings page.
 * Your RUM auth token.  
   * You can find or create a RUM auth token in the Splunk Observability UI, in your Organization Settings.
   * Important: this auth token *must* have the `RUM` authorization scope to work. 
@@ -112,11 +111,11 @@ the `<realm>` can be found in your Splunk Observability UI in the Account Settin
 
 Here is an example of a the very minimal configuration which uses these 3 values:
 ```java
-        String beaconUrl = "https://rum-ingest.<realm>.signalfx.com/v1/rum";
-        String rumAuthToken = "<your_auth_token>";
+        String beaconUrl = "<realm>";
+        String rumAuth = "<your_auth>";
         Config config = SplunkRum.newConfigBuilder()
-                .beaconUrl(beaconUrl)
-                .rumAuthToken(rumAuthToken)
+                .realm(realm)
+                .rumAuth(rumAuth)
                 .applicationName("My Android App")
                 .build();
 ```

@@ -17,6 +17,7 @@
 package com.splunk.rum;
 
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 
 /**
  * Configuration class for the Splunk Android RUM (Real User Monitoring) library.
@@ -37,11 +38,17 @@ public class Config {
 
     private Config(Builder builder) {
         this.beaconUrl = builder.beaconUrl;
-        this.rumAuthToken = builder.rumAuthToken;
+        this.rumAuthToken = builder.rumAuth;
         this.debugEnabled = builder.debugEnabled;
         this.applicationName = builder.applicationName;
         this.crashReportingEnabled = builder.crashReportingEnabled;
-        this.globalAttributes = builder.globalAttributes;
+        Attributes globalAttributes = builder.globalAttributes;
+        if (builder.environment != null) {
+            globalAttributes = globalAttributes.toBuilder()
+                    .put(ResourceAttributes.DEPLOYMENT_ENVIRONMENT, builder.environment)
+                    .build();
+        }
+        this.globalAttributes = globalAttributes;
         this.networkMonitorEnabled = builder.networkMonitorEnabled;
         this.anrDetectionEnabled = builder.anrDetectionEnabled;
     }
@@ -56,7 +63,7 @@ public class Config {
     /**
      * The configured RUM auth token for the library.
      */
-    public String getRumAuthToken() {
+    public String getRumAuth() {
         return rumAuthToken;
     }
 
@@ -111,17 +118,18 @@ public class Config {
         public boolean networkMonitorEnabled = true;
         public boolean anrDetectionEnabled = true;
         private String beaconUrl;
-        private String rumAuthToken;
+        private String rumAuth;
         private boolean debugEnabled = false;
         private String applicationName;
         private boolean crashReportingEnabled = true;
         private Attributes globalAttributes = Attributes.empty();
+        private String environment;
 
         /**
          * Create a new instance of {@link Config} from the options provided.
          */
         public Config build() {
-            if (rumAuthToken == null || beaconUrl == null || applicationName == null) {
+            if (rumAuth == null || beaconUrl == null || applicationName == null) {
                 throw new IllegalStateException("You must provide a rumAuthToken, a beaconUrl, and an application name to create a valid Config instance.");
             }
             return new Config(this);
@@ -129,6 +137,9 @@ public class Config {
 
         /**
          * Assign the "beacon" URL to be used by the RUM library.
+         * <p>
+         * Note that if you are using standard Splunk ingest, it is simpler to just use {@link #realm(String)}
+         * and let this configuration set the full URL for you.
          *
          * @return this
          */
@@ -138,12 +149,38 @@ public class Config {
         }
 
         /**
+         * Sets the realm for the beacon to send RUM telemetry to. This should be used in place
+         * of the {@link #beaconUrl(String)} method in most cases.
+         *
+         * @param realm A valid Splunk "realm"
+         * @return this
+         */
+        public Builder realm(String realm) {
+            this.beaconUrl = "https://rum-ingest." + realm + ".signalfx.com/v1/rum";
+            return this;
+        }
+
+        /**
+         * Assign the RUM auth token to be used by the RUM library.
+         * <p>
+         * This method is deprecated and will be removed in the next release.
+         *
+         * @return this
+         * @deprecated Use {@link #rumAuth(String)} now.
+         */
+        @Deprecated
+        public Builder rumAuthToken(String rumAuthToken) {
+            this.rumAuth = rumAuthToken;
+            return this;
+        }
+
+        /**
          * Assign the RUM auth token to be used by the RUM library.
          *
          * @return this
          */
-        public Builder rumAuthToken(String rumAuthToken) {
-            this.rumAuthToken = rumAuthToken;
+        public Builder rumAuth(String rumAuthToken) {
+            this.rumAuth = rumAuthToken;
             return this;
         }
 
@@ -208,6 +245,18 @@ public class Config {
          */
         public Builder globalAttributes(Attributes attributes) {
             this.globalAttributes = attributes == null ? Attributes.empty() : attributes;
+            return this;
+        }
+
+        /**
+         * Assign the deployment environment for this RUM instance. Will be passed along as a span
+         * attribute to help identify in the Splunk RUM UI.
+         *
+         * @param environment The deployment environment name.
+         * @return this.
+         */
+        public Builder deploymentEnvironment(String environment) {
+            this.environment = environment;
             return this;
         }
     }
