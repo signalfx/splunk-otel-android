@@ -22,7 +22,9 @@ import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTracing;
 import okhttp3.Interceptor;
 
 class NoOpSplunkRum extends SplunkRum {
-    public NoOpSplunkRum() {
+    static final NoOpSplunkRum INSTANCE = new NoOpSplunkRum();
+
+    private NoOpSplunkRum() {
         super(null, null);
     }
 

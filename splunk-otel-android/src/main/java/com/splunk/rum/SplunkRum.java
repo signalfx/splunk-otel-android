@@ -101,7 +101,7 @@ public class SplunkRum {
     public static SplunkRum getInstance() {
         if (INSTANCE == null) {
             Log.d(LOG_TAG, "SplunkRum not initialized. Returning no-op implementation");
-            return new NoOpSplunkRum();
+            return NoOpSplunkRum.INSTANCE;
         }
         return INSTANCE;
     }
@@ -198,7 +198,7 @@ public class SplunkRum {
      * @return A no-op instance of {@link SplunkRum}
      */
     public static SplunkRum noop() {
-        return new NoOpSplunkRum();
+        return NoOpSplunkRum.INSTANCE;
     }
 
 }

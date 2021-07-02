@@ -26,7 +26,7 @@ public class NoOpSplunkRumTest {
 
     @Test
     public void doesNotThrow() {
-        NoOpSplunkRum instance = new NoOpSplunkRum();
+        NoOpSplunkRum instance = NoOpSplunkRum.INSTANCE;
         instance.addRumEvent("foo", Attributes.empty());
         instance.addRumException("bar", Attributes.empty(), new RuntimeException());
         assertNotNull(instance.createOkHttpRumInterceptor());
