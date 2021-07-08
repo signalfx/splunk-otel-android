@@ -116,7 +116,7 @@ class RumInitializer {
         String configSettings = "[debug:" + config.isDebugEnabled() + "," +
                 "crashReporting:" + config.isCrashReportingEnabled() + "," +
                 "networkMonitor:" + config.isNetworkMonitorEnabled() + "]";
-        span.setAttribute("configSettings", configSettings);
+        span.setAttribute("config_settings", configSettings);
 
         for (RumInitializer.InitializationEvent initializationEvent : initializationEvents) {
             span.addEvent(initializationEvent.name, initializationEvent.time, TimeUnit.NANOSECONDS);

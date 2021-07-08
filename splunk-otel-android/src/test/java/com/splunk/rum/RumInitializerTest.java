@@ -57,7 +57,7 @@ public class RumInitializerTest {
         assertEquals("SplunkRum.initialize", initSpan.getName());
         assertEquals("appstart", initSpan.getAttributes().get(SplunkRum.COMPONENT_KEY));
         assertEquals("[debug:false,crashReporting:true,networkMonitor:false]",
-                initSpan.getAttributes().get(AttributeKey.stringKey("configSettings")));
+                initSpan.getAttributes().get(AttributeKey.stringKey("config_settings")));
 
         List<EventData> events = initSpan.getEvents();
         assertEquals(7, events.size());
