@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
@@ -91,11 +92,45 @@ class RumInitializer {
 
         if (config.isNetworkMonitorEnabled()) {
             new NetworkMonitor(connectionUtil).addConnectivityListener(tracer);
+            initializationEvents.add(new RumInitializer.InitializationEvent("networkMonitorInitialized", timingClock.now()));
+        }
+
+        if (config.isAnrDetectionEnabled()) {
+            initializeAnrReporting();
+            initializationEvents.add(new RumInitializer.InitializationEvent("anrMonitorInitialized", timingClock.now()));
         }
 
         recordInitializationSpan(startTimeNanos, initializationEvents, tracer, config);
 
         return new SplunkRum(openTelemetrySdk, sessionId);
+    }
+
+    private void initializeAnrReporting() {
+        Thread mainThread = Thread.currentThread();
+        Thread anrDetectorThread = new Thread(() -> {
+            AtomicInteger anrCounter = new AtomicInteger(0);
+            while (true) {
+                try {
+                    Thread.State state = mainThread.getState();
+                    if (state != Thread.State.RUNNABLE) {
+                        if (anrCounter.incrementAndGet() >= 5) {
+                            StackTraceElement[] stackTrace = mainThread.getStackTrace();
+                            SplunkRum.getInstance().recordAnr(stackTrace);
+                            //only report once per 5s.
+                            anrCounter.set(0);
+                        }
+                    } else {
+                        anrCounter.set(0);
+                    }
+                    Thread.sleep(1000);
+                } catch (Exception ignored) {
+                    break;
+                }
+            }
+        });
+        anrDetectorThread.setName("ANR Detector");
+        anrDetectorThread.setDaemon(true);
+        anrDetectorThread.start();
     }
 
     private String detectRumVersion() {
@@ -116,6 +151,7 @@ class RumInitializer {
 
         String configSettings = "[debug:" + config.isDebugEnabled() + "," +
                 "crashReporting:" + config.isCrashReportingEnabled() + "," +
+                "anrReporting:" + config.isAnrDetectionEnabled() + "," +
                 "networkMonitor:" + config.isNetworkMonitorEnabled() + "]";
         span.setAttribute("config_settings", configSettings);
 

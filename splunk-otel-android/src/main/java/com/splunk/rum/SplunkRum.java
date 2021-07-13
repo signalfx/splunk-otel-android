@@ -180,6 +180,22 @@ public class SplunkRum {
         span.setAttribute(ERROR_MESSAGE_KEY, e.getMessage());
     }
 
+    void recordAnr(StackTraceElement[] stackTrace) {
+        openTelemetrySdk.getTracer(RUM_TRACER_NAME)
+                .spanBuilder("ANR")
+                .setAttribute(SemanticAttributes.EXCEPTION_STACKTRACE, formatStackTrace(stackTrace))
+                .startSpan()
+                .end();
+    }
+
+    private String formatStackTrace(StackTraceElement[] stackTrace) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (StackTraceElement stackTraceElement : stackTrace) {
+            stringBuilder.append(stackTraceElement).append("\n");
+        }
+        return stringBuilder.toString();
+    }
+
     //for testing only
     static void resetSingletonForTest() {
         INSTANCE = null;
@@ -200,5 +216,4 @@ public class SplunkRum {
     public static SplunkRum noop() {
         return NoOpSplunkRum.INSTANCE;
     }
-
 }
