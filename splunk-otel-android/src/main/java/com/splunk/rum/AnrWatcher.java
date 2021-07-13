@@ -42,19 +42,21 @@ class AnrWatcher implements Runnable {
             //the main thread is probably shutting down. ignore and return.
             return;
         }
+        boolean success;
         try {
-            if (response.await(1, TimeUnit.SECONDS)) {
-                anrCounter.set(0);
-                return;
-            }
-            if (anrCounter.incrementAndGet() >= 5) {
-                StackTraceElement[] stackTrace = mainThread.getStackTrace();
-                splunkRumSupplier.get().recordAnr(stackTrace);
-                //only report once per 5s.
-                anrCounter.set(0);
-            }
+            success = response.await(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            //ignore and die
+            return;
+        }
+        if (success) {
+            anrCounter.set(0);
+            return;
+        }
+        if (anrCounter.incrementAndGet() >= 5) {
+            StackTraceElement[] stackTrace = mainThread.getStackTrace();
+            splunkRumSupplier.get().recordAnr(stackTrace);
+            //only report once per 5s.
+            anrCounter.set(0);
         }
     }
 }
