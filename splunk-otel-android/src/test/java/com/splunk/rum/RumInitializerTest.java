@@ -17,6 +17,7 @@
 package com.splunk.rum;
 
 import android.app.Application;
+import android.os.Looper;
 
 import org.junit.Test;
 
@@ -50,7 +51,7 @@ public class RumInitializerTest {
                 return testExporter;
             }
         };
-        SplunkRum splunkRum = testInitializer.initialize(() -> mock(ConnectionUtil.class, RETURNS_DEEP_STUBS));
+        SplunkRum splunkRum = testInitializer.initialize(() -> mock(ConnectionUtil.class, RETURNS_DEEP_STUBS), mock(Looper.class));
         splunkRum.flushSpans();
 
         List<SpanData> spans = testExporter.getFinishedSpanItems();

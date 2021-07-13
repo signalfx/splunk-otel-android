@@ -18,6 +18,8 @@ package com.splunk.rum;
 
 import android.app.Application;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.splunk.android.rum.R;
 
@@ -25,6 +27,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -52,7 +55,7 @@ class RumInitializer {
         this.application = application;
     }
 
-    SplunkRum initialize(Supplier<ConnectionUtil> connectionUtilSupplier) {
+    SplunkRum initialize(Supplier<ConnectionUtil> connectionUtilSupplier, Looper mainLooper) {
         String rumVersion = detectRumVersion();
         VisibleScreenTracker visibleScreenTracker = new VisibleScreenTracker();
 
@@ -96,7 +99,7 @@ class RumInitializer {
         }
 
         if (config.isAnrDetectionEnabled()) {
-            initializeAnrReporting();
+            initializeAnrReporting(mainLooper);
             initializationEvents.add(new RumInitializer.InitializationEvent("anrMonitorInitialized", timingClock.now()));
         }
 
@@ -105,26 +108,26 @@ class RumInitializer {
         return new SplunkRum(openTelemetrySdk, sessionId);
     }
 
-    private void initializeAnrReporting() {
-        Thread mainThread = Thread.currentThread();
+    private void initializeAnrReporting(Looper mainLooper) {
         Thread anrDetectorThread = new Thread(() -> {
+            Thread mainThread = mainLooper.getThread();
             AtomicInteger anrCounter = new AtomicInteger(0);
+            Handler uiHandler = new Handler(mainLooper);
             while (true) {
+                AtomicBoolean response = new AtomicBoolean(false);
+                uiHandler.post(() -> response.set(true));
                 try {
-                    Thread.State state = mainThread.getState();
-                    if (state != Thread.State.RUNNABLE) {
-                        if (anrCounter.incrementAndGet() >= 5) {
-                            StackTraceElement[] stackTrace = mainThread.getStackTrace();
-                            SplunkRum.getInstance().recordAnr(stackTrace);
-                            //only report once per 5s.
-                            anrCounter.set(0);
-                        }
-                    } else {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+                if (!response.get()) {
+                    if (anrCounter.incrementAndGet() >= 5) {
+                        StackTraceElement[] stackTrace = mainThread.getStackTrace();
+                        SplunkRum.getInstance().recordAnr(stackTrace);
+                        //only report once per 5s.
                         anrCounter.set(0);
                     }
-                    Thread.sleep(1000);
-                } catch (Exception ignored) {
-                    break;
                 }
             }
         });

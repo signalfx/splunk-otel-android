@@ -17,6 +17,7 @@
 package com.splunk.rum;
 
 import android.app.Application;
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
@@ -86,7 +87,8 @@ public class SplunkRum {
             return INSTANCE;
         }
 
-        INSTANCE = new RumInitializer(config, application).initialize(connectionUtilSupplier);
+        INSTANCE = new RumInitializer(config, application)
+                .initialize(connectionUtilSupplier, Looper.getMainLooper());
 
         if (config.isDebugEnabled()) {
             Log.i(LOG_TAG, "Splunk RUM monitoring initialized with session ID: " + INSTANCE.sessionId);
