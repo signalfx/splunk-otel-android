@@ -22,8 +22,10 @@ import org.junit.Test;
 
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class AnrWatcherTest {
@@ -92,10 +94,17 @@ public class AnrWatcherTest {
         when(mainThread.getStackTrace()).thenReturn(stackTrace);
 
         AnrWatcher anrWatcher = new AnrWatcher(handler, mainThread, () -> splunkRum);
+        when(handler.post(isA(Runnable.class))).thenReturn(true);
         for (int i = 0; i < 5; i++) {
-            when(handler.post(isA(Runnable.class))).thenReturn(true);
             anrWatcher.run();
         }
-        verify(splunkRum).recordAnr(stackTrace);
+        verify(splunkRum, times(1)).recordAnr(stackTrace);
+        for (int i = 0; i < 4; i++) {
+            anrWatcher.run();
+        }
+        verifyNoMoreInteractions(splunkRum);
+
+        anrWatcher.run();
+        verify(splunkRum, times(2)).recordAnr(stackTrace);
     }
 }
