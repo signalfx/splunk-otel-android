@@ -33,9 +33,9 @@ public class ConfigTest {
     @Test
     public void buildingRequiredFields() {
         assertThrows(IllegalStateException.class, () -> Config.builder().build());
-        assertThrows(IllegalStateException.class, () -> Config.builder().rumAuth("abc123").beaconUrl("http://backend").build());
-        assertThrows(IllegalStateException.class, () -> Config.builder().beaconUrl("http://backend").applicationName("appName").build());
-        assertThrows(IllegalStateException.class, () -> Config.builder().applicationName("appName").rumAuth("abc123").build());
+        assertThrows(IllegalStateException.class, () -> Config.builder().rumAccessToken("abc123").beaconEndpoint("http://backend").build());
+        assertThrows(IllegalStateException.class, () -> Config.builder().beaconEndpoint("http://backend").applicationName("appName").build());
+        assertThrows(IllegalStateException.class, () -> Config.builder().applicationName("appName").rumAccessToken("abc123").build());
     }
 
     @Test
@@ -45,8 +45,8 @@ public class ConfigTest {
                 .put(ResourceAttributes.DEPLOYMENT_ENVIRONMENT, "production")
                 .build();
         Config config = Config.builder().applicationName("appName")
-                .rumAuth("authToken")
-                .beaconUrl("http://beacon")
+                .rumAccessToken("authToken")
+                .beaconEndpoint("http://beacon")
                 .debugEnabled(true)
                 .crashReportingEnabled(false)
                 .networkMonitorEnabled(false)
@@ -57,7 +57,7 @@ public class ConfigTest {
         assertNotNull(config);
         assertEquals("appName", config.getApplicationName());
         assertEquals("authToken", config.getRumAuth());
-        assertEquals("http://beacon", config.getBeaconUrl());
+        assertEquals("http://beacon", config.getBeaconEndpoint());
         assertTrue(config.isDebugEnabled());
         assertFalse(config.isCrashReportingEnabled());
         assertFalse(config.isNetworkMonitorEnabled());
@@ -68,13 +68,13 @@ public class ConfigTest {
     @Test
     public void creation_default() {
         Config config = Config.builder().applicationName("appName")
-                .rumAuth("authToken")
+                .rumAccessToken("authToken")
                 .realm("foo")
                 .build();
         assertNotNull(config);
         assertEquals("appName", config.getApplicationName());
         assertEquals("authToken", config.getRumAuth());
-        assertEquals("https://rum-ingest.foo.signalfx.com/v1/rum", config.getBeaconUrl());
+        assertEquals("https://rum-ingest.foo.signalfx.com/v1/rum", config.getBeaconEndpoint());
         assertFalse(config.isDebugEnabled());
         assertTrue(config.isCrashReportingEnabled());
         assertTrue(config.isNetworkMonitorEnabled());
@@ -85,8 +85,8 @@ public class ConfigTest {
     @Test
     public void creation_nullHandling() {
         Config config = Config.builder().applicationName("appName")
-                .rumAuth("authToken")
-                .beaconUrl("http://beacon")
+                .rumAccessToken("authToken")
+                .beaconEndpoint("http://beacon")
                 .globalAttributes(null)
                 .build();
         assertEquals(Attributes.empty(), config.getGlobalAttributes());

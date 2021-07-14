@@ -27,7 +27,7 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
  */
 public class Config {
 
-    private final String beaconUrl;
+    private final String beaconEndpoint;
     private final String rumAuthToken;
     private final boolean debugEnabled;
     private final String applicationName;
@@ -37,15 +37,15 @@ public class Config {
     private final boolean anrDetectionEnabled;
 
     private Config(Builder builder) {
-        this.beaconUrl = builder.beaconUrl;
-        this.rumAuthToken = builder.rumAuth;
+        this.beaconEndpoint = builder.beaconEndpoint;
+        this.rumAuthToken = builder.rumAccessToken;
         this.debugEnabled = builder.debugEnabled;
         this.applicationName = builder.applicationName;
         this.crashReportingEnabled = builder.crashReportingEnabled;
         Attributes globalAttributes = builder.globalAttributes;
-        if (builder.environment != null) {
+        if (builder.deploymentEnvironment != null) {
             globalAttributes = globalAttributes.toBuilder()
-                    .put(ResourceAttributes.DEPLOYMENT_ENVIRONMENT, builder.environment)
+                    .put(ResourceAttributes.DEPLOYMENT_ENVIRONMENT, builder.deploymentEnvironment)
                     .build();
         }
         this.globalAttributes = globalAttributes;
@@ -56,8 +56,8 @@ public class Config {
     /**
      * The configured "beacon" URL for the RUM library.
      */
-    public String getBeaconUrl() {
-        return beaconUrl;
+    public String getBeaconEndpoint() {
+        return beaconEndpoint;
     }
 
     /**
@@ -117,19 +117,19 @@ public class Config {
     public static class Builder {
         public boolean networkMonitorEnabled = true;
         public boolean anrDetectionEnabled = true;
-        private String beaconUrl;
-        private String rumAuth;
+        private String beaconEndpoint;
+        private String rumAccessToken;
         private boolean debugEnabled = false;
         private String applicationName;
         private boolean crashReportingEnabled = true;
         private Attributes globalAttributes = Attributes.empty();
-        private String environment;
+        private String deploymentEnvironment;
 
         /**
          * Create a new instance of {@link Config} from the options provided.
          */
         public Config build() {
-            if (rumAuth == null || beaconUrl == null || applicationName == null) {
+            if (rumAccessToken == null || beaconEndpoint == null || applicationName == null) {
                 throw new IllegalStateException("You must provide a rumAuthToken, a beaconUrl, and an application name to create a valid Config instance.");
             }
             return new Config(this);
@@ -142,9 +142,23 @@ public class Config {
          * and let this configuration set the full URL for you.
          *
          * @return this
+         * @deprecated Use {@link #beaconEndpoint(String)} now.
          */
         public Builder beaconUrl(String beaconUrl) {
-            this.beaconUrl = beaconUrl;
+            this.beaconEndpoint = beaconUrl;
+            return this;
+        }
+
+        /**
+         * Assign the "beacon" endpoint URL to be used by the RUM library.
+         * <p>
+         * Note that if you are using standard Splunk ingest, it is simpler to just use {@link #realm(String)}
+         * and let this configuration set the full endpoint URL for you.
+         *
+         * @return this
+         */
+        public Builder beaconEndpoint(String beaconEndpoint) {
+            this.beaconEndpoint = beaconEndpoint;
             return this;
         }
 
@@ -156,7 +170,7 @@ public class Config {
          * @return this
          */
         public Builder realm(String realm) {
-            this.beaconUrl = "https://rum-ingest." + realm + ".signalfx.com/v1/rum";
+            this.beaconEndpoint = "https://rum-ingest." + realm + ".signalfx.com/v1/rum";
             return this;
         }
 
@@ -166,11 +180,11 @@ public class Config {
          * This method is deprecated and will be removed in the next release.
          *
          * @return this
-         * @deprecated Use {@link #rumAuth(String)} now.
+         * @deprecated Use {@link #rumAccessToken(String)} now.
          */
         @Deprecated
         public Builder rumAuthToken(String rumAuthToken) {
-            this.rumAuth = rumAuthToken;
+            this.rumAccessToken = rumAuthToken;
             return this;
         }
 
@@ -179,8 +193,8 @@ public class Config {
          *
          * @return this
          */
-        public Builder rumAuth(String rumAuthToken) {
-            this.rumAuth = rumAuthToken;
+        public Builder rumAccessToken(String rumAuthToken) {
+            this.rumAccessToken = rumAuthToken;
             return this;
         }
 
@@ -256,7 +270,7 @@ public class Config {
          * @return this.
          */
         public Builder deploymentEnvironment(String environment) {
-            this.environment = environment;
+            this.deploymentEnvironment = environment;
             return this;
         }
     }

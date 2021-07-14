@@ -25,7 +25,7 @@ android {
     buildTypes {
         all {
             resValue("string", "rum_realm", localProperties['rum.realm'] ?: "us0")
-            resValue("string", "rum_auth", localProperties['rum.auth'] ?: "dummyAuth")
+            resValue("string", "rum_access_token", localProperties['rum.access.token'] ?: "dummyAuth")
         }
 
         release {
