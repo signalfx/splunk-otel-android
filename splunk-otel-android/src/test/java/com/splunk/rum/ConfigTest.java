@@ -56,7 +56,7 @@ public class ConfigTest {
                 .build();
         assertNotNull(config);
         assertEquals("appName", config.getApplicationName());
-        assertEquals("authToken", config.getRumAuth());
+        assertEquals("authToken", config.getRumAccessToken());
         assertEquals("http://beacon", config.getBeaconEndpoint());
         assertTrue(config.isDebugEnabled());
         assertFalse(config.isCrashReportingEnabled());
@@ -73,7 +73,7 @@ public class ConfigTest {
                 .build();
         assertNotNull(config);
         assertEquals("appName", config.getApplicationName());
-        assertEquals("authToken", config.getRumAuth());
+        assertEquals("authToken", config.getRumAccessToken());
         assertEquals("https://rum-ingest.foo.signalfx.com/v1/rum", config.getBeaconEndpoint());
         assertFalse(config.isDebugEnabled());
         assertTrue(config.isCrashReportingEnabled());

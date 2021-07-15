@@ -28,7 +28,7 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 public class Config {
 
     private final String beaconEndpoint;
-    private final String rumAuthToken;
+    private final String rumAccessToken;
     private final boolean debugEnabled;
     private final String applicationName;
     private final boolean crashReportingEnabled;
@@ -38,7 +38,7 @@ public class Config {
 
     private Config(Builder builder) {
         this.beaconEndpoint = builder.beaconEndpoint;
-        this.rumAuthToken = builder.rumAccessToken;
+        this.rumAccessToken = builder.rumAccessToken;
         this.debugEnabled = builder.debugEnabled;
         this.applicationName = builder.applicationName;
         this.crashReportingEnabled = builder.crashReportingEnabled;
@@ -61,10 +61,10 @@ public class Config {
     }
 
     /**
-     * The configured RUM auth token for the library.
+     * The configured RUM access token for the library.
      */
-    public String getRumAuth() {
-        return rumAuthToken;
+    public String getRumAccessToken() {
+        return rumAccessToken;
     }
 
     /**
