@@ -49,7 +49,7 @@ public class WorkflowTimerTest {
 
     @Test
     public void delegation() {
-        Attributes evenAttributes = Attributes.of(stringKey("progress"), "halfway");
+        Attributes eventAttributes = Attributes.of(stringKey("progress"), "halfway");
 
         Scope scope = mock(Scope.class);
         Span span = mock(Span.class);
@@ -57,7 +57,7 @@ public class WorkflowTimerTest {
         WorkflowTimer workflowTimer = new WorkflowTimer(span, scope);
 
         workflowTimer.addEvent("cheese");
-        workflowTimer.addEvent("progress", evenAttributes);
+        workflowTimer.addEvent("progress", eventAttributes);
         workflowTimer.setAttribute("flavor", "lemon");
         workflowTimer.setAttribute("things", 5);
         workflowTimer.setAttribute("fraction", 1.2345);
@@ -66,7 +66,7 @@ public class WorkflowTimerTest {
         workflowTimer.end();
 
         verify(span).addEvent("cheese");
-        verify(span).addEvent("progress", evenAttributes);
+        verify(span).addEvent("progress", eventAttributes);
         verify(span).setAttribute("flavor", "lemon");
         verify(span).setAttribute("things", 5);
         verify(span).setAttribute("fraction", 1.2345);
