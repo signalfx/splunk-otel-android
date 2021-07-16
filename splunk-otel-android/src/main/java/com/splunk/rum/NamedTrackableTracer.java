@@ -71,12 +71,7 @@ class NamedTrackableTracer implements TrackableTracer {
         // the activity class name as the base of the span name.
         if (initialAppActivity.get() == null || trackableName.equals(initialAppActivity.get())) {
             Span span = startSpan(APP_START_SPAN_NAME);
-            if (initialAppActivity.get() == null) {
-                span.setAttribute(START_TYPE_KEY, "cold");
-            }
-            if (trackableName.equals(initialAppActivity.get())) {
-                span.setAttribute(START_TYPE_KEY, "warm");
-            }
+            span.setAttribute(START_TYPE_KEY, initialAppActivity.get() == null ? "cold" : "warm");
         } else {
             startSpan(trackableName + " Created");
         }
