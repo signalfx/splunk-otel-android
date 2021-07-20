@@ -16,16 +16,10 @@
 
 package com.splunk.rum;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-
-import java.io.IOException;
 
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.sdk.testing.junit4.OpenTelemetryRule;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -37,14 +31,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class RumResponseAttributesExtractorTest {
-    @Rule
-    public OpenTelemetryRule otelTesting = OpenTelemetryRule.create();
-    private Tracer tracer;
-
-    @Before
-    public void setup() {
-        tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
-    }
 
     @Test
     public void spanDecoration() {
@@ -74,7 +60,7 @@ public class RumResponseAttributesExtractorTest {
     }
 
     @Test
-    public void spanDecoration_noHeader() throws IOException {
+    public void spanDecoration_noLinkingHeader() {
         ServerTimingHeaderParser headerParser = mock(ServerTimingHeaderParser.class);
         when(headerParser.parse(null)).thenReturn(new String[0]);
 
@@ -95,6 +81,30 @@ public class RumResponseAttributesExtractorTest {
         assertEquals("http", attributes.get(SplunkRum.COMPONENT_KEY));
         assertNull(attributes.get(OkHttpRumInterceptor.LINK_TRACE_ID_KEY));
         assertNull(attributes.get(OkHttpRumInterceptor.LINK_SPAN_ID_KEY));
+    }
+
+    @Test
+    public void spanDecoration_contentLength() {
+        ServerTimingHeaderParser headerParser = mock(ServerTimingHeaderParser.class);
+        when(headerParser.parse(null)).thenReturn(new String[0]);
+
+        Request fakeRequest = mock(Request.class);
+        Response response = new Response.Builder()
+                .request(fakeRequest)
+                .protocol(Protocol.HTTP_1_1)
+                .message("hello")
+                .addHeader("Content-Length", "101")
+                .code(200)
+                .build();
+
+        RumResponseAttributesExtractor attributesExtractor = new RumResponseAttributesExtractor(headerParser);
+        AttributesBuilder attributesBuilder = Attributes.builder();
+        attributesExtractor.onEnd(attributesBuilder, fakeRequest, response);
+        attributesExtractor.onStart(attributesBuilder, fakeRequest);
+        Attributes attributes = attributesBuilder.build();
+
+        assertEquals("http", attributes.get(SplunkRum.COMPONENT_KEY));
+        assertEquals(101L, (long) attributes.get(HTTP_RESPONSE_CONTENT_LENGTH));
     }
 
 }
