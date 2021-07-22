@@ -54,11 +54,22 @@ public class SecondFragment extends Fragment {
     private FragmentSecondBinding binding;
     private Tracer sampleAppTracer;
 
+    private Span customChromeTabTimer;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         sampleAppTracer = SplunkRum.getInstance().getOpenTelemetry().getTracer("sampleAppTracer");
         binding = FragmentSecondBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (customChromeTabTimer != null) {
+            customChromeTabTimer.end();
+            customChromeTabTimer = null;
+        }
     }
 
     @Override
@@ -88,7 +99,11 @@ public class SecondFragment extends Fragment {
 
         binding.buttonToCustomTab.setOnClickListener(v -> {
             String url = "https://ssidhu.o11ystore.com/";
+            customChromeTabTimer = SplunkRum.getInstance().startWorkflow("Visit to Chrome Custom Tab");
             new CustomTabsIntent.Builder()
+                    .setColorScheme(CustomTabsIntent.COLOR_SCHEME_DARK)
+                    .setStartAnimations(getContext(), android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                    .setExitAnimations(getContext(), android.R.anim.slide_out_right, android.R.anim.slide_in_left)
                     .build()
                     .launchUrl(this.getContext(), Uri.parse(url));
         });
