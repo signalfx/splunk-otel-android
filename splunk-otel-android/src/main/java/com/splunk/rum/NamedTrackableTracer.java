@@ -132,7 +132,7 @@ class NamedTrackableTracer implements TrackableTracer {
     @Override
     public TrackableTracer addPreviousScreenAttribute() {
         String previouslyVisibleScreen = visibleScreenTracker.getPreviouslyVisibleScreen();
-        if (previouslyVisibleScreen != null && !previouslyVisibleScreen.equals(trackableName)) {
+        if (!trackableName.equals(previouslyVisibleScreen)) {
             span.setAttribute(SplunkRum.LAST_SCREEN_NAME_KEY, previouslyVisibleScreen);
         }
         return this;
