@@ -21,11 +21,13 @@ import android.os.Looper;
 import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTracing;
@@ -57,10 +59,12 @@ public class SplunkRum {
 
     private final SessionId sessionId;
     private final OpenTelemetrySdk openTelemetrySdk;
+    private final Config config;
 
-    SplunkRum(OpenTelemetrySdk openTelemetrySdk, SessionId sessionId) {
+    SplunkRum(OpenTelemetrySdk openTelemetrySdk, SessionId sessionId, Config config) {
         this.openTelemetrySdk = openTelemetrySdk;
         this.sessionId = sessionId;
+        this.config = config;
     }
 
     /**
@@ -257,6 +261,33 @@ public class SplunkRum {
             stringBuilder.append(stackTraceElement).append("\n");
         }
         return stringBuilder.toString();
+    }
+
+    /**
+     * Set an attribute in the global attributes that will be appended to every span and event.
+     * <p>
+     * Note: If this key is the same as an existing key in the global attributes, it will replace the
+     * existing value.
+     * <p>
+     * If you attempt to set a value to null or use a null key, this call will be ignored.
+     *
+     * @param key   The {@link AttributeKey} for the attribute.
+     * @param value The value of the attribute, which must match the generic type of the key.
+     * @param <T>   The generic type of the value.
+     * @return this.
+     */
+    public <T> SplunkRum setGlobalAttribute(AttributeKey<T> key, T value) {
+        updateGlobalAttributes(attributesBuilder -> attributesBuilder.put(key, value));
+        return this;
+    }
+
+    /**
+     * Update the global set of attributes that will be appended to every span and event.
+     *
+     * @param attributesUpdater A function which will update the current set of attributes, by operating on a {@link AttributesBuilder} from the current set.
+     */
+    public void updateGlobalAttributes(Consumer<AttributesBuilder> attributesUpdater) {
+        config.updateGlobalAttributes(attributesUpdater);
     }
 
     //for testing only
