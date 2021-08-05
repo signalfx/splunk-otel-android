@@ -44,16 +44,16 @@ public class SplunkRum {
     static final AttributeKey<String> COMPONENT_KEY = AttributeKey.stringKey("component");
     static final AttributeKey<String> SCREEN_NAME_KEY = AttributeKey.stringKey("screen.name");
     static final AttributeKey<String> LAST_SCREEN_NAME_KEY = AttributeKey.stringKey("last.screen.name");
+    static final AttributeKey<String> ERROR_TYPE_KEY = stringKey("error.type");
+    static final AttributeKey<String> ERROR_MESSAGE_KEY = stringKey("error.message");
+    static final AttributeKey<String> WORKFLOW_NAME_KEY = stringKey("workflow.name");
+
     static final String COMPONENT_APPSTART = "appstart";
     static final String COMPONENT_CRASH = "crash";
     static final String COMPONENT_ERROR = "error";
     static final String COMPONENT_UI = "ui";
-    static final AttributeKey<String> ERROR_TYPE_KEY = stringKey("error.type");
-    static final AttributeKey<String> ERROR_MESSAGE_KEY = stringKey("error.message");
-
     static final String LOG_TAG = "SplunkRum";
     static final String RUM_TRACER_NAME = "SplunkRum";
-    static final AttributeKey<String> WORKFLOW_NAME_KEY = stringKey("workflow.name");
 
     private static SplunkRum INSTANCE;
 
@@ -270,6 +270,9 @@ public class SplunkRum {
      * existing value.
      * <p>
      * If you attempt to set a value to null or use a null key, this call will be ignored.
+     * <p>
+     * Note: If multiple concurrent calls are made to this, the resulting set of attributes will
+     * only reflect one of the updates, and which one wins is non-deterministic.
      *
      * @param key   The {@link AttributeKey} for the attribute.
      * @param value The value of the attribute, which must match the generic type of the key.
@@ -283,6 +286,9 @@ public class SplunkRum {
 
     /**
      * Update the global set of attributes that will be appended to every span and event.
+     * <p>
+     * Note: If multiple concurrent calls are made to this, the resulting set of attributes will
+     * only reflect one of the updates, and which one wins is non-deterministic.
      *
      * @param attributesUpdater A function which will update the current set of attributes, by operating on a {@link AttributesBuilder} from the current set.
      */
