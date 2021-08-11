@@ -155,8 +155,8 @@ In order to build and run the sample application, you will need to configure a `
 in the root of the project. It will need to have two properties configured:
 
 ```properties
-rum.access.token=<a valid Splunk RUM access token>
-rum.beacon.url=https://rum-ingest.<realm>.signalfx.com/v1/rum
+rum.realm=<realm>
+rum.access.token=<a valid Splunk RUM access token for the realm>
 ```
 
 # License and versioning
