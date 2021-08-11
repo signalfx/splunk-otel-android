@@ -32,7 +32,23 @@
 
 > :construction: This project is currently in **BETA**.
 
-## Getting Started 
+## Features
+
+* Crash reporting
+* ANR detection
+* Network change detection
+* Full Android Activity and Fragment lifecycle monitoring
+* Access to the OpenTelemetry APIs for manual instrumentation
+* SplunkRum APIs for creating custom RUM events and reporting exceptions
+* Access to an OkHttp3 Interceptor implementation for monitoring http client requests
+
+## Getting Started
+
+### Prerequisites
+
+This library supports Android API levels 21 and above,
+with [core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring)
+enabled.
 
 ### Getting the library
 
@@ -93,19 +109,10 @@ Then, add the locally built library as a dependency in your application's build.
 ```
 dependencies {
 ...
-    implementation ("com.splunk:splunk-otel-android:0.3.0-SNAPSHOT")
+    implementation ("com.splunk:splunk-otel-android:0.4.0-SNAPSHOT")
 ...
 }
 ```
-
-### Features
-* Crash reporting
-* ANR detection
-* Network change detection
-* Full Android Activity and Fragment lifecycle monitoring
-* Access to the OpenTelemetry APIs for manual instrumentation
-* SplunkRum APIs for creating custom RUM events and reporting exceptions
-* Access to an OkHttp3 Interceptor implementation for monitoring http client requests
 
 ### Configuration
 
