@@ -210,6 +210,10 @@ at [javadoc.io](https://www.javadoc.io/doc/com.splunk/splunk-otel-android/latest
   that via one of two methods on the SplunkRum instance:  `setGlobalAttribute(AttributeKey)`
   or `updateGlobalAttributes(Consumer<AttributesBuilder> attributesUpdater)`. The former will add or
   update a single attribute, and the latter allows bulk updating of the attributes.
+- To add OpenTelemetry instrumentation to your OkHttp3 client, SplunkRum provides an `Interceptor` that
+  can be applied to your client. See the `createOkHttpRumInterceptor()`. Please note that the OpenTelemetry
+  APIs for OkHttp3 instrumentation are undergoing a re-work and this will method will probably change in an 
+  upcoming release.
 
 ## Sample Application
 
