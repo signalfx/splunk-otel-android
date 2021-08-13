@@ -129,13 +129,13 @@ In order to configure the Splunk RUM library, you will need to know three things
 Here is an example of a the very minimal configuration which uses these 3 values:
 
 ```java
-        String beaconUrl="<realm>";
-        String rumAccessToken="<your_RUM_access_token>";
-        Config config=SplunkRum.newConfigBuilder()
-        .realm(realm)
-        .rumAccessToken(rumAuth)
-        .applicationName("My Android App")
-        .build();
+  String beaconUrl="<realm>";
+  String rumAccessToken="<your_RUM_access_token>";
+  Config config=SplunkRum.newConfigBuilder()
+      .realm(realm)
+      .rumAccessToken(rumAuth)
+      .applicationName("My Android App")
+      .build();
 ```
 
 There are other options available on the `Config.Builder` instance, including enabling debug mode
