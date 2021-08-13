@@ -147,7 +147,7 @@ To initialize the Splunk RUM monitoring library, from your `android.app.Applicat
 simply call the static initializer in your `Application.onCreate()` implementation:
 
 ```java
-        SplunkRum.initialize(config,this);
+        SplunkRum.initialize(config, this);
 ```
 
 Examples of this process can be seen in the sample application included in this repository in
