@@ -80,7 +80,7 @@ dependencies {
 
 #### Build the library locally:
 
-First, clone this repository locally: 
+First, clone this repository locally:
 
 ```
 git clone https://github.com/signalfx/splunk-otel-android.git
@@ -117,22 +117,25 @@ dependencies {
 ### Configuration
 
 In order to configure the Splunk RUM library, you will need to know three things:
-* Your Splunk realm. 
+
+* Your Splunk realm.
   * The realm can be found in your Splunk Observability UI in the Account Settings page.
-* Your RUM access token.  
-  * You can find or create a RUM access token in the Splunk Observability UI, in your Organization Settings.
-  * Important: this access token *must* have the `RUM` authorization scope to work. 
+* Your RUM access token.
+  * You can find or create a RUM access token in the Splunk Observability UI, in your Organization
+    Settings.
+  * Important: this access token *must* have the `RUM` authorization scope to work.
 * The name of your application.
 
 Here is an example of a the very minimal configuration which uses these 3 values:
+
 ```java
-        String beaconUrl = "<realm>";
-        String rumAccessToken = "<your_RUM_access_token>";
-        Config config = SplunkRum.newConfigBuilder()
-                .realm(realm)
-                .rumAccessToken(rumAuth)
-                .applicationName("My Android App")
-                .build();
+        String beaconUrl="<realm>";
+        String rumAccessToken="<your_RUM_access_token>";
+        Config config=SplunkRum.newConfigBuilder()
+        .realm(realm)
+        .rumAccessToken(rumAuth)
+        .applicationName("My Android App")
+        .build();
 ```
 
 There are other options available on the `Config.Builder` instance, including enabling debug mode
@@ -188,12 +191,11 @@ at [javadoc.io](https://www.javadoc.io/doc/com.splunk/splunk-otel-android/latest
   generation. If you have need of writing your own manual instrumentation, the SplunkRum instance
   gives you direct access to the instance of OpenTelemetry that is being used via
   the `getOpenTelemetry()` method. For details on writing manual instrumentation, please refer to
-  the
-  [OpenTelemetry docs](https://opentelemetry.io/docs/java/manual_instrumentation/)
+  the [OpenTelemetry docs](https://opentelemetry.io/docs/java/manual_instrumentation/)
   and [examples](https://github.com/open-telemetry/opentelemetry-java/tree/main/examples).
 - The SplunkRum instance exposes the RUM session ID, in case you wish to provide this to your users
-  for troubleshooting purposes. This session ID is generated randomly at each application startup,
-  and contains no PII whatsoever.
+  for troubleshooting purposes. This session ID is generated randomly and contains no PII
+  whatsoever.
 - If you wish to record some simple Events or Workflows, the SplunkRum instances provides APIs for
   that:
   - `addRumEvent(String, Attributes)` : record a simple "zero duration" span with the provided name
@@ -203,6 +205,10 @@ at [javadoc.io](https://www.javadoc.io/doc/com.splunk/splunk-otel-android/latest
 - To record a custom Error or Exception, SplunkRum exposes an `addRumException(Throwable)` method,
   and one that also accepts a set of `Attributes`. These exceptions will appear as errors in the RUM
   UI, and error metrics will be recorded for them.
+- If you need to update the set of "global attributes" that were initially configured, you can do
+  that via one of two methods on the SplunkRum instance:  `setGlobalAttribute(AttributeKey)`
+  or `updateGlobalAttributes(Consumer<AttributesBuilder> attributesUpdater)`. The former will add or
+  update a single attribute, and the latter allows bulk updating of the attributes.
 
 ## Sample Application
 
@@ -219,5 +225,6 @@ rum.access.token=<a valid Splunk RUM access token for the realm>
 
 # License and versioning
 
-The Splunk Android RUM Instrumentation is released under the terms of the Apache Software License version 2.0. See
+The Splunk Android RUM Instrumentation is released under the terms of the Apache Software License
+version 2.0. See
 [the license file](./LICENSE) for more details.
