@@ -119,23 +119,25 @@ dependencies {
 In order to configure the Splunk RUM library, you will need to know three things:
 
 * Your Splunk realm.
-  * The realm can be found in your Splunk Observability UI in the Account Settings page.
+    * The realm can be found in your Splunk Observability UI in the Account Settings page.
 * Your RUM access token.
-  * You can find or create a RUM access token in the Splunk Observability UI, in your Organization
-    Settings.
-  * Important: this access token *must* have the `RUM` authorization scope to work.
+    * You can find or create a RUM access token in the Splunk Observability UI, in your Organization
+      Settings.
+    * Important: this access token *must* have the `RUM` authorization scope to work.
 * The name of your application.
 
 Here is an example of a the very minimal configuration which uses these 3 values:
 
 ```java
-  String beaconUrl="<realm>";
-  String rumAccessToken="<your_RUM_access_token>";
-  Config config=SplunkRum.newConfigBuilder()
-      .realm(realm)
-      .rumAccessToken(rumAuth)
-      .applicationName("My Android App")
-      .build();
+class MyApplication extends Application {
+    private final String beaconUrl = "<realm>";
+    private final String rumAccessToken = "<your_RUM_access_token>";
+    private final Config config = SplunkRum.newConfigBuilder()
+            .realm(realm)
+            .rumAccessToken(rumAuth)
+            .applicationName("My Android App")
+            .build();
+}
 ```
 
 There are other options available on the `Config.Builder` instance, including enabling debug mode
@@ -147,7 +149,15 @@ To initialize the Splunk RUM monitoring library, from your `android.app.Applicat
 simply call the static initializer in your `Application.onCreate()` implementation:
 
 ```java
+class MyApplication extends Application {
+    //...
+  
+    @Override
+    public void onCreate() {
+        super.onCreate();
         SplunkRum.initialize(config, this);
+    }
+}
 ```
 
 Examples of this process can be seen in the sample application included in this repository in
@@ -198,11 +208,11 @@ at [javadoc.io](https://www.javadoc.io/doc/com.splunk/splunk-otel-android/latest
   whatsoever.
 - If you wish to record some simple Events or Workflows, the SplunkRum instances provides APIs for
   that:
-  - `addRumEvent(String, Attributes)` : record a simple "zero duration" span with the provided name
-    and attributes.
-  - `startWorkflow(String) : Span` : This method allows you to start a Splunk RUM "workflow" for
-    which metrics will be recorded by the RUM backend. The returned OpenTelemetry `Span` instance *must* be ended
-    for this workflow to be recorded.
+    - `addRumEvent(String, Attributes)` : record a simple "zero duration" span with the provided
+      name and attributes.
+    - `startWorkflow(String) : Span` : This method allows you to start a Splunk RUM "workflow" for
+      which metrics will be recorded by the RUM backend. The returned OpenTelemetry `Span`
+      instance *must* be ended for this workflow to be recorded.
 - To record a custom Error or Exception, SplunkRum exposes an `addRumException(Throwable)` method,
   and one that also accepts a set of `Attributes`. These exceptions will appear as errors in the RUM
   UI, and error metrics will be recorded for them.
@@ -210,10 +220,10 @@ at [javadoc.io](https://www.javadoc.io/doc/com.splunk/splunk-otel-android/latest
   that via one of two methods on the SplunkRum instance:  `setGlobalAttribute(AttributeKey)`
   or `updateGlobalAttributes(Consumer<AttributesBuilder> attributesUpdater)`. The former will add or
   update a single attribute, and the latter allows bulk updating of the attributes.
-- To add OpenTelemetry instrumentation to your OkHttp3 client, SplunkRum provides an `Interceptor` that
-  can be applied to your client. See the `createOkHttpRumInterceptor()`. Please note that the OpenTelemetry
-  APIs for OkHttp3 instrumentation are undergoing a re-work and this will method will probably change in an 
-  upcoming release.
+- To add OpenTelemetry instrumentation to your OkHttp3 client, SplunkRum provides an `Interceptor`
+  that can be applied to your client. See the `createOkHttpRumInterceptor()`. Please note that the
+  OpenTelemetry APIs for OkHttp3 instrumentation are undergoing a re-work and this will method will
+  probably change in an upcoming release.
 
 ## Sample Application
 
