@@ -63,6 +63,7 @@ public class NamedTrackableTracerTest {
         SpanData span = getSingleSpan();
         assertEquals("AppStart", span.getName());
         assertEquals("hot", span.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        assertEquals(SplunkRum.COMPONENT_APPSTART, span.getAttributes().get(SplunkRum.COMPONENT_KEY));
     }
 
     @Test
@@ -93,6 +94,7 @@ public class NamedTrackableTracerTest {
         SpanData span = getSingleSpan();
         assertEquals("AppStart", span.getName());
         assertEquals("warm", span.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        assertEquals(SplunkRum.COMPONENT_APPSTART, span.getAttributes().get(SplunkRum.COMPONENT_KEY));
     }
 
     @Test

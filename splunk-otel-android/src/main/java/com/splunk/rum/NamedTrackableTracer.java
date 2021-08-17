@@ -79,6 +79,8 @@ class NamedTrackableTracer implements TrackableTracer {
         } else if (trackableName.equals(initialAppActivity.get())) {
             Span span = startSpan(APP_START_SPAN_NAME);
             span.setAttribute(SplunkRum.START_TYPE_KEY, "warm");
+            //override the component to be appstart
+            span.setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_APPSTART);
         } else {
             startSpan("Created");
         }
@@ -96,6 +98,8 @@ class NamedTrackableTracer implements TrackableTracer {
         if (!multiActivityApp && trackableName.equals(initialAppActivity.get())) {
             Span span = startSpan(APP_START_SPAN_NAME);
             span.setAttribute(SplunkRum.START_TYPE_KEY, "hot");
+            //override the component to be appstart
+            span.setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_APPSTART);
         } else {
             startSpan("Restarted");
         }
