@@ -33,6 +33,7 @@ import java.util.logging.Level;
 
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
@@ -48,10 +49,12 @@ class RumInitializer {
 
     private final Config config;
     private final Application application;
+    private final AppStartupTimer startupTimer;
 
-    RumInitializer(Config config, Application application) {
+    RumInitializer(Config config, Application application, AppStartupTimer startupTimer) {
         this.config = config;
         this.application = application;
+        this.startupTimer = startupTimer;
     }
 
     SplunkRum initialize(Supplier<ConnectionUtil> connectionUtilSupplier, Looper mainLooper) {
@@ -102,7 +105,7 @@ class RumInitializer {
             initializationEvents.add(new RumInitializer.InitializationEvent("anrMonitorInitialized", timingClock.now()));
         }
 
-        recordInitializationSpan(startTimeNanos, initializationEvents, tracer, config);
+        recordInitializationSpans(startTimeNanos, initializationEvents, tracer, config);
 
         return new SplunkRum(openTelemetrySdk, sessionId, config);
     }
@@ -125,11 +128,15 @@ class RumInitializer {
         return "unknown";
     }
 
-    private static void recordInitializationSpan(long startTimeNanos, List<InitializationEvent> initializationEvents, Tracer tracer, Config config) {
+    private void recordInitializationSpans(long startTimeNanos, List<InitializationEvent> initializationEvents, Tracer tracer, Config config) {
+        Span overallAppStart = startupTimer.start(tracer);
+        System.out.println("overallAppStart = " + overallAppStart);
         Span span = tracer.spanBuilder("SplunkRum.initialize")
+                .setParent(Context.current().with(overallAppStart))
                 .setStartTimestamp(startTimeNanos, TimeUnit.NANOSECONDS)
                 .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_APPSTART)
                 .startSpan();
+        System.out.println("span = " + span);
 
         String configSettings = "[debug:" + config.isDebugEnabled() + "," +
                 "crashReporting:" + config.isCrashReportingEnabled() + "," +

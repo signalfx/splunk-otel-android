@@ -52,7 +52,7 @@ public class NamedTrackableTracerTest {
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("Restarted", span.getName());
-        assertNull(span.getAttributes().get(NamedTrackableTracer.START_TYPE_KEY));
+        assertNull(span.getAttributes().get(SplunkRum.START_TYPE_KEY));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class NamedTrackableTracerTest {
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("AppStart", span.getName());
-        assertEquals("hot", span.getAttributes().get(NamedTrackableTracer.START_TYPE_KEY));
+        assertEquals("hot", span.getAttributes().get(SplunkRum.START_TYPE_KEY));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class NamedTrackableTracerTest {
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("Restarted", span.getName());
-        assertNull(span.getAttributes().get(NamedTrackableTracer.START_TYPE_KEY));
+        assertNull(span.getAttributes().get(SplunkRum.START_TYPE_KEY));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class NamedTrackableTracerTest {
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("Created", span.getName());
-        assertNull(span.getAttributes().get(NamedTrackableTracer.START_TYPE_KEY));
+        assertNull(span.getAttributes().get(SplunkRum.START_TYPE_KEY));
     }
 
     @Test
@@ -92,17 +92,26 @@ public class NamedTrackableTracerTest {
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("AppStart", span.getName());
-        assertEquals("warm", span.getAttributes().get(NamedTrackableTracer.START_TYPE_KEY));
+        assertEquals("warm", span.getAttributes().get(SplunkRum.START_TYPE_KEY));
     }
 
     @Test
     public void create_initialActivity_firstTime() {
+        SplunkRum.getStartupTimer().start(tracer);
         NamedTrackableTracer trackableTracer = new NamedTrackableTracer(mock(Activity.class), new AtomicReference<>(), tracer, visibleScreenTracker);
         trackableTracer.startTrackableCreation();
         trackableTracer.endActiveSpan();
-        SpanData span = getSingleSpan();
-        assertEquals("AppStart", span.getName());
-        assertEquals("cold", span.getAttributes().get(NamedTrackableTracer.START_TYPE_KEY));
+        SplunkRum.getStartupTimer().end();
+
+        List<SpanData> spans = otelTesting.getSpans();
+        assertEquals(2, spans.size());
+
+        SpanData appStartSpan = spans.get(0);
+        assertEquals("AppStart", appStartSpan.getName());
+        assertEquals("cold", appStartSpan.getAttributes().get(SplunkRum.START_TYPE_KEY));
+
+        SpanData innerSpan = spans.get(1);
+        assertEquals("Created", innerSpan.getName());
     }
 
     @Test
