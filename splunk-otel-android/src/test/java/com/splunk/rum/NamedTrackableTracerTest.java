@@ -43,6 +43,7 @@ public class NamedTrackableTracerTest {
     @Before
     public void setup() {
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
+        SplunkRum.getStartupTimer().end();
     }
 
     @Test

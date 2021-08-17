@@ -135,7 +135,10 @@ class NamedTrackableTracer implements TrackableTracer {
 
     @Override
     public void endActiveSpan() {
-        SplunkRum.getStartupTimer().end();
+        Span startupSpan = SplunkRum.getStartupTimer().getStartupSpan();
+        if (startupSpan != null) {
+            startupSpan.end();
+        }
         if (scope != null) {
             scope.close();
             scope = null;

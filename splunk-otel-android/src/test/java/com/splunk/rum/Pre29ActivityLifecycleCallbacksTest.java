@@ -46,6 +46,7 @@ public class Pre29ActivityLifecycleCallbacksTest {
     public void setup() {
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
         visibleScreenTracker = mock(VisibleScreenTracker.class);
+        SplunkRum.getStartupTimer().end();
     }
 
     @Test

@@ -46,6 +46,7 @@ public class RumLifecycleCallbacksTest {
     public void setup() {
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
         visibleScreenTracker = mock(VisibleScreenTracker.class);
+        SplunkRum.getStartupTimer().end();
     }
 
     @Test
