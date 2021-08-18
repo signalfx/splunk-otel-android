@@ -17,39 +17,36 @@
 package com.splunk.rum;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 
 class AppStartupTimer {
-    private final AtomicLong firstPossibleTimestamp = new AtomicLong(System.currentTimeMillis());
-    private final AtomicReference<Span> overallAppStartSpan = new AtomicReference<>();
+    private final long firstPossibleTimestamp = System.currentTimeMillis();
+    private volatile Span overallAppStartSpan = null;
 
     Span start(Tracer tracer) {
         //guard against a double-start and just return what's already in flight.
-        if (overallAppStartSpan.get() != null) {
-            return overallAppStartSpan.get();
+        if (overallAppStartSpan != null) {
+            return overallAppStartSpan;
         }
         final Span appStart = tracer.spanBuilder("AppStart")
-                .setStartTimestamp(firstPossibleTimestamp.get(), TimeUnit.MILLISECONDS)
+                .setStartTimestamp(firstPossibleTimestamp, TimeUnit.MILLISECONDS)
                 .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_APPSTART)
                 .setAttribute(SplunkRum.START_TYPE_KEY, "cold")
                 .startSpan();
-        overallAppStartSpan.set(appStart);
+        overallAppStartSpan = appStart;
         return appStart;
     }
 
     void end() {
-        Span span = overallAppStartSpan.get();
-        if (span != null) {
-            span.end();
-            overallAppStartSpan.set(null);
+        if (overallAppStartSpan != null) {
+            overallAppStartSpan.end();
+            overallAppStartSpan = null;
         }
     }
 
     Span getStartupSpan() {
-        return overallAppStartSpan.get();
+        return overallAppStartSpan;
     }
 }

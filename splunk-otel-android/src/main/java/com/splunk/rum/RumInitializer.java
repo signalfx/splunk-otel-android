@@ -130,13 +130,11 @@ class RumInitializer {
 
     private void recordInitializationSpans(long startTimeNanos, List<InitializationEvent> initializationEvents, Tracer tracer, Config config) {
         Span overallAppStart = startupTimer.start(tracer);
-        System.out.println("overallAppStart = " + overallAppStart);
         Span span = tracer.spanBuilder("SplunkRum.initialize")
                 .setParent(Context.current().with(overallAppStart))
                 .setStartTimestamp(startTimeNanos, TimeUnit.NANOSECONDS)
                 .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_APPSTART)
                 .startSpan();
-        System.out.println("span = " + span);
 
         String configSettings = "[debug:" + config.isDebugEnabled() + "," +
                 "crashReporting:" + config.isCrashReportingEnabled() + "," +
