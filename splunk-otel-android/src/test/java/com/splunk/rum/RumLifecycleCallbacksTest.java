@@ -41,23 +41,23 @@ public class RumLifecycleCallbacksTest {
     public OpenTelemetryRule otelTesting = OpenTelemetryRule.create();
     private Tracer tracer;
     private VisibleScreenTracker visibleScreenTracker;
+    private final AppStartupTimer startupTimer = new AppStartupTimer();
 
     @Before
     public void setup() {
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
         visibleScreenTracker = mock(VisibleScreenTracker.class);
-        SplunkRum.getStartupTimer().end();
     }
 
     @Test
     public void appStartup() {
-        SplunkRum.getStartupTimer().start(tracer);
-        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker);
+        startupTimer.start(tracer);
+        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker, startupTimer);
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         Activity activity = mock(Activity.class);
         testHarness.runAppStartupLifecycle(activity);
-        SplunkRum.getStartupTimer().end();
+        startupTimer.end();
 
         List<SpanData> spans = otelTesting.getSpans();
         assertEquals(2, spans.size());
@@ -92,7 +92,7 @@ public class RumLifecycleCallbacksTest {
 
     @Test
     public void activityCreation() {
-        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker);
+        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker, startupTimer);
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(rumLifecycleCallbacks);
         startupAppAndClearSpans(testHarness);
 
@@ -134,7 +134,7 @@ public class RumLifecycleCallbacksTest {
 
     @Test
     public void activityRestart() {
-        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker);
+        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker, startupTimer);
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -169,7 +169,7 @@ public class RumLifecycleCallbacksTest {
     @Test
     public void activityResumed() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("previousScreen");
-        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker);
+        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker, startupTimer);
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -198,7 +198,7 @@ public class RumLifecycleCallbacksTest {
 
     @Test
     public void activityDestroyedFromStopped() {
-        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker);
+        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker, startupTimer);
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -227,7 +227,7 @@ public class RumLifecycleCallbacksTest {
 
     @Test
     public void activityDestroyedFromPaused() {
-        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker);
+        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker, startupTimer);
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -271,7 +271,7 @@ public class RumLifecycleCallbacksTest {
 
     @Test
     public void activityStoppedFromRunning() {
-        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker);
+        RumLifecycleCallbacks rumLifecycleCallbacks = new RumLifecycleCallbacks(tracer, visibleScreenTracker, startupTimer);
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);

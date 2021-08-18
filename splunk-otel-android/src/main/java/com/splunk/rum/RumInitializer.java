@@ -84,9 +84,9 @@ class RumInitializer {
 
         Tracer tracer = openTelemetrySdk.getTracer(SplunkRum.RUM_TRACER_NAME);
         if (Build.VERSION.SDK_INT < 29) {
-            application.registerActivityLifecycleCallbacks(new Pre29ActivityCallbacks(tracer, visibleScreenTracker));
+            application.registerActivityLifecycleCallbacks(new Pre29ActivityCallbacks(tracer, visibleScreenTracker, startupTimer));
         } else {
-            application.registerActivityLifecycleCallbacks(new RumLifecycleCallbacks(tracer, visibleScreenTracker));
+            application.registerActivityLifecycleCallbacks(new RumLifecycleCallbacks(tracer, visibleScreenTracker, startupTimer));
         }
         initializationEvents.add(new RumInitializer.InitializationEvent("activityLifecycleCallbacksInitialized", timingClock.now()));
 

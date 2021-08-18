@@ -16,6 +16,8 @@
 
 package com.splunk.rum;
 
+import androidx.annotation.Nullable;
+
 import java.util.concurrent.TimeUnit;
 
 import io.opentelemetry.api.trace.Span;
@@ -46,6 +48,7 @@ class AppStartupTimer {
         }
     }
 
+    @Nullable
     Span getStartupSpan() {
         return overallAppStartSpan;
     }

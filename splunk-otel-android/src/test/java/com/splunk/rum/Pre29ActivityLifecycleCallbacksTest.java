@@ -41,23 +41,23 @@ public class Pre29ActivityLifecycleCallbacksTest {
     public OpenTelemetryRule otelTesting = OpenTelemetryRule.create();
     private Tracer tracer;
     private VisibleScreenTracker visibleScreenTracker;
+    private final AppStartupTimer appStartupTimer = new AppStartupTimer();
 
     @Before
     public void setup() {
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
         visibleScreenTracker = mock(VisibleScreenTracker.class);
-        SplunkRum.getStartupTimer().end();
     }
 
     @Test
     public void appStartup() {
-        SplunkRum.getStartupTimer().start(tracer);
-        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker);
+        appStartupTimer.start(tracer);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker, appStartupTimer);
         Pre29ActivityCallbackTestHarness testHarness = new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         Activity activity = mock(Activity.class);
         testHarness.runAppStartupLifecycle(activity);
-        SplunkRum.getStartupTimer().end();
+        appStartupTimer.end();
 
         List<SpanData> spans = otelTesting.getSpans();
         assertEquals(2, spans.size());
@@ -84,7 +84,7 @@ public class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     public void activityCreation() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker, appStartupTimer);
         Pre29ActivityCallbackTestHarness testHarness = new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
         startupAppAndClearSpans(testHarness);
 
@@ -118,7 +118,7 @@ public class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     public void activityRestart() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker, appStartupTimer);
         Pre29ActivityCallbackTestHarness testHarness = new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -149,7 +149,7 @@ public class Pre29ActivityLifecycleCallbacksTest {
     public void activityResumed() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("previousScreen");
 
-        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker, appStartupTimer);
         Pre29ActivityCallbackTestHarness testHarness = new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -176,7 +176,7 @@ public class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     public void activityDestroyedFromStopped() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker, appStartupTimer);
         Pre29ActivityCallbackTestHarness testHarness = new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -203,7 +203,7 @@ public class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     public void activityDestroyedFromPaused() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker, appStartupTimer);
         Pre29ActivityCallbackTestHarness testHarness = new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -243,7 +243,7 @@ public class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     public void activityStoppedFromRunning() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracer, visibleScreenTracker, appStartupTimer);
         Pre29ActivityCallbackTestHarness testHarness = new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
         startupAppAndClearSpans(testHarness);

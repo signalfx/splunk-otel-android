@@ -41,6 +41,7 @@ import okhttp3.Interceptor;
  * Entrypoint for Splunk's Android RUM (Real User Monitoring) support.
  */
 public class SplunkRum {
+    //initialize this here, statically, to make sure we capture the earliest possible timestamp for startup.
     private static final AppStartupTimer startupTimer = new AppStartupTimer();
 
     static final AttributeKey<String> COMPONENT_KEY = AttributeKey.stringKey("component");
@@ -116,10 +117,6 @@ public class SplunkRum {
             return NoOpSplunkRum.INSTANCE;
         }
         return INSTANCE;
-    }
-
-    static AppStartupTimer getStartupTimer() {
-        return startupTimer;
     }
 
     /**

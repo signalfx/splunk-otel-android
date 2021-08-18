@@ -39,16 +39,18 @@ class NamedTrackableTracer implements TrackableTracer {
     private final String trackableName;
     private final VisibleScreenTracker visibleScreenTracker;
     private final AttributeKey<String> nameKey;
+    private final AppStartupTimer appStartupTimer;
 
     private Span span;
     private Scope scope;
 
-    NamedTrackableTracer(Activity activity, AtomicReference<String> initialAppActivity, Tracer tracer, VisibleScreenTracker visibleScreenTracker) {
+    NamedTrackableTracer(Activity activity, AtomicReference<String> initialAppActivity, Tracer tracer, VisibleScreenTracker visibleScreenTracker, AppStartupTimer appStartupTimer) {
         this.initialAppActivity = initialAppActivity;
         this.tracer = tracer;
         this.trackableName = activity.getClass().getSimpleName();
         this.visibleScreenTracker = visibleScreenTracker;
         this.nameKey = ACTIVITY_NAME_KEY;
+        this.appStartupTimer = appStartupTimer;
     }
 
     NamedTrackableTracer(Fragment fragment, Tracer tracer, VisibleScreenTracker visibleScreenTracker) {
@@ -57,6 +59,7 @@ class NamedTrackableTracer implements TrackableTracer {
         this.trackableName = fragment.getClass().getSimpleName();
         this.visibleScreenTracker = visibleScreenTracker;
         this.nameKey = FRAGMENT_NAME_KEY;
+        this.appStartupTimer = null;
     }
 
     @Override
@@ -74,8 +77,8 @@ class NamedTrackableTracer implements TrackableTracer {
         // we name this span specially to show that it's the application starting up. Otherwise, use
         // the activity class name as the base of the span name.
         final boolean isColdStart = initialAppActivity.get() == null;
-        if (isColdStart) {
-            startSpan("Created", SplunkRum.getStartupTimer().getStartupSpan());
+        if (isColdStart && appStartupTimer != null) {
+            startSpan("Created", appStartupTimer.getStartupSpan());
         } else if (trackableName.equals(initialAppActivity.get())) {
             Span span = startSpan(APP_START_SPAN_NAME);
             span.setAttribute(SplunkRum.START_TYPE_KEY, "warm");
@@ -135,9 +138,8 @@ class NamedTrackableTracer implements TrackableTracer {
 
     @Override
     public void endActiveSpan() {
-        Span startupSpan = SplunkRum.getStartupTimer().getStartupSpan();
-        if (startupSpan != null) {
-            startupSpan.end();
+        if (appStartupTimer != null) {
+            appStartupTimer.end();
         }
         if (scope != null) {
             scope.close();
