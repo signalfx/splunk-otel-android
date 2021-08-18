@@ -33,7 +33,7 @@ import io.opentelemetry.api.trace.Tracer;
 
 class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
-    private final Map<String, TrackableTracer> tracersByActivityClassName = new HashMap<>();
+    private final Map<String, ActivityTracer> tracersByActivityClassName = new HashMap<>();
     private final AtomicReference<String> initialAppActivity = new AtomicReference<>();
     private final Tracer tracer;
     private final VisibleScreenTracker visibleScreenTracker;
@@ -48,7 +48,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityPreCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         getOrCreateTracer(activity)
-                .startTrackableCreation()
+                .startActivityCreation()
                 .addEvent("activityPreCreated");
 
         if (activity instanceof FragmentActivity) {
@@ -98,10 +98,10 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPostResumed(@NonNull Activity activity) {
-        getActivityTracer(activity)
+        getOrCreateTracer(activity)
                 .addEvent("activityPostResumed")
                 .addPreviousScreenAttribute()
-                .endSpanForTrackableResumed();
+                .endSpanForActivityResumed();
         visibleScreenTracker.activityResumed(activity);
     }
 
@@ -120,7 +120,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPostPaused(@NonNull Activity activity) {
-        getActivityTracer(activity).addEvent("activityPostPaused").endActiveSpan();
+        getOrCreateTracer(activity).addEvent("activityPostPaused").endActiveSpan();
     }
 
     @Override
@@ -137,7 +137,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPostStopped(@NonNull Activity activity) {
-        getActivityTracer(activity).addEvent("activityPostStopped").endActiveSpan();
+        getOrCreateTracer(activity).addEvent("activityPostStopped").endActiveSpan();
     }
 
     @Override
@@ -169,26 +169,18 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPostDestroyed(@NonNull Activity activity) {
-        getActivityTracer(activity).addEvent("activityPostDestroyed").endActiveSpan();
+        getOrCreateTracer(activity).addEvent("activityPostDestroyed").endActiveSpan();
     }
 
     private void addEvent(@NonNull Activity activity, String eventName) {
-        getActivityTracer(activity).addEvent(eventName);
+        getOrCreateTracer(activity).addEvent(eventName);
     }
 
-    private TrackableTracer getOrCreateTracer(Activity activity) {
-        TrackableTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
+    private ActivityTracer getOrCreateTracer(Activity activity) {
+        ActivityTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
         if (activityTracer == null) {
             activityTracer = new ActivityTracer(activity, initialAppActivity, tracer, visibleScreenTracker, startupTimer);
             tracersByActivityClassName.put(activity.getClass().getName(), activityTracer);
-        }
-        return activityTracer;
-    }
-
-    private TrackableTracer getActivityTracer(@NonNull Activity activity) {
-        TrackableTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
-        if (activityTracer == null) {
-            return TrackableTracer.NO_OP_TRACER;
         }
         return activityTracer;
     }

@@ -45,18 +45,9 @@ public class FragmentTracerTest {
     }
 
     @Test
-    public void restart() {
-        FragmentTracer trackableTracer = new FragmentTracer(mock(Fragment.class), tracer, visibleScreenTracker);
-        trackableTracer.initiateRestartSpanIfNecessary(false);
-        trackableTracer.endActiveSpan();
-        SpanData span = getSingleSpan();
-        assertEquals("Restarted", span.getName());
-    }
-
-    @Test
     public void create() {
         FragmentTracer trackableTracer = new FragmentTracer(mock(Fragment.class), tracer, visibleScreenTracker);
-        trackableTracer.startTrackableCreation();
+        trackableTracer.startFragmentCreation();
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("Created", span.getName());
@@ -95,11 +86,11 @@ public class FragmentTracerTest {
     public void addPreviousScreen() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("previousScreen");
 
-        FragmentTracer trackableTracer = new FragmentTracer(mock(Fragment.class), tracer, visibleScreenTracker);
+        FragmentTracer fragmentTracer = new FragmentTracer(mock(Fragment.class), tracer, visibleScreenTracker);
 
-        trackableTracer.startSpanIfNoneInProgress("starting");
-        trackableTracer.addPreviousScreenAttribute();
-        trackableTracer.endActiveSpan();
+        fragmentTracer.startSpanIfNoneInProgress("starting");
+        fragmentTracer.addPreviousScreenAttribute();
+        fragmentTracer.endActiveSpan();
 
         SpanData span = getSingleSpan();
         assertEquals("previousScreen", span.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));

@@ -16,8 +16,6 @@
 
 package com.splunk.rum;
 
-import static com.splunk.rum.TrackableTracer.NO_OP_TRACER;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
@@ -33,7 +31,7 @@ import java.util.Map;
 import io.opentelemetry.api.trace.Tracer;
 
 class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCallbacks {
-    private final Map<String, TrackableTracer> tracersByFragmentClassName = new HashMap<>();
+    private final Map<String, FragmentTracer> tracersByFragmentClassName = new HashMap<>();
 
     private final Tracer tracer;
     private final VisibleScreenTracker visibleScreenTracker;
@@ -47,7 +45,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     public void onFragmentPreAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
         super.onFragmentPreAttached(fm, f, context);
         getOrCreateTracer(f)
-                .startTrackableCreation()
+                .startFragmentCreation()
                 .addEvent("fragmentPreAttached");
     }
 
@@ -104,7 +102,9 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     @Override
     public void onFragmentStopped(@NonNull FragmentManager fm, @NonNull Fragment f) {
         super.onFragmentStopped(fm, f);
-        getFragmentTracer(f).addEvent("fragmentStopped").endActiveSpan();
+        getOrCreateTracer(f)
+                .addEvent("fragmentStopped")
+                .endActiveSpan();
     }
 
     @Override
@@ -141,24 +141,18 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     }
 
     private void addEvent(@NonNull Fragment fragment, String eventName) {
-        getFragmentTracer(fragment).addEvent(eventName);
+        FragmentTracer fragmentTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
+        if (fragmentTracer != null) {
+            fragmentTracer.addEvent(eventName);
+        }
     }
 
-    private TrackableTracer getOrCreateTracer(Fragment fragment) {
-        TrackableTracer activityTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
+    private FragmentTracer getOrCreateTracer(Fragment fragment) {
+        FragmentTracer activityTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
         if (activityTracer == null) {
             activityTracer = new FragmentTracer(fragment, tracer, visibleScreenTracker);
             tracersByFragmentClassName.put(fragment.getClass().getName(), activityTracer);
         }
         return activityTracer;
     }
-
-    private TrackableTracer getFragmentTracer(@NonNull Fragment fragment) {
-        TrackableTracer activityTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
-        if (activityTracer == null) {
-            return NO_OP_TRACER;
-        }
-        return activityTracer;
-    }
-
 }

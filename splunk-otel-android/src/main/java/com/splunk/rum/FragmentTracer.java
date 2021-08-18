@@ -21,84 +21,53 @@ import androidx.fragment.app.Fragment;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Scope;
 
-class FragmentTracer implements TrackableTracer {
+class FragmentTracer {
     static final AttributeKey<String> FRAGMENT_NAME_KEY = AttributeKey.stringKey("fragmentName");
 
-    private final Tracer tracer;
     private final String fragmentName;
-    private final VisibleScreenTracker visibleScreenTracker;
-
-    private Span span;
-    private Scope scope;
+    private final Tracer tracer;
+    private final SpanAndScope spanAndScope;
 
     FragmentTracer(Fragment fragment, Tracer tracer, VisibleScreenTracker visibleScreenTracker) {
         this.tracer = tracer;
         this.fragmentName = fragment.getClass().getSimpleName();
-        this.visibleScreenTracker = visibleScreenTracker;
+        this.spanAndScope = new SpanAndScope(visibleScreenTracker);
     }
 
-    @Override
-    public TrackableTracer startSpanIfNoneInProgress(String action) {
-        if (span != null) {
+    FragmentTracer startSpanIfNoneInProgress(String action) {
+        if (spanAndScope.spanInProgress()) {
             return this;
         }
-        startSpan(action);
+        spanAndScope.startSpan(() -> startSpan(action));
         return this;
     }
 
-    @Override
-    public TrackableTracer startTrackableCreation() {
-        startSpan("Created");
-        return this;
-    }
-
-    @Override
-    public TrackableTracer initiateRestartSpanIfNecessary(boolean multiActivityApp) {
-        if (span != null) {
-            return this;
-        }
-        startSpan("Restarted");
+    FragmentTracer startFragmentCreation() {
+        spanAndScope.startSpan(() -> startSpan("Created"));
         return this;
     }
 
     private Span startSpan(String spanName) {
-        span = tracer.spanBuilder(spanName)
+        Span span = tracer.spanBuilder(spanName)
                 .setAttribute(FRAGMENT_NAME_KEY, fragmentName)
                 .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_UI).startSpan();
         //do this after the span is started, so we can override the default screen.name set by the RumAttributeAppender.
         span.setAttribute(SplunkRum.SCREEN_NAME_KEY, fragmentName);
-        scope = span.makeCurrent();
         return span;
     }
 
-    @Override
-    public void endActiveSpan() {
-        if (scope != null) {
-            scope.close();
-            scope = null;
-        }
-        if (this.span != null) {
-            this.span.end();
-            this.span = null;
-        }
+    void endActiveSpan() {
+        spanAndScope.endActiveSpan();
     }
 
-    @Override
-    public TrackableTracer addPreviousScreenAttribute() {
-        String previouslyVisibleScreen = visibleScreenTracker.getPreviouslyVisibleScreen();
-        if (!fragmentName.equals(previouslyVisibleScreen)) {
-            span.setAttribute(SplunkRum.LAST_SCREEN_NAME_KEY, previouslyVisibleScreen);
-        }
+    FragmentTracer addPreviousScreenAttribute() {
+        spanAndScope.addPreviousScreenAttribute(fragmentName);
         return this;
     }
 
-    @Override
-    public TrackableTracer addEvent(String eventName) {
-        if (span != null) {
-            span.addEvent(eventName);
-        }
+    FragmentTracer addEvent(String eventName) {
+        spanAndScope.addEvent(eventName);
         return this;
     }
 }

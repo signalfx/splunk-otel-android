@@ -80,7 +80,7 @@ public class ActivityTracerTest {
     @Test
     public void create_nonInitialActivity() {
         ActivityTracer trackableTracer = new ActivityTracer(mock(Activity.class), new AtomicReference<>("FirstActivity"), tracer, visibleScreenTracker, appStartupTimer);
-        trackableTracer.startTrackableCreation();
+        trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("Created", span.getName());
@@ -90,7 +90,7 @@ public class ActivityTracerTest {
     @Test
     public void create_initialActivity() {
         ActivityTracer trackableTracer = new ActivityTracer(mock(Activity.class), new AtomicReference<>("Activity"), tracer, visibleScreenTracker, appStartupTimer);
-        trackableTracer.startTrackableCreation();
+        trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("AppStart", span.getName());
@@ -102,7 +102,7 @@ public class ActivityTracerTest {
     public void create_initialActivity_firstTime() {
         appStartupTimer.start(tracer);
         ActivityTracer trackableTracer = new ActivityTracer(mock(Activity.class), new AtomicReference<>(), tracer, visibleScreenTracker, appStartupTimer);
-        trackableTracer.startTrackableCreation();
+        trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
         appStartupTimer.end();
 
