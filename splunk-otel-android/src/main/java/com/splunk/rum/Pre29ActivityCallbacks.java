@@ -34,7 +34,7 @@ import io.opentelemetry.api.trace.Tracer;
 class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     private final Tracer tracer;
     private final VisibleScreenTracker visibleScreenTracker;
-    private final Map<String, NamedTrackableTracer> tracersByActivityClassName = new HashMap<>();
+    private final Map<String, TrackableTracer> tracersByActivityClassName = new HashMap<>();
     private final AtomicReference<String> initialAppActivity = new AtomicReference<>();
     private final AppStartupTimer appStartupTimer;
 
@@ -69,7 +69,7 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
                 .startSpanIfNoneInProgress("Resumed")
                 .addEvent("activityResumed")
                 .addPreviousScreenAttribute()
-                .endSpanForActivityResumed();
+                .endSpanForTrackableResumed();
         visibleScreenTracker.activityResumed(activity);
     }
 
@@ -104,9 +104,9 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     }
 
     private TrackableTracer getOrCreateTracer(Activity activity) {
-        NamedTrackableTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
+        TrackableTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
         if (activityTracer == null) {
-            activityTracer = new NamedTrackableTracer(activity, initialAppActivity, tracer, visibleScreenTracker, appStartupTimer);
+            activityTracer = new ActivityTracer(activity, initialAppActivity, tracer, visibleScreenTracker, appStartupTimer);
             tracersByActivityClassName.put(activity.getClass().getName(), activityTracer);
         }
         return activityTracer;

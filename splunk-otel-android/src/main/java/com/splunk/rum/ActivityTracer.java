@@ -18,8 +18,6 @@ package com.splunk.rum;
 
 import android.app.Activity;
 
-import androidx.fragment.app.Fragment;
-
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -29,37 +27,25 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 
-class NamedTrackableTracer implements TrackableTracer {
+class ActivityTracer implements TrackableTracer {
     static final AttributeKey<String> ACTIVITY_NAME_KEY = AttributeKey.stringKey("activityName");
-    static final AttributeKey<String> FRAGMENT_NAME_KEY = AttributeKey.stringKey("fragmentName");
     static final String APP_START_SPAN_NAME = "AppStart";
 
     private final AtomicReference<String> initialAppActivity;
     private final Tracer tracer;
-    private final String trackableName;
+    private final String activityName;
     private final VisibleScreenTracker visibleScreenTracker;
-    private final AttributeKey<String> nameKey;
     private final AppStartupTimer appStartupTimer;
 
     private Span span;
     private Scope scope;
 
-    NamedTrackableTracer(Activity activity, AtomicReference<String> initialAppActivity, Tracer tracer, VisibleScreenTracker visibleScreenTracker, AppStartupTimer appStartupTimer) {
+    ActivityTracer(Activity activity, AtomicReference<String> initialAppActivity, Tracer tracer, VisibleScreenTracker visibleScreenTracker, AppStartupTimer appStartupTimer) {
         this.initialAppActivity = initialAppActivity;
         this.tracer = tracer;
-        this.trackableName = activity.getClass().getSimpleName();
+        this.activityName = activity.getClass().getSimpleName();
         this.visibleScreenTracker = visibleScreenTracker;
-        this.nameKey = ACTIVITY_NAME_KEY;
         this.appStartupTimer = appStartupTimer;
-    }
-
-    NamedTrackableTracer(Fragment fragment, Tracer tracer, VisibleScreenTracker visibleScreenTracker) {
-        this.initialAppActivity = new AtomicReference<>("not relevant for fragments");
-        this.tracer = tracer;
-        this.trackableName = fragment.getClass().getSimpleName();
-        this.visibleScreenTracker = visibleScreenTracker;
-        this.nameKey = FRAGMENT_NAME_KEY;
-        this.appStartupTimer = null;
     }
 
     @Override
@@ -79,7 +65,7 @@ class NamedTrackableTracer implements TrackableTracer {
         final boolean isColdStart = initialAppActivity.get() == null;
         if (isColdStart && appStartupTimer != null) {
             startSpan("Created", appStartupTimer.getStartupSpan());
-        } else if (trackableName.equals(initialAppActivity.get())) {
+        } else if (activityName.equals(initialAppActivity.get())) {
             Span span = startSpan(APP_START_SPAN_NAME);
             span.setAttribute(SplunkRum.START_TYPE_KEY, "warm");
             //override the component to be appstart
@@ -98,7 +84,7 @@ class NamedTrackableTracer implements TrackableTracer {
         //restarting the first activity is a "hot" AppStart
         //Note: in a multi-activity application, navigating back to the first activity can trigger
         //this, so it would not be ideal to call it an AppStart.
-        if (!multiActivityApp && trackableName.equals(initialAppActivity.get())) {
+        if (!multiActivityApp && activityName.equals(initialAppActivity.get())) {
             Span span = startSpan(APP_START_SPAN_NAME);
             span.setAttribute(SplunkRum.START_TYPE_KEY, "hot");
             //override the component to be appstart
@@ -115,7 +101,7 @@ class NamedTrackableTracer implements TrackableTracer {
 
     private Span startSpan(String spanName, Span parentSpan) {
         final SpanBuilder spanBuilder = tracer.spanBuilder(spanName)
-                .setAttribute(nameKey, trackableName)
+                .setAttribute(ACTIVITY_NAME_KEY, activityName)
                 .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_UI);
         if (parentSpan != null) {
             spanBuilder.setParent(parentSpan.storeInContext(Context.current()));
@@ -123,15 +109,15 @@ class NamedTrackableTracer implements TrackableTracer {
         span = spanBuilder
                 .startSpan();
         //do this after the span is started, so we can override the default screen.name set by the RumAttributeAppender.
-        span.setAttribute(SplunkRum.SCREEN_NAME_KEY, trackableName);
+        span.setAttribute(SplunkRum.SCREEN_NAME_KEY, activityName);
         scope = span.makeCurrent();
         return span;
     }
 
     @Override
-    public void endSpanForActivityResumed() {
+    public void endSpanForTrackableResumed() {
         if (initialAppActivity.get() == null) {
-            initialAppActivity.set(trackableName);
+            initialAppActivity.set(activityName);
         }
         endActiveSpan();
     }
@@ -154,7 +140,7 @@ class NamedTrackableTracer implements TrackableTracer {
     @Override
     public TrackableTracer addPreviousScreenAttribute() {
         String previouslyVisibleScreen = visibleScreenTracker.getPreviouslyVisibleScreen();
-        if (!trackableName.equals(previouslyVisibleScreen)) {
+        if (!activityName.equals(previouslyVisibleScreen)) {
             span.setAttribute(SplunkRum.LAST_SCREEN_NAME_KEY, previouslyVisibleScreen);
         }
         return this;

@@ -28,7 +28,9 @@ interface TrackableTracer {
 
     TrackableTracer addEvent(String eventName);
 
-    void endSpanForActivityResumed();
+    default void endSpanForTrackableResumed() {
+        endActiveSpan();
+    }
 
     void endActiveSpan();
 
@@ -49,10 +51,6 @@ interface TrackableTracer {
         @Override
         public TrackableTracer initiateRestartSpanIfNecessary(boolean multiActivityApp) {
             return this;
-        }
-
-        @Override
-        public void endSpanForActivityResumed() {
         }
 
         @Override

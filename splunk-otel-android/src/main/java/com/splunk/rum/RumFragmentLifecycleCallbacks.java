@@ -16,6 +16,8 @@
 
 package com.splunk.rum;
 
+import static com.splunk.rum.TrackableTracer.NO_OP_TRACER;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
@@ -30,10 +32,8 @@ import java.util.Map;
 
 import io.opentelemetry.api.trace.Tracer;
 
-import static com.splunk.rum.TrackableTracer.NO_OP_TRACER;
-
 class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCallbacks {
-    private final Map<String, NamedTrackableTracer> tracersByFragmentClassName = new HashMap<>();
+    private final Map<String, TrackableTracer> tracersByFragmentClassName = new HashMap<>();
 
     private final Tracer tracer;
     private final VisibleScreenTracker visibleScreenTracker;
@@ -145,16 +145,16 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     }
 
     private TrackableTracer getOrCreateTracer(Fragment fragment) {
-        NamedTrackableTracer activityTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
+        TrackableTracer activityTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
         if (activityTracer == null) {
-            activityTracer = new NamedTrackableTracer(fragment, tracer, visibleScreenTracker);
+            activityTracer = new FragmentTracer(fragment, tracer, visibleScreenTracker);
             tracersByFragmentClassName.put(fragment.getClass().getName(), activityTracer);
         }
         return activityTracer;
     }
 
     private TrackableTracer getFragmentTracer(@NonNull Fragment fragment) {
-        NamedTrackableTracer activityTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
+        TrackableTracer activityTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
         if (activityTracer == null) {
             return NO_OP_TRACER;
         }

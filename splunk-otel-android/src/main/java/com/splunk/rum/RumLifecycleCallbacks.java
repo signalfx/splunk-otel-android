@@ -33,7 +33,7 @@ import io.opentelemetry.api.trace.Tracer;
 
 class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
-    private final Map<String, NamedTrackableTracer> tracersByActivityClassName = new HashMap<>();
+    private final Map<String, TrackableTracer> tracersByActivityClassName = new HashMap<>();
     private final AtomicReference<String> initialAppActivity = new AtomicReference<>();
     private final Tracer tracer;
     private final VisibleScreenTracker visibleScreenTracker;
@@ -101,7 +101,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
         getActivityTracer(activity)
                 .addEvent("activityPostResumed")
                 .addPreviousScreenAttribute()
-                .endSpanForActivityResumed();
+                .endSpanForTrackableResumed();
         visibleScreenTracker.activityResumed(activity);
     }
 
@@ -177,16 +177,16 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     }
 
     private TrackableTracer getOrCreateTracer(Activity activity) {
-        NamedTrackableTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
+        TrackableTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
         if (activityTracer == null) {
-            activityTracer = new NamedTrackableTracer(activity, initialAppActivity, tracer, visibleScreenTracker, startupTimer);
+            activityTracer = new ActivityTracer(activity, initialAppActivity, tracer, visibleScreenTracker, startupTimer);
             tracersByActivityClassName.put(activity.getClass().getName(), activityTracer);
         }
         return activityTracer;
     }
 
     private TrackableTracer getActivityTracer(@NonNull Activity activity) {
-        NamedTrackableTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
+        TrackableTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
         if (activityTracer == null) {
             return TrackableTracer.NO_OP_TRACER;
         }
