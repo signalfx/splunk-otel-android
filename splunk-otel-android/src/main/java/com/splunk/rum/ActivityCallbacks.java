@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import io.opentelemetry.api.trace.Tracer;
 
-class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
 
     private final Map<String, ActivityTracer> tracersByActivityClassName = new HashMap<>();
     private final AtomicReference<String> initialAppActivity = new AtomicReference<>();
@@ -39,7 +39,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     private final VisibleScreenTracker visibleScreenTracker;
     private final AppStartupTimer startupTimer;
 
-    RumLifecycleCallbacks(Tracer tracer, VisibleScreenTracker visibleScreenTracker, AppStartupTimer startupTimer) {
+    ActivityCallbacks(Tracer tracer, VisibleScreenTracker visibleScreenTracker, AppStartupTimer startupTimer) {
         this.tracer = tracer;
         this.visibleScreenTracker = visibleScreenTracker;
         this.startupTimer = startupTimer;
@@ -47,7 +47,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startActivityCreation()
                 .addEvent("activityPreCreated");
 
@@ -69,7 +69,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreStarted(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .initiateRestartSpanIfNecessary(tracersByActivityClassName.size() > 1)
                 .addEvent("activityPreStarted");
     }
@@ -86,7 +86,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreResumed(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startSpanIfNoneInProgress("Resumed")
                 .addEvent("activityPreResumed");
     }
@@ -98,7 +98,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPostResumed(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .addEvent("activityPostResumed")
                 .addPreviousScreenAttribute()
                 .endSpanForActivityResumed();
@@ -107,7 +107,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPrePaused(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startSpanIfNoneInProgress("Paused")
                 .addEvent("activityPrePaused");
         visibleScreenTracker.activityPaused(activity);
@@ -120,12 +120,12 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPostPaused(@NonNull Activity activity) {
-        getOrCreateTracer(activity).addEvent("activityPostPaused").endActiveSpan();
+        getTracer(activity).addEvent("activityPostPaused").endActiveSpan();
     }
 
     @Override
     public void onActivityPreStopped(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startSpanIfNoneInProgress("Stopped")
                 .addEvent("activityPreStopped");
     }
@@ -137,7 +137,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPostStopped(@NonNull Activity activity) {
-        getOrCreateTracer(activity).addEvent("activityPostStopped").endActiveSpan();
+        getTracer(activity).addEvent("activityPostStopped").endActiveSpan();
     }
 
     @Override
@@ -157,7 +157,7 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreDestroyed(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startSpanIfNoneInProgress("Destroyed")
                 .addEvent("activityPreDestroyed");
     }
@@ -169,14 +169,14 @@ class RumLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPostDestroyed(@NonNull Activity activity) {
-        getOrCreateTracer(activity).addEvent("activityPostDestroyed").endActiveSpan();
+        getTracer(activity).addEvent("activityPostDestroyed").endActiveSpan();
     }
 
     private void addEvent(@NonNull Activity activity, String eventName) {
-        getOrCreateTracer(activity).addEvent(eventName);
+        getTracer(activity).addEvent(eventName);
     }
 
-    private ActivityTracer getOrCreateTracer(Activity activity) {
+    private ActivityTracer getTracer(Activity activity) {
         ActivityTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
         if (activityTracer == null) {
             activityTracer = new ActivityTracer(activity, initialAppActivity, tracer, visibleScreenTracker, startupTimer);

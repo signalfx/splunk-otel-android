@@ -39,16 +39,16 @@ class FragmentTracer {
         if (spanAndScope.spanInProgress()) {
             return this;
         }
-        spanAndScope.startSpan(() -> startSpan(action));
+        spanAndScope.startSpan(() -> createSpan(action));
         return this;
     }
 
     FragmentTracer startFragmentCreation() {
-        spanAndScope.startSpan(() -> startSpan("Created"));
+        spanAndScope.startSpan(() -> createSpan("Created"));
         return this;
     }
 
-    private Span startSpan(String spanName) {
+    private Span createSpan(String spanName) {
         Span span = tracer.spanBuilder(spanName)
                 .setAttribute(FRAGMENT_NAME_KEY, fragmentName)
                 .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_UI).startSpan();

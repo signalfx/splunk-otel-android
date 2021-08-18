@@ -18,6 +18,8 @@ package com.splunk.rum;
 
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -48,53 +50,61 @@ class ActivityTracer {
         if (spanAndScope.spanInProgress()) {
             return this;
         }
-        spanAndScope.startSpan(() -> startSpan(action));
+        spanAndScope.startSpan(() -> createSpan(action));
         return this;
     }
 
     ActivityTracer startActivityCreation() {
+        spanAndScope.startSpan(this::makeCreationSpan);
+        return this;
+    }
+
+    private Span makeCreationSpan() {
         //If the application has never loaded an activity, or this is the initial activity getting re-created,
         // we name this span specially to show that it's the application starting up. Otherwise, use
         // the activity class name as the base of the span name.
-        final boolean isColdStart = initialAppActivity.get() == null;
-        if (isColdStart && appStartupTimer != null) {
-            spanAndScope.startSpan(() -> startSpan("Created", appStartupTimer.getStartupSpan()));
-        } else if (activityName.equals(initialAppActivity.get())) {
-            spanAndScope.startSpan(() -> createAppStartSpan("warm"));
-        } else {
-            spanAndScope.startSpan(() -> startSpan("Created"));
+        boolean isColdStart = initialAppActivity.get() == null;
+        if (isColdStart) {
+            return createSpanWithParent("Created", appStartupTimer.getStartupSpan());
         }
-        return this;
+        if (activityName.equals(initialAppActivity.get())) {
+            return createAppStartSpan("warm");
+        }
+        return createSpan("Created");
     }
 
     ActivityTracer initiateRestartSpanIfNecessary(boolean multiActivityApp) {
         if (spanAndScope.spanInProgress()) {
             return this;
         }
+        spanAndScope.startSpan(() -> makeRestartSpan(multiActivityApp));
+        return this;
+    }
+
+    @NonNull
+    private Span makeRestartSpan(boolean multiActivityApp) {
         //restarting the first activity is a "hot" AppStart
         //Note: in a multi-activity application, navigating back to the first activity can trigger
         //this, so it would not be ideal to call it an AppStart.
         if (!multiActivityApp && activityName.equals(initialAppActivity.get())) {
-            spanAndScope.startSpan(() -> createAppStartSpan("hot"));
-        } else {
-            spanAndScope.startSpan(() -> startSpan("Restarted"));
+            return createAppStartSpan("hot");
         }
-        return this;
+        return createSpan("Restarted");
     }
 
     private Span createAppStartSpan(String startType) {
-        Span span = startSpan(APP_START_SPAN_NAME);
+        Span span = createSpan(APP_START_SPAN_NAME);
         span.setAttribute(SplunkRum.START_TYPE_KEY, startType);
         //override the component to be appstart
         span.setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_APPSTART);
         return span;
     }
 
-    private Span startSpan(String spanName) {
-        return startSpan(spanName, null);
+    private Span createSpan(String spanName) {
+        return createSpanWithParent(spanName, null);
     }
 
-    private Span startSpan(String spanName, Span parentSpan) {
+    private Span createSpanWithParent(String spanName, Span parentSpan) {
         final SpanBuilder spanBuilder = tracer.spanBuilder(spanName)
                 .setAttribute(ACTIVITY_NAME_KEY, activityName)
                 .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_UI);
