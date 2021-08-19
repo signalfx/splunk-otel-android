@@ -46,7 +46,7 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startActivityCreation()
                 .addEvent("activityCreated");
 
@@ -58,14 +58,14 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .initiateRestartSpanIfNecessary(tracersByActivityClassName.size() > 1)
                 .addEvent("activityStarted");
     }
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startSpanIfNoneInProgress("Resumed")
                 .addEvent("activityResumed")
                 .addPreviousScreenAttribute()
@@ -75,7 +75,7 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startSpanIfNoneInProgress("Paused")
                 .addEvent("activityPaused")
                 .endActiveSpan();
@@ -84,7 +84,7 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startSpanIfNoneInProgress("Stopped")
                 .addEvent("activityStopped")
                 .endActiveSpan();
@@ -97,13 +97,13 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-        getOrCreateTracer(activity)
+        getTracer(activity)
                 .startSpanIfNoneInProgress("Destroyed")
                 .addEvent("activityDestroyed")
                 .endActiveSpan();
     }
 
-    private ActivityTracer getOrCreateTracer(Activity activity) {
+    private ActivityTracer getTracer(Activity activity) {
         ActivityTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
         if (activityTracer == null) {
             activityTracer = new ActivityTracer(activity, initialAppActivity, tracer, visibleScreenTracker, appStartupTimer);

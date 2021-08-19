@@ -44,7 +44,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     @Override
     public void onFragmentPreAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
         super.onFragmentPreAttached(fm, f, context);
-        getOrCreateTracer(f)
+        getTracer(f)
                 .startFragmentCreation()
                 .addEvent("fragmentPreAttached");
     }
@@ -70,7 +70,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     @Override
     public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onFragmentViewCreated(fm, f, v, savedInstanceState);
-        getOrCreateTracer(f)
+        getTracer(f)
                 .startSpanIfNoneInProgress("Restored")
                 .addEvent("fragmentViewCreated");
     }
@@ -84,7 +84,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     @Override
     public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
         super.onFragmentResumed(fm, f);
-        getOrCreateTracer(f)
+        getTracer(f)
                 .startSpanIfNoneInProgress("Resumed")
                 .addEvent("fragmentResumed")
                 .addPreviousScreenAttribute()
@@ -96,13 +96,13 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     public void onFragmentPaused(@NonNull FragmentManager fm, @NonNull Fragment f) {
         super.onFragmentPaused(fm, f);
         visibleScreenTracker.fragmentPaused(f);
-        getOrCreateTracer(f).startSpanIfNoneInProgress("Paused").addEvent("fragmentPaused");
+        getTracer(f).startSpanIfNoneInProgress("Paused").addEvent("fragmentPaused");
     }
 
     @Override
     public void onFragmentStopped(@NonNull FragmentManager fm, @NonNull Fragment f) {
         super.onFragmentStopped(fm, f);
-        getOrCreateTracer(f)
+        getTracer(f)
                 .addEvent("fragmentStopped")
                 .endActiveSpan();
     }
@@ -115,7 +115,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     @Override
     public void onFragmentViewDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
         super.onFragmentViewDestroyed(fm, f);
-        getOrCreateTracer(f)
+        getTracer(f)
                 .startSpanIfNoneInProgress("ViewDestroyed")
                 .addEvent("fragmentViewDestroyed")
                 .endActiveSpan();
@@ -125,7 +125,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
         super.onFragmentDestroyed(fm, f);
         //note: this might not get called if the dev has checked "retainInstance" on the fragment
-        getOrCreateTracer(f)
+        getTracer(f)
                 .startSpanIfNoneInProgress("Destroyed")
                 .addEvent("fragmentDestroyed");
     }
@@ -134,7 +134,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     public void onFragmentDetached(@NonNull FragmentManager fm, @NonNull Fragment f) {
         super.onFragmentDetached(fm, f);
         // this is a terminal operation, but might also be the only thing we see on app getting killed, so
-        getOrCreateTracer(f)
+        getTracer(f)
                 .startSpanIfNoneInProgress("Detached")
                 .addEvent("fragmentDetached")
                 .endActiveSpan();
@@ -147,7 +147,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
         }
     }
 
-    private FragmentTracer getOrCreateTracer(Fragment fragment) {
+    private FragmentTracer getTracer(Fragment fragment) {
         FragmentTracer activityTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
         if (activityTracer == null) {
             activityTracer = new FragmentTracer(fragment, tracer, visibleScreenTracker);

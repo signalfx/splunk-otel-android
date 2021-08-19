@@ -36,26 +36,26 @@ class ActivityTracer {
     private final Tracer tracer;
     private final String activityName;
     private final AppStartupTimer appStartupTimer;
-    private final SpanAndScope spanAndScope;
+    private final ActiveSpan activeSpan;
 
     ActivityTracer(Activity activity, AtomicReference<String> initialAppActivity, Tracer tracer, VisibleScreenTracker visibleScreenTracker, AppStartupTimer appStartupTimer) {
         this.initialAppActivity = initialAppActivity;
         this.tracer = tracer;
         this.activityName = activity.getClass().getSimpleName();
         this.appStartupTimer = appStartupTimer;
-        this.spanAndScope = new SpanAndScope(visibleScreenTracker);
+        this.activeSpan = new ActiveSpan(visibleScreenTracker);
     }
 
     ActivityTracer startSpanIfNoneInProgress(String action) {
-        if (spanAndScope.spanInProgress()) {
+        if (activeSpan.spanInProgress()) {
             return this;
         }
-        spanAndScope.startSpan(() -> createSpan(action));
+        activeSpan.startSpan(() -> createSpan(action));
         return this;
     }
 
     ActivityTracer startActivityCreation() {
-        spanAndScope.startSpan(this::makeCreationSpan);
+        activeSpan.startSpan(this::makeCreationSpan);
         return this;
     }
 
@@ -74,10 +74,10 @@ class ActivityTracer {
     }
 
     ActivityTracer initiateRestartSpanIfNecessary(boolean multiActivityApp) {
-        if (spanAndScope.spanInProgress()) {
+        if (activeSpan.spanInProgress()) {
             return this;
         }
-        spanAndScope.startSpan(() -> makeRestartSpan(multiActivityApp));
+        activeSpan.startSpan(() -> makeRestartSpan(multiActivityApp));
         return this;
     }
 
@@ -125,19 +125,18 @@ class ActivityTracer {
     }
 
     void endActiveSpan() {
-        if (appStartupTimer != null) {
-            appStartupTimer.end();
-        }
-        spanAndScope.endActiveSpan();
+        // If we happen to be in app startup, make sure this ends it. It's harmless if we're already out of the startup phase.
+        appStartupTimer.end();
+        activeSpan.endActiveSpan();
     }
 
     ActivityTracer addPreviousScreenAttribute() {
-        spanAndScope.addPreviousScreenAttribute(activityName);
+        activeSpan.addPreviousScreenAttribute(activityName);
         return this;
     }
 
     ActivityTracer addEvent(String eventName) {
-        spanAndScope.addEvent(eventName);
+        activeSpan.addEvent(eventName);
         return this;
     }
 }

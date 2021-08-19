@@ -27,24 +27,24 @@ class FragmentTracer {
 
     private final String fragmentName;
     private final Tracer tracer;
-    private final SpanAndScope spanAndScope;
+    private final ActiveSpan activeSpan;
 
     FragmentTracer(Fragment fragment, Tracer tracer, VisibleScreenTracker visibleScreenTracker) {
         this.tracer = tracer;
         this.fragmentName = fragment.getClass().getSimpleName();
-        this.spanAndScope = new SpanAndScope(visibleScreenTracker);
+        this.activeSpan = new ActiveSpan(visibleScreenTracker);
     }
 
     FragmentTracer startSpanIfNoneInProgress(String action) {
-        if (spanAndScope.spanInProgress()) {
+        if (activeSpan.spanInProgress()) {
             return this;
         }
-        spanAndScope.startSpan(() -> createSpan(action));
+        activeSpan.startSpan(() -> createSpan(action));
         return this;
     }
 
     FragmentTracer startFragmentCreation() {
-        spanAndScope.startSpan(() -> createSpan("Created"));
+        activeSpan.startSpan(() -> createSpan("Created"));
         return this;
     }
 
@@ -58,16 +58,16 @@ class FragmentTracer {
     }
 
     void endActiveSpan() {
-        spanAndScope.endActiveSpan();
+        activeSpan.endActiveSpan();
     }
 
     FragmentTracer addPreviousScreenAttribute() {
-        spanAndScope.addPreviousScreenAttribute(fragmentName);
+        activeSpan.addPreviousScreenAttribute(fragmentName);
         return this;
     }
 
     FragmentTracer addEvent(String eventName) {
-        spanAndScope.addEvent(eventName);
+        activeSpan.addEvent(eventName);
         return this;
     }
 }

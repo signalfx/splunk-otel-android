@@ -21,13 +21,13 @@ import java.util.function.Supplier;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Scope;
 
-class SpanAndScope {
+class ActiveSpan {
     private final VisibleScreenTracker visibleScreenTracker;
 
     private Span span;
     private Scope scope;
 
-    SpanAndScope(VisibleScreenTracker visibleScreenTracker) {
+    ActiveSpan(VisibleScreenTracker visibleScreenTracker) {
         this.visibleScreenTracker = visibleScreenTracker;
     }
 
@@ -36,6 +36,10 @@ class SpanAndScope {
     }
 
     void startSpan(Supplier<Span> spanCreator) {
+        //don't start one if there's already one in progress
+        if (span != null) {
+            return;
+        }
         this.span = spanCreator.get();
         scope = span.makeCurrent();
     }
