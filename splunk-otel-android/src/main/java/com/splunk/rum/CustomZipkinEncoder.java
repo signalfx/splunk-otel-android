@@ -36,14 +36,17 @@ class CustomZipkinEncoder implements BytesEncoder<Span> {
 
     private final WriteBuffer.Writer<Span> writer = new V2SpanWriter();
 
+    @Override
     public Encoding encoding() {
         return Encoding.JSON;
     }
 
+    @Override
     public int sizeInBytes(Span span) {
         return this.writer.sizeInBytes(span);
     }
 
+    @Override
     public byte[] encode(Span span) {
         String properSpanName = span.tags().get(RumAttributeAppender.SPLUNK_OPERATION_KEY.getKey());
 
@@ -55,6 +58,7 @@ class CustomZipkinEncoder implements BytesEncoder<Span> {
         return renamedResult.getBytes(StandardCharsets.UTF_8);
     }
 
+    @Override
     public byte[] encodeList(List<Span> spans) {
         //note: this doesn't appear to be called in our current code paths, so let's leave it be.
         return JsonCodec.writeList(this.writer, spans);
