@@ -26,6 +26,12 @@ import zipkin2.internal.JsonCodec;
 import zipkin2.internal.V2SpanWriter;
 import zipkin2.internal.WriteBuffer;
 
+/**
+ * We need a custom encoder to correct for the fact that the zipkin Span.Builder lowercases all Span names.
+ * <p>
+ * We do this by having the {@link RumAttributeAppender} add an additional attribute ({@link RumAttributeAppender#SPLUNK_OPERATION_KEY})
+ * with the span name properly cased, then correcting the span name here at encoding time.
+ */
 class CustomZipkinEncoder implements BytesEncoder<Span> {
 
     private final WriteBuffer.Writer<Span> writer = new V2SpanWriter();
