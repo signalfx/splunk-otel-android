@@ -57,7 +57,7 @@ class RumAttributeAppender implements SpanProcessor {
 
     @Override
     public void onStart(Context parentContext, ReadWriteSpan span) {
-        //set this custom attribute in order to let the CustomZipEncoder use it for the span name on the wire.
+        //set this custom attribute in order to let the CustomZipkinEncoder use it for the span name on the wire.
         span.setAttribute(SPLUNK_OPERATION_KEY, span.getName());
         span.setAttribute(APP_NAME_KEY, config.getApplicationName());
         span.setAttribute(SESSION_ID_KEY, sessionId.getSessionId());
