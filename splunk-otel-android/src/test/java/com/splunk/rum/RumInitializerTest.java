@@ -89,7 +89,7 @@ public class RumInitializerTest {
      * Verify that we have buffering in place in our exporter implementation.
      */
     @Test
-    public void exporterConfiguration() {
+    public void verifyExporterBuffering() {
         Config config = Config.builder().realm("dev").applicationName("testApp").rumAccessToken("accessToken").build();
         Application application = mock(Application.class);
         AppStartupTimer startupTimer = new AppStartupTimer();
