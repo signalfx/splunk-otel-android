@@ -23,11 +23,14 @@ import io.opentelemetry.api.common.Attributes;
  * This class hold {@link AttributeKey}s for standard RUM-related attributes that are not in the
  * OpenTelemetry {@link io.opentelemetry.semconv.trace.attributes.SemanticAttributes} definitions.
  */
-public class StandardAttributes {
+public final class StandardAttributes {
     /**
      * The version of your app. Useful for adding to global attributes.
      *
      * @see Config.Builder#globalAttributes(Attributes)
      */
     public static final AttributeKey<String> APP_VERSION = AttributeKey.stringKey("app.version");
+
+    private StandardAttributes() {
+    }
 }
