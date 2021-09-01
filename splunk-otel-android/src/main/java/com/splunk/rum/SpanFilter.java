@@ -33,13 +33,13 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
 final class SpanFilter implements SpanExporter {
     private final SpanExporter delegate;
     private final Predicate<String> rejectSpanNamesPredicate;
-    private final Map<AttributeKey<String>, Predicate<String>> rejectSpanAttributesPredicates;
-    private final Map<AttributeKey<String>, Function<String, String>> spanAttributeReplacements;
+    private final Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates;
+    private final Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements;
 
     SpanFilter(SpanExporter delegate,
                Predicate<String> rejectSpanNamesPredicate,
-               Map<AttributeKey<String>, Predicate<String>> rejectSpanAttributesPredicates,
-               Map<AttributeKey<String>, Function<String, String>> spanAttributeReplacements) {
+               Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates,
+               Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements) {
         this.delegate = delegate;
         this.rejectSpanNamesPredicate = rejectSpanNamesPredicate;
         this.rejectSpanAttributesPredicates = rejectSpanAttributesPredicates;
@@ -63,11 +63,11 @@ final class SpanFilter implements SpanExporter {
             return true;
         }
         Attributes attributes = span.getAttributes();
-        for (Map.Entry<AttributeKey<String>, Predicate<String>> e : rejectSpanAttributesPredicates.entrySet()) {
-            AttributeKey<String> key = e.getKey();
-            Predicate<String> valuePredicate = e.getValue();
-            String attributeValue = attributes.get(key);
-            if (attributeValue != null && valuePredicate.test(attributeValue)) {
+        for (Map.Entry<AttributeKey<?>, Predicate<?>> e : rejectSpanAttributesPredicates.entrySet()) {
+            AttributeKey<?> key = e.getKey();
+            Predicate<? super Object> valuePredicate = (Predicate<? super Object>) e.getValue();
+            Object attributeValue = attributes.get(key);
+            if (attributeValue != null && valuePredicate.test(attributes.get(key))) {
                 return true;
             }
         }
@@ -80,16 +80,12 @@ final class SpanFilter implements SpanExporter {
         }
 
         AttributesBuilder modifiedAttributes = Attributes.builder();
-        span.getAttributes().forEach((key, value) -> {
-            if (!(value instanceof String)) {
-                modifiedAttributes.put((AttributeKey<Object>) key, value);
-                return;
-            }
-            String oldValue = (String) value;
-            Function<String, String> valueModifier = spanAttributeReplacements.getOrDefault(key, Function.identity());
-            String newValue = valueModifier.apply(oldValue);
+        span.getAttributes().forEach((key, oldValue) -> {
+            Function<? super Object, ?> valueModifier =
+                    (Function<? super Object, ?>) spanAttributeReplacements.getOrDefault(key, Function.identity());
+            Object newValue = valueModifier.apply(oldValue);
             if (newValue != null) {
-                modifiedAttributes.put((AttributeKey<String>) key, newValue);
+                modifiedAttributes.put((AttributeKey<Object>) key, newValue);
             }
         });
 

@@ -31,8 +31,8 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
 public final class SpanFilterBuilder {
 
     private Predicate<String> rejectSpanNamesPredicate = spanName -> false;
-    private final Map<AttributeKey<String>, Predicate<String>> rejectSpanAttributesPredicates = new HashMap<>();
-    private final Map<AttributeKey<String>, Function<String, String>> spanAttributeReplacements = new HashMap<>();
+    private final Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates = new HashMap<>();
+    private final Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements = new HashMap<>();
 
     SpanFilterBuilder() {
     }
@@ -62,18 +62,18 @@ public final class SpanFilterBuilder {
      *                                with matching value should be rejected.
      * @return {@code this}.
      */
-    public SpanFilterBuilder rejectSpansByAttributeValue(
-            AttributeKey<String> attributeKey,
-            Predicate<String> attributeValuePredicate) {
+    public <T> SpanFilterBuilder rejectSpansByAttributeValue(
+            AttributeKey<T> attributeKey,
+            Predicate<? super T> attributeValuePredicate) {
 
         rejectSpanAttributesPredicates.compute(attributeKey,
                 (k, oldValue) -> oldValue == null
                         ? attributeValuePredicate
-                        : oldValue.or(attributeValuePredicate));
+                        : ((Predicate<T>) oldValue).or(attributeValuePredicate));
         return this;
     }
 
-    public SpanFilterBuilder removeSpanAttribute(AttributeKey<String> attributeKey) {
+    public <T> SpanFilterBuilder removeSpanAttribute(AttributeKey<T> attributeKey) {
         return removeSpanAttribute(attributeKey, value -> true);
     }
 
@@ -88,9 +88,9 @@ public final class SpanFilterBuilder {
      *                                value should be removed from the span.
      * @return {@code this}.
      */
-    public SpanFilterBuilder removeSpanAttribute(
-            AttributeKey<String> attributeKey,
-            Predicate<String> attributeValuePredicate) {
+    public <T> SpanFilterBuilder removeSpanAttribute(
+            AttributeKey<T> attributeKey,
+            Predicate<? super T> attributeValuePredicate) {
 
         return replaceSpanAttribute(attributeKey, old -> attributeValuePredicate.test(old) ? null : old);
     }
@@ -108,22 +108,22 @@ public final class SpanFilterBuilder {
      *                               the new one.
      * @return {@code this}.
      */
-    public SpanFilterBuilder replaceSpanAttribute(
-            AttributeKey<String> attributeKey,
-            Function<String, String> attributeValueModifier) {
+    public <T> SpanFilterBuilder replaceSpanAttribute(
+            AttributeKey<T> attributeKey,
+            Function<? super T, ? extends T> attributeValueModifier) {
 
         spanAttributeReplacements.compute(attributeKey,
                 (k, oldValue) -> oldValue == null
                         ? attributeValueModifier
-                        : oldValue.andThen(attributeValueModifier));
+                        : ((Function<T, T>) oldValue).andThen(attributeValueModifier));
         return this;
     }
 
     Function<SpanExporter, SpanExporter> build() {
         // make a copy so that the references from the builder are not included in the returned function
         Predicate<String> rejectSpanNamesPredicate = this.rejectSpanNamesPredicate;
-        Map<AttributeKey<String>, Predicate<String>> rejectSpanAttributesPredicates = new HashMap<>(this.rejectSpanAttributesPredicates);
-        Map<AttributeKey<String>, Function<String, String>> spanAttributeReplacements = new HashMap<>(this.spanAttributeReplacements);
+        Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates = new HashMap<>(this.rejectSpanAttributesPredicates);
+        Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements = new HashMap<>(this.spanAttributeReplacements);
 
         return exporter -> new SpanFilter(exporter, rejectSpanNamesPredicate, rejectSpanAttributesPredicates, spanAttributeReplacements);
     }

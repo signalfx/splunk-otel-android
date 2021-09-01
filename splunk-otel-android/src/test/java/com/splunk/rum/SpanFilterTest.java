@@ -87,6 +87,7 @@ public class SpanFilterTest {
         SpanExporter underTest = new SpanFilterBuilder()
                 .rejectSpansByAttributeValue(ATTRIBUTE, value -> value.equals("test"))
                 .rejectSpansByAttributeValue(ATTRIBUTE, value -> value.equals("rejected!"))
+                .rejectSpansByAttributeValue(LONG_ATTRIBUTE, value -> value > 100)
                 .build()
                 .apply(delegate);
 
@@ -94,13 +95,14 @@ public class SpanFilterTest {
         SpanData differentKey = span("span", Attributes.of(OTHER_ATTRIBUTE, "test", LONG_ATTRIBUTE, 42L));
         SpanData anotherRejected = span("span", Attributes.of(ATTRIBUTE, "rejected!"));
         SpanData differentValue = span("span", Attributes.of(ATTRIBUTE, "not really test"));
+        SpanData yetAnotherRejected = span("span", Attributes.of(ATTRIBUTE, "pass", LONG_ATTRIBUTE, 123L));
 
         CompletableResultCode expectedResult = new CompletableResultCode();
         when(delegate.export(asList(differentKey, differentValue))).thenReturn(expectedResult);
 
         // when
         CompletableResultCode result = underTest.export(
-                asList(rejected, differentKey, anotherRejected, differentValue));
+                asList(rejected, differentKey, anotherRejected, differentValue, yetAnotherRejected));
 
         // then
         assertSame(expectedResult, result);
@@ -142,6 +144,7 @@ public class SpanFilterTest {
         SpanExporter underTest = new SpanFilterBuilder()
                 .replaceSpanAttribute(ATTRIBUTE, value -> value + "!!!")
                 .replaceSpanAttribute(ATTRIBUTE, value -> value + "1")
+                .replaceSpanAttribute(LONG_ATTRIBUTE, value -> value + 1)
                 // make sure that attribute types are taken into account
                 .replaceSpanAttribute(stringKey("long_attribute"), value -> "abc")
                 .build()
@@ -162,7 +165,7 @@ public class SpanFilterTest {
         List<SpanData> exportedSpans = new ArrayList<>(spansCaptor.getValue());
         assertEquals(2, exportedSpans.size());
         assertEquals("first", exportedSpans.get(0).getName());
-        assertEquals(Attributes.of(ATTRIBUTE, "test!!!1", LONG_ATTRIBUTE, 42L), exportedSpans.get(0).getAttributes());
+        assertEquals(Attributes.of(ATTRIBUTE, "test!!!1", LONG_ATTRIBUTE, 43L), exportedSpans.get(0).getAttributes());
         assertEquals("second", exportedSpans.get(1).getName());
         assertEquals(Attributes.of(OTHER_ATTRIBUTE, "test"), exportedSpans.get(1).getAttributes());
     }

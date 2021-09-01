@@ -47,7 +47,7 @@ public class SampleApplication extends Application {
                 .filterSpans(spanFilter ->
                         spanFilter
                                 .removeSpanAttribute(stringKey("http.user_agent"))
-                                .rejectSpansByName(spanName -> spanName.equals("ignored")))
+                                .rejectSpansByName(spanName -> spanName.contains("ignored")))
                 .build();
         SplunkRum.initialize(config, this);
     }
