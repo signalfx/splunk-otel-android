@@ -54,7 +54,7 @@ public final class SpanFilterBuilder {
     /**
      * Remove matching spans from the exporter pipeline.
      * <p>
-     * Any Span that contains an attribute with key {@code attributeKey} and value matching the
+     * Any span that contains an attribute with key {@code attributeKey} and value matching the
      * {@code attributeValuePredicate} will not be exported.
      *
      * @param attributeKey            An attribute key to match.
