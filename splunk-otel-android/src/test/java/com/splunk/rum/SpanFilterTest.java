@@ -171,6 +171,31 @@ public class SpanFilterTest {
     }
 
     @Test
+    public void shouldReplaceSpanAttributes_removeAttributeByReturningNull() {
+        // given
+        SpanExporter underTest = new SpanFilterBuilder()
+                .replaceSpanAttribute(ATTRIBUTE, value -> null)
+                .build()
+                .apply(delegate);
+
+        SpanData span = span("first", Attributes.of(ATTRIBUTE, "test", LONG_ATTRIBUTE, 42L));
+
+        CompletableResultCode expectedResult = new CompletableResultCode();
+        when(delegate.export(spansCaptor.capture())).thenReturn(expectedResult);
+
+        // when
+        CompletableResultCode result = underTest.export(singletonList(span));
+
+        // then
+        assertSame(expectedResult, result);
+
+        List<SpanData> exportedSpans = new ArrayList<>(spansCaptor.getValue());
+        assertEquals(1, exportedSpans.size());
+        assertEquals("first", exportedSpans.get(0).getName());
+        assertEquals(Attributes.of(LONG_ATTRIBUTE, 42L), exportedSpans.get(0).getAttributes());
+    }
+
+    @Test
     public void builderChangesShouldNotApplyToAlreadyDecoratedExporter() {
         // given
         SpanFilterBuilder builder = new SpanFilterBuilder();
