@@ -40,7 +40,7 @@ public final class SpanFilterBuilder {
     /**
      * Remove matching spans from the exporter pipeline.
      * <p>
-     * Span names that match the {@code spanNamePredicate} will not be exported.
+     * Spans with names that match the {@code spanNamePredicate} will not be exported.
      *
      * @param spanNamePredicate A function that returns true if a span with passed name should be
      *                          rejected.
@@ -54,7 +54,7 @@ public final class SpanFilterBuilder {
     /**
      * Remove matching spans from the exporter pipeline.
      * <p>
-     * Span that contains an attribute with key {@code attributeKey} and value matching the
+     * Any Span that contains an attribute with key {@code attributeKey} and value matching the
      * {@code attributeValuePredicate} will not be exported.
      *
      * @param attributeKey            An attribute key to match.
@@ -76,7 +76,7 @@ public final class SpanFilterBuilder {
     /**
      * Modify span data before it enters the exporter pipeline.
      * <p>
-     * An attribute with key {@code attributeKey} and  will be removed from the span before it is exported.
+     * Any attribute with key {@code attributeKey} and  will be removed from the span before it is exported.
      *
      * @param attributeKey An attribute key to match.
      * @return {@code this}.
@@ -88,7 +88,7 @@ public final class SpanFilterBuilder {
     /**
      * Modify span data before it enters the exporter pipeline.
      * <p>
-     * An attribute with key {@code attributeKey} and value matching the
+     * Any attribute with key {@code attributeKey} and value matching the
      * {@code attributeValuePredicate} will be removed from the span before it is exported.
      *
      * @param attributeKey            An attribute key to match.
@@ -106,8 +106,8 @@ public final class SpanFilterBuilder {
     /**
      * Modify span data before it enters the exporter pipeline.
      * <p>
-     * Value of an attribute with key {@code attributeKey} will be passed to the
-     * {@code attributeValueModifier} function. Value returned by the function will replace the
+     * The value of any attribute with key {@code attributeKey} will be passed to the
+     * {@code attributeValueModifier} function. The value returned by the function will replace the
      * original value. When the modifier function returns {@code null} the attribute will be removed
      * from the span.
      *
