@@ -73,6 +73,14 @@ public final class SpanFilterBuilder {
         return this;
     }
 
+    /**
+     * Modify span data before it enters the exporter pipeline.
+     * <p>
+     * An attribute with key {@code attributeKey} and  will be removed from the span before it is exported.
+     *
+     * @param attributeKey An attribute key to match.
+     * @return {@code this}.
+     */
     public <T> SpanFilterBuilder removeSpanAttribute(AttributeKey<T> attributeKey) {
         return removeSpanAttribute(attributeKey, value -> true);
     }
