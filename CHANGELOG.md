@@ -13,7 +13,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - OpenTelemetry okhttp instrumentation has been updated to version 1.5.3-alpha. 
 - For okhttp, SplunkRum now exposes a wrapper for your `OkHttpClient` which implements the `Call.Factory`
-  interface. This `Call.Factory` will properly managing context propagation with asynchronous http calls.
+  interface. This `Call.Factory` will properly manage context propagation with asynchronous http calls.
 - The okhttp Interceptor provided by SplunkRum has been deprecated. Please use the `Call.Factory` from now on.
   The `createOkHttpRumInterceptor()` method will be removed in a future release.
 - A new class (`com.splunk.rum.StandardAttributes`) has been introduced to provide `AttributeKey`s for 
