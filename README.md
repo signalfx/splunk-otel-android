@@ -40,7 +40,8 @@
 * Full Android Activity and Fragment lifecycle monitoring
 * Access to the OpenTelemetry APIs for manual instrumentation
 * SplunkRum APIs for creating custom RUM events and reporting exceptions
-* Access to an OkHttp3 Interceptor implementation for monitoring http client requests
+* Access to an OkHttp3 Call.Factory implementation for monitoring http client requests
+* APIs to redact any span from export, or change span attributes before export.
 
 ## Getting Started
 
