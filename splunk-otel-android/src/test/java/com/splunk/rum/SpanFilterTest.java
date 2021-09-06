@@ -35,6 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -63,6 +64,29 @@ public class SpanFilterTest {
         SpanExporter underTest = new SpanFilterBuilder()
                 .rejectSpansByName(spanName -> spanName.equals("span2"))
                 .rejectSpansByName(spanName -> spanName.equals("span4"))
+                .build()
+                .apply(delegate);
+
+        SpanData span1 = span("span1");
+        SpanData span2 = span("span2");
+        SpanData span3 = span("span3");
+        SpanData span4 = span("span4");
+
+        CompletableResultCode expectedResult = new CompletableResultCode();
+        when(delegate.export(asList(span1, span3))).thenReturn(expectedResult);
+
+        // when
+        CompletableResultCode result = underTest.export(asList(span1, span2, span3, span4));
+
+        // then
+        assertSame(expectedResult, result);
+    }
+
+    @Test
+    public void shouldRejectSpansByName_byPattern() {
+        // given
+        SpanExporter underTest = new SpanFilterBuilder()
+                .rejectSpansByName(Pattern.compile("span[24]"))
                 .build()
                 .apply(delegate);
 

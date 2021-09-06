@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
@@ -35,6 +36,19 @@ public final class SpanFilterBuilder {
     private final Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements = new HashMap<>();
 
     SpanFilterBuilder() {
+    }
+
+    /**
+     * Remove matching spans from the exporter pipeline.
+     * <p>
+     * Spans with names that match the passed {@code pattern} will not be exported.
+     *
+     * @param pattern A regular expression pattern that matches names of spans that should be
+     *                rejected.
+     * @return {@code this}.
+     */
+    public SpanFilterBuilder rejectSpansByName(Pattern pattern) {
+        return rejectSpansByName(spanName -> pattern.matcher(spanName).matches());
     }
 
     /**
