@@ -20,9 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
 /**
  * Allows to modify span data before it is sent to the exported. Spans can be modified or entirely
@@ -54,6 +57,22 @@ public final class SpanFilterBuilder {
     /**
      * Remove matching spans from the exporter pipeline.
      * <p>
+     * Any span that contains the {@code http.url} attribute value matching the passed
+     * {@code pattern} will not be exported.
+     *
+     * @param pattern A regular expression pattern that matches {@code http.url} attribute values of
+     *                spans that should be rejected.
+     * @return {@code this}.
+     */
+    public SpanFilterBuilder rejectSpansByHttpUrl(Pattern pattern) {
+        return rejectSpansByAttributeValue(
+                SemanticAttributes.HTTP_URL,
+                url -> pattern.matcher(url).matches());
+    }
+
+    /**
+     * Remove matching spans from the exporter pipeline.
+     * <p>
      * Any span that contains an attribute with key {@code attributeKey} and value matching the
      * {@code attributeValuePredicate} will not be exported.
      *
@@ -71,6 +90,22 @@ public final class SpanFilterBuilder {
                         ? attributeValuePredicate
                         : ((Predicate<T>) oldValue).or(attributeValuePredicate));
         return this;
+    }
+
+    /**
+     * Modify span data before it enters the exporter pipeline.
+     * <p>
+     * The {@code http.url} attribute value matching the passed {@code pattern} will be removed from
+     * the span before it is exported.
+     *
+     * @param pattern A regular expression pattern that matches {@code http.url} attribute values
+     *                that should be removed from the span.
+     * @return {@code this}.
+     */
+    public <T> SpanFilterBuilder removeHttpUrl(Pattern pattern) {
+        return removeSpanAttribute(
+                SemanticAttributes.HTTP_URL,
+                url -> pattern.matcher(url).matches());
     }
 
     /**
@@ -101,6 +136,25 @@ public final class SpanFilterBuilder {
             Predicate<? super T> attributeValuePredicate) {
 
         return replaceSpanAttribute(attributeKey, old -> attributeValuePredicate.test(old) ? null : old);
+    }
+
+    /**
+     * Modify span data before it enters the exporter pipeline.
+     * <p>
+     * The value of the {@code http.url} attribute matching the passed {@code pattern} will be
+     * modified in a way that replaces all subsequences that match {@code pattern} with the
+     * {@code replacement} string. The behavior of this method is consistent with the
+     * {@link Matcher#replaceAll(String)} method.
+     *
+     * @param pattern     A regular expression pattern that matches {@code http.url} attribute
+     *                    values that should undergo replacement.
+     * @param replacement The replacement string.
+     * @return {@code this}.
+     */
+    public <T> SpanFilterBuilder replaceHttpUrl(Pattern pattern, String replacement) {
+        return replaceSpanAttribute(
+                SemanticAttributes.HTTP_URL,
+                url -> pattern.matcher(url).replaceAll(replacement));
     }
 
     /**

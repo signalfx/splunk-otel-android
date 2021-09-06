@@ -18,12 +18,14 @@ package com.splunk.rum;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_URL;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +37,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -109,6 +112,30 @@ public class SpanFilterTest {
     }
 
     @Test
+    public void shouldRejectSpansByHttpUrl() {
+        // given
+        SpanExporter underTest = new SpanFilterBuilder()
+                .rejectSpansByHttpUrl(Pattern.compile(".*secret$"))
+                .rejectSpansByHttpUrl(Pattern.compile(".*auth=(\\w+).*"))
+                .build()
+                .apply(delegate);
+
+        SpanData rejected = span("span", Attributes.of(HTTP_URL, "https://www.splunk.com/secret"));
+        SpanData anotherRejected = span("span", Attributes.of(HTTP_URL, "https://www.splunk.com/login?auth=password123"));
+        SpanData notRejected = span("span", Attributes.of(HTTP_URL, "https://www.splunk.com/thisoneisokay"));
+
+        CompletableResultCode expectedResult = new CompletableResultCode();
+        when(delegate.export(singletonList(notRejected))).thenReturn(expectedResult);
+
+        // when
+        CompletableResultCode result = underTest.export(
+                asList(rejected, anotherRejected, notRejected));
+
+        // then
+        assertSame(expectedResult, result);
+    }
+
+    @Test
     public void shouldRemoveSpanAttributes() {
         // given
         SpanExporter underTest = new SpanFilterBuilder()
@@ -136,6 +163,34 @@ public class SpanFilterTest {
         assertEquals(Attributes.of(LONG_ATTRIBUTE, 42L), exportedSpans.get(0).getAttributes());
         assertEquals("second", exportedSpans.get(1).getName());
         assertEquals(Attributes.of(ATTRIBUTE, "not test", OTHER_ATTRIBUTE, "test"), exportedSpans.get(1).getAttributes());
+    }
+
+    @Test
+    public void shouldRemoveHttpUrl() {
+        // given
+        SpanExporter underTest = new SpanFilterBuilder()
+                .removeHttpUrl(Pattern.compile(".*auth=(\\w+).*"))
+                .build()
+                .apply(delegate);
+
+        SpanData span1 = span("first", Attributes.of(HTTP_URL, "https://www.splunk.com/login?auth=password123"));
+        SpanData span2 = span("second", Attributes.of(HTTP_URL, "https://www.splunk.com/thisoneisokay"));
+
+        CompletableResultCode expectedResult = new CompletableResultCode();
+        when(delegate.export(spansCaptor.capture())).thenReturn(expectedResult);
+
+        // when
+        CompletableResultCode result = underTest.export(asList(span1, span2));
+
+        // then
+        assertSame(expectedResult, result);
+
+        List<SpanData> exportedSpans = new ArrayList<>(spansCaptor.getValue());
+        assertEquals(2, exportedSpans.size());
+        assertEquals("first", exportedSpans.get(0).getName());
+        assertTrue(exportedSpans.get(0).getAttributes().isEmpty());
+        assertEquals("second", exportedSpans.get(1).getName());
+        assertEquals(Attributes.of(HTTP_URL, "https://www.splunk.com/thisoneisokay"), exportedSpans.get(1).getAttributes());
     }
 
     @Test
@@ -168,6 +223,34 @@ public class SpanFilterTest {
         assertEquals(Attributes.of(ATTRIBUTE, "test!!!1", LONG_ATTRIBUTE, 43L), exportedSpans.get(0).getAttributes());
         assertEquals("second", exportedSpans.get(1).getName());
         assertEquals(Attributes.of(OTHER_ATTRIBUTE, "test"), exportedSpans.get(1).getAttributes());
+    }
+
+    @Test
+    public void shouldReplaceHttpUrl() {
+        // given
+        SpanExporter underTest = new SpanFilterBuilder()
+                .replaceHttpUrl(Pattern.compile("(auth)=\\w+"), "$1=<redacted>")
+                .build()
+                .apply(delegate);
+
+        SpanData span1 = span("first", Attributes.of(HTTP_URL, "https://www.splunk.com/login?auth=password123"));
+        SpanData span2 = span("second", Attributes.of(HTTP_URL, "https://www.splunk.com/thisoneisokay"));
+
+        CompletableResultCode expectedResult = new CompletableResultCode();
+        when(delegate.export(spansCaptor.capture())).thenReturn(expectedResult);
+
+        // when
+        CompletableResultCode result = underTest.export(asList(span1, span2));
+
+        // then
+        assertSame(expectedResult, result);
+
+        List<SpanData> exportedSpans = new ArrayList<>(spansCaptor.getValue());
+        assertEquals(2, exportedSpans.size());
+        assertEquals("first", exportedSpans.get(0).getName());
+        assertEquals(Attributes.of(HTTP_URL, "https://www.splunk.com/login?auth=<redacted>"), exportedSpans.get(0).getAttributes());
+        assertEquals("second", exportedSpans.get(1).getName());
+        assertEquals(Attributes.of(HTTP_URL, "https://www.splunk.com/thisoneisokay"), exportedSpans.get(1).getAttributes());
     }
 
     @Test

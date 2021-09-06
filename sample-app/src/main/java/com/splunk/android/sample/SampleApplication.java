@@ -24,6 +24,8 @@ import com.splunk.rum.Config;
 import com.splunk.rum.SplunkRum;
 import com.splunk.rum.StandardAttributes;
 
+import java.util.regex.Pattern;
+
 import io.opentelemetry.api.common.Attributes;
 
 public class SampleApplication extends Application {
@@ -47,7 +49,9 @@ public class SampleApplication extends Application {
                 .filterSpans(spanFilter ->
                         spanFilter
                                 .removeSpanAttribute(stringKey("http.user_agent"))
-                                .rejectSpansByName(spanName -> spanName.contains("ignored")))
+                                .rejectSpansByName(spanName -> spanName.contains("ignored"))
+                                // sensitive data in the login http.url attribute will be redacted before it hits the exporter
+                                .replaceHttpUrl(Pattern.compile("(user|pass)=\\w+"), "$1=<redacted>"))
                 .build();
         SplunkRum.initialize(config, this);
     }
