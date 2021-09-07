@@ -16,7 +16,6 @@
 
 package com.splunk.rum;
 
-import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -40,22 +39,19 @@ class ConnectionUtil {
 
     private final AtomicReference<CurrentNetwork> currentNetwork = new AtomicReference<>();
 
-    ConnectionUtil(Context context) {
-        this(ConnectionUtil::createNetworkMonitoringRequest, NetworkDetector.create(context), (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+    ConnectionUtil(NetworkDetector networkDetector) {
+        this.networkDetector = networkDetector;
+        this.connectionMonitor = new ConnectionMonitor();
     }
 
-    //for testing, since building the NetworkRequest fails in junit due to .. Android.
-    ConnectionUtil(Supplier<NetworkRequest> createNetworkMonitoringRequest, NetworkDetector networkDetector, ConnectivityManager connectivityManager) {
-        this.connectionMonitor = new ConnectionMonitor();
-
+    void startMonitoring(Supplier<NetworkRequest> createNetworkMonitoringRequest, ConnectivityManager connectivityManager) {
+        refreshNetworkStatus();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             connectivityManager.registerDefaultNetworkCallback(connectionMonitor);
         } else {
             NetworkRequest networkRequest = createNetworkMonitoringRequest.get();
             connectivityManager.registerNetworkCallback(networkRequest, connectionMonitor);
         }
-        this.networkDetector = networkDetector;
-        refreshNetworkStatus();
     }
 
     CurrentNetwork refreshNetworkStatus() {
@@ -64,8 +60,8 @@ class ConnectionUtil {
         return activeNetwork;
     }
 
-    private static NetworkRequest createNetworkMonitoringRequest() {
-        //todo: this throws an NPE when running in junit. what's up with that?
+    static NetworkRequest createNetworkMonitoringRequest() {
+        //note: this throws an NPE when running in junit without robolectric, due to Android
         return new NetworkRequest.Builder()
                 .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
                 .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)

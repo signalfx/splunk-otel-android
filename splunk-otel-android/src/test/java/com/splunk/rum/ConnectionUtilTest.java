@@ -16,7 +16,21 @@
 
 package com.splunk.rum;
 
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkRequest;
 import android.os.Build;
 
@@ -28,21 +42,11 @@ import org.robolectric.annotation.Config;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @RunWith(RobolectricTestRunner.class)
 public class ConnectionUtilTest {
 
     @Test
-    @Config(sdk = Build.VERSION_CODES.LOLLIPOP)
+    @Config(sdk = LOLLIPOP)
     public void lollipop() {
         NetworkRequest networkRequest = mock(NetworkRequest.class);
         NetworkDetector networkDetector = mock(NetworkDetector.class);
@@ -52,7 +56,8 @@ public class ConnectionUtilTest {
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null)) //called on init
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"));
 
-        ConnectionUtil connectionUtil = new ConnectionUtil(() -> networkRequest, networkDetector, connectivityManager);
+        ConnectionUtil connectionUtil = new ConnectionUtil(networkDetector);
+        connectionUtil.startMonitoring(() -> networkRequest, connectivityManager);
 
         assertTrue(connectionUtil.isOnline());
         assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null), connectionUtil.getActiveNetwork());
@@ -89,7 +94,8 @@ public class ConnectionUtilTest {
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null))
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"));
 
-        ConnectionUtil connectionUtil = new ConnectionUtil(() -> networkRequest, networkDetector, connectivityManager);
+        ConnectionUtil connectionUtil = new ConnectionUtil(networkDetector);
+        connectionUtil.startMonitoring(() -> networkRequest, connectivityManager);
 
         assertTrue(connectionUtil.isOnline());
         assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null), connectionUtil.getActiveNetwork());
@@ -114,5 +120,23 @@ public class ConnectionUtilTest {
         assertEquals(1, notified.get());
         monitorCaptor.getValue().onLost(null);
         assertEquals(2, notified.get());
+    }
+
+    @Test
+    @Config(sdk = {Build.VERSION_CODES.Q, Build.VERSION_CODES.LOLLIPOP})
+    public void shouldNotFailOnImmediateConnectionManagerCall() {
+        NetworkRequest networkRequest = mock(NetworkRequest.class);
+        NetworkDetector networkDetector = mock(NetworkDetector.class);
+        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
+
+        doAnswer(invocation -> {
+            ConnectivityManager.NetworkCallback callback = invocation.getArgument(1);
+            callback.onAvailable(mock(Network.class));
+            return null;
+        }).when(connectivityManager)
+                .registerNetworkCallback(eq(networkRequest), any(ConnectivityManager.NetworkCallback.class));
+
+        ConnectionUtil connectionUtil = new ConnectionUtil(networkDetector);
+        connectionUtil.startMonitoring(() -> networkRequest, connectivityManager);
     }
 }
