@@ -70,6 +70,7 @@ class RumInitializer {
         List<RumInitializer.InitializationEvent> initializationEvents = new ArrayList<>();
 
         ConnectionUtil connectionUtil = connectionUtilSupplier.get();
+        connectionUtil.start();
         initializationEvents.add(new InitializationEvent("connectionUtilInitialized", timingClock.now()));
 
         SpanExporter zipkinExporter = buildExporter(connectionUtil);

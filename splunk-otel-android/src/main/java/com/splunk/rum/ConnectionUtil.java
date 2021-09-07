@@ -26,7 +26,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 //note: based on ideas from stack overflow: https://stackoverflow.com/questions/32547006/connectivitymanager-getnetworkinfoint-deprecated
@@ -35,10 +34,12 @@ class ConnectionUtil {
     static final CurrentNetwork NO_NETWORK = new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null);
     static final CurrentNetwork UNKNOWN_NETWORK = new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null);
 
-    private final ConnectionMonitor connectionMonitor;
+    private final Supplier<NetworkRequest> createNetworkMonitoringRequest;
     private final NetworkDetector networkDetector;
+    private final ConnectivityManager connectivityManager;
 
-    private final AtomicReference<CurrentNetwork> currentNetwork = new AtomicReference<>();
+    private volatile CurrentNetwork currentNetwork;
+    private volatile ConnectionStateListener connectionStateListener;
 
     ConnectionUtil(Context context) {
         this(ConnectionUtil::createNetworkMonitoringRequest, NetworkDetector.create(context), (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
@@ -46,22 +47,25 @@ class ConnectionUtil {
 
     //for testing, since building the NetworkRequest fails in junit due to .. Android.
     ConnectionUtil(Supplier<NetworkRequest> createNetworkMonitoringRequest, NetworkDetector networkDetector, ConnectivityManager connectivityManager) {
-        this.connectionMonitor = new ConnectionMonitor();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            connectivityManager.registerDefaultNetworkCallback(connectionMonitor);
-        } else {
-            NetworkRequest networkRequest = createNetworkMonitoringRequest.get();
-            connectivityManager.registerNetworkCallback(networkRequest, connectionMonitor);
-        }
+        this.createNetworkMonitoringRequest = createNetworkMonitoringRequest;
         this.networkDetector = networkDetector;
+        this.connectivityManager = connectivityManager;
         refreshNetworkStatus();
     }
 
     CurrentNetwork refreshNetworkStatus() {
         CurrentNetwork activeNetwork = networkDetector.detectCurrentNetwork();
-        currentNetwork.set(activeNetwork);
+        currentNetwork = activeNetwork;
         return activeNetwork;
+    }
+
+    void start() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            connectivityManager.registerDefaultNetworkCallback(new ConnectionMonitor());
+        } else {
+            NetworkRequest networkRequest = createNetworkMonitoringRequest.get();
+            connectivityManager.registerNetworkCallback(networkRequest, new ConnectionMonitor());
+        }
     }
 
     private static NetworkRequest createNetworkMonitoringRequest() {
@@ -76,24 +80,18 @@ class ConnectionUtil {
     }
 
     boolean isOnline() {
-        return currentNetwork.get().isOnline();
+        return currentNetwork.isOnline();
     }
 
     CurrentNetwork getActiveNetwork() {
-        return currentNetwork.get();
+        return currentNetwork;
     }
 
     void setInternetStateListener(ConnectionStateListener listener) {
-        connectionMonitor.setOnConnectionStateListener(listener);
+        connectionStateListener = listener;
     }
 
-    class ConnectionMonitor extends ConnectivityManager.NetworkCallback {
-
-        private ConnectionStateListener connectionStateListener;
-
-        void setOnConnectionStateListener(ConnectionStateListener connectionStateListener) {
-            this.connectionStateListener = connectionStateListener;
-        }
+    private class ConnectionMonitor extends ConnectivityManager.NetworkCallback {
 
         @Override
         public void onAvailable(@NonNull Network network) {
@@ -112,7 +110,7 @@ class ConnectionUtil {
             //this method, we'll force it to be NO_NETWORK, rather than relying on the ConnectivityManager to have the right
             //state at the right time during this event.
             CurrentNetwork activeNetwork = NO_NETWORK;
-            currentNetwork.set(activeNetwork);
+            currentNetwork = activeNetwork;
             if (connectionStateListener != null) {
                 connectionStateListener.onAvailable(false, activeNetwork);
                 Log.d(SplunkRum.LOG_TAG, "  onLost: isConnected:" + false + ", activeNetwork: " + activeNetwork);
