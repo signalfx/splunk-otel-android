@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -55,11 +54,8 @@ public class RumInitializerTest {
                 return testExporter;
             }
         };
-        ConnectionUtil connectionUtil = mock(ConnectionUtil.class, RETURNS_DEEP_STUBS);
-        SplunkRum splunkRum = testInitializer.initialize(() -> connectionUtil, mock(Looper.class));
+        SplunkRum splunkRum = testInitializer.initialize(() -> mock(ConnectionUtil.class, RETURNS_DEEP_STUBS), mock(Looper.class));
         splunkRum.flushSpans();
-
-        verify(connectionUtil).start();
 
         List<SpanData> spans = testExporter.getFinishedSpanItems();
         assertEquals(1, spans.size());

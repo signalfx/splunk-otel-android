@@ -56,8 +56,8 @@ public class ConnectionUtilTest {
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null)) //called on init
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"));
 
-        ConnectionUtil connectionUtil = new ConnectionUtil(() -> networkRequest, networkDetector, connectivityManager);
-        connectionUtil.start();
+        ConnectionUtil connectionUtil = new ConnectionUtil(networkDetector);
+        connectionUtil.startMonitoring(() -> networkRequest, connectivityManager);
 
         assertTrue(connectionUtil.isOnline());
         assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null), connectionUtil.getActiveNetwork());
@@ -94,8 +94,8 @@ public class ConnectionUtilTest {
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null))
                 .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"));
 
-        ConnectionUtil connectionUtil = new ConnectionUtil(() -> networkRequest, networkDetector, connectivityManager);
-        connectionUtil.start();
+        ConnectionUtil connectionUtil = new ConnectionUtil(networkDetector);
+        connectionUtil.startMonitoring(() -> networkRequest, connectivityManager);
 
         assertTrue(connectionUtil.isOnline());
         assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null), connectionUtil.getActiveNetwork());
@@ -136,8 +136,8 @@ public class ConnectionUtilTest {
         }).when(connectivityManager)
                 .registerNetworkCallback(eq(networkRequest), any(NetworkCallback.class));
 
-        ConnectionUtil connectionUtil = new ConnectionUtil(() -> networkRequest, networkDetector, connectivityManager);
-        connectionUtil.start();
+        ConnectionUtil connectionUtil = new ConnectionUtil(networkDetector);
+        connectionUtil.startMonitoring(() -> networkRequest, connectivityManager);
     }
 
     @Test
@@ -154,7 +154,7 @@ public class ConnectionUtilTest {
         }).when(connectivityManager)
                 .registerDefaultNetworkCallback(any(NetworkCallback.class));
 
-        ConnectionUtil connectionUtil = new ConnectionUtil(() -> networkRequest, networkDetector, connectivityManager);
-        connectionUtil.start();
+        ConnectionUtil connectionUtil = new ConnectionUtil(networkDetector);
+        connectionUtil.startMonitoring(() -> networkRequest, connectivityManager);
     }
 }
