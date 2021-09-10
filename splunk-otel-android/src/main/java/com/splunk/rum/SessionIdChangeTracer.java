@@ -23,7 +23,7 @@ import io.opentelemetry.api.trace.Tracer;
 
 final class SessionIdChangeTracer implements SessionIdChangeListener {
 
-    static final AttributeKey<String> PREVIOUS_SESSION_ID_KEY = stringKey("splunk.previous.rumSessionId");
+    static final AttributeKey<String> PREVIOUS_SESSION_ID_KEY = stringKey("splunk.rum.previous_session_id");
 
     private final Tracer tracer;
 
@@ -34,8 +34,7 @@ final class SessionIdChangeTracer implements SessionIdChangeListener {
     @Override
     public void onChange(String oldSessionId, String newSessionId) {
         tracer.spanBuilder("sessionId.change")
-                // TODO: new component for sessionId changes?
-                .setAttribute(SplunkRum.COMPONENT_KEY, "session")
+                // TODO: should we set component?
                 .setAttribute(PREVIOUS_SESSION_ID_KEY, oldSessionId)
                 .startSpan()
                 .end();

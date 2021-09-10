@@ -51,8 +51,7 @@ public class SessionIdChangeTracerTest {
         SpanData span = spans.get(0);
         assertEquals("sessionId.change", span.getName());
         Attributes attributes = span.getAttributes();
-        assertEquals(2, attributes.size());
-        assertEquals("session", attributes.get(SplunkRum.COMPONENT_KEY));
+        assertEquals(1, attributes.size());
         assertEquals("123", attributes.get(SessionIdChangeTracer.PREVIOUS_SESSION_ID_KEY));
         // splunk.rumSessionId attribute is set in the RumAttributeAppender class
     }
