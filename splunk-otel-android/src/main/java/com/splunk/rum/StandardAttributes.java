@@ -33,7 +33,7 @@ public final class StandardAttributes {
     public static final AttributeKey<String> APP_VERSION = AttributeKey.stringKey("app.version");
 
     /**
-     * Full HTTP request URL in the form {@code scheme://host[:port]/path?query[#fragment]}. Useful
+     * Full HTTP client request URL in the form {@code scheme://host[:port]/path?query[#fragment]}. Useful
      * for span data filtering with the {@link SpanFilterBuilder}.
      *
      * @see SemanticAttributes#HTTP_URL
