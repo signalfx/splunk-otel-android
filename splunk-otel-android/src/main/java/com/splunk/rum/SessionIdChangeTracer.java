@@ -34,7 +34,6 @@ final class SessionIdChangeTracer implements SessionIdChangeListener {
     @Override
     public void onChange(String oldSessionId, String newSessionId) {
         tracer.spanBuilder("sessionId.change")
-                // TODO: should we set component?
                 .setAttribute(PREVIOUS_SESSION_ID_KEY, oldSessionId)
                 .startSpan()
                 .end();
