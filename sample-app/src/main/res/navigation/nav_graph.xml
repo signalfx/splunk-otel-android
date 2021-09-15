@@ -43,5 +43,5 @@
     <fragment
         android:id="@+id/shopWebViewFragment"
         android:name="com.splunk.android.sample.ShopWebViewFragment"
-        android:label="fragment_web_view" />
+        android:label="Online Boutique" />
 </navigation>
