@@ -337,6 +337,8 @@ public class SplunkRum {
      * This method will enable Splunk Browser-based RUM to integrate with the current Android RUM
      * Session. It injects a javascript object named "SplunkRumNative" into your WebView which exposes
      * the Android Session ID to the browser-based RUM javascript implementation.
+     * <p>
+     * Please note: This API is not stable and may change in future releases.
      *
      * @param webView The WebView to inject the javascript object into.
      */
