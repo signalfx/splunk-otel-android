@@ -51,19 +51,6 @@ public class SimpleNetworkDetectorTest {
     }
 
     @Test
-    public void exception() {
-        ConnectivityManager connectivityManager =
-                mock(ConnectivityManager.class);
-
-        when(connectivityManager.getActiveNetworkInfo()).thenThrow(new SecurityException("bug"));
-        SimpleNetworkDetector networkDetector = new SimpleNetworkDetector(connectivityManager);
-
-        CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null), currentNetwork);
-    }
-
-    @Test
     public void other() {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) ApplicationProvider.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -52,21 +52,6 @@ public class PostApi29NetworkDetectorTest {
     }
 
     @Test
-    public void exception() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        TelephonyManager telephonyManager = mock(TelephonyManager.class);
-        Context context = mock(Context.class);
-
-        Network network = mock(Network.class);
-        when(connectivityManager.getActiveNetwork()).thenReturn(network);
-        when(connectivityManager.getNetworkCapabilities(network)).thenThrow(new SecurityException("bug"));
-
-        PostApi29NetworkDetector networkDetector = new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
-        CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null), currentNetwork);
-    }
-
-    @Test
     public void wifi() {
         ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
         TelephonyManager telephonyManager = mock(TelephonyManager.class);

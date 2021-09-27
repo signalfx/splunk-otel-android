@@ -31,26 +31,20 @@ class SimpleNetworkDetector implements NetworkDetector {
 
     @Override
     public CurrentNetwork detectCurrentNetwork() {
-        try {
-            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo(); // Deprecated in API 29
-            if (activeNetwork == null) {
-                return NO_NETWORK;
-            }
-            switch (activeNetwork.getType()) {
-                case ConnectivityManager.TYPE_MOBILE:  // Deprecated in API 28
-                    return new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, activeNetwork.getSubtypeName());
-                case ConnectivityManager.TYPE_WIFI:  // Deprecated in API 28
-                    return new CurrentNetwork(NetworkState.TRANSPORT_WIFI, activeNetwork.getSubtypeName());
-                case ConnectivityManager.TYPE_VPN:
-                    return new CurrentNetwork(NetworkState.TRANSPORT_VPN, activeNetwork.getSubtypeName());
-            }
-            //there is an active network, but it doesn't fall into the neat buckets above
-            return UNKNOWN_NETWORK;
-        } catch (Exception e) {
-            //guard against security issues/bugs when accessing the connectivityManager.
-            // see: https://issuetracker.google.com/issues/175055271
-            return UNKNOWN_NETWORK;
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo(); // Deprecated in API 29
+        if (activeNetwork == null) {
+            return NO_NETWORK;
         }
+        switch (activeNetwork.getType()) {
+            case ConnectivityManager.TYPE_MOBILE:  // Deprecated in API 28
+                return new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, activeNetwork.getSubtypeName());
+            case ConnectivityManager.TYPE_WIFI:  // Deprecated in API 28
+                return new CurrentNetwork(NetworkState.TRANSPORT_WIFI, activeNetwork.getSubtypeName());
+            case ConnectivityManager.TYPE_VPN:
+                return new CurrentNetwork(NetworkState.TRANSPORT_VPN, activeNetwork.getSubtypeName());
+        }
+        //there is an active network, but it doesn't fall into the neat buckets above
+        return UNKNOWN_NETWORK;
     }
 
 }
