@@ -62,7 +62,7 @@ class ConnectionUtil {
             activeNetwork = UNKNOWN_NETWORK;
         }
         currentNetwork = activeNetwork;
-        return currentNetwork;
+        return activeNetwork;
     }
 
     static NetworkRequest createNetworkMonitoringRequest() {
