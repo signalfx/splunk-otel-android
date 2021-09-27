@@ -61,7 +61,8 @@ class ConnectionUtil {
             // see: https://issuetracker.google.com/issues/175055271
             activeNetwork = UNKNOWN_NETWORK;
         }
-        return currentNetwork = activeNetwork;
+        currentNetwork = activeNetwork;
+        return currentNetwork;
     }
 
     static NetworkRequest createNetworkMonitoringRequest() {
