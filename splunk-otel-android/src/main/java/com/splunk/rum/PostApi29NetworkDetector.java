@@ -51,8 +51,8 @@ class PostApi29NetworkDetector implements NetworkDetector {
             if (capabilities == null) {
                 return NO_NETWORK;
             }
-            String subType = null;
             if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                String subType = null;
                 // If the app has the permission, use it to get a subtype.
                 if (hasPermission(Manifest.permission.READ_PHONE_STATE)) {
                     subType = getDataNetworkTypeName(telephonyManager.getDataNetworkType());
