@@ -16,6 +16,10 @@
 
 package com.splunk.rum;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -27,10 +31,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.Q)
@@ -49,6 +49,21 @@ public class PostApi29NetworkDetectorTest {
         PostApi29NetworkDetector networkDetector = new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
         assertEquals(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null), currentNetwork);
+    }
+
+    @Test
+    public void exception() {
+        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
+        TelephonyManager telephonyManager = mock(TelephonyManager.class);
+        Context context = mock(Context.class);
+
+        Network network = mock(Network.class);
+        when(connectivityManager.getActiveNetwork()).thenReturn(network);
+        when(connectivityManager.getNetworkCapabilities(network)).thenThrow(new SecurityException("bug"));
+
+        PostApi29NetworkDetector networkDetector = new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
+        CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
+        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null), currentNetwork);
     }
 
     @Test

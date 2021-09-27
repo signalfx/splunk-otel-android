@@ -16,6 +16,9 @@
 
 package com.splunk.rum;
 
+import static com.splunk.rum.ConnectionUtil.NO_NETWORK;
+import static com.splunk.rum.ConnectionUtil.UNKNOWN_NETWORK;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -27,9 +30,6 @@ import android.telephony.TelephonyManager;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
-
-import static com.splunk.rum.ConnectionUtil.NO_NETWORK;
-import static com.splunk.rum.ConnectionUtil.UNKNOWN_NETWORK;
 
 @RequiresApi(api = Build.VERSION_CODES.Q)
 class PostApi29NetworkDetector implements NetworkDetector {
@@ -46,24 +46,30 @@ class PostApi29NetworkDetector implements NetworkDetector {
     @SuppressLint("MissingPermission")
     @Override
     public CurrentNetwork detectCurrentNetwork() {
-        NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
-        if (capabilities == null) {
-            return NO_NETWORK;
-        }
-        String subType = null;
-        if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-            // If the app has the permission, use it to get a subtype.
-            if (hasPermission(Manifest.permission.READ_PHONE_STATE)) {
-                subType = getDataNetworkTypeName(telephonyManager.getDataNetworkType());
+        try {
+            NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+            if (capabilities == null) {
+                return NO_NETWORK;
             }
-            return new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType);
-        } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            return new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null);
-        } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-            return new CurrentNetwork(NetworkState.TRANSPORT_VPN, null);
+            String subType = null;
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                // If the app has the permission, use it to get a subtype.
+                if (hasPermission(Manifest.permission.READ_PHONE_STATE)) {
+                    subType = getDataNetworkTypeName(telephonyManager.getDataNetworkType());
+                }
+                return new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType);
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                return new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null);
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                return new CurrentNetwork(NetworkState.TRANSPORT_VPN, null);
+            }
+            //there is an active network, but it doesn't fall into the neat buckets above
+            return UNKNOWN_NETWORK;
+        } catch (Exception e) {
+            //guard against possible bugs/security issues with using the connectivityManager.
+            // see: https://issuetracker.google.com/issues/175055271
+            return UNKNOWN_NETWORK;
         }
-        //there is an active network, but it doesn't fall into the neat buckets above
-        return UNKNOWN_NETWORK;
     }
 
     //visible for testing

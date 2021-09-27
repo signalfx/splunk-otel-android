@@ -16,11 +16,11 @@
 
 package com.splunk.rum;
 
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-
 import static com.splunk.rum.ConnectionUtil.NO_NETWORK;
 import static com.splunk.rum.ConnectionUtil.UNKNOWN_NETWORK;
+
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 class SimpleNetworkDetector implements NetworkDetector {
     private final ConnectivityManager connectivityManager;
@@ -31,20 +31,26 @@ class SimpleNetworkDetector implements NetworkDetector {
 
     @Override
     public CurrentNetwork detectCurrentNetwork() {
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo(); // Deprecated in API 29
-        if (activeNetwork == null) {
-            return NO_NETWORK;
+        try {
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo(); // Deprecated in API 29
+            if (activeNetwork == null) {
+                return NO_NETWORK;
+            }
+            switch (activeNetwork.getType()) {
+                case ConnectivityManager.TYPE_MOBILE:  // Deprecated in API 28
+                    return new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, activeNetwork.getSubtypeName());
+                case ConnectivityManager.TYPE_WIFI:  // Deprecated in API 28
+                    return new CurrentNetwork(NetworkState.TRANSPORT_WIFI, activeNetwork.getSubtypeName());
+                case ConnectivityManager.TYPE_VPN:
+                    return new CurrentNetwork(NetworkState.TRANSPORT_VPN, activeNetwork.getSubtypeName());
+            }
+            //there is an active network, but it doesn't fall into the neat buckets above
+            return UNKNOWN_NETWORK;
+        } catch (Exception e) {
+            //guard against security issues/bugs when accessing the connectivityManager.
+            // see: https://issuetracker.google.com/issues/175055271
+            return UNKNOWN_NETWORK;
         }
-        switch (activeNetwork.getType()) {
-            case ConnectivityManager.TYPE_MOBILE:  // Deprecated in API 28
-                return new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, activeNetwork.getSubtypeName());
-            case ConnectivityManager.TYPE_WIFI:  // Deprecated in API 28
-                return new CurrentNetwork(NetworkState.TRANSPORT_WIFI, activeNetwork.getSubtypeName());
-            case ConnectivityManager.TYPE_VPN:
-                return new CurrentNetwork(NetworkState.TRANSPORT_VPN, activeNetwork.getSubtypeName());
-        }
-        //there is an active network, but it doesn't fall into the neat buckets above
-        return UNKNOWN_NETWORK;
     }
 
 }
