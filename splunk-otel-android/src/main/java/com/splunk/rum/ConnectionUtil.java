@@ -53,16 +53,14 @@ class ConnectionUtil {
     }
 
     CurrentNetwork refreshNetworkStatus() {
-        CurrentNetwork activeNetwork;
         try {
-            activeNetwork = networkDetector.detectCurrentNetwork();
+            currentNetwork = networkDetector.detectCurrentNetwork();
         } catch (Exception e) {
             //guard against security issues/bugs when accessing the Android connectivityManager.
             // see: https://issuetracker.google.com/issues/175055271
-            activeNetwork = UNKNOWN_NETWORK;
+            currentNetwork = UNKNOWN_NETWORK;
         }
-        currentNetwork = activeNetwork;
-        return activeNetwork;
+        return currentNetwork;
     }
 
     static NetworkRequest createNetworkMonitoringRequest() {
