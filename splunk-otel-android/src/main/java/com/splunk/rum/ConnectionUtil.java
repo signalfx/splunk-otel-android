@@ -44,6 +44,14 @@ class ConnectionUtil {
 
     void startMonitoring(Supplier<NetworkRequest> createNetworkMonitoringRequest, ConnectivityManager connectivityManager) {
         refreshNetworkStatus();
+        try {
+            registerNetworkCallbacks(createNetworkMonitoringRequest, connectivityManager);
+        } catch (Exception e) {
+            //if this fails, we'll go without network change events.
+        }
+    }
+
+    private void registerNetworkCallbacks(Supplier<NetworkRequest> createNetworkMonitoringRequest, ConnectivityManager connectivityManager) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             connectivityManager.registerDefaultNetworkCallback(new ConnectionMonitor());
         } else {
