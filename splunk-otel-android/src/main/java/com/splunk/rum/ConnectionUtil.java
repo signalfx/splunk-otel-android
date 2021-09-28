@@ -48,6 +48,7 @@ class ConnectionUtil {
             registerNetworkCallbacks(createNetworkMonitoringRequest, connectivityManager);
         } catch (Exception e) {
             //if this fails, we'll go without network change events.
+            Log.w(SplunkRum.LOG_TAG, "Failed to register network callbacks. Automatic network monitoring is disabled.", e);
         }
     }
 
