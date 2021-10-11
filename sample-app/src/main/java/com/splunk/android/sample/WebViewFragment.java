@@ -105,5 +105,10 @@ public class WebViewFragment extends Fragment {
         public String getRumAccessToken() {
             return context.getResources().getString(R.string.rum_access_token);
         }
+
+        @JavascriptInterface
+        public String getRumRealm() {
+            return context.getResources().getString(R.string.rum_realm);
+        }
     }
 }

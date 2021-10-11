@@ -8,7 +8,7 @@
             crossorigin="anonymous"></script>
     <script>
       SplunkRum.init({
-          beaconUrl: 'https://rum-ingest.us0.signalfx.com/v1/rum',
+          beaconUrl: 'https://rum-ingest.' + Android.getRumRealm() + '.signalfx.com/v1/rum',
           rumAuth: Android.getRumAccessToken(),
           app: 'Android WebView Spectacular.com'
         });
