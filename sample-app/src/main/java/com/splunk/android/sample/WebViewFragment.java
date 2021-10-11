@@ -100,5 +100,10 @@ public class WebViewFragment extends Fragment {
             SplunkRum.getInstance().addRumEvent("WebViewButtonClicked", Attributes.empty());
             Toast.makeText(context, toast, Toast.LENGTH_LONG).show();
         }
+
+        @JavascriptInterface
+        public String getRumAccessToken() {
+            return context.getResources().getString(R.string.rum_access_token);
+        }
     }
 }
