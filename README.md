@@ -32,6 +32,8 @@
 
 > :construction: This project is currently in **BETA**. It is officially supported by Splunk. However, breaking changes MAY be introduced.
 
+Splunk RUM Product Documentation can be found [here](https://docs.splunk.com/Observability/rum/intro-to-rum.html#nav-Introduction-to-Splunk-RUM).
+
 ## Features
 
 * Crash reporting
