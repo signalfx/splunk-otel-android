@@ -173,7 +173,7 @@ class RumInitializer {
         for (RumInitializer.InitializationEvent initializationEvent : initializationEvents) {
             span.addEvent(initializationEvent.name, initializationEvent.time, TimeUnit.NANOSECONDS);
         }
-        span.end();
+        span.end(timingClock.now(), TimeUnit.NANOSECONDS);
     }
 
     private SdkTracerProvider buildTracerProvider(
