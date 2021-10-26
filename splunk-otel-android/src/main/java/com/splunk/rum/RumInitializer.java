@@ -57,12 +57,13 @@ class RumInitializer {
     private final Application application;
     private final AppStartupTimer startupTimer;
     private final List<RumInitializer.InitializationEvent> initializationEvents = new ArrayList<>();
-    private final AnchoredClock timingClock = AnchoredClock.create(Clock.getDefault());
+    private final AnchoredClock timingClock;
 
     RumInitializer(Config config, Application application, AppStartupTimer startupTimer) {
         this.config = config;
         this.application = application;
         this.startupTimer = startupTimer;
+        this.timingClock = startupTimer.startupClock;
     }
 
     SplunkRum initialize(Supplier<ConnectionUtil> connectionUtilSupplier, Looper mainLooper) {
