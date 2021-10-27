@@ -140,7 +140,7 @@ class MyApplication extends Application {
     private final String rumAccessToken = "<your_RUM_access_token>";
     private final Config config = SplunkRum.newConfigBuilder()
             .realm(realm)
-            .rumAccessToken(rumAuth)
+            .rumAccessToken(rumAccessToken)
             .applicationName("My Android App")
             .build();
 }
