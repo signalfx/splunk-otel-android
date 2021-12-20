@@ -261,3 +261,5 @@ version 2.0. See
 [desugar]: https://developer.android.com/studio/write/java8-support#library-desugaring
 
 [javadoc-url]: https://www.javadoc.io/doc/com.splunk/splunk-otel-android/latest/com/splunk/rum/SplunkRum.html
+
+>ℹ️&nbsp;&nbsp;SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.
