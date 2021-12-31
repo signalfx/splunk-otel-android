@@ -169,6 +169,38 @@ class MyApplication extends Application {
 Examples of this process can be seen in the sample application included in this repository in
 the `sample-app` submodule.
 
+### Instrument WebViews using the Browser RUM agent
+
+Mobile RUM instrumentation and Browser RUM instrumentation can be used
+simultaneously by sharing the `splunk.rumSessionId` between both
+instrumentations to see RUM data combined in one stream.
+
+The following Android snippet shows how to integrate Android RUM with
+Splunk Browser RUM:
+
+``` java
+import android.webkit.WebView;
+import com.splunk.rum.SplunkRum;
+
+//...
+/* 
+Make sure that the WebView instance only loads pages under 
+your control and instrumented with Splunk Browser RUM. The 
+integrateWithBrowserRum() method can expose the splunk.rumSessionId
+of your user to every site/page loaded in the WebView instance.
+*/
+@Override
+public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+   super.onViewCreated(view, savedInstanceState);
+   binding.webView.setWebViewClient(new LocalContentWebViewClient(assetLoader));
+   binding.webView.loadUrl("https://subdomain.example.com/instrumented-page.html");
+
+   binding.webView.getSettings().setJavaScriptEnabled(true);
+   binding.webView.addJavascriptInterface(new WebAppInterface(getContext()), "Android");
+   SplunkRum.getInstance().integrateWithBrowserRum(binding.webView);
+}
+```
+
 ### Advanced Usage
 
 #### Additional `Config.Builder` options.
