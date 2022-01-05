@@ -201,6 +201,15 @@ public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceStat
 }
 ```
 
+You can now retrieve the session id in your JS code using `SplunkRumNative.getNativeSessionId()`. For example:
+
+```html
+<p>Session ID: <span id="session_id"></span></p>
+
+<script type="text/javascript">
+    document.getElementById("session_id").innerHTML = SplunkRumNative.getNativeSessionId();
+</script>
+\```
 ### Advanced Usage
 
 #### Additional `Config.Builder` options.
