@@ -209,7 +209,7 @@ You can now retrieve the session id in your JS code using `SplunkRumNative.getNa
 <script type="text/javascript">
     document.getElementById("session_id").innerHTML = SplunkRumNative.getNativeSessionId();
 </script>
-\```
+```
 ### Advanced Usage
 
 #### Additional `Config.Builder` options.
