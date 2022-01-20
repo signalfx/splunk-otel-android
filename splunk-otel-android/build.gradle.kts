@@ -122,7 +122,7 @@ project.afterEvaluate {
     //note: we need to declare this here in afterEvaluate because the android plugin doesn't
     // resolve dependencies early enough to make the libraryVariants hack work until here.
     val javadoc by tasks.registering(Javadoc::class) {
-        source = fileTree(android.sourceSets.named("main").get().java.srcDirs)
+        source = android.sourceSets.named("main").get().java.getSourceFiles()
         classpath += project.files(android.bootClasspath)
 
         // grab the library variants, because apparently this is where the real classpath lives that
