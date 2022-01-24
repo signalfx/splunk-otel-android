@@ -122,7 +122,7 @@ public class TracingHurlStackTest {
 
         SpanData span = spans.get(0);
 
-        testsAttributes(span, url, 200);
+        verifyAttributes(span, url, 200);
 
     }
 
@@ -152,7 +152,7 @@ public class TracingHurlStackTest {
 
         SpanData span = spans.get(0);
 
-        testsAttributes(span, url, 500);
+        verifyAttributes(span, url, 500);
     }
 
     @Test
@@ -218,22 +218,22 @@ public class TracingHurlStackTest {
         assertThat(spans).hasSize(2);
 
         SpanData firstSpan = spans.get(0);
-        testsAttributes(firstSpan, url, 200);
+        verifyAttributes(firstSpan, url, 200);
 
         SpanData secondSpan = spans.get(1);
-        testsAttributes(secondSpan, url, 200);
+        verifyAttributes(secondSpan, url, 200);
     }
 
     //TODO: concurrent tests
 
-    private void testsAttributes(SpanData span, String url, int status) {
+    private void verifyAttributes(SpanData span, String url, int status) {
         assertThat(span.getName()).isEqualTo("HTTP GET");
 
         Attributes spanAttributes = span.getAttributes();
         assertThat(spanAttributes.get(SemanticAttributes.HTTP_STATUS_CODE)).isEqualTo(status);
         assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_PORT)).isEqualTo(server.getPort());
-        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_NAME)).isEqualTo(url);
-        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_IP)).isEqualTo(server.getHostName());
+        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_NAME)).isEqualTo(server.getHostName());
+        assertThat(spanAttributes.get(SemanticAttributes.HTTP_URL)).isEqualTo(url);
     }
 
     private int findUnusedPort() {

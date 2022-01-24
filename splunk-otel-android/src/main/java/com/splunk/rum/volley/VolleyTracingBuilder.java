@@ -90,7 +90,6 @@ public final class VolleyTracingBuilder {
                         .addAttributesExtractor(httpAttributesExtractor)
                         .addAttributesExtractor(netAttributesExtractor)
                         .addAttributesExtractors(additionalExtractors)
-                        .addRequestMetrics(HttpClientMetrics.get())
                         .newClientInstrumenter(ClientRequestHeaderSetter.INSTANCE);
 
         return new VolleyTracing(instrumenter);

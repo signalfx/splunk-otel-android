@@ -51,34 +51,24 @@ final class VolleyHttpClientAttributesExtractor extends HttpClientAttributesExtr
     protected String method(RequestWrapper requestWrapper) {
         Request<?> request = requestWrapper.getRequest();
         switch (request.getMethod()) {
-            case -1:
-                try {
-                    if (request.getPostBody() != null) {
-                        return "POST";
-                    } else {
-                        return "GET";
-                    }
-                } catch (AuthFailureError authFailureError) {
-                    return "GET_OR_POST";
-                }
-            case 0:
+            case Request.Method.GET:
                 return "GET";
-            case 1:
+            case Request.Method.POST:
                 return "POST";
-            case 2:
+            case Request.Method.PUT:
                 return "PUT";
-            case 3:
+            case Request.Method.DELETE:
                 return "DELETE";
-            case 4:
+            case Request.Method.HEAD:
                 return "HEAD";
-            case 5:
+            case Request.Method.OPTIONS:
                 return "OPTIONS";
-            case 6:
+            case Request.Method.TRACE:
                 return "TRACE";
-            case 7:
+            case Request.Method.PATCH:
                 return "PATCH";
             default:
-                return "";
+                return null;
         }
     }
 

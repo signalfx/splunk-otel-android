@@ -32,7 +32,7 @@ final class VolleyNetClientAttributesExtractor extends NetClientAttributesExtrac
 
     @Override
     public String peerName(RequestWrapper requestWrapper, @Nullable HttpResponse httpResponse) {
-        return requestWrapper.getRequest().getUrl();
+        return requestWrapper.getUrl().getHost();
     }
 
     @Override
@@ -42,6 +42,6 @@ final class VolleyNetClientAttributesExtractor extends NetClientAttributesExtrac
 
     @Override
     public String peerIp(RequestWrapper requestWrapper, @Nullable HttpResponse httpResponse) {
-        return requestWrapper.getUrl().getHost();
+        return null;
     }
 }

@@ -79,8 +79,9 @@ final class TracingHurlStack extends HurlStack {
         } finally {
             if (scope != null) {
                 scope.close();
-                instrumenter.end(context, currentRequestWrapper.get(), response, throwable);
+                instrumenter.end(context, requestWrapper, response, throwable);
             }
+            currentRequestWrapper.remove();
         }
 
         return response;
