@@ -44,6 +44,7 @@ import org.robolectric.annotation.LooperMode;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +58,6 @@ import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
-import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
@@ -86,7 +86,7 @@ public class TracingHurlStackTest {
         OpenTelemetry otel = OpenTelemetrySdk.builder()
                 .setTracerProvider(sdkTracerProvider)
                 .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
-                .buildAndRegisterGlobal();
+                .build();
 
         //setup Volley with TracingHurlStack
         testQueue = TestRequestQueue.create(otel);
@@ -101,10 +101,10 @@ public class TracingHurlStackTest {
         server.enqueue(new MockResponse().setBody("success"));
         server.play();
 
-        String url = server.getUrl("/success").toString();
+        URL url = server.getUrl("/success");
 
         RequestFuture<String> response = RequestFuture.newFuture();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(),
                 response, response);
 
         testQueue.addToQueue(stringRequest);
@@ -122,7 +122,7 @@ public class TracingHurlStackTest {
 
         SpanData span = spans.get(0);
 
-        verifyAttributes(span, url, 200);
+        verifyAttributes(span, url, 200L);
 
     }
 
@@ -132,10 +132,10 @@ public class TracingHurlStackTest {
         server.enqueue(new MockResponse().setResponseCode(500));
         server.play();
 
-        String url = server.getUrl("/error").toString();
+        URL url = server.getUrl("/error");
 
         RequestFuture<String> response = RequestFuture.newFuture();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(),
                 response, response);
 
         testQueue.addToQueue(stringRequest);
@@ -152,7 +152,7 @@ public class TracingHurlStackTest {
 
         SpanData span = spans.get(0);
 
-        verifyAttributes(span, url, 500);
+        verifyAttributes(span, url, 500L);
     }
 
     @Test
@@ -161,11 +161,11 @@ public class TracingHurlStackTest {
         server.enqueue(new MockResponse().setBody("should not be received"));
         server.play();
 
-        String url = "http://" + server.getHostName() + ":" + findUnusedPort() + "/none";
+        URL url = new URL("http://" + server.getHostName() + ":" + findUnusedPort() + "/none");
 
         RequestFuture<String> response = RequestFuture.newFuture();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(),
                 response, response);
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(100, 0, 1f));
 
@@ -186,9 +186,11 @@ public class TracingHurlStackTest {
 
         assertThat(span.getStatus()).isEqualTo(StatusData.error());
 
-        EventData event = span.getEvents().stream().filter(e -> e.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME)).findFirst().orElse(null);
+        assertThat(span.getEvents())
+                .hasSize(1)
+                .allSatisfy(e -> e.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME));
 
-        assertThat(event).isNotNull();
+        verifyAttributes(span, url, null);
 
     }
 
@@ -199,9 +201,9 @@ public class TracingHurlStackTest {
         server.enqueue(new MockResponse().setBody("success2"));
         server.play();
 
-        String url = server.getUrl("/success").toString();
+        URL url = server.getUrl("/success");
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(),
                 response -> {
                 }, error -> {
         });
@@ -218,22 +220,24 @@ public class TracingHurlStackTest {
         assertThat(spans).hasSize(2);
 
         SpanData firstSpan = spans.get(0);
-        verifyAttributes(firstSpan, url, 200);
+        verifyAttributes(firstSpan, url, 200L);
 
         SpanData secondSpan = spans.get(1);
-        verifyAttributes(secondSpan, url, 200);
+        verifyAttributes(secondSpan, url, 200L);
     }
 
     //TODO: concurrent tests
 
-    private void verifyAttributes(SpanData span, String url, int status) {
+    private void verifyAttributes(SpanData span, URL url, Long status) {
         assertThat(span.getName()).isEqualTo("HTTP GET");
 
         Attributes spanAttributes = span.getAttributes();
         assertThat(spanAttributes.get(SemanticAttributes.HTTP_STATUS_CODE)).isEqualTo(status);
-        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_PORT)).isEqualTo(server.getPort());
-        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_NAME)).isEqualTo(server.getHostName());
-        assertThat(spanAttributes.get(SemanticAttributes.HTTP_URL)).isEqualTo(url);
+        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_PORT)).isEqualTo(url.getPort());
+        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_NAME)).isEqualTo(url.getHost());
+        assertThat(spanAttributes.get(SemanticAttributes.HTTP_URL)).isEqualTo(url.toString());
+        assertThat(spanAttributes.get(SemanticAttributes.HTTP_METHOD)).isEqualTo("GET");
+
     }
 
     private int findUnusedPort() {

@@ -94,7 +94,7 @@ final class VolleyHttpClientAttributesExtractor extends HttpClientAttributesExtr
     protected Long requestContentLength(RequestWrapper requestWrapper, @Nullable HttpResponse response) {
         Request<?> request = requestWrapper.getRequest();
         try {
-            return request.getBody() != null ? (long) requestWrapper.getRequest().getBody().length : null;
+            return request.getBody() != null ? (long) request.getBody().length : null;
         } catch (AuthFailureError authFailureError) {
             return null;
         }

@@ -90,6 +90,9 @@ final class TracingHurlStack extends HurlStack {
 
     @Override
     protected HttpURLConnection createConnection(URL url) throws IOException {
+        // requestWrapper cannot null here, because this method is called only
+        // inside parent's executeRequest() (through a private method - openConnection()),
+        // so currentRequestWrapper.set() is always called before that
         RequestWrapper requestWrapper = currentRequestWrapper.get();
         requestWrapper.setUrl(url);
         return super.createConnection(url);
