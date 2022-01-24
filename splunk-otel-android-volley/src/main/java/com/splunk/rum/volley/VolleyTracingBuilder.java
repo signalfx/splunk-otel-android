@@ -36,7 +36,7 @@ import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanStatusExtr
  */
 public final class VolleyTracingBuilder {
 
-    private static final String INSTRUMENTATION_NAME = "io.opentelemetry.volley";
+    private static final String INSTRUMENTATION_NAME = "com.splunk.android.volley";
 
     private final OpenTelemetry openTelemetry;
     private final List<AttributesExtractor<RequestWrapper, HttpResponse>> additionalExtractors =

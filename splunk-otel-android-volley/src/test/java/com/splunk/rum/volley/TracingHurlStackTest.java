@@ -81,8 +81,6 @@ public class TracingHurlStackTest {
                 .addSpanProcessor(SimpleSpanProcessor.create(exporter))
                 .build();
 
-        GlobalOpenTelemetry.resetForTest();
-
         OpenTelemetry otel = OpenTelemetrySdk.builder()
                 .setTracerProvider(sdkTracerProvider)
                 .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
