@@ -27,7 +27,6 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.NoCache;
@@ -108,7 +107,6 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        shadowOf(getMainLooper()).idle();
         Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         while (!scheduler.advanceToLastPostedRunnable());
 
@@ -140,7 +138,6 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        shadowOf(getMainLooper()).idle();
         Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         while (!scheduler.advanceToLastPostedRunnable());
 
@@ -172,7 +169,6 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        shadowOf(getMainLooper()).idle();
         Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         while (!scheduler.advanceToLastPostedRunnable());
 
@@ -214,7 +210,6 @@ public class TracingHurlStackTest {
         testQueue.addToQueue(stringRequest);
         testQueue.addToQueue(stringRequest);
 
-        shadowOf(getMainLooper()).idle();
         Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         while (!scheduler.advanceToLastPostedRunnable());
         while (!scheduler.advanceToNextPostedRunnable());
