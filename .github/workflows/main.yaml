@@ -1,5 +1,9 @@
 name: "Continuous Build"
 
+concurrency:
+  group: ci
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
   push:
@@ -18,4 +22,4 @@ jobs:
           java-version: 11
 
       - name: Build and test
-        run: touch ./local.properties; ./gradlew build javadoc --no-daemon
+        run: touch ./local.properties; ./gradlew build javadoc --no-daemon --scan

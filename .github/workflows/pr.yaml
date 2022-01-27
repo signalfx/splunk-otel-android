@@ -1,5 +1,9 @@
 name: PR build
 
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 on:
   pull_request:
 
@@ -15,4 +19,4 @@ jobs:
           java-version: 11
 
       - name: Build and test
-        run: touch ./local.properties; ./gradlew build javadoc --no-daemon
+        run: touch ./local.properties; ./gradlew build javadoc --no-daemon --scan
