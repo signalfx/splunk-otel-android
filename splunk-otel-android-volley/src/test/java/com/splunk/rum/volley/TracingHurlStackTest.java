@@ -165,14 +165,14 @@ public class TracingHurlStackTest {
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(),
                 response, response);
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(50, 0, 1f));
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(500, 0, 1f));
 
         testQueue.addToQueue(stringRequest);
 
         Thread.sleep(1000); // Volley works asynchronously, we need to wait for Looper to receive the task
         shadowOf(getMainLooper()).idle();
 
-        assertThatThrownBy(() -> response.get(1, TimeUnit.SECONDS)).hasCauseInstanceOf(TimeoutError.class);
+        assertThatThrownBy(() -> response.get(5, TimeUnit.SECONDS)).hasCauseInstanceOf(TimeoutError.class);
 
         assertThat(server.getRequestCount()).isEqualTo(0); //server received no requests
 
