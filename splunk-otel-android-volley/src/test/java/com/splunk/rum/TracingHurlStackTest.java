@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.volley;
+package com.splunk.rum;
 
 import static android.os.Looper.getMainLooper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +34,8 @@ import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.google.mockwebserver.MockResponse;
 import com.google.mockwebserver.MockWebServer;
+import com.splunk.rum.SplunkRum;
+import com.splunk.rum.VolleyTracing;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,13 +46,13 @@ import org.robolectric.util.Scheduler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
@@ -151,6 +153,8 @@ public class TracingHurlStackTest {
         SpanData span = spans.get(0);
 
         verifyAttributes(span, url, 500L);
+
+
     }
 
     @Test
@@ -190,6 +194,10 @@ public class TracingHurlStackTest {
                 .allSatisfy(e -> e.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME));
 
         verifyAttributes(span, url, null);
+
+        Attributes spanAttributes = span.getAttributes();
+        assertThat(spanAttributes.get(SplunkRum.ERROR_TYPE_KEY)).isEqualTo("SocketTimeoutException");
+        assertThat(spanAttributes.get(SemanticAttributes.EXCEPTION_TYPE)).isEqualTo("SocketTimeoutException");
 
     }
 
@@ -237,7 +245,6 @@ public class TracingHurlStackTest {
         assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_NAME)).isEqualTo(url.getHost());
         assertThat(spanAttributes.get(SemanticAttributes.HTTP_URL)).isEqualTo(url.toString());
         assertThat(spanAttributes.get(SemanticAttributes.HTTP_METHOD)).isEqualTo("GET");
-
     }
 
     private int findUnusedPort() {
