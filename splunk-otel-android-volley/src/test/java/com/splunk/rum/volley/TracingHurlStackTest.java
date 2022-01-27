@@ -41,6 +41,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.LooperMode;
+import org.robolectric.util.Scheduler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -64,7 +65,7 @@ import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
 @RunWith(RobolectricTestRunner.class)
-@LooperMode(LooperMode.Mode.PAUSED)
+@LooperMode(LooperMode.Mode.LEGACY)
 public class TracingHurlStackTest {
 
     private InMemorySpanExporter exporter;
@@ -107,8 +108,9 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        Thread.sleep(100); // Volley works asynchronously, we need to wait for Looper to receive the task
         shadowOf(getMainLooper()).idle();
+        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+        while (!scheduler.advanceToLastPostedRunnable());
 
         String result = response.get(10, TimeUnit.SECONDS);
 
@@ -138,8 +140,9 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        Thread.sleep(100); // Volley works asynchronously, we need to wait for Looper to receive the task
         shadowOf(getMainLooper()).idle();
+        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+        while (!scheduler.advanceToLastPostedRunnable());
 
         assertThatThrownBy(() -> response.get(10, TimeUnit.SECONDS)).hasCauseInstanceOf(VolleyError.class);
 
@@ -169,8 +172,9 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        Thread.sleep(1000); // Volley works asynchronously, we need to wait for Looper to receive the task
         shadowOf(getMainLooper()).idle();
+        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+        while (!scheduler.advanceToLastPostedRunnable());
 
         //thrown exception type depends on the system, e.g. on MacOS - TimeoutError, on Ubuntu - NoConnectionException
         assertThatThrownBy(() -> response.get(3, TimeUnit.SECONDS)).isInstanceOf(Throwable.class);
@@ -210,8 +214,10 @@ public class TracingHurlStackTest {
         testQueue.addToQueue(stringRequest);
         testQueue.addToQueue(stringRequest);
 
-        Thread.sleep(100); // Volley works asynchronously, we need to wait for Looper to receive the task
         shadowOf(getMainLooper()).idle();
+        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+        while (!scheduler.advanceToLastPostedRunnable());
+        while (!scheduler.advanceToNextPostedRunnable());
 
         assertThat(server.getRequestCount()).isEqualTo(2);
 
