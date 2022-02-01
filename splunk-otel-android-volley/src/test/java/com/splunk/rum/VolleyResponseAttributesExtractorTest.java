@@ -126,6 +126,4 @@ public class VolleyResponseAttributesExtractorTest {
         assertEquals("failed to make a call", attributes.get(SplunkRum.ERROR_MESSAGE_KEY));
     }
 
-    //TODO: test like OkHttpClientInterceptor, where TracingHurlStack is registered and some internal volley behaviour is mocked
-    // to throw an exception
 }

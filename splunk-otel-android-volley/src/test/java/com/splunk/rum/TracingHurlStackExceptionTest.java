@@ -34,8 +34,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.LooperMode;
 import org.robolectric.util.Scheduler;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +44,7 @@ import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
 @RunWith(RobolectricTestRunner.class)
 @LooperMode(LooperMode.Mode.LEGACY)
-public class ExceptionTest {
+public class TracingHurlStackExceptionTest {
 
     @Rule
     public OpenTelemetryRule otelTesting = OpenTelemetryRule.create();
