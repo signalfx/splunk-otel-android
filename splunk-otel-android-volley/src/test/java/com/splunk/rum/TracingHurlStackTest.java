@@ -172,10 +172,6 @@ public class TracingHurlStackTest {
 
         verifyAttributes(span, url, null);
 
-        Attributes spanAttributes = span.getAttributes();
-        assertThat(spanAttributes.get(SplunkRum.ERROR_TYPE_KEY)).isEqualTo("SocketTimeoutException");
-        assertThat(spanAttributes.get(SemanticAttributes.EXCEPTION_TYPE)).isEqualTo("SocketTimeoutException");
-
     }
 
     @Test
