@@ -79,4 +79,36 @@ public class SessionIdTest {
         String secondSessionId = sessionId.getSessionId();
         verify(listener).onChange(firstSessionId, secondSessionId);
     }
+
+    @Test
+    public void shouldTimeoutSessionAfter15MinutesOfInactivity() {
+        TestClock clock = TestClock.create();
+        SessionId sessionId = new SessionId(clock);
+
+        String value = sessionId.getSessionId();
+        assertEquals(value, sessionId.getSessionId());
+
+        sessionId.startInactivityTimeout();
+        clock.advance(15, TimeUnit.MINUTES);
+        assertNotEquals(value, sessionId.getSessionId());
+    }
+
+    @Test
+    public void shouldResetTheTimeoutWhenGetSessionIdIsCalled() {
+        TestClock clock = TestClock.create();
+        SessionId sessionId = new SessionId(clock);
+
+        String value = sessionId.getSessionId();
+        assertEquals(value, sessionId.getSessionId());
+
+        sessionId.startInactivityTimeout();
+        clock.advance(14, TimeUnit.MINUTES);
+        clock.advance(59, TimeUnit.SECONDS);
+
+        assertEquals(value, sessionId.getSessionId());
+
+        clock.advance(1, TimeUnit.HOURS);
+
+        assertEquals(value, sessionId.getSessionId());
+    }
 }
