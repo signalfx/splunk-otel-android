@@ -181,8 +181,8 @@ public class TracingHurlStackTest {
     @Test
     public void reusedRequest() throws IOException {
 
-        String firstResponseBody = "success1";
-        String secondResponseBody = "success2";
+        String firstResponseBody = "first response";
+        String secondResponseBody = "second response";
 
         server.enqueue(new MockResponse().setBody(firstResponseBody));
         server.enqueue(new MockResponse().setBody(secondResponseBody));
