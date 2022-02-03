@@ -44,9 +44,8 @@ public class VolleyResponseAttributesExtractorTest {
         ServerTimingHeaderParser headerParser = mock(ServerTimingHeaderParser.class);
         when(headerParser.parse("headerValue")).thenReturn(new String[]{"9499195c502eb217c448a68bfe0f967c", "fe16eca542cd5d86"});
 
-        List<Header> responseHeaders = Arrays.asList(
-                new Header("Server-Timing", "headerValue"),
-                new Header("Content-Length", "101")
+        List<Header> responseHeaders = Collections.singletonList(
+                new Header("Server-Timing", "headerValue")
         );
         RequestWrapper fakeRequest = new RequestWrapper(mock(Request.class), Collections.emptyMap());
         HttpResponse response = new HttpResponse(200, responseHeaders, "hello".getBytes());
@@ -58,9 +57,8 @@ public class VolleyResponseAttributesExtractorTest {
         Attributes attributes = attributesBuilder.build();
 
         assertEquals("http", attributes.get(SplunkRum.COMPONENT_KEY));
-        assertEquals("9499195c502eb217c448a68bfe0f967c", attributes.get(OkHttpRumInterceptor.LINK_TRACE_ID_KEY));
-        assertEquals("fe16eca542cd5d86", attributes.get(OkHttpRumInterceptor.LINK_SPAN_ID_KEY));
-        assertEquals(101L, (long) attributes.get(HTTP_RESPONSE_CONTENT_LENGTH));
+        assertEquals("9499195c502eb217c448a68bfe0f967c", attributes.get(SplunkRum.LINK_TRACE_ID_KEY));
+        assertEquals("fe16eca542cd5d86", attributes.get(SplunkRum.LINK_SPAN_ID_KEY));
     }
 
     @Test
@@ -79,29 +77,8 @@ public class VolleyResponseAttributesExtractorTest {
         Attributes attributes = attributesBuilder.build();
 
         assertEquals("http", attributes.get(SplunkRum.COMPONENT_KEY));
-        assertNull(attributes.get(OkHttpRumInterceptor.LINK_TRACE_ID_KEY));
-        assertNull(attributes.get(OkHttpRumInterceptor.LINK_SPAN_ID_KEY));
-    }
-
-    @Test
-    public void spanDecoration_contentLength() {
-        ServerTimingHeaderParser headerParser = mock(ServerTimingHeaderParser.class);
-        when(headerParser.parse(null)).thenReturn(new String[0]);
-
-        List<Header> responseHeaders = Collections.singletonList(
-                new Header("Content-Length", "101")
-        );
-        RequestWrapper fakeRequest = new RequestWrapper(mock(Request.class), Collections.emptyMap());
-        HttpResponse response = new HttpResponse(200, responseHeaders, "hello".getBytes());
-
-        VolleyResponseAttributesExtractor attributesExtractor = new VolleyResponseAttributesExtractor(headerParser);
-        AttributesBuilder attributesBuilder = Attributes.builder();
-        attributesExtractor.onEnd(attributesBuilder, fakeRequest, response, null);
-        attributesExtractor.onStart(attributesBuilder, fakeRequest);
-        Attributes attributes = attributesBuilder.build();
-
-        assertEquals("http", attributes.get(SplunkRum.COMPONENT_KEY));
-        assertEquals(101L, (long) attributes.get(HTTP_RESPONSE_CONTENT_LENGTH));
+        assertNull(attributes.get(SplunkRum.LINK_TRACE_ID_KEY));
+        assertNull(attributes.get(SplunkRum.LINK_SPAN_ID_KEY));
     }
 
     @Test

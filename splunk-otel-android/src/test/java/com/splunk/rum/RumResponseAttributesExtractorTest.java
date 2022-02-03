@@ -57,8 +57,8 @@ public class RumResponseAttributesExtractorTest {
         Attributes attributes = attributesBuilder.build();
 
         assertEquals("http", attributes.get(SplunkRum.COMPONENT_KEY));
-        assertEquals("9499195c502eb217c448a68bfe0f967c", attributes.get(OkHttpRumInterceptor.LINK_TRACE_ID_KEY));
-        assertEquals("fe16eca542cd5d86", attributes.get(OkHttpRumInterceptor.LINK_SPAN_ID_KEY));
+        assertEquals("9499195c502eb217c448a68bfe0f967c", attributes.get(SplunkRum.LINK_TRACE_ID_KEY));
+        assertEquals("fe16eca542cd5d86", attributes.get(SplunkRum.LINK_SPAN_ID_KEY));
         assertEquals(101L, (long) attributes.get(HTTP_RESPONSE_CONTENT_LENGTH));
     }
 
@@ -82,8 +82,8 @@ public class RumResponseAttributesExtractorTest {
         Attributes attributes = attributesBuilder.build();
 
         assertEquals("http", attributes.get(SplunkRum.COMPONENT_KEY));
-        assertNull(attributes.get(OkHttpRumInterceptor.LINK_TRACE_ID_KEY));
-        assertNull(attributes.get(OkHttpRumInterceptor.LINK_SPAN_ID_KEY));
+        assertNull(attributes.get(SplunkRum.LINK_TRACE_ID_KEY));
+        assertNull(attributes.get(SplunkRum.LINK_SPAN_ID_KEY));
     }
 
     @Test

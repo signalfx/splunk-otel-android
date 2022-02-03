@@ -22,8 +22,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 import static org.robolectric.Shadows.shadowOf;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Header;
 import com.android.volley.Request;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.RequestFuture;
@@ -31,6 +34,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.mockwebserver.MockResponse;
 import com.google.mockwebserver.MockWebServer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,6 +47,7 @@ import org.robolectric.util.Scheduler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -75,7 +81,8 @@ public class TracingHurlStackTest {
     @Test
     public void success() throws IOException, InterruptedException, ExecutionException, TimeoutException {
 
-        server.enqueue(new MockResponse().setBody("success"));
+        String responseBody = "success";
+        server.enqueue(new MockResponse().setBody(responseBody));
         server.play();
 
         URL url = server.getUrl("/success");
@@ -99,14 +106,14 @@ public class TracingHurlStackTest {
 
         SpanData span = spans.get(0);
 
-        verifyAttributes(span, url, 200L);
-
+        verifyAttributes(span, url, 200L, responseBody);
     }
 
     @Test
     public void serverError() throws IOException, InterruptedException {
 
-        server.enqueue(new MockResponse().setResponseCode(500));
+        String responseBody = "error";
+        server.enqueue(new MockResponse().setBody(responseBody).setResponseCode(500));
         server.play();
 
         URL url = server.getUrl("/error");
@@ -129,9 +136,7 @@ public class TracingHurlStackTest {
 
         SpanData span = spans.get(0);
 
-        verifyAttributes(span, url, 500L);
-
-
+        verifyAttributes(span, url, 500L, responseBody);
     }
 
     @Test
@@ -170,15 +175,17 @@ public class TracingHurlStackTest {
                 .hasSize(1)
                 .allSatisfy(e -> e.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME));
 
-        verifyAttributes(span, url, null);
-
+        verifyAttributes(span, url, null, null);
     }
 
     @Test
     public void reusedRequest() throws IOException {
 
-        server.enqueue(new MockResponse().setBody("success1"));
-        server.enqueue(new MockResponse().setBody("success2"));
+        String firstResponseBody = "success1";
+        String secondResponseBody = "success2";
+
+        server.enqueue(new MockResponse().setBody(firstResponseBody));
+        server.enqueue(new MockResponse().setBody(secondResponseBody));
         server.play();
 
         URL url = server.getUrl("/success");
@@ -201,16 +208,15 @@ public class TracingHurlStackTest {
         assertThat(spans).hasSize(2);
 
         SpanData firstSpan = spans.get(0);
-        verifyAttributes(firstSpan, url, 200L);
+        verifyAttributes(firstSpan, url, 200L, firstResponseBody);
 
         SpanData secondSpan = spans.get(1);
-        verifyAttributes(secondSpan, url, 200L);
+        verifyAttributes(secondSpan, url, 200L, secondResponseBody);
     }
-
 
     //TODO: concurrent tests
 
-    private void verifyAttributes(SpanData span, URL url, Long status) {
+    private void verifyAttributes(SpanData span, URL url, Long status, String responseBody) {
         assertThat(span.getName()).isEqualTo("HTTP GET");
 
         Attributes spanAttributes = span.getAttributes();
@@ -219,6 +225,10 @@ public class TracingHurlStackTest {
         assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_NAME)).isEqualTo(url.getHost());
         assertThat(spanAttributes.get(SemanticAttributes.HTTP_URL)).isEqualTo(url.toString());
         assertThat(spanAttributes.get(SemanticAttributes.HTTP_METHOD)).isEqualTo("GET");
+
+        if(responseBody != null){
+            assertThat(span.getAttributes().get(SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH)).isEqualTo(responseBody.length());
+        }
     }
 
     private int findUnusedPort() {

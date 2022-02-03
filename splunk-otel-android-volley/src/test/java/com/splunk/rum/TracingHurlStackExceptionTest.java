@@ -83,7 +83,6 @@ public class TracingHurlStackExceptionTest {
 
         assertThat(spanAttributes.get(SemanticAttributes.EXCEPTION_TYPE)).isEqualTo("RuntimeException");
         assertThat(spanAttributes.get(SemanticAttributes.EXCEPTION_MESSAGE)).isEqualTo("Something went wrong");
-
     }
 
     static class FailingURLRewriter implements HurlStack.UrlRewriter {
