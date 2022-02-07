@@ -24,9 +24,12 @@ publishing {
             groupId = "com.splunk"
             artifactId = base.archivesName.get()
 
+            afterEvaluate {
+                pom.name.set("${project.extra["pomName"]}")
+                pom.description.set(project.description)
+            }
+
             pom {
-                name.set("Splunk Otel Android")
-                description.set("A library for instrumenting Android applications for Splunk RUM")
                 url.set("https://github.com/signalfx/splunk-otel-android")
                 licenses {
                     license {

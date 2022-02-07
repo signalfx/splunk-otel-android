@@ -1,6 +1,6 @@
 plugins {
     id("com.android.library")
-    id("splunk.publish-conventions")
+    id("splunk.android-library-conventions")
 }
 
 android {
@@ -62,3 +62,6 @@ dependencies {
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 }
+
+extra["pomName"] = "Splunk Otel Android"
+description = "A library for instrumenting Android applications for Splunk RUM"

@@ -2,7 +2,7 @@ import java.time.Duration
 
 plugins {
     id("com.android.library")
-    id("splunk.publish-conventions")
+    id("splunk.android-library-conventions")
 }
 
 android {
@@ -70,3 +70,6 @@ dependencies {
 tasks.withType<Test>().configureEach {
     timeout.set(Duration.ofMinutes(15))
 }
+
+extra["pomName"] = "Splunk Otel Android Volley"
+description = "A library for instrumenting Android applications using Volley Library for Splunk RUM"
