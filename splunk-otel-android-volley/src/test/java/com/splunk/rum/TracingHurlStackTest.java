@@ -22,11 +22,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 import static org.robolectric.Shadows.shadowOf;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Header;
 import com.android.volley.Request;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.RequestFuture;
@@ -34,8 +31,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.mockwebserver.MockResponse;
 import com.google.mockwebserver.MockWebServer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,13 +42,16 @@ import org.robolectric.util.Scheduler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.sdk.testing.junit4.OpenTelemetryRule;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
@@ -214,10 +212,57 @@ public class TracingHurlStackTest {
         verifyAttributes(secondSpan, url, 200L, secondResponseBody);
     }
 
-    //TODO: concurrent tests
+    @Test
+    public void concurrency() throws IOException {
+
+        int count = 50;
+        String responseBody = "success";
+
+        for(int i = 0; i < count; i++){
+            server.enqueue(new MockResponse().setBody(responseBody));
+        }
+
+        server.play();
+        URL url = server.getUrl("/success");
+
+        CountDownLatch latch = new CountDownLatch(1);
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+
+        for(int i = 0; i < count; i++){
+            Runnable job =
+                () -> {
+                    try {
+                        latch.await();
+                    } catch (InterruptedException e) {
+                        throw new AssertionError(e);
+                    }
+                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(), response -> {}, error -> {});
+                    testQueue.addToQueue(stringRequest);
+                };
+            pool.submit(job);
+        }
+
+        latch.countDown();
+
+        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+        for(int i = 0; i < count; i++) {
+            while (!scheduler.advanceToLastPostedRunnable());
+        }
+
+        assertThat(server.getRequestCount()).isEqualTo(50);
+
+        otelTesting.getSpans().forEach(
+                span -> {
+                    verifyAttributes(span, url, 200L, "success");
+                }
+        );
+
+        pool.shutdown();
+    }
 
     private void verifyAttributes(SpanData span, URL url, Long status, String responseBody) {
         assertThat(span.getName()).isEqualTo("HTTP GET");
+        assertThat(span.getKind()).isEqualTo(SpanKind.CLIENT);
 
         Attributes spanAttributes = span.getAttributes();
         assertThat(spanAttributes.get(SemanticAttributes.HTTP_STATUS_CODE)).isEqualTo(status);
