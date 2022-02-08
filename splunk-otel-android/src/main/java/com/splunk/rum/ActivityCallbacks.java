@@ -40,14 +40,16 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     private final VisibleScreenTracker visibleScreenTracker;
     private final AppStartupTimer startupTimer;
     private final List<AppStateListener> appStateListeners;
+    private SlowRenderingDetector slowRenderingDetector;
     //we count the number of activities that have been "started" and not yet "stopped" here to figure out when the app goes into the background.
     private int numberOfOpenActivities = 0;
 
-    ActivityCallbacks(Tracer tracer, VisibleScreenTracker visibleScreenTracker, AppStartupTimer startupTimer, List<AppStateListener> appStateListeners) {
+    ActivityCallbacks(Tracer tracer, VisibleScreenTracker visibleScreenTracker, AppStartupTimer startupTimer, List<AppStateListener> appStateListeners, SlowRenderingDetector slowRenderingDetector) {
         this.tracer = tracer;
         this.visibleScreenTracker = visibleScreenTracker;
         this.startupTimer = startupTimer;
         this.appStateListeners = appStateListeners;
+        this.slowRenderingDetector = slowRenderingDetector;
     }
 
     @Override
@@ -77,6 +79,7 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
         getTracer(activity)
                 .initiateRestartSpanIfNecessary(tracersByActivityClassName.size() > 1)
                 .addEvent("activityPreStarted");
+        slowRenderingDetector.add(activity);
     }
 
     @Override
@@ -149,6 +152,7 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
             }
         }
         addEvent(activity, "activityStopped");
+        slowRenderingDetector.stop(activity);
     }
 
     @Override

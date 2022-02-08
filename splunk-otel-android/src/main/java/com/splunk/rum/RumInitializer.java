@@ -103,10 +103,13 @@ class RumInitializer {
             initializationEvents.add(new RumInitializer.InitializationEvent("networkMonitorInitialized", timingClock.now()));
         }
 
+        SlowRenderingDetector slowRenderingDetector = new SlowRenderingDetector(tracer);
+        slowRenderingDetector.start();
+
         if (Build.VERSION.SDK_INT < 29) {
             application.registerActivityLifecycleCallbacks(new Pre29ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, appStateListeners));
         } else {
-            application.registerActivityLifecycleCallbacks(new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, appStateListeners));
+            application.registerActivityLifecycleCallbacks(new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, appStateListeners, slowRenderingDetector));
         }
         initializationEvents.add(new RumInitializer.InitializationEvent("activityLifecycleCallbacksInitialized", timingClock.now()));
 
