@@ -88,7 +88,7 @@ public class SlowRenderingDetectorImpl implements SlowRenderingDetector {
         if(slowCount > 0){
             makeSpan("slowRender", slowCount, now);
         }
-        if(slowCount > 0){
+        if(frozenCount > 0){
             makeSpan("frozenRender", frozenCount, now);
         }
     }
