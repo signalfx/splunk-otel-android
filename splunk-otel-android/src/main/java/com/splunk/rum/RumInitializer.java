@@ -103,7 +103,8 @@ class RumInitializer {
             initializationEvents.add(new RumInitializer.InitializationEvent("networkMonitorInitialized", timingClock.now()));
         }
 
-        SlowRenderingDetector slowRenderingDetector = new SlowRenderingDetector(tracer);
+
+        SlowRenderingDetector slowRenderingDetector = buildSlowRenderDetector(tracer);
         slowRenderingDetector.start();
 
         if (Build.VERSION.SDK_INT < 29) {
@@ -121,6 +122,15 @@ class RumInitializer {
         recordInitializationSpans(startTimeNanos, initializationEvents, tracer, config);
 
         return new SplunkRum(openTelemetrySdk, sessionId, config);
+    }
+
+    private SlowRenderingDetector buildSlowRenderDetector(Tracer tracer) {
+        try {
+            Class.forName("androidx.core.app.FrameMetricsAggregator");
+            return new SlowRenderingDetectorImpl(tracer);
+        } catch (ClassNotFoundException e) {
+            return SlowRenderingDetector.NO_OP;
+        }
     }
 
     private AppStateListener initializeAnrReporting(Looper mainLooper) {
