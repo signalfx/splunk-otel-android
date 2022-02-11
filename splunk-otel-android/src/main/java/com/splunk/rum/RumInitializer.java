@@ -251,7 +251,7 @@ class RumInitializer {
         SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
         initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
 
-        ThrottlingExporter throttlingExporter = ThrottlingExporter.newBuilder(new BufferingExporter(connectionUtil, zipkinSpanExporter))
+        ThrottlingExporter throttlingExporter = ThrottlingExporter.newBuilder(new MemoryBufferingExporter(connectionUtil, zipkinSpanExporter))
                 .categorizeByAttribute(SplunkRum.COMPONENT_KEY)
                 .maxSpansInWindow(100)
                 .windowSize(Duration.ofSeconds(30))
