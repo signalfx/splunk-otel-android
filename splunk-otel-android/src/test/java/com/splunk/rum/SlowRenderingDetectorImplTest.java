@@ -4,14 +4,10 @@ import static androidx.core.app.FrameMetricsAggregator.DRAW_INDEX;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import android.app.Activity;
@@ -26,9 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -59,14 +53,14 @@ public class SlowRenderingDetectorImplTest {
 
     @Test
     public void add() {
-        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null);
+        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null, 0);
         testInstance.add(activity);
         verify(frameMetrics).add(activity);
     }
 
     @Test
     public void stopBeforeAddOk() {
-        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null);
+        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null, 0);
         testInstance.stop(activity);
     }
 
@@ -77,7 +71,7 @@ public class SlowRenderingDetectorImplTest {
 
         when(frameMetrics.remove(activity)).thenReturn(metricsArray);
 
-        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null);
+        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null, 1001);
 
         testInstance.add(activity);
         testInstance.stop(activity);
@@ -95,9 +89,9 @@ public class SlowRenderingDetectorImplTest {
             Runnable runnable = invocation.getArgument(0);
             runnable.run(); // just call it immediately
             return null;
-        }).when(exec).scheduleAtFixedRate(any(), eq(1L), eq(1L), eq(TimeUnit.SECONDS));
+        }).when(exec).scheduleAtFixedRate(any(), eq(1001L), eq(1001L), eq(TimeUnit.MILLISECONDS));
 
-        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, exec);
+        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, exec, 1001);
         testInstance.add(activity);
         testInstance.start();
         List<SpanData> spans = otelTesting.getSpans();

@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.util.Log;
 import android.util.SparseIntArray;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.FrameMetricsAggregator;
 
 import java.time.Instant;
@@ -17,7 +16,6 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
@@ -31,16 +29,18 @@ public class SlowRenderingDetectorImpl implements SlowRenderingDetector {
 
     private final Set<Activity> activities = new HashSet<>();
     private final Tracer tracer;
+    private final long renderDurationPollingIntervalMs;
 
-    public SlowRenderingDetectorImpl(Tracer tracer) {
-        this(tracer, new FrameMetricsAggregator(DRAW_DURATION), Executors.newScheduledThreadPool(1));
+    public SlowRenderingDetectorImpl(Tracer tracer, int renderDurationPollingIntervalMs) {
+        this(tracer, new FrameMetricsAggregator(DRAW_DURATION), Executors.newScheduledThreadPool(1), renderDurationPollingIntervalMs);
     }
 
     // Exists for testing
-    SlowRenderingDetectorImpl(Tracer tracer, FrameMetricsAggregator frameMetricsAggregator, ScheduledExecutorService executorService) {
+    SlowRenderingDetectorImpl(Tracer tracer, FrameMetricsAggregator frameMetricsAggregator, ScheduledExecutorService executorService, long renderDurationPollingIntervalMs) {
         this.tracer = tracer;
         this.frameMetrics = frameMetricsAggregator;
         this.executorService = executorService;
+        this.renderDurationPollingIntervalMs = renderDurationPollingIntervalMs;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class SlowRenderingDetectorImpl implements SlowRenderingDetector {
 
     @Override
     public void start() {
-        executorService.scheduleAtFixedRate(this::reportSlowRenders, 1, 1, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(this::reportSlowRenders, renderDurationPollingIntervalMs, renderDurationPollingIntervalMs, TimeUnit.MILLISECONDS);
     }
 
     private void reportSlowRenders() {
