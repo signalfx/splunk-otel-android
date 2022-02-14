@@ -96,6 +96,7 @@ public class ActivityCallbacksTest {
         checkEventExists(events, "activityPostResumed");
 
         verify(appStateListener).appForegrounded();
+        verify(slowRenderingDetector).add(activity);
     }
 
     @Test
@@ -286,6 +287,7 @@ public class ActivityCallbacksTest {
         checkEventExists(events, "activityPostDestroyed");
 
         verify(appStateListener).appBackgrounded();
+        verify(slowRenderingDetector).stop(activity);
     }
 
     @Test
