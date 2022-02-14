@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.util.Log;
 import android.util.SparseIntArray;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.FrameMetricsAggregator;
 
 import java.time.Instant;
@@ -16,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
@@ -24,13 +26,21 @@ public class SlowRenderingDetectorImpl implements SlowRenderingDetector {
 
     public static final int SLOW_THRESHOLD_MS = 16;
     public static final int FROZEN_THRESHOLD_MS = 700;
-    private final FrameMetricsAggregator frameMetrics = new FrameMetricsAggregator(DRAW_DURATION);
-    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    private final FrameMetricsAggregator frameMetrics;
+    private final ScheduledExecutorService executorService;
+
     private final Set<Activity> activities = new HashSet<>();
     private final Tracer tracer;
 
     public SlowRenderingDetectorImpl(Tracer tracer) {
+        this(tracer, new FrameMetricsAggregator(DRAW_DURATION), Executors.newScheduledThreadPool(1));
+    }
+
+    // Exists for testing
+    SlowRenderingDetectorImpl(Tracer tracer, FrameMetricsAggregator frameMetricsAggregator, ScheduledExecutorService executorService) {
         this.tracer = tracer;
+        this.frameMetrics = frameMetricsAggregator;
+        this.executorService = executorService;
     }
 
     @Override
