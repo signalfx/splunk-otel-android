@@ -35,6 +35,7 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
  */
 public class Config {
 
+    public static final int DEFAULT_SLOW_RENDER_POLLING_INTERVAL_MS = 1000;
     private final String beaconEndpoint;
     private final String rumAccessToken;
     private final boolean debugEnabled;
@@ -44,6 +45,7 @@ public class Config {
     private final boolean anrDetectionEnabled;
     private final AtomicReference<Attributes> globalAttributes = new AtomicReference<>();
     private final Function<SpanExporter, SpanExporter> spanFilterExporterDecorator;
+    private final int renderDurationPollingIntervalMs;
 
     private Config(Builder builder) {
         this.beaconEndpoint = builder.beaconEndpoint;
@@ -54,6 +56,7 @@ public class Config {
         this.globalAttributes.set(addDeploymentEnvironment(builder));
         this.networkMonitorEnabled = builder.networkMonitorEnabled;
         this.anrDetectionEnabled = builder.anrDetectionEnabled;
+        this.renderDurationPollingIntervalMs = builder.renderDurationPollingIntervalMs;
         this.spanFilterExporterDecorator = builder.spanFilterBuilder.build();
     }
 
@@ -125,6 +128,16 @@ public class Config {
         return anrDetectionEnabled;
     }
 
+    /**
+     * Returns the number of ms to be used for polling frame render durations,
+     * used in slow render and freeze draw detection. Zero indicates that no
+     * polling will be performed.
+     * @return - Number milliseconds to poll
+     */
+    public int getRenderDurationPollingIntervalMs() {
+        return renderDurationPollingIntervalMs;
+    }
+
     void updateGlobalAttributes(Consumer<AttributesBuilder> updater) {
         while (true) {
             Attributes oldAttributes = globalAttributes.get();
@@ -158,6 +171,7 @@ public class Config {
         private String deploymentEnvironment;
         private final SpanFilterBuilder spanFilterBuilder = new SpanFilterBuilder();
         private String realm;
+        private int renderDurationPollingIntervalMs = DEFAULT_SLOW_RENDER_POLLING_INTERVAL_MS;
 
         /**
          * Create a new instance of {@link Config} from the options provided.
@@ -263,6 +277,17 @@ public class Config {
          */
         public Builder anrDetectionEnabled(boolean enable) {
             this.anrDetectionEnabled = enable;
+            return this;
+        }
+
+        /**
+         * Configures the rate at which frame render durations are polled. Pass zero to
+         * disable polling for slow/frozen renders.
+         * @param interval - The period that should be used for polling (in ms)
+         * @return this
+         */
+        public Builder renderDurationPollingIntervalMs(int interval){
+            this.renderDurationPollingIntervalMs = interval;
             return this;
         }
 

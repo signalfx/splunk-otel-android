@@ -16,10 +16,13 @@
 
 package com.splunk.rum;
 
+import static com.splunk.rum.SplunkRum.LOG_TAG;
+
 import android.app.Application;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.splunk.android.rum.R;
 
@@ -104,7 +107,7 @@ class RumInitializer {
         }
 
 
-        SlowRenderingDetector slowRenderingDetector = buildSlowRenderDetector(tracer);
+        SlowRenderingDetector slowRenderingDetector = buildSlowRenderDetector(config, tracer);
         slowRenderingDetector.start();
 
         if (Build.VERSION.SDK_INT < 29) {
@@ -124,11 +127,16 @@ class RumInitializer {
         return new SplunkRum(openTelemetrySdk, sessionId, config);
     }
 
-    private SlowRenderingDetector buildSlowRenderDetector(Tracer tracer) {
+    private SlowRenderingDetector buildSlowRenderDetector(Config config, Tracer tracer) {
+        if(config.getRenderDurationPollingIntervalMs() == 0){
+            Log.w(LOG_TAG, "Slow/frozen rendering detection has been disabled by user.");
+            return SlowRenderingDetector.NO_OP;
+        }
         try {
             Class.forName("androidx.core.app.FrameMetricsAggregator");
             return new SlowRenderingDetectorImpl(tracer);
         } catch (ClassNotFoundException e) {
+            Log.w(LOG_TAG, "FrameMetricsAggregator is not available on this platform - slow/frozen rendering detection is disabled.");
             return SlowRenderingDetector.NO_OP;
         }
     }

@@ -22,6 +22,8 @@ import io.opentelemetry.api.trace.Tracer;
 
 public class SlowRenderingDetectorImpl implements SlowRenderingDetector {
 
+    public static final int SLOW_THRESHOLD_MS = 16;
+    public static final int FROZEN_THRESHOLD_MS = 700;
     private final FrameMetricsAggregator frameMetrics = new FrameMetricsAggregator(DRAW_DURATION);
     private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private final Set<Activity> activities = new HashSet<>();
@@ -75,10 +77,10 @@ public class SlowRenderingDetectorImpl implements SlowRenderingDetector {
         for (int i = 0; i < durationToCountHistogram.size(); i++) {
             int duration = durationToCountHistogram.keyAt(i);
             int count = durationToCountHistogram.get(duration);
-            if (duration > 700) {
+            if (duration > FROZEN_THRESHOLD_MS) {
                 Log.d(LOG_TAG, "* FROZEN RENDER DETECTED: " + duration + " ms." + count + " times");
                 frozenCount += count;
-            } else if (duration > 16) {
+            } else if (duration > SLOW_THRESHOLD_MS) {
                 Log.d(LOG_TAG, "* Slow render detected: " + duration + " ms. " + count + " times");
                 slowCount += count;
             }
