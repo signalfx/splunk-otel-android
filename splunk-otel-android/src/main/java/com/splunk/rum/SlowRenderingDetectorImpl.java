@@ -88,10 +88,10 @@ public class SlowRenderingDetectorImpl implements SlowRenderingDetector {
 
         Instant now = Instant.now();
         if(slowCount > 0){
-            makeSpan("slowRender", slowCount, now);
+            makeSpan("slowRenders", slowCount, now);
         }
         if(frozenCount > 0){
-            makeSpan("frozenRender", frozenCount, now);
+            makeSpan("frozenRenders", frozenCount, now);
         }
     }
 
