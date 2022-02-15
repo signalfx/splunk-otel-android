@@ -107,7 +107,7 @@ class RumInitializer {
         }
 
 
-        SlowRenderingDetector slowRenderingDetector = buildSlowRenderDetector(config, tracer);
+        SlowRenderingDetector slowRenderingDetector = buildSlowRenderingDetector(config, tracer);
         slowRenderingDetector.start();
 
         if (Build.VERSION.SDK_INT < 29) {
@@ -127,7 +127,7 @@ class RumInitializer {
         return new SplunkRum(openTelemetrySdk, sessionId, config);
     }
 
-    private SlowRenderingDetector buildSlowRenderDetector(Config config, Tracer tracer) {
+    private SlowRenderingDetector buildSlowRenderingDetector(Config config, Tracer tracer) {
         if(config.getRenderDurationPollingIntervalMs() == 0){
             Log.w(LOG_TAG, "Slow/frozen rendering detection has been disabled by user.");
             return SlowRenderingDetector.NO_OP;
