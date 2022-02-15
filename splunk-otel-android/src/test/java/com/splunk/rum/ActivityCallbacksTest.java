@@ -58,7 +58,13 @@ public class ActivityCallbacksTest {
     @Test
     public void appStartup() {
         startupTimer.start(tracer);
-        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, singletonList(appStateListener), slowRenderingDetector);
+        ActivityCallbacks activityCallbacks = ActivityCallbacks.builder()
+                .tracer(tracer)
+                .visibleScreenTracker(visibleScreenTracker)
+                .startupTimer(startupTimer)
+                .appStateListeners(singletonList(appStateListener))
+                .slowRenderingDetector(slowRenderingDetector)
+                .build();
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(activityCallbacks);
 
         Activity activity = mock(Activity.class);
@@ -101,7 +107,14 @@ public class ActivityCallbacksTest {
 
     @Test
     public void activityCreation() {
-        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, singletonList(appStateListener), slowRenderingDetector);
+        ActivityCallbacks activityCallbacks = ActivityCallbacks.builder()
+                .tracer(tracer)
+                .visibleScreenTracker(visibleScreenTracker)
+                .startupTimer(startupTimer)
+                .appStateListeners(singletonList(appStateListener))
+                .slowRenderingDetector(slowRenderingDetector)
+                .build();
+
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(activityCallbacks);
         startupAppAndClearSpans(testHarness);
 
@@ -146,7 +159,14 @@ public class ActivityCallbacksTest {
 
     @Test
     public void activityRestart() {
-        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, singletonList(appStateListener), slowRenderingDetector);
+        ActivityCallbacks activityCallbacks = ActivityCallbacks.builder()
+                .tracer(tracer)
+                .visibleScreenTracker(visibleScreenTracker)
+                .startupTimer(startupTimer)
+                .appStateListeners(singletonList(appStateListener))
+                .slowRenderingDetector(slowRenderingDetector)
+                .build();
+
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(activityCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -183,7 +203,14 @@ public class ActivityCallbacksTest {
     @Test
     public void activityResumed() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("previousScreen");
-        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, singletonList(appStateListener), slowRenderingDetector);
+        ActivityCallbacks activityCallbacks = ActivityCallbacks.builder()
+                .tracer(tracer)
+                .visibleScreenTracker(visibleScreenTracker)
+                .startupTimer(startupTimer)
+                .appStateListeners(singletonList(appStateListener))
+                .slowRenderingDetector(slowRenderingDetector)
+                .build();
+
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(activityCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -214,7 +241,14 @@ public class ActivityCallbacksTest {
 
     @Test
     public void activityDestroyedFromStopped() {
-        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, singletonList(appStateListener), slowRenderingDetector);
+        ActivityCallbacks activityCallbacks = ActivityCallbacks.builder()
+                .tracer(tracer)
+                .visibleScreenTracker(visibleScreenTracker)
+                .startupTimer(startupTimer)
+                .appStateListeners(singletonList(appStateListener))
+                .slowRenderingDetector(slowRenderingDetector)
+                .build();
+
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(activityCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -245,7 +279,14 @@ public class ActivityCallbacksTest {
 
     @Test
     public void activityDestroyedFromPaused() {
-        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, singletonList(appStateListener), slowRenderingDetector);
+        ActivityCallbacks activityCallbacks = ActivityCallbacks.builder()
+                .tracer(tracer)
+                .visibleScreenTracker(visibleScreenTracker)
+                .startupTimer(startupTimer)
+                .appStateListeners(singletonList(appStateListener))
+                .slowRenderingDetector(slowRenderingDetector)
+                .build();
+
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(activityCallbacks);
 
         startupAppAndClearSpans(testHarness);
@@ -292,7 +333,14 @@ public class ActivityCallbacksTest {
 
     @Test
     public void activityStoppedFromRunning() {
-        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer, singletonList(appStateListener), slowRenderingDetector);
+        ActivityCallbacks activityCallbacks = ActivityCallbacks.builder()
+                .tracer(tracer)
+                .visibleScreenTracker(visibleScreenTracker)
+                .startupTimer(startupTimer)
+                .appStateListeners(singletonList(appStateListener))
+                .slowRenderingDetector(slowRenderingDetector)
+                .build();
+
         ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(activityCallbacks);
 
         startupAppAndClearSpans(testHarness);

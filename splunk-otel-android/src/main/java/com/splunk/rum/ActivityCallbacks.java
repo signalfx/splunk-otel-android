@@ -44,12 +44,16 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     //we count the number of activities that have been "started" and not yet "stopped" here to figure out when the app goes into the background.
     private int numberOfOpenActivities = 0;
 
-    ActivityCallbacks(Tracer tracer, VisibleScreenTracker visibleScreenTracker, AppStartupTimer startupTimer, List<AppStateListener> appStateListeners, SlowRenderingDetector slowRenderingDetector) {
-        this.tracer = tracer;
-        this.visibleScreenTracker = visibleScreenTracker;
-        this.startupTimer = startupTimer;
-        this.appStateListeners = appStateListeners;
-        this.slowRenderingDetector = slowRenderingDetector;
+    private ActivityCallbacks(Builder builder) {
+        this.tracer = builder.tracer;
+        this.visibleScreenTracker = builder.visibleScreenTracker;
+        this.startupTimer = builder.startupTimer;
+        this.appStateListeners = builder.appStateListeners;
+        this.slowRenderingDetector = builder.slowRenderingDetector;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     @Override
@@ -203,6 +207,43 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
             tracersByActivityClassName.put(activity.getClass().getName(), activityTracer);
         }
         return activityTracer;
+    }
+
+    static class Builder {
+        private Tracer tracer;
+        private VisibleScreenTracker visibleScreenTracker;
+        private AppStartupTimer startupTimer;
+        private List<AppStateListener> appStateListeners;
+        private SlowRenderingDetector slowRenderingDetector;
+
+        public ActivityCallbacks build(){
+            return new ActivityCallbacks(this);
+        }
+
+        public Builder tracer(Tracer tracer) {
+            this.tracer = tracer;
+            return this;
+        }
+
+        public Builder visibleScreenTracker(VisibleScreenTracker visibleScreenTracker) {
+            this.visibleScreenTracker = visibleScreenTracker;
+            return this;
+        }
+
+        public Builder startupTimer(AppStartupTimer startupTimer) {
+            this.startupTimer = startupTimer;
+            return this;
+        }
+
+        public Builder appStateListeners(List<AppStateListener> appStateListeners) {
+            this.appStateListeners = appStateListeners;
+            return this;
+        }
+
+        public Builder slowRenderingDetector(SlowRenderingDetector slowRenderingDetector) {
+            this.slowRenderingDetector = slowRenderingDetector;
+            return this;
+        }
     }
 
 }
