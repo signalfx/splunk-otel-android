@@ -40,7 +40,7 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     private final VisibleScreenTracker visibleScreenTracker;
     private final AppStartupTimer startupTimer;
     private final List<AppStateListener> appStateListeners;
-    private SlowRenderingDetector slowRenderingDetector;
+    private final SlowRenderingDetector slowRenderingDetector;
     //we count the number of activities that have been "started" and not yet "stopped" here to figure out when the app goes into the background.
     private int numberOfOpenActivities = 0;
 
