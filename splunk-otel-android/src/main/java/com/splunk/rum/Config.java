@@ -35,6 +35,7 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
  */
 public class Config {
 
+    public static final boolean DEFAULT_ENABLE_SLOW_RENDERING_DETECTION = true;
     public static final int DEFAULT_SLOW_RENDER_POLLING_INTERVAL_MS = 1000;
     private final String beaconEndpoint;
     private final String rumAccessToken;
@@ -45,6 +46,7 @@ public class Config {
     private final boolean anrDetectionEnabled;
     private final AtomicReference<Attributes> globalAttributes = new AtomicReference<>();
     private final Function<SpanExporter, SpanExporter> spanFilterExporterDecorator;
+    private final boolean slowRenderingDetectionEnabled;
     private final int renderDurationPollingIntervalMs;
 
     private Config(Builder builder) {
@@ -57,6 +59,7 @@ public class Config {
         this.networkMonitorEnabled = builder.networkMonitorEnabled;
         this.anrDetectionEnabled = builder.anrDetectionEnabled;
         this.renderDurationPollingIntervalMs = builder.renderDurationPollingIntervalMs;
+        this.slowRenderingDetectionEnabled = builder.slowRenderingDetectionEnabled;
         this.spanFilterExporterDecorator = builder.spanFilterBuilder.build();
     }
 
@@ -103,6 +106,20 @@ public class Config {
      */
     public boolean isCrashReportingEnabled() {
         return crashReportingEnabled;
+    }
+
+    /**
+     * Is the slow rendering detection feature disabled or not.
+     */
+    public boolean isSlowRenderingDetectionDisabled() {
+        return !isSlowRenderingDetectionEnabled();
+    }
+
+    /**
+     * Is the slow rendering detection feature enabled or not.
+     */
+    public boolean isSlowRenderingDetectionEnabled(){
+        return slowRenderingDetectionEnabled;
     }
 
     /**
@@ -162,6 +179,7 @@ public class Config {
     public static class Builder {
         public boolean networkMonitorEnabled = true;
         public boolean anrDetectionEnabled = true;
+        public boolean slowRenderingDetectionEnabled = DEFAULT_ENABLE_SLOW_RENDERING_DETECTION;
         private String beaconEndpoint;
         private String rumAccessToken;
         private boolean debugEnabled = false;
@@ -287,6 +305,10 @@ public class Config {
          * @return this
          */
         public Builder renderDurationPollingIntervalMs(int interval){
+            if(interval <= 0){
+                Log.e(SplunkRum.LOG_TAG, "invalid renderDurationPollingIntervalMs: " + interval + " is not positive");
+                return this;
+            }
             this.renderDurationPollingIntervalMs = interval;
             return this;
         }
@@ -322,6 +344,15 @@ public class Config {
          */
         public Builder filterSpans(Consumer<SpanFilterBuilder> configurer) {
             configurer.accept(spanFilterBuilder);
+            return this;
+        }
+
+        /**
+         * Call this to disable the detection of slow rendering
+         * @return this
+         */
+        public Builder disableSlowRenderingDetection(){
+            slowRenderingDetectionEnabled = false;
             return this;
         }
     }

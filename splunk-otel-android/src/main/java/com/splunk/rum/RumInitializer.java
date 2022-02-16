@@ -135,7 +135,7 @@ class RumInitializer {
     }
 
     private SlowRenderingDetector buildSlowRenderingDetector(Config config, Tracer tracer) {
-        if(config.getRenderDurationPollingIntervalMs() == 0){
+        if(config.isSlowRenderingDetectionDisabled()){
             Log.w(LOG_TAG, "Slow/frozen rendering detection has been disabled by user.");
             return SlowRenderingDetector.NO_OP;
         }

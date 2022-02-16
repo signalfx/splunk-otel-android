@@ -243,7 +243,9 @@ when initializing your instance of the SplunkRum API:
   or changing the span name. See the javadoc on the `SpanFilterBuilder` class for more details.
 - `renderDurationPollingIntervalMs(int)` :
   Set/change the default polling interval for slow/frozen render detection, in milliseconds.
-  Default is 1000ms. Passing zero will disable the slow render detection. 
+  Default is 1000ms. Value must be positive. 
+- `disableSlowRenderingDetection()` :
+  Disable the detection of slow frame renders (default is enabled). 
 
 #### APIs provided by the `SplunkRum` instance:
 
