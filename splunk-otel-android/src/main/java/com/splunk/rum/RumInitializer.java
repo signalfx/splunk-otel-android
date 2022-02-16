@@ -26,6 +26,8 @@ import android.util.Log;
 
 import com.splunk.android.rum.R;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -257,6 +259,12 @@ class RumInitializer {
                 .windowSize(Duration.ofSeconds(30))
                 .build();
         return config.decorateWithSpanFilter(throttlingExporter);
+    }
+
+    SpanExporter getToDiskExporter(){
+        android.content.Context context = application.getApplicationContext();
+        File filesDir = context.getFilesDir();
+        return ZipkinWriteToDiskExporter.create();
     }
 
     //visible for testing
