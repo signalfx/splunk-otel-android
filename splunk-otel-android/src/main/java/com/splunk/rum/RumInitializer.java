@@ -140,6 +140,7 @@ class RumInitializer {
             return SlowRenderingDetector.NO_OP;
         }
         try {
+            initializationEvents.add(new RumInitializer.InitializationEvent("slowRenderingDetectorInitialized", timingClock.now()));
             Class.forName("androidx.core.app.FrameMetricsAggregator");
             return new SlowRenderingDetectorImpl(tracer, config.getRenderDurationPollingIntervalMs());
         } catch (ClassNotFoundException e) {
@@ -195,6 +196,7 @@ class RumInitializer {
         String configSettings = "[debug:" + config.isDebugEnabled() + "," +
                 "crashReporting:" + config.isCrashReportingEnabled() + "," +
                 "anrReporting:" + config.isAnrDetectionEnabled() + "," +
+                "slowRenderingDetector:" + config.isSlowRenderingDetectionEnabled() + "," +
                 "networkMonitor:" + config.isNetworkMonitorEnabled() + "]";
         span.setAttribute("config_settings", configSettings);
 
