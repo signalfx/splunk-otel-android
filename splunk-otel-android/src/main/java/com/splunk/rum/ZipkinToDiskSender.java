@@ -39,12 +39,19 @@ public class ZipkinToDiskSender extends Sender {
     public Call<Void> sendSpans(List<byte[]> encodedSpans) {
         long now = System.currentTimeMillis();
         String outfile = path.toString() + File.separator + now + ".spans";
-        try (FileOutputStream out = new FileOutputStream(outfile)) {
+        String tmpFile = outfile + ".tmp";
+
+        try (FileOutputStream out = new FileOutputStream(tmpFile)) {
             for (byte[] encodedSpan : encodedSpans) {
                 out.write(encodedSpan);
             }
         } catch (IOException e) {
             Log.e(SplunkRum.LOG_TAG, "Error buffering span data to disk", e);
+            return Call.create(null);
+        }
+
+        if(!new File(tmpFile).renameTo(new File(outfile))){
+            Log.e(SplunkRum.LOG_TAG, "Error renaming temp spans file");
         }
         return Call.create(null);
     }
