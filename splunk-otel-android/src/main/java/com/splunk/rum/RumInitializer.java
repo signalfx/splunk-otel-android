@@ -27,8 +27,6 @@ import android.util.Log;
 import com.splunk.android.rum.R;
 
 import java.io.File;
-import java.nio.file.FileSystems;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +54,6 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import kotlin.Lazy;
 
 class RumInitializer {
 

@@ -38,7 +38,7 @@ public class ZipkinToDiskSender extends Sender {
     @Override
     public Call<Void> sendSpans(List<byte[]> encodedSpans) {
         long now = System.currentTimeMillis();
-        String outfile = path.toString() + File.pathSeparator + now + ".spans";
+        String outfile = path.toString() + File.separator + now + ".spans";
         try (FileOutputStream out = new FileOutputStream(outfile)) {
             for (byte[] encodedSpan : encodedSpans) {
                 out.write(encodedSpan);

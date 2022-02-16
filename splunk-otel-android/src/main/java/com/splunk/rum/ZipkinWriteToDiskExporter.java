@@ -1,7 +1,8 @@
 package com.splunk.rum;
 
+import android.util.Log;
+
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Collection;
 
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
@@ -20,7 +21,15 @@ public class ZipkinWriteToDiskExporter implements SpanExporter  {
     }
 
     public static ZipkinWriteToDiskExporter create(File path){
-        Sender sender = new ZipkinToDiskSender(path);
+        File spansPath = new File(path, "spans");
+        if(!spansPath.exists()){
+            if(!spansPath.mkdir()){
+                Log.e(SplunkRum.LOG_TAG, "Error creating path " + spansPath + " for span buffer, defaulting to parent");
+                spansPath = path;
+            }
+        }
+
+        Sender sender = new ZipkinToDiskSender(spansPath);
         ZipkinSpanExporter delegate = ZipkinSpanExporter.builder()
                 .setEncoder(new CustomZipkinEncoder())
                 .setSender(sender)
