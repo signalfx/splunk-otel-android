@@ -27,6 +27,7 @@ import android.util.Log;
 import com.splunk.android.rum.R;
 
 import java.io.File;
+import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import kotlin.Lazy;
 
 class RumInitializer {
 
@@ -250,7 +252,8 @@ class RumInitializer {
             ZipkinSpanExporter.baseLogger.setLevel(Level.SEVERE);
             initializationEvents.add(new InitializationEvent("logger setup complete", timingClock.now()));
         }
-        SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
+//        SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
+        SpanExporter zipkinSpanExporter = getToDiskExporter();
         initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
 
         ThrottlingExporter throttlingExporter = ThrottlingExporter.newBuilder(new MemoryBufferingExporter(connectionUtil, zipkinSpanExporter))
@@ -262,9 +265,11 @@ class RumInitializer {
     }
 
     SpanExporter getToDiskExporter(){
-        android.content.Context context = application.getApplicationContext();
-        File filesDir = context.getFilesDir();
-        return ZipkinWriteToDiskExporter.create();
+        return new LazyInitSpanExporter(() -> {
+            android.content.Context context = application.getApplicationContext();
+            File filesDir = context.getFilesDir();
+            return ZipkinWriteToDiskExporter.create(filesDir);
+        });
     }
 
     //visible for testing

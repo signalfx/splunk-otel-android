@@ -14,9 +14,9 @@ import zipkin2.reporter.Sender;
 
 public class ZipkinToDiskSender extends Sender {
 
-    private final Path path;
+    private final File path;
 
-    public ZipkinToDiskSender(Path path) {
+    public ZipkinToDiskSender(File path) {
         this.path = path;
     }
 

@@ -1,5 +1,6 @@
 package com.splunk.rum;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 
@@ -18,7 +19,7 @@ public class ZipkinWriteToDiskExporter implements SpanExporter  {
         this.delegate = delegate;
     }
 
-    public static ZipkinWriteToDiskExporter create(Path path){
+    public static ZipkinWriteToDiskExporter create(File path){
         Sender sender = new ZipkinToDiskSender(path);
         ZipkinSpanExporter delegate = ZipkinSpanExporter.builder()
                 .setEncoder(new CustomZipkinEncoder())
