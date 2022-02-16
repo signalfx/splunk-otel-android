@@ -83,7 +83,6 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
         getTracer(activity)
                 .initiateRestartSpanIfNecessary(tracersByActivityClassName.size() > 1)
                 .addEvent("activityPreStarted");
-        slowRenderingDetector.add(activity);
     }
 
     @Override
@@ -112,6 +111,7 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
         addEvent(activity, "activityResumed");
+        slowRenderingDetector.add(activity);
     }
 
     @Override
@@ -134,6 +134,7 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
         addEvent(activity, "activityPaused");
+        slowRenderingDetector.stop(activity);
     }
 
     @Override
@@ -156,7 +157,6 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
             }
         }
         addEvent(activity, "activityStopped");
-        slowRenderingDetector.stop(activity);
     }
 
     @Override

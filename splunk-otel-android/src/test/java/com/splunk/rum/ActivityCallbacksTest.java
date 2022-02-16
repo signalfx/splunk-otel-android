@@ -328,7 +328,6 @@ public class ActivityCallbacksTest {
         checkEventExists(events, "activityPostDestroyed");
 
         verify(appStateListener).appBackgrounded();
-        verify(slowRenderingDetector).stop(activity);
     }
 
     @Test
@@ -365,6 +364,7 @@ public class ActivityCallbacksTest {
         checkEventExists(events, "activityPrePaused");
         checkEventExists(events, "activityPaused");
         checkEventExists(events, "activityPostPaused");
+        verify(slowRenderingDetector).stop(activity);
 
         SpanData destroyedSpan = spans.get(1);
 
