@@ -5,7 +5,6 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 import zipkin2.Call;
@@ -27,7 +26,7 @@ public class ZipkinToDiskSender extends Sender {
 
     @Override
     public int messageMaxBytes() {
-        return 1024*1024;
+        return 1024 * 1024;
     }
 
     @Override
@@ -38,21 +37,33 @@ public class ZipkinToDiskSender extends Sender {
     @Override
     public Call<Void> sendSpans(List<byte[]> encodedSpans) {
         long now = System.currentTimeMillis();
-        String outfile = path.toString() + File.separator + now + ".spans";
-        String tmpFile = outfile + ".tmp";
+        File tmpFile = createTempFilename(now);
+        if (writeToTempFile(tmpFile, encodedSpans)) {
+            File outfile = createFilename(now);
+            if (!tmpFile.renameTo(outfile)) {
+                Log.e(SplunkRum.LOG_TAG, "Error renaming spans temp file");
+            }
+        }
+        return Call.create(null);
+    }
 
+    private File createFilename(long now) {
+        return new File(path.toString() + File.separator + now + ".spans");
+    }
+
+    private File createTempFilename(long now) {
+        return new File(createFilename(now) + ".tmp");
+    }
+
+    private boolean writeToTempFile(File tmpFile, List<byte[]> encodedSpans) {
         try (FileOutputStream out = new FileOutputStream(tmpFile)) {
             for (byte[] encodedSpan : encodedSpans) {
                 out.write(encodedSpan);
             }
         } catch (IOException e) {
             Log.e(SplunkRum.LOG_TAG, "Error buffering span data to disk", e);
-            return Call.create(null);
+            return false;
         }
-
-        if(!new File(tmpFile).renameTo(new File(outfile))){
-            Log.e(SplunkRum.LOG_TAG, "Error renaming temp spans file");
-        }
-        return Call.create(null);
+        return true;
     }
 }
