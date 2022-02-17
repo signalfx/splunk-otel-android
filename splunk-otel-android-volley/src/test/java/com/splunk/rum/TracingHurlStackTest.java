@@ -180,6 +180,22 @@ public class TracingHurlStackTest {
 
     @Test
     public void reusedRequest() throws IOException {
+        Runnable threadDump = new Runnable() {
+            @Override
+            public void run() {
+                System.err.println("---------------");
+                for (Map.Entry<Thread, StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
+                    System.err.println(entry.getKey());
+                    for (StackTraceElement stackTraceElement : entry.getValue()) {
+                        System.err.println(stackTraceElement);
+                    }
+                    System.err.println();
+                }
+            }
+        };
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleWithFixedDelay(threadDump, 1, 1, TimeUnit.MINUTES);
+        try {
 
         String firstResponseBody = "first response";
         String secondResponseBody = "second response";
@@ -198,10 +214,14 @@ public class TracingHurlStackTest {
         testQueue.addToQueue(stringRequest);
         testQueue.addToQueue(stringRequest);
 
+        System.err.println("get scheduler");
         Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+        System.err.println("advanceToLastPostedRunnable");
         while (!scheduler.advanceToLastPostedRunnable());
+        System.err.println("advanceToNextPostedRunnable");
         while (!scheduler.advanceToNextPostedRunnable());
 
+        System.err.println("assert count");
         assertThat(server.getRequestCount()).isEqualTo(2);
 
         List<SpanData> spans = otelTesting.getSpans();
@@ -212,6 +232,10 @@ public class TracingHurlStackTest {
 
         SpanData secondSpan = spans.get(1);
         verifyAttributes(secondSpan, url, 200L, secondResponseBody);
+        } finally {
+            System.err.println("end");
+            scheduledExecutorService.shutdownNow();
+        }
     }
 
     @Test
