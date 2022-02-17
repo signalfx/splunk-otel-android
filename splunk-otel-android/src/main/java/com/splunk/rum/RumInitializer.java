@@ -54,6 +54,7 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import zipkin2.reporter.Sender;
 
 class RumInitializer {
 
@@ -250,10 +251,16 @@ class RumInitializer {
             initializationEvents.add(new InitializationEvent("logger setup complete", timingClock.now()));
         }
 //        SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
-        SpanExporter zipkinSpanExporter = getToDiskExporter();
+        SpanExporter diskBufferingExporter = getToDiskExporter();
         initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
 
-        ThrottlingExporter throttlingExporter = ThrottlingExporter.newBuilder(new MemoryBufferingExporter(connectionUtil, zipkinSpanExporter))
+        Sender sender = new Okhttp;
+        DiskToZipkinExporter diskToZipkinExporter = DiskToZipkinExporter.builder()
+                .sender(sender)
+                .build();
+        diskToZipkinExporter.startPolling();
+
+        ThrottlingExporter throttlingExporter = ThrottlingExporter.newBuilder(new MemoryBufferingExporter(connectionUtil, diskBufferingExporter))
                 .categorizeByAttribute(SplunkRum.COMPONENT_KEY)
                 .maxSpansInWindow(100)
                 .windowSize(Duration.ofSeconds(30))

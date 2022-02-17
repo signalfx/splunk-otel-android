@@ -29,7 +29,7 @@ public class ZipkinWriteToDiskExporter implements SpanExporter  {
             }
         }
 
-        Sender sender = new ZipkinToDiskSender(spansPath);
+        Sender sender = new ZipkinToDiskSender(spansPath, new FileUtils());
         ZipkinSpanExporter delegate = ZipkinSpanExporter.builder()
                 .setEncoder(new CustomZipkinEncoder())
                 .setSender(sender)

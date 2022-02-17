@@ -14,9 +14,16 @@ import zipkin2.reporter.Sender;
 public class ZipkinToDiskSender extends Sender {
 
     private final File path;
+    private final FileUtils fileUtils;
 
     public ZipkinToDiskSender(File path) {
+        this(path, new FileUtils());
+    }
+
+    // exists for testing
+    ZipkinToDiskSender(File path, FileUtils fileUtils) {
         this.path = path;
+        this.fileUtils = fileUtils;
     }
 
     @Override
@@ -56,10 +63,8 @@ public class ZipkinToDiskSender extends Sender {
     }
 
     private boolean writeToTempFile(File tmpFile, List<byte[]> encodedSpans) {
-        try (FileOutputStream out = new FileOutputStream(tmpFile)) {
-            for (byte[] encodedSpan : encodedSpans) {
-                out.write(encodedSpan);
-            }
+        try {
+            fileUtils.writeFileContents(tmpFile, encodedSpans);
         } catch (IOException e) {
             Log.e(SplunkRum.LOG_TAG, "Error buffering span data to disk", e);
             return false;
