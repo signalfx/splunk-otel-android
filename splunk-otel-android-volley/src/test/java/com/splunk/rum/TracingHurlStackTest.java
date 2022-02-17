@@ -43,10 +43,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -214,6 +216,22 @@ public class TracingHurlStackTest {
 
     @Test
     public void concurrency() throws IOException {
+        Runnable threadDump = new Runnable() {
+            @Override
+            public void run() {
+                System.err.println("---------------");
+                for (Map.Entry<Thread, StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
+                    System.err.println(entry.getKey());
+                    for (StackTraceElement stackTraceElement : entry.getValue()) {
+                        System.err.println(stackTraceElement);
+                    }
+                    System.err.println();
+                }
+            }
+        };
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleWithFixedDelay(threadDump, 1, 1, TimeUnit.MINUTES);
+        try {
 
         int count = 50;
         String responseBody = "success";
@@ -244,20 +262,28 @@ public class TracingHurlStackTest {
 
         latch.countDown();
 
+        System.err.println("get scheduler");
         Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         for(int i = 0; i < count; i++) {
             while (!scheduler.advanceToLastPostedRunnable());
         }
 
+        System.err.println("assert count");
         assertThat(server.getRequestCount()).isEqualTo(50);
 
+        System.err.println("assert spans");
         otelTesting.getSpans().forEach(
                 span -> {
                     verifyAttributes(span, url, 200L, "success");
                 }
         );
 
+        System.err.println("shutdown");
         pool.shutdown();
+        } finally {
+            System.err.println("end");
+            scheduledExecutorService.shutdownNow();
+        }
     }
 
     private void verifyAttributes(SpanData span, URL url, Long status, String responseBody) {

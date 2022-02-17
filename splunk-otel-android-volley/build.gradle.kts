@@ -78,7 +78,7 @@ dependencies {
 }
 
 tasks.withType<Test>().configureEach {
-    timeout.set(Duration.ofMinutes(15))
+    timeout.set(Duration.ofMinutes(5))
 }
 
 extra["pomName"] = "Splunk Otel Android Volley"
