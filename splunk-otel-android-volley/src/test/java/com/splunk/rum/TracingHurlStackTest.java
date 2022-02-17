@@ -201,7 +201,7 @@ public class TracingHurlStackTest {
 
         for(int i = 0; i < 2; i++) {
             while(!scheduler.areAnyRunnable());
-            scheduler.advanceToNextPostedRunnable();
+            scheduler.runOneTask();
         }
 
         assertThat(server.getRequestCount()).isEqualTo(2);
@@ -253,7 +253,7 @@ public class TracingHurlStackTest {
 
         for(int i = 0; i < count; i++) {
             while (!scheduler.areAnyRunnable());
-            scheduler.advanceToNextPostedRunnable();
+            scheduler.runOneTask();
             System.err.println("Advanced to runnable: " + i);
         }
 
