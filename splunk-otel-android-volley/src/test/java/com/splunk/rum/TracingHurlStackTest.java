@@ -16,14 +16,14 @@
 
 package com.splunk.rum;
 
-import static android.os.Looper.getMainLooper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
-import static org.robolectric.Shadows.shadowOf;
+import static org.robolectric.annotation.LooperMode.Mode.PAUSED;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.RequestFuture;
@@ -42,6 +42,7 @@ import org.robolectric.util.Scheduler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -60,7 +61,7 @@ import io.opentelemetry.sdk.trace.data.StatusData;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
 @RunWith(RobolectricTestRunner.class)
-@LooperMode(LooperMode.Mode.LEGACY)
+@LooperMode(PAUSED)
 public class TracingHurlStackTest {
 
     @Rule
@@ -93,10 +94,14 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        while (!scheduler.advanceToLastPostedRunnable());
+        // Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+        // while (!scheduler.advanceToLastPostedRunnable());
+
+        // shadowOf(getMainLooper()).idle();
 
         String result = response.get(10, TimeUnit.SECONDS);
+
+        // shadowOf(getMainLooper()).idle();
 
         assertThat(server.takeRequest().getPath()).isEqualTo("/success"); //server received request
         assertThat(result).isEqualTo("success");
@@ -124,8 +129,8 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        while (!scheduler.advanceToLastPostedRunnable());
+        // Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+        // while (!scheduler.advanceToLastPostedRunnable());
 
         assertThatThrownBy(() -> response.get(10, TimeUnit.SECONDS)).hasCauseInstanceOf(VolleyError.class);
 
@@ -155,8 +160,8 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        while (!scheduler.advanceToLastPostedRunnable());
+        // Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+        // while (!scheduler.advanceToLastPostedRunnable());
 
         //thrown exception type depends on the system, e.g. on MacOS - TimeoutError, on Ubuntu - NoConnectionException
         assertThatThrownBy(() -> response.get(3, TimeUnit.SECONDS)).isInstanceOf(Throwable.class);
@@ -179,24 +184,7 @@ public class TracingHurlStackTest {
     }
 
     @Test
-    public void reusedRequest() throws IOException {
-        Runnable threadDump = new Runnable() {
-            @Override
-            public void run() {
-                System.err.println("---------------");
-                for (Map.Entry<Thread, StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
-                    System.err.println(entry.getKey());
-                    for (StackTraceElement stackTraceElement : entry.getValue()) {
-                        System.err.println(stackTraceElement);
-                    }
-                    System.err.println();
-                }
-            }
-        };
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorService.scheduleWithFixedDelay(threadDump, 1, 1, TimeUnit.MINUTES);
-        try {
-
+    public void reusedRequest() throws IOException, InterruptedException {
         String firstResponseBody = "first response";
         String secondResponseBody = "second response";
 
@@ -206,22 +194,20 @@ public class TracingHurlStackTest {
 
         URL url = server.getUrl("/success");
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(),
-                response -> {
-                }, error -> {
-        });
-
+        class TestResponseListener implements Response.Listener<String> {
+            CountDownLatch countDownLatch = new CountDownLatch(2);
+            @Override
+            public void onResponse(String response) {
+                countDownLatch.countDown();
+            }
+        }
+        TestResponseListener testResponseListener = new TestResponseListener();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(), testResponseListener, error -> {});
         testQueue.addToQueue(stringRequest);
         testQueue.addToQueue(stringRequest);
 
-        System.err.println("get scheduler");
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        System.err.println("advanceToLastPostedRunnable");
-        while (!scheduler.advanceToLastPostedRunnable());
-        System.err.println("advanceToNextPostedRunnable");
-        while (!scheduler.advanceToNextPostedRunnable());
+        testResponseListener.countDownLatch.await();
 
-        System.err.println("assert count");
         assertThat(server.getRequestCount()).isEqualTo(2);
 
         List<SpanData> spans = otelTesting.getSpans();
@@ -232,31 +218,10 @@ public class TracingHurlStackTest {
 
         SpanData secondSpan = spans.get(1);
         verifyAttributes(secondSpan, url, 200L, secondResponseBody);
-        } finally {
-            System.err.println("end");
-            scheduledExecutorService.shutdownNow();
-        }
     }
 
     @Test
-    public void concurrency() throws IOException {
-        Runnable threadDump = new Runnable() {
-            @Override
-            public void run() {
-                System.err.println("---------------");
-                for (Map.Entry<Thread, StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
-                    System.err.println(entry.getKey());
-                    for (StackTraceElement stackTraceElement : entry.getValue()) {
-                        System.err.println(stackTraceElement);
-                    }
-                    System.err.println();
-                }
-            }
-        };
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorService.scheduleWithFixedDelay(threadDump, 1, 1, TimeUnit.MINUTES);
-        try {
-
+    public void concurrency() throws IOException, InterruptedException {
         int count = 50;
         String responseBody = "success";
 
@@ -270,6 +235,14 @@ public class TracingHurlStackTest {
         CountDownLatch latch = new CountDownLatch(1);
         ExecutorService pool = Executors.newFixedThreadPool(4);
 
+        class TestResponseListener implements Response.Listener<String> {
+            CountDownLatch countDownLatch = new CountDownLatch(count);
+            @Override
+            public void onResponse(String response) {
+                countDownLatch.countDown();
+            }
+        }
+        TestResponseListener testResponseListener = new TestResponseListener();
         for(int i = 0; i < count; i++){
             Runnable job =
                 () -> {
@@ -278,36 +251,24 @@ public class TracingHurlStackTest {
                     } catch (InterruptedException e) {
                         throw new AssertionError(e);
                     }
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(), response -> {}, error -> {});
+                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(), testResponseListener, error -> {});
                     testQueue.addToQueue(stringRequest);
                 };
             pool.submit(job);
         }
 
         latch.countDown();
+        testResponseListener.countDownLatch.await();
 
-        System.err.println("get scheduler");
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        for(int i = 0; i < count; i++) {
-            while (!scheduler.advanceToLastPostedRunnable());
-        }
-
-        System.err.println("assert count");
         assertThat(server.getRequestCount()).isEqualTo(50);
 
-        System.err.println("assert spans");
         otelTesting.getSpans().forEach(
                 span -> {
                     verifyAttributes(span, url, 200L, "success");
                 }
         );
 
-        System.err.println("shutdown");
         pool.shutdown();
-        } finally {
-            System.err.println("end");
-            scheduledExecutorService.shutdownNow();
-        }
     }
 
     private void verifyAttributes(SpanData span, URL url, Long status, String responseBody) {

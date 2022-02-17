@@ -17,12 +17,15 @@
 package com.splunk.rum;
 
 import com.android.volley.Cache;
+import com.android.volley.ExecutorDelivery;
 import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
+
+import java.util.concurrent.Executors;
 
 class TestRequestQueue {
 
@@ -37,7 +40,9 @@ class TestRequestQueue {
         Cache cache = new NoCache();
         Network network = new BasicNetwork(hurlStack);
 
-        queue = new RequestQueue(cache, network);
+        // ResponseDelivery responseDelivery = new ExecutorDelivery(Executors.newSingleThreadExecutor());
+        // queue = new RequestQueue(cache, network);
+        queue = new RequestQueue(cache, network, 1, new ExecutorDelivery(Executors.newSingleThreadExecutor()));
         queue.start();
     }
 
