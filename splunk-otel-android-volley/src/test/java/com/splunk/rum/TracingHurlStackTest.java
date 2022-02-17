@@ -197,7 +197,7 @@ public class TracingHurlStackTest {
         testQueue.addToQueue(stringRequest);
 
         Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        while (!scheduler.advanceToLastPostedRunnable());
+        while (!scheduler.advanceToNextPostedRunnable());
         while (!scheduler.advanceToNextPostedRunnable());
 
         assertThat(server.getRequestCount()).isEqualTo(2);
@@ -246,7 +246,7 @@ public class TracingHurlStackTest {
 
         Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         for(int i = 0; i < count; i++) {
-            while (!scheduler.advanceToLastPostedRunnable());
+            while (!scheduler.advanceToNextPostedRunnable());
         }
 
         assertThat(server.getRequestCount()).isEqualTo(50);
