@@ -16,10 +16,8 @@
 
 package com.splunk.rum;
 
-import static android.os.Looper.getMainLooper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.robolectric.Shadows.shadowOf;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.HurlStack;
@@ -31,10 +29,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.LooperMode;
-import org.robolectric.util.Scheduler;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.opentelemetry.api.common.Attributes;
@@ -43,7 +42,6 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
 @RunWith(RobolectricTestRunner.class)
-@LooperMode(LooperMode.Mode.LEGACY)
 public class TracingHurlStackExceptionTest {
 
     @Rule
@@ -60,15 +58,28 @@ public class TracingHurlStackExceptionTest {
 
     @Test
     public void spanDecoration_error() {
+        Runnable threadDump = new Runnable() {
+            @Override
+            public void run() {
+                System.err.println("---------------");
+                for (Map.Entry<Thread, StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
+                    System.err.println(entry.getKey());
+                    for (StackTraceElement stackTraceElement : entry.getValue()) {
+                        System.err.println(stackTraceElement);
+                    }
+                    System.err.println();
+                }
+            }
+        };
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleWithFixedDelay(threadDump, 1, 1, TimeUnit.MINUTES);
+        try {
 
         RequestFuture<String> response = RequestFuture.newFuture();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, "whatever",
                 response, response);
 
         testQueue.addToQueue(stringRequest);
-
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        while (!scheduler.advanceToLastPostedRunnable());
 
         assertThatThrownBy(() -> response.get(3, TimeUnit.SECONDS)).hasRootCauseInstanceOf(RuntimeException.class);
 
@@ -83,6 +94,10 @@ public class TracingHurlStackExceptionTest {
 
         assertThat(spanAttributes.get(SemanticAttributes.EXCEPTION_TYPE)).isEqualTo("RuntimeException");
         assertThat(spanAttributes.get(SemanticAttributes.EXCEPTION_MESSAGE)).isEqualTo("Something went wrong");
+
+        } finally {
+            scheduledExecutorService.shutdownNow();
+        }
     }
 
     static class FailingURLRewriter implements HurlStack.UrlRewriter {
