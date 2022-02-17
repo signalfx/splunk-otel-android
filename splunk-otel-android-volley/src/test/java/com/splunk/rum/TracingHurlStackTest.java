@@ -127,7 +127,6 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-//        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         while (!scheduler.advanceToLastPostedRunnable());
 
         assertThatThrownBy(() -> response.get(10, TimeUnit.SECONDS)).hasCauseInstanceOf(VolleyError.class);
@@ -255,6 +254,7 @@ public class TracingHurlStackTest {
         for(int i = 0; i < count; i++) {
             while (!scheduler.areAnyRunnable());
             scheduler.advanceToNextPostedRunnable();
+            System.err.println("Advanced to runnable: " + i);
         }
 
         assertThat(server.getRequestCount()).isEqualTo(50);
