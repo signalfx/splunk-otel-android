@@ -10,6 +10,7 @@ import android.util.SparseIntArray;
 
 import androidx.core.app.FrameMetricsAggregator;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,18 +30,18 @@ public class SlowRenderingDetectorImpl implements SlowRenderingDetector {
 
     private final Set<Activity> activities = new HashSet<>();
     private final Tracer tracer;
-    private final long renderDurationPollingIntervalMs;
+    private final Duration slowRenderPollingDuration;
 
-    public SlowRenderingDetectorImpl(Tracer tracer, int renderDurationPollingIntervalMs) {
-        this(tracer, new FrameMetricsAggregator(DRAW_DURATION), Executors.newScheduledThreadPool(1), renderDurationPollingIntervalMs);
+    public SlowRenderingDetectorImpl(Tracer tracer, Duration slowRenderPollingDuration) {
+        this(tracer, new FrameMetricsAggregator(DRAW_DURATION), Executors.newScheduledThreadPool(1), slowRenderPollingDuration);
     }
 
     // Exists for testing
-    SlowRenderingDetectorImpl(Tracer tracer, FrameMetricsAggregator frameMetricsAggregator, ScheduledExecutorService executorService, long renderDurationPollingIntervalMs) {
+    SlowRenderingDetectorImpl(Tracer tracer, FrameMetricsAggregator frameMetricsAggregator, ScheduledExecutorService executorService, Duration slowRenderPollingDuration) {
         this.tracer = tracer;
         this.frameMetrics = frameMetricsAggregator;
         this.executorService = executorService;
-        this.renderDurationPollingIntervalMs = renderDurationPollingIntervalMs;
+        this.slowRenderPollingDuration = slowRenderPollingDuration;
     }
 
     @Override
@@ -60,7 +61,7 @@ public class SlowRenderingDetectorImpl implements SlowRenderingDetector {
 
     @Override
     public void start() {
-        executorService.scheduleAtFixedRate(this::reportSlowRenders, renderDurationPollingIntervalMs, renderDurationPollingIntervalMs, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(this::reportSlowRenders, slowRenderPollingDuration.toMillis(), slowRenderPollingDuration.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     private void reportSlowRenders() {

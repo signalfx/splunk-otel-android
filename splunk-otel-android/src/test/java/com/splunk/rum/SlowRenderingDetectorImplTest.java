@@ -24,6 +24,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,14 +54,14 @@ public class SlowRenderingDetectorImplTest {
 
     @Test
     public void add() {
-        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null, 0);
+        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null, Duration.ofSeconds(0));
         testInstance.add(activity);
         verify(frameMetrics).add(activity);
     }
 
     @Test
     public void stopBeforeAddOk() {
-        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null, 0);
+        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null, Duration.ofSeconds(0));
         testInstance.stop(activity);
     }
 
@@ -71,7 +72,7 @@ public class SlowRenderingDetectorImplTest {
 
         when(frameMetrics.remove(activity)).thenReturn(metricsArray);
 
-        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null, 1001);
+        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, null, Duration.ofMillis(1001));
 
         testInstance.add(activity);
         testInstance.stop(activity);
@@ -91,7 +92,7 @@ public class SlowRenderingDetectorImplTest {
             return null;
         }).when(exec).scheduleAtFixedRate(any(), eq(1001L), eq(1001L), eq(TimeUnit.MILLISECONDS));
 
-        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, exec, 1001);
+        SlowRenderingDetectorImpl testInstance = new SlowRenderingDetectorImpl(tracer, frameMetrics, exec, Duration.ofMillis(1001));
         testInstance.add(activity);
         testInstance.start();
         List<SpanData> spans = otelTesting.getSpans();

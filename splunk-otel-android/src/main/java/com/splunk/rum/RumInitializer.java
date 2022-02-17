@@ -142,7 +142,7 @@ class RumInitializer {
         try {
             initializationEvents.add(new RumInitializer.InitializationEvent("slowRenderingDetectorInitialized", timingClock.now()));
             Class.forName("androidx.core.app.FrameMetricsAggregator");
-            return new SlowRenderingDetectorImpl(tracer, config.getRenderDurationPollingIntervalMs());
+            return new SlowRenderingDetectorImpl(tracer, config.getSlowRenderPollingDuration());
         } catch (ClassNotFoundException e) {
             Log.w(LOG_TAG, "FrameMetricsAggregator is not available on this platform - slow/frozen rendering detection is disabled.");
             return SlowRenderingDetector.NO_OP;
