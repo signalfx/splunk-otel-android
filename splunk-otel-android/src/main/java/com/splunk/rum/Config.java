@@ -300,7 +300,7 @@ public class Config {
 
         /**
          * Configures the rate at which frame render durations are polled.
-         * @param interval - The period that should be used for polling (in ms)
+         * @param interval - The period that should be used for polling
          * @return this
          */
         public Builder slowRenderPollingDuration(Duration interval){
