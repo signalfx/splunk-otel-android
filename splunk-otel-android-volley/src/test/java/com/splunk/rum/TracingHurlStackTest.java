@@ -31,6 +31,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.mockwebserver.MockResponse;
 import com.google.mockwebserver.MockWebServer;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,6 +66,7 @@ public class TracingHurlStackTest {
     public OpenTelemetryRule otelTesting = OpenTelemetryRule.create();
     private TestRequestQueue testQueue;
     private MockWebServer server;
+    private Scheduler scheduler;
 
     @Before
     public void setup() {
@@ -74,6 +76,10 @@ public class TracingHurlStackTest {
 
         //setup test server
         server = new MockWebServer();
+
+        //pause Robolectric scheduler
+        scheduler = shadowOf(getMainLooper()).getScheduler();
+        scheduler.setIdleState(Scheduler.IdleState.PAUSED);
     }
 
     @Test
@@ -91,7 +97,6 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         while (!scheduler.advanceToLastPostedRunnable());
 
         String result = response.get(10, TimeUnit.SECONDS);
@@ -122,7 +127,7 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
+//        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         while (!scheduler.advanceToLastPostedRunnable());
 
         assertThatThrownBy(() -> response.get(10, TimeUnit.SECONDS)).hasCauseInstanceOf(VolleyError.class);
@@ -153,7 +158,6 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         while (!scheduler.advanceToLastPostedRunnable());
 
         //thrown exception type depends on the system, e.g. on MacOS - TimeoutError, on Ubuntu - NoConnectionException
@@ -196,8 +200,6 @@ public class TracingHurlStackTest {
         testQueue.addToQueue(stringRequest);
         testQueue.addToQueue(stringRequest);
 
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-
         for(int i = 0; i < 2; i++) {
             while(!scheduler.areAnyRunnable());
             scheduler.advanceToNextPostedRunnable();
@@ -239,7 +241,10 @@ public class TracingHurlStackTest {
                     } catch (InterruptedException e) {
                         throw new AssertionError(e);
                     }
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(), response -> {}, error -> {});
+                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(), response -> {
+                    }, error -> {
+                        Assert.fail();
+                    });
                     testQueue.addToQueue(stringRequest);
                 };
             pool.submit(job);
@@ -247,7 +252,6 @@ public class TracingHurlStackTest {
 
         latch.countDown();
 
-        Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
         for(int i = 0; i < count; i++) {
             while (!scheduler.areAnyRunnable());
             scheduler.advanceToNextPostedRunnable();
