@@ -299,8 +299,7 @@ public class Config {
         }
 
         /**
-         * Configures the rate at which frame render durations are polled. Pass zero to
-         * disable polling for slow/frozen renders.
+         * Configures the rate at which frame render durations are polled.
          * @param interval - The period that should be used for polling (in ms)
          * @return this
          */
