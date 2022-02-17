@@ -254,7 +254,6 @@ public class TracingHurlStackTest {
         for(int i = 0; i < count; i++) {
             while (!scheduler.areAnyRunnable());
             scheduler.runOneTask();
-            System.err.println("Advanced to runnable: " + i);
         }
 
         assertThat(server.getRequestCount()).isEqualTo(50);
