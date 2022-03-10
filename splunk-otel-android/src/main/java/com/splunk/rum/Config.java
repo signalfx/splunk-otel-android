@@ -38,6 +38,7 @@ public class Config {
 
     public static final boolean DEFAULT_ENABLE_SLOW_RENDERING_DETECTION = true;
     public static final Duration DEFAULT_SLOW_RENDER_POLLING_INTERVAL = Duration.ofSeconds(1);
+    public static final double DEFAULT_MAX_UNCOMPRESSED_BANDWIDTH = 15.0 * 1024;
     private final String beaconEndpoint;
     private final String rumAccessToken;
     private final boolean debugEnabled;
@@ -49,6 +50,7 @@ public class Config {
     private final Function<SpanExporter, SpanExporter> spanFilterExporterDecorator;
     private final boolean slowRenderingDetectionEnabled;
     private final Duration slowRenderPollingDuration;
+    private final boolean enableDiskBuffering;
 
     private Config(Builder builder) {
         this.beaconEndpoint = builder.beaconEndpoint;
@@ -62,6 +64,7 @@ public class Config {
         this.slowRenderPollingDuration = builder.slowRenderPollingDuration;
         this.slowRenderingDetectionEnabled = builder.slowRenderingDetectionEnabled;
         this.spanFilterExporterDecorator = builder.spanFilterBuilder.build();
+        this.enableDiskBuffering = builder.enableDiskBuffering;
     }
 
     private Attributes addDeploymentEnvironment(Builder builder) {
@@ -173,13 +176,18 @@ public class Config {
         return spanFilterExporterDecorator.apply(exporter);
     }
 
+    public boolean isDiskBufferingDisabled() {
+        return !enableDiskBuffering;
+    }
+
     /**
      * Builder class for the Splunk RUM {@link Config} class.
      */
     public static class Builder {
-        public boolean networkMonitorEnabled = true;
-        public boolean anrDetectionEnabled = true;
-        public boolean slowRenderingDetectionEnabled = DEFAULT_ENABLE_SLOW_RENDERING_DETECTION;
+        private boolean networkMonitorEnabled = true;
+        private boolean anrDetectionEnabled = true;
+        private boolean slowRenderingDetectionEnabled = DEFAULT_ENABLE_SLOW_RENDERING_DETECTION;
+        private boolean enableDiskBuffering = false;
         private String beaconEndpoint;
         private String rumAccessToken;
         private boolean debugEnabled = false;
@@ -253,6 +261,17 @@ public class Config {
          */
         public Builder debugEnabled(boolean enable) {
             this.debugEnabled = enable;
+            return this;
+        }
+
+        /**
+         * Enables the storage-based buffering of telemetry. By default, telemetry will be buffered
+         * in memory and throttled. If this feature is enabled, telemetry is buffered in the local
+         * storage until it is exported.
+         * @return this
+         */
+        public Builder enableDiskBuffering(){
+            this.enableDiskBuffering = true;
             return this;
         }
 

@@ -24,9 +24,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.splunk.android.rum.R;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,6 +58,7 @@ import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import zipkin2.reporter.Sender;
+import zipkin2.reporter.okhttp3.OkHttpSender;
 
 class RumInitializer {
 
@@ -243,24 +247,50 @@ class RumInitializer {
 
     //visible for testing
     SpanExporter buildExporter(ConnectionUtil connectionUtil) {
-        String endpoint = config.getBeaconEndpoint() + "?auth=" + config.getRumAccessToken();
         if (!config.isDebugEnabled()) {
             //tell the Zipkin exporter to shut up already. We're on mobile, network stuff happens.
             // we'll do our best to hang on to the spans with the wrapping BufferingExporter.
             ZipkinSpanExporter.baseLogger.setLevel(Level.SEVERE);
             initializationEvents.add(new InitializationEvent("logger setup complete", timingClock.now()));
         }
-//        SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
-        SpanExporter diskBufferingExporter = getToDiskExporter();
-        initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
 
-        Sender sender = new Okhttp;
+        if(config.isDiskBufferingDisabled()){
+            SpanExporter spanExporter = buildMemoryBufferingThrottledExporter(connectionUtil);
+            initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
+            return spanExporter;
+        }
+        return buildStorageBufferingExporter(connectionUtil);
+    }
+
+    private SpanExporter buildStorageBufferingExporter(ConnectionUtil connectionUtil) {
+        Sender sender = OkHttpSender.newBuilder()
+                .endpoint(getEndpoint())
+                .build();
+        Path filesDir = Paths.get(application.getApplicationContext().getFilesDir().toURI());
+        Path spanFilesPath = filesDir.resolve("spans");
         DiskToZipkinExporter diskToZipkinExporter = DiskToZipkinExporter.builder()
+                .connectionUtil(connectionUtil)
                 .sender(sender)
+                .spanFilesPath(spanFilesPath)
                 .build();
         diskToZipkinExporter.startPolling();
 
-        ThrottlingExporter throttlingExporter = ThrottlingExporter.newBuilder(new MemoryBufferingExporter(connectionUtil, diskBufferingExporter))
+        SpanExporter diskBufferingExporter = getToDiskExporter();
+        SpanExporter spanExporter = config.decorateWithSpanFilter(diskBufferingExporter);
+        initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
+        return spanExporter;
+    }
+
+    @NonNull
+    private String getEndpoint() {
+        String endpoint = config.getBeaconEndpoint() + "?auth=" + config.getRumAccessToken();
+        return endpoint;
+    }
+
+    private SpanExporter buildMemoryBufferingThrottledExporter(ConnectionUtil connectionUtil) {
+        String endpoint = getEndpoint();
+        SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
+        ThrottlingExporter throttlingExporter = ThrottlingExporter.newBuilder(new MemoryBufferingExporter(connectionUtil, zipkinSpanExporter))
                 .categorizeByAttribute(SplunkRum.COMPONENT_KEY)
                 .maxSpansInWindow(100)
                 .windowSize(Duration.ofSeconds(30))
@@ -271,8 +301,8 @@ class RumInitializer {
     SpanExporter getToDiskExporter(){
         return new LazyInitSpanExporter(() -> {
             android.content.Context context = application.getApplicationContext();
-            File filesDir = context.getFilesDir();
-            return ZipkinWriteToDiskExporter.create(filesDir);
+            Path filesDir = Paths.get(context.getFilesDir().toURI());
+            return ZipkinWriteToDiskExporterFactory.create(filesDir);
         });
     }
 

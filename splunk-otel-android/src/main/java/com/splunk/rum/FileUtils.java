@@ -1,39 +1,58 @@
 package com.splunk.rum;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
+import static com.splunk.rum.SplunkRum.LOG_TAG;
+
+import android.util.Log;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-// Basic wrapper around filesystem operations
+// Basic wrapper around filesystem operations, primarily for testing
 public class FileUtils {
 
-    void writeFileContents(File tmpFile, List<byte[]> blocksOfData) throws IOException {
-        try (FileOutputStream out = new FileOutputStream(tmpFile)) {
+    void writeAsLines(Path tmpFile, List<byte[]> blocksOfData) throws IOException {
+        try (FileOutputStream out = new FileOutputStream(tmpFile.toFile())) {
             for (byte[] block : blocksOfData) {
                 out.write(block);
+                out.write('\n');
             }
         }
     }
 
-    byte[] readFileCompletely(File file) throws IOException {
-        try (FileInputStream in = new FileInputStream(file)) {
-            int fileSize = (int) file.length();
-            byte[] fileBuffer = new byte[fileSize];
-            byte[] buffer = new byte[1024 * 10];
-            int readSoFar = 0;
-            while (readSoFar < fileSize) {
-                int rc = in.read(buffer);
-                System.arraycopy(buffer, 0, fileBuffer, readSoFar, rc);
-                readSoFar += rc;
-            }
-            return fileBuffer;
+    List<byte[]> readFileCompletely(Path file) throws IOException {
+        byte[] bytes = Files.readAllBytes(file);
+        String[] lines = new String(bytes).split("\n");
+        return Arrays.stream(lines)
+                .map(line -> line.getBytes(StandardCharsets.UTF_8))
+                .collect(Collectors.toList());
+    }
+
+    Stream<Path> listFiles(Path dir) throws IOException {
+        return Files.list(dir);
+    }
+
+    boolean isRegularFile(Path file){
+        return Files.isRegularFile(file);
+    }
+
+    void safeDelete(Path file) {
+        try {
+            Files.delete(file);
+        } catch (IOException e) {
+            Log.w(LOG_TAG, "Error deleting file " + file, e);
         }
     }
 
-    public File[] listFiles(File path, FileFilter fileFilter) {
-        return path.listFiles(fileFilter);
+    Path moveAtomic(Path source, Path target) throws IOException {
+        return Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
     }
+
 }
