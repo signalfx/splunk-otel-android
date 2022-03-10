@@ -68,7 +68,7 @@ public class DiskToZipkinExporter {
 
             double sustainedRate = bandwidthTracker.totalSustainedRate();
             if (sustainedRate > bandwidthLimit) {
-                Log.i(SplunkRum.LOG_TAG, String.format("Export rate %.2f exceed limit of %.2f, backing off", sustainedRate, bandwidthLimit));
+                Log.i(SplunkRum.LOG_TAG, String.format("Export rate %.2f exceeds limit of %.2f, backing off", sustainedRate, bandwidthLimit));
                 break;
             }
 
