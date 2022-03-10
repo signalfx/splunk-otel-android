@@ -184,19 +184,12 @@ public class TracingHurlStackTest {
 
         URL url = server.getUrl("/success");
 
-        class TestResponseListener implements Response.Listener<String> {
-            CountDownLatch countDownLatch = new CountDownLatch(2);
-            @Override
-            public void onResponse(String response) {
-                countDownLatch.countDown();
-            }
-        }
-        TestResponseListener testResponseListener = new TestResponseListener();
+        TestResponseListener testResponseListener = new TestResponseListener(2);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url.toString(), testResponseListener, error -> {});
         testQueue.addToQueue(stringRequest);
         testQueue.addToQueue(stringRequest);
 
-        testResponseListener.countDownLatch.await();
+        testResponseListener.countDownLatch.await(10, TimeUnit.SECONDS);
 
         assertThat(server.getRequestCount()).isEqualTo(2);
 
@@ -225,14 +218,7 @@ public class TracingHurlStackTest {
         CountDownLatch latch = new CountDownLatch(1);
         ExecutorService pool = Executors.newFixedThreadPool(4);
 
-        class TestResponseListener implements Response.Listener<String> {
-            CountDownLatch countDownLatch = new CountDownLatch(count);
-            @Override
-            public void onResponse(String response) {
-                countDownLatch.countDown();
-            }
-        }
-        TestResponseListener testResponseListener = new TestResponseListener();
+        TestResponseListener testResponseListener = new TestResponseListener(count);
         for(int i = 0; i < count; i++){
             Runnable job =
                 () -> {
@@ -248,7 +234,7 @@ public class TracingHurlStackTest {
         }
 
         latch.countDown();
-        testResponseListener.countDownLatch.await();
+        testResponseListener.countDownLatch.await(10, TimeUnit.SECONDS);
 
         assertThat(server.getRequestCount()).isEqualTo(50);
 
@@ -286,6 +272,19 @@ public class TracingHurlStackTest {
             fail("Port is not available");
         }
         return -1;
+    }
+
+    private static class TestResponseListener implements Response.Listener<String> {
+        private final CountDownLatch countDownLatch;
+
+        TestResponseListener(int count) {
+            countDownLatch = new CountDownLatch(count);
+        }
+
+        @Override
+        public void onResponse(String response) {
+            countDownLatch.countDown();
+        }
     }
 
 }
