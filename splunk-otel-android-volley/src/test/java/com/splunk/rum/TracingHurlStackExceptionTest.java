@@ -24,6 +24,7 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,35 +47,24 @@ public class TracingHurlStackExceptionTest {
 
     @Rule
     public OpenTelemetryRule otelTesting = OpenTelemetryRule.create();
-
     private TestRequestQueue testQueue;
+    private StuckTestHelper stuckTestHelper;
 
     @Before
     public void setup() {
         //setup Volley with TracingHurlStack
         HurlStack tracingHurlStack = VolleyTracing.create(otelTesting.getOpenTelemetry()).newHurlStack(new FailingURLRewriter());
         testQueue = TestRequestQueue.create(tracingHurlStack);
+        stuckTestHelper = StuckTestHelper.start();
+    }
+
+    @After
+    public void cleanup() {
+        stuckTestHelper.close();
     }
 
     @Test
     public void spanDecoration_error() {
-        Runnable threadDump = new Runnable() {
-            @Override
-            public void run() {
-                System.err.println("---------------");
-                for (Map.Entry<Thread, StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
-                    System.err.println(entry.getKey());
-                    for (StackTraceElement stackTraceElement : entry.getValue()) {
-                        System.err.println(stackTraceElement);
-                    }
-                    System.err.println();
-                }
-            }
-        };
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorService.scheduleWithFixedDelay(threadDump, 1, 1, TimeUnit.MINUTES);
-        try {
-
         RequestFuture<String> response = RequestFuture.newFuture();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, "whatever",
                 response, response);
@@ -94,10 +84,6 @@ public class TracingHurlStackExceptionTest {
 
         assertThat(spanAttributes.get(SemanticAttributes.EXCEPTION_TYPE)).isEqualTo("RuntimeException");
         assertThat(spanAttributes.get(SemanticAttributes.EXCEPTION_MESSAGE)).isEqualTo("Something went wrong");
-
-        } finally {
-            scheduledExecutorService.shutdownNow();
-        }
     }
 
     static class FailingURLRewriter implements HurlStack.UrlRewriter {

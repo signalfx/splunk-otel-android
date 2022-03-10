@@ -36,12 +36,9 @@ class TestRequestQueue {
     }
 
     private TestRequestQueue(HurlStack hurlStack) {
-
         Cache cache = new NoCache();
         Network network = new BasicNetwork(hurlStack);
 
-        // ResponseDelivery responseDelivery = new ExecutorDelivery(Executors.newSingleThreadExecutor());
-        // queue = new RequestQueue(cache, network);
         queue = new RequestQueue(cache, network, 1, new ExecutorDelivery(Executors.newSingleThreadExecutor()));
         queue.start();
     }

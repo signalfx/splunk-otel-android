@@ -31,6 +31,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.mockwebserver.MockResponse;
 import com.google.mockwebserver.MockWebServer;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,6 +62,7 @@ public class TracingHurlStackTest {
     @Rule
     public OpenTelemetryRule otelTesting = OpenTelemetryRule.create();
     private TestRequestQueue testQueue;
+    private StuckTestHelper stuckTestHelper;
     private MockWebServer server;
 
     @Before
@@ -68,9 +70,16 @@ public class TracingHurlStackTest {
         //setup Volley with TracingHurlStack
         HurlStack tracingHurlStack = VolleyTracing.create(otelTesting.getOpenTelemetry()).newHurlStack();
         testQueue = TestRequestQueue.create(tracingHurlStack);
+        stuckTestHelper = StuckTestHelper.start();
 
         //setup test server
         server = new MockWebServer();
+    }
+
+    @After
+    public void cleanup() throws IOException {
+        stuckTestHelper.close();
+        server.shutdown();
     }
 
     @Test
@@ -88,14 +97,7 @@ public class TracingHurlStackTest {
 
         testQueue.addToQueue(stringRequest);
 
-        // Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        // while (!scheduler.advanceToLastPostedRunnable());
-
-        // shadowOf(getMainLooper()).idle();
-
         String result = response.get(10, TimeUnit.SECONDS);
-
-        // shadowOf(getMainLooper()).idle();
 
         assertThat(server.takeRequest().getPath()).isEqualTo("/success"); //server received request
         assertThat(result).isEqualTo("success");
@@ -122,9 +124,6 @@ public class TracingHurlStackTest {
                 response, response);
 
         testQueue.addToQueue(stringRequest);
-
-        // Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        // while (!scheduler.advanceToLastPostedRunnable());
 
         assertThatThrownBy(() -> response.get(10, TimeUnit.SECONDS)).hasCauseInstanceOf(VolleyError.class);
 
@@ -153,9 +152,6 @@ public class TracingHurlStackTest {
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(50, 0, 1f));
 
         testQueue.addToQueue(stringRequest);
-
-        // Scheduler scheduler = shadowOf(getMainLooper()).getScheduler();
-        // while (!scheduler.advanceToLastPostedRunnable());
 
         //thrown exception type depends on the system, e.g. on MacOS - TimeoutError, on Ubuntu - NoConnectionException
         assertThatThrownBy(() -> response.get(3, TimeUnit.SECONDS)).isInstanceOf(Throwable.class);
