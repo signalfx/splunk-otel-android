@@ -254,7 +254,7 @@ class RumInitializer {
             initializationEvents.add(new InitializationEvent("logger setup complete", timingClock.now()));
         }
 
-        if(config.isDiskBufferingDisabled()){
+        if(!config.isDiskBufferingEnabled()){
             SpanExporter spanExporter = buildMemoryBufferingThrottledExporter(connectionUtil);
             initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
             return spanExporter;

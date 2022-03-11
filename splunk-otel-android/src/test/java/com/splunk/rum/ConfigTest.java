@@ -64,7 +64,7 @@ public class ConfigTest {
         assertFalse(config.isNetworkMonitorEnabled());
         assertFalse(config.isAnrDetectionEnabled());
         assertEquals(expectedFinalAttributes, config.getGlobalAttributes());
-        assertFalse(config.isDiskBufferingDisabled());
+        assertTrue(config.isDiskBufferingEnabled());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class ConfigTest {
         assertTrue(config.isNetworkMonitorEnabled());
         assertTrue(config.isAnrDetectionEnabled());
         assertEquals(Attributes.empty(), config.getGlobalAttributes());
-        assertTrue(config.isDiskBufferingDisabled());
+        assertFalse(config.isDiskBufferingEnabled());
     }
 
     @Test

@@ -50,7 +50,7 @@ public class Config {
     private final Function<SpanExporter, SpanExporter> spanFilterExporterDecorator;
     private final boolean slowRenderingDetectionEnabled;
     private final Duration slowRenderPollingDuration;
-    private final boolean enableDiskBuffering;
+    private final boolean diskBufferingEnabled;
 
     private Config(Builder builder) {
         this.beaconEndpoint = builder.beaconEndpoint;
@@ -64,7 +64,7 @@ public class Config {
         this.slowRenderPollingDuration = builder.slowRenderPollingDuration;
         this.slowRenderingDetectionEnabled = builder.slowRenderingDetectionEnabled;
         this.spanFilterExporterDecorator = builder.spanFilterBuilder.build();
-        this.enableDiskBuffering = builder.enableDiskBuffering;
+        this.diskBufferingEnabled = builder.diskBufferingEnabled;
     }
 
     private Attributes addDeploymentEnvironment(Builder builder) {
@@ -176,8 +176,8 @@ public class Config {
         return spanFilterExporterDecorator.apply(exporter);
     }
 
-    public boolean isDiskBufferingDisabled() {
-        return !enableDiskBuffering;
+    public boolean isDiskBufferingEnabled() {
+        return diskBufferingEnabled;
     }
 
     /**
@@ -187,7 +187,7 @@ public class Config {
         private boolean networkMonitorEnabled = true;
         private boolean anrDetectionEnabled = true;
         private boolean slowRenderingDetectionEnabled = DEFAULT_ENABLE_SLOW_RENDERING_DETECTION;
-        private boolean enableDiskBuffering = false;
+        private boolean diskBufferingEnabled = false;
         private String beaconEndpoint;
         private String rumAccessToken;
         private boolean debugEnabled = false;
@@ -271,7 +271,7 @@ public class Config {
          * @return this
          */
         public Builder enableDiskBuffering(){
-            this.enableDiskBuffering = true;
+            this.diskBufferingEnabled = true;
             return this;
         }
 
