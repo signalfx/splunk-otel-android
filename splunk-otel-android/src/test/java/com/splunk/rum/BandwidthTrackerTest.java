@@ -25,24 +25,6 @@ public class BandwidthTrackerTest {
     }
 
     @Test
-    public void testLatestRateNoData() {
-        BandwidthTracker tracker = new BandwidthTracker(clock);
-        assertEquals(0.0, tracker.latestBlockRate(), 0.0);
-    }
-
-    @Test
-    public void testLatest() {
-        BandwidthTracker tracker = new BandwidthTracker(clock);
-        tracker.tick(Collections.singletonList(new byte[100]));
-        tracker.tick(Collections.singletonList(new byte[200]));
-        // 200 bytes in the last tick, 5 seconds, so 200/5 => 40.0 bps
-        assertEquals(40.0, tracker.latestBlockRate(), 0.0);
-        tracker.tick(Collections.singletonList(new byte[300]));
-        // 300 bytes in the last tick, 5 seconds, so 300/5 => 60.0 bps
-        assertEquals(60.0, tracker.latestBlockRate(), 0.0);
-    }
-
-    @Test
     public void testSustainedRateNoData() {
         BandwidthTracker tracker = new BandwidthTracker(clock);
         assertEquals(0.0, tracker.totalSustainedRate(), 0.0);

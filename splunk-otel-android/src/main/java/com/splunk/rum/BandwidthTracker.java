@@ -54,11 +54,4 @@ class BandwidthTracker {
         double timeDelta = (times.get(times.size() - 1) - times.get(0)) / 1000.0;
         return total / timeDelta;
     }
-
-    double latestBlockRate() {
-        if (sizes.size() < 2) return 0;
-        double lastBlockSize = sizes.get(sizes.size() - 1);
-        double timeDelta = (times.get(times.size() - 1) - times.get(times.size() - 2)) / 1000.0;
-        return lastBlockSize / timeDelta;
-    }
 }
