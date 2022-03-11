@@ -12,10 +12,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Clock;
 import java.util.Arrays;
 import java.util.List;
@@ -24,11 +23,9 @@ import java.util.List;
 public class ZipkinToDiskSenderTest {
 
     private final long now = System.currentTimeMillis();
-    private final Path path = Paths.get("/my/great/storage/location");
-    private final String tmpFile = "/my/great/storage/location/" + now + ".spans.tmp";
-    private final Path tmpPath = Paths.get(tmpFile);
+    private final File path = new File("/my/great/storage/location");
     private final String finalFile = "/my/great/storage/location/" + now + ".spans";
-    private final Path finalPath = Paths.get(finalFile);
+    private final File finalPath = new File(finalFile);
     private final byte[] span1 = "span one".getBytes(StandardCharsets.UTF_8);
     private final byte[] span2 = "span one".getBytes(StandardCharsets.UTF_8);
 
@@ -49,30 +46,17 @@ public class ZipkinToDiskSenderTest {
         ZipkinToDiskSender sender = new ZipkinToDiskSender(path, fileUtils, clock);
         sender.sendSpans(spans);
 
-        verify(fileUtils).writeAsLines(tmpPath, spans);
-        verify(fileUtils).moveAtomic(tmpPath, finalPath);
+        verify(fileUtils).writeAsLines(finalPath, spans);
     }
 
     @Test
     public void testWriteFails() throws Exception {
         List<byte[]> spans = Arrays.asList(span1, span2);
-        doThrow(new IOException("boom")).when(fileUtils).writeAsLines(tmpPath, spans);
+        doThrow(new IOException("boom")).when(fileUtils).writeAsLines(finalPath, spans);
 
         ZipkinToDiskSender sender = new ZipkinToDiskSender(path, fileUtils, clock);
         sender.sendSpans(spans);
-
-        verify(fileUtils, never()).moveAtomic(any(), any());
-    }
-
-    @Test
-    public void testRenameFails() throws Exception {
-        List<byte[]> spans = Arrays.asList(span1, span2);
-        doThrow(new IOException("boom")).when(fileUtils).moveAtomic(tmpPath, finalPath);
-
-        ZipkinToDiskSender sender = new ZipkinToDiskSender(path, fileUtils, clock);
-        sender.sendSpans(spans);
-        verify(fileUtils).moveAtomic(tmpPath, finalPath);
-
+        // Exception not thrown
     }
 
 }

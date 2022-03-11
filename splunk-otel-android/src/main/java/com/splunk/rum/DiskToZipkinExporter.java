@@ -6,8 +6,8 @@ import static java.util.Collections.emptyList;
 
 import android.util.Log;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -28,7 +28,7 @@ public class DiskToZipkinExporter {
     private final ScheduledExecutorService threadPool;
     private final ConnectionUtil connectionUtil;
     private final Sender sender;
-    private final Path spanFilesPath;
+    private final File spanFilesPath;
     private final FileUtils fileUtils;
     private final BandwidthTracker bandwidthTracker;
     private final double bandwidthLimit;
@@ -62,9 +62,9 @@ public class DiskToZipkinExporter {
             return;
         }
 
-        List<Path> pendingFiles = getPendingFiles();
+        List<File> pendingFiles = getPendingFiles();
         boolean sentAnything = false;
-        for (Path file : pendingFiles) {
+        for (File file : pendingFiles) {
 
             double sustainedRate = bandwidthTracker.totalSustainedRate();
             if (sustainedRate > bandwidthLimit) {
@@ -83,15 +83,15 @@ public class DiskToZipkinExporter {
         }
     }
 
-    private List<Path> getPendingFiles() throws IOException {
+    private List<File> getPendingFiles() throws IOException {
         return fileUtils.listFiles(spanFilesPath)
                 .filter(fileUtils::isRegularFile)
                 .filter(file -> file.toString().endsWith(".spans"))
-                .sorted(Comparator.comparing(o -> o.getFileName().toString()))
+                .sorted(Comparator.comparing(File::getName))
                 .collect(Collectors.toList());
     }
 
-    private boolean handleFileOnDisk(Path file) {
+    private boolean handleFileOnDisk(File file) {
         Log.d(LOG_TAG, "Reading file content for ingest: " + file);
         List<byte[]> encodedSpans = readFileCompletely(file);
         if(encodedSpans.isEmpty()) {
@@ -113,7 +113,7 @@ public class DiskToZipkinExporter {
         }
     }
 
-    private List<byte[]> readFileCompletely(Path file) {
+    private List<byte[]> readFileCompletely(File file) {
         try {
             return fileUtils.readFileCompletely(file);
         } catch (IOException e) {
@@ -135,7 +135,7 @@ public class DiskToZipkinExporter {
         private ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor();
         private Sender sender;
         private ConnectionUtil connectionUtil;
-        private Path spanFilesPath;
+        private File spanFilesPath;
         private FileUtils fileUtils = new FileUtils();
         private double bandwidthLimit = DEFAULT_MAX_UNCOMPRESSED_BANDWIDTH;
 
@@ -164,7 +164,7 @@ public class DiskToZipkinExporter {
             return this;
         }
 
-        Builder spanFilesPath(Path spanFilesPath) {
+        Builder spanFilesPath(File spanFilesPath) {
             this.spanFilesPath = spanFilesPath;
             return this;
         }

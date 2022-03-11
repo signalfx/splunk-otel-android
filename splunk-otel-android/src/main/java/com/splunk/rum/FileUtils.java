@@ -2,57 +2,62 @@ package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.LOG_TAG;
 
+import android.util.AtomicFile;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 // Basic wrapper around filesystem operations, primarily for testing
 public class FileUtils {
 
-    void writeAsLines(Path tmpFile, List<byte[]> blocksOfData) throws IOException {
-        try (FileOutputStream out = new FileOutputStream(tmpFile.toFile())) {
-            for (byte[] block : blocksOfData) {
-                out.write(block);
+    void writeAsLines(File file, List<byte[]> blocksOfData) throws IOException {
+        AtomicFile outfile = new AtomicFile(file);
+        try(FileOutputStream out = outfile.startWrite()){
+            for (byte[] encodedSpan : blocksOfData) {
+                out.write(encodedSpan);
                 out.write('\n');
             }
+            outfile.finishWrite(out);
         }
     }
 
-    List<byte[]> readFileCompletely(Path file) throws IOException {
-        byte[] bytes = Files.readAllBytes(file);
-        String[] lines = new String(bytes).split("\n");
-        return Arrays.stream(lines)
-                .map(line -> line.getBytes(StandardCharsets.UTF_8))
-                .collect(Collectors.toList());
+    List<byte[]> readFileCompletely(File file) throws IOException {
+        List<byte[]> result = new ArrayList<>();
+        try(FileReader fileReader = new FileReader(file)){
+            try(BufferedReader buff = new BufferedReader(fileReader)){
+                String line;
+                while((line = buff.readLine()) != null){
+                    result.add(line.getBytes(StandardCharsets.UTF_8));
+                }
+            }
+        }
+        return result;
     }
 
-    Stream<Path> listFiles(Path dir) throws IOException {
-        return Files.list(dir);
+    Stream<File> listFiles(File dir) {
+        File[] files = dir.listFiles();
+        if(files == null) {
+            return Stream.empty();
+        }
+        return Arrays.stream(files);
     }
 
-    boolean isRegularFile(Path file){
-        return Files.isRegularFile(file);
+    boolean isRegularFile(File file){
+        return file.isFile();
     }
 
-    void safeDelete(Path file) {
-        try {
-            Files.delete(file);
-        } catch (IOException e) {
-            Log.w(LOG_TAG, "Error deleting file " + file, e);
+    void safeDelete(File file) {
+        if(!file.delete()){
+            Log.w(LOG_TAG, "Error deleting file " + file);
         }
     }
-
-    Path moveAtomic(Path source, Path target) throws IOException {
-        return Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
-    }
-
 }

@@ -6,7 +6,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
 import static java.util.Collections.singletonList;
 
 import org.junit.Before;
@@ -15,10 +14,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -30,15 +28,15 @@ import zipkin2.reporter.Sender;
 public class DiskToZipkinExporterTest {
 
     static final int BANDWIDTH_LIMIT = 20 * 1024;
-    static final Path spanFilesPath = Paths.get("/path/to/thing");
+    static final File spanFilesPath = new File("/path/to/thing");
     private final byte[] span1 = "span1".getBytes(StandardCharsets.UTF_8);
     private final byte[] span2 = "span2".getBytes(StandardCharsets.UTF_8);
     private final byte[] span3 = "span3".getBytes(StandardCharsets.UTF_8);
-    private final Path file1 = spanFilesPath.resolve("file1.spans");
-    private final Path file2 = spanFilesPath.resolve("file2.spans");
+    private final File file1 = new File(spanFilesPath.getAbsolutePath() + File.separator + "file1.spans");
+    private final File file2 = new File(spanFilesPath.getAbsolutePath() + File.separator + "file2.spans");
     private final List<byte[]> file1Spans = singletonList(span1);
     private final List<byte[]> file2Spans = Arrays.asList(span2, span3);
-    private final Path imposter = spanFilesPath.resolve("someImposterFile.dll");
+    private final File imposter = new File(spanFilesPath.getAbsolutePath() + File.separator + "someImposterFile.dll");
 
     @Mock
     private ConnectionUtil connectionUtil;
@@ -55,7 +53,7 @@ public class DiskToZipkinExporterTest {
     public void setup() throws Exception{
         when(connectionUtil.refreshNetworkStatus()).thenReturn(currentNetwork);
         when(currentNetwork.isOnline()).thenReturn(true);
-        Stream<Path> files = Stream.of(file1, imposter, file2);
+        Stream<File> files = Stream.of(file1, imposter, file2);
         when(fileUtils.listFiles(spanFilesPath)).thenReturn(files);
         when(fileUtils.isRegularFile(file1)).thenReturn(true);
         when(fileUtils.isRegularFile(file2)).thenReturn(true);

@@ -2,10 +2,11 @@ package com.splunk.rum;
 
 import android.util.Log;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Clock;
 import java.util.List;
+import java.util.Locale;
 
 import zipkin2.Call;
 import zipkin2.codec.Encoding;
@@ -13,16 +14,16 @@ import zipkin2.reporter.Sender;
 
 public class ZipkinToDiskSender extends Sender {
 
-    private final Path path;
+    private final File path;
     private final FileUtils fileUtils;
     private final Clock clock;
 
-    public ZipkinToDiskSender(Path path) {
+    public ZipkinToDiskSender(File path) {
         this(path, new FileUtils(), Clock.systemDefaultZone());
     }
 
     // exists for testing
-    ZipkinToDiskSender(Path path, FileUtils fileUtils, Clock clock) {
+    ZipkinToDiskSender(File path, FileUtils fileUtils, Clock clock) {
         this.path = path;
         this.fileUtils = fileUtils;
         this.clock = clock;
@@ -40,40 +41,23 @@ public class ZipkinToDiskSender extends Sender {
 
     @Override
     public int messageSizeInBytes(List<byte[]> encodedSpans) {
-        return encodedSpans.stream().reduce(0, (acc, cur) -> acc + cur.length + 1, Integer::sum) ;
+        return encodedSpans.stream().reduce(0, (acc, cur) -> acc + cur.length + 1, Integer::sum);
     }
 
     @Override
     public Call<Void> sendSpans(List<byte[]> encodedSpans) {
         long now = clock.millis();
-        Path tmpFile = createTempFilename(now);
-        if (writeToTempFile(tmpFile, encodedSpans)) {
-            Path outfile = createFilename(now);
-            try {
-                fileUtils.moveAtomic(tmpFile, outfile);
-            } catch (IOException e) {
-                Log.e(SplunkRum.LOG_TAG, "Error renaming spans temp file");
-            }
+        File filename = createFilename(now);
+        try {
+            fileUtils.writeAsLines(filename, encodedSpans);
+        } catch (IOException e) {
+            Log.e(SplunkRum.LOG_TAG, "Error writing spans to storage", e);
         }
         return Call.create(null);
     }
 
-    private Path createFilename(long now) {
-        return path.resolve(now + ".spans");
-    }
-
-    private Path createTempFilename(long now) {
-        Path filename = createFilename(now);
-        return filename.resolveSibling(filename.getFileName() + ".tmp");
-    }
-
-    private boolean writeToTempFile(Path tmpFile, List<byte[]> encodedSpans) {
-        try {
-            fileUtils.writeAsLines(tmpFile, encodedSpans);
-        } catch (IOException e) {
-            Log.e(SplunkRum.LOG_TAG, "Error buffering span data to disk", e);
-            return false;
-        }
-        return true;
+    private File createFilename(long now) {
+        String filePath = String.format(Locale.getDefault(), "%s%s%d.spans", path.getAbsolutePath(), File.separator, now);
+        return new File(filePath);
     }
 }

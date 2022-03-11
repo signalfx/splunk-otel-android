@@ -28,12 +28,12 @@ import androidx.annotation.NonNull;
 
 import com.splunk.android.rum.R;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -272,8 +272,9 @@ class RumInitializer {
         Sender sender = OkHttpSender.newBuilder()
                 .endpoint(getEndpoint())
                 .build();
-        Path filesDir = Paths.get(application.getApplicationContext().getFilesDir().toURI());
-        Path spanFilesPath = filesDir.resolve("spans");
+        File filesDir = application.getApplicationContext().getFilesDir();
+        File spanFilesPath = new File(String.format(Locale.getDefault(), "%s%sspans", filesDir.getAbsolutePath(), File.separator));
+
         DiskToZipkinExporter diskToZipkinExporter = DiskToZipkinExporter.builder()
                 .connectionUtil(connectionUtil)
                 .sender(sender)
@@ -302,7 +303,7 @@ class RumInitializer {
     SpanExporter getToDiskExporter(){
         return new LazyInitSpanExporter(() -> {
             android.content.Context context = application.getApplicationContext();
-            Path filesDir = Paths.get(context.getFilesDir().toURI());
+            File filesDir = context.getFilesDir();
             return ZipkinWriteToDiskExporterFactory.create(filesDir);
         });
     }

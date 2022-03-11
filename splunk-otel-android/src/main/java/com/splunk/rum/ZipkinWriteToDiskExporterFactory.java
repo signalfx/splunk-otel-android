@@ -2,14 +2,10 @@ package com.splunk.rum;
 
 import android.util.Log;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collection;
+import java.io.File;
+import java.util.Locale;
 
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
-import io.opentelemetry.sdk.common.CompletableResultCode;
-import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.sdk.trace.export.SpanExporter;
 import zipkin2.reporter.Sender;
 
 /**
@@ -21,12 +17,10 @@ public class ZipkinWriteToDiskExporterFactory {
     private ZipkinWriteToDiskExporterFactory(){
     }
 
-    public static ZipkinSpanExporter create(Path path) {
-        Path spansPath = path.resolve("spans");
-        if (!Files.exists(spansPath)) {
-            try {
-                Files.createDirectory(spansPath);
-            } catch (Exception e) {
+    public static ZipkinSpanExporter create(File path) {
+        File spansPath = new File(String.format(Locale.getDefault(), "%s%sspans", path.getAbsolutePath(), File.separator));
+        if (!spansPath.exists()) {
+            if(!spansPath.mkdirs()){
                 Log.e(SplunkRum.LOG_TAG, "Error creating path " + spansPath + " for span buffer, defaulting to parent");
                 spansPath = path;
             }
