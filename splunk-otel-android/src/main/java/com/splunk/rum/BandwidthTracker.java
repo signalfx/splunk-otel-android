@@ -4,6 +4,8 @@ import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
+import kotlin.collections.ArrayDeque;
+
 /**
  * Utility class to track how much bandwidth is being used by span data.
  * It tracks raw, uncompressed spans bytes being input to a sender and is not
@@ -12,8 +14,8 @@ import java.util.List;
 class BandwidthTracker {
     private final static int DATAPOINTS_TO_TRACK = 6;
     private final Clock clock;
-    private final List<Long> times = new ArrayList<>();
-    private final List<Long> sizes = new ArrayList<>();
+    private final List<Long> times = new ArrayDeque<>();
+    private final List<Long> sizes = new ArrayDeque<>();
 
     BandwidthTracker(){
         this(Clock.systemDefaultZone());
