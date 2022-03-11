@@ -84,7 +84,7 @@ class RumInitializer {
         ConnectionUtil connectionUtil = connectionUtilSupplier.get();
         initializationEvents.add(new InitializationEvent("connectionUtilInitialized", timingClock.now()));
 
-        SpanExporter zipkinExporter = buildExporter(connectionUtil);
+        SpanExporter zipkinExporter = buildFilteringExporter(connectionUtil);
         initializationEvents.add(new RumInitializer.InitializationEvent("exporterInitialized", timingClock.now()));
 
         SessionId sessionId = new SessionId();
@@ -246,7 +246,14 @@ class RumInitializer {
     }
 
     //visible for testing
-    SpanExporter buildExporter(ConnectionUtil connectionUtil) {
+    SpanExporter buildFilteringExporter(ConnectionUtil connectionUtil) {
+        SpanExporter exporter = buildExporter(connectionUtil);
+        SpanExporter filteredExporter = config.decorateWithSpanFilter(exporter);
+        initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
+        return filteredExporter;
+    }
+
+    private SpanExporter buildExporter(ConnectionUtil connectionUtil) {
         if (!config.isDebugEnabled()) {
             //tell the Zipkin exporter to shut up already. We're on mobile, network stuff happens.
             // we'll do our best to hang on to the spans with the wrapping BufferingExporter.
@@ -254,12 +261,11 @@ class RumInitializer {
             initializationEvents.add(new InitializationEvent("logger setup complete", timingClock.now()));
         }
 
-        if(!config.isDiskBufferingEnabled()){
-            SpanExporter spanExporter = buildMemoryBufferingThrottledExporter(connectionUtil);
-            initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
-            return spanExporter;
+        if (config.isDiskBufferingEnabled()) {
+            return buildStorageBufferingExporter(connectionUtil);
         }
-        return buildStorageBufferingExporter(connectionUtil);
+
+        return buildMemoryBufferingThrottledExporter(connectionUtil);
     }
 
     private SpanExporter buildStorageBufferingExporter(ConnectionUtil connectionUtil) {
@@ -275,27 +281,22 @@ class RumInitializer {
                 .build();
         diskToZipkinExporter.startPolling();
 
-        SpanExporter diskBufferingExporter = getToDiskExporter();
-        SpanExporter spanExporter = config.decorateWithSpanFilter(diskBufferingExporter);
-        initializationEvents.add(new InitializationEvent("zipkin exporter initialized", timingClock.now()));
-        return spanExporter;
+        return getToDiskExporter();
     }
 
     @NonNull
     private String getEndpoint() {
-        String endpoint = config.getBeaconEndpoint() + "?auth=" + config.getRumAccessToken();
-        return endpoint;
+        return config.getBeaconEndpoint() + "?auth=" + config.getRumAccessToken();
     }
 
     private SpanExporter buildMemoryBufferingThrottledExporter(ConnectionUtil connectionUtil) {
         String endpoint = getEndpoint();
         SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
-        ThrottlingExporter throttlingExporter = ThrottlingExporter.newBuilder(new MemoryBufferingExporter(connectionUtil, zipkinSpanExporter))
+        return ThrottlingExporter.newBuilder(new MemoryBufferingExporter(connectionUtil, zipkinSpanExporter))
                 .categorizeByAttribute(SplunkRum.COMPONENT_KEY)
                 .maxSpansInWindow(100)
                 .windowSize(Duration.ofSeconds(30))
                 .build();
-        return config.decorateWithSpanFilter(throttlingExporter);
     }
 
     SpanExporter getToDiskExporter(){
