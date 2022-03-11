@@ -81,6 +81,8 @@ public class DiskToZipkinExporterTest {
         verify(fileUtils).safeDelete(file1);
         verify(fileUtils).safeDelete(file2);
         verify(fileUtils, never()).readFileCompletely(imposter);
+        verify(bandwidthTracker).tick(file1Spans);
+        verify(bandwidthTracker).tick(file2Spans);
     }
 
     @Test

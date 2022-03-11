@@ -45,13 +45,17 @@ class BandwidthTracker {
         sizes.add(currentSize);
     }
 
+    /**
+     * Calculates the current average sustained throughput.
+     * @return - The currently tracked bandwidth, in bytes per second.
+     */
     double totalSustainedRate() {
         if (sizes.size() < 2) return 0;
 
         // Don't count the first ingest payload
         double total = sizes.stream().skip(1).reduce(0L, Long::sum, Long::sum);
 
-        double timeDelta = (times.get(times.size() - 1) - times.get(0)) / 1000.0;
-        return total / timeDelta;
+        double timeDeltaInSeconds = (times.get(times.size() - 1) - times.get(0)) / 1000.0;
+        return total / timeDeltaInSeconds;
     }
 }
