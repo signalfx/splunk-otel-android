@@ -13,12 +13,12 @@ import zipkin2.reporter.Sender;
  * Creates a ZipkinSpanExporter that is configured with an instance of
  * a ZipkinToDiskSender that writes telemetry to disk.
  */
-public class ZipkinWriteToDiskExporterFactory {
+class ZipkinWriteToDiskExporterFactory {
 
     private ZipkinWriteToDiskExporterFactory(){
     }
 
-    public static ZipkinSpanExporter create(Application application) {
+    static ZipkinSpanExporter create(Application application) {
         File spansPath = FileUtils.getSpansDirectory(application);
         if (!spansPath.exists()) {
             if(!spansPath.mkdirs()){

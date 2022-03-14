@@ -12,13 +12,13 @@ import zipkin2.Call;
 import zipkin2.codec.Encoding;
 import zipkin2.reporter.Sender;
 
-public class ZipkinToDiskSender extends Sender {
+class ZipkinToDiskSender extends Sender {
 
     private final File path;
     private final FileUtils fileUtils;
     private final Clock clock;
 
-    public ZipkinToDiskSender(File path) {
+    ZipkinToDiskSender(File path) {
         this(path, new FileUtils(), Clock.systemDefaultZone());
     }
 

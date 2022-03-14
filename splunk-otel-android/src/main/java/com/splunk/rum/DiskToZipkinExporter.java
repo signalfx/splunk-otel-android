@@ -23,7 +23,7 @@ import zipkin2.reporter.Sender;
  * via a sender. It is bandwidth sensitive and will throttle back if the limit
  * is exceeded.
  */
-public class DiskToZipkinExporter {
+class DiskToZipkinExporter {
 
     private final ScheduledExecutorService threadPool;
     private final ConnectionUtil connectionUtil;
@@ -33,7 +33,7 @@ public class DiskToZipkinExporter {
     private final BandwidthTracker bandwidthTracker;
     private final double bandwidthLimit;
 
-    public DiskToZipkinExporter(Builder builder) {
+    DiskToZipkinExporter(Builder builder) {
         this.threadPool = builder.threadPool;
         this.connectionUtil = builder.connectionUtil;
         this.sender = builder.sender;
