@@ -50,7 +50,7 @@ dependencies {
 
     implementation(platform("io.opentelemetry:opentelemetry-bom-alpha:1.12.0-alpha-SNAPSHOT"))
     implementation("io.opentelemetry:opentelemetry-semconv")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:1.12.0-alpha-SNAPSHOT")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:1.13.0-alpha-SNAPSHOT")
 
     api("io.opentelemetry:opentelemetry-api")
     api("com.squareup.okhttp3:okhttp:4.9.3")
