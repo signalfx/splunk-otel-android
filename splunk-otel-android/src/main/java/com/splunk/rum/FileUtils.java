@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.stream.Stream;
 
 // Basic wrapper around filesystem operations, primarily for testing
-public class FileUtils {
+class FileUtils {
 
     static File getSpansDirectory(Application application){
         File filesDir = application.getApplicationContext().getFilesDir();
