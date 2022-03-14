@@ -1,5 +1,6 @@
 package com.splunk.rum;
 
+import android.app.Application;
 import android.util.Log;
 
 import java.io.File;
@@ -17,12 +18,12 @@ public class ZipkinWriteToDiskExporterFactory {
     private ZipkinWriteToDiskExporterFactory(){
     }
 
-    public static ZipkinSpanExporter create(File path) {
-        File spansPath = new File(String.format(Locale.getDefault(), "%s%sspans", path.getAbsolutePath(), File.separator));
+    public static ZipkinSpanExporter create(Application application) {
+        File spansPath = FileUtils.getSpansDirectory(application);
         if (!spansPath.exists()) {
             if(!spansPath.mkdirs()){
                 Log.e(SplunkRum.LOG_TAG, "Error creating path " + spansPath + " for span buffer, defaulting to parent");
-                spansPath = path;
+                spansPath = application.getApplicationContext().getFilesDir();
             }
         }
 

@@ -2,6 +2,7 @@ package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.LOG_TAG;
 
+import android.app.Application;
 import android.util.AtomicFile;
 import android.util.Log;
 
@@ -14,10 +15,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 // Basic wrapper around filesystem operations, primarily for testing
 public class FileUtils {
+
+    static File getSpansDirectory(Application application){
+        File filesDir = application.getApplicationContext().getFilesDir();
+        return new File(String.format(Locale.getDefault(), "%s%sspans", filesDir.getAbsolutePath(), File.separator));
+    }
 
     void writeAsLines(File file, List<byte[]> blocksOfData) throws IOException {
         AtomicFile outfile = new AtomicFile(file);

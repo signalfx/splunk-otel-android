@@ -272,8 +272,7 @@ class RumInitializer {
         Sender sender = OkHttpSender.newBuilder()
                 .endpoint(getEndpoint())
                 .build();
-        File filesDir = application.getApplicationContext().getFilesDir();
-        File spanFilesPath = new File(String.format(Locale.getDefault(), "%s%sspans", filesDir.getAbsolutePath(), File.separator));
+        File spanFilesPath = FileUtils.getSpansDirectory(application);
 
         DiskToZipkinExporter diskToZipkinExporter = DiskToZipkinExporter.builder()
                 .connectionUtil(connectionUtil)
@@ -302,9 +301,7 @@ class RumInitializer {
 
     SpanExporter getToDiskExporter(){
         return new LazyInitSpanExporter(() -> {
-            android.content.Context context = application.getApplicationContext();
-            File filesDir = context.getFilesDir();
-            return ZipkinWriteToDiskExporterFactory.create(filesDir);
+            return ZipkinWriteToDiskExporterFactory.create(application);
         });
     }
 
