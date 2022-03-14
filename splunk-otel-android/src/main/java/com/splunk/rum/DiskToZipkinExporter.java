@@ -1,6 +1,5 @@
 package com.splunk.rum;
 
-import static com.splunk.rum.Config.DEFAULT_MAX_UNCOMPRESSED_BANDWIDTH;
 import static com.splunk.rum.SplunkRum.LOG_TAG;
 import static java.util.Collections.emptyList;
 
@@ -24,6 +23,8 @@ import zipkin2.reporter.Sender;
  * is exceeded.
  */
 class DiskToZipkinExporter {
+
+    public static final double DEFAULT_MAX_UNCOMPRESSED_BANDWIDTH = 15.0 * 1024;
 
     private final ScheduledExecutorService threadPool;
     private final ConnectionUtil connectionUtil;

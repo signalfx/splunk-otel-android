@@ -38,7 +38,6 @@ public class Config {
 
     public static final boolean DEFAULT_ENABLE_SLOW_RENDERING_DETECTION = true;
     public static final Duration DEFAULT_SLOW_RENDER_POLLING_INTERVAL = Duration.ofSeconds(1);
-    public static final double DEFAULT_MAX_UNCOMPRESSED_BANDWIDTH = 15.0 * 1024;
     private final String beaconEndpoint;
     private final String rumAccessToken;
     private final boolean debugEnabled;
