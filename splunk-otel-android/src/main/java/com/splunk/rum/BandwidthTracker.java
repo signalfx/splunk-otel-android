@@ -1,10 +1,9 @@
 package com.splunk.rum;
 
 import java.time.Clock;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.List;
 
-import kotlin.collections.ArrayDeque;
 
 /**
  * Utility class to track how much bandwidth is being used by span data.
@@ -14,8 +13,8 @@ import kotlin.collections.ArrayDeque;
 class BandwidthTracker {
     private final static int DATAPOINTS_TO_TRACK = 6;
     private final Clock clock;
-    private final List<Long> times = new ArrayDeque<>();
-    private final List<Long> sizes = new ArrayDeque<>();
+    private final ArrayDeque<Long> times = new ArrayDeque<>();
+    private final ArrayDeque<Long> sizes = new ArrayDeque<>();
 
     BandwidthTracker(){
         this(Clock.systemDefaultZone());
@@ -32,12 +31,12 @@ class BandwidthTracker {
      */
     void tick(List<byte[]> zipkinSpanData) {
         if (times.size() > DATAPOINTS_TO_TRACK) {
-            times.remove(0);
+            times.remove(0L);
         }
         times.add(clock.millis());
 
         if (sizes.size() > DATAPOINTS_TO_TRACK) {
-            sizes.remove(0);
+            sizes.remove(0L);
         }
         long currentSize = zipkinSpanData.stream()
                 .map(bytes -> bytes.length)
@@ -55,7 +54,7 @@ class BandwidthTracker {
         // Don't count the first ingest payload
         double total = sizes.stream().skip(1).reduce(0L, Long::sum, Long::sum);
 
-        double timeDeltaInSeconds = (times.get(times.size() - 1) - times.get(0)) / 1000.0;
+        double timeDeltaInSeconds = (times.getLast() - times.getFirst()) / 1000.0;
         return total / timeDeltaInSeconds;
     }
 }
