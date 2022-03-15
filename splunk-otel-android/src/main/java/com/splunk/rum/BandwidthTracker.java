@@ -31,12 +31,12 @@ class BandwidthTracker {
      */
     void tick(List<byte[]> zipkinSpanData) {
         if (times.size() > DATAPOINTS_TO_TRACK) {
-            times.remove(0L);
+            times.removeFirst();
         }
         times.add(clock.millis());
 
         if (sizes.size() > DATAPOINTS_TO_TRACK) {
-            sizes.remove(0L);
+            sizes.removeFirst();
         }
         long currentSize = zipkinSpanData.stream()
                 .map(bytes -> bytes.length)
