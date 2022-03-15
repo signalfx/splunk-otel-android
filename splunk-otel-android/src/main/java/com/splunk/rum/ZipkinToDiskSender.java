@@ -57,7 +57,6 @@ class ZipkinToDiskSender extends Sender {
     }
 
     private File createFilename(long now) {
-        String filePath = String.format(Locale.getDefault(), "%s%s%d.spans", path.getAbsolutePath(), File.separator, now);
-        return new File(filePath);
+        return new File(path, now + ".spans");
     }
 }

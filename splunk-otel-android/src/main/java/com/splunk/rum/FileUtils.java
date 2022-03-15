@@ -23,7 +23,7 @@ class FileUtils {
 
     static File getSpansDirectory(Application application){
         File filesDir = application.getApplicationContext().getFilesDir();
-        return new File(String.format(Locale.getDefault(), "%s%sspans", filesDir.getAbsolutePath(), File.separator));
+        return new File(filesDir, "spans");
     }
 
     void writeAsLines(File file, List<byte[]> blocksOfData) throws IOException {
