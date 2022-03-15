@@ -31,17 +31,18 @@ class SessionId {
 
     private final Clock clock;
     private final AtomicReference<String> value = new AtomicReference<>();
+    private final SessionIdTimeoutHandler timeoutHandler;
     private volatile long createTimeNanos;
-    private volatile long timeoutStartNanos = NO_TIMEOUT;
     private volatile SessionIdChangeListener sessionIdChangeListener;
 
-    SessionId() {
-        this(Clock.getDefault());
+    SessionId(SessionIdTimeoutHandler timeoutHandler) {
+        this(Clock.getDefault(), timeoutHandler);
     }
 
     //for testing
-    SessionId(Clock clock) {
+    SessionId(Clock clock, SessionIdTimeoutHandler timeoutHandler) {
         this.clock = clock;
+        this.timeoutHandler = timeoutHandler;
         value.set(createNewId());
         createTimeNanos = clock.now();
     }
@@ -54,43 +55,33 @@ class SessionId {
     }
 
     String getSessionId() {
-        String currentValue = value.get();
-        if (sessionExpired() || sessionTimedOut()) {
+        String oldValue = value.get();
+        String currentValue = oldValue;
+        boolean sessionIdChanged = false;
+
+        if (sessionExpired() || timeoutHandler.hasTimedOut()) {
             String newId = createNewId();
             //if this returns false, then another thread updated the value already.
-            if (value.compareAndSet(currentValue, newId)) {
+            sessionIdChanged = value.compareAndSet(oldValue, newId);
+            if (sessionIdChanged) {
                 createTimeNanos = clock.now();
-                if (sessionIdChangeListener != null) {
-                    sessionIdChangeListener.onChange(currentValue, newId);
-                }
             }
             currentValue = value.get();
         }
-        resetTimeout();
-        return currentValue;
-    }
 
-    void startInactivityTimeout() {
-        timeoutStartNanos = clock.nanoTime();
+        timeoutHandler.bump();
+        // sessionId change listener needs tobe called after bumping the timer because it may create a new span
+        if (sessionIdChanged && sessionIdChangeListener != null) {
+            sessionIdChangeListener.onChange(oldValue, currentValue);
+        }
+
+        return currentValue;
     }
 
     private boolean sessionExpired() {
         // TODO: it probably should use nanoTime(); now() javadoc explicitly states that it's not meant to be used to compute duration
         long elapsedTime = clock.now() - createTimeNanos;
         return elapsedTime >= SESSION_LIFETIME_NANOS;
-    }
-
-    private boolean sessionTimedOut() {
-        if (timeoutStartNanos == NO_TIMEOUT) {
-            // we haven't started the inactivity timeout yet
-            return false;
-        }
-        long elapsedTime = clock.nanoTime() - timeoutStartNanos;
-        return elapsedTime >= SESSION_TIMEOUT_NANOS;
-    }
-
-    private void resetTimeout() {
-        timeoutStartNanos = NO_TIMEOUT;
     }
 
     void setSessionIdChangeListener(SessionIdChangeListener sessionIdChangeListener) {

@@ -82,8 +82,9 @@ class RumInitializer {
         SpanExporter zipkinExporter = buildExporter(connectionUtil);
         initializationEvents.add(new RumInitializer.InitializationEvent("exporterInitialized", timingClock.now()));
 
-        SessionId sessionId = new SessionId();
-        appStateListeners.add(new SessionIdInactivityTimeoutListener(sessionId));
+        SessionIdTimeoutHandler timeoutHandler = new SessionIdTimeoutHandler();
+        SessionId sessionId = new SessionId(timeoutHandler);
+        appStateListeners.add(timeoutHandler);
         initializationEvents.add(new RumInitializer.InitializationEvent("sessionIdInitialized", timingClock.now()));
 
         SdkTracerProvider sdkTracerProvider = buildTracerProvider(Clock.getDefault(), zipkinExporter, sessionId, rumVersion, visibleScreenTracker, connectionUtil);
