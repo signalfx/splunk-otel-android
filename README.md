@@ -44,6 +44,8 @@ Splunk RUM Product Documentation can be found [here](https://docs.splunk.com/Obs
 * SplunkRum APIs for creating custom RUM events and reporting exceptions
 * Access to an OkHttp3 Call.Factory implementation for monitoring http client requests
 * APIs to redact any span from export, or change span attributes before export
+* Slow / frozen render detection
+* Offline buffering of telemetry via storage
 
 ## Getting Started
 
@@ -245,7 +247,9 @@ when initializing your instance of the SplunkRum API:
   Set/change the default polling interval for slow/frozen render detection.
   Default is 1000ms. Value must be positive. 
 - `slowRenderingDetectionEnabled(boolean)` :
-  Disable the detection of slow frame renders (default is enabled). 
+  Disable the detection of slow frame renders (default is enabled).
+- `enableDiskBuffering()` : 
+  Enables the storage-based buffering of telemetry.
 
 #### APIs provided by the `SplunkRum` instance:
 
@@ -277,6 +281,21 @@ when initializing your instance of the SplunkRum API:
 - To add OpenTelemetry instrumentation to your OkHttp3 client, SplunkRum provides an
   okhttp `Call.Factory` wrapper that can be applied to your client. See
   the `createRumOkHttpCallFactory(OkHttpClient)` for details.
+
+#### Slow / Frozen Renders
+
+By default, Splunk RUM will detect and report slow and frozen screen renders.
+To disable this feature, call `.disableSlowRenderingDetection()` on the 
+`Config.Builder`.
+
+The Splunk RUM definitions of "slow" and "frozen" are in line with the
+[Android Vitals definitions](https://developer.android.com/topic/performance/vitals/frozen):
+
+| category | speed   | spanName      | span attr |
+|----------|---------|---------------|-----------|
+| slow     | > 16ms  | slowRenders   | count     | 
+| frozen   | > 700ms | frozenRenders | count     |
+
 
 ## Troubleshooting
 
