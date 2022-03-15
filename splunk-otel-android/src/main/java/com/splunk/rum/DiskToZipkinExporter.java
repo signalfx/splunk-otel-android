@@ -24,7 +24,7 @@ import zipkin2.reporter.Sender;
  */
 class DiskToZipkinExporter {
 
-    public static final double DEFAULT_MAX_UNCOMPRESSED_BANDWIDTH = 15.0 * 1024;
+    static final double DEFAULT_MAX_UNCOMPRESSED_BANDWIDTH = 15.0 * 1024;
 
     private final ScheduledExecutorService threadPool;
     private final ConnectionUtil connectionUtil;
