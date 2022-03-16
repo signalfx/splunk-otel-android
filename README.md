@@ -284,7 +284,7 @@ when initializing your instance of the SplunkRum API:
 
 #### Detection of slow or frozen renders
 
-By default, Splunk RUM will detect and report slow and frozen screen renders.
+By default, Splunk RUM detects and reports slow or frozen screen renders.
 To disable this feature, call `.disableSlowRenderingDetection()` on the 
 `Config.Builder`.
 
