@@ -248,8 +248,9 @@ when initializing your instance of the SplunkRum API:
   Default is 1000ms. Value must be positive. 
 - `slowRenderingDetectionEnabled(boolean)` :
   Disables the detection of slow frame renders. Enabled by default.
-- `enableDiskBuffering()` : 
-  Enables the storage-based buffering of telemetry. This setting is useful when instrumenting applications that might work offline for extended periods of time.
+- `diskBufferingEnabled(boolean)` : 
+  Enables the storage-based buffering of telemetry. 
+  This setting is useful when instrumenting applications that might work offline for extended periods of time.
 
 #### APIs provided by the `SplunkRum` instance:
 
