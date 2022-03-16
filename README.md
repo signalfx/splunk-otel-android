@@ -292,9 +292,9 @@ To disable this feature, call `.disableSlowRenderingDetection()` on the
 Splunk RUM defines renders as slow or frozen following the [Android Vitals definitions](https://developer.android.com/topic/performance/vitals/frozen):
 
 | Category | Speed   | spanName      | Attribute   |
-|----------|---------|---------------|-----------|
-| Slow     | >16ms  | slowRenders   | count     | 
-| Frozen   | >700ms | frozenRenders | count     |
+|----------|---------|---------------|-------------|
+| Slow     | >16ms  | slowRenders    | count       | 
+| Frozen   | >700ms | frozenRenders  | count       |
 
 
 ## Troubleshooting
