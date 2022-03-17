@@ -286,7 +286,7 @@ when initializing your instance of the SplunkRum API:
 #### Detection of slow or frozen renders
 
 By default, Splunk RUM detects and reports slow or frozen screen renders.
-To disable this feature, call `.disableSlowRenderingDetection()` on the 
+To disable this feature, call `.slowRenderingDetectionEnabled(false)` on the 
 `Config.Builder`.
 
 Splunk RUM defines renders as slow or frozen following the [Android Vitals definitions](https://developer.android.com/topic/performance/vitals/frozen):
