@@ -20,6 +20,6 @@ allprojects {
         }
     }
     if (findProperty("release") != "true") {
-        version = "$version"
+        version = "$version-SNAPSHOT"
     }
 }

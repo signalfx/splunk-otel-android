@@ -17,6 +17,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Updated to OpenTelemetry Java v1.12.0 (#254)
 * Add experimental support of buffering telemetry through storage (#251)
 * Consistency improvements to public configuration API (#255)
+* Add session timeout after a period of inactivity (#226)
 * Numerous dependency upgrades
 
 ---
