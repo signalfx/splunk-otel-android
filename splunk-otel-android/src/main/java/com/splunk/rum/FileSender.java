@@ -94,7 +94,11 @@ class FileSender {
 
         public boolean incrementAndCheckMax(File file) {
             Integer count = attempts.merge(file, 1, (cur, x) -> cur + 1);
-            return count >= maxRetries;
+            boolean exceededRetries = count >= maxRetries;
+            if(exceededRetries){
+                Log.w(LOG_TAG, "Dropping data in " + file + " (max retries exceeded " + maxRetries + ")");
+            }
+            return exceededRetries;
         }
     }
 
