@@ -107,7 +107,7 @@ class FileSender {
         private Sender sender;
         private FileUtils fileUtils = new FileUtils();
         private BandwidthTracker bandwidthTracker;
-        public RetryTracker retryTracker;
+        private RetryTracker retryTracker;
         private int maxRetries = DEFAULT_MAX_RETRIES;
 
         Builder sender(Sender sender) {
