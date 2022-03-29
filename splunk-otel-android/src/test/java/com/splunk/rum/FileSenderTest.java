@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import zipkin2.Call;
 import zipkin2.reporter.Sender;
@@ -41,6 +42,8 @@ public class FileSenderTest {
     private Sender delegate;
     @Mock
     private Call<Void> httpCall;
+    @Mock
+    private Consumer<Integer> backoff;
 
     @Before
     public void setup() throws Exception {
@@ -72,6 +75,7 @@ public class FileSenderTest {
         boolean result = sender.handleFileOnDisk(file);
         assertFalse(result);
         verify(fileUtils, never()).safeDelete(any());
+        verify(backoff).accept(1);
     }
 
     @Test
@@ -81,12 +85,15 @@ public class FileSenderTest {
         boolean result = sender.handleFileOnDisk(file);
         assertFalse(result);
         verify(fileUtils, never()).safeDelete(any());
+        verify(backoff).accept(1);
         result = sender.handleFileOnDisk(file);
         assertFalse(result);
         verify(fileUtils, never()).safeDelete(any());
+        verify(backoff).accept(2);
         result = sender.handleFileOnDisk(file);
         assertFalse(result);
         verify(fileUtils).safeDelete(file);
+        verifyNoMoreInteractions(backoff);
     }
 
     @Test
@@ -105,6 +112,7 @@ public class FileSenderTest {
 
     private FileSender buildSender(int maxRetries) {
         return FileSender.builder()
+                .backoff(backoff)
                 .bandwidthTracker(bandwidthTracker)
                 .maxRetries(maxRetries)
                 .sender(delegate)

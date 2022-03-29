@@ -10,13 +10,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import zipkin2.Call;
 import zipkin2.reporter.Sender;
 
 class FileSender {
 
-    private final static int DEFAULT_MAX_RETRIES = 10;
+    private final static int DEFAULT_MAX_RETRIES = 20;
 
     private final Sender sender;
     private final FileUtils fileUtils;
@@ -46,8 +48,10 @@ class FileSender {
         }
 
         boolean sentOk = attemptSend(file, encodedSpans);
-        boolean doneWithRetries = sentOk || retryTracker.incrementAndCheckMax(file);
-        if(doneWithRetries) {
+        if(!sentOk){
+            retryTracker.trackFailure(file);
+        }
+        if(sentOk || retryTracker.exceededRetries(file)){
             retryTracker.clear(file);
             fileUtils.safeDelete(file);
         }
@@ -83,21 +87,49 @@ class FileSender {
     private static class RetryTracker {
         private final Map<File,Integer> attempts = new HashMap<>();
         private final int maxRetries;
+        private final Consumer<Integer> backoff;
 
-        private RetryTracker(int maxRetries) {
+        private RetryTracker(int maxRetries, Consumer<Integer> backoff) {
             this.maxRetries = maxRetries;
+            this.backoff = backoff;
         }
         void clear(File file) {
             attempts.remove(file);
         }
 
-        boolean incrementAndCheckMax(File file) {
-            Integer count = attempts.merge(file, 1, (cur, x) -> cur + 1);
-            boolean exceededRetries = count >= maxRetries;
+        /**
+         * Updates the count of tracked failures for this file.
+         * If the retry count has not been exceeded, it will perform
+         * a backoff step.
+         * @param file - the file for which an attempt was unsuccessful
+         */
+        void trackFailure(File file) {
+            Integer retryCount = attempts.merge(file, 1, (cur, x) -> cur + 1);
+            boolean exceededRetries = retryCount >= maxRetries;
             if(exceededRetries){
                 Log.w(LOG_TAG, "Dropping data in " + file + " (max retries exceeded " + maxRetries + ")");
             }
-            return exceededRetries;
+            else {
+                backoff.accept(retryCount);
+            }
+        }
+
+        boolean exceededRetries(File file) {
+            return attempts.getOrDefault(file, 0) >= maxRetries;
+        }
+    }
+
+    static class DefaultBackoff implements Consumer<Integer> {
+
+        @Override
+        public void accept(Integer attempts) {
+            long seconds = Math.min(60, attempts * 5);
+            try {
+                TimeUnit.SECONDS.sleep(seconds);
+            } catch (InterruptedException e) {
+                Log.w(LOG_TAG, "Error during backoff", e);
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
@@ -108,6 +140,7 @@ class FileSender {
         private BandwidthTracker bandwidthTracker;
         private RetryTracker retryTracker;
         private int maxRetries = DEFAULT_MAX_RETRIES;
+        private Consumer<Integer> backoff = new DefaultBackoff();
 
         Builder sender(Sender sender) {
             this.sender = sender;
@@ -129,8 +162,14 @@ class FileSender {
             return this;
         }
 
+        // Exists for testing
+        Builder backoff(Consumer<Integer> backoff){
+            this.backoff = backoff;
+            return this;
+        }
+
         FileSender build() {
-            this.retryTracker = new RetryTracker(maxRetries);
+            this.retryTracker = new RetryTracker(maxRetries, backoff);
             return new FileSender(this);
         }
     }
