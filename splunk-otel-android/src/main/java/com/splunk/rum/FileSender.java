@@ -87,12 +87,11 @@ class FileSender {
         private RetryTracker(int maxRetries) {
             this.maxRetries = maxRetries;
         }
-
-        public void clear(File file) {
+        void clear(File file) {
             attempts.remove(file);
         }
 
-        public boolean incrementAndCheckMax(File file) {
+        boolean incrementAndCheckMax(File file) {
             Integer count = attempts.merge(file, 1, (cur, x) -> cur + 1);
             boolean exceededRetries = count >= maxRetries;
             if(exceededRetries){
