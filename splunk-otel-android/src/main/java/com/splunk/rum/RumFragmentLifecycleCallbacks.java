@@ -148,11 +148,7 @@ class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCal
     }
 
     private FragmentTracer getTracer(Fragment fragment) {
-        FragmentTracer activityTracer = tracersByFragmentClassName.get(fragment.getClass().getName());
-        if (activityTracer == null) {
-            activityTracer = new FragmentTracer(fragment, tracer, visibleScreenTracker);
-            tracersByFragmentClassName.put(fragment.getClass().getName(), activityTracer);
-        }
-        return activityTracer;
+        return tracersByFragmentClassName.computeIfAbsent(fragment.getClass().getName(),
+                k -> new FragmentTracer(fragment, tracer, visibleScreenTracker));
     }
 }

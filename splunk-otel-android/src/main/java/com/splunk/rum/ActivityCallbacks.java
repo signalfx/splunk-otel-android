@@ -201,12 +201,8 @@ class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     }
 
     private ActivityTracer getTracer(Activity activity) {
-        ActivityTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
-        if (activityTracer == null) {
-            activityTracer = new ActivityTracer(activity, initialAppActivity, tracer, visibleScreenTracker, startupTimer);
-            tracersByActivityClassName.put(activity.getClass().getName(), activityTracer);
-        }
-        return activityTracer;
+        return tracersByActivityClassName.computeIfAbsent(activity.getClass().getName(),
+                k -> new ActivityTracer(activity, initialAppActivity, tracer, visibleScreenTracker, startupTimer));
     }
 
     static class Builder {
