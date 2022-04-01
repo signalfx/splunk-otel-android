@@ -296,6 +296,21 @@ Splunk RUM defines renders as slow or frozen following the [Android Vitals defin
 | Slow     | >16ms  | slowRenders    | count       | 
 | Frozen   | >700ms | frozenRenders  | count       |
 
+## Customizing Screen Names
+
+By default, instrumentation will use the simple class name of each `Fragment`
+and `Activity` type in the `screen.name` attribute. If you wish to customize this
+behavior, you may use the `@RumScreenName` annotation.
+
+For example, the following Activity will show up with the `screen.name` 
+set to the value "Buttercup".
+
+```java
+@RumScreenName("Buttercup")
+public class MainActivity extends Activity {
+    ...
+}
+```
 
 ## Troubleshooting
 
