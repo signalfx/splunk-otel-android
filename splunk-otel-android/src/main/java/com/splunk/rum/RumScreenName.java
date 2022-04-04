@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation can be used to customize the screen.name attribute
+ * This annotation can be used to customize the {@code screen.name} attribute
  * for an instrumented Fragment or Activity.
  */
 @Retention(RetentionPolicy.RUNTIME)

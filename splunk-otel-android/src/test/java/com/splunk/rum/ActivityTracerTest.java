@@ -172,9 +172,6 @@ public class ActivityTracerTest {
 
     @RumScreenName("squarely")
     static class AnnotatedActivity extends Activity {
-        @Override
-        public void onPointerCaptureChanged(boolean hasCapture) {
-        }
     }
 
     private SpanData getSingleSpan() {
