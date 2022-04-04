@@ -26,7 +26,7 @@ class FragmentTracer {
     static final AttributeKey<String> FRAGMENT_NAME_KEY = AttributeKey.stringKey("fragmentName");
 
     private final String fragmentName;
-    private final String customScreenName;
+    private final String screenName;
     private final Tracer tracer;
     private final ActiveSpan activeSpan;
 
@@ -34,7 +34,7 @@ class FragmentTracer {
         this.tracer = tracer;
         this.fragmentName = fragment.getClass().getSimpleName();
         RumScreenName rumScreenName = fragment.getClass().getAnnotation(RumScreenName.class);
-        this.customScreenName = rumScreenName == null ? null : rumScreenName.value();
+        this.screenName = rumScreenName == null ? fragmentName : rumScreenName.value();
         this.activeSpan = new ActiveSpan(visibleScreenTracker);
     }
 
@@ -56,7 +56,7 @@ class FragmentTracer {
                 .setAttribute(FRAGMENT_NAME_KEY, fragmentName)
                 .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_UI).startSpan();
         //do this after the span is started, so we can override the default screen.name set by the RumAttributeAppender.
-        span.setAttribute(SplunkRum.SCREEN_NAME_KEY, customScreenName == null ? fragmentName : customScreenName);
+        span.setAttribute(SplunkRum.SCREEN_NAME_KEY, screenName);
         return span;
     }
 

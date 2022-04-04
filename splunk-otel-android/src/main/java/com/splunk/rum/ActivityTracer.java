@@ -35,7 +35,7 @@ class ActivityTracer {
     private final AtomicReference<String> initialAppActivity;
     private final Tracer tracer;
     private final String activityName;
-    private final String customScreenName;
+    private final String screenName;
     private final AppStartupTimer appStartupTimer;
     private final ActiveSpan activeSpan;
 
@@ -44,7 +44,7 @@ class ActivityTracer {
         this.tracer = tracer;
         this.activityName = activity.getClass().getSimpleName();
         RumScreenName rumScreenName = activity.getClass().getAnnotation(RumScreenName.class);
-        this.customScreenName = rumScreenName == null ? null : rumScreenName.value();
+        this.screenName = rumScreenName == null ? activityName : rumScreenName.value();
         this.appStartupTimer = appStartupTimer;
         this.activeSpan = new ActiveSpan(visibleScreenTracker);
     }
@@ -116,7 +116,7 @@ class ActivityTracer {
         }
         Span span = spanBuilder.startSpan();
         //do this after the span is started, so we can override the default screen.name set by the RumAttributeAppender.
-        span.setAttribute(SplunkRum.SCREEN_NAME_KEY, customScreenName == null ? activityName : customScreenName);
+        span.setAttribute(SplunkRum.SCREEN_NAME_KEY, screenName);
         return span;
     }
 
