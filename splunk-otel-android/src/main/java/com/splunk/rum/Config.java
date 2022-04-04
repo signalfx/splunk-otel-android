@@ -50,8 +50,11 @@ public class Config {
     private final boolean slowRenderingDetectionEnabled;
     private final Duration slowRenderingDetectionPollInterval;
     private final boolean diskBufferingEnabled;
+<<<<<<< HEAD
     private final int maxUsageMegabytes;
     private final boolean sessionBasedSamplerEnabled;
+=======
+>>>>>>> 34aba40 (Remove redundant configuration option.)
     private final double sessionBasedSamplerRatio;
 
     private Config(Builder builder) {
@@ -67,8 +70,11 @@ public class Config {
         this.slowRenderingDetectionEnabled = builder.slowRenderingDetectionEnabled;
         this.spanFilterExporterDecorator = builder.spanFilterBuilder.build();
         this.diskBufferingEnabled = builder.diskBufferingEnabled;
+<<<<<<< HEAD
         this.maxUsageMegabytes = builder.maxUsageMegabytes;
         this.sessionBasedSamplerEnabled = builder.sessionBasedSamplerEnabled;
+=======
+>>>>>>> 34aba40 (Remove redundant configuration option.)
         this.sessionBasedSamplerRatio = builder.sessionBasedSamplerRatio;
     }
 
@@ -164,6 +170,7 @@ public class Config {
     }
 
     /**
+<<<<<<< HEAD
      * Returns the max number of megabytes that will be used to buffer telemetry data in storage.
      * If this value is exceeded, older telemetry will be deleted until the usage is reduced.
      */
@@ -179,6 +186,8 @@ public class Config {
     }
 
     /**
+=======
+>>>>>>> 34aba40 (Remove redundant configuration option.)
      * Get ratio of sessions that get sampled (0.0 - 1.0, where 1 is all sessions).
      */
     public double getSessionBasedSamplerRatio() {
