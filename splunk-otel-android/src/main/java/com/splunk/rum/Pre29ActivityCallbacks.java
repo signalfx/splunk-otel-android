@@ -119,8 +119,12 @@ class Pre29ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
     }
 
     private ActivityTracer getTracer(Activity activity) {
-        return tracersByActivityClassName.computeIfAbsent(activity.getClass().getName(),
-                k -> new ActivityTracer(activity, initialAppActivity, tracer, visibleScreenTracker, appStartupTimer));
+        ActivityTracer activityTracer = tracersByActivityClassName.get(activity.getClass().getName());
+        if (activityTracer == null) {
+            activityTracer = new ActivityTracer(activity, initialAppActivity, tracer, visibleScreenTracker, appStartupTimer);
+            tracersByActivityClassName.put(activity.getClass().getName(), activityTracer);
+        }
+        return activityTracer;
     }
 
 }
