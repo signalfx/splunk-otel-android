@@ -238,7 +238,7 @@ class RumInitializer {
                 .setResource(resource);
         initializationEvents.add(new RumInitializer.InitializationEvent("tracerProviderBuilderInitialized", timingClock.now()));
 
-        if (config.getSessionBasedSamplerRatio() != 1.0) {
+        if (config.isSessionBasedSamplerEnabled()) {
             tracerProviderBuilder.setSampler(Sampler.parentBased(new SessionIdRatioBasedSampler(config.getSessionBasedSamplerRatio(), sessionId)));
         }
 
