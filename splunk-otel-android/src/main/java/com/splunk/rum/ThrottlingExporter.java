@@ -58,7 +58,11 @@ class ThrottlingExporter implements SpanExporter {
         List<SpanData> spansBelowLimit = new ArrayList<>();
         for (SpanData span : spans) {
             String category = categoryFunction.apply(span);
-            Window window = categoryToWindow.computeIfAbsent(category, k -> new Window());
+            Window window = categoryToWindow.get(category);
+            if (window == null) {
+                window = new Window();
+                categoryToWindow.put(category, window);
+            }
             if (!window.aboveLimit(span)) {
                 spansBelowLimit.add(span);
             }
