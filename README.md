@@ -302,8 +302,8 @@ By default, the instrumentation uses the simple class name of each `Fragment`
 and `Activity` type as the value of the `screen.name` attribute. To customize the
 screen name, use the `@RumScreenName` annotation.
 
-For example, the following Activity will show up with the `screen.name` 
-set to the value "Buttercup".
+For example, the following activity appears with the `screen.name` 
+attribute set to the value "Buttercup":
 
 ```java
 @RumScreenName("Buttercup")
