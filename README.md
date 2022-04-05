@@ -298,9 +298,9 @@ Splunk RUM defines renders as slow or frozen following the [Android Vitals defin
 
 ## Customizing screen names
 
-By default, instrumentation will use the simple class name of each `Fragment`
-and `Activity` type in the `screen.name` attribute. If you wish to customize this
-behavior, you may use the `@RumScreenName` annotation.
+By default, the instrumentation uses the simple class name of each `Fragment`
+and `Activity` type as the value of the `screen.name` attribute. To customize the
+screen name, use the `@RumScreenName` annotation.
 
 For example, the following Activity will show up with the `screen.name` 
 set to the value "Buttercup".
