@@ -56,7 +56,6 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import io.opentelemetry.sdk.trace.samplers.Sampler;
 import zipkin2.reporter.Sender;
 import zipkin2.reporter.okhttp3.OkHttpSender;
 
@@ -239,7 +238,7 @@ class RumInitializer {
         initializationEvents.add(new RumInitializer.InitializationEvent("tracerProviderBuilderInitialized", timingClock.now()));
 
         if (config.isSessionBasedSamplerEnabled()) {
-            tracerProviderBuilder.setSampler(Sampler.parentBased(new SessionIdRatioBasedSampler(config.getSessionBasedSamplerRatio(), sessionId)));
+            tracerProviderBuilder.setSampler(new SessionIdRatioBasedSampler(config.getSessionBasedSamplerRatio(), sessionId));
         }
 
         if (config.isDebugEnabled()) {
