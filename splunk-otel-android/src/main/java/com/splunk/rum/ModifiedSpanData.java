@@ -16,6 +16,12 @@
 
 package com.splunk.rum;
 
+import static com.splunk.rum.SplunkRum.ERROR_MESSAGE_KEY;
+import static com.splunk.rum.SplunkRum.ERROR_TYPE_KEY;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.EXCEPTION_MESSAGE;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.EXCEPTION_STACKTRACE;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.EXCEPTION_TYPE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +47,7 @@ final class ModifiedSpanData extends DelegatingSpanData {
         List<EventData> modifiedEvents = new ArrayList<>(original.getEvents().size());
         for (EventData event : original.getEvents()) {
             if (event.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME)) {
-                copyExceptionInfoToSpanAttributes(event, modifiedAttributes);
+                modifiedAttributes.putAll(extractExceptionAttributes(event));
             } else {
                 // if it's not an exception, leave the event as it is
                 modifiedEvents.add(event);
@@ -51,26 +57,28 @@ final class ModifiedSpanData extends DelegatingSpanData {
         return new ModifiedSpanData(original, modifiedEvents, modifiedAttributes.build());
     }
 
-    private static void copyExceptionInfoToSpanAttributes(EventData event, AttributesBuilder modifiedAttributes) {
-        String type = event.getAttributes().get(SemanticAttributes.EXCEPTION_TYPE);
-        String message = event.getAttributes().get(SemanticAttributes.EXCEPTION_MESSAGE);
-        String stacktrace = event.getAttributes().get(SemanticAttributes.EXCEPTION_STACKTRACE);
+    private static Attributes extractExceptionAttributes(EventData event) {
+        String type = event.getAttributes().get(EXCEPTION_TYPE);
+        String message = event.getAttributes().get(EXCEPTION_MESSAGE);
+        String stacktrace = event.getAttributes().get(EXCEPTION_STACKTRACE);
 
+        AttributesBuilder builder = Attributes.builder();
         if (type != null) {
             int dot = type.lastIndexOf('.');
             String simpleType = dot == -1 ? type : type.substring(dot + 1);
-            modifiedAttributes.put(SemanticAttributes.EXCEPTION_TYPE, simpleType);
+            builder.put(EXCEPTION_TYPE, simpleType);
             // this attribute's here to support the RUM UI/backend until it can be updated to use otel conventions.
-            modifiedAttributes.put(SplunkRum.ERROR_TYPE_KEY, simpleType);
+            builder.put(ERROR_TYPE_KEY, simpleType);
         }
         if (message != null) {
-            modifiedAttributes.put(SemanticAttributes.EXCEPTION_MESSAGE, message);
+            builder.put(EXCEPTION_MESSAGE, message);
             // this attribute's here to support the RUM UI/backend until it can be updated to use otel conventions.
-            modifiedAttributes.put(SplunkRum.ERROR_MESSAGE_KEY, message);
+            builder.put(ERROR_MESSAGE_KEY, message);
         }
         if (stacktrace != null) {
-            modifiedAttributes.put(SemanticAttributes.EXCEPTION_STACKTRACE, stacktrace);
+            builder.put(EXCEPTION_STACKTRACE, stacktrace);
         }
+        return builder.build();
     }
 
     ModifiedSpanData(SpanData original, List<EventData> modifiedEvents, Attributes modifiedAttributes) {
