@@ -28,8 +28,6 @@ android {
         }
     }
     compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-
         sourceCompatibility(JavaVersion.VERSION_1_8)
         targetCompatibility(JavaVersion.VERSION_1_8)
     }
@@ -74,7 +72,6 @@ dependencies {
     testImplementation("com.google.mockwebserver:mockwebserver:20130706")
     testImplementation("com.android.volley:volley:1.2.0")
     testImplementation("org.apache.httpcomponents:httpclient:4.5.13")
-
 }
 
 tasks.withType<Test>().configureEach {
