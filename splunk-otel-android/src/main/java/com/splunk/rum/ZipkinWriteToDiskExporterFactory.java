@@ -27,7 +27,16 @@ class ZipkinWriteToDiskExporterFactory {
             }
         }
 
-        Sender sender = new ZipkinToDiskSender(spansPath);
+        FileUtils fileUtils = new FileUtils();
+        DeviceSpanStorageLimiter limiter = DeviceSpanStorageLimiter.builder()
+                .fileUtils(fileUtils)
+                .path(spansPath)
+                .build();
+        Sender sender = ZipkinToDiskSender.builder()
+                .path(spansPath)
+                .fileUtils(fileUtils)
+                .storageLimiter(limiter)
+                .build();
         return ZipkinSpanExporter.builder()
                 .setEncoder(new CustomZipkinEncoder())
                 .setSender(sender)
