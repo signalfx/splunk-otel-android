@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 class DeviceSpanStorageLimiter {
-    private static final int DEFAULT_MAX_STORAGE_USE_MB = 25;
+    static final int DEFAULT_MAX_STORAGE_USE_MB = 25;
     private final File path;
     private final int maxStorageUseMb;
     private final FileUtils fileUtils;
