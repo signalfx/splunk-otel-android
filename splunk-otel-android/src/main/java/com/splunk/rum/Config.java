@@ -393,6 +393,10 @@ public class Config {
             return this;
         }
 
+        /**
+         * Sets the limit of the max number of megabytes that will be used to buffer telemetry data in storage.
+         * When this value is exceeded, older telemetry will be deleted until the usage is reduced.
+         */
         public Builder limitDiskUsageMegabytes(int maxUsageMegabytes) {
             this.maxUsageMegabytes = maxUsageMegabytes;
             return this;
