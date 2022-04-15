@@ -25,12 +25,16 @@ class DeviceSpanStorageLimiter {
      * Ensures that the storage currently used by spans has not exceeded the limit.
      * If it does, it will delete older files until the limit is no longer exceeded.
      *
+     * This method also looks at the free space on the device and will return false if
+     * the available free space is less than our max storage.
+     *
      * @return - true if the free space is under the limit (including when files have
      * been deleted to return back under the limit), false if not enough space could be
      * freed to get us back under out limit.
      */
     boolean ensureFreeSpace() {
         tryFreeingSpace();
+        // play nice if disk is getting full
         return path.getFreeSpace() > limitInBytes();
     }
 
