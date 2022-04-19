@@ -256,9 +256,7 @@ when initializing your instance of the SplunkRum API:
   that will be used. Default = 25MB.
 - `enableSessionBasedSampling(double)` :
   Enable session ID based sampling and set its sampling ratio. The ratio is a probability of a
-  session being included between between 0.0 (all dropped) and 1.0 (all included). Sampling is only
-  applied if the spans created via `SplunkRum` APIs are root spans. If a custom parent span context
-  was created, then the sampling flag of the parent span is respected instead.
+  session being included between between 0.0 (all dropped) and 1.0 (all included).
 
 #### APIs provided by the `SplunkRum` instance:
 
