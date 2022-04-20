@@ -177,9 +177,9 @@ public class SplunkRum {
     }
 
     private OkHttpTelemetry createOkHttpTracing() {
-        return OkHttpTelemetry
-                .builder(openTelemetrySdk)
-                .addAttributesExtractor(new RumResponseAttributesExtractor(new ServerTimingHeaderParser()))
+        return OkHttpTelemetry.builder(openTelemetrySdk)
+                .addAttributesExtractor(
+                        new RumResponseAttributesExtractor(new ServerTimingHeaderParser()))
                 .build();
     }
 
