@@ -7,7 +7,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Version 0.15.0
 
-* Updated to OpenTelemetry Java v1.14.0
+* Updated to OpenTelemetry Java v1.14.0 (#287)
 
 ## Version 0.14.0
 
