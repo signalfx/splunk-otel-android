@@ -55,7 +55,7 @@ dependencies {
     implementation(platform("io.opentelemetry:opentelemetry-bom-alpha:1.15.0-alpha"))
     implementation("io.opentelemetry:opentelemetry-semconv")
 
-    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.15.0-alpha"))
+    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.17.0-alpha-SNAPSHOT"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
 
