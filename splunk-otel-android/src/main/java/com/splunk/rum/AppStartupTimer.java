@@ -37,10 +37,13 @@ class AppStartupTimer {
     private volatile Span overallAppStartSpan = null;
     private volatile Runnable completionCallback = null;
     // whether activity has been created
+    // accessed only from UI thread
     private boolean uiInitStarted = false;
     // whether MAX_TIME_TO_UI_INIT has been exceeded
+    // accessed only from UI thread
     private boolean uiInitTooLate = false;
-    private volatile boolean isStartedFromBackground = false;
+    // accessed only from UI thread
+    private boolean isStartedFromBackground = false;
 
     Span start(Tracer tracer) {
         // guard against a double-start and just return what's already in flight.
