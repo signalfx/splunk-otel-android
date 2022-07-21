@@ -40,7 +40,7 @@ class AppStartupTimer {
     private boolean uiInitStarted = false;
     // whether MAX_TIME_TO_UI_INIT has been exceeded
     private boolean uiInitTooLate = false;
-    private boolean isStartedFromBackground = false;
+    private volatile boolean isStartedFromBackground = false;
 
     Span start(Tracer tracer) {
         // guard against a double-start and just return what's already in flight.
