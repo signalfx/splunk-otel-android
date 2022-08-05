@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
+
 import com.splunk.android.sample.databinding.FragmentFirstBinding;
 import com.splunk.rum.SplunkRum;
 import io.opentelemetry.api.trace.Span;
@@ -39,6 +40,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import java.security.SecureRandom;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -100,6 +105,13 @@ public class FirstFragment extends Fragment {
                     Span workflow = splunkRum.startWorkflow("Workflow with 404");
                     makeCall("https://pmrum.o11ystore.com/foobarbaz", workflow);
                 });
+
+        binding.volleyRequest.setOnClickListener(
+                v -> {
+                    VolleyExample volleyExample = new VolleyExample(splunkRum);
+                    volleyExample.doHttpRequest();
+                }
+        );
 
         sessionId.postValue(splunkRum.getRumSessionId());
     }
@@ -216,4 +228,17 @@ public class FirstFragment extends Fragment {
                     }
                 }
             };
+    // Much like the comment above, you should NEVER do something like this in production, it
+    // is an extremely bad practice. This is only present because the demo endpoint uses a
+    // self-signed SSL cert.
+    static {
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier((arg0, arg1) -> true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
