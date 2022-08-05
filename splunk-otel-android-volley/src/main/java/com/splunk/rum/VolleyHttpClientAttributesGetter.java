@@ -16,15 +16,21 @@
 
 package com.splunk.rum;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
 import androidx.annotation.Nullable;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Header;
 import com.android.volley.Request;
 import com.android.volley.toolbox.HttpResponse;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesGetter;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesGetter;
 
 enum VolleyHttpClientAttributesGetter
         implements HttpClientAttributesGetter<RequestWrapper, HttpResponse> {
@@ -68,18 +74,26 @@ enum VolleyHttpClientAttributesGetter
 
     @Override
     public List<String> requestHeader(RequestWrapper requestWrapper, String name) {
-        String header;
+        Request<?> request = requestWrapper.getRequest();
         try {
-            header = requestWrapper.getRequest().getHeaders().get(name);
-            if (header == null) {
-                header = requestWrapper.getAdditionalHeaders().get(name);
+            String result = findCaseInsensitive(name, request.getHeaders());
+            if(result != null){
+                return singletonList(result);
             }
-
+            result = findCaseInsensitive(name, requestWrapper.getAdditionalHeaders());
+            return result == null ? emptyList() : singletonList(result);
         } catch (AuthFailureError e) {
-            header = null;
+            return emptyList();
         }
+    }
 
-        return header != null ? Collections.singletonList(header) : Collections.emptyList();
+    private String findCaseInsensitive(String name, Map<String, String> headers) {
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            if (header.getKey().equalsIgnoreCase(name)) {
+                return header.getValue();
+            }
+        }
+        return null;
     }
 
     @Nullable
@@ -127,12 +141,12 @@ enum VolleyHttpClientAttributesGetter
 
     static List<String> headersToList(List<Header> headers, String name) {
         if (headers.size() == 0) {
-            return Collections.emptyList();
+            return emptyList();
         }
 
         List<String> headersList = new ArrayList<>();
         for (Header header : headers) {
-            if (header.getName().equals(name)) {
+            if (header.getName().equalsIgnoreCase(name)) {
                 headersList.add(header.getValue());
             }
         }
