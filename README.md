@@ -21,7 +21,7 @@
   <a href="https://github.com/signalfx/splunk-otel-android/actions?query=workflow%3A%22Continuous+Build%22">
      <img alt="Build Status" src="https://img.shields.io/github/workflow/status/signalfx/splunk-otel-android/Continuous%20Build?style=for-the-badge">
   </a>
-   
+
   <a href="https://github.com/signalfx/gdi-specification/releases/tag/v1.3.0">
     <img alt="Splunk GDI specification" src="https://img.shields.io/badge/GDI-1.3.0-blueviolet?style=for-the-badge">
   </a>
