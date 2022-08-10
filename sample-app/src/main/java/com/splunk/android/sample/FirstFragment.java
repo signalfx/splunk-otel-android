@@ -28,7 +28,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
-
 import com.splunk.android.sample.databinding.FragmentFirstBinding;
 import com.splunk.rum.SplunkRum;
 import io.opentelemetry.api.trace.Span;
@@ -40,9 +39,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import java.security.SecureRandom;
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -110,8 +107,7 @@ public class FirstFragment extends Fragment {
                 v -> {
                     VolleyExample volleyExample = new VolleyExample(splunkRum);
                     volleyExample.doHttpRequest();
-                }
-        );
+                });
 
         sessionId.postValue(splunkRum.getRumSessionId());
     }

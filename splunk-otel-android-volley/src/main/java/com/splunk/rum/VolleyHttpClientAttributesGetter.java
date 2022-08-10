@@ -20,17 +20,14 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import androidx.annotation.Nullable;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Header;
 import com.android.volley.Request;
 import com.android.volley.toolbox.HttpResponse;
-
+import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesGetter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesGetter;
 
 enum VolleyHttpClientAttributesGetter
         implements HttpClientAttributesGetter<RequestWrapper, HttpResponse> {
@@ -77,7 +74,7 @@ enum VolleyHttpClientAttributesGetter
         Request<?> request = requestWrapper.getRequest();
         try {
             String result = findCaseInsensitive(name, request.getHeaders());
-            if(result != null){
+            if (result != null) {
                 return singletonList(result);
             }
             result = findCaseInsensitive(name, requestWrapper.getAdditionalHeaders());

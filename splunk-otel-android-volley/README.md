@@ -4,12 +4,12 @@
 Status: Experimental
 
 This directory contains the Splunk instrumentation for the [Volley](https://google.github.io/volley/)
-HTTP client library. If you use the Volley HTTP client in your Android application, you can 
+HTTP client library. If you use the Volley HTTP client in your Android application, you can
 leverage this instrumentation to help simplify tracing and capture of HTTP headers.
 
 ## Add to your project
 
-In addition to the [main Splunk Android SDK dependency](https://github.com/signalfx/splunk-otel-android#getting-the-library), 
+In addition to the [main Splunk Android SDK dependency](https://github.com/signalfx/splunk-otel-android#getting-the-library),
 you will also need to add the `splunk-otel-android-volley` dependency to your `build.gradle.kts`:
 
 
@@ -23,7 +23,7 @@ dependencies {
 
 ## How to use VolleyTracing
 
-See the class `VolleyExample.java` file in the sample application in this repository for an 
+See the class `VolleyExample.java` file in the sample application in this repository for an
 example of how to create an instrumented client HTTP call.
 
 First, you will create an instance of `VolleyTracing` by passing your `splunkRum` instance
@@ -33,7 +33,7 @@ to the builder:
 VolleyTracing volleyTracing = VolleyTracing.builder(splunkRum).build();
 ```
 You can also add extra request/response headers to capture to the builder.
-These headers will be attached to the RUM Volley HTTP client spans with 
+These headers will be attached to the RUM Volley HTTP client spans with
 a`http.response.header.` prefix.
 
 Next, get an instance of `HurlStack` from your `volleyTracing` instance:
@@ -42,7 +42,7 @@ Next, get an instance of `HurlStack` from your `volleyTracing` instance:
 HurlStack hurlStack = volleyTracing.newHurlStack();
 ```
 
-Then, use the `hurlStack` to create your request queue, 
+Then, use the `hurlStack` to create your request queue,
 
 ```java
 RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(hurlStack), 1,
@@ -54,6 +54,6 @@ To make instrumented Volley HTTP requests, just use the `RequestQueue` like you 
 
 # Troubleshooting
 
-This library is `Experimental` and we actively welcome feedback. Please 
-[open an issue](https://github.com/signalfx/splunk-otel-android/issues/new) to report any 
+This library is `Experimental` and we actively welcome feedback. Please
+[open an issue](https://github.com/signalfx/splunk-otel-android/issues/new) to report any
 challenges or concerns.
