@@ -1,6 +1,6 @@
 ---
 
-<p style="text-align: center">
+<p align="center">
   <strong>
     <a href="#getting-started">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
@@ -8,7 +8,7 @@
   </strong>
 </p>
 
-<p style="text-align: center">
+<p align="center">
   <a href="https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.15.0">
     <img alt="OpenTelemetry Instrumentation for Java Version" src="https://img.shields.io/badge/otel-1.15.0-blueviolet?style=for-the-badge">
   </a>
@@ -28,7 +28,7 @@
   <img alt="Beta" src="https://img.shields.io/badge/status-beta-informational?style=for-the-badge">
 </p>
 
-<p style="text-align: center">
+<p align="center">
   <strong>
     <a href="docs/faq.md">FAQ</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
