@@ -87,4 +87,11 @@ public class VolleyHttpClientAttributesGetterTest {
         List<String> fooValues = testClass.responseHeader(request, response, "FOO");
         assertThat(fooValues).containsExactly("bar", "baz");
     }
+
+    @Test
+    public void testNullResponse() {
+        VolleyHttpClientAttributesGetter testClass = VolleyHttpClientAttributesGetter.INSTANCE;
+        List<String> values = testClass.responseHeader(null, null, "content-type");
+        assertThat(values).isEmpty();
+    }
 }

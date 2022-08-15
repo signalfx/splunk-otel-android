@@ -133,6 +133,9 @@ enum VolleyHttpClientAttributesGetter
     @Override
     public List<String> responseHeader(
             RequestWrapper requestWrapper, @Nullable HttpResponse response, String name) {
+        if (response == null) {
+            return emptyList();
+        }
         return headersToList(response.getHeaders(), name);
     }
 
