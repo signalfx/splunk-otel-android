@@ -27,6 +27,7 @@ import com.android.volley.toolbox.HttpResponse;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -41,9 +42,17 @@ public class VolleyHttpClientAttributesGetterTest {
         Request<?> request = mock(Request.class);
 
         doReturn(request).when(requestWrapper).getRequest();
-        HashMap<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("Foo", "bar");
+        Map<String, String> requestHeaders = new HashMap<>();
+        requestHeaders.put("foo", "bar");
+        requestHeaders.put("aye", "b");
+        requestHeaders.put("Foo", "baz");
+        requestHeaders.put("FOO", "beep");
         requestHeaders.put("Content-Type", "application/json");
+
+        Map<String, String> additionalHeaders = new HashMap<>();
+        additionalHeaders.put("Aye", "beeee");
+        when(requestWrapper.getAdditionalHeaders()).thenReturn(additionalHeaders);
+
         doReturn(requestHeaders).when(request).getHeaders();
 
         VolleyHttpClientAttributesGetter testClass = VolleyHttpClientAttributesGetter.INSTANCE;
@@ -52,7 +61,9 @@ public class VolleyHttpClientAttributesGetterTest {
         assertThat(values).containsExactly("application/json");
 
         List<String> fooValues = testClass.requestHeader(requestWrapper, "FOO");
-        assertThat(fooValues).containsExactly("bar");
+        assertThat(fooValues).containsExactly("bar", "baz", "beep");
+        List<String> ayeValues = testClass.requestHeader(requestWrapper, "aYe");
+        assertThat(ayeValues).contains("b", "beeee");
     }
 
     @Test
@@ -61,7 +72,11 @@ public class VolleyHttpClientAttributesGetterTest {
         RequestWrapper request = mock(RequestWrapper.class);
         HttpResponse response = mock(HttpResponse.class);
 
-        List<Header> responseHeaders = makeResponseHeaders();
+        List<Header> responseHeaders =
+                Arrays.asList(
+                        new Header("Foo", "bar"),
+                        new Header("Foo", "baz"),
+                        new Header("Content-Type", "application/json"));
         when(response.getHeaders()).thenReturn(responseHeaders);
 
         VolleyHttpClientAttributesGetter testClass = VolleyHttpClientAttributesGetter.INSTANCE;
@@ -71,12 +86,5 @@ public class VolleyHttpClientAttributesGetterTest {
 
         List<String> fooValues = testClass.responseHeader(request, response, "FOO");
         assertThat(fooValues).containsExactly("bar", "baz");
-    }
-
-    private List<Header> makeResponseHeaders() {
-        return Arrays.asList(
-                new Header("Foo", "bar"),
-                new Header("Foo", "baz"),
-                new Header("Content-Type", "application/json"));
     }
 }

@@ -17,7 +17,6 @@
 package com.splunk.rum;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 
 import androidx.annotation.Nullable;
 import com.android.volley.AuthFailureError;
@@ -73,24 +72,25 @@ enum VolleyHttpClientAttributesGetter
     public List<String> requestHeader(RequestWrapper requestWrapper, String name) {
         Request<?> request = requestWrapper.getRequest();
         try {
-            String result = findCaseInsensitive(name, request.getHeaders());
-            if (result != null) {
-                return singletonList(result);
-            }
-            result = findCaseInsensitive(name, requestWrapper.getAdditionalHeaders());
-            return result == null ? emptyList() : singletonList(result);
+            Map<String, String> headers = request.getHeaders();
+            Map<String, String> additionalHeaders = requestWrapper.getAdditionalHeaders();
+            List<String> result = new ArrayList<>(headers.size() + additionalHeaders.size());
+            result.addAll(findCaseInsensitive(name, headers));
+            result.addAll(findCaseInsensitive(name, additionalHeaders));
+            return result;
         } catch (AuthFailureError e) {
             return emptyList();
         }
     }
 
-    private String findCaseInsensitive(String name, Map<String, String> headers) {
+    private List<String> findCaseInsensitive(String name, Map<String, String> headers) {
+        List<String> result = new ArrayList<>(headers.size());
         for (Map.Entry<String, String> header : headers.entrySet()) {
             if (header.getKey().equalsIgnoreCase(name)) {
-                return header.getValue();
+                result.add(header.getValue());
             }
         }
-        return null;
+        return result;
     }
 
     @Nullable
