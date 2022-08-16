@@ -74,7 +74,7 @@ enum VolleyHttpClientAttributesGetter
         try {
             Map<String, String> headers = request.getHeaders();
             Map<String, String> additionalHeaders = requestWrapper.getAdditionalHeaders();
-            List<String> result = new ArrayList<>(headers.size() + additionalHeaders.size());
+            List<String> result = new ArrayList<>();
             result.addAll(findCaseInsensitive(name, headers));
             result.addAll(findCaseInsensitive(name, additionalHeaders));
             return result;
