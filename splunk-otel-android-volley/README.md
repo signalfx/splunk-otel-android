@@ -34,7 +34,7 @@ VolleyTracing volleyTracing = VolleyTracing.builder(splunkRum).build();
 ```
 You can also add extra request/response headers to capture to the builder.
 These headers will be attached to the RUM Volley HTTP client spans with
-a`http.response.header.` prefix.
+`http.request.header.` or `http.response.header.` respectively.
 
 Next, get an instance of `HurlStack` from your `volleyTracing` instance:
 
@@ -42,15 +42,7 @@ Next, get an instance of `HurlStack` from your `volleyTracing` instance:
 HurlStack hurlStack = volleyTracing.newHurlStack();
 ```
 
-Then, use the `hurlStack` to create your request queue,
-
-```java
-RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(hurlStack), 1,
-                        new ExecutorDelivery(Executors.newSingleThreadExecutor()));
-queue.start();
-```
-
-To make instrumented Volley HTTP requests, just use the `RequestQueue` like you normally would!
+Then, use the `hurlStack` to create your request queue and send requests like you normally would.
 
 # Troubleshooting
 
