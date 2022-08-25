@@ -52,7 +52,7 @@ android {
 val otelVersion = "1.16.0-alpha"
 dependencies {
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.6")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 
     implementation("androidx.appcompat:appcompat:1.5.0")
     implementation("androidx.webkit:webkit:1.5.0")
