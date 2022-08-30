@@ -63,7 +63,7 @@ public class SplunkRumTest {
 
     private Tracer tracer;
     private final AtomicReference<Attributes> globalAttributes =
-            new AtomicReference<>(Attributes.empty());
+            new AtomicReference<>(Attributes.of(stringKey("key"), "value"));
 
     @Before
     public void setup() {
@@ -165,11 +165,11 @@ public class SplunkRumTest {
                         globalAttributes);
 
         splunkRum.updateGlobalAttributes(
-                attributesBuilder -> attributesBuilder.put("key", "value"));
+                attributesBuilder -> attributesBuilder.put("key", "value2"));
         splunkRum.setGlobalAttribute(longKey("otherKey"), 1234L);
 
         assertEquals(
-                Attributes.of(stringKey("key"), "value", longKey("otherKey"), 1234L),
+                Attributes.of(stringKey("key"), "value2", longKey("otherKey"), 1234L),
                 globalAttributes.get());
     }
 
@@ -288,6 +288,7 @@ public class SplunkRumTest {
 
     @Test
     public void updateLocation() {
+        AtomicReference<Attributes> globalAttributes = new AtomicReference<>(Attributes.empty());
         SplunkRum splunkRum =
                 new SplunkRum(
                         (OpenTelemetrySdk) otelTesting.getOpenTelemetry(),
