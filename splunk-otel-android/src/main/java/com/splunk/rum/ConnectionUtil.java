@@ -142,7 +142,7 @@ class ConnectionUtil {
 
     static class Factory {
 
-        ConnectionUtil create(Application application) {
+        ConnectionUtil createAndStart(Application application) {
             Context context = application.getApplicationContext();
             ConnectionUtil connectionUtil = new ConnectionUtil(NetworkDetector.create(context));
             connectionUtil.startMonitoring(

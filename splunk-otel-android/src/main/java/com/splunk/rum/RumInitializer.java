@@ -86,7 +86,7 @@ class RumInitializer {
         long startTimeNanos = timingClock.now();
         List<AppStateListener> appStateListeners = new ArrayList<>();
 
-        ConnectionUtil connectionUtil = connectionUtilFactory.create(application);
+        ConnectionUtil connectionUtil = connectionUtilFactory.createAndStart(application);
         initializationEvents.add(
                 new InitializationEvent("connectionUtilInitialized", timingClock.now()));
 

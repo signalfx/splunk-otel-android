@@ -80,7 +80,7 @@ public class SplunkRumTest {
                         .setApplicationName("appName")
                         .setBeaconEndpoint("http://backend")
                         .setRumAccessToken("abracadabra")
-                        .disableAnrDetection(true);
+                        .disableAnrDetection();
 
         when(application.getApplicationContext()).thenReturn(context);
         when(context.getFilesDir()).thenReturn(new File("/my/storage/spot"));
@@ -110,7 +110,7 @@ public class SplunkRumTest {
                         .setApplicationName("appName")
                         .setBeaconEndpoint("http://backend")
                         .setRumAccessToken("abracadabra")
-                        .disableAnrDetection(true);
+                        .disableAnrDetection();
 
         when(application.getApplicationContext()).thenReturn(context);
         when(context.getFilesDir()).thenReturn(new File("/my/storage/spot"));
@@ -140,7 +140,7 @@ public class SplunkRumTest {
                         .setApplicationName("appName")
                         .setBeaconEndpoint("http://backend")
                         .setRumAccessToken("abracadabra")
-                        .disableAnrDetection(true);
+                        .disableAnrDetection();
 
         SplunkRum splunkRum =
                 SplunkRum.initialize(splunkRumBuilder, application, connectionUtilFactory);
@@ -289,7 +289,7 @@ public class SplunkRumTest {
                         .setApplicationName("appName")
                         .setBeaconEndpoint("http://backend")
                         .setRumAccessToken("abracadabra")
-                        .disableAnrDetection(true);
+                        .disableAnrDetection();
 
         SplunkRum splunkRum =
                 SplunkRum.initialize(splunkRumBuilder, application, connectionUtilFactory);

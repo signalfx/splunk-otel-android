@@ -211,7 +211,7 @@ public class RumInitializerTest {
         ConnectionUtil connectionUtil = mock(ConnectionUtil.class, RETURNS_DEEP_STUBS);
         when(connectionUtil.refreshNetworkStatus().isOnline()).thenReturn(true);
         ConnectionUtil.Factory connectionUtilFactory = mock(ConnectionUtil.Factory.class);
-        when(connectionUtilFactory.create(application)).thenReturn(connectionUtil);
+        when(connectionUtilFactory.createAndStart(application)).thenReturn(connectionUtil);
 
         AppStartupTimer appStartupTimer = new AppStartupTimer();
         RumInitializer initializer =

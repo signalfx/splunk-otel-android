@@ -118,8 +118,8 @@ public final class SplunkRumBuilder {
      *
      * @return {@code this}
      */
-    public SplunkRumBuilder enableDebug(boolean enabled) {
-        this.debugEnabled = enabled;
+    public SplunkRumBuilder enableDebug() {
+        this.debugEnabled = true;
         return this;
     }
 
@@ -133,8 +133,8 @@ public final class SplunkRumBuilder {
      *
      * @return {@code this}
      */
-    public SplunkRumBuilder enableDiskBuffering(boolean enabled) {
-        this.diskBufferingEnabled = enabled;
+    public SplunkRumBuilder enableDiskBuffering() {
+        this.diskBufferingEnabled = true;
         return this;
     }
 
@@ -146,8 +146,8 @@ public final class SplunkRumBuilder {
      *
      * @return {@code this}
      */
-    public SplunkRumBuilder disableCrashReporting(boolean disabled) {
-        this.crashReportingEnabled = !disabled;
+    public SplunkRumBuilder disableCrashReporting() {
+        this.crashReportingEnabled = false;
         return this;
     }
 
@@ -159,8 +159,8 @@ public final class SplunkRumBuilder {
      *
      * @return {@code this}
      */
-    public SplunkRumBuilder disableNetworkMonitorEnabled(boolean disabled) {
-        this.networkMonitorEnabled = !disabled;
+    public SplunkRumBuilder disableNetworkMonitorEnabled() {
+        this.networkMonitorEnabled = false;
         return this;
     }
 
@@ -174,8 +174,8 @@ public final class SplunkRumBuilder {
      *
      * @return {@code this}
      */
-    public SplunkRumBuilder disableAnrDetection(boolean disabled) {
-        this.anrDetectionEnabled = !disabled;
+    public SplunkRumBuilder disableAnrDetection() {
+        this.anrDetectionEnabled = false;
         return this;
     }
 
@@ -187,8 +187,8 @@ public final class SplunkRumBuilder {
      *
      * @return {@code this}
      */
-    public SplunkRumBuilder disableSlowRenderingDetection(boolean enabled) {
-        slowRenderingDetectionEnabled = enabled;
+    public SplunkRumBuilder disableSlowRenderingDetection() {
+        slowRenderingDetectionEnabled = false;
         return this;
     }
 

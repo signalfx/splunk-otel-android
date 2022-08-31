@@ -176,26 +176,35 @@ public class Config {
         return new Builder();
     }
 
-    SpanExporter decorateWithSpanFilter(SpanExporter exporter) {
-        return spanFilterExporterDecorator.apply(exporter);
-    }
-
     SplunkRumBuilder toSplunkRumBuilder() {
         SplunkRumBuilder splunkRumBuilder =
                 new SplunkRumBuilder()
                         .setApplicationName(applicationName)
                         .setBeaconEndpoint(beaconEndpoint)
-                        .setRumAccessToken(rumAccessToken)
-                        .enableDebug(debugEnabled)
-                        .enableDiskBuffering(diskBufferingEnabled)
-                        .disableCrashReporting(!crashReportingEnabled)
-                        .disableNetworkMonitorEnabled(!networkMonitorEnabled)
-                        .disableAnrDetection(!anrDetectionEnabled)
-                        .disableSlowRenderingDetection(!slowRenderingDetectionEnabled)
-                        .setSlowRenderingDetectionPollInterval(slowRenderingDetectionPollInterval)
-                        .setGlobalAttributes(globalAttributes)
-                        .filterSpans(spanFilterBuilderConfigurer)
-                        .limitDiskUsageMegabytes(maxUsageMegabytes);
+                        .setRumAccessToken(rumAccessToken);
+        if (debugEnabled) {
+            splunkRumBuilder.enableDebug();
+        }
+        if (diskBufferingEnabled) {
+            splunkRumBuilder.enableDiskBuffering();
+        }
+        if (!crashReportingEnabled) {
+            splunkRumBuilder.disableCrashReporting();
+        }
+        if (!networkMonitorEnabled) {
+            splunkRumBuilder.disableNetworkMonitorEnabled();
+        }
+        if (!anrDetectionEnabled) {
+            splunkRumBuilder.disableAnrDetection();
+        }
+        if (!slowRenderingDetectionEnabled) {
+            splunkRumBuilder.disableSlowRenderingDetection();
+        }
+        splunkRumBuilder
+                .setSlowRenderingDetectionPollInterval(slowRenderingDetectionPollInterval)
+                .setGlobalAttributes(globalAttributes)
+                .filterSpans(spanFilterBuilderConfigurer)
+                .limitDiskUsageMegabytes(maxUsageMegabytes);
         if (sessionBasedSamplerEnabled) {
             splunkRumBuilder.enableSessionBasedSampling(sessionBasedSamplerRatio);
         }
