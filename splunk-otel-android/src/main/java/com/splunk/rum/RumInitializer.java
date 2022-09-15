@@ -406,6 +406,8 @@ class RumInitializer {
                         ZipkinSpanExporter.builder()
                                 .setEncoder(new CustomZipkinEncoder())
                                 .setEndpoint(endpoint)
+                                // remove the local IP address
+                                .setLocalIpAddressSupplier(() -> null)
                                 .build());
     }
 
