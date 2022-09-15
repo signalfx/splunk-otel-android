@@ -7,6 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## Version 0.18.0
+
+* Updated to OpenTelemetry Java v1.18.0
+* Introduced a `SplunkRumBuilder` class and deprecated `Config` (#342)
+
 ## Version 0.17.0
 
 * Ignore background application starts when measuring AppStart events (#315)
