@@ -41,11 +41,11 @@ class FileSender {
     private final BandwidthTracker bandwidthTracker;
     private final RetryTracker retryTracker;
 
-    private FileSender(Builder builder, RetryTracker retryTracker) {
+    private FileSender(Builder builder) {
         this.sender = requireNonNull(builder.sender);
         this.fileUtils = builder.fileUtils;
         this.bandwidthTracker = requireNonNull(builder.bandwidthTracker);
-        this.retryTracker = retryTracker;
+        this.retryTracker = builder.buildRetryTracker();
     }
 
     /**
@@ -186,7 +186,11 @@ class FileSender {
         }
 
         FileSender build() {
-            return new FileSender(this, new RetryTracker(maxRetries, backoff));
+            return new FileSender(this);
+        }
+
+        private RetryTracker buildRetryTracker() {
+            return new RetryTracker(maxRetries, backoff);
         }
     }
 }
