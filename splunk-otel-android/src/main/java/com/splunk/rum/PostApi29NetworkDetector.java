@@ -30,7 +30,7 @@ import android.telephony.TelephonyManager;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
-@RequiresApi(api = Build.VERSION_CODES.Q)
+@RequiresApi(api = Build.VERSION_CODES.P)
 class PostApi29NetworkDetector implements NetworkDetector {
     private final ConnectivityManager connectivityManager;
     private final TelephonyManager telephonyManager;

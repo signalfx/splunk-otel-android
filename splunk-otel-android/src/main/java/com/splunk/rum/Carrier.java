@@ -22,7 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import java.util.Objects;
 
-@RequiresApi(api = Build.VERSION_CODES.Q)
+@RequiresApi(api = Build.VERSION_CODES.P)
 class Carrier {
 
     private final int id;

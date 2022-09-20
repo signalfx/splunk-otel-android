@@ -20,7 +20,7 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import androidx.annotation.RequiresApi;
 
-@RequiresApi(api = Build.VERSION_CODES.Q)
+@RequiresApi(api = Build.VERSION_CODES.P)
 class CarrierFinder {
 
     private final TelephonyManager telephonyManager;
