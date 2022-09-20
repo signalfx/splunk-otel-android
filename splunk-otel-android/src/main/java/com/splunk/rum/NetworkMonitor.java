@@ -84,13 +84,7 @@ class NetworkMonitor implements AppStateListener {
                                 .setAttribute(
                                         NET_HOST_CONNECTION_TYPE,
                                         activeNetwork.getState().getHumanName());
-                activeNetwork
-                        .getSubType()
-                        .ifPresent(
-                                subType ->
-                                        available.setAttribute(
-                                                SemanticAttributes.NET_HOST_CONNECTION_SUBTYPE,
-                                                subType));
+                RumAttributeAppender.appendNetworkAttributes(available, activeNetwork);
                 available.end();
             }
         }

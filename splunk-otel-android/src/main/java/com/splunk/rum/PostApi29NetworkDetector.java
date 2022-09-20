@@ -34,14 +34,16 @@ import androidx.core.app.ActivityCompat;
 class PostApi29NetworkDetector implements NetworkDetector {
     private final ConnectivityManager connectivityManager;
     private final TelephonyManager telephonyManager;
+    private final CarrierFinder carrierFinder;
     private final Context context;
 
     PostApi29NetworkDetector(
             ConnectivityManager connectivityManager,
             TelephonyManager telephonyManager,
-            Context context) {
+            CarrierFinder carrierFinder, Context context) {
         this.connectivityManager = connectivityManager;
         this.telephonyManager = telephonyManager;
+        this.carrierFinder = carrierFinder;
         this.context = context;
     }
 
@@ -54,16 +56,17 @@ class PostApi29NetworkDetector implements NetworkDetector {
             return NO_NETWORK;
         }
         String subType = null;
+        Carrier carrier = carrierFinder.get();
         if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
             // If the app has the permission, use it to get a subtype.
             if (hasPermission(Manifest.permission.READ_PHONE_STATE)) {
                 subType = getDataNetworkTypeName(telephonyManager.getDataNetworkType());
             }
-            return new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType);
+            return new CurrentNetwork(carrier, NetworkState.TRANSPORT_CELLULAR, subType);
         } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            return new CurrentNetwork(NetworkState.TRANSPORT_WIFI);
+            return new CurrentNetwork(carrier, NetworkState.TRANSPORT_WIFI);
         } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-            return new CurrentNetwork(NetworkState.TRANSPORT_VPN);
+            return new CurrentNetwork(carrier, NetworkState.TRANSPORT_VPN);
         }
         // there is an active network, but it doesn't fall into the neat buckets above
         return UNKNOWN_NETWORK;

@@ -16,11 +16,14 @@
 
 package com.splunk.rum;
 
+import android.os.Build;
+
 import androidx.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 
 final class CurrentNetwork {
+    @Nullable private final Carrier carrier;
     private final NetworkState state;
     @Nullable private final String subType;
 
@@ -28,7 +31,16 @@ final class CurrentNetwork {
         this(state, null);
     }
 
+    CurrentNetwork(Carrier carrier, NetworkState state) {
+        this(carrier, state, null);
+    }
+
     CurrentNetwork(NetworkState state, @Nullable String subType) {
+        this(null, state, subType);
+    }
+
+    CurrentNetwork(@Nullable Carrier carrier, NetworkState state, @Nullable String subType) {
+        this.carrier = carrier;
         this.state = state;
         this.subType = subType;
     }
@@ -52,18 +64,42 @@ final class CurrentNetwork {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof CurrentNetwork)) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         CurrentNetwork that = (CurrentNetwork) o;
-        return state == that.state && Objects.equals(subType, that.subType);
+        return Objects.equals(carrier, that.carrier) && state == that.state && Objects.equals(subType, that.subType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(state, subType);
+        return Objects.hash(carrier, state, subType);
+    }
+
+    @SuppressWarnings("NullAway")
+    @Nullable
+    public String getCarrierCountryCode() {
+        return haveCarrier() ? carrier.getMobileCountryCode() : null;
+    }
+
+    @SuppressWarnings("NullAway")
+    @Nullable
+    public String getCarrierIsoCountryCode() {
+        return haveCarrier() ? carrier.getIsoCountryCode() : null;
+    }
+
+    @SuppressWarnings("NullAway")
+    @Nullable
+    public String getCarrierNetworkCode() {
+        return haveCarrier() ? carrier.getMobileNetworkCode() : null;
+    }
+
+    @SuppressWarnings("NullAway")
+    @Nullable
+    public String getCarrierName() {
+        return haveCarrier() ? carrier.getName() : null;
+    }
+
+    private boolean haveCarrier(){
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) && (carrier != null);
     }
 }

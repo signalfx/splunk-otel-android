@@ -16,6 +16,7 @@
 
 package com.splunk.rum;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -26,6 +27,8 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.telephony.TelephonyManager;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -35,79 +38,66 @@ import org.robolectric.annotation.Config;
 @Config(sdk = Build.VERSION_CODES.Q)
 public class PostApi29NetworkDetectorTest {
 
+    ConnectivityManager connectivityManager;
+    TelephonyManager telephonyManager;
+    Context context;
+    Network network;
+    NetworkCapabilities networkCapabilities;
+    CarrierFinder carrierFinder;
+
+    @Before
+    public void setup() {
+        connectivityManager = mock(ConnectivityManager.class);
+        telephonyManager = mock(TelephonyManager.class);
+        context = mock(Context.class);
+        network = mock(Network.class);
+        carrierFinder = mock(CarrierFinder.class);
+        networkCapabilities = mock(NetworkCapabilities.class);
+
+        when(connectivityManager.getActiveNetwork()).thenReturn(network);
+        when(connectivityManager.getNetworkCapabilities(network)).thenReturn(networkCapabilities);
+    }
+
     @Test
     public void none() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        TelephonyManager telephonyManager = mock(TelephonyManager.class);
-        Context context = mock(Context.class);
-
-        Network network = mock(Network.class);
-        when(connectivityManager.getActiveNetwork()).thenReturn(network);
         when(connectivityManager.getNetworkCapabilities(network)).thenReturn(null);
 
         PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
+                new PostApi29NetworkDetector(connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
         assertEquals(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE), currentNetwork);
     }
 
     @Test
     public void wifi() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        TelephonyManager telephonyManager = mock(TelephonyManager.class);
-        Context context = mock(Context.class);
-
-        Network network = mock(Network.class);
-        when(connectivityManager.getActiveNetwork()).thenReturn(network);
-        NetworkCapabilities networkCapabilities = mock(NetworkCapabilities.class);
-        when(connectivityManager.getNetworkCapabilities(network)).thenReturn(networkCapabilities);
-
         when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)).thenReturn(true);
 
         PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
+                new PostApi29NetworkDetector(connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
         assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_WIFI), currentNetwork);
     }
 
     @Test
     public void cellular() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        TelephonyManager telephonyManager = mock(TelephonyManager.class);
-        Context context = mock(Context.class);
-
-        Network network = mock(Network.class);
-        when(connectivityManager.getActiveNetwork()).thenReturn(network);
-        NetworkCapabilities networkCapabilities = mock(NetworkCapabilities.class);
-        when(connectivityManager.getNetworkCapabilities(network)).thenReturn(networkCapabilities);
         when(telephonyManager.getDataNetworkType()).thenReturn(TelephonyManager.NETWORK_TYPE_LTE);
-
         when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
                 .thenReturn(true);
 
         PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
+                new PostApi29NetworkDetector(connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
         assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"), currentNetwork);
     }
 
     @Test
     public void cellular_noTelephonyPermissions() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        TelephonyManager telephonyManager = mock(TelephonyManager.class);
-        Context context = mock(Context.class);
-
-        Network network = mock(Network.class);
-        when(connectivityManager.getActiveNetwork()).thenReturn(network);
-        NetworkCapabilities networkCapabilities = mock(NetworkCapabilities.class);
-        when(connectivityManager.getNetworkCapabilities(network)).thenReturn(networkCapabilities);
         when(telephonyManager.getDataNetworkType()).thenReturn(TelephonyManager.NETWORK_TYPE_LTE);
-
         when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
                 .thenReturn(true);
 
         PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(connectivityManager, telephonyManager, context) {
+                new PostApi29NetworkDetector(connectivityManager, telephonyManager, carrierFinder, context) {
                     @Override
                     boolean hasPermission(String permission) {
                         return false;
@@ -119,37 +109,31 @@ public class PostApi29NetworkDetectorTest {
 
     @Test
     public void other() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        TelephonyManager telephonyManager = mock(TelephonyManager.class);
-        Context context = mock(Context.class);
-
-        Network network = mock(Network.class);
-        when(connectivityManager.getActiveNetwork()).thenReturn(network);
-        NetworkCapabilities networkCapabilities = mock(NetworkCapabilities.class);
-        when(connectivityManager.getNetworkCapabilities(network)).thenReturn(networkCapabilities);
-
         PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
+                new PostApi29NetworkDetector(connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
         assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN), currentNetwork);
     }
 
     @Test
     public void vpn() {
-        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-        TelephonyManager telephonyManager = mock(TelephonyManager.class);
-        Context context = mock(Context.class);
-
-        Network network = mock(Network.class);
-        when(connectivityManager.getActiveNetwork()).thenReturn(network);
-        NetworkCapabilities networkCapabilities = mock(NetworkCapabilities.class);
-        when(connectivityManager.getNetworkCapabilities(network)).thenReturn(networkCapabilities);
-
         when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)).thenReturn(true);
 
         PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
+                new PostApi29NetworkDetector(connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
         assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_VPN), currentNetwork);
+    }
+
+    @Test
+    public void carrierIsSet() {
+        Carrier carrier = Carrier.builder().name("flib").build();
+        when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+                .thenReturn(true);
+        when(carrierFinder.get()).thenReturn(carrier);
+        PostApi29NetworkDetector networkDetector =
+                new PostApi29NetworkDetector(connectivityManager, telephonyManager, carrierFinder, context);
+        CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
+        assertThat(currentNetwork.getCarrierName()).isEqualTo("flib");
     }
 }

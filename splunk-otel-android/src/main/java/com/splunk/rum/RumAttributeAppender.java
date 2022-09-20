@@ -22,12 +22,17 @@ import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.DE
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS_NAME;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS_TYPE;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS_VERSION;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_ICC;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_MCC;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_MNC;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_NAME;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CONNECTION_SUBTYPE;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CONNECTION_TYPE;
 
 import android.os.Build;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
@@ -84,9 +89,19 @@ class RumAttributeAppender implements SpanProcessor {
         span.setAttribute(SplunkRum.SCREEN_NAME_KEY, currentScreen);
         CurrentNetwork currentNetwork = connectionUtil.getActiveNetwork();
         span.setAttribute(NET_HOST_CONNECTION_TYPE, currentNetwork.getState().getHumanName());
+        appendNetworkAttributes(span, currentNetwork);
+    }
+
+    @SuppressWarnings("NullAway")
+    static void appendNetworkAttributes(Span span, CurrentNetwork currentNetwork){
         currentNetwork
                 .getSubType()
                 .ifPresent(subtype -> span.setAttribute(NET_HOST_CONNECTION_SUBTYPE, subtype));
+        span.setAttribute(NET_HOST_CARRIER_NAME, currentNetwork.getCarrierName());
+        span.setAttribute(NET_HOST_CARRIER_MCC, currentNetwork.getCarrierCountryCode());
+        span.setAttribute(NET_HOST_CARRIER_MNC, currentNetwork.getCarrierNetworkCode());
+        span.setAttribute(NET_HOST_CARRIER_ICC, currentNetwork.getCarrierIsoCountryCode());
+
     }
 
     @Override
