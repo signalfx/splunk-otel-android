@@ -93,7 +93,7 @@ class RumAttributeAppender implements SpanProcessor {
     }
 
     @SuppressWarnings("NullAway")
-    static void appendNetworkAttributes(Span span, CurrentNetwork currentNetwork){
+    static void appendNetworkAttributes(Span span, CurrentNetwork currentNetwork) {
         currentNetwork
                 .getSubType()
                 .ifPresent(subtype -> span.setAttribute(NET_HOST_CONNECTION_SUBTYPE, subtype));
@@ -101,7 +101,6 @@ class RumAttributeAppender implements SpanProcessor {
         span.setAttribute(NET_HOST_CARRIER_MCC, currentNetwork.getCarrierCountryCode());
         span.setAttribute(NET_HOST_CARRIER_MNC, currentNetwork.getCarrierNetworkCode());
         span.setAttribute(NET_HOST_CARRIER_ICC, currentNetwork.getCarrierIsoCountryCode());
-
     }
 
     @Override

@@ -61,8 +61,7 @@ public class ConnectionUtilTest {
 
         assertTrue(connectionUtil.isOnline());
         assertEquals(
-                new CurrentNetwork(NetworkState.TRANSPORT_WIFI),
-                connectionUtil.getActiveNetwork());
+                new CurrentNetwork(NetworkState.TRANSPORT_WIFI), connectionUtil.getActiveNetwork());
 
         ArgumentCaptor<NetworkCallback> monitorCaptor =
                 ArgumentCaptor.forClass(NetworkCallback.class);
@@ -109,8 +108,7 @@ public class ConnectionUtilTest {
 
         assertTrue(connectionUtil.isOnline());
         assertEquals(
-                new CurrentNetwork(NetworkState.TRANSPORT_WIFI),
-                connectionUtil.getActiveNetwork());
+                new CurrentNetwork(NetworkState.TRANSPORT_WIFI), connectionUtil.getActiveNetwork());
         verify(connectivityManager, never())
                 .registerNetworkCallback(eq(networkRequest), isA(NetworkCallback.class));
 

@@ -17,7 +17,6 @@
 package com.splunk.rum;
 
 import android.os.Build;
-
 import androidx.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
@@ -67,7 +66,9 @@ final class CurrentNetwork {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CurrentNetwork that = (CurrentNetwork) o;
-        return Objects.equals(carrier, that.carrier) && state == that.state && Objects.equals(subType, that.subType);
+        return Objects.equals(carrier, that.carrier)
+                && state == that.state
+                && Objects.equals(subType, that.subType);
     }
 
     @Override
@@ -99,7 +100,7 @@ final class CurrentNetwork {
         return haveCarrier() ? carrier.getName() : null;
     }
 
-    private boolean haveCarrier(){
+    private boolean haveCarrier() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) && (carrier != null);
     }
 }

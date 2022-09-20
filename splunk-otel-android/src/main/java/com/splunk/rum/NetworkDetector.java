@@ -31,7 +31,8 @@ interface NetworkDetector {
             TelephonyManager telephonyManager =
                     (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             CarrierFinder carrierFinder = new CarrierFinder(telephonyManager);
-            return new PostApi29NetworkDetector(connectivityManager, telephonyManager, carrierFinder, context);
+            return new PostApi29NetworkDetector(
+                    connectivityManager, telephonyManager, carrierFinder, context);
         }
         return new SimpleNetworkDetector(connectivityManager);
     }

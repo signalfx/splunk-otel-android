@@ -1,11 +1,25 @@
+/*
+ * Copyright Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.splunk.rum;
 
 import android.os.Build;
 import android.telephony.TelephonyManager;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-
 import java.util.Objects;
 
 @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -58,7 +72,11 @@ class Carrier {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Carrier carrier = (Carrier) o;
-        return id == carrier.id && Objects.equals(name, carrier.name) && Objects.equals(mobileCountryCode, carrier.mobileCountryCode) && Objects.equals(mobileNetworkCode, carrier.mobileNetworkCode) && Objects.equals(isoCountryCode, carrier.isoCountryCode);
+        return id == carrier.id
+                && Objects.equals(name, carrier.name)
+                && Objects.equals(mobileCountryCode, carrier.mobileCountryCode)
+                && Objects.equals(mobileNetworkCode, carrier.mobileNetworkCode)
+                && Objects.equals(isoCountryCode, carrier.isoCountryCode);
     }
 
     @Override
@@ -73,7 +91,7 @@ class Carrier {
         private @Nullable String mobileNetworkCode = null;
         private @Nullable String isoCountryCode = null;
 
-        Carrier build(){
+        Carrier build() {
             return new Carrier(this);
         }
 
@@ -102,5 +120,4 @@ class Carrier {
             return this;
         }
     }
-
 }

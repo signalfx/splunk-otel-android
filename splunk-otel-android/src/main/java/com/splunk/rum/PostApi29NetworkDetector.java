@@ -40,7 +40,8 @@ class PostApi29NetworkDetector implements NetworkDetector {
     PostApi29NetworkDetector(
             ConnectivityManager connectivityManager,
             TelephonyManager telephonyManager,
-            CarrierFinder carrierFinder, Context context) {
+            CarrierFinder carrierFinder,
+            Context context) {
         this.connectivityManager = connectivityManager;
         this.telephonyManager = telephonyManager;
         this.carrierFinder = carrierFinder;
