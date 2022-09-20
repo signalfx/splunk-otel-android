@@ -163,8 +163,8 @@ public class RumInitializerTest {
 
         ConnectionUtil connectionUtil = mock(ConnectionUtil.class);
 
-        CurrentNetwork offline = new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null);
-        CurrentNetwork online = new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null);
+        CurrentNetwork offline = new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE);
+        CurrentNetwork online = new CurrentNetwork(NetworkState.TRANSPORT_WIFI);
         when(connectionUtil.refreshNetworkStatus()).thenReturn(offline, online);
 
         long currentTimeNanos = MILLISECONDS.toNanos(System.currentTimeMillis());

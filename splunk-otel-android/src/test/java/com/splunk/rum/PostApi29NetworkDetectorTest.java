@@ -48,7 +48,7 @@ public class PostApi29NetworkDetectorTest {
         PostApi29NetworkDetector networkDetector =
                 new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null), currentNetwork);
+        assertEquals(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE), currentNetwork);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class PostApi29NetworkDetectorTest {
         PostApi29NetworkDetector networkDetector =
                 new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null), currentNetwork);
+        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_WIFI), currentNetwork);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class PostApi29NetworkDetectorTest {
                     }
                 };
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, null), currentNetwork);
+        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR), currentNetwork);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class PostApi29NetworkDetectorTest {
         PostApi29NetworkDetector networkDetector =
                 new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null), currentNetwork);
+        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN), currentNetwork);
     }
 
     @Test
@@ -150,6 +150,6 @@ public class PostApi29NetworkDetectorTest {
         PostApi29NetworkDetector networkDetector =
                 new PostApi29NetworkDetector(connectivityManager, telephonyManager, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_VPN, null), currentNetwork);
+        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_VPN), currentNetwork);
     }
 }

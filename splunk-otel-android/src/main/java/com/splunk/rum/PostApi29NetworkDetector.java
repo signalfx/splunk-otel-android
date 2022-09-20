@@ -61,9 +61,9 @@ class PostApi29NetworkDetector implements NetworkDetector {
             }
             return new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType);
         } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            return new CurrentNetwork(NetworkState.TRANSPORT_WIFI, null);
+            return new CurrentNetwork(NetworkState.TRANSPORT_WIFI);
         } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-            return new CurrentNetwork(NetworkState.TRANSPORT_VPN, null);
+            return new CurrentNetwork(NetworkState.TRANSPORT_VPN);
         }
         // there is an active network, but it doesn't fall into the neat buckets above
         return UNKNOWN_NETWORK;

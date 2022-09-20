@@ -44,7 +44,7 @@ public class MemoryBufferingExporterTest {
     @Before
     public void setUp() {
         when(connectionUtil.refreshNetworkStatus())
-                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, null));
+                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR));
     }
 
     @Test
@@ -63,8 +63,8 @@ public class MemoryBufferingExporterTest {
     @Test
     public void offlinePath() {
         when(connectionUtil.refreshNetworkStatus())
-                .thenReturn(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE, null))
-                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN, null));
+                .thenReturn(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE))
+                .thenReturn(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN));
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =

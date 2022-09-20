@@ -24,6 +24,10 @@ final class CurrentNetwork {
     private final NetworkState state;
     @Nullable private final String subType;
 
+    CurrentNetwork(NetworkState state) {
+        this(state, null);
+    }
+
     CurrentNetwork(NetworkState state, @Nullable String subType) {
         this.state = state;
         this.subType = subType;
