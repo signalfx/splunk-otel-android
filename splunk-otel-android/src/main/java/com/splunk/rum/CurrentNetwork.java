@@ -26,22 +26,17 @@ final class CurrentNetwork {
     private final NetworkState state;
     @Nullable private final String subType;
 
-    CurrentNetwork(NetworkState state) {
-        this(state, null);
-    }
-
-    CurrentNetwork(Carrier carrier, NetworkState state) {
-        this(carrier, state, null);
-    }
-
-    CurrentNetwork(NetworkState state, @Nullable String subType) {
-        this(null, state, subType);
-    }
-
-    CurrentNetwork(@Nullable Carrier carrier, NetworkState state, @Nullable String subType) {
+    private CurrentNetwork(
+            @Nullable Carrier carrier, NetworkState state, @Nullable String subType) {
         this.carrier = carrier;
         this.state = state;
         this.subType = subType;
+    }
+
+    public CurrentNetwork(Builder builder) {
+        this.carrier = builder.carrier;
+        this.state = builder.state;
+        this.subType = builder.subType;
     }
 
     boolean isOnline() {
@@ -102,5 +97,33 @@ final class CurrentNetwork {
 
     private boolean haveCarrier() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) && (carrier != null);
+    }
+
+    static Builder builder(NetworkState state) {
+        return new Builder(state);
+    }
+
+    static class Builder {
+        @Nullable private Carrier carrier;
+        private final NetworkState state;
+        @Nullable private String subType;
+
+        public Builder(NetworkState state) {
+            this.state = state;
+        }
+
+        CurrentNetwork build() {
+            return new CurrentNetwork(this);
+        }
+
+        public Builder carrier(@Nullable Carrier carrier) {
+            this.carrier = carrier;
+            return this;
+        }
+
+        public Builder subType(@Nullable String subType) {
+            this.subType = subType;
+            return this;
+        }
     }
 }

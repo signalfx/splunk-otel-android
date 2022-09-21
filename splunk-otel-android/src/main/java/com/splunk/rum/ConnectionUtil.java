@@ -32,9 +32,10 @@ import java.util.function.Supplier;
 // https://stackoverflow.com/questions/32547006/connectivitymanager-getnetworkinfoint-deprecated
 class ConnectionUtil {
 
-    static final CurrentNetwork NO_NETWORK = new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE);
+    static final CurrentNetwork NO_NETWORK =
+            CurrentNetwork.builder(NetworkState.NO_NETWORK_AVAILABLE).build();
     static final CurrentNetwork UNKNOWN_NETWORK =
-            new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN);
+            CurrentNetwork.builder(NetworkState.TRANSPORT_UNKNOWN).build();
 
     private final NetworkDetector networkDetector;
 

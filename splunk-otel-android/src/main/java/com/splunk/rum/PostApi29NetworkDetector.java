@@ -63,11 +63,14 @@ class PostApi29NetworkDetector implements NetworkDetector {
             if (hasPermission(Manifest.permission.READ_PHONE_STATE)) {
                 subType = getDataNetworkTypeName(telephonyManager.getDataNetworkType());
             }
-            return new CurrentNetwork(carrier, NetworkState.TRANSPORT_CELLULAR, subType);
+            return CurrentNetwork.builder(NetworkState.TRANSPORT_CELLULAR)
+                    .carrier(carrier)
+                    .subType(subType)
+                    .build();
         } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            return new CurrentNetwork(carrier, NetworkState.TRANSPORT_WIFI);
+            return CurrentNetwork.builder(NetworkState.TRANSPORT_WIFI).carrier(carrier).build();
         } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-            return new CurrentNetwork(carrier, NetworkState.TRANSPORT_VPN);
+            return CurrentNetwork.builder(NetworkState.TRANSPORT_VPN).carrier(carrier).build();
         }
         // there is an active network, but it doesn't fall into the neat buckets above
         return UNKNOWN_NETWORK;
