@@ -53,7 +53,11 @@ final class CurrentNetwork {
 
     @Override
     public String toString() {
-        return "CurrentNetwork{" + "state=" + state + ", subType='" + subType + '\'' + '}';
+        return "CurrentNetwork{" +
+                "carrier=" + carrier +
+                ", state=" + state +
+                ", subType='" + subType + '\'' +
+                '}';
     }
 
     @Override
