@@ -31,13 +31,13 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
 @RequiresApi(api = Build.VERSION_CODES.P)
-class PostApi29NetworkDetector implements NetworkDetector {
+class PostApi28NetworkDetector implements NetworkDetector {
     private final ConnectivityManager connectivityManager;
     private final TelephonyManager telephonyManager;
     private final CarrierFinder carrierFinder;
     private final Context context;
 
-    PostApi29NetworkDetector(
+    PostApi28NetworkDetector(
             ConnectivityManager connectivityManager,
             TelephonyManager telephonyManager,
             CarrierFinder carrierFinder,

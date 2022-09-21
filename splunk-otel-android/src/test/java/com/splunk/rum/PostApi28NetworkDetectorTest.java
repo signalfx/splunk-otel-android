@@ -35,7 +35,7 @@ import org.robolectric.annotation.Config;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.Q)
-public class PostApi29NetworkDetectorTest {
+public class PostApi28NetworkDetectorTest {
 
     ConnectivityManager connectivityManager;
     TelephonyManager telephonyManager;
@@ -61,22 +61,22 @@ public class PostApi29NetworkDetectorTest {
     public void none() {
         when(connectivityManager.getNetworkCapabilities(network)).thenReturn(null);
 
-        PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(
+        PostApi28NetworkDetector networkDetector =
+                new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE), currentNetwork);
+        assertEquals(CurrentNetwork.builder(NetworkState.NO_NETWORK_AVAILABLE).build(), currentNetwork);
     }
 
     @Test
     public void wifi() {
         when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)).thenReturn(true);
 
-        PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(
+        PostApi28NetworkDetector networkDetector =
+                new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_WIFI), currentNetwork);
+        assertEquals(CurrentNetwork.builder(NetworkState.TRANSPORT_WIFI).build(), currentNetwork);
     }
 
     @Test
@@ -85,11 +85,11 @@ public class PostApi29NetworkDetectorTest {
         when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
                 .thenReturn(true);
 
-        PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(
+        PostApi28NetworkDetector networkDetector =
+                new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, "LTE"), currentNetwork);
+        assertEquals(CurrentNetwork.builder(NetworkState.TRANSPORT_CELLULAR).subType("LTE").build(), currentNetwork);
     }
 
     @Test
@@ -98,8 +98,8 @@ public class PostApi29NetworkDetectorTest {
         when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
                 .thenReturn(true);
 
-        PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(
+        PostApi28NetworkDetector networkDetector =
+                new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context) {
                     @Override
                     boolean hasPermission(String permission) {
@@ -107,27 +107,27 @@ public class PostApi29NetworkDetectorTest {
                     }
                 };
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_CELLULAR), currentNetwork);
+        assertEquals(CurrentNetwork.builder(NetworkState.TRANSPORT_CELLULAR).build(), currentNetwork);
     }
 
     @Test
     public void other() {
-        PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(
+        PostApi28NetworkDetector networkDetector =
+                new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN), currentNetwork);
+        assertEquals(CurrentNetwork.builder(NetworkState.TRANSPORT_UNKNOWN).build(), currentNetwork);
     }
 
     @Test
     public void vpn() {
         when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)).thenReturn(true);
 
-        PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(
+        PostApi28NetworkDetector networkDetector =
+                new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(new CurrentNetwork(NetworkState.TRANSPORT_VPN), currentNetwork);
+        assertEquals(CurrentNetwork.builder(NetworkState.TRANSPORT_VPN).build(), currentNetwork);
     }
 
     @Test
@@ -136,8 +136,8 @@ public class PostApi29NetworkDetectorTest {
         when(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
                 .thenReturn(true);
         when(carrierFinder.get()).thenReturn(carrier);
-        PostApi29NetworkDetector networkDetector =
-                new PostApi29NetworkDetector(
+        PostApi28NetworkDetector networkDetector =
+                new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
         assertThat(currentNetwork.getCarrierName()).isEqualTo("flib");
