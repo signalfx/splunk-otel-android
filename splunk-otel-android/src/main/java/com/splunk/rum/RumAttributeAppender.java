@@ -30,6 +30,7 @@ import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_H
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CONNECTION_TYPE;
 
 import android.os.Build;
+import androidx.annotation.Nullable;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
@@ -91,14 +92,19 @@ class RumAttributeAppender implements SpanProcessor {
         appendNetworkAttributes(span, currentNetwork);
     }
 
-    @SuppressWarnings("NullAway")
     static void appendNetworkAttributes(Span span, CurrentNetwork currentNetwork) {
-        span.setAttribute(NET_HOST_CONNECTION_TYPE, currentNetwork.getState().getHumanName());
-        span.setAttribute(NET_HOST_CONNECTION_SUBTYPE, currentNetwork.getSubType());
-        span.setAttribute(NET_HOST_CARRIER_NAME, currentNetwork.getCarrierName());
-        span.setAttribute(NET_HOST_CARRIER_MCC, currentNetwork.getCarrierCountryCode());
-        span.setAttribute(NET_HOST_CARRIER_MNC, currentNetwork.getCarrierNetworkCode());
-        span.setAttribute(NET_HOST_CARRIER_ICC, currentNetwork.getCarrierIsoCountryCode());
+        setIfNotNull(span, NET_HOST_CONNECTION_TYPE, currentNetwork.getState().getHumanName());
+        setIfNotNull(span, NET_HOST_CONNECTION_SUBTYPE, currentNetwork.getSubType());
+        setIfNotNull(span, NET_HOST_CARRIER_NAME, currentNetwork.getCarrierName());
+        setIfNotNull(span, NET_HOST_CARRIER_MCC, currentNetwork.getCarrierCountryCode());
+        setIfNotNull(span, NET_HOST_CARRIER_MNC, currentNetwork.getCarrierNetworkCode());
+        setIfNotNull(span, NET_HOST_CARRIER_ICC, currentNetwork.getCarrierIsoCountryCode());
+    }
+
+    private static void setIfNotNull(Span span, AttributeKey<String> key, @Nullable String value) {
+        if (value != null) {
+            span.setAttribute(key, value);
+        }
     }
 
     @Override

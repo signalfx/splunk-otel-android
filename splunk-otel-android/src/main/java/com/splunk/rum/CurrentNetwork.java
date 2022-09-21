@@ -53,11 +53,15 @@ final class CurrentNetwork {
 
     @Override
     public String toString() {
-        return "CurrentNetwork{" +
-                "carrier=" + carrier +
-                ", state=" + state +
-                ", subType='" + subType + '\'' +
-                '}';
+        return "CurrentNetwork{"
+                + "carrier="
+                + carrier
+                + ", state="
+                + state
+                + ", subType='"
+                + subType
+                + '\''
+                + '}';
     }
 
     @Override
@@ -100,7 +104,7 @@ final class CurrentNetwork {
     }
 
     private boolean haveCarrier() {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) && (carrier != null);
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) && (carrier != null);
     }
 
     static Builder builder(NetworkState state) {
