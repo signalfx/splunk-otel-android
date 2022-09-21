@@ -34,7 +34,7 @@ class CarrierFinder {
         int id = telephonyManager.getSimCarrierId();
         builder.id(id);
         CharSequence name = telephonyManager.getSimCarrierIdName();
-        if (name != null && validString(name.toString())) {
+        if (validString(name.toString())) {
             builder.name(name.toString());
         }
         String simOperator = telephonyManager.getSimOperator();
@@ -50,7 +50,7 @@ class CarrierFinder {
         return builder.build();
     }
 
-    private boolean validString(String str) {
-        return !(str == null || str.isEmpty());
+    private boolean validString(CharSequence str) {
+        return !(str == null || str.length() == 0);
     }
 }
