@@ -88,12 +88,12 @@ class RumAttributeAppender implements SpanProcessor {
         String currentScreen = visibleScreenTracker.getCurrentlyVisibleScreen();
         span.setAttribute(SplunkRum.SCREEN_NAME_KEY, currentScreen);
         CurrentNetwork currentNetwork = connectionUtil.getActiveNetwork();
-        span.setAttribute(NET_HOST_CONNECTION_TYPE, currentNetwork.getState().getHumanName());
         appendNetworkAttributes(span, currentNetwork);
     }
 
     @SuppressWarnings("NullAway")
     static void appendNetworkAttributes(Span span, CurrentNetwork currentNetwork) {
+        span.setAttribute(NET_HOST_CONNECTION_TYPE, currentNetwork.getState().getHumanName());
         currentNetwork
                 .getSubType()
                 .ifPresent(subtype -> span.setAttribute(NET_HOST_CONNECTION_SUBTYPE, subtype));
