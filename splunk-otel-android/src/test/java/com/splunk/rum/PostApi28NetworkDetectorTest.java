@@ -65,7 +65,8 @@ public class PostApi28NetworkDetectorTest {
                 new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(CurrentNetwork.builder(NetworkState.NO_NETWORK_AVAILABLE).build(), currentNetwork);
+        assertEquals(
+                CurrentNetwork.builder(NetworkState.NO_NETWORK_AVAILABLE).build(), currentNetwork);
     }
 
     @Test
@@ -89,7 +90,9 @@ public class PostApi28NetworkDetectorTest {
                 new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(CurrentNetwork.builder(NetworkState.TRANSPORT_CELLULAR).subType("LTE").build(), currentNetwork);
+        assertEquals(
+                CurrentNetwork.builder(NetworkState.TRANSPORT_CELLULAR).subType("LTE").build(),
+                currentNetwork);
     }
 
     @Test
@@ -107,7 +110,8 @@ public class PostApi28NetworkDetectorTest {
                     }
                 };
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(CurrentNetwork.builder(NetworkState.TRANSPORT_CELLULAR).build(), currentNetwork);
+        assertEquals(
+                CurrentNetwork.builder(NetworkState.TRANSPORT_CELLULAR).build(), currentNetwork);
     }
 
     @Test
@@ -116,7 +120,8 @@ public class PostApi28NetworkDetectorTest {
                 new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertEquals(CurrentNetwork.builder(NetworkState.TRANSPORT_UNKNOWN).build(), currentNetwork);
+        assertEquals(
+                CurrentNetwork.builder(NetworkState.TRANSPORT_UNKNOWN).build(), currentNetwork);
     }
 
     @Test

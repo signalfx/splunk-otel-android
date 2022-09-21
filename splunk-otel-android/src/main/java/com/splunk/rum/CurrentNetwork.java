@@ -19,7 +19,6 @@ package com.splunk.rum;
 import android.os.Build;
 import androidx.annotation.Nullable;
 import java.util.Objects;
-import java.util.Optional;
 
 final class CurrentNetwork {
     @Nullable private final Carrier carrier;
@@ -47,8 +46,9 @@ final class CurrentNetwork {
         return state;
     }
 
-    Optional<String> getSubType() {
-        return Optional.ofNullable(subType);
+    @Nullable
+    String getSubType() {
+        return subType;
     }
 
     @Override
