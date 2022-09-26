@@ -25,14 +25,7 @@ final class CurrentNetwork {
     private final NetworkState state;
     @Nullable private final String subType;
 
-    private CurrentNetwork(
-            @Nullable Carrier carrier, NetworkState state, @Nullable String subType) {
-        this.carrier = carrier;
-        this.state = state;
-        this.subType = subType;
-    }
-
-    public CurrentNetwork(Builder builder) {
+    private CurrentNetwork(Builder builder) {
         this.carrier = builder.carrier;
         this.state = builder.state;
         this.subType = builder.subType;
