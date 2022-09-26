@@ -78,6 +78,8 @@ class NetworkMonitor implements AppStateListener {
                         tracer.spanBuilder("network.change")
                                 .setAttribute(NETWORK_STATUS_KEY, "available")
                                 .startSpan();
+                // put these after span start to override what might be set in the
+                // RumAttributeAppender.
                 RumAttributeAppender.appendNetworkAttributes(available, activeNetwork);
                 available.end();
             }
