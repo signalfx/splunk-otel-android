@@ -7,10 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
-## Version 0.18.0
+## Version 1.0.0-RC1
+
+Release candidate for 1.0.0.
 
 * Updated to OpenTelemetry Java v1.18.0
 * Introduced a `SplunkRumBuilder` class and deprecated `Config` (#342)
+* Add mobile carrier info to Span attributes (name/mcc/mnc/icc) (#358)
+* Improve thread safety of slow rendering detector (#361)
 
 ## Version 0.17.0
 
