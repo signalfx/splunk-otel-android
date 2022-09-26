@@ -34,7 +34,7 @@ class CarrierFinder {
         int id = telephonyManager.getSimCarrierId();
         builder.id(id);
         CharSequence name = telephonyManager.getSimCarrierIdName();
-        if (validString(name.toString())) {
+        if (validString(name)) {
             builder.name(name.toString());
         }
         String simOperator = telephonyManager.getSimOperator();
