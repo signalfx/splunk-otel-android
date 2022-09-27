@@ -127,7 +127,7 @@ Then, add the locally built library as a dependency in your application's build.
 ```
 dependencies {
 ...
-    implementation ("com.splunk:splunk-otel-android:1.0.0-RC2-SNAPSHOT")
+    implementation ("com.splunk:splunk-otel-android:1.0.0-rc.2-SNAPSHOT")
 ...
 }
 ```
