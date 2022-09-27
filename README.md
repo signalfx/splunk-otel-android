@@ -91,7 +91,7 @@ Then, add the latest release as a dependency in your application's build.gradle 
 ```
 dependencies {
 ...
-    implementation ("com.splunk:splunk-otel-android:1.0.0-RC1")
+    implementation ("com.splunk:splunk-otel-android:1.0.0-rc.1")
 ...
 }
 ```

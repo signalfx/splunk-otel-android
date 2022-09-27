@@ -7,7 +7,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
-## Version 1.0.0-RC1
+## Version 1.0.0-rc.1
 
 Release candidate for 1.0.0.
 
