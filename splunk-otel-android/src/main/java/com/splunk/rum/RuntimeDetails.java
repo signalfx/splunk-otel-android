@@ -27,7 +27,7 @@ import java.io.File;
 /** Represents details about the runtime environment at a time */
 final class RuntimeDetails extends BroadcastReceiver {
 
-    private volatile Double batteryPercent = null;
+    private @Nullable volatile Double batteryPercent = null;
     private final File filesDir;
 
     static RuntimeDetails create(Context context) {
