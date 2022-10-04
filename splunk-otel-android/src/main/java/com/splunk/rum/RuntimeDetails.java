@@ -23,12 +23,11 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import androidx.annotation.Nullable;
 import java.io.File;
-import java.util.concurrent.atomic.AtomicReference;
 
 /** Represents details about the runtime environment at a time */
 final class RuntimeDetails extends BroadcastReceiver {
 
-    private final AtomicReference<Double> batteryPercent = new AtomicReference<>();
+    private volatile Double batteryPercent = null;
     private final File filesDir;
 
     static RuntimeDetails create(Context context) {
@@ -54,13 +53,13 @@ final class RuntimeDetails extends BroadcastReceiver {
 
     @Nullable
     Double getCurrentBatteryPercent() {
-        return batteryPercent.get();
+        return batteryPercent;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-        batteryPercent.set(level * 100.0d / (float) scale);
+        batteryPercent = level * 100.0d / (float) scale;
     }
 }
