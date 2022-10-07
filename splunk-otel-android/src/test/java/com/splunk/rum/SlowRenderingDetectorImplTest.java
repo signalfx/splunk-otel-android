@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.os.Build;
 import android.os.Handler;
 import android.view.FrameMetrics;
@@ -71,6 +72,8 @@ public class SlowRenderingDetectorImplTest {
     @Before
     public void setup() {
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
+        ComponentName componentName = new ComponentName("io.otel", "Komponent");
+        when(activity.getComponentName()).thenReturn(componentName);
     }
 
     @Test
@@ -182,12 +185,18 @@ public class SlowRenderingDetectorImplTest {
                                 assertThat(span)
                                         .hasName("slowRenders")
                                         .endsAt(span.getStartEpochNanos())
-                                        .hasAttribute(COUNT_KEY, 3L),
+                                        .hasAttribute(COUNT_KEY, 3L)
+                                        .hasAttribute(
+                                                AttributeKey.stringKey("activity.name"),
+                                                "io.otel/Komponent"),
                         span ->
                                 assertThat(span)
                                         .hasName("frozenRenders")
                                         .endsAt(span.getStartEpochNanos())
-                                        .hasAttribute(COUNT_KEY, 1L));
+                                        .hasAttribute(COUNT_KEY, 1L)
+                                        .hasAttribute(
+                                                AttributeKey.stringKey("activity.name"),
+                                                "io.otel/Komponent"));
     }
 
     private List<Long> makeSomeDurations() {
