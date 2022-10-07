@@ -44,6 +44,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -79,8 +80,12 @@ public class SlowRenderingDetectorImplTest {
 
         testInstance.add(activity);
 
+        ArgumentCaptor<SlowRenderingDetectorImpl.PerActivityListener> captor =
+                ArgumentCaptor.forClass(SlowRenderingDetectorImpl.PerActivityListener.class);
+
         verify(activity.getWindow())
-                .addOnFrameMetricsAvailableListener(testInstance, frameMetricsHandler);
+                .addOnFrameMetricsAvailableListener(captor.capture(), eq(frameMetricsHandler));
+        captor.getValue().getActivityName();
     }
 
     @Test
@@ -102,9 +107,12 @@ public class SlowRenderingDetectorImplTest {
         testInstance.add(activity);
         testInstance.stop(activity);
 
+        ArgumentCaptor<SlowRenderingDetectorImpl.PerActivityListener> captor =
+                ArgumentCaptor.forClass(SlowRenderingDetectorImpl.PerActivityListener.class);
+
         verify(activity.getWindow())
-                .addOnFrameMetricsAvailableListener(testInstance, frameMetricsHandler);
-        verify(activity.getWindow()).removeOnFrameMetricsAvailableListener(testInstance);
+                .addOnFrameMetricsAvailableListener(captor.capture(), eq(frameMetricsHandler));
+        verify(activity.getWindow()).removeOnFrameMetricsAvailableListener(captor.getValue());
         assertThat(otelTesting.getSpans()).hasSize(0);
     }
 
@@ -115,9 +123,14 @@ public class SlowRenderingDetectorImplTest {
 
         testInstance.add(activity);
 
+        ArgumentCaptor<SlowRenderingDetectorImpl.PerActivityListener> captor =
+                ArgumentCaptor.forClass(SlowRenderingDetectorImpl.PerActivityListener.class);
+
         for (long duration : makeSomeDurations()) {
             when(frameMetrics.getMetric(FrameMetrics.DRAW_DURATION)).thenReturn(duration);
-            testInstance.onFrameMetricsAvailable(null, frameMetrics, 0);
+            verify(activity.getWindow())
+                    .addOnFrameMetricsAvailableListener(captor.capture(), any());
+            captor.getValue().onFrameMetricsAvailable(null, frameMetrics, 0);
         }
 
         testInstance.stop(activity);
@@ -145,9 +158,14 @@ public class SlowRenderingDetectorImplTest {
 
         testInstance.add(activity);
 
+        ArgumentCaptor<SlowRenderingDetectorImpl.PerActivityListener> captor =
+                ArgumentCaptor.forClass(SlowRenderingDetectorImpl.PerActivityListener.class);
+
         for (long duration : makeSomeDurations()) {
             when(frameMetrics.getMetric(FrameMetrics.DRAW_DURATION)).thenReturn(duration);
-            testInstance.onFrameMetricsAvailable(null, frameMetrics, 0);
+            verify(activity.getWindow())
+                    .addOnFrameMetricsAvailableListener(captor.capture(), any());
+            captor.getValue().onFrameMetricsAvailable(null, frameMetrics, 0);
         }
 
         testInstance.start();
