@@ -19,7 +19,6 @@ package com.splunk.rum;
 import static io.opentelemetry.api.common.AttributeKey.doubleKey;
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
-import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.location.Location;
@@ -28,6 +27,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.webkit.WebView;
 import androidx.annotation.Nullable;
+import com.splunk.rum.internal.opentelemetry.GlobalAttributesSpanAppender;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -39,7 +39,6 @@ import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTelemetry;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -79,7 +78,7 @@ public class SplunkRum {
 
     private final SessionId sessionId;
     private final OpenTelemetrySdk openTelemetrySdk;
-    private final AtomicReference<Attributes> globalAttributes;
+    private final GlobalAttributesSpanAppender globalAttributes;
 
     static {
         Handler handler = new Handler(Looper.getMainLooper());
@@ -89,7 +88,7 @@ public class SplunkRum {
     SplunkRum(
             OpenTelemetrySdk openTelemetrySdk,
             SessionId sessionId,
-            AtomicReference<Attributes> globalAttributes) {
+            GlobalAttributesSpanAppender globalAttributes) {
         this.openTelemetrySdk = openTelemetrySdk;
         this.sessionId = sessionId;
         this.globalAttributes = globalAttributes;
@@ -269,11 +268,9 @@ public class SplunkRum {
      * @param key The {@link AttributeKey} for the attribute.
      * @param value The value of the attribute, which must match the generic type of the key.
      * @param <T> The generic type of the value.
-     * @return this.
      */
-    public <T> SplunkRum setGlobalAttribute(AttributeKey<T> key, T value) {
+    public <T> void setGlobalAttribute(AttributeKey<T> key, T value) {
         updateGlobalAttributes(attributesBuilder -> attributesBuilder.put(key, value));
-        return this;
     }
 
     /**
@@ -286,18 +283,7 @@ public class SplunkRum {
      *     operating on a {@link AttributesBuilder} from the current set.
      */
     public void updateGlobalAttributes(Consumer<AttributesBuilder> attributesUpdater) {
-        while (true) {
-            // we're absolutely certain this will never be null
-            Attributes oldAttributes = requireNonNull(globalAttributes.get());
-
-            AttributesBuilder builder = oldAttributes.toBuilder();
-            attributesUpdater.accept(builder);
-            Attributes newAttributes = builder.build();
-
-            if (globalAttributes.compareAndSet(oldAttributes, newAttributes)) {
-                break;
-            }
-        }
+        globalAttributes.update(attributesUpdater);
     }
 
     // for testing only
