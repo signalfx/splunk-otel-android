@@ -17,6 +17,7 @@
 package com.splunk.rum;
 
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -88,7 +89,7 @@ public class SlowRenderingDetectorImplTest {
 
         verify(activity.getWindow())
                 .addOnFrameMetricsAvailableListener(captor.capture(), eq(frameMetricsHandler));
-        captor.getValue().getActivityName();
+        assertEquals("io.otel/Komponent", captor.getValue().getActivityName());
     }
 
     @Test
@@ -129,11 +130,11 @@ public class SlowRenderingDetectorImplTest {
         ArgumentCaptor<SlowRenderingDetectorImpl.PerActivityListener> captor =
                 ArgumentCaptor.forClass(SlowRenderingDetectorImpl.PerActivityListener.class);
 
+        verify(activity.getWindow()).addOnFrameMetricsAvailableListener(captor.capture(), any());
+        SlowRenderingDetectorImpl.PerActivityListener listener = captor.getValue();
         for (long duration : makeSomeDurations()) {
             when(frameMetrics.getMetric(FrameMetrics.DRAW_DURATION)).thenReturn(duration);
-            verify(activity.getWindow())
-                    .addOnFrameMetricsAvailableListener(captor.capture(), any());
-            captor.getValue().onFrameMetricsAvailable(null, frameMetrics, 0);
+            listener.onFrameMetricsAvailable(null, frameMetrics, 0);
         }
 
         testInstance.stop(activity);
@@ -164,11 +165,11 @@ public class SlowRenderingDetectorImplTest {
         ArgumentCaptor<SlowRenderingDetectorImpl.PerActivityListener> captor =
                 ArgumentCaptor.forClass(SlowRenderingDetectorImpl.PerActivityListener.class);
 
+        verify(activity.getWindow()).addOnFrameMetricsAvailableListener(captor.capture(), any());
+        SlowRenderingDetectorImpl.PerActivityListener listener = captor.getValue();
         for (long duration : makeSomeDurations()) {
             when(frameMetrics.getMetric(FrameMetrics.DRAW_DURATION)).thenReturn(duration);
-            verify(activity.getWindow())
-                    .addOnFrameMetricsAvailableListener(captor.capture(), any());
-            captor.getValue().onFrameMetricsAvailable(null, frameMetrics, 0);
+            listener.onFrameMetricsAvailable(null, frameMetrics, 0);
         }
 
         testInstance.start();
