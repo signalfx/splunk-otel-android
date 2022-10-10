@@ -92,7 +92,7 @@ class SlowRenderingDetectorImpl implements SlowRenderingDetector {
     @Override
     public void add(Activity activity) {
         PerActivityListener listener = new PerActivityListener(activity);
-        PerActivityListener existing = activities.put(activity, listener);
+        PerActivityListener existing = activities.putIfAbsent(activity, listener);
         if (existing == null) {
             activity.getWindow().addOnFrameMetricsAvailableListener(listener, frameMetricsHandler);
         }
