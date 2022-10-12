@@ -25,5 +25,4 @@ OpenTelemetry Android Client SDK to support real user monitoring (RUM).
 
 You can following along with the OpenTelemetry client
 [SIG notes](https://docs.google.com/document/d/16Vsdh-DM72AfMg_FIt9yT9ExEWF4A_vRbQ3jRNBe09w/edit#heading=h.yplevr950565)
-or see `#otel-client-side-telemetry` in CNCF slack.  
-
+or see `#otel-client-side-telemetry` in CNCF slack.
