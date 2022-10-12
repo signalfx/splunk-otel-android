@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.internal.opentelemetry;
+package io.opentelemetry.rum.internal;
 
 import static java.util.Objects.requireNonNull;
 
