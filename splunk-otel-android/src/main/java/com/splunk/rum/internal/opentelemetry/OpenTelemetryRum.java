@@ -45,7 +45,7 @@ public interface OpenTelemetryRum {
 
     /**
      * Get the client session ID associated with this instance of the RUM instrumentation library.
-     * Note: this value can change throughout the lifetime of an application instance, so it is
+     * Note: this value will change throughout the lifetime of an application instance, so it is
      * recommended that you do not cache this value, but always retrieve it from here when needed.
      */
     String getRumSessionId();
