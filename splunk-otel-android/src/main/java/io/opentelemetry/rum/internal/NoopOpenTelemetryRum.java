@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.internal.opentelemetry;
+package io.opentelemetry.rum.internal;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.TraceId;
