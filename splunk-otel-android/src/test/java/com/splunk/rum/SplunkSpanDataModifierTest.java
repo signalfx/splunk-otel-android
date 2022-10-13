@@ -16,6 +16,9 @@
 
 package com.splunk.rum;
 
+import static com.splunk.rum.SplunkSpanDataModifier.REACT_NATIVE_SPAN_ID_KEY;
+import static com.splunk.rum.SplunkSpanDataModifier.REACT_NATIVE_TRACE_ID_KEY;
+import static com.splunk.rum.SplunkSpanDataModifier.SPLUNK_OPERATION_KEY;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
@@ -23,7 +26,10 @@ import static java.util.Collections.singleton;
 import static org.mockito.Mockito.when;
 
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.TraceFlags;
+import io.opentelemetry.api.trace.TraceState;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.testing.trace.TestSpanData;
@@ -35,7 +41,6 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import java.util.Arrays;
 import java.util.Collection;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -48,13 +53,6 @@ public class SplunkSpanDataModifierTest {
 
     @Mock private SpanExporter delegate;
     @Captor private ArgumentCaptor<Collection<SpanData>> exportedSpansCaptor;
-
-    private SplunkSpanDataModifier underTest;
-
-    @Before
-    public void setUp() {
-        underTest = new SplunkSpanDataModifier(delegate);
-    }
 
     @Test
     public void shouldConvertExceptionEventsToSpanAttributes() {
@@ -94,6 +92,7 @@ public class SplunkSpanDataModifierTest {
         CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
         when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
 
+        SpanExporter underTest = new SplunkSpanDataModifier(delegate, false);
         CompletableResultCode actual = underTest.export(singleton(original));
 
         assertThat(actual).isSameAs(exportResult);
@@ -108,7 +107,7 @@ public class SplunkSpanDataModifierTest {
                                 123, "test", Attributes.of(stringKey("attribute"), "value")))
                 .hasTotalRecordedEvents(1)
                 .hasAttributesSatisfyingExactly(
-                        equalTo(SplunkSpanDataModifier.SPLUNK_OPERATION_KEY, "test"),
+                        equalTo(SPLUNK_OPERATION_KEY, "test"),
                         equalTo(stringKey("attribute"), "value"),
                         equalTo(SemanticAttributes.EXCEPTION_TYPE, "Error"),
                         equalTo(SplunkRum.ERROR_TYPE_KEY, "Error"),
@@ -133,6 +132,7 @@ public class SplunkSpanDataModifierTest {
         CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
         when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
 
+        SpanExporter underTest = new SplunkSpanDataModifier(delegate, false);
         CompletableResultCode actual = underTest.export(singleton(original));
 
         assertThat(actual).isSameAs(exportResult);
@@ -141,8 +141,7 @@ public class SplunkSpanDataModifierTest {
         assertThat(exportedSpans).hasSize(1);
         assertThat(exportedSpans.iterator().next())
                 .hasName("SplunkRumSpan")
-                .hasAttributesSatisfyingExactly(
-                        equalTo(SplunkSpanDataModifier.SPLUNK_OPERATION_KEY, "SplunkRumSpan"));
+                .hasAttributesSatisfyingExactly(equalTo(SPLUNK_OPERATION_KEY, "SplunkRumSpan"));
     }
 
     @Test
@@ -176,6 +175,7 @@ public class SplunkSpanDataModifierTest {
         CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
         when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
 
+        SpanExporter underTest = new SplunkSpanDataModifier(delegate, false);
         CompletableResultCode actual = underTest.export(singleton(original));
 
         assertThat(actual).isSameAs(exportResult);
@@ -185,7 +185,7 @@ public class SplunkSpanDataModifierTest {
         assertThat(exportedSpans.iterator().next())
                 .hasName("SplunkRumSpan")
                 .hasAttributesSatisfyingExactly(
-                        equalTo(SplunkSpanDataModifier.SPLUNK_OPERATION_KEY, "SplunkRumSpan"),
+                        equalTo(SPLUNK_OPERATION_KEY, "SplunkRumSpan"),
                         equalTo(ResourceAttributes.DEPLOYMENT_ENVIRONMENT, "dev"),
                         equalTo(ResourceAttributes.DEVICE_MODEL_NAME, "phone"),
                         equalTo(ResourceAttributes.DEVICE_MODEL_IDENTIFIER, "phone 12345"),
@@ -194,5 +194,96 @@ public class SplunkSpanDataModifierTest {
                         equalTo(ResourceAttributes.OS_VERSION, "13"),
                         equalTo(SplunkRum.APP_NAME_KEY, "myApp"),
                         equalTo(SplunkRum.RUM_VERSION_KEY, "1.0.0"));
+    }
+
+    @Test
+    public void shouldIgnoreReactIdsIfReactNativeSupportIsDisabled() {
+        SpanContext spanContext =
+                SpanContext.create(
+                        "00000000000000000000000000000123",
+                        "0000000000000456",
+                        TraceFlags.getSampled(),
+                        TraceState.getDefault());
+
+        SpanData original =
+                TestSpanData.builder()
+                        .setSpanContext(spanContext)
+                        .setName("SplunkRumSpan")
+                        .setKind(SpanKind.CLIENT)
+                        .setStatus(StatusData.unset())
+                        .setStartEpochNanos(12345)
+                        .setEndEpochNanos(67890)
+                        .setHasEnded(true)
+                        .setAttributes(
+                                Attributes.builder()
+                                        .put(
+                                                REACT_NATIVE_TRACE_ID_KEY,
+                                                "99999999999999999999999999999999")
+                                        .put(REACT_NATIVE_SPAN_ID_KEY, "8888888888888888")
+                                        .build())
+                        .build();
+
+        CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
+        when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
+
+        SpanExporter underTest = new SplunkSpanDataModifier(delegate, false);
+        CompletableResultCode actual = underTest.export(singleton(original));
+
+        assertThat(actual).isSameAs(exportResult);
+
+        Collection<SpanData> exportedSpans = exportedSpansCaptor.getValue();
+        assertThat(exportedSpans).hasSize(1);
+        assertThat(exportedSpans.iterator().next())
+                .hasName("SplunkRumSpan")
+                .hasTraceId(spanContext.getTraceId())
+                .hasSpanId(spanContext.getSpanId())
+                .hasAttributesSatisfyingExactly(
+                        equalTo(SPLUNK_OPERATION_KEY, "SplunkRumSpan"),
+                        equalTo(REACT_NATIVE_TRACE_ID_KEY, "99999999999999999999999999999999"),
+                        equalTo(REACT_NATIVE_SPAN_ID_KEY, "8888888888888888"));
+    }
+
+    @Test
+    public void shouldReplaceTraceAndSpanIdWithReactNativeIds() {
+        SpanContext spanContext =
+                SpanContext.create(
+                        "00000000000000000000000000000123",
+                        "0000000000000456",
+                        TraceFlags.getSampled(),
+                        TraceState.getDefault());
+
+        SpanData original =
+                TestSpanData.builder()
+                        .setSpanContext(spanContext)
+                        .setName("SplunkRumSpan")
+                        .setKind(SpanKind.CLIENT)
+                        .setStatus(StatusData.unset())
+                        .setStartEpochNanos(12345)
+                        .setEndEpochNanos(67890)
+                        .setHasEnded(true)
+                        .setAttributes(
+                                Attributes.builder()
+                                        .put(
+                                                REACT_NATIVE_TRACE_ID_KEY,
+                                                "99999999999999999999999999999999")
+                                        .put(REACT_NATIVE_SPAN_ID_KEY, "8888888888888888")
+                                        .build())
+                        .build();
+
+        CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
+        when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
+
+        SpanExporter underTest = new SplunkSpanDataModifier(delegate, true);
+        CompletableResultCode actual = underTest.export(singleton(original));
+
+        assertThat(actual).isSameAs(exportResult);
+
+        Collection<SpanData> exportedSpans = exportedSpansCaptor.getValue();
+        assertThat(exportedSpans).hasSize(1);
+        assertThat(exportedSpans.iterator().next())
+                .hasName("SplunkRumSpan")
+                .hasTraceId("99999999999999999999999999999999")
+                .hasSpanId("8888888888888888")
+                .hasAttributesSatisfyingExactly(equalTo(SPLUNK_OPERATION_KEY, "SplunkRumSpan"));
     }
 }
