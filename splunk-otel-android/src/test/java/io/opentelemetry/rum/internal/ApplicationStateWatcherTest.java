@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.splunk.rum;
+package io.opentelemetry.rum.internal;
 
-import static java.util.Arrays.asList;
 import static org.mockito.Mockito.inOrder;
 
 import android.app.Activity;
+import io.opentelemetry.rum.internal.instrumentation.ApplicationStateListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,17 +28,19 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AppStateWatcherTest {
+public class ApplicationStateWatcherTest {
 
     @Mock Activity activity;
-    @Mock AppStateListener listener1;
-    @Mock AppStateListener listener2;
+    @Mock ApplicationStateListener listener1;
+    @Mock ApplicationStateListener listener2;
 
-    AppStateWatcher underTest;
+    ApplicationStateWatcher underTest;
 
     @Before
     public void setUp() {
-        underTest = new AppStateWatcher(asList(listener1, listener2));
+        underTest = new ApplicationStateWatcher();
+        underTest.registerListener(listener1);
+        underTest.registerListener(listener2);
     }
 
     @Test
@@ -50,8 +52,8 @@ public class AppStateWatcherTest {
         underTest.onActivityStopped(activity);
 
         InOrder io = inOrder(listener1, listener2);
-        io.verify(listener1).appForegrounded();
-        io.verify(listener2).appForegrounded();
+        io.verify(listener1).onApplicationForegrounded();
+        io.verify(listener2).onApplicationForegrounded();
         io.verifyNoMoreInteractions();
     }
 
@@ -63,10 +65,10 @@ public class AppStateWatcherTest {
         underTest.onActivityStopped(activity);
 
         InOrder io = inOrder(listener1, listener2);
-        io.verify(listener1).appForegrounded();
-        io.verify(listener2).appForegrounded();
-        io.verify(listener1).appBackgrounded();
-        io.verify(listener2).appBackgrounded();
+        io.verify(listener1).onApplicationForegrounded();
+        io.verify(listener2).onApplicationForegrounded();
+        io.verify(listener1).onApplicationBackgrounded();
+        io.verify(listener2).onApplicationBackgrounded();
         io.verifyNoMoreInteractions();
     }
 }

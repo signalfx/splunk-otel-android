@@ -27,9 +27,8 @@ import io.opentelemetry.api.OpenTelemetry;
 public interface OpenTelemetryRum {
 
     /** Returns a new {@link OpenTelemetryRumBuilder} for {@link OpenTelemetryRum}. */
-    @SuppressWarnings("NullAway") // temp
     static OpenTelemetryRumBuilder builder() {
-        return null;
+        return new OpenTelemetryRumBuilder();
     }
 
     /** Returns a no-op implementation of {@link OpenTelemetryRum}. */
