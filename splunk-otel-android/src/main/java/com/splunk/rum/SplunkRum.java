@@ -160,7 +160,7 @@ public class SplunkRum {
     }
 
     private OkHttpTelemetry createOkHttpTracing() {
-        return OkHttpTelemetry.builder(openTelemetryRum.getOpenTelemetry())
+        return OkHttpTelemetry.builder(getOpenTelemetry())
                 .addAttributesExtractor(
                         new RumResponseAttributesExtractor(new ServerTimingHeaderParser()))
                 .build();
@@ -244,7 +244,7 @@ public class SplunkRum {
     }
 
     Tracer getTracer() {
-        return openTelemetryRum.getOpenTelemetry().getTracer(RUM_TRACER_NAME);
+        return getOpenTelemetry().getTracer(RUM_TRACER_NAME);
     }
 
     void recordAnr(StackTraceElement[] stackTrace) {
@@ -304,7 +304,7 @@ public class SplunkRum {
 
     // (currently) for testing only
     void flushSpans() {
-        OpenTelemetry openTelemetry = openTelemetryRum.getOpenTelemetry();
+        OpenTelemetry openTelemetry = getOpenTelemetry();
         if (openTelemetry instanceof OpenTelemetrySdk) {
             ((OpenTelemetrySdk) openTelemetry)
                     .getSdkTracerProvider()
