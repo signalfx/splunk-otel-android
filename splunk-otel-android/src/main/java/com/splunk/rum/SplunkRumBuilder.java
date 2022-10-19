@@ -141,8 +141,7 @@ public final class SplunkRumBuilder {
     /**
      * Enables support for the React Native instrumentation.
      *
-     * <p>This feature is disabled by default. You can enable it by calling this configuration
-     * method with a {@code true} value.
+     * <p>This feature is disabled by default. You can enable it by calling this method.
      *
      * @return {@code this}
      */
