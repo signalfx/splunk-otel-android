@@ -41,21 +41,21 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import java.util.Arrays;
 import java.util.Collection;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SplunkSpanDataModifierTest {
+@ExtendWith(MockitoExtension.class)
+class SplunkSpanDataModifierTest {
 
     @Mock private SpanExporter delegate;
     @Captor private ArgumentCaptor<Collection<SpanData>> exportedSpansCaptor;
 
     @Test
-    public void shouldConvertExceptionEventsToSpanAttributes() {
+    void shouldConvertExceptionEventsToSpanAttributes() {
         SpanData original =
                 TestSpanData.builder()
                         .setName("test")
@@ -118,7 +118,7 @@ public class SplunkSpanDataModifierTest {
     }
 
     @Test
-    public void shouldSetCaseSensitiveSpanNameToAttribute() {
+    void shouldSetCaseSensitiveSpanNameToAttribute() {
         SpanData original =
                 TestSpanData.builder()
                         .setName("SplunkRumSpan")
@@ -145,7 +145,7 @@ public class SplunkSpanDataModifierTest {
     }
 
     @Test
-    public void shouldCopySelectedResourceAttributes() {
+    void shouldCopySelectedResourceAttributes() {
         Resource resource =
                 Resource.create(
                         Attributes.builder()
@@ -197,7 +197,7 @@ public class SplunkSpanDataModifierTest {
     }
 
     @Test
-    public void shouldIgnoreReactIdsIfReactNativeSupportIsDisabled() {
+    void shouldIgnoreReactIdsIfReactNativeSupportIsDisabled() {
         SpanContext spanContext =
                 SpanContext.create(
                         "00000000000000000000000000000123",
@@ -244,7 +244,7 @@ public class SplunkSpanDataModifierTest {
     }
 
     @Test
-    public void shouldReplaceTraceAndSpanIdWithReactNativeIds() {
+    void shouldReplaceTraceAndSpanIdWithReactNativeIds() {
         SpanContext spanContext =
                 SpanContext.create(
                         "00000000000000000000000000000123",
