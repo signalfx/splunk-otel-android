@@ -31,7 +31,7 @@ import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class RumAttributeAppenderTest {
+class RumAttributeAppenderTest {
 
     private VisibleScreenTracker visibleScreenTracker;
     private final ConnectionUtil connectionUtil = mock(ConnectionUtil.class);

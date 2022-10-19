@@ -20,15 +20,15 @@ import static org.mockito.Mockito.inOrder;
 
 import android.app.Activity;
 import io.opentelemetry.rum.internal.instrumentation.ApplicationStateListener;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ApplicationStateWatcherTest {
+@ExtendWith(MockitoExtension.class)
+class ApplicationStateWatcherTest {
 
     @Mock Activity activity;
     @Mock ApplicationStateListener listener1;
@@ -36,15 +36,15 @@ public class ApplicationStateWatcherTest {
 
     ApplicationStateWatcher underTest;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         underTest = new ApplicationStateWatcher();
         underTest.registerListener(listener1);
         underTest.registerListener(listener2);
     }
 
     @Test
-    public void appForegrounded() {
+    void appForegrounded() {
         underTest.onActivityStarted(activity);
         underTest.onActivityStarted(activity);
         underTest.onActivityStopped(activity);
@@ -58,7 +58,7 @@ public class ApplicationStateWatcherTest {
     }
 
     @Test
-    public void appBackgrounded() {
+    void appBackgrounded() {
         underTest.onActivityStarted(activity);
         underTest.onActivityStarted(activity);
         underTest.onActivityStopped(activity);

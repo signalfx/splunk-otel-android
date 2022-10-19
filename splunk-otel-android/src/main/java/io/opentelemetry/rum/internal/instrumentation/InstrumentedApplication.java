@@ -41,6 +41,9 @@ public interface InstrumentedApplication {
     /**
      * Registers the passed {@link ApplicationStateListener} - from now on it will be called
      * whenever the application is moved from background to foreground, and vice versa.
+     *
+     * <p>Users of this method should take care to avoid passing the same listener instance multiple
+     * times; duplicates are not trimmed.
      */
     void registerApplicationStateListener(ApplicationStateListener listener);
 }

@@ -29,15 +29,15 @@ import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class OpenTelemetryRumBuilderTest {
+@ExtendWith(MockitoExtension.class)
+class OpenTelemetryRumBuilderTest {
 
     final Resource resource =
             Resource.getDefault().toBuilder().put("test.attribute", "abcdef").build();
@@ -50,14 +50,14 @@ public class OpenTelemetryRumBuilderTest {
     @Captor ArgumentCaptor<Application.ActivityLifecycleCallbacks> activityCallbacksCaptor;
 
     @Test
-    public void shouldRegisterApplicationStateWatcher() {
+    void shouldRegisterApplicationStateWatcher() {
         OpenTelemetryRum.builder().build(application);
 
         verify(application).registerActivityLifecycleCallbacks(isA(ApplicationStateWatcher.class));
     }
 
     @Test
-    public void shouldBuildTracerProvider() {
+    void shouldBuildTracerProvider() {
         OpenTelemetryRum openTelemetryRum =
                 OpenTelemetryRum.builder()
                         .setResource(resource)
@@ -85,7 +85,7 @@ public class OpenTelemetryRumBuilderTest {
     }
 
     @Test
-    public void shouldInstallInstrumentation() {
+    void shouldInstallInstrumentation() {
         OpenTelemetryRum.builder()
                 .addInstrumentation(
                         instrumentedApplication -> {
