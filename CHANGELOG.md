@@ -20,7 +20,7 @@ Release candidate for 1.0.0.
 * Included activity name in slow and frozen render reports (#373)
 * Renamed the `SplunkRumBuilder#disableNetworkMonitorEnabled()` method to
   `SplunkRumBuilder#disableNetworkMonitor()` (#377)
-* Added experimental React Native support (React Native lib will be developed and weleased
+* Added experimental React Native support (React Native lib will be developed and released
   separately) (#381)
 
 ## Version 1.0.0-rc.1

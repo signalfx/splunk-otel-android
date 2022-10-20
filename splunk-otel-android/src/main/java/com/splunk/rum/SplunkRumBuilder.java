@@ -113,7 +113,7 @@ public final class SplunkRumBuilder {
     /**
      * Enables debugging information to be emitted from the RUM library.
      *
-     * <p>This feature is disabled by default. You can enable it by calling configuration method.
+     * <p>This feature is disabled by default. You can enable it by calling this method.
      *
      * @return {@code this}
      */
