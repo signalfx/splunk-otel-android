@@ -18,7 +18,6 @@ package io.opentelemetry.rum.internal;
 
 import android.app.Application;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.rum.internal.instrumentation.InstrumentationInstaller;
 import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.logs.SdkLoggerProvider;
@@ -31,6 +30,7 @@ import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 /**
  * A builder of {@link OpenTelemetryRum}. It enabled configuring the OpenTelemetry SDK and disabling
@@ -48,7 +48,8 @@ public final class OpenTelemetryRumBuilder {
             meterProviderCustomizers = new ArrayList<>();
     private final List<BiFunction<SdkLoggerProviderBuilder, Application, SdkLoggerProviderBuilder>>
             loggerProviderCustomizers = new ArrayList<>();
-    private final List<InstrumentationInstaller> instrumentationInstallers = new ArrayList<>();
+    private final List<Consumer<InstrumentedApplication>> instrumentationInstallers =
+            new ArrayList<>();
 
     OpenTelemetryRumBuilder() {}
 
@@ -123,13 +124,13 @@ public final class OpenTelemetryRumBuilder {
     }
 
     /**
-     * Adds an {@link InstrumentationInstaller} that will be run on an {@link
+     * Adds an instrumentation installer function that will be run on an {@link
      * InstrumentedApplication} instance as a part of the {@link #build(Application)} method call.
      *
      * @return {@code this}
      */
     public OpenTelemetryRumBuilder addInstrumentation(
-            InstrumentationInstaller instrumentationInstaller) {
+            Consumer<InstrumentedApplication> instrumentationInstaller) {
         instrumentationInstallers.add(instrumentationInstaller);
         return this;
     }
@@ -167,8 +168,8 @@ public final class OpenTelemetryRumBuilder {
         InstrumentedApplication instrumentedApplication =
                 new InstrumentedApplicationImpl(
                         application, openTelemetrySdk, applicationStateWatcher);
-        for (InstrumentationInstaller installer : instrumentationInstallers) {
-            installer.install(instrumentedApplication);
+        for (Consumer<InstrumentedApplication> installer : instrumentationInstallers) {
+            installer.accept(instrumentedApplication);
         }
 
         return new OpenTelemetryRumImpl(openTelemetrySdk, sessionId);
