@@ -160,7 +160,7 @@ class SlowRenderingDetectorImpl
                 Window window, FrameMetrics frameMetrics, int dropCountSinceLastInvocation) {
 
             long firstDrawFrame = frameMetrics.getMetric(FIRST_DRAW_FRAME);
-            if(firstDrawFrame == 1){
+            if (firstDrawFrame == 1) {
                 return;
             }
 

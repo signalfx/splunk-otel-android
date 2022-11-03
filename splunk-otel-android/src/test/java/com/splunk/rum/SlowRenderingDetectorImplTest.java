@@ -27,7 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import android.app.Activity;
@@ -184,7 +183,8 @@ public class SlowRenderingDetectorImplTest {
 
     @Test
     public void activityListenerSkipsFirstFrame() {
-        SlowRenderingDetectorImpl.PerActivityListener listener = new SlowRenderingDetectorImpl.PerActivityListener(null);
+        SlowRenderingDetectorImpl.PerActivityListener listener =
+                new SlowRenderingDetectorImpl.PerActivityListener(null);
         when(frameMetrics.getMetric(FIRST_DRAW_FRAME)).thenReturn(1L);
         listener.onFrameMetricsAvailable(null, frameMetrics, 99);
         verify(frameMetrics, never()).getMetric(DRAW_DURATION);
