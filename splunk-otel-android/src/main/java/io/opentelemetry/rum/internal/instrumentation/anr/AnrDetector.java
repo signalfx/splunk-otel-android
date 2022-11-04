@@ -18,6 +18,7 @@ package io.opentelemetry.rum.internal.instrumentation.anr;
 
 import android.os.Handler;
 import android.os.Looper;
+import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
@@ -42,14 +43,10 @@ public final class AnrDetector {
     private final Looper mainLooper;
     private final ScheduledExecutorService scheduler;
 
-    // visible for tests
-    AnrDetector(
-            List<AttributesExtractor<StackTraceElement[], Void>> additionalExtractors,
-            Looper mainLooper,
-            ScheduledExecutorService scheduler) {
-        this.additionalExtractors = additionalExtractors;
-        this.mainLooper = mainLooper;
-        this.scheduler = scheduler;
+    AnrDetector(AnrDetectorBuilder builder) {
+        this.additionalExtractors = builder.additionalExtractors;
+        this.mainLooper = builder.mainLooper;
+        this.scheduler = builder.scheduler;
     }
 
     /**
@@ -59,27 +56,30 @@ public final class AnrDetector {
      * thread's stack trace will be reported to the RUM system.
      */
     public void installOn(InstrumentedApplication instrumentedApplication) {
-        Thread mainThread = mainLooper.getThread();
         Handler uiHandler = new Handler(mainLooper);
-        Instrumenter<StackTraceElement[], Void> instrumenter =
-                Instrumenter.<StackTraceElement[], Void>builder(
-                                instrumentedApplication.getOpenTelemetrySdk(),
-                                "io.opentelemetry.anr",
-                                stackTrace -> "ANR")
-                        // it's always an error
-                        .setSpanStatusExtractor(
-                                (spanStatusBuilder, stackTrace, unused, error) ->
-                                        spanStatusBuilder.setStatus(StatusCode.ERROR))
-                        .addAttributesExtractor(new StackTraceFormatter())
-                        .addAttributesExtractors(additionalExtractors)
-                        .buildInstrumenter();
+        AnrWatcher anrWatcher =
+                new AnrWatcher(
+                        uiHandler,
+                        mainLooper.getThread(),
+                        buildAnrInstrumenter(instrumentedApplication.getOpenTelemetrySdk()));
 
-        AnrWatcher anrWatcher = new AnrWatcher(uiHandler, mainThread, instrumenter);
-
-        AnrDetectorToggle listener = new AnrDetectorToggle(anrWatcher, scheduler);
+        AnrDetectorToggler listener = new AnrDetectorToggler(anrWatcher, scheduler);
         // call it manually the first time to enable the ANR detection
         listener.onApplicationForegrounded();
 
         instrumentedApplication.registerApplicationStateListener(listener);
+    }
+
+    private Instrumenter<StackTraceElement[], Void> buildAnrInstrumenter(
+            OpenTelemetry openTelemetry) {
+        return Instrumenter.<StackTraceElement[], Void>builder(
+                        openTelemetry, "io.opentelemetry.anr", stackTrace -> "ANR")
+                // it's always an error
+                .setSpanStatusExtractor(
+                        (spanStatusBuilder, stackTrace, unused, error) ->
+                                spanStatusBuilder.setStatus(StatusCode.ERROR))
+                .addAttributesExtractor(new StackTraceFormatter())
+                .addAttributesExtractors(additionalExtractors)
+                .buildInstrumenter();
     }
 }

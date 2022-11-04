@@ -28,10 +28,10 @@ public final class AnrDetectorBuilder {
 
     AnrDetectorBuilder() {}
 
-    private final List<AttributesExtractor<StackTraceElement[], Void>> additionalExtractors =
+    final List<AttributesExtractor<StackTraceElement[], Void>> additionalExtractors =
             new ArrayList<>();
-    private Looper mainLooper = Looper.getMainLooper();
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    Looper mainLooper = Looper.getMainLooper();
+    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     /** Adds an {@link AttributesExtractor} that will extract additional attributes. */
     public AnrDetectorBuilder addAttributesExtractor(
@@ -54,6 +54,6 @@ public final class AnrDetectorBuilder {
 
     /** Returns a new {@link AnrDetector} with the settings of this {@link AnrDetectorBuilder}. */
     public AnrDetector build() {
-        return new AnrDetector(additionalExtractors, mainLooper, scheduler);
+        return new AnrDetector(this);
     }
 }

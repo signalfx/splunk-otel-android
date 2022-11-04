@@ -30,8 +30,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -41,8 +39,6 @@ class AnrDetectorTest {
     @Mock Looper mainLooper;
     @Mock ScheduledExecutorService scheduler;
     @Mock InstrumentedApplication instrumentedApplication;
-
-    @Captor ArgumentCaptor<AnrWatcher> anrWatcherCaptor;
 
     @Test
     void shouldInstallInstrumentation() {
@@ -59,10 +55,9 @@ class AnrDetectorTest {
 
         // verify that the ANR scheduler was started
         verify(scheduler)
-                .scheduleAtFixedRate(
-                        anrWatcherCaptor.capture(), eq(1L), eq(1L), eq(TimeUnit.SECONDS));
+                .scheduleAtFixedRate(isA(AnrWatcher.class), eq(1L), eq(1L), eq(TimeUnit.SECONDS));
         // verify that an application listener was installed
         verify(instrumentedApplication)
-                .registerApplicationStateListener(isA(AnrDetectorToggle.class));
+                .registerApplicationStateListener(isA(AnrDetectorToggler.class));
     }
 }

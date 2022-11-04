@@ -30,13 +30,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class AnrDetectorToggleTest {
+class AnrDetectorTogglerTest {
 
     @Mock Runnable anrWatcher;
     @Mock ScheduledExecutorService scheduler;
     @Mock ScheduledFuture<?> future;
 
-    @InjectMocks AnrDetectorToggle underTest;
+    @InjectMocks AnrDetectorToggler underTest;
 
     @Test
     void testOnApplicationForegrounded() {

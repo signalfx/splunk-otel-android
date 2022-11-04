@@ -22,14 +22,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-final class AnrDetectorToggle implements ApplicationStateListener {
+final class AnrDetectorToggler implements ApplicationStateListener {
 
     private final Runnable anrWatcher;
     private final ScheduledExecutorService anrScheduler;
 
     @Nullable private ScheduledFuture<?> future;
 
-    AnrDetectorToggle(Runnable anrWatcher, ScheduledExecutorService anrScheduler) {
+    AnrDetectorToggler(Runnable anrWatcher, ScheduledExecutorService anrScheduler) {
         this.anrWatcher = anrWatcher;
         this.anrScheduler = anrScheduler;
     }
