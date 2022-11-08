@@ -47,6 +47,7 @@ class CrashReporterTest {
     @BeforeAll
     static void setUp() {
         existingHandler = Thread.getDefaultUncaughtExceptionHandler();
+        // disable the handler installed by junit
         Thread.setDefaultUncaughtExceptionHandler(null);
     }
 
