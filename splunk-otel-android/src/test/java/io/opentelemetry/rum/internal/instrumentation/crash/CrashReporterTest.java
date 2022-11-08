@@ -47,6 +47,7 @@ class CrashReporterTest {
     @BeforeAll
     static void setUp() {
         existingHandler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(null);
     }
 
     @AfterAll
