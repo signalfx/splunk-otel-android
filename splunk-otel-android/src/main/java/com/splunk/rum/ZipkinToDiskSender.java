@@ -59,7 +59,7 @@ class ZipkinToDiskSender extends Sender {
 
     @Override
     public Call<Void> sendSpans(List<byte[]> encodedSpans) {
-        if(encodedSpans.isEmpty()){
+        if (encodedSpans.isEmpty()) {
             return Call.create(null);
         }
         if (!storageLimiter.ensureFreeSpace()) {
