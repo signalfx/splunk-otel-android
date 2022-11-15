@@ -55,7 +55,6 @@ public class SampleApplication extends Application {
                                 spanFilter
                                         .removeSpanAttribute(stringKey("http.user_agent"))
                                         .rejectSpansByName(spanName -> spanName.contains("ignored"))
-                                        .rejectSpansByName(name -> !name.equals("nope"))
                                         // sensitive data in the login http.url attribute
                                         // will be redacted before it hits the exporter
                                         .replaceSpanAttribute(
