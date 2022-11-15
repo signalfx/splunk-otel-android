@@ -16,7 +16,7 @@
 
 package com.splunk.rum;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,6 +27,7 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.telephony.TelephonyManager;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -145,6 +146,7 @@ public class PostApi28NetworkDetectorTest {
                 new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertThat(currentNetwork.getCarrierName()).isEqualTo("flib");
+        assertThat(currentNetwork.getNetworkAttributes())
+                .containsEntry(SemanticAttributes.NET_HOST_CARRIER_NAME, "flib");
     }
 }

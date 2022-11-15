@@ -16,25 +16,12 @@
 
 package com.splunk.rum;
 
-import static io.opentelemetry.api.common.AttributeKey.stringKey;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_ICC;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_MCC;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_MNC;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_NAME;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CONNECTION_SUBTYPE;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CONNECTION_TYPE;
-
-import androidx.annotation.Nullable;
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 
 class RumAttributeAppender implements SpanProcessor {
-
-    static final AttributeKey<String> SESSION_ID_KEY = stringKey("splunk.rumSessionId");
 
     private final VisibleScreenTracker visibleScreenTracker;
     private final ConnectionUtil connectionUtil;
@@ -50,22 +37,7 @@ class RumAttributeAppender implements SpanProcessor {
         span.setAttribute(SplunkRum.SCREEN_NAME_KEY, currentScreen);
 
         CurrentNetwork currentNetwork = connectionUtil.getActiveNetwork();
-        appendNetworkAttributes(span, currentNetwork);
-    }
-
-    static void appendNetworkAttributes(Span span, CurrentNetwork currentNetwork) {
-        setIfNotNull(span, NET_HOST_CONNECTION_TYPE, currentNetwork.getState().getHumanName());
-        setIfNotNull(span, NET_HOST_CONNECTION_SUBTYPE, currentNetwork.getSubType());
-        setIfNotNull(span, NET_HOST_CARRIER_NAME, currentNetwork.getCarrierName());
-        setIfNotNull(span, NET_HOST_CARRIER_MCC, currentNetwork.getCarrierCountryCode());
-        setIfNotNull(span, NET_HOST_CARRIER_MNC, currentNetwork.getCarrierNetworkCode());
-        setIfNotNull(span, NET_HOST_CARRIER_ICC, currentNetwork.getCarrierIsoCountryCode());
-    }
-
-    private static void setIfNotNull(Span span, AttributeKey<String> key, @Nullable String value) {
-        if (value != null) {
-            span.setAttribute(key, value);
-        }
+        span.setAllAttributes(currentNetwork.getNetworkAttributes());
     }
 
     @Override

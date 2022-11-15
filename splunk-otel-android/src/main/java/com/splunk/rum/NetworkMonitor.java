@@ -81,7 +81,7 @@ class NetworkMonitor implements ApplicationStateListener {
                                 .startSpan();
                 // put these after span start to override what might be set in the
                 // RumAttributeAppender.
-                RumAttributeAppender.appendNetworkAttributes(available, activeNetwork);
+                available.setAllAttributes(activeNetwork.getNetworkAttributes());
                 available.end();
             }
         }
