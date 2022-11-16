@@ -27,7 +27,9 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 @RunWith(RobolectricTestRunner.class)
-public class CurrentNetworkTest {
+public class CurrentNetworkAttributesExtractorTest {
+
+    final CurrentNetworkAttributesExtractor underTest = new CurrentNetworkAttributesExtractor();
 
     @Config(sdk = Build.VERSION_CODES.P)
     @Test
@@ -45,7 +47,7 @@ public class CurrentNetworkTest {
                                         .build())
                         .build();
 
-        assertThat(currentNetwork.getNetworkAttributes())
+        assertThat(underTest.extract(currentNetwork))
                 .containsOnly(
                         entry(SemanticAttributes.NET_HOST_CONNECTION_TYPE, "cell"),
                         entry(SemanticAttributes.NET_HOST_CONNECTION_SUBTYPE, "aaa"),
@@ -64,7 +66,7 @@ public class CurrentNetworkTest {
                         .carrier(Carrier.builder().id(42).name("ShadyTel").build())
                         .build();
 
-        assertThat(currentNetwork.getNetworkAttributes())
+        assertThat(underTest.extract(currentNetwork))
                 .containsOnly(
                         entry(SemanticAttributes.NET_HOST_CONNECTION_TYPE, "cell"),
                         entry(SemanticAttributes.NET_HOST_CONNECTION_SUBTYPE, "aaa"));

@@ -27,7 +27,6 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -146,7 +145,6 @@ public class PostApi28NetworkDetectorTest {
                 new PostApi28NetworkDetector(
                         connectivityManager, telephonyManager, carrierFinder, context);
         CurrentNetwork currentNetwork = networkDetector.detectCurrentNetwork();
-        assertThat(currentNetwork.getNetworkAttributes())
-                .containsEntry(SemanticAttributes.NET_HOST_CARRIER_NAME, "flib");
+        assertThat(currentNetwork.getCarrierName()).isEqualTo("flib");
     }
 }

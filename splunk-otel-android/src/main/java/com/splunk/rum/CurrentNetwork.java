@@ -16,18 +16,8 @@
 
 package com.splunk.rum;
 
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_ICC;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_MCC;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_MNC;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CARRIER_NAME;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CONNECTION_SUBTYPE;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.NET_HOST_CONNECTION_TYPE;
-
 import android.os.Build;
 import androidx.annotation.Nullable;
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.common.AttributesBuilder;
 import java.util.Objects;
 
 final class CurrentNetwork {
@@ -49,30 +39,22 @@ final class CurrentNetwork {
         return state;
     }
 
-    Attributes getNetworkAttributes() {
-        AttributesBuilder builder =
-                Attributes.builder().put(NET_HOST_CONNECTION_TYPE, state.getHumanName());
-
-        setIfNotNull(builder, NET_HOST_CONNECTION_SUBTYPE, subType);
-        if (haveCarrier()) {
-            setIfNotNull(builder, NET_HOST_CARRIER_NAME, carrier.getName());
-            setIfNotNull(builder, NET_HOST_CARRIER_MCC, carrier.getMobileCountryCode());
-            setIfNotNull(builder, NET_HOST_CARRIER_MNC, carrier.getMobileNetworkCode());
-            setIfNotNull(builder, NET_HOST_CARRIER_ICC, carrier.getIsoCountryCode());
-        }
-
-        return builder.build();
+    @Nullable
+    String getSubType() {
+        return subType;
     }
 
-    private boolean haveCarrier() {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) && (carrier != null);
-    }
-
-    private static void setIfNotNull(
-            AttributesBuilder builder, AttributeKey<String> key, @Nullable String value) {
-        if (value != null) {
-            builder.put(key, value);
-        }
+    @Override
+    public String toString() {
+        return "CurrentNetwork{"
+                + "carrier="
+                + carrier
+                + ", state="
+                + state
+                + ", subType='"
+                + subType
+                + '\''
+                + '}';
     }
 
     @Override
@@ -90,17 +72,32 @@ final class CurrentNetwork {
         return Objects.hash(carrier, state, subType);
     }
 
-    @Override
-    public String toString() {
-        return "CurrentNetwork{"
-                + "carrier="
-                + carrier
-                + ", state="
-                + state
-                + ", subType='"
-                + subType
-                + '\''
-                + '}';
+    @SuppressWarnings("NullAway")
+    @Nullable
+    public String getCarrierCountryCode() {
+        return haveCarrier() ? carrier.getMobileCountryCode() : null;
+    }
+
+    @SuppressWarnings("NullAway")
+    @Nullable
+    public String getCarrierIsoCountryCode() {
+        return haveCarrier() ? carrier.getIsoCountryCode() : null;
+    }
+
+    @SuppressWarnings("NullAway")
+    @Nullable
+    public String getCarrierNetworkCode() {
+        return haveCarrier() ? carrier.getMobileNetworkCode() : null;
+    }
+
+    @SuppressWarnings("NullAway")
+    @Nullable
+    public String getCarrierName() {
+        return haveCarrier() ? carrier.getName() : null;
+    }
+
+    private boolean haveCarrier() {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) && (carrier != null);
     }
 
     static Builder builder(NetworkState state) {

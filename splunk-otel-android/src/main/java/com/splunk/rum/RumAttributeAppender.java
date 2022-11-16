@@ -25,6 +25,8 @@ class RumAttributeAppender implements SpanProcessor {
 
     private final VisibleScreenTracker visibleScreenTracker;
     private final ConnectionUtil connectionUtil;
+    private final CurrentNetworkAttributesExtractor networkAttributesExtractor =
+            new CurrentNetworkAttributesExtractor();
 
     RumAttributeAppender(VisibleScreenTracker visibleScreenTracker, ConnectionUtil connectionUtil) {
         this.visibleScreenTracker = visibleScreenTracker;
@@ -37,7 +39,7 @@ class RumAttributeAppender implements SpanProcessor {
         span.setAttribute(SplunkRum.SCREEN_NAME_KEY, currentScreen);
 
         CurrentNetwork currentNetwork = connectionUtil.getActiveNetwork();
-        span.setAllAttributes(currentNetwork.getNetworkAttributes());
+        span.setAllAttributes(networkAttributesExtractor.extract(currentNetwork));
     }
 
     @Override
