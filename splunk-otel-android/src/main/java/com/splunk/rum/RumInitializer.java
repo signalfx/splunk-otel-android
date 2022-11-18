@@ -116,15 +116,16 @@ class RumInitializer {
                             new RumInitializer.InitializationEvent(
                                     "batchSpanProcessorInitialized", timingClock.now()));
 
-                    RumAttributeAppender attributeAppender =
-                            new RumAttributeAppender(visibleScreenTracker, connectionUtil);
+                    ScreenAttributesAppender screenAttributesAppender =
+                            new ScreenAttributesAppender(visibleScreenTracker);
                     initializationEvents.add(
                             new RumInitializer.InitializationEvent(
                                     "attributeAppenderInitialized", timingClock.now()));
 
                     tracerProviderBuilder
-                            .addSpanProcessor(attributeAppender)
+                            .addSpanProcessor(new NetworkAttributesAppender(connectionUtil))
                             .addSpanProcessor(globalAttributesSpanAppender)
+                            .addSpanProcessor(screenAttributesAppender)
                             .addSpanProcessor(batchSpanProcessor)
                             .setSpanLimits(
                                     SpanLimits.builder()
