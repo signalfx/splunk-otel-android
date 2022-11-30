@@ -95,10 +95,6 @@ class ConnectionUtil {
                 .build();
     }
 
-    boolean isOnline() {
-        return currentNetwork.isOnline();
-    }
-
     CurrentNetwork getActiveNetwork() {
         return currentNetwork;
     }
@@ -107,21 +103,24 @@ class ConnectionUtil {
         listeners.add(listener);
     }
 
+    private void notifyListeners(CurrentNetwork activeNetwork) {
+        for (NetworkChangeListener listener : listeners) {
+            listener.onNetworkChange(activeNetwork);
+        }
+    }
+
     private class ConnectionMonitor extends ConnectivityManager.NetworkCallback {
 
         @Override
         public void onAvailable(@NonNull Network network) {
             CurrentNetwork activeNetwork = refreshNetworkStatus();
-            Log.d(SplunkRum.LOG_TAG, "  onLost: activeNetwork=" + activeNetwork);
+            Log.d(SplunkRum.LOG_TAG, "  onAvailable: activeNetwork=" + activeNetwork);
 
-            for (NetworkChangeListener listener : listeners) {
-                listener.onNetworkChange(activeNetwork);
-            }
+            notifyListeners(activeNetwork);
         }
 
         @Override
         public void onLost(@NonNull Network network) {
-            Log.d(SplunkRum.LOG_TAG, "onLost: ");
             // it seems that the "currentActiveNetwork" is still the one that is being lost, so for
             // this method, we'll force it to be NO_NETWORK, rather than relying on the
             // ConnectivityManager to have the right
@@ -130,9 +129,7 @@ class ConnectionUtil {
             currentNetwork = activeNetwork;
             Log.d(SplunkRum.LOG_TAG, "  onLost: activeNetwork=" + activeNetwork);
 
-            for (NetworkChangeListener listener : listeners) {
-                listener.onNetworkChange(activeNetwork);
-            }
+            notifyListeners(activeNetwork);
         }
     }
 
