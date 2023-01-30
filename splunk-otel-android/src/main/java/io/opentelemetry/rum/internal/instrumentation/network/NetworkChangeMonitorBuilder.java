@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * A builder of {@link NetworkChangeMonitor}.
  *
- * <p>This class is internal and is hence not for public use. Its APIs are unstable and can change
+ * <p>This class is internal and not for public use. Its APIs are unstable and can change
  * at any time.
  */
 public final class NetworkChangeMonitorBuilder {
@@ -42,10 +42,6 @@ public final class NetworkChangeMonitorBuilder {
         return this;
     }
 
-    /**
-     * Returns a new {@link NetworkChangeMonitor} with the settings of this {@link
-     * NetworkChangeMonitorBuilder}.
-     */
     public NetworkChangeMonitor build() {
         return new NetworkChangeMonitor(this);
     }

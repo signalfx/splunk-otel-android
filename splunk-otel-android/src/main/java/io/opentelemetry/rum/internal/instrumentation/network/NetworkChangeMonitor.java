@@ -26,17 +26,15 @@ import java.util.List;
 /**
  * Entrypoint for installing the network change monitoring instrumentation.
  *
- * <p>This class is internal and is hence not for public use. Its APIs are unstable and can change
+ * <p>This class is internal and not for public use. Its APIs are unstable and can change
  * at any time.
  */
 public final class NetworkChangeMonitor {
 
-    /** Returns a new {@link NetworkChangeMonitor} with the default settings. */
     public static NetworkChangeMonitor create(CurrentNetworkProvider currentNetworkProvider) {
         return builder(currentNetworkProvider).build();
     }
 
-    /** Returns a new {@link NetworkChangeMonitorBuilder}. */
     public static NetworkChangeMonitorBuilder builder(
             CurrentNetworkProvider currentNetworkProvider) {
         return new NetworkChangeMonitorBuilder(currentNetworkProvider);
