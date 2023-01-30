@@ -26,8 +26,8 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
  * A {@link SpanProcessor} implementation that appends a set of {@linkplain Attributes attributes}
  * describing the {@linkplain CurrentNetwork current network} to every span that is exported.
  *
- * <p>This class is internal and not for public use. Its APIs are unstable and can change
- * at any time.
+ * <p>This class is internal and not for public use. Its APIs are unstable and can change at any
+ * time.
  */
 public final class NetworkAttributesSpanAppender implements SpanProcessor {
 

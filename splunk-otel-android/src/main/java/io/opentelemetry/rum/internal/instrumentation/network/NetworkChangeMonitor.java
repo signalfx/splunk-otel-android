@@ -26,8 +26,8 @@ import java.util.List;
 /**
  * Entrypoint for installing the network change monitoring instrumentation.
  *
- * <p>This class is internal and not for public use. Its APIs are unstable and can change
- * at any time.
+ * <p>This class is internal and not for public use. Its APIs are unstable and can change at any
+ * time.
  */
 public final class NetworkChangeMonitor {
 
