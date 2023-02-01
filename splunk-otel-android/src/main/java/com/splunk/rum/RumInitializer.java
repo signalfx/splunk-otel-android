@@ -19,7 +19,6 @@ package com.splunk.rum;
 import static com.splunk.rum.SplunkRum.APP_NAME_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_ERROR;
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
-import static com.splunk.rum.SplunkRum.LOG_TAG;
 import static com.splunk.rum.SplunkRum.RUM_VERSION_KEY;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
@@ -33,7 +32,6 @@ import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.SE
 import android.app.Application;
 import android.os.Build;
 import android.os.Looper;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.splunk.android.rum.R;
@@ -50,6 +48,7 @@ import io.opentelemetry.rum.internal.instrumentation.crash.CrashReporter;
 import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.rum.internal.instrumentation.network.NetworkAttributesSpanAppender;
 import io.opentelemetry.rum.internal.instrumentation.network.NetworkChangeMonitor;
+import io.opentelemetry.rum.internal.instrumentation.slowrendering.SlowRenderingDetector;
 import io.opentelemetry.sdk.common.Clock;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
@@ -191,15 +190,19 @@ class RumInitializer {
                     });
         }
 
-        otelRumBuilder.addInstrumentation(
-                instrumentedApplication -> {
-                    SlowRenderingDetector slowRenderingDetector =
-                            buildSlowRenderingDetector(
-                                    instrumentedApplication
-                                            .getOpenTelemetrySdk()
-                                            .getTracer(SplunkRum.RUM_TRACER_NAME));
-                    slowRenderingDetector.start(instrumentedApplication.getApplication());
-                });
+        if (builder.slowRenderingDetectionEnabled) {
+            otelRumBuilder.addInstrumentation(
+                    instrumentedApplication -> {
+                        SlowRenderingDetector.builder()
+                                .setSlowRenderingDetectionPollInterval(
+                                        builder.slowRenderingDetectionPollInterval)
+                                .build()
+                                .installOn(instrumentedApplication);
+                        initializationEvents.add(
+                                new RumInitializer.InitializationEvent(
+                                        "slowRenderingDetectorInitialized", timingClock.now()));
+                    });
+        }
 
         otelRumBuilder.addInstrumentation(
                 instrumentedApplication -> {
@@ -251,23 +254,6 @@ class RumInitializer {
                 openTelemetryRum.getOpenTelemetry().getTracer(SplunkRum.RUM_TRACER_NAME));
 
         return new SplunkRum(openTelemetryRum, globalAttributesSpanAppender);
-    }
-
-    private SlowRenderingDetector buildSlowRenderingDetector(Tracer tracer) {
-        if (!builder.slowRenderingDetectionEnabled) {
-            Log.w(LOG_TAG, "Slow/frozen rendering detection has been disabled by user.");
-            return NoOpSlowRenderingDetector.INSTANCE;
-        }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            Log.w(
-                    LOG_TAG,
-                    "Slow/frozen rendering detection is not supported on platforms older than Android N (SDK version 24).");
-            return NoOpSlowRenderingDetector.INSTANCE;
-        }
-        initializationEvents.add(
-                new RumInitializer.InitializationEvent(
-                        "slowRenderingDetectorInitialized", timingClock.now()));
-        return new SlowRenderingDetectorImpl(tracer, builder.slowRenderingDetectionPollInterval);
     }
 
     private String detectRumVersion() {
