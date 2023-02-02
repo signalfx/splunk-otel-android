@@ -18,6 +18,7 @@ package io.opentelemetry.rum.internal.instrumentation.slowrendering;
 
 import static android.view.FrameMetrics.DRAW_DURATION;
 import static android.view.FrameMetrics.FIRST_DRAW_FRAME;
+import static io.opentelemetry.rum.internal.instrumentation.slowrendering.SlowRenderingDetector.OPEN_TELEMETRY_RUM_LOG_TAG;
 
 import android.app.Activity;
 import android.app.Application;
@@ -189,7 +190,7 @@ class SlowRenderListener implements Application.ActivityLifecycleCallbacks {
         try {
             activities.forEach((activity, listener) -> reportSlow(listener));
         } catch (Exception e) {
-            Log.w("OpenTelemetryRum", "Exception while processing frame metrics", e);
+            Log.w(OPEN_TELEMETRY_RUM_LOG_TAG, "Exception while processing frame metrics", e);
         }
     }
 
@@ -202,12 +203,12 @@ class SlowRenderListener implements Application.ActivityLifecycleCallbacks {
             int count = durationToCountHistogram.get(duration);
             if (duration > FROZEN_THRESHOLD_MS) {
                 Log.d(
-                        "OpenTelemetryRum",
+                        OPEN_TELEMETRY_RUM_LOG_TAG,
                         "* FROZEN RENDER DETECTED: " + duration + " ms." + count + " times");
                 frozenCount += count;
             } else if (duration > SLOW_THRESHOLD_MS) {
                 Log.d(
-                        "OpenTelemetryRum",
+                        OPEN_TELEMETRY_RUM_LOG_TAG,
                         "* Slow render detected: " + duration + " ms. " + count + " times");
                 slowCount += count;
             }

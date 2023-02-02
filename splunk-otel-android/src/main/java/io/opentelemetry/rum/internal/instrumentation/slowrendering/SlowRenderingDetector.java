@@ -29,6 +29,8 @@ import java.time.Duration;
  */
 public final class SlowRenderingDetector {
 
+    static final String OPEN_TELEMETRY_RUM_LOG_TAG = "OpenTelemetryRum";
+
     public static SlowRenderingDetector create() {
         return builder().build();
     }
@@ -50,7 +52,7 @@ public final class SlowRenderingDetector {
     public void installOn(InstrumentedApplication instrumentedApplication) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             Log.w(
-                    "OpenTelemetryRum",
+                    OPEN_TELEMETRY_RUM_LOG_TAG,
                     "Slow/frozen rendering detection is not supported on platforms older than Android N (SDK version 24).");
             return;
         }
