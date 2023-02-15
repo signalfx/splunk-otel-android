@@ -44,6 +44,7 @@ import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
 import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
 import io.opentelemetry.rum.internal.OpenTelemetryRum;
 import io.opentelemetry.rum.internal.OpenTelemetryRumBuilder;
+import io.opentelemetry.rum.internal.instrumentation.activity.RumFragmentActivityRegisterer;
 import io.opentelemetry.rum.internal.instrumentation.anr.AnrDetector;
 import io.opentelemetry.rum.internal.instrumentation.crash.CrashReporter;
 import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
@@ -191,11 +192,11 @@ class RumInitializer {
                     Application.ActivityLifecycleCallbacks screenTrackingBinding;
                     Application.ActivityLifecycleCallbacks fragmentRegisterer;
                     if (Build.VERSION.SDK_INT < 29) {
-                        activityCallbacks = new Pre29ActivityCallbacks(tracers, fragmentLifecycle);
+                        activityCallbacks = new Pre29ActivityCallbacks(tracers);
                         screenTrackingBinding = new Pre29VisibleScreenLifecycleBinding(visibleScreenTracker);
                         fragmentRegisterer = RumFragmentActivityRegisterer.createPre29(fragmentLifecycle);
                     } else {
-                        activityCallbacks = new ActivityCallbacks(tracers, fragmentLifecycle);
+                        activityCallbacks = new ActivityCallbacks(tracers);
                         screenTrackingBinding = new VisibleScreenLifecycleBinding(visibleScreenTracker);
                         fragmentRegisterer = RumFragmentActivityRegisterer.create(fragmentLifecycle);
                     }

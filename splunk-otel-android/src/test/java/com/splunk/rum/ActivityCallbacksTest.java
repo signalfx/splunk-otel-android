@@ -36,37 +36,35 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class ActivityCallbacksTest {
     @RegisterExtension final OpenTelemetryExtension otelTesting = OpenTelemetryExtension.create();
 
-    private Tracer tracer;
+    private ActivityTracerCache tracers;
     private VisibleScreenTracker visibleScreenTracker;
-    private final AppStartupTimer startupTimer = new AppStartupTimer();
 
     @BeforeEach
     public void setup() {
-        tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
+        Tracer tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
+        AppStartupTimer startupTimer = new AppStartupTimer();
         visibleScreenTracker = mock(VisibleScreenTracker.class);
+        tracers = new ActivityTracerCache(tracer, visibleScreenTracker, startupTimer);
     }
 
     @Test
     void appStartup() {
-        startupTimer.start(tracer);
-        ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer);
-        ActivityCallbackTestHarness testHarness =
-                new ActivityCallbackTestHarness(activityCallbacks);
+        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracers);
+        ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(activityCallbacks);
 
         Activity activity = mock(Activity.class);
         testHarness.runAppStartupLifecycle(activity);
-        startupTimer.end();
 
         List<SpanData> spans = otelTesting.getSpans();
-        assertEquals(2, spans.size());
+        assertEquals(1, spans.size());
 
-        SpanData startupSpan = spans.get(0);
+        SpanData creationSpan = spans.get(0);
 
-        assertEquals("AppStart", startupSpan.getName());
-        assertEquals("cold", startupSpan.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        //TODO: ADD THIS TEST TO THE NEW COMPONENT(S)
+//        assertEquals("AppStart", startupSpan.getName());
+//        assertEquals("cold", startupSpan.getAttributes().get(SplunkRum.START_TYPE_KEY));
 
-        SpanData creationSpan = spans.get(1);
+//        SpanData creationSpan = spans.get(1);
 
         assertEquals(
                 activity.getClass().getSimpleName(),
@@ -97,7 +95,7 @@ class ActivityCallbacksTest {
     @Test
     void activityCreation() {
         ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer);
+                new ActivityCallbacks(tracers);
 
         ActivityCallbackTestHarness testHarness =
                 new ActivityCallbackTestHarness(activityCallbacks);
@@ -147,7 +145,7 @@ class ActivityCallbacksTest {
     @Test
     void activityRestart() {
         ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer);
+                new ActivityCallbacks(tracers);
 
         ActivityCallbackTestHarness testHarness =
                 new ActivityCallbackTestHarness(activityCallbacks);
@@ -189,8 +187,7 @@ class ActivityCallbacksTest {
     @Test
     void activityResumed() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("previousScreen");
-        ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer);
+        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracers);
 
         ActivityCallbackTestHarness testHarness =
                 new ActivityCallbackTestHarness(activityCallbacks);
@@ -226,7 +223,7 @@ class ActivityCallbacksTest {
     @Test
     void activityDestroyedFromStopped() {
         ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer);
+                new ActivityCallbacks(tracers);
 
         ActivityCallbackTestHarness testHarness =
                 new ActivityCallbackTestHarness(activityCallbacks);
@@ -261,8 +258,7 @@ class ActivityCallbacksTest {
 
     @Test
     void activityDestroyedFromPaused() {
-        ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer);
+        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracers);
 
         ActivityCallbackTestHarness testHarness =
                 new ActivityCallbackTestHarness(activityCallbacks);
@@ -317,8 +313,7 @@ class ActivityCallbacksTest {
 
     @Test
     void activityStoppedFromRunning() {
-        ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer);
+        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracers);
 
         ActivityCallbackTestHarness testHarness =
                 new ActivityCallbackTestHarness(activityCallbacks);

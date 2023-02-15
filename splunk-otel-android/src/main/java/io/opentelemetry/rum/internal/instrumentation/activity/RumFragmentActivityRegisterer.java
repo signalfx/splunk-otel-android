@@ -1,4 +1,4 @@
-package com.splunk.rum;
+package io.opentelemetry.rum.internal.instrumentation.activity;
 
 import android.app.Activity;
 import android.app.Application;
@@ -13,12 +13,14 @@ import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
 
 /**
  * Registers the RumFragmentLifecycleCallbacks when an activity is created.
+ * There are just 2 factory methods here, one for API level before 29, and
+ * one for the rest.
  */
-class RumFragmentActivityRegisterer {
+public class RumFragmentActivityRegisterer {
 
     private RumFragmentActivityRegisterer(){}
 
-    static Application.ActivityLifecycleCallbacks create(FragmentManager.FragmentLifecycleCallbacks fragmentCallbacks){
+    public static Application.ActivityLifecycleCallbacks create(FragmentManager.FragmentLifecycleCallbacks fragmentCallbacks){
         return new DefaultingActivityLifecycleCallbacks() {
             @Override
             public void onActivityPreCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
@@ -29,7 +31,7 @@ class RumFragmentActivityRegisterer {
         };
     }
 
-    static Application.ActivityLifecycleCallbacks createPre29(FragmentManager.FragmentLifecycleCallbacks fragmentCallbacks){
+    public static Application.ActivityLifecycleCallbacks createPre29(FragmentManager.FragmentLifecycleCallbacks fragmentCallbacks){
         return new DefaultingActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
