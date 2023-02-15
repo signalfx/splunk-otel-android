@@ -21,7 +21,6 @@ import android.app.Application;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import io.opentelemetry.api.trace.Span;
@@ -66,13 +65,12 @@ class AppStartupTimer {
         return appStart;
     }
 
-    /**
-     * Creates a lifecycle listener that starts the UI init when an activity is created.
-     */
-    Application.ActivityLifecycleCallbacks createLifecycleCallback(){
+    /** Creates a lifecycle listener that starts the UI init when an activity is created. */
+    Application.ActivityLifecycleCallbacks createLifecycleCallback() {
         return new DefaultingActivityLifecycleCallbacks() {
             @Override
-            public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+            public void onActivityCreated(
+                    @NonNull Activity activity, @Nullable Bundle savedInstanceState) {
                 startUiInit();
             }
         };

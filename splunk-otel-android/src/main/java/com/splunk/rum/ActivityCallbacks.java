@@ -18,10 +18,8 @@ package com.splunk.rum;
 
 import android.app.Activity;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
 
 class ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
@@ -51,8 +49,7 @@ class ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreStarted(@NonNull Activity activity) {
-        tracers.initiateRestartSpanIfNecessary(activity)
-                .addEvent("activityPreStarted");
+        tracers.initiateRestartSpanIfNecessary(activity).addEvent("activityPreStarted");
     }
 
     @Override
@@ -67,8 +64,7 @@ class ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreResumed(@NonNull Activity activity) {
-        tracers.startSpanIfNoneInProgress(activity, "Resumed")
-                        .addEvent("activityPreResumed");
+        tracers.startSpanIfNoneInProgress(activity, "Resumed").addEvent("activityPreResumed");
     }
 
     @Override
@@ -115,8 +111,7 @@ class ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPreDestroyed(@NonNull Activity activity) {
-        tracers.startSpanIfNoneInProgress(activity, "Destroyed")
-                .addEvent("activityPreDestroyed");
+        tracers.startSpanIfNoneInProgress(activity, "Destroyed").addEvent("activityPreDestroyed");
     }
 
     @Override
@@ -128,5 +123,4 @@ class ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
     public void onActivityPostDestroyed(@NonNull Activity activity) {
         tracers.addEvent(activity, "activityPostDestroyed").endActiveSpan();
     }
-
 }

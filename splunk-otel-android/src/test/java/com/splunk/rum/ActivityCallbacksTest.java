@@ -50,7 +50,8 @@ class ActivityCallbacksTest {
     @Test
     void appStartup() {
         ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracers);
-        ActivityCallbackTestHarness testHarness = new ActivityCallbackTestHarness(activityCallbacks);
+        ActivityCallbackTestHarness testHarness =
+                new ActivityCallbackTestHarness(activityCallbacks);
 
         Activity activity = mock(Activity.class);
         testHarness.runAppStartupLifecycle(activity);
@@ -60,11 +61,11 @@ class ActivityCallbacksTest {
 
         SpanData creationSpan = spans.get(0);
 
-        //TODO: ADD THIS TEST TO THE NEW COMPONENT(S)
-//        assertEquals("AppStart", startupSpan.getName());
-//        assertEquals("cold", startupSpan.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        // TODO: ADD THIS TEST TO THE NEW COMPONENT(S)
+        //        assertEquals("AppStart", startupSpan.getName());
+        //        assertEquals("cold", startupSpan.getAttributes().get(SplunkRum.START_TYPE_KEY));
 
-//        SpanData creationSpan = spans.get(1);
+        //        SpanData creationSpan = spans.get(1);
 
         assertEquals(
                 activity.getClass().getSimpleName(),
@@ -94,8 +95,7 @@ class ActivityCallbacksTest {
 
     @Test
     void activityCreation() {
-        ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracers);
+        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracers);
 
         ActivityCallbackTestHarness testHarness =
                 new ActivityCallbackTestHarness(activityCallbacks);
@@ -144,8 +144,7 @@ class ActivityCallbacksTest {
 
     @Test
     void activityRestart() {
-        ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracers);
+        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracers);
 
         ActivityCallbackTestHarness testHarness =
                 new ActivityCallbackTestHarness(activityCallbacks);
@@ -222,8 +221,7 @@ class ActivityCallbacksTest {
 
     @Test
     void activityDestroyedFromStopped() {
-        ActivityCallbacks activityCallbacks =
-                new ActivityCallbacks(tracers);
+        ActivityCallbacks activityCallbacks = new ActivityCallbacks(tracers);
 
         ActivityCallbackTestHarness testHarness =
                 new ActivityCallbackTestHarness(activityCallbacks);

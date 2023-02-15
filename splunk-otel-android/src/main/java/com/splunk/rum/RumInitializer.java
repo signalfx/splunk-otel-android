@@ -186,33 +186,44 @@ class RumInitializer {
                                     .getOpenTelemetrySdk()
                                     .getTracer(SplunkRum.RUM_TRACER_NAME);
                     Application.ActivityLifecycleCallbacks activityCallbacks;
-                    ActivityTracerCache tracers = new ActivityTracerCache(tracer, visibleScreenTracker, startupTimer);
+                    ActivityTracerCache tracers =
+                            new ActivityTracerCache(tracer, visibleScreenTracker, startupTimer);
 
-                    RumFragmentLifecycleCallbacks fragmentLifecycle = new RumFragmentLifecycleCallbacks(tracer, visibleScreenTracker);
+                    RumFragmentLifecycleCallbacks fragmentLifecycle =
+                            new RumFragmentLifecycleCallbacks(tracer, visibleScreenTracker);
                     Application.ActivityLifecycleCallbacks screenTrackingBinding;
                     Application.ActivityLifecycleCallbacks fragmentRegisterer;
                     if (Build.VERSION.SDK_INT < 29) {
                         activityCallbacks = new Pre29ActivityCallbacks(tracers);
-                        screenTrackingBinding = new Pre29VisibleScreenLifecycleBinding(visibleScreenTracker);
-                        fragmentRegisterer = RumFragmentActivityRegisterer.createPre29(fragmentLifecycle);
+                        screenTrackingBinding =
+                                new Pre29VisibleScreenLifecycleBinding(visibleScreenTracker);
+                        fragmentRegisterer =
+                                RumFragmentActivityRegisterer.createPre29(fragmentLifecycle);
                     } else {
                         activityCallbacks = new ActivityCallbacks(tracers);
-                        screenTrackingBinding = new VisibleScreenLifecycleBinding(visibleScreenTracker);
-                        fragmentRegisterer = RumFragmentActivityRegisterer.create(fragmentLifecycle);
+                        screenTrackingBinding =
+                                new VisibleScreenLifecycleBinding(visibleScreenTracker);
+                        fragmentRegisterer =
+                                RumFragmentActivityRegisterer.create(fragmentLifecycle);
                     }
 
-                    instrumentedApplication.getApplication()
-                            .registerActivityLifecycleCallbacks(startupTimer.createLifecycleCallback());
+                    instrumentedApplication
+                            .getApplication()
+                            .registerActivityLifecycleCallbacks(
+                                    startupTimer.createLifecycleCallback());
 
                     instrumentedApplication
                             .getApplication()
                             .registerActivityLifecycleCallbacks(activityCallbacks);
-                    instrumentedApplication.getApplication().registerActivityLifecycleCallbacks(fragmentRegisterer);
-                    instrumentedApplication.getApplication().registerActivityLifecycleCallbacks(screenTrackingBinding);
+                    instrumentedApplication
+                            .getApplication()
+                            .registerActivityLifecycleCallbacks(fragmentRegisterer);
+                    instrumentedApplication
+                            .getApplication()
+                            .registerActivityLifecycleCallbacks(screenTrackingBinding);
                     initializationEvents.add(
                             new RumInitializer.InitializationEvent(
                                     "activityLifecycleCallbacksInitialized", timingClock.now()));
-
                 });
 
         OpenTelemetryRum openTelemetryRum = otelRumBuilder.build(application);

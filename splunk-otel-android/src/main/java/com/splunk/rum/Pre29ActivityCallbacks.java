@@ -18,12 +18,8 @@ package com.splunk.rum;
 
 import android.app.Activity;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-
 import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
 
 class Pre29ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
@@ -40,8 +36,7 @@ class Pre29ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-        tracers.initiateRestartSpanIfNecessary(activity)
-                .addEvent("activityStarted");
+        tracers.initiateRestartSpanIfNecessary(activity).addEvent("activityStarted");
     }
 
     @Override
@@ -61,7 +56,7 @@ class Pre29ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-        tracers.startSpanIfNoneInProgress(activity,"Stopped")
+        tracers.startSpanIfNoneInProgress(activity, "Stopped")
                 .addEvent("activityStopped")
                 .endActiveSpan();
     }

@@ -45,13 +45,11 @@ class Pre29ActivityLifecycleCallbacksTest {
         Tracer tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
         visibleScreenTracker = mock(VisibleScreenTracker.class);
         tracers = new ActivityTracerCache(tracer, visibleScreenTracker, appStartupTimer);
-
     }
 
     @Test
     void appStartup() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks =
-                new Pre29ActivityCallbacks(tracers);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracers);
         Pre29ActivityCallbackTestHarness testHarness =
                 new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
@@ -63,9 +61,9 @@ class Pre29ActivityLifecycleCallbacksTest {
 
         SpanData creationSpan = spans.get(0);
 
-        //TODO: Add test to relevant components
-//        assertEquals("AppStart", appStartSpan.getName());
-//        assertEquals("cold", appStartSpan.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        // TODO: Add test to relevant components
+        //        assertEquals("AppStart", appStartSpan.getName());
+        //        assertEquals("cold", appStartSpan.getAttributes().get(SplunkRum.START_TYPE_KEY));
 
         assertEquals(
                 activity.getClass().getSimpleName(),
@@ -87,8 +85,7 @@ class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     void activityCreation() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks =
-                new Pre29ActivityCallbacks(tracers);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracers);
         Pre29ActivityCallbackTestHarness testHarness =
                 new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
         startupAppAndClearSpans(testHarness);
@@ -128,8 +125,7 @@ class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     void activityRestart() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks =
-                new Pre29ActivityCallbacks(tracers);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracers);
         Pre29ActivityCallbackTestHarness testHarness =
                 new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
@@ -166,8 +162,7 @@ class Pre29ActivityLifecycleCallbacksTest {
     void activityResumed() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("previousScreen");
 
-        Pre29ActivityCallbacks rumLifecycleCallbacks =
-                new Pre29ActivityCallbacks(tracers);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracers);
         Pre29ActivityCallbackTestHarness testHarness =
                 new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
@@ -199,8 +194,7 @@ class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     void activityDestroyedFromStopped() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks =
-                new Pre29ActivityCallbacks(tracers);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracers);
         Pre29ActivityCallbackTestHarness testHarness =
                 new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
@@ -232,8 +226,7 @@ class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     void activityDestroyedFromPaused() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks =
-                new Pre29ActivityCallbacks(tracers);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracers);
         Pre29ActivityCallbackTestHarness testHarness =
                 new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 
@@ -283,8 +276,7 @@ class Pre29ActivityLifecycleCallbacksTest {
 
     @Test
     void activityStoppedFromRunning() {
-        Pre29ActivityCallbacks rumLifecycleCallbacks =
-                new Pre29ActivityCallbacks(tracers);
+        Pre29ActivityCallbacks rumLifecycleCallbacks = new Pre29ActivityCallbacks(tracers);
         Pre29ActivityCallbackTestHarness testHarness =
                 new Pre29ActivityCallbackTestHarness(rumLifecycleCallbacks);
 

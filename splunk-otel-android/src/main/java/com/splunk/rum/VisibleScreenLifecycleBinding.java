@@ -17,26 +17,18 @@
 package com.splunk.rum;
 
 import android.app.Activity;
-import android.app.Application;
-import android.os.Bundle;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-
 import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
 
 /**
- * An ActivityLifecycleCallbacks that is responsible for telling the VisibleScreenTracker
- * when an activity has been resumed and when an activity has been paused. It's just
- * a glue class.
+ * An ActivityLifecycleCallbacks that is responsible for telling the VisibleScreenTracker when an
+ * activity has been resumed and when an activity has been paused. It's just a glue class.
  */
 class VisibleScreenLifecycleBinding implements DefaultingActivityLifecycleCallbacks {
 
     private final VisibleScreenTracker visibleScreenTracker;
 
-    VisibleScreenLifecycleBinding(VisibleScreenTracker visibleScreenTracker){
+    VisibleScreenLifecycleBinding(VisibleScreenTracker visibleScreenTracker) {
         this.visibleScreenTracker = visibleScreenTracker;
     }
 
@@ -49,5 +41,4 @@ class VisibleScreenLifecycleBinding implements DefaultingActivityLifecycleCallba
     public void onActivityPrePaused(@NonNull Activity activity) {
         visibleScreenTracker.activityPaused(activity);
     }
-
 }

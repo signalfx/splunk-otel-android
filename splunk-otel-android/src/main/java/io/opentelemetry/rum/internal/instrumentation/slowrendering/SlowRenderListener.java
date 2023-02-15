@@ -21,9 +21,7 @@ import static android.view.FrameMetrics.FIRST_DRAW_FRAME;
 import static io.opentelemetry.rum.internal.instrumentation.slowrendering.SlowRenderingDetector.OPEN_TELEMETRY_RUM_LOG_TAG;
 
 import android.app.Activity;
-import android.app.Application;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -33,12 +31,10 @@ import android.view.FrameMetrics;
 import android.view.Window;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
