@@ -21,33 +21,21 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 
 import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
 
 class ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
 
     private final ActivityTracerCache tracers;
-    private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycle;
 
-    ActivityCallbacks(
-            ActivityTracerCache tracers,
-            FragmentManager.FragmentLifecycleCallbacks fragmentLifecycle) {
+    ActivityCallbacks(ActivityTracerCache tracers) {
         this.tracers = tracers;
-        this.fragmentLifecycle = fragmentLifecycle;
     }
 
     @Override
     public void onActivityPreCreated(
             @NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         tracers.startActivityCreation(activity).addEvent("activityPreCreated");
-
-        if (activity instanceof FragmentActivity) {
-            FragmentManager fragmentManager =
-                    ((FragmentActivity) activity).getSupportFragmentManager();
-            fragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycle, true);
-        }
     }
 
     @Override

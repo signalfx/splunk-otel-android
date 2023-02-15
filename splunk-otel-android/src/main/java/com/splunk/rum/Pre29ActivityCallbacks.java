@@ -28,23 +28,14 @@ import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
 
 class Pre29ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
     private final ActivityTracerCache tracers;
-    private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycle;
 
-    Pre29ActivityCallbacks(
-            ActivityTracerCache tracers,
-            FragmentManager.FragmentLifecycleCallbacks fragmentLifecycle) {
+    Pre29ActivityCallbacks(ActivityTracerCache tracers) {
         this.tracers = tracers;
-        this.fragmentLifecycle = fragmentLifecycle;
     }
 
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         tracers.startActivityCreation(activity).addEvent("activityCreated");
-
-        if (activity instanceof FragmentActivity) {
-            FragmentManager fragmentManager = ((FragmentActivity) activity).getSupportFragmentManager();
-            fragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycle, true);
-        }
     }
 
     @Override

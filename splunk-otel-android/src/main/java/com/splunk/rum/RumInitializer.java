@@ -189,12 +189,15 @@ class RumInitializer {
 
                     RumFragmentLifecycleCallbacks fragmentLifecycle = new RumFragmentLifecycleCallbacks(tracer, visibleScreenTracker);
                     Application.ActivityLifecycleCallbacks screenTrackingBinding;
+                    Application.ActivityLifecycleCallbacks fragmentRegisterer;
                     if (Build.VERSION.SDK_INT < 29) {
                         activityCallbacks = new Pre29ActivityCallbacks(tracers, fragmentLifecycle);
                         screenTrackingBinding = new Pre29VisibleScreenLifecycleBinding(visibleScreenTracker);
+                        fragmentRegisterer = RumFragmentActivityRegisterer.createPre29(fragmentLifecycle);
                     } else {
                         activityCallbacks = new ActivityCallbacks(tracers, fragmentLifecycle);
                         screenTrackingBinding = new VisibleScreenLifecycleBinding(visibleScreenTracker);
+                        fragmentRegisterer = RumFragmentActivityRegisterer.create(fragmentLifecycle);
                     }
 
                     instrumentedApplication.getApplication()
@@ -203,6 +206,7 @@ class RumInitializer {
                     instrumentedApplication
                             .getApplication()
                             .registerActivityLifecycleCallbacks(activityCallbacks);
+                    instrumentedApplication.getApplication().registerActivityLifecycleCallbacks(fragmentRegisterer);
                     instrumentedApplication.getApplication().registerActivityLifecycleCallbacks(screenTrackingBinding);
                     initializationEvents.add(
                             new RumInitializer.InitializationEvent(
