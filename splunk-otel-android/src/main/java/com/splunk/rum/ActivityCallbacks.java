@@ -30,15 +30,12 @@ class ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
 
     private final ActivityTracerCache tracers;
     private final RumFragmentLifecycleCallbacks fragmentLifecycle;
-    private final AppStartupTimer startupTimer;
 
     ActivityCallbacks(
             ActivityTracerCache tracers,
-            RumFragmentLifecycleCallbacks fragmentLifecycle,
-            AppStartupTimer startupTimer) {
+            RumFragmentLifecycleCallbacks fragmentLifecycle) {
         this.tracers = tracers;
         this.fragmentLifecycle = fragmentLifecycle;
-        this.startupTimer = startupTimer;
     }
 
     @Override
@@ -55,7 +52,6 @@ class ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
 
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        startupTimer.startUiInit();
         tracers.addEvent(activity, "activityCreated");
     }
 
