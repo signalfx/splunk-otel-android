@@ -185,20 +185,26 @@ class RumInitializer {
                                     .getOpenTelemetrySdk()
                                     .getTracer(SplunkRum.RUM_TRACER_NAME);
                     Application.ActivityLifecycleCallbacks activityCallbacks;
+                    ActivityTracerCache tracers = new ActivityTracerCache(tracer, visibleScreenTracker, startupTimer);
+
+                    RumFragmentLifecycleCallbacks fragmentLifecycle = new RumFragmentLifecycleCallbacks(tracer, visibleScreenTracker);
+                    Application.ActivityLifecycleCallbacks screenTrackingBinding;
                     if (Build.VERSION.SDK_INT < 29) {
-                        activityCallbacks =
-                                new Pre29ActivityCallbacks(
-                                        tracer, visibleScreenTracker, startupTimer);
+                        activityCallbacks = new Pre29ActivityCallbacks(tracers, fragmentLifecycle, startupTimer);
+                        screenTrackingBinding = new Pre29VisibleScreenLifecycleBinding(visibleScreenTracker);
                     } else {
-                        activityCallbacks =
-                                new ActivityCallbacks(tracer, visibleScreenTracker, startupTimer);
+                        activityCallbacks = new ActivityCallbacks(tracers, fragmentLifecycle, startupTimer);
+                        screenTrackingBinding = new VisibleScreenLifecycleBinding(visibleScreenTracker);
                     }
+
                     instrumentedApplication
                             .getApplication()
                             .registerActivityLifecycleCallbacks(activityCallbacks);
+                    instrumentedApplication.getApplication().registerActivityLifecycleCallbacks(screenTrackingBinding);
                     initializationEvents.add(
                             new RumInitializer.InitializationEvent(
                                     "activityLifecycleCallbacksInitialized", timingClock.now()));
+
                 });
 
         OpenTelemetryRum openTelemetryRum = otelRumBuilder.build(application);

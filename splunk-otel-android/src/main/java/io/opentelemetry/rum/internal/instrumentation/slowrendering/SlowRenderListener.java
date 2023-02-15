@@ -37,6 +37,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +48,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-class SlowRenderListener implements Application.ActivityLifecycleCallbacks {
+class SlowRenderListener implements DefaultingActivityLifecycleCallbacks {
 
     static final int SLOW_THRESHOLD_MS = 16;
     static final int FROZEN_THRESHOLD_MS = 700;
@@ -106,13 +108,6 @@ class SlowRenderListener implements Application.ActivityLifecycleCallbacks {
     }
 
     @Override
-    public void onActivityCreated(
-            @NonNull Activity activity, @Nullable Bundle savedInstanceState) {}
-
-    @Override
-    public void onActivityStarted(@NonNull Activity activity) {}
-
-    @Override
     public void onActivityResumed(@NonNull Activity activity) {
         PerActivityListener listener = new PerActivityListener(activity);
         PerActivityListener existing = activities.putIfAbsent(activity, listener);
@@ -129,15 +124,6 @@ class SlowRenderListener implements Application.ActivityLifecycleCallbacks {
             reportSlow(listener);
         }
     }
-
-    @Override
-    public void onActivityStopped(@NonNull Activity activity) {}
-
-    @Override
-    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}
-
-    @Override
-    public void onActivityDestroyed(@NonNull Activity activity) {}
 
     static class PerActivityListener implements Window.OnFrameMetricsAvailableListener {
 
