@@ -28,11 +28,11 @@ import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
 
 class Pre29ActivityCallbacks implements DefaultingActivityLifecycleCallbacks {
     private final ActivityTracerCache tracers;
-    private final RumFragmentLifecycleCallbacks fragmentLifecycle;
+    private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycle;
 
     Pre29ActivityCallbacks(
             ActivityTracerCache tracers,
-            RumFragmentLifecycleCallbacks fragmentLifecycle) {
+            FragmentManager.FragmentLifecycleCallbacks fragmentLifecycle) {
         this.tracers = tracers;
         this.fragmentLifecycle = fragmentLifecycle;
     }
