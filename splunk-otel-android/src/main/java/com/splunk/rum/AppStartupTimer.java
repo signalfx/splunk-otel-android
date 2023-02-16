@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
+import io.opentelemetry.rum.internal.util.AnchoredClock;
 import io.opentelemetry.sdk.common.Clock;
 import java.util.concurrent.TimeUnit;
 
@@ -36,8 +37,8 @@ class AppStartupTimer {
     private static final long MAX_TIME_TO_UI_INIT = TimeUnit.MINUTES.toNanos(1);
 
     // exposed so it can be used for the rest of the startup sequence timing.
-    final RumInitializer.AnchoredClock startupClock =
-            RumInitializer.AnchoredClock.create(Clock.getDefault());
+    final AnchoredClock startupClock =
+            AnchoredClock.create(Clock.getDefault());
     private final long firstPossibleTimestamp = startupClock.now();
     @Nullable private volatile Span overallAppStartSpan = null;
     @Nullable private volatile Runnable completionCallback = null;

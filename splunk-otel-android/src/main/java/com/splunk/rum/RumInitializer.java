@@ -53,7 +53,7 @@ import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvi
 import io.opentelemetry.rum.internal.instrumentation.network.NetworkAttributesSpanAppender;
 import io.opentelemetry.rum.internal.instrumentation.network.NetworkChangeMonitor;
 import io.opentelemetry.rum.internal.instrumentation.slowrendering.SlowRenderingDetector;
-import io.opentelemetry.sdk.common.Clock;
+import io.opentelemetry.rum.internal.util.AnchoredClock;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
@@ -510,28 +510,6 @@ class RumInitializer {
         private InitializationEvent(String name, long time) {
             this.name = name;
             this.time = time;
-        }
-    }
-
-    // copied from otel-java
-    static final class AnchoredClock {
-        private final Clock clock;
-        private final long epochNanos;
-        private final long nanoTime;
-
-        private AnchoredClock(Clock clock, long epochNanos, long nanoTime) {
-            this.clock = clock;
-            this.epochNanos = epochNanos;
-            this.nanoTime = nanoTime;
-        }
-
-        public static AnchoredClock create(Clock clock) {
-            return new AnchoredClock(clock, clock.now(), clock.nanoTime());
-        }
-
-        long now() {
-            long deltaNanos = this.clock.nanoTime() - this.nanoTime;
-            return this.epochNanos + deltaNanos;
         }
     }
 
