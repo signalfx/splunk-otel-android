@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>We have to treat DialogFragments slightly differently since they don't replace the launching
  * screen, and the launching screen never leaves visibility.
  */
-public class VisibleScreenTracker {
+class VisibleScreenTracker {
     private final AtomicReference<String> lastResumedActivity = new AtomicReference<>();
     private final AtomicReference<String> previouslyLastResumedActivity = new AtomicReference<>();
     private final AtomicReference<String> lastResumedFragment = new AtomicReference<>();

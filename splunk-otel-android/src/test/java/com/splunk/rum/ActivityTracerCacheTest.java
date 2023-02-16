@@ -73,7 +73,7 @@ class ActivityTracerCacheTest {
         verify(activityTracer).addEvent("beep1");
         verify(activityTracer).addEvent("beep2");
         verify(activityTracer).addEvent("beep3");
-        verifyNoMoreInteractions(tracerCreator);
+        verify(tracerCreator).apply(activity);
     }
 
     @Test

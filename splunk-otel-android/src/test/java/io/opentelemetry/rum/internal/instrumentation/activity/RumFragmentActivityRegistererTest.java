@@ -18,7 +18,6 @@ package io.opentelemetry.rum.internal.instrumentation.activity;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.app.Activity;
@@ -52,13 +51,11 @@ class RumFragmentActivityRegistererTest {
     @Test
     void callbackIgnoresNonFragmentActivity() {
         Activity activity = mock(Activity.class);
-        FragmentManager manager = mock(FragmentManager.class);
 
         Application.ActivityLifecycleCallbacks underTest =
                 RumFragmentActivityRegisterer.create(fragmentCallbacks);
 
         underTest.onActivityPreCreated(activity, null);
-        verifyNoInteractions(manager);
     }
 
     @Test
@@ -78,12 +75,10 @@ class RumFragmentActivityRegistererTest {
     @Test
     void pre29CallbackIgnoresNonFragmentActivity() {
         Activity activity = mock(Activity.class);
-        FragmentManager manager = mock(FragmentManager.class);
 
         Application.ActivityLifecycleCallbacks underTest =
                 RumFragmentActivityRegisterer.createPre29(fragmentCallbacks);
 
         underTest.onActivityCreated(activity, null);
-        verifyNoInteractions(manager);
     }
 }

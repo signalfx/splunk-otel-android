@@ -28,7 +28,7 @@ import java.util.function.Function;
  * Encapsulates the fact that we have an ActivityTracer instance per Activity class, and provides
  * convenience methods for adding events and starting spans.
  */
-public class ActivityTracerCache {
+class ActivityTracerCache {
 
     private final Map<String, ActivityTracer> tracersByActivityClassName = new HashMap<>();
 
@@ -62,20 +62,20 @@ public class ActivityTracerCache {
         this.tracerFactory = tracerFactory;
     }
 
-    public ActivityTracer addEvent(Activity activity, String eventName) {
+    ActivityTracer addEvent(Activity activity, String eventName) {
         return getTracer(activity).addEvent(eventName);
     }
 
-    public ActivityTracer startSpanIfNoneInProgress(Activity activity, String spanName) {
+    ActivityTracer startSpanIfNoneInProgress(Activity activity, String spanName) {
         return getTracer(activity).startSpanIfNoneInProgress(spanName);
     }
 
-    public ActivityTracer initiateRestartSpanIfNecessary(Activity activity) {
+    ActivityTracer initiateRestartSpanIfNecessary(Activity activity) {
         boolean isMultiActivityApp = tracersByActivityClassName.size() > 1;
         return getTracer(activity).initiateRestartSpanIfNecessary(isMultiActivityApp);
     }
 
-    public ActivityTracer startActivityCreation(Activity activity) {
+    ActivityTracer startActivityCreation(Activity activity) {
         return getTracer(activity).startActivityCreation();
     }
 

@@ -45,5 +45,6 @@ class Pre29VisibleScreenLifecycleBindingTest {
                 new Pre29VisibleScreenLifecycleBinding(tracker);
         underTest.onActivityPaused(activity);
         verify(tracker).activityPaused(activity);
+        verifyNoMoreInteractions(tracker);
     }
 }
