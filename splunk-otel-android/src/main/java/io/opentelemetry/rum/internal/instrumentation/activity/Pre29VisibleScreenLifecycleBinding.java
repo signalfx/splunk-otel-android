@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum;
+package io.opentelemetry.rum.internal.instrumentation.activity;
 
 import android.app.Activity;
 import androidx.annotation.NonNull;
@@ -26,11 +26,11 @@ import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTrack
  * activity has been resumed and when an activity has been paused. It's just a glue class designed
  * for API level < 29.
  */
-class Pre29VisibleScreenLifecycleBinding implements DefaultingActivityLifecycleCallbacks {
+public class Pre29VisibleScreenLifecycleBinding implements DefaultingActivityLifecycleCallbacks {
 
     private final VisibleScreenTracker visibleScreenTracker;
 
-    Pre29VisibleScreenLifecycleBinding(VisibleScreenTracker visibleScreenTracker) {
+    public Pre29VisibleScreenLifecycleBinding(VisibleScreenTracker visibleScreenTracker) {
         this.visibleScreenTracker = visibleScreenTracker;
     }
 

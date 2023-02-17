@@ -50,6 +50,7 @@ import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
 import io.opentelemetry.rum.internal.instrumentation.activity.ActivityCallbacks;
 import io.opentelemetry.rum.internal.instrumentation.activity.ActivityTracerCache;
 import io.opentelemetry.rum.internal.instrumentation.activity.Pre29ActivityCallbacks;
+import io.opentelemetry.rum.internal.instrumentation.activity.Pre29VisibleScreenLifecycleBinding;
 import io.opentelemetry.rum.internal.instrumentation.activity.RumFragmentActivityRegisterer;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenLifecycleBinding;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
