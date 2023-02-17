@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.splunk.rum;
+package io.opentelemetry.rum.internal.instrumentation.fragment;
 
 import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_UI;
 import static io.opentelemetry.rum.internal.RumConstants.SCREEN_NAME_KEY;
 
 import androidx.fragment.app.Fragment;
+
+import com.splunk.rum.RumScreenName;
+
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
