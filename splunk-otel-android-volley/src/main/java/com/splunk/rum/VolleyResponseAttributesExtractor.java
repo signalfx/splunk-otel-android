@@ -18,7 +18,6 @@ package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.LINK_SPAN_ID_KEY;
 import static com.splunk.rum.SplunkRum.LINK_TRACE_ID_KEY;
-
 import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 
 import androidx.annotation.Nullable;

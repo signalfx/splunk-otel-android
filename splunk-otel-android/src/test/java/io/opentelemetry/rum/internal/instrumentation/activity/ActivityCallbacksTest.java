@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.splunk.rum;
+package io.opentelemetry.rum.internal.instrumentation.activity;
 
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_APPSTART;
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_UI;
+import static io.opentelemetry.rum.internal.RumConstants.LAST_SCREEN_NAME_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.SCREEN_NAME_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.START_TYPE_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -73,10 +79,9 @@ class ActivityCallbacksTest {
                 creationSpan.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(),
-                creationSpan.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
-        assertEquals(
-                SplunkRum.COMPONENT_UI, creationSpan.getAttributes().get(SplunkRum.COMPONENT_KEY));
-        assertNull(creationSpan.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+                creationSpan.getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals(COMPONENT_UI, creationSpan.getAttributes().get(COMPONENT_KEY));
+        assertNull(creationSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = creationSpan.getEvents();
         assertEquals(9, events.size());
@@ -110,16 +115,14 @@ class ActivityCallbacksTest {
         SpanData span = spans.get(0);
 
         assertEquals("AppStart", span.getName());
-        assertEquals("warm", span.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        assertEquals("warm", span.getAttributes().get(START_TYPE_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(),
                 span.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
-                activity.getClass().getSimpleName(),
-                span.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
-        assertEquals(
-                SplunkRum.COMPONENT_APPSTART, span.getAttributes().get(SplunkRum.COMPONENT_KEY));
-        assertNull(span.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+                activity.getClass().getSimpleName(), span.getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals(COMPONENT_APPSTART, span.getAttributes().get(COMPONENT_KEY));
+        assertNull(span.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = span.getEvents();
         assertEquals(9, events.size());
@@ -161,16 +164,14 @@ class ActivityCallbacksTest {
         SpanData span = spans.get(0);
 
         assertEquals("AppStart", span.getName());
-        assertEquals("hot", span.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        assertEquals("hot", span.getAttributes().get(START_TYPE_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(),
                 span.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
-                activity.getClass().getSimpleName(),
-                span.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
-        assertEquals(
-                SplunkRum.COMPONENT_APPSTART, span.getAttributes().get(SplunkRum.COMPONENT_KEY));
-        assertNull(span.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+                activity.getClass().getSimpleName(), span.getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals(COMPONENT_APPSTART, span.getAttributes().get(COMPONENT_KEY));
+        assertNull(span.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = span.getEvents();
         assertEquals(6, events.size());
@@ -207,10 +208,9 @@ class ActivityCallbacksTest {
                 activity.getClass().getSimpleName(),
                 span.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
-                activity.getClass().getSimpleName(),
-                span.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
-        assertEquals(SplunkRum.COMPONENT_UI, span.getAttributes().get(SplunkRum.COMPONENT_KEY));
-        assertEquals("previousScreen", span.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+                activity.getClass().getSimpleName(), span.getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals(COMPONENT_UI, span.getAttributes().get(COMPONENT_KEY));
+        assertEquals("previousScreen", span.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = span.getEvents();
         assertEquals(3, events.size());
@@ -242,10 +242,9 @@ class ActivityCallbacksTest {
                 activity.getClass().getSimpleName(),
                 span.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
-                activity.getClass().getSimpleName(),
-                span.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
-        assertEquals(SplunkRum.COMPONENT_UI, span.getAttributes().get(SplunkRum.COMPONENT_KEY));
-        assertNull(span.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+                activity.getClass().getSimpleName(), span.getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals(COMPONENT_UI, span.getAttributes().get(COMPONENT_KEY));
+        assertNull(span.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = span.getEvents();
         assertEquals(3, events.size());
@@ -278,10 +277,9 @@ class ActivityCallbacksTest {
                 stoppedSpan.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(),
-                stoppedSpan.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
-        assertEquals(
-                SplunkRum.COMPONENT_UI, stoppedSpan.getAttributes().get(SplunkRum.COMPONENT_KEY));
-        assertNull(stoppedSpan.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+                stoppedSpan.getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals(COMPONENT_UI, stoppedSpan.getAttributes().get(COMPONENT_KEY));
+        assertNull(stoppedSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = stoppedSpan.getEvents();
         assertEquals(3, events.size());
@@ -298,9 +296,9 @@ class ActivityCallbacksTest {
                 destroyedSpan.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(),
-                destroyedSpan.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
-        assertEquals("ui", destroyedSpan.getAttributes().get(SplunkRum.COMPONENT_KEY));
-        assertNull(destroyedSpan.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+                destroyedSpan.getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals("ui", destroyedSpan.getAttributes().get(COMPONENT_KEY));
+        assertNull(destroyedSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         events = destroyedSpan.getEvents();
         assertEquals(3, events.size());
@@ -333,10 +331,9 @@ class ActivityCallbacksTest {
                 stoppedSpan.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(),
-                stoppedSpan.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
-        assertEquals(
-                SplunkRum.COMPONENT_UI, stoppedSpan.getAttributes().get(SplunkRum.COMPONENT_KEY));
-        assertNull(stoppedSpan.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+                stoppedSpan.getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals(COMPONENT_UI, stoppedSpan.getAttributes().get(COMPONENT_KEY));
+        assertNull(stoppedSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = stoppedSpan.getEvents();
         assertEquals(3, events.size());
@@ -353,9 +350,9 @@ class ActivityCallbacksTest {
                 destroyedSpan.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(),
-                destroyedSpan.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
-        assertEquals("ui", destroyedSpan.getAttributes().get(SplunkRum.COMPONENT_KEY));
-        assertNull(destroyedSpan.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+                destroyedSpan.getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals("ui", destroyedSpan.getAttributes().get(COMPONENT_KEY));
+        assertNull(destroyedSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         events = destroyedSpan.getEvents();
         assertEquals(3, events.size());

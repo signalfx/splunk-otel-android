@@ -18,11 +18,14 @@ package com.splunk.rum;
 
 import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_UI;
+import static io.opentelemetry.rum.internal.RumConstants.SCREEN_NAME_KEY;
 
 import androidx.fragment.app.Fragment;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.ActiveSpan;
+import java.util.function.Supplier;
 
 class FragmentTracer {
     static final AttributeKey<String> FRAGMENT_NAME_KEY = AttributeKey.stringKey("fragmentName");
@@ -32,12 +35,13 @@ class FragmentTracer {
     private final Tracer tracer;
     private final ActiveSpan activeSpan;
 
-    FragmentTracer(Fragment fragment, Tracer tracer, VisibleScreenTracker visibleScreenTracker) {
+    FragmentTracer(Fragment fragment, Tracer tracer, Supplier<String> previouslyVisibleScreen) {
         this.tracer = tracer;
         this.fragmentName = fragment.getClass().getSimpleName();
         RumScreenName rumScreenName = fragment.getClass().getAnnotation(RumScreenName.class);
         this.screenName = rumScreenName == null ? fragmentName : rumScreenName.value();
-        this.activeSpan = new ActiveSpan(visibleScreenTracker);
+        // TODO: FIXME VIOLATES DEPENDENCY INJECTION
+        this.activeSpan = new ActiveSpan(previouslyVisibleScreen);
     }
 
     FragmentTracer startSpanIfNoneInProgress(String action) {
@@ -61,7 +65,7 @@ class FragmentTracer {
                         .startSpan();
         // do this after the span is started, so we can override the default screen.name set by the
         // RumAttributeAppender.
-        span.setAttribute(SplunkRum.SCREEN_NAME_KEY, screenName);
+        span.setAttribute(SCREEN_NAME_KEY, screenName);
         return span;
     }
 

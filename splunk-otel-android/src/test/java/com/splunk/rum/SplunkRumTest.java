@@ -18,6 +18,7 @@ package com.splunk.rum;
 
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -193,7 +194,7 @@ public class SplunkRumTest {
                 .hasName("NullPointerException")
                 .hasAttributes(
                         attributes.toBuilder()
-                                .put(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_ERROR)
+                                .put(COMPONENT_KEY, SplunkRum.COMPONENT_ERROR)
                                 .build())
                 .hasException(exception);
     }

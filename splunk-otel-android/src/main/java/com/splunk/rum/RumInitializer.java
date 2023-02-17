@@ -47,7 +47,12 @@ import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
 import io.opentelemetry.rum.internal.OpenTelemetryRum;
 import io.opentelemetry.rum.internal.OpenTelemetryRumBuilder;
 import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
+import io.opentelemetry.rum.internal.instrumentation.activity.ActivityCallbacks;
+import io.opentelemetry.rum.internal.instrumentation.activity.ActivityTracerCache;
+import io.opentelemetry.rum.internal.instrumentation.activity.Pre29ActivityCallbacks;
 import io.opentelemetry.rum.internal.instrumentation.activity.RumFragmentActivityRegisterer;
+import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenLifecycleBinding;
+import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.rum.internal.instrumentation.anr.AnrDetector;
 import io.opentelemetry.rum.internal.instrumentation.crash.CrashReporter;
 import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
@@ -55,7 +60,6 @@ import io.opentelemetry.rum.internal.instrumentation.network.NetworkAttributesSp
 import io.opentelemetry.rum.internal.instrumentation.network.NetworkChangeMonitor;
 import io.opentelemetry.rum.internal.instrumentation.slowrendering.SlowRenderingDetector;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
-import io.opentelemetry.rum.internal.util.AnchoredClock;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
@@ -105,7 +109,8 @@ class RumInitializer {
 
         otelRumBuilder.setResource(createResource());
         initializationEvents.add(
-                new RumInitializer.InitializationEvent("resourceInitialized", startupTimer.clockNow()));
+                new RumInitializer.InitializationEvent(
+                        "resourceInitialized", startupTimer.clockNow()));
 
         CurrentNetworkProvider currentNetworkProvider =
                 currentNetworkProviderFactory.apply(application);
@@ -206,7 +211,8 @@ class RumInitializer {
                 instrumentedApp -> {
                     initializationEvents.add(
                             new InitializationEvent(
-                                    "activityLifecycleCallbacksInitialized", startupTimer.clockNow()));
+                                    "activityLifecycleCallbacksInitialized",
+                                    startupTimer.clockNow()));
                 });
     }
 
@@ -333,7 +339,8 @@ class RumInitializer {
                             .installOn(instrumentedApplication);
 
                     initializationEvents.add(
-                            new InitializationEvent("anrMonitorInitialized", startupTimer.clockNow()));
+                            new InitializationEvent(
+                                    "anrMonitorInitialized", startupTimer.clockNow()));
                 });
     }
 

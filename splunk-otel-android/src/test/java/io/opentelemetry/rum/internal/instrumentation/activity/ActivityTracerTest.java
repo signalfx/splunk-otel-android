@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.splunk.rum;
+package io.opentelemetry.rum.internal.instrumentation.activity;
 
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_APPSTART;
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.LAST_SCREEN_NAME_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.SCREEN_NAME_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.START_TYPE_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.app.Activity;
+import com.splunk.rum.RumScreenName;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
@@ -51,13 +57,13 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("FirstActivity"),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
         trackableTracer.initiateRestartSpanIfNecessary(false);
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("Restarted", span.getName());
-        assertNull(span.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        assertNull(span.getAttributes().get(START_TYPE_KEY));
     }
 
     @Test
@@ -67,15 +73,14 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("Activity"),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
         trackableTracer.initiateRestartSpanIfNecessary(false);
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("AppStart", span.getName());
-        assertEquals("hot", span.getAttributes().get(SplunkRum.START_TYPE_KEY));
-        assertEquals(
-                SplunkRum.COMPONENT_APPSTART, span.getAttributes().get(SplunkRum.COMPONENT_KEY));
+        assertEquals("hot", span.getAttributes().get(START_TYPE_KEY));
+        assertEquals(COMPONENT_APPSTART, span.getAttributes().get(COMPONENT_KEY));
     }
 
     @Test
@@ -85,13 +90,13 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("Activity"),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
         trackableTracer.initiateRestartSpanIfNecessary(true);
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("Restarted", span.getName());
-        assertNull(span.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        assertNull(span.getAttributes().get(START_TYPE_KEY));
     }
 
     @Test
@@ -101,13 +106,13 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("FirstActivity"),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
         trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("Created", span.getName());
-        assertNull(span.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        assertNull(span.getAttributes().get(START_TYPE_KEY));
     }
 
     @Test
@@ -117,15 +122,14 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("Activity"),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
         trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
         assertEquals("AppStart", span.getName());
-        assertEquals("warm", span.getAttributes().get(SplunkRum.START_TYPE_KEY));
-        assertEquals(
-                SplunkRum.COMPONENT_APPSTART, span.getAttributes().get(SplunkRum.COMPONENT_KEY));
+        assertEquals("warm", span.getAttributes().get(START_TYPE_KEY));
+        assertEquals(COMPONENT_APPSTART, span.getAttributes().get(COMPONENT_KEY));
     }
 
     @Test
@@ -136,7 +140,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
         trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
@@ -147,7 +151,7 @@ public class ActivityTracerTest {
 
         SpanData appStartSpan = spans.get(0);
         assertEquals("AppStart", appStartSpan.getName());
-        assertEquals("cold", appStartSpan.getAttributes().get(SplunkRum.START_TYPE_KEY));
+        assertEquals("cold", appStartSpan.getAttributes().get(START_TYPE_KEY));
 
         SpanData innerSpan = spans.get(1);
         assertEquals("Created", innerSpan.getName());
@@ -162,7 +166,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
 
         trackableTracer.startSpanIfNoneInProgress("starting");
@@ -170,7 +174,7 @@ public class ActivityTracerTest {
         trackableTracer.endActiveSpan();
 
         SpanData span = getSingleSpan();
-        assertNull(span.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+        assertNull(span.getAttributes().get(LAST_SCREEN_NAME_KEY));
     }
 
     @Test
@@ -183,7 +187,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
 
         trackableTracer.startSpanIfNoneInProgress("starting");
@@ -191,7 +195,7 @@ public class ActivityTracerTest {
         trackableTracer.endActiveSpan();
 
         SpanData span = getSingleSpan();
-        assertNull(span.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+        assertNull(span.getAttributes().get(LAST_SCREEN_NAME_KEY));
     }
 
     @Test
@@ -203,7 +207,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
 
         trackableTracer.startSpanIfNoneInProgress("starting");
@@ -211,7 +215,7 @@ public class ActivityTracerTest {
         trackableTracer.endActiveSpan();
 
         SpanData span = getSingleSpan();
-        assertEquals("previousScreen", span.getAttributes().get(SplunkRum.LAST_SCREEN_NAME_KEY));
+        assertEquals("previousScreen", span.getAttributes().get(LAST_SCREEN_NAME_KEY));
     }
 
     @Test
@@ -222,12 +226,12 @@ public class ActivityTracerTest {
                         annotatedActivity,
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker,
+                        visibleScreenTracker::getPreviouslyVisibleScreen,
                         appStartupTimer);
         activityTracer.startActivityCreation();
         activityTracer.endActiveSpan();
         SpanData span = getSingleSpan();
-        assertEquals("squarely", span.getAttributes().get(SplunkRum.SCREEN_NAME_KEY));
+        assertEquals("squarely", span.getAttributes().get(SCREEN_NAME_KEY));
     }
 
     @RumScreenName("squarely")

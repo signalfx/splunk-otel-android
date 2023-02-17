@@ -17,6 +17,7 @@
 package com.splunk.rum;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -91,7 +92,7 @@ class RumInitializerTest {
                 initSpan.getParentSpanContext(), startupTimer.getStartupSpan().getSpanContext());
 
         assertEquals("SplunkRum.initialize", initSpan.getName());
-        assertEquals("appstart", initSpan.getAttributes().get(SplunkRum.COMPONENT_KEY));
+        assertEquals("appstart", initSpan.getAttributes().get(COMPONENT_KEY));
         assertEquals(
                 "[debug:false,crashReporting:true,anrReporting:true,slowRenderingDetector:true,networkMonitor:true]",
                 initSpan.getAttributes().get(stringKey("config_settings")));
@@ -258,7 +259,7 @@ class RumInitializerTest {
                                                         OpenTelemetryAssertions.assertThat(
                                                                         attributes)
                                                                 .containsEntry(
-                                                                        SplunkRum.COMPONENT_KEY,
+                                                                        COMPONENT_KEY,
                                                                         SplunkRum.COMPONENT_ERROR)
                                                                 .containsEntry(
                                                                         stringKey("attribute"),

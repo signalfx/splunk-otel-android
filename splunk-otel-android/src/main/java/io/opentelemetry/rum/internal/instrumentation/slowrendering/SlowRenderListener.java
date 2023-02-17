@@ -18,7 +18,6 @@ package io.opentelemetry.rum.internal.instrumentation.slowrendering;
 
 import static android.view.FrameMetrics.DRAW_DURATION;
 import static android.view.FrameMetrics.FIRST_DRAW_FRAME;
-
 import static io.opentelemetry.rum.internal.RumConstants.OTEL_RUM_LOG_TAG;
 
 import android.app.Activity;
