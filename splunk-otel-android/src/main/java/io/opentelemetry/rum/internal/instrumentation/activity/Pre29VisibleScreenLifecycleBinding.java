@@ -19,7 +19,6 @@ package io.opentelemetry.rum.internal.instrumentation.activity;
 import android.app.Activity;
 import androidx.annotation.NonNull;
 import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
-import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 
 /**
  * An ActivityLifecycleCallbacks that is responsible for telling the VisibleScreenTracker when an
