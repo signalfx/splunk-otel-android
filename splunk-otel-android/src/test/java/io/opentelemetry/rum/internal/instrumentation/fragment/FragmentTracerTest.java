@@ -50,7 +50,10 @@ class FragmentTracerTest {
     @Test
     void create() {
         FragmentTracer trackableTracer =
-                new FragmentTracer(mock(Fragment.class), tracer, activeSpan);
+                FragmentTracer.builder(mock(Fragment.class))
+                        .tracer(tracer)
+                        .activeSpan(activeSpan)
+                        .build();
         trackableTracer.startFragmentCreation();
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
@@ -62,7 +65,10 @@ class FragmentTracerTest {
         VisibleScreenTracker visibleScreenTracker = mock(VisibleScreenTracker.class);
 
         FragmentTracer trackableTracer =
-                new FragmentTracer(mock(Fragment.class), tracer, activeSpan);
+                FragmentTracer.builder(mock(Fragment.class))
+                        .tracer(tracer)
+                        .activeSpan(activeSpan)
+                        .build();
 
         trackableTracer.startSpanIfNoneInProgress("starting");
         trackableTracer.addPreviousScreenAttribute();
@@ -78,7 +84,10 @@ class FragmentTracerTest {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("Fragment");
 
         FragmentTracer trackableTracer =
-                new FragmentTracer(mock(Fragment.class), tracer, activeSpan);
+                FragmentTracer.builder(mock(Fragment.class))
+                        .tracer(tracer)
+                        .activeSpan(activeSpan)
+                        .build();
 
         trackableTracer.startSpanIfNoneInProgress("starting");
         trackableTracer.addPreviousScreenAttribute();
@@ -96,7 +105,10 @@ class FragmentTracerTest {
         activeSpan = new ActiveSpan(visibleScreenTracker::getPreviouslyVisibleScreen);
 
         FragmentTracer fragmentTracer =
-                new FragmentTracer(mock(Fragment.class), tracer, activeSpan);
+                FragmentTracer.builder(mock(Fragment.class))
+                        .tracer(tracer)
+                        .activeSpan(activeSpan)
+                        .build();
 
         fragmentTracer.startSpanIfNoneInProgress("starting");
         fragmentTracer.addPreviousScreenAttribute();
@@ -109,7 +121,9 @@ class FragmentTracerTest {
     @Test
     void testAnnotatedScreenName() {
         Fragment fragment = new AnnotatedFragment();
-        FragmentTracer fragmentTracer = new FragmentTracer(fragment, tracer, activeSpan);
+        FragmentTracer fragmentTracer =
+                FragmentTracer.builder(fragment).tracer(tracer).activeSpan(activeSpan).build();
+
         fragmentTracer.startFragmentCreation();
         fragmentTracer.endActiveSpan();
         SpanData span = getSingleSpan();
