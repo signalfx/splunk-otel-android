@@ -19,7 +19,6 @@ package io.opentelemetry.rum.internal.instrumentation.activity;
 import android.app.Activity;
 import androidx.annotation.VisibleForTesting;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.rum.internal.ActiveSpan;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,12 +50,12 @@ public class ActivityTracerCache {
             AppStartupTimer startupTimer) {
         this(
                 activity ->
-                        new ActivityTracer(
-                                activity,
-                                initialAppActivity,
-                                tracer,
-                                startupTimer,
-                                new ActiveSpan(visibleScreenTracker::getPreviouslyVisibleScreen)));
+                        ActivityTracer.builder(activity)
+                                .initialAppActivity(initialAppActivity)
+                                .tracer(tracer)
+                                .appStartupTimer(startupTimer)
+                                .visibleScreenTracker(visibleScreenTracker)
+                                .build());
     }
 
     @VisibleForTesting

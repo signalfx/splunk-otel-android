@@ -26,7 +26,6 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.ActiveSpan;
-import java.util.function.Supplier;
 
 class FragmentTracer {
     static final AttributeKey<String> FRAGMENT_NAME_KEY = AttributeKey.stringKey("fragmentName");
@@ -36,7 +35,7 @@ class FragmentTracer {
     private final Tracer tracer;
     private final ActiveSpan activeSpan;
 
-    //TODO: Builder
+    // TODO: Builder
     FragmentTracer(Fragment fragment, Tracer tracer, ActiveSpan activeSpan) {
         this.tracer = tracer;
         this.fragmentName = fragment.getClass().getSimpleName();

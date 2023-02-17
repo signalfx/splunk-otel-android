@@ -34,7 +34,6 @@ import io.opentelemetry.context.Context;
 import io.opentelemetry.rum.internal.ActiveSpan;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 public class ActivityTracer {
     static final AttributeKey<String> ACTIVITY_NAME_KEY = AttributeKey.stringKey("activityName");
@@ -47,20 +46,14 @@ public class ActivityTracer {
     private final AppStartupTimer appStartupTimer;
     private final ActiveSpan activeSpan;
 
-    // TODO: Builder
-    public ActivityTracer(
-            Activity activity,
-            AtomicReference<String> initialAppActivity,
-            Tracer tracer,
-            AppStartupTimer appStartupTimer,
-            ActiveSpan activeSpan) {
-        this.initialAppActivity = initialAppActivity;
-        this.tracer = tracer;
-        this.activityName = activity.getClass().getSimpleName();
-        RumScreenName rumScreenName = activity.getClass().getAnnotation(RumScreenName.class);
+    private ActivityTracer(Builder builder) {
+        this.initialAppActivity = builder.initialAppActivity;
+        this.tracer = builder.tracer;
+        this.activityName = builder.getActivityName();
+        RumScreenName rumScreenName = builder.getRumScreenName();
         this.screenName = rumScreenName == null ? activityName : rumScreenName.value();
-        this.appStartupTimer = appStartupTimer;
-        this.activeSpan = activeSpan;
+        this.appStartupTimer = builder.appStartupTimer;
+        this.activeSpan = builder.activeSpan;
     }
 
     ActivityTracer startSpanIfNoneInProgress(String spanName) {
@@ -159,5 +152,63 @@ public class ActivityTracer {
     public ActivityTracer addEvent(String eventName) {
         activeSpan.addEvent(eventName);
         return this;
+    }
+
+    public static Builder builder(Activity activity) {
+        return new Builder(activity);
+    }
+
+    static class Builder {
+        private final Activity activity;
+        private AtomicReference<String> initialAppActivity = new AtomicReference<>();
+        private Tracer tracer;
+        private AppStartupTimer appStartupTimer;
+        private ActiveSpan activeSpan;
+
+        public Builder(Activity activity) {
+            this.activity = activity;
+        }
+
+        public Builder visibleScreenTracker(VisibleScreenTracker visibleScreenTracker) {
+            this.activeSpan = new ActiveSpan(visibleScreenTracker::getPreviouslyVisibleScreen);
+            return this;
+        }
+
+        public Builder initialAppActivity(String activityName) {
+            initialAppActivity.set(activityName);
+            return this;
+        }
+
+        public Builder initialAppActivity(AtomicReference<String> initialAppActivity) {
+            this.initialAppActivity = initialAppActivity;
+            return this;
+        }
+
+        public Builder tracer(Tracer tracer) {
+            this.tracer = tracer;
+            return this;
+        }
+
+        public Builder appStartupTimer(AppStartupTimer appStartupTimer) {
+            this.appStartupTimer = appStartupTimer;
+            return this;
+        }
+
+        public Builder activeSpan(ActiveSpan activeSpan) {
+            this.activeSpan = activeSpan;
+            return this;
+        }
+
+        public String getActivityName() {
+            return activity.getClass().getSimpleName();
+        }
+
+        public RumScreenName getRumScreenName() {
+            return activity.getClass().getAnnotation(RumScreenName.class);
+        }
+
+        public ActivityTracer build() {
+            return new ActivityTracer(this);
+        }
     }
 }
