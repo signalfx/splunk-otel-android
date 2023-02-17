@@ -52,16 +52,15 @@ public class ActivityTracer {
             Activity activity,
             AtomicReference<String> initialAppActivity,
             Tracer tracer,
-            Supplier<String> previouslyVisibleScreen,
-            AppStartupTimer appStartupTimer) {
+            AppStartupTimer appStartupTimer,
+            ActiveSpan activeSpan) {
         this.initialAppActivity = initialAppActivity;
         this.tracer = tracer;
         this.activityName = activity.getClass().getSimpleName();
         RumScreenName rumScreenName = activity.getClass().getAnnotation(RumScreenName.class);
         this.screenName = rumScreenName == null ? activityName : rumScreenName.value();
         this.appStartupTimer = appStartupTimer;
-        // TODO: PASS ME IN (THIS VIOLATES DEPENDENCY INJECTION)
-        this.activeSpan = new ActiveSpan(previouslyVisibleScreen);
+        this.activeSpan = activeSpan;
     }
 
     ActivityTracer startSpanIfNoneInProgress(String spanName) {

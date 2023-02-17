@@ -36,13 +36,13 @@ class FragmentTracer {
     private final Tracer tracer;
     private final ActiveSpan activeSpan;
 
-    FragmentTracer(Fragment fragment, Tracer tracer, Supplier<String> previouslyVisibleScreen) {
+    //TODO: Builder
+    FragmentTracer(Fragment fragment, Tracer tracer, ActiveSpan activeSpan) {
         this.tracer = tracer;
         this.fragmentName = fragment.getClass().getSimpleName();
         RumScreenName rumScreenName = fragment.getClass().getAnnotation(RumScreenName.class);
         this.screenName = rumScreenName == null ? fragmentName : rumScreenName.value();
-        // TODO: FIXME VIOLATES DEPENDENCY INJECTION
-        this.activeSpan = new ActiveSpan(previouslyVisibleScreen);
+        this.activeSpan = activeSpan;
     }
 
     FragmentTracer startSpanIfNoneInProgress(String action) {

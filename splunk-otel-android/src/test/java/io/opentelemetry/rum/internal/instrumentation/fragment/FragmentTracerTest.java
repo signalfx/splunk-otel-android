@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import androidx.fragment.app.Fragment;
 import com.splunk.rum.RumScreenName;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.ActiveSpan;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
 import io.opentelemetry.sdk.trace.data.SpanData;
@@ -37,11 +38,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class FragmentTracerTest {
     @RegisterExtension final OpenTelemetryExtension otelTesting = OpenTelemetryExtension.create();
     private Tracer tracer;
-    private final VisibleScreenTracker visibleScreenTracker = mock(VisibleScreenTracker.class);
+    private ActiveSpan activeSpan;
 
     @BeforeEach
     void setup() {
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
+        VisibleScreenTracker visibleScreenTracker = mock(VisibleScreenTracker.class);
+        activeSpan = new ActiveSpan(visibleScreenTracker::getPreviouslyVisibleScreen);
     }
 
     @Test
@@ -50,7 +53,7 @@ class FragmentTracerTest {
                 new FragmentTracer(
                         mock(Fragment.class),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen);
+                        activeSpan);
         trackableTracer.startFragmentCreation();
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
@@ -65,7 +68,7 @@ class FragmentTracerTest {
                 new FragmentTracer(
                         mock(Fragment.class),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen);
+                        activeSpan);
 
         trackableTracer.startSpanIfNoneInProgress("starting");
         trackableTracer.addPreviousScreenAttribute();
@@ -84,7 +87,7 @@ class FragmentTracerTest {
                 new FragmentTracer(
                         mock(Fragment.class),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen);
+                        activeSpan);
 
         trackableTracer.startSpanIfNoneInProgress("starting");
         trackableTracer.addPreviousScreenAttribute();
@@ -96,13 +99,16 @@ class FragmentTracerTest {
 
     @Test
     void addPreviousScreen() {
+
+        VisibleScreenTracker visibleScreenTracker = mock(VisibleScreenTracker.class);
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("previousScreen");
+        activeSpan = new ActiveSpan(visibleScreenTracker::getPreviouslyVisibleScreen);
 
         FragmentTracer fragmentTracer =
                 new FragmentTracer(
                         mock(Fragment.class),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen);
+                        activeSpan);
 
         fragmentTracer.startSpanIfNoneInProgress("starting");
         fragmentTracer.addPreviousScreenAttribute();
@@ -117,7 +123,7 @@ class FragmentTracerTest {
         Fragment fragment = new AnnotatedFragment();
         FragmentTracer fragmentTracer =
                 new FragmentTracer(
-                        fragment, tracer, visibleScreenTracker::getPreviouslyVisibleScreen);
+                        fragment, tracer, activeSpan);
         fragmentTracer.startFragmentCreation();
         fragmentTracer.endActiveSpan();
         SpanData span = getSingleSpan();

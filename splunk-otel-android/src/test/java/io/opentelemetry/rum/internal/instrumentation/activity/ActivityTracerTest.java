@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import android.app.Activity;
 import com.splunk.rum.RumScreenName;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.ActiveSpan;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
 import io.opentelemetry.sdk.trace.data.SpanData;
@@ -44,10 +45,12 @@ public class ActivityTracerTest {
     private Tracer tracer;
     private final VisibleScreenTracker visibleScreenTracker = mock(VisibleScreenTracker.class);
     private final AppStartupTimer appStartupTimer = new AppStartupTimer();
+    private ActiveSpan activeSpan;
 
     @BeforeEach
     public void setup() {
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
+        activeSpan = new ActiveSpan(visibleScreenTracker::getPreviouslyVisibleScreen);
     }
 
     @Test
@@ -57,8 +60,8 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("FirstActivity"),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+
+                        appStartupTimer, activeSpan);
         trackableTracer.initiateRestartSpanIfNecessary(false);
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
@@ -73,8 +76,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("Activity"),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+                        appStartupTimer, activeSpan);
         trackableTracer.initiateRestartSpanIfNecessary(false);
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
@@ -90,8 +92,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("Activity"),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+                        appStartupTimer, activeSpan);
         trackableTracer.initiateRestartSpanIfNecessary(true);
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
@@ -106,8 +107,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("FirstActivity"),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+                        appStartupTimer, activeSpan);
         trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
@@ -122,8 +122,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>("Activity"),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+                        appStartupTimer, activeSpan);
         trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
         SpanData span = getSingleSpan();
@@ -140,8 +139,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+                        appStartupTimer, activeSpan);
         trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
         appStartupTimer.end();
@@ -166,8 +164,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+                        appStartupTimer, activeSpan);
 
         trackableTracer.startSpanIfNoneInProgress("starting");
         trackableTracer.addPreviousScreenAttribute();
@@ -187,8 +184,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+                        appStartupTimer, activeSpan);
 
         trackableTracer.startSpanIfNoneInProgress("starting");
         trackableTracer.addPreviousScreenAttribute();
@@ -207,8 +203,7 @@ public class ActivityTracerTest {
                         mock(Activity.class),
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+                        appStartupTimer, activeSpan);
 
         trackableTracer.startSpanIfNoneInProgress("starting");
         trackableTracer.addPreviousScreenAttribute();
@@ -226,8 +221,7 @@ public class ActivityTracerTest {
                         annotatedActivity,
                         new AtomicReference<>(),
                         tracer,
-                        visibleScreenTracker::getPreviouslyVisibleScreen,
-                        appStartupTimer);
+                        appStartupTimer, activeSpan);
         activityTracer.startActivityCreation();
         activityTracer.endActiveSpan();
         SpanData span = getSingleSpan();

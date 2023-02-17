@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.ActiveSpan;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import java.util.HashMap;
 import java.util.Map;
@@ -154,7 +155,7 @@ public class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifec
         if (activityTracer == null) {
             activityTracer =
                     new FragmentTracer(
-                            fragment, tracer, visibleScreenTracker::getPreviouslyVisibleScreen);
+                            fragment, tracer, new ActiveSpan(visibleScreenTracker::getPreviouslyVisibleScreen));
             tracersByFragmentClassName.put(fragment.getClass().getName(), activityTracer);
         }
         return activityTracer;
