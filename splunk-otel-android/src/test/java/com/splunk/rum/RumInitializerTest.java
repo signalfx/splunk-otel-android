@@ -36,6 +36,7 @@ import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetwork;
 import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
+import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions;
 import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter;
 import io.opentelemetry.sdk.testing.trace.TestSpanData;

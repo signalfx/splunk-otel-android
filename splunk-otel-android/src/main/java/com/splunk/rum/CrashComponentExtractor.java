@@ -16,6 +16,8 @@
 
 package com.splunk.rum;
 
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
@@ -38,7 +40,7 @@ final class CrashComponentExtractor implements AttributesExtractor<CrashDetails,
                 crashHappened.compareAndSet(false, true)
                         ? SplunkRum.COMPONENT_CRASH
                         : SplunkRum.COMPONENT_ERROR;
-        attributes.put(SplunkRum.COMPONENT_KEY, component);
+        attributes.put(COMPONENT_KEY, component);
     }
 
     @Override

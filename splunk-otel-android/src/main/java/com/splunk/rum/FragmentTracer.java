@@ -16,6 +16,9 @@
 
 package com.splunk.rum;
 
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_UI;
+
 import androidx.fragment.app.Fragment;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
@@ -54,7 +57,7 @@ class FragmentTracer {
         Span span =
                 tracer.spanBuilder(spanName)
                         .setAttribute(FRAGMENT_NAME_KEY, fragmentName)
-                        .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_UI)
+                        .setAttribute(COMPONENT_KEY, COMPONENT_UI)
                         .startSpan();
         // do this after the span is started, so we can override the default screen.name set by the
         // RumAttributeAppender.

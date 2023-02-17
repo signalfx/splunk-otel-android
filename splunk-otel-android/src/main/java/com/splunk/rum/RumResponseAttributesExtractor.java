@@ -19,6 +19,8 @@ package com.splunk.rum;
 import static com.splunk.rum.SplunkRum.LINK_SPAN_ID_KEY;
 import static com.splunk.rum.SplunkRum.LINK_TRACE_ID_KEY;
 
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
@@ -35,7 +37,7 @@ class RumResponseAttributesExtractor implements AttributesExtractor<Request, Res
 
     @Override
     public void onStart(AttributesBuilder attributes, Context parentContext, Request request) {
-        attributes.put(SplunkRum.COMPONENT_KEY, "http");
+        attributes.put(COMPONENT_KEY, "http");
     }
 
     @Override

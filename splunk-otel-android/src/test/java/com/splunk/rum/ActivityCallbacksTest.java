@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import android.app.Activity;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;

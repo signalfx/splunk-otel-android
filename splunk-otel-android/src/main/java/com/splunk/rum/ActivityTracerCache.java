@@ -19,6 +19,8 @@ package com.splunk.rum;
 import android.app.Activity;
 import androidx.annotation.VisibleForTesting;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;

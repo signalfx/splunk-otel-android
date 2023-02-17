@@ -16,6 +16,11 @@
 
 package com.splunk.rum;
 
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_APPSTART;
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_UI;
+import static io.opentelemetry.rum.internal.RumConstants.START_TYPE_KEY;
+
 import android.app.Activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +29,8 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
+import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 class ActivityTracer {
@@ -101,9 +108,9 @@ class ActivityTracer {
 
     private Span createAppStartSpan(String startType) {
         Span span = createSpan(APP_START_SPAN_NAME);
-        span.setAttribute(SplunkRum.START_TYPE_KEY, startType);
+        span.setAttribute(START_TYPE_KEY, startType);
         // override the component to be appstart
-        span.setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_APPSTART);
+        span.setAttribute(COMPONENT_KEY, COMPONENT_APPSTART);
         return span;
     }
 
@@ -115,7 +122,7 @@ class ActivityTracer {
         final SpanBuilder spanBuilder =
                 tracer.spanBuilder(spanName)
                         .setAttribute(ACTIVITY_NAME_KEY, activityName)
-                        .setAttribute(SplunkRum.COMPONENT_KEY, SplunkRum.COMPONENT_UI);
+                        .setAttribute(COMPONENT_KEY, COMPONENT_UI);
         if (parentSpan != null) {
             spanBuilder.setParent(parentSpan.storeInContext(Context.current()));
         }

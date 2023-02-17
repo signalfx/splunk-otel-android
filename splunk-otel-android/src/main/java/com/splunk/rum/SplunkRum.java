@@ -19,6 +19,7 @@ package com.splunk.rum;
 import static io.opentelemetry.api.common.AttributeKey.doubleKey;
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 
 import android.app.Application;
 import android.location.Location;
@@ -37,6 +38,7 @@ import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTelemetry;
 import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
 import io.opentelemetry.rum.internal.OpenTelemetryRum;
 import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
+import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -50,14 +52,12 @@ public class SplunkRum {
     // startup.
     private static final AppStartupTimer startupTimer = new AppStartupTimer();
 
-    static final AttributeKey<String> COMPONENT_KEY = AttributeKey.stringKey("component");
     static final AttributeKey<String> SCREEN_NAME_KEY = AttributeKey.stringKey("screen.name");
     static final AttributeKey<String> LAST_SCREEN_NAME_KEY =
             AttributeKey.stringKey("last.screen.name");
     static final AttributeKey<String> ERROR_TYPE_KEY = stringKey("error.type");
     static final AttributeKey<String> ERROR_MESSAGE_KEY = stringKey("error.message");
     static final AttributeKey<String> WORKFLOW_NAME_KEY = stringKey("workflow.name");
-    static final AttributeKey<String> START_TYPE_KEY = stringKey("start.type");
     static final AttributeKey<Double> LOCATION_LATITUDE_KEY = doubleKey("location.lat");
     static final AttributeKey<Double> LOCATION_LONGITUDE_KEY = doubleKey("location.long");
 
@@ -65,10 +65,8 @@ public class SplunkRum {
     static final AttributeKey<Long> HEAP_FREE_KEY = longKey("heap.free");
     static final AttributeKey<Double> BATTERY_PERCENT_KEY = doubleKey("battery.percent");
 
-    static final String COMPONENT_APPSTART = "appstart";
     static final String COMPONENT_CRASH = "crash";
     static final String COMPONENT_ERROR = "error";
-    static final String COMPONENT_UI = "ui";
     static final String LOG_TAG = "SplunkRum";
     static final String RUM_TRACER_NAME = "SplunkRum";
 
