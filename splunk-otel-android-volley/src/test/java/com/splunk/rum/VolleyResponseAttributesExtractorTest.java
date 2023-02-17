@@ -21,6 +21,8 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+
 import com.android.volley.Header;
 import com.android.volley.Request;
 import com.android.volley.toolbox.HttpResponse;
@@ -51,7 +53,7 @@ public class VolleyResponseAttributesExtractorTest {
         attributesExtractor.onEnd(attributesBuilder, null, fakeRequest, response, null);
         Attributes attributes = attributesBuilder.build();
 
-        assertEquals("http", attributes.get(SplunkRum.COMPONENT_KEY));
+        assertEquals("http", attributes.get(COMPONENT_KEY));
         assertEquals(
                 "9499195c502eb217c448a68bfe0f967c", attributes.get(SplunkRum.LINK_TRACE_ID_KEY));
         assertEquals("fe16eca542cd5d86", attributes.get(SplunkRum.LINK_SPAN_ID_KEY));
@@ -73,7 +75,7 @@ public class VolleyResponseAttributesExtractorTest {
         attributesExtractor.onStart(attributesBuilder, null, fakeRequest);
         Attributes attributes = attributesBuilder.build();
 
-        assertEquals("http", attributes.get(SplunkRum.COMPONENT_KEY));
+        assertEquals("http", attributes.get(COMPONENT_KEY));
         assertNull(attributes.get(SplunkRum.LINK_TRACE_ID_KEY));
         assertNull(attributes.get(SplunkRum.LINK_SPAN_ID_KEY));
     }
