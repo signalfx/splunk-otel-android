@@ -19,6 +19,13 @@ import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTrack
 import io.opentelemetry.rum.internal.instrumentation.fragment.RumFragmentLifecycleCallbacks;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 
+/**
+ * This is an umbrella instrumentation that covers several things:
+ * * startup timer callback is registered so that UI startup time can be measured
+ * - activity lifecycle callbacks are registered so that lifecycle events can be generated
+ * - activity lifecycle callback listener is registered to that will register a FragmentLifecycleCallbacks when appropriate
+ * - activity lifecycle callback listener is registered to dispatch events to the VisibleScreenTracker
+ */
 public class AndroidLifecycleInstrumentation {
 
     private static final String INSTRUMENTATION_SCOPE = "io.opentelemetry.lifecycle";
