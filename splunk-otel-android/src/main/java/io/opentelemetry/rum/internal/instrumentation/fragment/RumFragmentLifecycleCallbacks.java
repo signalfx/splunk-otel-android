@@ -155,8 +155,8 @@ public class RumFragmentLifecycleCallbacks extends FragmentManager.FragmentLifec
         if (activityTracer == null) {
             activityTracer =
                     FragmentTracer.builder(fragment)
-                            .tracer(tracer)
-                            .activeSpan(
+                            .setTracer(tracer)
+                            .setActiveSpan(
                                     new ActiveSpan(
                                             visibleScreenTracker::getPreviouslyVisibleScreen))
                             .build();

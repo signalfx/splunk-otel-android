@@ -95,12 +95,12 @@ class FragmentTracer {
             this.fragment = fragment;
         }
 
-        Builder tracer(Tracer tracer) {
+        Builder setTracer(Tracer tracer) {
             this.tracer = tracer;
             return this;
         }
 
-        Builder activeSpan(ActiveSpan activeSpan) {
+        Builder setActiveSpan(ActiveSpan activeSpan) {
             this.activeSpan = activeSpan;
             return this;
         }

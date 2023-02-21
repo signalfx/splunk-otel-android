@@ -51,8 +51,8 @@ class FragmentTracerTest {
     void create() {
         FragmentTracer trackableTracer =
                 FragmentTracer.builder(mock(Fragment.class))
-                        .tracer(tracer)
-                        .activeSpan(activeSpan)
+                        .setTracer(tracer)
+                        .setActiveSpan(activeSpan)
                         .build();
         trackableTracer.startFragmentCreation();
         trackableTracer.endActiveSpan();
@@ -66,8 +66,8 @@ class FragmentTracerTest {
 
         FragmentTracer trackableTracer =
                 FragmentTracer.builder(mock(Fragment.class))
-                        .tracer(tracer)
-                        .activeSpan(activeSpan)
+                        .setTracer(tracer)
+                        .setActiveSpan(activeSpan)
                         .build();
 
         trackableTracer.startSpanIfNoneInProgress("starting");
@@ -85,8 +85,8 @@ class FragmentTracerTest {
 
         FragmentTracer trackableTracer =
                 FragmentTracer.builder(mock(Fragment.class))
-                        .tracer(tracer)
-                        .activeSpan(activeSpan)
+                        .setTracer(tracer)
+                        .setActiveSpan(activeSpan)
                         .build();
 
         trackableTracer.startSpanIfNoneInProgress("starting");
@@ -106,8 +106,8 @@ class FragmentTracerTest {
 
         FragmentTracer fragmentTracer =
                 FragmentTracer.builder(mock(Fragment.class))
-                        .tracer(tracer)
-                        .activeSpan(activeSpan)
+                        .setTracer(tracer)
+                        .setActiveSpan(activeSpan)
                         .build();
 
         fragmentTracer.startSpanIfNoneInProgress("starting");
@@ -122,7 +122,7 @@ class FragmentTracerTest {
     void testAnnotatedScreenName() {
         Fragment fragment = new AnnotatedFragment();
         FragmentTracer fragmentTracer =
-                FragmentTracer.builder(fragment).tracer(tracer).activeSpan(activeSpan).build();
+                FragmentTracer.builder(fragment).setTracer(tracer).setActiveSpan(activeSpan).build();
 
         fragmentTracer.startFragmentCreation();
         fragmentTracer.endActiveSpan();
