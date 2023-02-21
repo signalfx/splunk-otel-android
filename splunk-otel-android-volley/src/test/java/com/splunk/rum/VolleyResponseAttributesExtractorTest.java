@@ -16,7 +16,7 @@
 
 package com.splunk.rum;
 
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
