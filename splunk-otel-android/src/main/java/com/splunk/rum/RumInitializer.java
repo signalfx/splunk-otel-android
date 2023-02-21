@@ -204,19 +204,18 @@ class RumInitializer {
     private void installLifecycleInstrumentations(
             OpenTelemetryRumBuilder otelRumBuilder, VisibleScreenTracker visibleScreenTracker) {
 
-        Function<Tracer, Tracer> tracerCustomizer = tracer -> (Tracer) spanName -> {
-            String component = spanName.equals(APP_START_SPAN_NAME) ? COMPONENT_APPSTART : COMPONENT_UI;
-            return tracer.spanBuilder(spanName)
-                    .setAttribute(COMPONENT_KEY, component);
-        };
-        AndroidLifecycleInstrumentation instrumentation = AndroidLifecycleInstrumentation.builder()
-                .setVisibleScreenTracker(visibleScreenTracker)
-                .setStartupTimer(startupTimer)
-                .setTracerCustomizer(tracerCustomizer)
-                .build();
-
         otelRumBuilder.addInstrumentation(
                 instrumentedApp -> {
+                    Function<Tracer, Tracer> tracerCustomizer = tracer -> (Tracer) spanName -> {
+                        String component = spanName.equals(APP_START_SPAN_NAME) ? COMPONENT_APPSTART : COMPONENT_UI;
+                        return tracer.spanBuilder(spanName)
+                                .setAttribute(COMPONENT_KEY, component);
+                    };
+                    AndroidLifecycleInstrumentation instrumentation = AndroidLifecycleInstrumentation.builder()
+                            .setVisibleScreenTracker(visibleScreenTracker)
+                            .setStartupTimer(startupTimer)
+                            .setTracerCustomizer(tracerCustomizer)
+                            .build();
                     instrumentation.installOn(instrumentedApp);
                     initializationEvents.add(
                             new InitializationEvent(
