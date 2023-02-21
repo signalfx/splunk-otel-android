@@ -16,8 +16,8 @@
 
 package com.splunk.rum;
 
+import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;

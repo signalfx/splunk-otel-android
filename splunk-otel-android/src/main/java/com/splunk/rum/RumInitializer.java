@@ -17,12 +17,14 @@
 package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.APP_NAME_KEY;
+import static com.splunk.rum.SplunkRum.COMPONENT_APPSTART;
 import static com.splunk.rum.SplunkRum.COMPONENT_ERROR;
+import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
+import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
 import static com.splunk.rum.SplunkRum.RUM_VERSION_KEY;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_APPSTART;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.DEVICE_MODEL_IDENTIFIER;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.DEVICE_MODEL_NAME;
@@ -254,7 +256,12 @@ class RumInitializer {
     @NonNull
     private Application.ActivityLifecycleCallbacks buildFragmentRegisterer(
             VisibleScreenTracker visibleScreenTracker, InstrumentedApplication instrumentedApp) {
-        Tracer tracer = instrumentedApp.getOpenTelemetrySdk().getTracer(RUM_TRACER_NAME);
+        Tracer delegateTracer = instrumentedApp.getOpenTelemetrySdk().getTracer(RUM_TRACER_NAME);
+        Tracer tracer =
+                spanName ->
+                        delegateTracer
+                                .spanBuilder(spanName)
+                                .setAttribute(COMPONENT_KEY, COMPONENT_UI);
         RumFragmentLifecycleCallbacks fragmentLifecycle =
                 new RumFragmentLifecycleCallbacks(tracer, visibleScreenTracker);
         if (Build.VERSION.SDK_INT < 29) {
@@ -288,7 +295,19 @@ class RumInitializer {
     @NonNull
     private Application.ActivityLifecycleCallbacks buildActivityEventsCallback(
             VisibleScreenTracker visibleScreenTracker, InstrumentedApplication instrumentedApp) {
-        Tracer tracer = instrumentedApp.getOpenTelemetrySdk().getTracer(RUM_TRACER_NAME);
+        Tracer delegateTracer = instrumentedApp.getOpenTelemetrySdk().getTracer(RUM_TRACER_NAME);
+        Tracer tracer =
+                spanName -> {
+                    // override the component to be appstart when appstart
+                    String component =
+                            spanName.equals(APP_START_SPAN_NAME)
+                                    ? COMPONENT_APPSTART
+                                    : COMPONENT_UI;
+                    return delegateTracer
+                            .spanBuilder(spanName)
+                            .setAttribute(COMPONENT_KEY, component);
+                };
+
         ActivityTracerCache tracers =
                 new ActivityTracerCache(tracer, visibleScreenTracker, startupTimer);
         if (Build.VERSION.SDK_INT < 29) {
@@ -392,7 +411,16 @@ class RumInitializer {
     }
 
     private void recordInitializationSpans(
-            long startTimeNanos, List<InitializationEvent> initializationEvents, Tracer tracer) {
+            long startTimeNanos,
+            List<InitializationEvent> initializationEvents,
+            Tracer delegateTracer) {
+
+        Tracer tracer =
+                spanName ->
+                        delegateTracer
+                                .spanBuilder(spanName)
+                                .setAttribute(COMPONENT_KEY, COMPONENT_APPSTART);
+
         Span overallAppStart = startupTimer.start(tracer);
         Span span =
                 tracer.spanBuilder("SplunkRum.initialize")

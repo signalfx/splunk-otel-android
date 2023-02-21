@@ -16,8 +16,6 @@
 
 package io.opentelemetry.rum.internal.instrumentation.fragment;
 
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_UI;
 import static io.opentelemetry.rum.internal.RumConstants.LAST_SCREEN_NAME_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.SCREEN_NAME_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,7 +67,6 @@ class RumFragmentLifecycleCallbacksTest {
                 spanData.getAttributes().get(FragmentTracer.FRAGMENT_NAME_KEY));
         assertEquals(
                 fragment.getClass().getSimpleName(), spanData.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, spanData.getAttributes().get(COMPONENT_KEY));
         assertNull(spanData.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = spanData.getEvents();
@@ -104,7 +101,6 @@ class RumFragmentLifecycleCallbacksTest {
                 spanData.getAttributes().get(FragmentTracer.FRAGMENT_NAME_KEY));
         assertEquals(
                 fragment.getClass().getSimpleName(), spanData.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, spanData.getAttributes().get(COMPONENT_KEY));
         assertEquals("previousScreen", spanData.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = spanData.getEvents();
@@ -132,7 +128,6 @@ class RumFragmentLifecycleCallbacksTest {
         assertEquals(
                 fragment.getClass().getSimpleName(),
                 spanData.getAttributes().get(FragmentTracer.FRAGMENT_NAME_KEY));
-        assertEquals(COMPONENT_UI, spanData.getAttributes().get(COMPONENT_KEY));
         assertNull(spanData.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = spanData.getEvents();
@@ -160,7 +155,6 @@ class RumFragmentLifecycleCallbacksTest {
                 spanData.getAttributes().get(FragmentTracer.FRAGMENT_NAME_KEY));
         assertEquals(
                 fragment.getClass().getSimpleName(), spanData.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, spanData.getAttributes().get(COMPONENT_KEY));
         assertNull(spanData.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = spanData.getEvents();
@@ -190,7 +184,6 @@ class RumFragmentLifecycleCallbacksTest {
         assertEquals(
                 fragment.getClass().getSimpleName(),
                 pauseSpan.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, pauseSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(pauseSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = pauseSpan.getEvents();
@@ -207,7 +200,6 @@ class RumFragmentLifecycleCallbacksTest {
         assertEquals(
                 fragment.getClass().getSimpleName(),
                 destroyViewSpan.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, destroyViewSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(destroyViewSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         events = destroyViewSpan.getEvents();
@@ -218,7 +210,6 @@ class RumFragmentLifecycleCallbacksTest {
 
         assertEquals("Destroyed", detachSpan.getName());
         assertNotNull(detachSpan.getAttributes().get(FragmentTracer.FRAGMENT_NAME_KEY));
-        assertEquals(COMPONENT_UI, detachSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(detachSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         events = detachSpan.getEvents();
@@ -247,7 +238,6 @@ class RumFragmentLifecycleCallbacksTest {
         assertEquals(
                 fragment.getClass().getSimpleName(),
                 span.getAttributes().get(FragmentTracer.FRAGMENT_NAME_KEY));
-        assertEquals(COMPONENT_UI, span.getAttributes().get(COMPONENT_KEY));
         assertNull(span.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = span.getEvents();
@@ -276,7 +266,6 @@ class RumFragmentLifecycleCallbacksTest {
         assertEquals(
                 fragment.getClass().getSimpleName(),
                 destroyViewSpan.getAttributes().get(FragmentTracer.FRAGMENT_NAME_KEY));
-        assertEquals(COMPONENT_UI, destroyViewSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(destroyViewSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = destroyViewSpan.getEvents();
@@ -289,7 +278,6 @@ class RumFragmentLifecycleCallbacksTest {
         assertEquals(
                 fragment.getClass().getSimpleName(),
                 detachSpan.getAttributes().get(FragmentTracer.FRAGMENT_NAME_KEY));
-        assertEquals(COMPONENT_UI, detachSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(detachSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         events = detachSpan.getEvents();
@@ -319,7 +307,6 @@ class RumFragmentLifecycleCallbacksTest {
         assertEquals(
                 fragment.getClass().getSimpleName(),
                 detachSpan.getAttributes().get(FragmentTracer.FRAGMENT_NAME_KEY));
-        assertEquals(COMPONENT_UI, detachSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(detachSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = detachSpan.getEvents();

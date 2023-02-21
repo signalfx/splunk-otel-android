@@ -19,7 +19,6 @@ package com.splunk.rum;
 import static io.opentelemetry.api.common.AttributeKey.doubleKey;
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 
 import android.app.Application;
 import android.location.Location;
@@ -52,6 +51,7 @@ public class SplunkRum {
     // startup.
     private static final AppStartupTimer startupTimer = new AppStartupTimer();
 
+    static final AttributeKey<String> COMPONENT_KEY = AttributeKey.stringKey("component");
     static final AttributeKey<String> ERROR_TYPE_KEY = stringKey("error.type");
     static final AttributeKey<String> ERROR_MESSAGE_KEY = stringKey("error.message");
     static final AttributeKey<String> WORKFLOW_NAME_KEY = stringKey("workflow.name");
@@ -62,6 +62,8 @@ public class SplunkRum {
     static final AttributeKey<Long> HEAP_FREE_KEY = longKey("heap.free");
     static final AttributeKey<Double> BATTERY_PERCENT_KEY = doubleKey("battery.percent");
 
+    static final String COMPONENT_APPSTART = "appstart";
+    static final String COMPONENT_UI = "ui";
     static final String COMPONENT_CRASH = "crash";
     static final String COMPONENT_ERROR = "error";
     static final String LOG_TAG = "SplunkRum";

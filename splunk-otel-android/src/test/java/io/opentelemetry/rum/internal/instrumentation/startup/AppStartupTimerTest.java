@@ -16,8 +16,6 @@
 
 package io.opentelemetry.rum.internal.instrumentation.startup;
 
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_APPSTART;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.START_TYPE_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,7 +26,6 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -54,7 +51,6 @@ class AppStartupTimerTest {
         SpanData spanData = spans.get(0);
 
         assertEquals("AppStart", spanData.getName());
-        Assertions.assertEquals(COMPONENT_APPSTART, spanData.getAttributes().get(COMPONENT_KEY));
         assertEquals("cold", spanData.getAttributes().get(START_TYPE_KEY));
     }
 

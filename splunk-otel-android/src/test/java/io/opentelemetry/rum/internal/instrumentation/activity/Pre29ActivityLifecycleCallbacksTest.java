@@ -16,9 +16,6 @@
 
 package io.opentelemetry.rum.internal.instrumentation.activity;
 
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_APPSTART;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_UI;
 import static io.opentelemetry.rum.internal.RumConstants.LAST_SCREEN_NAME_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.SCREEN_NAME_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.START_TYPE_KEY;
@@ -78,7 +75,6 @@ class Pre29ActivityLifecycleCallbacksTest {
         assertEquals(
                 activity.getClass().getSimpleName(),
                 creationSpan.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, creationSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(creationSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = creationSpan.getEvents();
@@ -110,7 +106,6 @@ class Pre29ActivityLifecycleCallbacksTest {
                 span.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(), span.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_APPSTART, span.getAttributes().get(COMPONENT_KEY));
         assertNull(span.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = span.getEvents();
@@ -150,7 +145,6 @@ class Pre29ActivityLifecycleCallbacksTest {
                 span.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(), span.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_APPSTART, span.getAttributes().get(COMPONENT_KEY));
         assertNull(span.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = span.getEvents();
@@ -184,7 +178,6 @@ class Pre29ActivityLifecycleCallbacksTest {
                 span.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(), span.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, span.getAttributes().get(COMPONENT_KEY));
         assertEquals("previousScreen", span.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = span.getEvents();
@@ -215,7 +208,6 @@ class Pre29ActivityLifecycleCallbacksTest {
                 span.getAttributes().get(ActivityTracer.ACTIVITY_NAME_KEY));
         assertEquals(
                 activity.getClass().getSimpleName(), span.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, span.getAttributes().get(COMPONENT_KEY));
         assertNull(span.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = span.getEvents();
@@ -247,7 +239,6 @@ class Pre29ActivityLifecycleCallbacksTest {
         assertEquals(
                 activity.getClass().getSimpleName(),
                 stoppedSpan.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, stoppedSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(stoppedSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = stoppedSpan.getEvents();
@@ -264,7 +255,6 @@ class Pre29ActivityLifecycleCallbacksTest {
         assertEquals(
                 activity.getClass().getSimpleName(),
                 destroyedSpan.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals("ui", destroyedSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(destroyedSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         events = destroyedSpan.getEvents();
@@ -296,7 +286,6 @@ class Pre29ActivityLifecycleCallbacksTest {
         assertEquals(
                 activity.getClass().getSimpleName(),
                 stoppedSpan.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals(COMPONENT_UI, stoppedSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(stoppedSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         List<EventData> events = stoppedSpan.getEvents();
@@ -313,7 +302,6 @@ class Pre29ActivityLifecycleCallbacksTest {
         assertEquals(
                 activity.getClass().getSimpleName(),
                 destroyedSpan.getAttributes().get(SCREEN_NAME_KEY));
-        assertEquals("ui", destroyedSpan.getAttributes().get(COMPONENT_KEY));
         assertNull(destroyedSpan.getAttributes().get(LAST_SCREEN_NAME_KEY));
 
         events = destroyedSpan.getEvents();

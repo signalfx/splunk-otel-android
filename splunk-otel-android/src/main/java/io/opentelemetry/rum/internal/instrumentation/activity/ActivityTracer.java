@@ -16,9 +16,7 @@
 
 package io.opentelemetry.rum.internal.instrumentation.activity;
 
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_APPSTART;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_UI;
+import static io.opentelemetry.rum.internal.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.rum.internal.RumConstants.SCREEN_NAME_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.START_TYPE_KEY;
 
@@ -37,7 +35,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ActivityTracer {
     static final AttributeKey<String> ACTIVITY_NAME_KEY = AttributeKey.stringKey("activityName");
-    static final String APP_START_SPAN_NAME = "AppStart";
 
     private final AtomicReference<String> initialAppActivity;
     private final Tracer tracer;
@@ -106,8 +103,6 @@ public class ActivityTracer {
     private Span createAppStartSpan(String startType) {
         Span span = createSpan(APP_START_SPAN_NAME);
         span.setAttribute(START_TYPE_KEY, startType);
-        // override the component to be appstart
-        span.setAttribute(COMPONENT_KEY, COMPONENT_APPSTART);
         return span;
     }
 
@@ -117,9 +112,7 @@ public class ActivityTracer {
 
     private Span createSpanWithParent(String spanName, @Nullable Span parentSpan) {
         final SpanBuilder spanBuilder =
-                tracer.spanBuilder(spanName)
-                        .setAttribute(ACTIVITY_NAME_KEY, activityName)
-                        .setAttribute(COMPONENT_KEY, COMPONENT_UI);
+                tracer.spanBuilder(spanName).setAttribute(ACTIVITY_NAME_KEY, activityName);
         if (parentSpan != null) {
             spanBuilder.setParent(parentSpan.storeInContext(Context.current()));
         }

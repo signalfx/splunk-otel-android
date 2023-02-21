@@ -16,8 +16,6 @@
 
 package io.opentelemetry.rum.internal.instrumentation.activity;
 
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_APPSTART;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.LAST_SCREEN_NAME_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.SCREEN_NAME_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.START_TYPE_KEY;
@@ -82,7 +80,6 @@ public class ActivityTracerTest {
         SpanData span = getSingleSpan();
         assertEquals("AppStart", span.getName());
         assertEquals("hot", span.getAttributes().get(START_TYPE_KEY));
-        assertEquals(COMPONENT_APPSTART, span.getAttributes().get(COMPONENT_KEY));
     }
 
     @Test
@@ -132,7 +129,6 @@ public class ActivityTracerTest {
         SpanData span = getSingleSpan();
         assertEquals("AppStart", span.getName());
         assertEquals("warm", span.getAttributes().get(START_TYPE_KEY));
-        assertEquals(COMPONENT_APPSTART, span.getAttributes().get(COMPONENT_KEY));
     }
 
     @Test
@@ -161,8 +157,6 @@ public class ActivityTracerTest {
 
     @Test
     public void addPreviousScreen_noPrevious() {
-        VisibleScreenTracker visibleScreenTracker = mock(VisibleScreenTracker.class);
-
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
                         .setTracer(tracer)

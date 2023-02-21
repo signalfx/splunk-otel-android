@@ -16,7 +16,7 @@
 
 package com.splunk.rum;
 
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;

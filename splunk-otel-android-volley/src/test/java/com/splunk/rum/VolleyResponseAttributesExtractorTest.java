@@ -16,12 +16,11 @@
 
 package com.splunk.rum;
 
+import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 
 import com.android.volley.Header;
 import com.android.volley.Request;

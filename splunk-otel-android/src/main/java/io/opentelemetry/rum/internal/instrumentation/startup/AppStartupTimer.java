@@ -16,8 +16,6 @@
 
 package io.opentelemetry.rum.internal.instrumentation.startup;
 
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_APPSTART;
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.OTEL_RUM_LOG_TAG;
 import static io.opentelemetry.rum.internal.RumConstants.START_TYPE_KEY;
 
@@ -63,7 +61,6 @@ public class AppStartupTimer {
         final Span appStart =
                 tracer.spanBuilder("AppStart")
                         .setStartTimestamp(firstPossibleTimestamp, TimeUnit.NANOSECONDS)
-                        .setAttribute(COMPONENT_KEY, COMPONENT_APPSTART)
                         .setAttribute(START_TYPE_KEY, "cold")
                         .startSpan();
         overallAppStartSpan = appStart;

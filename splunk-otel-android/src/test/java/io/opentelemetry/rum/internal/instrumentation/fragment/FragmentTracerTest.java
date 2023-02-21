@@ -122,7 +122,10 @@ class FragmentTracerTest {
     void testAnnotatedScreenName() {
         Fragment fragment = new AnnotatedFragment();
         FragmentTracer fragmentTracer =
-                FragmentTracer.builder(fragment).setTracer(tracer).setActiveSpan(activeSpan).build();
+                FragmentTracer.builder(fragment)
+                        .setTracer(tracer)
+                        .setActiveSpan(activeSpan)
+                        .build();
 
         fragmentTracer.startFragmentCreation();
         fragmentTracer.endActiveSpan();

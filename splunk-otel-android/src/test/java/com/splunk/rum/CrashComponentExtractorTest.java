@@ -16,7 +16,7 @@
 
 package com.splunk.rum;
 
-import static io.opentelemetry.rum.internal.RumConstants.COMPONENT_KEY;
+import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
 
 import io.opentelemetry.api.common.Attributes;
