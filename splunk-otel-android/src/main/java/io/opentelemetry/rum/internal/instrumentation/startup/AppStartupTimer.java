@@ -74,7 +74,11 @@ public class AppStartupTimer {
         return startupClock.now();
     }
 
-    /** Creates a lifecycle listener that starts the UI init when an activity is created. */
+    /**
+     * Creates a lifecycle listener that starts the UI init when an activity is created.
+     *
+     * @return a new Application.ActivityLifecycleCallbacks instance
+     */
     public Application.ActivityLifecycleCallbacks createLifecycleCallback() {
         return new DefaultingActivityLifecycleCallbacks() {
             @Override

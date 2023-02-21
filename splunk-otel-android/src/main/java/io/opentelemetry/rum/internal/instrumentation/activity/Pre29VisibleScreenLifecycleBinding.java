@@ -23,7 +23,7 @@ import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
 /**
  * An ActivityLifecycleCallbacks that is responsible for telling the VisibleScreenTracker when an
  * activity has been resumed and when an activity has been paused. It's just a glue class designed
- * for API level < 29.
+ * for API level before 29.
  */
 public class Pre29VisibleScreenLifecycleBinding implements DefaultingActivityLifecycleCallbacks {
 
