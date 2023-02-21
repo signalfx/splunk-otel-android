@@ -23,6 +23,7 @@ import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
 import static com.splunk.rum.SplunkRum.RUM_VERSION_KEY;
+import static java.util.Objects.requireNonNull;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.rum.internal.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
@@ -32,15 +33,28 @@ import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS_TYPE;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS_VERSION;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.SERVICE_NAME;
-import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.os.Build;
 import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.splunk.android.rum.R;
+
+import java.io.File;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
@@ -48,17 +62,10 @@ import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
 import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
 import io.opentelemetry.rum.internal.OpenTelemetryRum;
 import io.opentelemetry.rum.internal.OpenTelemetryRumBuilder;
-import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
-import io.opentelemetry.rum.internal.instrumentation.activity.ActivityCallbacks;
-import io.opentelemetry.rum.internal.instrumentation.activity.ActivityTracerCache;
-import io.opentelemetry.rum.internal.instrumentation.activity.Pre29ActivityCallbacks;
-import io.opentelemetry.rum.internal.instrumentation.activity.Pre29VisibleScreenLifecycleBinding;
-import io.opentelemetry.rum.internal.instrumentation.activity.RumFragmentActivityRegisterer;
-import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenLifecycleBinding;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.rum.internal.instrumentation.anr.AnrDetector;
 import io.opentelemetry.rum.internal.instrumentation.crash.CrashReporter;
-import io.opentelemetry.rum.internal.instrumentation.fragment.RumFragmentLifecycleCallbacks;
+import io.opentelemetry.rum.internal.instrumentation.lifecycle.AndroidLifecycleInstrumentation;
 import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.rum.internal.instrumentation.network.NetworkAttributesSpanAppender;
 import io.opentelemetry.rum.internal.instrumentation.network.NetworkChangeMonitor;
@@ -73,15 +80,6 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import java.io.File;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.logging.Level;
 import zipkin2.reporter.Sender;
 import zipkin2.reporter.okhttp3.OkHttpSender;
 
@@ -206,114 +204,25 @@ class RumInitializer {
     private void installLifecycleInstrumentations(
             OpenTelemetryRumBuilder otelRumBuilder, VisibleScreenTracker visibleScreenTracker) {
 
-        installStartupTimerInstrumentation(otelRumBuilder);
-        installActivityLifecycleEventsInstrumentation(otelRumBuilder, visibleScreenTracker);
-        installFragmentLifecycleInstrumentation(otelRumBuilder, visibleScreenTracker);
-        installScreenTrackingInstrumentation(otelRumBuilder, visibleScreenTracker);
+        Function<Tracer, Tracer> tracerCustomizer = tracer -> (Tracer) spanName -> {
+            String component = spanName.equals(APP_START_SPAN_NAME) ? COMPONENT_APPSTART : COMPONENT_UI;
+            return tracer.spanBuilder(spanName)
+                    .setAttribute(COMPONENT_KEY, component);
+        };
+        AndroidLifecycleInstrumentation instrumentation = AndroidLifecycleInstrumentation.builder()
+                .setVisibleScreenTracker(visibleScreenTracker)
+                .setStartupTimer(startupTimer)
+                .setTracerCustomizer(tracerCustomizer)
+                .build();
 
         otelRumBuilder.addInstrumentation(
                 instrumentedApp -> {
+                    instrumentation.installOn(instrumentedApp);
                     initializationEvents.add(
                             new InitializationEvent(
                                     "activityLifecycleCallbacksInitialized",
                                     startupTimer.clockNow()));
                 });
-    }
-
-    private void installScreenTrackingInstrumentation(
-            OpenTelemetryRumBuilder otelRumBuilder, VisibleScreenTracker visibleScreenTracker) {
-        otelRumBuilder.addInstrumentation(
-                instrumentedApp -> {
-                    Application.ActivityLifecycleCallbacks screenTrackingBinding =
-                            buildScreenTrackingBinding(visibleScreenTracker);
-                    instrumentedApp
-                            .getApplication()
-                            .registerActivityLifecycleCallbacks(screenTrackingBinding);
-                });
-    }
-
-    @NonNull
-    private Application.ActivityLifecycleCallbacks buildScreenTrackingBinding(
-            VisibleScreenTracker visibleScreenTracker) {
-        if (Build.VERSION.SDK_INT < 29) {
-            return new Pre29VisibleScreenLifecycleBinding(visibleScreenTracker);
-        }
-        return new VisibleScreenLifecycleBinding(visibleScreenTracker);
-    }
-
-    private void installFragmentLifecycleInstrumentation(
-            OpenTelemetryRumBuilder otelRumBuilder, VisibleScreenTracker visibleScreenTracker) {
-        otelRumBuilder.addInstrumentation(
-                instrumentedApp -> {
-                    Application.ActivityLifecycleCallbacks fragmentRegisterer =
-                            buildFragmentRegisterer(visibleScreenTracker, instrumentedApp);
-                    instrumentedApp
-                            .getApplication()
-                            .registerActivityLifecycleCallbacks(fragmentRegisterer);
-                });
-    }
-
-    @NonNull
-    private Application.ActivityLifecycleCallbacks buildFragmentRegisterer(
-            VisibleScreenTracker visibleScreenTracker, InstrumentedApplication instrumentedApp) {
-        Tracer delegateTracer = instrumentedApp.getOpenTelemetrySdk().getTracer(RUM_TRACER_NAME);
-        Tracer tracer =
-                spanName ->
-                        delegateTracer
-                                .spanBuilder(spanName)
-                                .setAttribute(COMPONENT_KEY, COMPONENT_UI);
-        RumFragmentLifecycleCallbacks fragmentLifecycle =
-                new RumFragmentLifecycleCallbacks(tracer, visibleScreenTracker);
-        if (Build.VERSION.SDK_INT < 29) {
-            return RumFragmentActivityRegisterer.createPre29(fragmentLifecycle);
-        }
-        return RumFragmentActivityRegisterer.create(fragmentLifecycle);
-    }
-
-    private void installStartupTimerInstrumentation(OpenTelemetryRumBuilder otelRumBuilder) {
-        otelRumBuilder.addInstrumentation(
-                instrumentedApp -> {
-                    instrumentedApp
-                            .getApplication()
-                            .registerActivityLifecycleCallbacks(
-                                    startupTimer.createLifecycleCallback());
-                });
-    }
-
-    private void installActivityLifecycleEventsInstrumentation(
-            OpenTelemetryRumBuilder otelRumBuilder, VisibleScreenTracker visibleScreenTracker) {
-        otelRumBuilder.addInstrumentation(
-                instrumentedApp -> {
-                    Application.ActivityLifecycleCallbacks activityCallbacks =
-                            buildActivityEventsCallback(visibleScreenTracker, instrumentedApp);
-                    instrumentedApp
-                            .getApplication()
-                            .registerActivityLifecycleCallbacks(activityCallbacks);
-                });
-    }
-
-    @NonNull
-    private Application.ActivityLifecycleCallbacks buildActivityEventsCallback(
-            VisibleScreenTracker visibleScreenTracker, InstrumentedApplication instrumentedApp) {
-        Tracer delegateTracer = instrumentedApp.getOpenTelemetrySdk().getTracer(RUM_TRACER_NAME);
-        Tracer tracer =
-                spanName -> {
-                    // override the component to be appstart when appstart
-                    String component =
-                            spanName.equals(APP_START_SPAN_NAME)
-                                    ? COMPONENT_APPSTART
-                                    : COMPONENT_UI;
-                    return delegateTracer
-                            .spanBuilder(spanName)
-                            .setAttribute(COMPONENT_KEY, component);
-                };
-
-        ActivityTracerCache tracers =
-                new ActivityTracerCache(tracer, visibleScreenTracker, startupTimer);
-        if (Build.VERSION.SDK_INT < 29) {
-            return new Pre29ActivityCallbacks(tracers);
-        }
-        return new ActivityCallbacks(tracers);
     }
 
     private Resource createResource() {
