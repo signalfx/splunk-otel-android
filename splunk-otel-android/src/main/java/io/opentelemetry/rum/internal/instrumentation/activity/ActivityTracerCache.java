@@ -51,10 +51,10 @@ public class ActivityTracerCache {
         this(
                 activity ->
                         ActivityTracer.builder(activity)
-                                .initialAppActivity(initialAppActivity)
-                                .tracer(tracer)
-                                .appStartupTimer(startupTimer)
-                                .visibleScreenTracker(visibleScreenTracker)
+                                .setInitialAppActivity(initialAppActivity)
+                                .setTracer(tracer)
+                                .setAppStartupTimer(startupTimer)
+                                .setVisibleScreenTracker(visibleScreenTracker)
                                 .build());
     }
 

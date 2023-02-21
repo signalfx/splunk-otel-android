@@ -56,10 +56,10 @@ public class ActivityTracerTest {
     void restart_nonInitialActivity() {
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
-                        .initialAppActivity("FirstActivity")
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setInitialAppActivity("FirstActivity")
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
         trackableTracer.initiateRestartSpanIfNecessary(false);
         trackableTracer.endActiveSpan();
@@ -72,10 +72,10 @@ public class ActivityTracerTest {
     public void restart_initialActivity() {
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
-                        .initialAppActivity("Activity")
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setInitialAppActivity("Activity")
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
         trackableTracer.initiateRestartSpanIfNecessary(false);
         trackableTracer.endActiveSpan();
@@ -89,10 +89,10 @@ public class ActivityTracerTest {
     public void restart_initialActivity_multiActivityApp() {
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
-                        .initialAppActivity("Activity")
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setInitialAppActivity("Activity")
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
         trackableTracer.initiateRestartSpanIfNecessary(true);
         trackableTracer.endActiveSpan();
@@ -105,10 +105,10 @@ public class ActivityTracerTest {
     public void create_nonInitialActivity() {
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
-                        .initialAppActivity("FirstActivity")
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setInitialAppActivity("FirstActivity")
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
 
         trackableTracer.startActivityCreation();
@@ -122,10 +122,10 @@ public class ActivityTracerTest {
     public void create_initialActivity() {
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
-                        .initialAppActivity("Activity")
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setInitialAppActivity("Activity")
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
         trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
@@ -140,9 +140,9 @@ public class ActivityTracerTest {
         appStartupTimer.start(tracer);
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
         trackableTracer.startActivityCreation();
         trackableTracer.endActiveSpan();
@@ -165,9 +165,9 @@ public class ActivityTracerTest {
 
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
 
         trackableTracer.startSpanIfNoneInProgress("starting");
@@ -185,9 +185,9 @@ public class ActivityTracerTest {
 
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
 
         trackableTracer.startSpanIfNoneInProgress("starting");
@@ -204,9 +204,9 @@ public class ActivityTracerTest {
 
         ActivityTracer trackableTracer =
                 ActivityTracer.builder(mock(Activity.class))
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
 
         trackableTracer.startSpanIfNoneInProgress("starting");
@@ -222,9 +222,9 @@ public class ActivityTracerTest {
         Activity annotatedActivity = new AnnotatedActivity();
         ActivityTracer activityTracer =
                 ActivityTracer.builder(annotatedActivity)
-                        .tracer(tracer)
-                        .appStartupTimer(appStartupTimer)
-                        .activeSpan(activeSpan)
+                        .setTracer(tracer)
+                        .setAppStartupTimer(appStartupTimer)
+                        .setActiveSpan(activeSpan)
                         .build();
         activityTracer.startActivityCreation();
         activityTracer.endActiveSpan();

@@ -169,32 +169,32 @@ public class ActivityTracer {
             this.activity = activity;
         }
 
-        public Builder visibleScreenTracker(VisibleScreenTracker visibleScreenTracker) {
+        public Builder setVisibleScreenTracker(VisibleScreenTracker visibleScreenTracker) {
             this.activeSpan = new ActiveSpan(visibleScreenTracker::getPreviouslyVisibleScreen);
             return this;
         }
 
-        public Builder initialAppActivity(String activityName) {
+        public Builder setInitialAppActivity(String activityName) {
             initialAppActivity.set(activityName);
             return this;
         }
 
-        public Builder initialAppActivity(AtomicReference<String> initialAppActivity) {
+        public Builder setInitialAppActivity(AtomicReference<String> initialAppActivity) {
             this.initialAppActivity = initialAppActivity;
             return this;
         }
 
-        public Builder tracer(Tracer tracer) {
+        public Builder setTracer(Tracer tracer) {
             this.tracer = tracer;
             return this;
         }
 
-        public Builder appStartupTimer(AppStartupTimer appStartupTimer) {
+        public Builder setAppStartupTimer(AppStartupTimer appStartupTimer) {
             this.appStartupTimer = appStartupTimer;
             return this;
         }
 
-        public Builder activeSpan(ActiveSpan activeSpan) {
+        public Builder setActiveSpan(ActiveSpan activeSpan) {
             this.activeSpan = activeSpan;
             return this;
         }
