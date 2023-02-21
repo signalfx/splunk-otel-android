@@ -32,7 +32,5 @@ public class RumConstants {
 
     public static final String APP_START_SPAN_NAME = "AppStart";
 
-    // chopping block
-
     private RumConstants() {}
 }
