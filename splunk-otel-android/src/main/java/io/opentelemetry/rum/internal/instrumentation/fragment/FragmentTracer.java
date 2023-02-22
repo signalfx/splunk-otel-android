@@ -23,7 +23,7 @@ import com.splunk.rum.RumScreenName;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.rum.internal.ActiveSpan;
+import io.opentelemetry.rum.internal.util.ActiveSpan;
 
 class FragmentTracer {
     static final AttributeKey<String> FRAGMENT_NAME_KEY = AttributeKey.stringKey("fragmentName");

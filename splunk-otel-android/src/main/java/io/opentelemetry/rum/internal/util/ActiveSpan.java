@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.opentelemetry.rum.internal;
+package io.opentelemetry.rum.internal.util;
 
 import static io.opentelemetry.rum.internal.RumConstants.LAST_SCREEN_NAME_KEY;
 

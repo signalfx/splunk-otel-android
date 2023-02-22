@@ -29,8 +29,8 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
-import io.opentelemetry.rum.internal.ActiveSpan;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
+import io.opentelemetry.rum.internal.util.ActiveSpan;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ActivityTracer {
@@ -192,11 +192,11 @@ public class ActivityTracer {
             return this;
         }
 
-        public String getActivityName() {
+        private String getActivityName() {
             return activity.getClass().getSimpleName();
         }
 
-        public RumScreenName getRumScreenName() {
+        private RumScreenName getRumScreenName() {
             return activity.getClass().getAnnotation(RumScreenName.class);
         }
 
