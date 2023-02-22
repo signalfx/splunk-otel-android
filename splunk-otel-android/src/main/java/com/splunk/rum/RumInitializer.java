@@ -23,7 +23,6 @@ import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
 import static com.splunk.rum.SplunkRum.RUM_VERSION_KEY;
-import static java.util.Objects.requireNonNull;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.rum.internal.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
@@ -33,28 +32,15 @@ import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS_TYPE;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS_VERSION;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.SERVICE_NAME;
+import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.os.Build;
 import android.os.Looper;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.splunk.android.rum.R;
-
-import java.io.File;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.logging.Level;
-
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
@@ -80,6 +66,15 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import java.io.File;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.logging.Level;
 import zipkin2.reporter.Sender;
 import zipkin2.reporter.okhttp3.OkHttpSender;
 
@@ -206,16 +201,23 @@ class RumInitializer {
 
         otelRumBuilder.addInstrumentation(
                 instrumentedApp -> {
-                    Function<Tracer, Tracer> tracerCustomizer = tracer -> (Tracer) spanName -> {
-                        String component = spanName.equals(APP_START_SPAN_NAME) ? COMPONENT_APPSTART : COMPONENT_UI;
-                        return tracer.spanBuilder(spanName)
-                                .setAttribute(COMPONENT_KEY, component);
-                    };
-                    AndroidLifecycleInstrumentation instrumentation = AndroidLifecycleInstrumentation.builder()
-                            .setVisibleScreenTracker(visibleScreenTracker)
-                            .setStartupTimer(startupTimer)
-                            .setTracerCustomizer(tracerCustomizer)
-                            .build();
+                    Function<Tracer, Tracer> tracerCustomizer =
+                            tracer ->
+                                    (Tracer)
+                                            spanName -> {
+                                                String component =
+                                                        spanName.equals(APP_START_SPAN_NAME)
+                                                                ? COMPONENT_APPSTART
+                                                                : COMPONENT_UI;
+                                                return tracer.spanBuilder(spanName)
+                                                        .setAttribute(COMPONENT_KEY, component);
+                                            };
+                    AndroidLifecycleInstrumentation instrumentation =
+                            AndroidLifecycleInstrumentation.builder()
+                                    .setVisibleScreenTracker(visibleScreenTracker)
+                                    .setStartupTimer(startupTimer)
+                                    .setTracerCustomizer(tracerCustomizer)
+                                    .build();
                     instrumentation.installOn(instrumentedApp);
                     initializationEvents.add(
                             new InitializationEvent(
