@@ -1,12 +1,24 @@
+/*
+ * Copyright Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.opentelemetry.rum.internal.instrumentation.lifecycle;
 
 import android.app.Application;
 import android.os.Build;
-
 import androidx.annotation.NonNull;
-
-import java.util.function.Function;
-
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
 import io.opentelemetry.rum.internal.instrumentation.activity.ActivityCallbacks;
@@ -18,13 +30,14 @@ import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenLifec
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.rum.internal.instrumentation.fragment.RumFragmentLifecycleCallbacks;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
+import java.util.function.Function;
 
 /**
- * This is an umbrella instrumentation that covers several things:
- * * startup timer callback is registered so that UI startup time can be measured
- * - activity lifecycle callbacks are registered so that lifecycle events can be generated
- * - activity lifecycle callback listener is registered to that will register a FragmentLifecycleCallbacks when appropriate
- * - activity lifecycle callback listener is registered to dispatch events to the VisibleScreenTracker
+ * This is an umbrella instrumentation that covers several things: * startup timer callback is
+ * registered so that UI startup time can be measured - activity lifecycle callbacks are registered
+ * so that lifecycle events can be generated - activity lifecycle callback listener is registered to
+ * that will register a FragmentLifecycleCallbacks when appropriate - activity lifecycle callback
+ * listener is registered to dispatch events to the VisibleScreenTracker
  */
 public class AndroidLifecycleInstrumentation {
 
@@ -32,7 +45,7 @@ public class AndroidLifecycleInstrumentation {
     private final AppStartupTimer startupTimer;
     private final VisibleScreenTracker visibleScreenTracker;
 
-    private final Function<Tracer,Tracer> tracerCustomizer;
+    private final Function<Tracer, Tracer> tracerCustomizer;
 
     private AndroidLifecycleInstrumentation(Builder builder) {
         this.startupTimer = builder.startupTimer;
@@ -44,7 +57,7 @@ public class AndroidLifecycleInstrumentation {
         return new Builder();
     }
 
-    public void installOn(InstrumentedApplication app){
+    public void installOn(InstrumentedApplication app) {
         installStartupTimerInstrumentation(app);
         installActivityLifecycleEventsInstrumentation(app);
         installFragmentLifecycleInstrumentation(app);
@@ -53,19 +66,19 @@ public class AndroidLifecycleInstrumentation {
 
     private void installStartupTimerInstrumentation(InstrumentedApplication app) {
         app.getApplication()
-                .registerActivityLifecycleCallbacks(
-                        startupTimer.createLifecycleCallback());
+                .registerActivityLifecycleCallbacks(startupTimer.createLifecycleCallback());
     }
 
-    private void installActivityLifecycleEventsInstrumentation(InstrumentedApplication app){
-            Application.ActivityLifecycleCallbacks activityCallbacks =
-                    buildActivityEventsCallback(app);
-            app.getApplication().registerActivityLifecycleCallbacks(activityCallbacks);
+    private void installActivityLifecycleEventsInstrumentation(InstrumentedApplication app) {
+        Application.ActivityLifecycleCallbacks activityCallbacks = buildActivityEventsCallback(app);
+        app.getApplication().registerActivityLifecycleCallbacks(activityCallbacks);
     }
 
     @NonNull
-    private Application.ActivityLifecycleCallbacks buildActivityEventsCallback(InstrumentedApplication instrumentedApp) {
-        Tracer delegateTracer = instrumentedApp.getOpenTelemetrySdk().getTracer(INSTRUMENTATION_SCOPE);
+    private Application.ActivityLifecycleCallbacks buildActivityEventsCallback(
+            InstrumentedApplication instrumentedApp) {
+        Tracer delegateTracer =
+                instrumentedApp.getOpenTelemetrySdk().getTracer(INSTRUMENTATION_SCOPE);
         Tracer tracer = tracerCustomizer.apply(delegateTracer);
 
         ActivityTracerCache tracers =
@@ -78,12 +91,12 @@ public class AndroidLifecycleInstrumentation {
 
     private void installFragmentLifecycleInstrumentation(InstrumentedApplication app) {
         Application.ActivityLifecycleCallbacks fragmentRegisterer = buildFragmentRegisterer(app);
-        app.getApplication()
-                .registerActivityLifecycleCallbacks(fragmentRegisterer);
+        app.getApplication().registerActivityLifecycleCallbacks(fragmentRegisterer);
     }
 
     @NonNull
-    private Application.ActivityLifecycleCallbacks buildFragmentRegisterer(InstrumentedApplication app) {
+    private Application.ActivityLifecycleCallbacks buildFragmentRegisterer(
+            InstrumentedApplication app) {
 
         Tracer delegateTracer = app.getOpenTelemetrySdk().getTracer(INSTRUMENTATION_SCOPE);
         Tracer tracer = tracerCustomizer.apply(delegateTracer);
@@ -98,8 +111,7 @@ public class AndroidLifecycleInstrumentation {
     private void installScreenTrackingInstrumentation(InstrumentedApplication app) {
         Application.ActivityLifecycleCallbacks screenTrackingBinding =
                 buildScreenTrackingBinding(visibleScreenTracker);
-        app.getApplication()
-                .registerActivityLifecycleCallbacks(screenTrackingBinding);
+        app.getApplication().registerActivityLifecycleCallbacks(screenTrackingBinding);
     }
 
     @NonNull
@@ -135,5 +147,4 @@ public class AndroidLifecycleInstrumentation {
             return new AndroidLifecycleInstrumentation(this);
         }
     }
-
 }
