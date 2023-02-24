@@ -122,5 +122,4 @@ public class AndroidLifecycleInstrumentation {
         }
         return new VisibleScreenLifecycleBinding(visibleScreenTracker);
     }
-
 }
