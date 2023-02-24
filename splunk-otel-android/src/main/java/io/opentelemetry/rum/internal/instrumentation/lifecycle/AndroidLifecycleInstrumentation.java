@@ -47,14 +47,14 @@ public class AndroidLifecycleInstrumentation {
 
     private final Function<Tracer, Tracer> tracerCustomizer;
 
-    private AndroidLifecycleInstrumentation(Builder builder) {
+    AndroidLifecycleInstrumentation(AndroidLifecycleInstrumentationBuilder builder) {
         this.startupTimer = builder.startupTimer;
         this.visibleScreenTracker = builder.visibleScreenTracker;
         this.tracerCustomizer = builder.tracerCustomizer;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static AndroidLifecycleInstrumentationBuilder builder() {
+        return new AndroidLifecycleInstrumentationBuilder();
     }
 
     public void installOn(InstrumentedApplication app) {
@@ -123,28 +123,4 @@ public class AndroidLifecycleInstrumentation {
         return new VisibleScreenLifecycleBinding(visibleScreenTracker);
     }
 
-    public static class Builder {
-        private AppStartupTimer startupTimer;
-        private VisibleScreenTracker visibleScreenTracker;
-        private Function<Tracer, Tracer> tracerCustomizer = Function.identity();
-
-        public Builder setStartupTimer(AppStartupTimer timer) {
-            this.startupTimer = timer;
-            return this;
-        }
-
-        public Builder setVisibleScreenTracker(VisibleScreenTracker tracker) {
-            this.visibleScreenTracker = tracker;
-            return this;
-        }
-
-        public Builder setTracerCustomizer(Function<Tracer, Tracer> customizer) {
-            this.tracerCustomizer = customizer;
-            return this;
-        }
-
-        public AndroidLifecycleInstrumentation build() {
-            return new AndroidLifecycleInstrumentation(this);
-        }
-    }
 }
