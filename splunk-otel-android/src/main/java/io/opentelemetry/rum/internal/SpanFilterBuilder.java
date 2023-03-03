@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum;
+package io.opentelemetry.rum.internal;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
@@ -33,8 +33,6 @@ public final class SpanFilterBuilder {
     private final Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates =
             new HashMap<>();
     private final Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements = new HashMap<>();
-
-    SpanFilterBuilder() {}
 
     /**
      * Remove matching spans from the exporter pipeline.
@@ -129,7 +127,7 @@ public final class SpanFilterBuilder {
         return this;
     }
 
-    Function<SpanExporter, SpanExporter> build() {
+    public Function<SpanExporter, SpanExporter> build() {
         // make a copy so that the references from the builder are not included in the returned
         // function
         Predicate<String> rejectSpanNamesPredicate = this.rejectSpanNamesPredicate;
