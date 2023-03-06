@@ -84,8 +84,6 @@ public final class VolleyTracingBuilder {
     public VolleyTracing build() {
         VolleyHttpClientAttributesGetter httpAttributesGetter =
                 VolleyHttpClientAttributesGetter.INSTANCE;
-        VolleyNetClientAttributesGetter netAttributesGetter =
-                VolleyNetClientAttributesGetter.INSTANCE;
         SpanStatusExtractor<RequestWrapper, HttpResponse> spanStatusExtractor =
                 HttpSpanStatusExtractor.create(httpAttributesGetter);
         SpanNameExtractor<RequestWrapper> spanNameExtractor =
@@ -96,8 +94,6 @@ public final class VolleyTracingBuilder {
                                 openTelemetry, INSTRUMENTATION_NAME, spanNameExtractor)
                         .setSpanStatusExtractor(spanStatusExtractor)
                         .addAttributesExtractor(httpClientAttributesExtractorBuilder.build())
-                        .addAttributesExtractor(
-                                NetClientAttributesExtractor.create(netAttributesGetter))
                         .addAttributesExtractor(
                                 new VolleyResponseAttributesExtractor(
                                         new ServerTimingHeaderParser()))
