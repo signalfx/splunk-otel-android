@@ -22,8 +22,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Delegating wrapper around otel SpanFilterBuilder. This class is deprecated and you should prefer
- * to use the otel version of SpanFilterBuilder.
+ * Delegating wrapper around otel SpanFilterBuilder.
  */
 @Deprecated
 public final class SpanFilterBuilder {

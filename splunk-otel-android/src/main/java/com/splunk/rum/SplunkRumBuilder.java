@@ -22,7 +22,6 @@ import android.app.Application;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.rum.internal.SpanFilterBuilder;
 import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.time.Duration;
