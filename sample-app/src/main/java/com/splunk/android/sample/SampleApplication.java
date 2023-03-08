@@ -50,7 +50,7 @@ public class SampleApplication extends Application {
                                 .put("vendor", "Splunk")
                                 .put(StandardAttributes.APP_VERSION, BuildConfig.VERSION_NAME)
                                 .build())
-                .filterSpans(
+                .configureSpanFilter(
                         spanFilter ->
                                 spanFilter
                                         .removeSpanAttribute(stringKey("http.user_agent"))

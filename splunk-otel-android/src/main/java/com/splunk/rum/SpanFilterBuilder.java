@@ -21,9 +21,7 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-/**
- * Delegating wrapper around otel SpanFilterBuilder.
- */
+/** Delegating wrapper around otel SpanFilterBuilder. */
 @Deprecated
 public final class SpanFilterBuilder {
 
@@ -108,6 +106,10 @@ public final class SpanFilterBuilder {
             AttributeKey<T> attributeKey, Function<? super T, ? extends T> attributeValueModifier) {
         delegate.replaceSpanAttribute(attributeKey, attributeValueModifier);
         return this;
+    }
+
+    io.opentelemetry.rum.internal.SpanFilterBuilder getDelegate() {
+        return delegate;
     }
 
     public Function<SpanExporter, SpanExporter> build() {

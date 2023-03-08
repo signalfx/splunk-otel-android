@@ -51,7 +51,7 @@ android {
     }
 }
 
-val otelVersion = "1.23.1"
+val otelVersion = "1.23.1e"
 val otelAlphaVersion = "$otelVersion-alpha"
 val otelInstrumentationVersion = "1.23.0"
 val otelInstrumentationAlphaVersion = "$otelInstrumentationVersion-alpha"
