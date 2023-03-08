@@ -114,61 +114,86 @@ class RumInitializer {
         initializationEvents.add(
                 new InitializationEvent("connectionUtilInitialized", startupTimer.clockNow()));
 
+        // TODO: How truly important is the order of these span processors? The location of event
+        // generation should probably not be altered...
+
         GlobalAttributesSpanAppender globalAttributesSpanAppender =
                 GlobalAttributesSpanAppender.create(builder.globalAttributes);
-        otelRumBuilder.addTracerProviderCustomizer(
-                (tracerProviderBuilder, app) -> {
-                    SpanProcessor networkAttributesSpanAppender =
-                            NetworkAttributesSpanAppender.create(currentNetworkProvider);
-                    ScreenAttributesAppender screenAttributesAppender =
-                            new ScreenAttributesAppender(visibleScreenTracker);
-                    initializationEvents.add(
-                            new RumInitializer.InitializationEvent(
-                                    "attributeAppenderInitialized", startupTimer.clockNow()));
 
-                    SpanExporter zipkinExporter = buildFilteringExporter(currentNetworkProvider);
-                    initializationEvents.add(
-                            new RumInitializer.InitializationEvent(
-                                    "exporterInitialized", startupTimer.clockNow()));
+        // Add span processor that appends global attributes.
+        otelRumBuilder.addTracerProviderCustomizer((tracerProviderBuilder, app) ->
+                tracerProviderBuilder.addSpanProcessor(globalAttributesSpanAppender));
 
-                    BatchSpanProcessor batchSpanProcessor =
-                            BatchSpanProcessor.builder(zipkinExporter).build();
-                    initializationEvents.add(
-                            new RumInitializer.InitializationEvent(
-                                    "batchSpanProcessorInitialized", startupTimer.clockNow()));
+        // Add span processor that appends network attributes.
+        otelRumBuilder.addTracerProviderCustomizer((tracerProviderBuilder, app) -> {
+            SpanProcessor networkAttributesSpanAppender =
+                    NetworkAttributesSpanAppender.create(currentNetworkProvider);
+            return tracerProviderBuilder.addSpanProcessor(networkAttributesSpanAppender);
+        });
 
-                    tracerProviderBuilder
-                            .addSpanProcessor(globalAttributesSpanAppender)
-                            .addSpanProcessor(networkAttributesSpanAppender)
-                            .addSpanProcessor(screenAttributesAppender)
-                            .addSpanProcessor(batchSpanProcessor)
-                            .setSpanLimits(
-                                    SpanLimits.builder()
-                                            .setMaxAttributeValueLength(MAX_ATTRIBUTE_LENGTH)
-                                            .build());
+        // Add span processor that appends screen attributes and generate init event.
+        otelRumBuilder.addTracerProviderCustomizer((tracerProviderBuilder, app) -> {
+            ScreenAttributesAppender screenAttributesAppender =
+                    new ScreenAttributesAppender(visibleScreenTracker);
+            initializationEvents.add(
+                    new RumInitializer.InitializationEvent(
+                            "attributeAppenderInitialized", startupTimer.clockNow()));
+            return tracerProviderBuilder.addSpanProcessor(screenAttributesAppender);
+        });
 
-                    if (builder.sessionBasedSamplerEnabled) {
-                        // TODO: this is hacky behavior that utilizes a mutable variable, fix this!
-                        tracerProviderBuilder.setSampler(
-                                new SessionIdRatioBasedSampler(
-                                        builder.sessionBasedSamplerRatio, SplunkRum::getInstance));
-                    }
+        // Add batch span processor
+        otelRumBuilder.addTracerProviderCustomizer((tracerProviderBuilder, app) -> {
+            SpanExporter zipkinExporter = buildFilteringExporter(currentNetworkProvider);
+            initializationEvents.add(
+                    new RumInitializer.InitializationEvent(
+                            "exporterInitialized", startupTimer.clockNow()));
 
-                    if (builder.debugEnabled) {
-                        tracerProviderBuilder.addSpanProcessor(
-                                SimpleSpanProcessor.create(
-                                        builder.decorateWithSpanFilter(
-                                                LoggingSpanExporter.create())));
-                        initializationEvents.add(
-                                new RumInitializer.InitializationEvent(
-                                        "debugSpanExporterInitialized", startupTimer.clockNow()));
-                    }
+            BatchSpanProcessor batchSpanProcessor =
+                    BatchSpanProcessor.builder(zipkinExporter).build();
+            initializationEvents.add(
+                    new RumInitializer.InitializationEvent(
+                            "batchSpanProcessorInitialized", startupTimer.clockNow()));
+            return tracerProviderBuilder.addSpanProcessor(batchSpanProcessor);
+        });
 
-                    initializationEvents.add(
-                            new RumInitializer.InitializationEvent(
-                                    "tracerProviderInitialized", startupTimer.clockNow()));
-                    return tracerProviderBuilder;
-                });
+        // Set span limits
+        otelRumBuilder.addTracerProviderCustomizer((tracerProviderBuilder, app) ->
+                tracerProviderBuilder.setSpanLimits(
+                        SpanLimits.builder()
+                                .setMaxAttributeValueLength(MAX_ATTRIBUTE_LENGTH)
+                                .build()));
+
+        // Set up the sampler, if enabled
+        if (builder.sessionBasedSamplerEnabled) {
+            otelRumBuilder.addTracerProviderCustomizer((tracerProviderBuilder, app) -> {
+                // TODO: this is hacky behavior that utilizes a mutable variable, fix this!
+                return tracerProviderBuilder.setSampler(
+                        new SessionIdRatioBasedSampler(
+                                builder.sessionBasedSamplerRatio, () -> SplunkRum.getInstance().getRumSessionId()));
+            });
+        }
+
+        // Wire up the logging exporter, if enabled.
+        if (builder.debugEnabled) {
+            otelRumBuilder.addTracerProviderCustomizer((tracerProviderBuilder, app) -> {
+                tracerProviderBuilder.addSpanProcessor(
+                        SimpleSpanProcessor.create(
+                                builder.decorateWithSpanFilter(
+                                        LoggingSpanExporter.create())));
+                initializationEvents.add(
+                        new RumInitializer.InitializationEvent(
+                                "debugSpanExporterInitialized", startupTimer.clockNow()));
+                return tracerProviderBuilder;
+            });
+        }
+
+        //Add final event showing tracer provider init finished
+        otelRumBuilder.addTracerProviderCustomizer((tracerProviderBuilder, app) -> {
+            initializationEvents.add(
+                    new RumInitializer.InitializationEvent(
+                            "tracerProviderInitialized", startupTimer.clockNow()));
+            return tracerProviderBuilder;
+        });
 
         if (builder.anrDetectionEnabled) {
             installAnrDetector(otelRumBuilder, mainLooper);
