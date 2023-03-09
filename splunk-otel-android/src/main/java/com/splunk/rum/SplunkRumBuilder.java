@@ -240,27 +240,13 @@ public final class SplunkRumBuilder {
     }
 
     /**
-     * Configures span data filtering. This method is deprecated in favor of {@link #configureSpanFilter(Consumer)}.
+     * Configures span data filtering.
      *
      * @param configurer A function that will configure the passed {@link SpanFilterBuilder}.
      * @return {@code this}
      */
-    @Deprecated
     public SplunkRumBuilder filterSpans(Consumer<SpanFilterBuilder> configurer) {
         configurer.accept(spanFilterBuilder);
-        return this;
-    }
-
-    /**
-     * Configures span data filtering.
-     *
-     * @param configurer A function that will configure the passed {@link
-     *     io.opentelemetry.rum.internal.SpanFilterBuilder}.
-     * @return {@code this}
-     */
-    public SplunkRumBuilder configureSpanFilter(
-            Consumer<io.opentelemetry.rum.internal.SpanFilterBuilder> configurer) {
-        configurer.accept(spanFilterBuilder.getDelegate());
         return this;
     }
 

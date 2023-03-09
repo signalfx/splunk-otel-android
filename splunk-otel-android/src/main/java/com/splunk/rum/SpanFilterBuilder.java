@@ -22,7 +22,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /** Delegating wrapper around otel SpanFilterBuilder. */
-@Deprecated
 public final class SpanFilterBuilder {
 
     private final io.opentelemetry.rum.internal.SpanFilterBuilder delegate =
