@@ -240,7 +240,7 @@ public final class SplunkRumBuilder {
     }
 
     /**
-     * Configures span data filtering. This method is deprecated in favor of configureSpanFilter().
+     * Configures span data filtering. This method is deprecated in favor of {@link #configureSpanFilter(Consumer)}.
      *
      * @param configurer A function that will configure the passed {@link SpanFilterBuilder}.
      * @return {@code this}
