@@ -97,7 +97,7 @@ class RumInitializer {
             Looper mainLooper) {
         VisibleScreenTracker visibleScreenTracker = new VisibleScreenTracker();
 
-        long startTimeNanos = startupTimer.clockNow();
+        initializationEvents.begin();
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder();
 
         otelRumBuilder.setResource(createResource());
@@ -206,7 +206,6 @@ class RumInitializer {
         OpenTelemetryRum openTelemetryRum = otelRumBuilder.build(application);
 
         initializationEvents.recordInitializationSpans(
-                startTimeNanos,
                 builder.getConfigFlags(),
                 openTelemetryRum.getOpenTelemetry().getTracer(RUM_TRACER_NAME));
 

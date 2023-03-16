@@ -31,16 +31,21 @@ import java.util.concurrent.TimeUnit;
 class InitializationEvents {
     private final AppStartupTimer startupTimer;
     private final List<Event> events = new ArrayList<>();
+    private long startTimeNanos = -1;
 
     InitializationEvents(AppStartupTimer startupTimer) {
         this.startupTimer = startupTimer;
+    }
+
+    void begin() {
+        startTimeNanos = startupTimer.clockNow();
     }
 
     void emit(String eventName) {
         events.add(new Event(eventName, startupTimer.clockNow()));
     }
 
-    void recordInitializationSpans(long startTimeNanos, ConfigFlags flags, Tracer delegateTracer) {
+    void recordInitializationSpans(ConfigFlags flags, Tracer delegateTracer) {
         Tracer tracer =
                 spanName ->
                         delegateTracer
