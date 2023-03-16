@@ -16,6 +16,8 @@
 
 package com.splunk.rum;
 
+import androidx.annotation.NonNull;
+
 class ConfigFlags {
     private boolean debugEnabled = false;
     private boolean diskBufferingEnabled = false;
@@ -79,5 +81,25 @@ class ConfigFlags {
 
     boolean isReactNativeSupportEnabled() {
         return reactNativeSupportEnabled;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "[debug:"
+                + debugEnabled
+                + ","
+                + "crashReporting:"
+                + crashReportingEnabled
+                + ","
+                + "anrReporting:"
+                + anrDetectionEnabled
+                + ","
+                + "slowRenderingDetector:"
+                + slowRenderingDetectionEnabled
+                + ","
+                + "networkMonitor:"
+                + networkMonitorEnabled
+                + "]";
     }
 }

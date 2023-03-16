@@ -54,8 +54,7 @@ class InitializationEvents {
                         .setStartTimestamp(startTimeNanos, TimeUnit.NANOSECONDS)
                         .startSpan();
 
-        String configSettings = buildConfigSettings(flags);
-        span.setAttribute("config_settings", configSettings);
+        span.setAttribute("config_settings", flags.toString());
 
         for (Event initializationEvent : events) {
             span.addEvent(initializationEvent.name, initializationEvent.time, TimeUnit.NANOSECONDS);
@@ -64,25 +63,6 @@ class InitializationEvents {
         // we only want to create SplunkRum.initialize span when there is a AppStart span so we
         // register a callback that is called right before AppStart span is ended
         startupTimer.setCompletionCallback(() -> span.end(spanEndTime, TimeUnit.NANOSECONDS));
-    }
-
-    @NonNull
-    private String buildConfigSettings(ConfigFlags flags) {
-        return "[debug:"
-                + flags.isDebugEnabled()
-                + ","
-                + "crashReporting:"
-                + flags.isCrashReportingEnabled()
-                + ","
-                + "anrReporting:"
-                + flags.isAnrDetectionEnabled()
-                + ","
-                + "slowRenderingDetector:"
-                + flags.isSlowRenderingDetectionEnabled()
-                + ","
-                + "networkMonitor:"
-                + flags.isNetworkMonitorEnabled()
-                + "]";
     }
 
     private static class Event {
