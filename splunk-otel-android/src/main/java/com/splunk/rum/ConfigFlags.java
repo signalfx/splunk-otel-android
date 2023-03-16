@@ -16,7 +16,7 @@
 
 package com.splunk.rum;
 
-public class ConfigFlags {
+class ConfigFlags {
     private boolean debugEnabled = false;
     private boolean diskBufferingEnabled = false;
     private boolean reactNativeSupportEnabled = false;
@@ -25,59 +25,59 @@ public class ConfigFlags {
     private boolean anrDetectionEnabled = true;
     private boolean slowRenderingDetectionEnabled = true;
 
-    public void enableDebug() {
+    void enableDebug() {
         debugEnabled = true;
     }
 
-    public void enableDiskBuffering() {
+    void enableDiskBuffering() {
         diskBufferingEnabled = true;
     }
 
-    public void enableReactNativeSupport() {
+    void enableReactNativeSupport() {
         reactNativeSupportEnabled = true;
     }
 
-    public void disableCrashReporting() {
+    void disableCrashReporting() {
         crashReportingEnabled = false;
     }
 
-    public void disableNetworkMonitor() {
+    void disableNetworkMonitor() {
         networkMonitorEnabled = false;
     }
 
-    public void disableAnrDetection() {
+    void disableAnrDetection() {
         anrDetectionEnabled = false;
     }
 
-    public void disableSlowRenderingDetection() {
+    void disableSlowRenderingDetection() {
         slowRenderingDetectionEnabled = false;
     }
 
-    public boolean isDebugEnabled() {
+    boolean isDebugEnabled() {
         return debugEnabled;
     }
 
-    public boolean isAnrDetectionEnabled() {
+    boolean isAnrDetectionEnabled() {
         return anrDetectionEnabled;
     }
 
-    public boolean isNetworkMonitorEnabled() {
+    boolean isNetworkMonitorEnabled() {
         return networkMonitorEnabled;
     }
 
-    public boolean isSlowRenderingDetectionEnabled() {
+    boolean isSlowRenderingDetectionEnabled() {
         return slowRenderingDetectionEnabled;
     }
 
-    public boolean isCrashReportingEnabled() {
+    boolean isCrashReportingEnabled() {
         return crashReportingEnabled;
     }
 
-    public boolean isDiskBufferingEnabled() {
+    boolean isDiskBufferingEnabled() {
         return diskBufferingEnabled;
     }
 
-    public boolean isReactNativeSupportEnabled() {
+    boolean isReactNativeSupportEnabled() {
         return reactNativeSupportEnabled;
     }
 }
