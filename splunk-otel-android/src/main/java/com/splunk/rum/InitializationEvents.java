@@ -52,7 +52,6 @@ class InitializationEvents {
                 tracer.spanBuilder("SplunkRum.initialize")
                         .setParent(Context.current().with(overallAppStart))
                         .setStartTimestamp(startTimeNanos, TimeUnit.NANOSECONDS)
-                        .setAttribute(COMPONENT_KEY, COMPONENT_APPSTART)
                         .startSpan();
 
         String configSettings = buildConfigSettings(flags);
