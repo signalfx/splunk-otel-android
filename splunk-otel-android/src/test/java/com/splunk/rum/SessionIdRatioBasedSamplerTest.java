@@ -16,6 +16,7 @@
 
 package com.splunk.rum;
 
+import static io.opentelemetry.rum.internal.RumConstants.SESSION_ID_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.opentelemetry.api.common.Attributes;
@@ -37,7 +38,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class SessionIdRatioBasedSamplerTest {
     private static final String HIGH_ID = "00000000000000008fffffffffffffff";
-    private static final Supplier<String> HIGH_ID_SUPPLIER = () -> HIGH_ID;
     private static final String LOW_ID = "00000000000000000000000000000000";
     private static final Supplier<String> LOW_ID_SAMPLER = () -> LOW_ID;
     private static final IdGenerator idsGenerator = IdGenerator.random();
@@ -49,44 +49,42 @@ class SessionIdRatioBasedSamplerTest {
 
     @Test
     void samplerDropsHigh() {
-        SessionIdRatioBasedSampler sampler = new SessionIdRatioBasedSampler(0.5, HIGH_ID_SUPPLIER);
+        SessionIdRatioBasedSampler sampler = new SessionIdRatioBasedSampler(0.5);
 
         // Sampler drops if TraceIdRatioBasedSampler would drop this sessionId
-        assertEquals(shouldSample(sampler), SamplingDecision.DROP);
+        assertEquals(shouldSample(sampler, HIGH_ID), SamplingDecision.DROP);
     }
 
     @Test
     void samplerKeepsLowestId() {
         // Sampler accepts if TraceIdRatioBasedSampler would accept this sessionId
-        SessionIdRatioBasedSampler sampler = new SessionIdRatioBasedSampler(0.5, LOW_ID_SAMPLER);
-        assertEquals(shouldSample(sampler), SamplingDecision.RECORD_AND_SAMPLE);
+        SessionIdRatioBasedSampler sampler = new SessionIdRatioBasedSampler(0.5);
+        assertEquals(shouldSample(sampler, LOW_ID), SamplingDecision.RECORD_AND_SAMPLE);
     }
 
     @Test
     void zeroRatioDropsAll() {
-        SessionIdRatioBasedSampler samplerHigh =
-                new SessionIdRatioBasedSampler(0.0, HIGH_ID_SUPPLIER);
-        assertEquals(shouldSample(samplerHigh), SamplingDecision.DROP);
-        SessionIdRatioBasedSampler samplerLow = new SessionIdRatioBasedSampler(0.0, LOW_ID_SAMPLER);
-        assertEquals(shouldSample(samplerLow), SamplingDecision.DROP);
+        SessionIdRatioBasedSampler samplerHigh = new SessionIdRatioBasedSampler(0.0);
+        assertEquals(shouldSample(samplerHigh, HIGH_ID), SamplingDecision.DROP);
+        SessionIdRatioBasedSampler samplerLow = new SessionIdRatioBasedSampler(0.0);
+        assertEquals(shouldSample(samplerLow, LOW_ID), SamplingDecision.DROP);
     }
 
     @Test
     void oneRatioAcceptsAll() {
-        SessionIdRatioBasedSampler samplerHigh =
-                new SessionIdRatioBasedSampler(1.0, HIGH_ID_SUPPLIER);
-        assertEquals(shouldSample(samplerHigh), SamplingDecision.RECORD_AND_SAMPLE);
-        SessionIdRatioBasedSampler samplerLow = new SessionIdRatioBasedSampler(1.0, LOW_ID_SAMPLER);
-        assertEquals(shouldSample(samplerLow), SamplingDecision.RECORD_AND_SAMPLE);
+        SessionIdRatioBasedSampler samplerHigh = new SessionIdRatioBasedSampler(1.0);
+        assertEquals(shouldSample(samplerHigh, HIGH_ID), SamplingDecision.RECORD_AND_SAMPLE);
+        SessionIdRatioBasedSampler samplerLow = new SessionIdRatioBasedSampler(1.0);
+        assertEquals(shouldSample(samplerLow, LOW_ID), SamplingDecision.RECORD_AND_SAMPLE);
     }
 
-    private SamplingDecision shouldSample(Sampler sampler) {
+    private SamplingDecision shouldSample(Sampler sampler, String sessionId) {
         return sampler.shouldSample(
                         parentContext,
                         traceId,
                         "name",
                         SpanKind.INTERNAL,
-                        Attributes.empty(),
+                        Attributes.of(SESSION_ID_KEY, sessionId),
                         parentLinks)
                 .getDecision();
     }

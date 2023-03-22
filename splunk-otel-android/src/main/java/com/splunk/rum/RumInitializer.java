@@ -157,14 +157,10 @@ class RumInitializer {
 
         // Set up the sampler, if enabled
         if (builder.sessionBasedSamplerEnabled) {
+            SessionIdRatioBasedSampler sampler =
+                    new SessionIdRatioBasedSampler(builder.sessionBasedSamplerRatio);
             otelRumBuilder.addTracerProviderCustomizer(
-                    (tracerProviderBuilder, app) -> {
-                        // TODO: this is hacky behavior that utilizes a mutable variable, fix this!
-                        return tracerProviderBuilder.setSampler(
-                                new SessionIdRatioBasedSampler(
-                                        builder.sessionBasedSamplerRatio,
-                                        () -> SplunkRum.getInstance().getRumSessionId()));
-                    });
+                    (tracerProviderBuilder, app) -> tracerProviderBuilder.setSampler(sampler));
         }
 
         // Wire up the logging exporter, if enabled.

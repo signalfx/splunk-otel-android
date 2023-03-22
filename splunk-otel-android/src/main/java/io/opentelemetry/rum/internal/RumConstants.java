@@ -32,5 +32,8 @@ public class RumConstants {
 
     public static final String APP_START_SPAN_NAME = "AppStart";
 
+    // TODO: rename to something that is not splunk specific
+    public static final AttributeKey<String> SESSION_ID_KEY = stringKey("splunk.rumSessionId");
+
     private RumConstants() {}
 }
