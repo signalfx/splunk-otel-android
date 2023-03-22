@@ -46,6 +46,7 @@ import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
 import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
 import io.opentelemetry.rum.internal.OpenTelemetryRum;
 import io.opentelemetry.rum.internal.OpenTelemetryRumBuilder;
+import io.opentelemetry.rum.internal.SessionIdRatioBasedSampler;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.rum.internal.instrumentation.anr.AnrDetector;
 import io.opentelemetry.rum.internal.instrumentation.crash.CrashReporter;
