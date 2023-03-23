@@ -41,8 +41,10 @@ import io.opentelemetry.sdk.trace.data.StatusData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+
 import java.util.Arrays;
 import java.util.Collection;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -53,8 +55,31 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class SplunkSpanDataModifierTest {
 
-    @Mock private SpanExporter delegate;
-    @Captor private ArgumentCaptor<Collection<SpanData>> exportedSpansCaptor;
+    @Mock
+    private SpanExporter delegate;
+    @Captor
+    private ArgumentCaptor<Collection<SpanData>> exportedSpansCaptor;
+
+    @Test
+    void changesSpanIdAttrName() {
+        String sessionId = "abc123fonzie";
+        Attributes attrs = Attributes.of(RumConstants.SESSION_ID_KEY, sessionId);
+        SpanData original = startBuilder()
+                        .setAttributes(attrs)
+                        .build();
+
+        CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
+        when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
+
+        SplunkSpanDataModifier underTest = new SplunkSpanDataModifier(delegate, false);
+        underTest.export(singletonList(original));
+
+        Collection<SpanData> exported = exportedSpansCaptor.getValue();
+        assertThat(exported).hasSize(1);
+        SpanData first = exported.iterator().next();
+        assertThat(first.getAttributes().get(StandardAttributes.SESSION_ID_KEY)).isEqualTo(sessionId);
+        assertThat(first.getAttributes().get(RumConstants.SESSION_ID_KEY)).isEqualTo(sessionId);
+    }
 
     @Test
     void changesSpanIdAttrName() {
@@ -234,8 +259,7 @@ class SplunkSpanDataModifierTest {
                         TraceFlags.getSampled(),
                         TraceState.getDefault());
 
-        SpanData original =
-                startBuilder("SplunkRumSpan")
+        SpanData original = startBuilder("SplunkRumSpan")
                         .setSpanContext(spanContext)
                         .setAttributes(
                                 Attributes.builder()
