@@ -25,7 +25,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-class SessionId {
+public class SessionId {
 
     private static final long SESSION_LIFETIME_NANOS = TimeUnit.HOURS.toNanos(4);
 
@@ -54,7 +54,11 @@ class SessionId {
         return TraceId.fromLongs(random.nextLong(), random.nextLong());
     }
 
-    String getSessionId() {
+    SessionIdTimeoutHandler getTimeoutHandler() {
+        return timeoutHandler;
+    }
+
+    public String getSessionId() {
         // value will never be null
         String oldValue = requireNonNull(value.get());
         String currentValue = oldValue;

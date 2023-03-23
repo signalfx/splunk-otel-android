@@ -41,6 +41,7 @@ import java.util.function.Consumer;
  */
 public final class OpenTelemetryRumBuilder {
 
+    private final SessionId sessionId;
     private Resource resource = Resource.getDefault();
     private final List<BiFunction<SdkTracerProviderBuilder, Application, SdkTracerProviderBuilder>>
             tracerProviderCustomizers = new ArrayList<>();
@@ -51,7 +52,9 @@ public final class OpenTelemetryRumBuilder {
     private final List<Consumer<InstrumentedApplication>> instrumentationInstallers =
             new ArrayList<>();
 
-    OpenTelemetryRumBuilder() {}
+    OpenTelemetryRumBuilder(SessionId sessionId) {
+        this.sessionId = sessionId;
+    }
 
     /**
      * Assign a {@link Resource} to be attached to all telemetry emitted by the {@link
@@ -135,6 +138,10 @@ public final class OpenTelemetryRumBuilder {
         return this;
     }
 
+    public SessionId getSessionId() {
+        return sessionId;
+    }
+
     /**
      * Creates a new instance of {@link OpenTelemetryRum} with the settings of this {@link
      * OpenTelemetryRumBuilder}.
@@ -151,9 +158,7 @@ public final class OpenTelemetryRumBuilder {
         ApplicationStateWatcher applicationStateWatcher = new ApplicationStateWatcher();
         application.registerActivityLifecycleCallbacks(applicationStateWatcher);
 
-        SessionIdTimeoutHandler timeoutHandler = new SessionIdTimeoutHandler();
-        SessionId sessionId = new SessionId(timeoutHandler);
-        applicationStateWatcher.registerListener(timeoutHandler);
+        applicationStateWatcher.registerListener(sessionId.getTimeoutHandler());
 
         OpenTelemetrySdk openTelemetrySdk =
                 OpenTelemetrySdk.builder()
