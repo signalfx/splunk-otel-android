@@ -19,6 +19,8 @@ package io.opentelemetry.rum.internal;
 import static io.opentelemetry.rum.internal.RumConstants.PREVIOUS_SESSION_ID_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import static io.opentelemetry.rum.internal.RumConstants.PREVIOUS_SESSION_ID_KEY;
+
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
