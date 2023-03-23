@@ -85,7 +85,6 @@ final class SplunkSpanDataModifier implements SpanExporter {
         // Copy the native session id name into the splunk name
         String sessionId = original.getAttributes().get(RumConstants.SESSION_ID_KEY);
         modifiedAttributes.put(StandardAttributes.SESSION_ID_KEY, sessionId);
-        modifiedAttributes.remove(RumConstants.SESSION_ID_KEY);
 
         SpanContext spanContext;
         if (reactNativeEnabled) {

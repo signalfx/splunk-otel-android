@@ -23,6 +23,7 @@ import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.when;
 
 import io.opentelemetry.api.common.Attributes;
@@ -30,6 +31,7 @@ import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.TraceFlags;
 import io.opentelemetry.api.trace.TraceState;
+import io.opentelemetry.rum.internal.RumConstants;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.testing.trace.TestSpanData;
@@ -39,8 +41,10 @@ import io.opentelemetry.sdk.trace.data.StatusData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+
 import java.util.Arrays;
 import java.util.Collection;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -51,19 +55,36 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class SplunkSpanDataModifierTest {
 
-    @Mock private SpanExporter delegate;
-    @Captor private ArgumentCaptor<Collection<SpanData>> exportedSpansCaptor;
+    @Mock
+    private SpanExporter delegate;
+    @Captor
+    private ArgumentCaptor<Collection<SpanData>> exportedSpansCaptor;
+
+    @Test
+    void changesSpanIdAttrName() {
+        String sessionId = "abc123fonzie";
+        Attributes attrs = Attributes.of(RumConstants.SESSION_ID_KEY, sessionId);
+        SpanData original = startBuilder()
+                        .setAttributes(attrs)
+                        .build();
+
+        CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
+        when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
+
+        SplunkSpanDataModifier underTest = new SplunkSpanDataModifier(delegate, false);
+        underTest.export(singletonList(original));
+
+        Collection<SpanData> exported = exportedSpansCaptor.getValue();
+        assertThat(exported).hasSize(1);
+        SpanData first = exported.iterator().next();
+        assertThat(first.getAttributes().get(StandardAttributes.SESSION_ID_KEY)).isEqualTo(sessionId);
+        assertThat(first.getAttributes().get(RumConstants.SESSION_ID_KEY)).isEqualTo(sessionId);
+    }
 
     @Test
     void shouldConvertExceptionEventsToSpanAttributes() {
         SpanData original =
-                TestSpanData.builder()
-                        .setName("test")
-                        .setKind(SpanKind.CLIENT)
-                        .setStatus(StatusData.unset())
-                        .setStartEpochNanos(12345)
-                        .setEndEpochNanos(67890)
-                        .setHasEnded(true)
+                startBuilder()
                         .setEvents(
                                 Arrays.asList(
                                         EventData.create(
@@ -119,15 +140,7 @@ class SplunkSpanDataModifierTest {
 
     @Test
     void shouldSetCaseSensitiveSpanNameToAttribute() {
-        SpanData original =
-                TestSpanData.builder()
-                        .setName("SplunkRumSpan")
-                        .setKind(SpanKind.CLIENT)
-                        .setStatus(StatusData.unset())
-                        .setStartEpochNanos(12345)
-                        .setEndEpochNanos(67890)
-                        .setHasEnded(true)
-                        .build();
+        SpanData original = startBuilder("SplunkRumSpan").build();
 
         CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
         when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
@@ -205,15 +218,8 @@ class SplunkSpanDataModifierTest {
                         TraceFlags.getSampled(),
                         TraceState.getDefault());
 
-        SpanData original =
-                TestSpanData.builder()
+        SpanData original = startBuilder("SplunkRumSpan")
                         .setSpanContext(spanContext)
-                        .setName("SplunkRumSpan")
-                        .setKind(SpanKind.CLIENT)
-                        .setStatus(StatusData.unset())
-                        .setStartEpochNanos(12345)
-                        .setEndEpochNanos(67890)
-                        .setHasEnded(true)
                         .setAttributes(
                                 Attributes.builder()
                                         .put(
@@ -285,5 +291,19 @@ class SplunkSpanDataModifierTest {
                 .hasTraceId("99999999999999999999999999999999")
                 .hasSpanId("8888888888888888")
                 .hasAttributesSatisfyingExactly(equalTo(SPLUNK_OPERATION_KEY, "SplunkRumSpan"));
+    }
+
+    private TestSpanData.Builder startBuilder() {
+        return startBuilder("test");
+    }
+
+    private TestSpanData.Builder startBuilder(String name) {
+        return TestSpanData.builder()
+                .setName(name)
+                .setKind(SpanKind.CLIENT)
+                .setStatus(StatusData.unset())
+                .setStartEpochNanos(12345)
+                .setEndEpochNanos(67890)
+                .setHasEnded(true);
     }
 }
