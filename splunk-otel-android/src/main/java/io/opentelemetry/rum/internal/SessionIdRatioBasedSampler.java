@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.splunk.rum;
+package io.opentelemetry.rum.internal;
 
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.context.Context;
-import io.opentelemetry.rum.internal.SessionId;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.samplers.SamplingResult;
@@ -32,11 +31,11 @@ import java.util.List;
  * io.opentelemetry.api.trace.TraceId#fromLongs(long, long)} internally to generate random session
  * IDs.
  */
-class SessionIdRatioBasedSampler implements Sampler {
+public class SessionIdRatioBasedSampler implements Sampler {
     private final Sampler ratioBasedSampler;
     private final SessionId sessionid;
 
-    SessionIdRatioBasedSampler(double ratio, SessionId sessionId) {
+    public SessionIdRatioBasedSampler(double ratio, SessionId sessionId) {
         this.sessionid = sessionId;
         // SessionId uses the same format as TraceId, so we can reuse trace ID ratio sampler.
         this.ratioBasedSampler = Sampler.traceIdRatioBased(ratio);
