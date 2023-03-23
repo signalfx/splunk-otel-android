@@ -16,10 +16,8 @@
 
 package io.opentelemetry.rum.internal;
 
-import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.rum.internal.RumConstants.PREVIOUS_SESSION_ID_KEY;
 
-import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Tracer;
 
 final class SessionIdChangeTracer implements SessionIdChangeListener {

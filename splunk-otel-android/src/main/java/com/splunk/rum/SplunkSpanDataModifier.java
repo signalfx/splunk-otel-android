@@ -87,8 +87,9 @@ final class SplunkSpanDataModifier implements SpanExporter {
         modifiedAttributes.put(StandardAttributes.SESSION_ID_KEY, sessionId);
 
         // Copy previous session id to splunk name, if applicable.
-        String previousSessionId = original.getAttributes().get(RumConstants.PREVIOUS_SESSION_ID_KEY);
-        if(previousSessionId != null){
+        String previousSessionId =
+                original.getAttributes().get(RumConstants.PREVIOUS_SESSION_ID_KEY);
+        if (previousSessionId != null) {
             modifiedAttributes.put(StandardAttributes.PREVIOUS_SESSION_ID_KEY, previousSessionId);
         }
 

@@ -93,7 +93,8 @@ class SplunkSpanDataModifierTest {
         SpanData first = exported.iterator().next();
         assertThat(first.getAttributes().get(StandardAttributes.PREVIOUS_SESSION_ID_KEY))
                 .isEqualTo(previousSessionId);
-        assertThat(first.getAttributes().get(RumConstants.PREVIOUS_SESSION_ID_KEY)).isEqualTo(previousSessionId);
+        assertThat(first.getAttributes().get(RumConstants.PREVIOUS_SESSION_ID_KEY))
+                .isEqualTo(previousSessionId);
     }
 
     @Test
