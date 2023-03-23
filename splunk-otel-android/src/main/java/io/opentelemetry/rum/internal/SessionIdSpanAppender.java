@@ -25,7 +25,6 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 
 final class SessionIdSpanAppender implements SpanProcessor {
 
-
     private final SessionId sessionId;
 
     public SessionIdSpanAppender(SessionId sessionId) {

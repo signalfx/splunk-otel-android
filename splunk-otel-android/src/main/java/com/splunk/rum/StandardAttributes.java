@@ -41,8 +41,7 @@ public final class StandardAttributes {
      *
      * @see SplunkRumBuilder#setGlobalAttributes(Attributes)
      */
-    public static final AttributeKey<String> APP_BUILD_TYPE =
-            stringKey("app.build.type");
+    public static final AttributeKey<String> APP_BUILD_TYPE = stringKey("app.build.type");
 
     /**
      * Full HTTP client request URL in the form {@code scheme://host[:port]/path?query[#fragment]}.
@@ -51,7 +50,9 @@ public final class StandardAttributes {
      * @see SemanticAttributes#HTTP_URL
      */
     public static final AttributeKey<String> HTTP_URL = SemanticAttributes.HTTP_URL;
-    public static final AttributeKey<? super String> SESSION_ID_KEY = stringKey("splunk.rumSessionId");
+
+    public static final AttributeKey<? super String> SESSION_ID_KEY =
+            stringKey("splunk.rumSessionId");
 
     private StandardAttributes() {}
 }

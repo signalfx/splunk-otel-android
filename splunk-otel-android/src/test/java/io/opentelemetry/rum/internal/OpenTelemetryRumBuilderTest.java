@@ -81,8 +81,7 @@ class OpenTelemetryRumBuilderTest {
         assertThat(spans.get(0))
                 .hasName("test span")
                 .hasResource(resource)
-                .hasAttributesSatisfyingExactly(
-                        equalTo(SESSION_ID_KEY, sessionId));
+                .hasAttributesSatisfyingExactly(equalTo(SESSION_ID_KEY, sessionId));
     }
 
     @Test

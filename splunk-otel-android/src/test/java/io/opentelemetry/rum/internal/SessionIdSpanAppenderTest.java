@@ -16,12 +16,11 @@
 
 package io.opentelemetry.rum.internal;
 
+import static io.opentelemetry.rum.internal.RumConstants.SESSION_ID_KEY;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import static io.opentelemetry.rum.internal.RumConstants.SESSION_ID_KEY;
 
 import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
