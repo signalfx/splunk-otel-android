@@ -50,7 +50,9 @@ public final class StandardAttributes {
      * @see SemanticAttributes#HTTP_URL
      */
     public static final AttributeKey<String> HTTP_URL = SemanticAttributes.HTTP_URL;
-    public static final AttributeKey<? super String> SESSION_ID_KEY = stringKey("splunk.rumSessionId");
+
+    public static final AttributeKey<? super String> SESSION_ID_KEY =
+            stringKey("splunk.rumSessionId");
 
     public static final AttributeKey<? super String> SESSION_ID_KEY =
             stringKey("splunk.rumSessionId");
