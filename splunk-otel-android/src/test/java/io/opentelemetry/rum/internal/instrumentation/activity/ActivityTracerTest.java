@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.app.Activity;
-import com.splunk.rum.RumScreenName;
+import io.opentelemetry.rum.internal.instrumentation.RumScreenName;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.rum.internal.util.ActiveSpan;

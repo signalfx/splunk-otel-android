@@ -28,7 +28,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
 import com.splunk.android.sample.databinding.FragmentSecondBinding;
-import com.splunk.rum.RumScreenName;
+import io.opentelemetry.rum.internal.instrumentation.RumScreenName;
 import com.splunk.rum.SplunkRum;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
