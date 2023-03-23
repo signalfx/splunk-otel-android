@@ -77,9 +77,9 @@ class SplunkSpanDataModifierTest {
     }
 
     @Test
-    void changesSpanIdAttrName() {
-        String sessionId = "abc123fonzie";
-        Attributes attrs = Attributes.of(RumConstants.SESSION_ID_KEY, sessionId);
+    void changesPreviousSpanIdAttrName() {
+        String previousSessionId = "iamveryoldindeed-abc-123";
+        Attributes attrs = Attributes.of(RumConstants.PREVIOUS_SESSION_ID_KEY, previousSessionId);
         SpanData original = startBuilder().setAttributes(attrs).build();
 
         CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
@@ -91,9 +91,9 @@ class SplunkSpanDataModifierTest {
         Collection<SpanData> exported = exportedSpansCaptor.getValue();
         assertThat(exported).hasSize(1);
         SpanData first = exported.iterator().next();
-        assertThat(first.getAttributes().get(StandardAttributes.SESSION_ID_KEY))
-                .isEqualTo(sessionId);
-        assertThat(first.getAttributes().get(RumConstants.SESSION_ID_KEY)).isEqualTo(sessionId);
+        assertThat(first.getAttributes().get(StandardAttributes.PREVIOUS_SESSION_ID_KEY))
+                .isEqualTo(previousSessionId);
+        assertThat(first.getAttributes().get(RumConstants.PREVIOUS_SESSION_ID_KEY)).isEqualTo(previousSessionId);
     }
 
     @Test

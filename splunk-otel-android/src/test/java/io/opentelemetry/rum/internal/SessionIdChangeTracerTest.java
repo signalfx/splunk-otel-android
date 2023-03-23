@@ -18,6 +18,8 @@ package io.opentelemetry.rum.internal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import static io.opentelemetry.rum.internal.RumConstants.PREVIOUS_SESSION_ID_KEY;
+
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
@@ -48,7 +50,7 @@ class SessionIdChangeTracerTest {
         assertEquals("sessionId.change", span.getName());
         Attributes attributes = span.getAttributes();
         assertEquals(1, attributes.size());
-        assertEquals("123", attributes.get(SessionIdChangeTracer.PREVIOUS_SESSION_ID_KEY));
+        assertEquals("123", attributes.get(PREVIOUS_SESSION_ID_KEY));
         // splunk.rumSessionId attribute is set in the RumAttributeAppender class
     }
 }
