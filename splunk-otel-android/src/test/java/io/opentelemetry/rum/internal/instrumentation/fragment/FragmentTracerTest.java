@@ -24,8 +24,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import androidx.fragment.app.Fragment;
-import io.opentelemetry.rum.internal.instrumentation.RumScreenName;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.instrumentation.RumScreenName;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.rum.internal.util.ActiveSpan;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
