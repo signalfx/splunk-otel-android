@@ -52,8 +52,9 @@ public final class OpenTelemetryRumBuilder {
     private final List<Consumer<InstrumentedApplication>> instrumentationInstallers =
             new ArrayList<>();
 
-    OpenTelemetryRumBuilder(SessionId sessionId) {
-        this.sessionId = sessionId;
+    OpenTelemetryRumBuilder() {
+        SessionIdTimeoutHandler timeoutHandler = new SessionIdTimeoutHandler();
+        this.sessionId = new SessionId(timeoutHandler);
     }
 
     /**

@@ -37,11 +37,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class SessionIdRatioBasedSamplerTest {
-    @Mock SessionId sessionId;
     private static final String HIGH_ID = "00000000000000008fffffffffffffff";
     private static final String LOW_ID = "00000000000000000000000000000000";
     private static final IdGenerator idsGenerator = IdGenerator.random();
 
+    @Mock SessionId sessionId;
     private final String traceId = idsGenerator.generateTraceId();
     private final Context parentContext = Context.root().with(Span.getInvalid());
     private final List<LinkData> parentLinks =

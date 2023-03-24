@@ -28,9 +28,7 @@ public interface OpenTelemetryRum {
 
     /** Returns a new {@link OpenTelemetryRumBuilder} for {@link OpenTelemetryRum}. */
     static OpenTelemetryRumBuilder builder() {
-        SessionIdTimeoutHandler timeoutHandler = new SessionIdTimeoutHandler();
-        SessionId sessionId = new SessionId(timeoutHandler);
-        return new OpenTelemetryRumBuilder(sessionId);
+        return new OpenTelemetryRumBuilder();
     }
 
     /** Returns a no-op implementation of {@link OpenTelemetryRum}. */
