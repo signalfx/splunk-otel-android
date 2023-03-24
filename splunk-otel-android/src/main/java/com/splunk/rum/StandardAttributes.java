@@ -56,14 +56,5 @@ public final class StandardAttributes {
     public static final AttributeKey<? super String> SESSION_ID_KEY =
             stringKey("splunk.rumSessionId");
 
-    public static final AttributeKey<? super String> PREVIOUS_SESSION_ID_KEY =
-            AttributeKey.stringKey("splunk.rum.previous_session_id");
-
-    public static final AttributeKey<? super String> SESSION_ID_KEY =
-            stringKey("splunk.rumSessionId");
-
-    public static final AttributeKey<? super String> SESSION_ID_KEY =
-            stringKey("splunk.rumSessionId");
-
     private StandardAttributes() {}
 }
