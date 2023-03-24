@@ -17,7 +17,6 @@
 package io.opentelemetry.rum.internal;
 
 import static io.opentelemetry.rum.internal.RumConstants.PREVIOUS_SESSION_ID_KEY;
-import static io.opentelemetry.rum.internal.RumConstants.PREVIOUS_SESSION_ID_KEY;
 
 import io.opentelemetry.api.trace.Tracer;
 
