@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 
 import android.app.Activity;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.rum.internal.instrumentation.RumScreenName;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.rum.internal.util.ActiveSpan;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
@@ -212,11 +211,11 @@ public class ActivityTracerTest {
     }
 
     @Test
-    public void testAnnotatedActivity() {
-        Activity annotatedActivity = new AnnotatedActivity();
+    public void testScreenName() {
         ActivityTracer activityTracer =
-                ActivityTracer.builder(annotatedActivity)
+                ActivityTracer.builder(mock(Activity.class))
                         .setTracer(tracer)
+                        .setScreenName("squarely")
                         .setAppStartupTimer(appStartupTimer)
                         .setActiveSpan(activeSpan)
                         .build();
@@ -225,9 +224,6 @@ public class ActivityTracerTest {
         SpanData span = getSingleSpan();
         assertEquals("squarely", span.getAttributes().get(SCREEN_NAME_KEY));
     }
-
-    @RumScreenName("squarely")
-    static class AnnotatedActivity extends Activity {}
 
     private SpanData getSingleSpan() {
         List<SpanData> generatedSpans = otelTesting.getSpans();

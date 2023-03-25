@@ -233,6 +233,7 @@ class RumInitializer {
                                     .setVisibleScreenTracker(visibleScreenTracker)
                                     .setStartupTimer(startupTimer)
                                     .setTracerCustomizer(tracerCustomizer)
+                                    .setScreenNameExtractor(SplunkScreenNameExtractor.INSTANCE)
                                     .build();
                     instrumentation.installOn(instrumentedApp);
                     initializationEvents.emit("activityLifecycleCallbacksInitialized");
