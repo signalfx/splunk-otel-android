@@ -195,10 +195,6 @@ public class ActivityTracer {
             return activity.getClass().getSimpleName();
         }
 
-        //        private RumScreenName getRumScreenName() {
-        //            return activity.getClass().getAnnotation(RumScreenName.class);
-        //        }
-
         public ActivityTracer build() {
             return new ActivityTracer(this);
         }
