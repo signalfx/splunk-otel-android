@@ -23,6 +23,8 @@ import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
 
+import static internal.RumConstants.APP_START_SPAN_NAME;
+
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.rum.internal.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.rum.internal.RumConstants.RUM_SDK_VERSION;
@@ -38,22 +40,23 @@ import androidx.annotation.Nullable;
 
 import com.splunk.android.rum.R;
 
+import internal.GlobalAttributesSpanAppender;
+import internal.OpenTelemetryRum;
+import internal.OpenTelemetryRumBuilder;
+import internal.SessionIdRatioBasedSampler;
+import internal.instrumentation.activity.VisibleScreenTracker;
+import internal.instrumentation.anr.AnrDetector;
+import internal.instrumentation.crash.CrashReporter;
+import internal.instrumentation.lifecycle.AndroidLifecycleInstrumentation;
+import internal.instrumentation.network.CurrentNetworkProvider;
+import internal.instrumentation.network.NetworkAttributesSpanAppender;
+import internal.instrumentation.network.NetworkChangeMonitor;
+import internal.instrumentation.slowrendering.SlowRenderingDetector;
+import internal.instrumentation.startup.AppStartupTimer;
+
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
-import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
-import io.opentelemetry.rum.internal.OpenTelemetryRum;
-import io.opentelemetry.rum.internal.OpenTelemetryRumBuilder;
-import io.opentelemetry.rum.internal.SessionIdRatioBasedSampler;
-import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
-import io.opentelemetry.rum.internal.instrumentation.anr.AnrDetector;
-import io.opentelemetry.rum.internal.instrumentation.crash.CrashReporter;
-import io.opentelemetry.rum.internal.instrumentation.lifecycle.AndroidLifecycleInstrumentation;
-import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
-import io.opentelemetry.rum.internal.instrumentation.network.NetworkAttributesSpanAppender;
-import io.opentelemetry.rum.internal.instrumentation.network.NetworkChangeMonitor;
-import io.opentelemetry.rum.internal.instrumentation.slowrendering.SlowRenderingDetector;
-import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;

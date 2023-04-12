@@ -19,10 +19,11 @@ package com.splunk.rum;
 import static com.splunk.rum.SplunkRum.COMPONENT_APPSTART;
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 
+import internal.instrumentation.startup.AppStartupTimer;
+
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
-import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 
 import java.util.ArrayList;
 import java.util.List;

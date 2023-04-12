@@ -47,6 +47,7 @@ val otelAlphaVersion = "$otelVersion-alpha"
 val otelInstrumentationAlphaVersion = "1.26.0-alpha-SNAPSHOT"
 
 dependencies {
+    implementation(project(":opentelemetry-android-instrumentation"))
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.21"))
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core:1.10.0")
@@ -75,7 +76,7 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.10.2")
     testImplementation("androidx.test:core:1.5.0")
     testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("org.awaitility:awaitility:4.2.0")
+    testImplementation("com.google.guava:guava:31.1-jre")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 }

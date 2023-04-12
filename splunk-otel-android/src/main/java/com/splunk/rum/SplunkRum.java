@@ -29,6 +29,11 @@ import android.webkit.WebView;
 
 import androidx.annotation.Nullable;
 
+import internal.GlobalAttributesSpanAppender;
+import internal.OpenTelemetryRum;
+import internal.instrumentation.network.CurrentNetworkProvider;
+import internal.instrumentation.startup.AppStartupTimer;
+
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -36,10 +41,6 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTelemetry;
-import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
-import io.opentelemetry.rum.internal.OpenTelemetryRum;
-import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
-import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 
 import okhttp3.Call;
