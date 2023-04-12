@@ -52,12 +52,12 @@ final class AndroidResource {
     }
 
     private static String readAppName(Application application) {
-        return trapToNull(
+        return trapTo(
                 () -> {
                     int stringId =
                             application.getApplicationContext().getApplicationInfo().labelRes;
                     return application.getApplicationContext().getString(stringId);
-                });
+                }, "unknown_service:android");
     }
 
     private static String detectRumVersion(Application application) {
@@ -71,10 +71,6 @@ final class AndroidResource {
                             .getString(R.string.rum_version);
                 },
                 "unknown");
-    }
-
-    private static String trapToNull(Supplier<String> fn) {
-        return trapTo(fn, null);
     }
 
     private static String trapTo(Supplier<String> fn, String defaultValue) {
