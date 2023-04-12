@@ -44,7 +44,7 @@ import java.util.function.Consumer;
 public final class OpenTelemetryRumBuilder {
 
     private final SessionId sessionId;
-    private Resource resource = Resource.getDefault();
+    private final Application application;
     private final List<BiFunction<SdkTracerProviderBuilder, Application, SdkTracerProviderBuilder>>
             tracerProviderCustomizers = new ArrayList<>();
     private final List<BiFunction<SdkMeterProviderBuilder, Application, SdkMeterProviderBuilder>>
@@ -53,20 +53,35 @@ public final class OpenTelemetryRumBuilder {
             loggerProviderCustomizers = new ArrayList<>();
     private final List<Consumer<InstrumentedApplication>> instrumentationInstallers =
             new ArrayList<>();
+    private Resource resource;
 
-    OpenTelemetryRumBuilder() {
+    OpenTelemetryRumBuilder(Application application) {
         SessionIdTimeoutHandler timeoutHandler = new SessionIdTimeoutHandler();
+        this.application = application;
         this.sessionId = new SessionId(timeoutHandler);
+        this.resource = AndroidResource.createDefault(application);
     }
 
     /**
      * Assign a {@link Resource} to be attached to all telemetry emitted by the {@link
-     * OpenTelemetryRum} created by this builder.
+     * OpenTelemetryRum} created by this builder. This replaces any existing resource.
      *
      * @return {@code this}
      */
     public OpenTelemetryRumBuilder setResource(Resource resource) {
         this.resource = resource;
+        return this;
+    }
+
+    /**
+     * Merges a new {@link Resource} with any existing {@link Resource} in this builder. The
+     * resulting {@link Resource} will be attached to all telemetry emitted by the {@link
+     * OpenTelemetryRum} created by this builder.
+     *
+     * @return {@code this}
+     */
+    public OpenTelemetryRumBuilder mergeResource(Resource resource) {
+        this.resource = this.resource.merge(resource);
         return this;
     }
 

@@ -16,6 +16,8 @@
 
 package io.opentelemetry.rum.internal;
 
+import android.app.Application;
+
 import io.opentelemetry.api.OpenTelemetry;
 
 /**
@@ -27,8 +29,8 @@ import io.opentelemetry.api.OpenTelemetry;
 public interface OpenTelemetryRum {
 
     /** Returns a new {@link OpenTelemetryRumBuilder} for {@link OpenTelemetryRum}. */
-    static OpenTelemetryRumBuilder builder() {
-        return new OpenTelemetryRumBuilder();
+    static OpenTelemetryRumBuilder builder(Application application) {
+        return new OpenTelemetryRumBuilder(application);
     }
 
     /** Returns a no-op implementation of {@link OpenTelemetryRum}. */
