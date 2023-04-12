@@ -146,7 +146,7 @@ public final class OpenTelemetryRumBuilder {
 
     /**
      * Adds an instrumentation installer function that will be run on an {@link
-     * InstrumentedApplication} instance as a part of the {@link #build(Application)} method call.
+     * InstrumentedApplication} instance as a part of the {@link #build()} method call.
      *
      * @return {@code this}
      */
