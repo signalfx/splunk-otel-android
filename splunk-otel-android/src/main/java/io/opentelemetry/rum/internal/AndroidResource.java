@@ -57,7 +57,8 @@ final class AndroidResource {
                     int stringId =
                             application.getApplicationContext().getApplicationInfo().labelRes;
                     return application.getApplicationContext().getString(stringId);
-                }, "unknown_service:android");
+                },
+                "unknown_service:android");
     }
 
     private static String detectRumVersion(Application application) {
