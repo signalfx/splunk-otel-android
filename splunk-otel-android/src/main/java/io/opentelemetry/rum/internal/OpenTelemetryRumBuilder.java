@@ -167,10 +167,9 @@ public final class OpenTelemetryRumBuilder {
      * <p>This method will initialize the OpenTelemetry SDK and install built-in system
      * instrumentations in the passed Android {@link Application}.
      *
-     * @param application The {@link Application} that is being instrumented.
      * @return A new {@link OpenTelemetryRum} instance.
      */
-    public OpenTelemetryRum build(Application application) {
+    public OpenTelemetryRum build() {
         // the app state listeners need to be run in the first ActivityLifecycleCallbacks since they
         // might turn off/on additional telemetry depending on whether the app is active or not
         ApplicationStateWatcher applicationStateWatcher = new ApplicationStateWatcher();

@@ -204,7 +204,7 @@ class RumInitializer {
         // Lifecycle events instrumentation are always installed.
         installLifecycleInstrumentations(otelRumBuilder, visibleScreenTracker);
 
-        OpenTelemetryRum openTelemetryRum = otelRumBuilder.build(application);
+        OpenTelemetryRum openTelemetryRum = otelRumBuilder.build();
 
         initializationEvents.recordInitializationSpans(
                 builder.getConfigFlags(),

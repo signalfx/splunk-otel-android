@@ -32,11 +32,12 @@ import com.splunk.android.rum.R;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 
+import java.util.function.Supplier;
+
 final class AndroidResource {
 
     static Resource createDefault(Application application) {
-        int stringId = application.getApplicationContext().getApplicationInfo().labelRes;
-        String appName = application.getApplicationContext().getString(stringId);
+        String appName = readAppName(application);
         ResourceBuilder resourceBuilder =
                 Resource.getDefault().toBuilder().put(SERVICE_NAME, appName);
 
@@ -50,17 +51,37 @@ final class AndroidResource {
                 .build();
     }
 
+    private static String readAppName(Application application) {
+        return trapToNull(
+                () -> {
+                    int stringId =
+                            application.getApplicationContext().getApplicationInfo().labelRes;
+                    return application.getApplicationContext().getString(stringId);
+                });
+    }
+
     private static String detectRumVersion(Application application) {
+        return trapTo(
+                () -> {
+                    // TODO: Verify that this will be in the lib/jar at runtime.
+                    // TODO: After donation, package of R file will change
+                    return application
+                            .getApplicationContext()
+                            .getResources()
+                            .getString(R.string.rum_version);
+                },
+                "unknown");
+    }
+
+    private static String trapToNull(Supplier<String> fn) {
+        return trapTo(fn, null);
+    }
+
+    private static String trapTo(Supplier<String> fn, String defaultValue) {
         try {
-            // TODO: Verify that this will be in the lib/jar at runtime.
-            // TODO: After donation, package of R file will change
-            return application
-                    .getApplicationContext()
-                    .getResources()
-                    .getString(R.string.rum_version);
+            return fn.get();
         } catch (Exception e) {
-            // ignore for now
+            return defaultValue;
         }
-        return "unknown";
     }
 }
