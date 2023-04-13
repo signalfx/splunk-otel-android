@@ -19,7 +19,8 @@ android {
     buildTypes {
         all {
             // provide the version of the library as a resource so it can be used as a span attribute.
-            resValue("string", "rum.version", "${project.version}")
+            // TODO: Put back in after AndroidResource is merged/available
+            // resValue("string", "rum.version", "${project.version}")
         }
         release {
             isMinifyEnabled = false
