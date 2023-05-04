@@ -19,6 +19,7 @@ package internal;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.opentelemetry.rum.internal.SessionIdTimeoutHandler;
 import io.opentelemetry.sdk.testing.time.TestClock;
 
 import org.junit.jupiter.api.Test;

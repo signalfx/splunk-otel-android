@@ -40,9 +40,9 @@ import android.content.Context;
 import android.location.Location;
 import android.webkit.WebView;
 
-import internal.GlobalAttributesSpanAppender;
-import internal.OpenTelemetryRum;
-import internal.instrumentation.network.CurrentNetworkProvider;
+import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
+import io.opentelemetry.rum.internal.OpenTelemetryRum;
+import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
 
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;

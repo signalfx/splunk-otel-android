@@ -16,9 +16,9 @@
 
 package com.splunk.rum;
 
-import static internal.RumConstants.SCREEN_NAME_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.SCREEN_NAME_KEY;
 
-import internal.instrumentation.activity.VisibleScreenTracker;
+import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 
 import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;

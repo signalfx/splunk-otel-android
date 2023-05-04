@@ -29,10 +29,10 @@ import android.webkit.WebView;
 
 import androidx.annotation.Nullable;
 
-import internal.GlobalAttributesSpanAppender;
-import internal.OpenTelemetryRum;
-import internal.instrumentation.network.CurrentNetworkProvider;
-import internal.instrumentation.startup.AppStartupTimer;
+import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
+import io.opentelemetry.rum.internal.OpenTelemetryRum;
+import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
+import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;

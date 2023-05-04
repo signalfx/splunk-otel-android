@@ -25,7 +25,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import internal.instrumentation.network.CurrentNetworkProvider;
+import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
 
 import java.io.File;
 import java.util.Comparator;

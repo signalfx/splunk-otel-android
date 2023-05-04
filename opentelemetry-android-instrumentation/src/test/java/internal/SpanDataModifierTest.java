@@ -31,6 +31,7 @@ import static java.util.Collections.singletonList;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.rum.internal.SpanFilterBuilder;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.testing.trace.TestSpanData;
 import io.opentelemetry.sdk.trace.data.SpanData;

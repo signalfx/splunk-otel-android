@@ -24,6 +24,8 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.context.Context;
+import io.opentelemetry.rum.internal.SessionId;
+import io.opentelemetry.rum.internal.SessionIdRatioBasedSampler;
 import io.opentelemetry.sdk.trace.IdGenerator;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
@@ -43,7 +45,8 @@ class SessionIdRatioBasedSamplerTest {
     private static final String LOW_ID = "00000000000000000000000000000000";
     private static final IdGenerator idsGenerator = IdGenerator.random();
 
-    @Mock SessionId sessionId;
+    @Mock
+    SessionId sessionId;
     private final String traceId = idsGenerator.generateTraceId();
     private final Context parentContext = Context.root().with(Span.getInvalid());
     private final List<LinkData> parentLinks =

@@ -26,8 +26,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import internal.instrumentation.network.CurrentNetwork;
-import internal.instrumentation.network.CurrentNetworkProvider;
+import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetwork;
+import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
 
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;

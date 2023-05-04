@@ -16,7 +16,7 @@
 
 package internal;
 
-import static internal.RumConstants.SESSION_ID_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.SESSION_ID_KEY;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,6 +24,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.opentelemetry.context.Context;
+import io.opentelemetry.rum.internal.SessionId;
+import io.opentelemetry.rum.internal.SessionIdSpanAppender;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class SessionIdSpanAppenderTest {
 
-    @Mock SessionId sessionId;
+    @Mock
+    SessionId sessionId;
     @Mock ReadWriteSpan span;
 
     @Test

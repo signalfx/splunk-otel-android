@@ -28,6 +28,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.opentelemetry.rum.internal.SessionId;
+import io.opentelemetry.rum.internal.SessionIdChangeListener;
+import io.opentelemetry.rum.internal.SessionIdTimeoutHandler;
 import io.opentelemetry.sdk.testing.time.TestClock;
 
 import org.junit.jupiter.api.Test;
@@ -42,7 +45,8 @@ import java.util.regex.Pattern;
 @ExtendWith(MockitoExtension.class)
 class SessionIdTest {
 
-    @Mock SessionIdTimeoutHandler timeoutHandler;
+    @Mock
+    SessionIdTimeoutHandler timeoutHandler;
 
     @Test
     void valueValid() {

@@ -37,9 +37,9 @@ import android.os.Looper;
 
 import com.google.common.base.Strings;
 
-import internal.instrumentation.network.CurrentNetwork;
-import internal.instrumentation.network.CurrentNetworkProvider;
-import internal.instrumentation.startup.AppStartupTimer;
+import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetwork;
+import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
+import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;

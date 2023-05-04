@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.context.Context;
+import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 
 import org.junit.jupiter.api.Test;

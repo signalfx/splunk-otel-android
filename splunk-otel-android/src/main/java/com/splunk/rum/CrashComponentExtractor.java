@@ -18,7 +18,7 @@ package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 
-import internal.instrumentation.crash.CrashDetails;
+import io.opentelemetry.rum.internal.instrumentation.crash.CrashDetails;
 
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;

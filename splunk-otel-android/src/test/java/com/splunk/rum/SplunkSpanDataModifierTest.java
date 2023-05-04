@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 
-import internal.RumConstants;
+import io.opentelemetry.rum.internal.RumConstants;
 
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanContext;

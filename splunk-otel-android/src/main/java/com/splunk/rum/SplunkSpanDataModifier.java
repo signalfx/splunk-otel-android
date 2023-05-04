@@ -27,7 +27,7 @@ import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.EXCEP
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
-import internal.RumConstants;
+import io.opentelemetry.rum.internal.RumConstants;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;

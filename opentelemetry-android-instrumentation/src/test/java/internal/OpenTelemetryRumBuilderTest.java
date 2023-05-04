@@ -16,7 +16,7 @@
 
 package internal;
 
-import static internal.RumConstants.SESSION_ID_KEY;
+import static io.opentelemetry.rum.internal.RumConstants.SESSION_ID_KEY;
 
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.equalTo;
@@ -27,7 +27,9 @@ import static org.mockito.Mockito.verify;
 import android.app.Activity;
 import android.app.Application;
 
-import internal.instrumentation.ApplicationStateListener;
+import io.opentelemetry.rum.internal.ApplicationStateWatcher;
+import io.opentelemetry.rum.internal.OpenTelemetryRum;
+import io.opentelemetry.rum.internal.instrumentation.ApplicationStateListener;
 
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter;
