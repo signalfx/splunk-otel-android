@@ -23,9 +23,8 @@ import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
 
-import static io.opentelemetry.rum.internal.RumConstants.APP_START_SPAN_NAME;
-
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
+import static io.opentelemetry.rum.internal.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.rum.internal.RumConstants.RUM_SDK_VERSION;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
 
@@ -39,6 +38,9 @@ import androidx.annotation.Nullable;
 
 import com.splunk.android.rum.R;
 
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.exporter.logging.LoggingSpanExporter;
+import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
 import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
 import io.opentelemetry.rum.internal.OpenTelemetryRum;
 import io.opentelemetry.rum.internal.OpenTelemetryRumBuilder;
@@ -52,10 +54,6 @@ import io.opentelemetry.rum.internal.instrumentation.network.NetworkAttributesSp
 import io.opentelemetry.rum.internal.instrumentation.network.NetworkChangeMonitor;
 import io.opentelemetry.rum.internal.instrumentation.slowrendering.SlowRenderingDetector;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
-
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.exporter.logging.LoggingSpanExporter;
-import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
@@ -263,7 +261,7 @@ class RumInitializer {
         if (builder.deploymentEnvironment != null) {
             resourceBuilder.put(DEPLOYMENT_ENVIRONMENT, builder.deploymentEnvironment);
         }
-        //TODO: Use the splunk-specific version key and not the upstream one
+        // TODO: Use the splunk-specific version key and not the upstream one
         return resourceBuilder.put(RUM_SDK_VERSION, detectRumVersion()).build();
     }
 

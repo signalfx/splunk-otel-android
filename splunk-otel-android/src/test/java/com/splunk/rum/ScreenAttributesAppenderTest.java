@@ -28,9 +28,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
-
 import io.opentelemetry.context.Context;
+import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 
 import org.junit.jupiter.api.BeforeEach;

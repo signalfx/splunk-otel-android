@@ -40,16 +40,15 @@ import android.content.Context;
 import android.location.Location;
 import android.webkit.WebView;
 
-import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
-import io.opentelemetry.rum.internal.OpenTelemetryRum;
-import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
-
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanId;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
+import io.opentelemetry.rum.internal.GlobalAttributesSpanAppender;
+import io.opentelemetry.rum.internal.OpenTelemetryRum;
+import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;

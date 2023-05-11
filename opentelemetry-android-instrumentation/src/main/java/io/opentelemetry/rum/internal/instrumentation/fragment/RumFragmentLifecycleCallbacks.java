@@ -25,11 +25,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.instrumentation.ScreenNameExtractor;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.rum.internal.util.ActiveSpan;
-
-import io.opentelemetry.api.trace.Tracer;
 
 import java.util.HashMap;
 import java.util.Map;

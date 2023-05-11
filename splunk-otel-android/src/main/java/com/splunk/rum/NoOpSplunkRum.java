@@ -18,12 +18,11 @@ package com.splunk.rum;
 
 import android.webkit.WebView;
 
-import io.opentelemetry.rum.internal.OpenTelemetryRum;
-
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.OpenTelemetryRum;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;

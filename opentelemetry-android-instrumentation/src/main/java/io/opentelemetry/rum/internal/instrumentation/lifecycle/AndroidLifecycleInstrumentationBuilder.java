@@ -16,11 +16,10 @@
 
 package io.opentelemetry.rum.internal.instrumentation.lifecycle;
 
+import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.instrumentation.ScreenNameExtractor;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
-
-import io.opentelemetry.api.trace.Tracer;
 
 import java.util.function.Function;
 

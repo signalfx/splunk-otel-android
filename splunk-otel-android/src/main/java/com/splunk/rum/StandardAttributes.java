@@ -18,10 +18,9 @@ package com.splunk.rum;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
-import io.opentelemetry.rum.internal.SpanFilterBuilder;
-
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.rum.internal.SpanFilterBuilder;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
 /**

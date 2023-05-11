@@ -28,7 +28,6 @@ import android.os.Build;
 
 import io.opentelemetry.rum.internal.instrumentation.ApplicationStateListener;
 import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
-
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.testing.junit4.OpenTelemetryRule;
 import io.opentelemetry.sdk.trace.data.SpanData;

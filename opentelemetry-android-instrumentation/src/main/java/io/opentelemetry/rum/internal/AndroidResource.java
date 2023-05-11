@@ -29,6 +29,7 @@ import android.os.Build;
 
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
+
 import opentelemetry.rum.instrumentation.R;
 
 import java.util.function.Supplier;

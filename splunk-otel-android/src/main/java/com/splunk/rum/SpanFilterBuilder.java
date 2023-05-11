@@ -25,7 +25,8 @@ import java.util.function.Predicate;
 /** Delegating wrapper around otel SpanFilterBuilder. */
 public final class SpanFilterBuilder {
 
-    private final io.opentelemetry.rum.internal.SpanFilterBuilder delegate = new io.opentelemetry.rum.internal.SpanFilterBuilder();
+    private final io.opentelemetry.rum.internal.SpanFilterBuilder delegate =
+            new io.opentelemetry.rum.internal.SpanFilterBuilder();
     /**
      * Remove matching spans from the exporter pipeline.
      *

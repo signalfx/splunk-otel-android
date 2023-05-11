@@ -21,7 +21,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
-
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;

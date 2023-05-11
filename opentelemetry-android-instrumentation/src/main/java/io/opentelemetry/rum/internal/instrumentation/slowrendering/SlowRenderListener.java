@@ -33,11 +33,10 @@ import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
-import io.opentelemetry.rum.internal.RumConstants;
-
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.DefaultingActivityLifecycleCallbacks;
+import io.opentelemetry.rum.internal.RumConstants;
 
 import java.time.Duration;
 import java.time.Instant;

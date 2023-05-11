@@ -18,12 +18,11 @@ package io.opentelemetry.rum.internal.instrumentation.fragment;
 
 import androidx.fragment.app.Fragment;
 
-import io.opentelemetry.rum.internal.RumConstants;
-import io.opentelemetry.rum.internal.util.ActiveSpan;
-
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.RumConstants;
+import io.opentelemetry.rum.internal.util.ActiveSpan;
 
 class FragmentTracer {
     static final AttributeKey<String> FRAGMENT_NAME_KEY = AttributeKey.stringKey("fragmentName");

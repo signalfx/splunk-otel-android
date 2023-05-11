@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 import android.os.Looper;
 
 import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
-
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 
 import org.junit.jupiter.api.Test;

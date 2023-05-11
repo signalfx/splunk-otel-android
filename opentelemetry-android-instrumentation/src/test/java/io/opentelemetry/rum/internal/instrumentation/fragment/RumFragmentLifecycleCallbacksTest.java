@@ -29,10 +29,9 @@ import static org.mockito.Mockito.when;
 
 import androidx.fragment.app.Fragment;
 
+import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.instrumentation.ScreenNameExtractor;
 import io.opentelemetry.rum.internal.instrumentation.activity.VisibleScreenTracker;
-
-import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
