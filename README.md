@@ -8,6 +8,7 @@
   </strong>
 </p>
 
+
 <p align="center">
   <img alt="Stable" src="https://img.shields.io/badge/status-stable-informational?style=for-the-badge">
   <a href="https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.21.0">
