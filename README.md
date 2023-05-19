@@ -48,7 +48,7 @@ For official documentation on the Splunk OTel Instrumentation for Android, see [
 
 ## Sample Application
 
-This repository includes a sample application that demonstrates some features of the iOS RUM agent.
+This repository includes a sample application that demonstrates some features of the Android RUM agent.
 
 To build and run the sample application, configure a `local.properties` file in the root of the project. The project requires the following properties:
 
