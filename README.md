@@ -5,6 +5,8 @@
     <a href="#getting-started">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
     <a href="CONTRIBUTING.md">Getting Involved</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="SECURITY.md">Security</a>
   </strong>
 </p>
 
