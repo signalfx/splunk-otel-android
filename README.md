@@ -70,4 +70,4 @@ version 2.0. See [the license file](./LICENSE) for more details.
 
 # Build Environment
 
-Make sure to select JDK 17 to build & run on Android Studio
+Make sure to select JDK 17 to build & run on Android Studio.
