@@ -67,3 +67,7 @@ For troubleshooting issues with the Splunk OpenTelemetry instrumentation of Andr
 
 The Splunk Android RUM Instrumentation is licensed under the terms of the Apache Software License
 version 2.0. See [the license file](./LICENSE) for more details.
+
+# Build Environment
+
+Make sure to select JDK 17 to build & run on Android Studio
