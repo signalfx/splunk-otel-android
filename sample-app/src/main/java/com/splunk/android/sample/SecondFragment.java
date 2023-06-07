@@ -210,7 +210,8 @@ public class SecondFragment extends Fragment {
 
     private void updateLabel() {
         int count = (int) spans.get();
-        spanCountLabel.postValue(getResources().getQuantityString(R.plurals.spam_status, count, count));
+        spanCountLabel.postValue(
+                getResources().getQuantityString(R.plurals.spam_status, count, count));
     }
 
     private void createSpamSpan() {
