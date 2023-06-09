@@ -112,7 +112,7 @@ public final class SpanFilterBuilder {
         return delegate;
     }
 
-    public Function<SpanExporter, SpanExporter> build() {
-        return delegate.build();
+    public SpanExporter build(SpanExporter exporter) {
+        return delegate.build(exporter);
     }
 }

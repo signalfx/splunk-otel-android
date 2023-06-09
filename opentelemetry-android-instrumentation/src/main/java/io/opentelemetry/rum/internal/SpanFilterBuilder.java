@@ -127,15 +127,14 @@ public final class SpanFilterBuilder {
         return this;
     }
 
-    public Function<SpanExporter, SpanExporter> build() {
+    public SpanExporter build(SpanExporter delegate) {
         // make a copy so that the references from the builder are not included in the returned
         // function
 
-        return exporter ->
-                new SpanDataModifier(
-                        exporter,
-                        this.rejectSpanNamesPredicate,
-                        new HashMap<>(this.rejectSpanAttributesPredicates),
-                        new HashMap<>(this.spanAttributeReplacements));
+        return new SpanDataModifier(
+                delegate,
+                this.rejectSpanNamesPredicate,
+                new HashMap<>(this.rejectSpanAttributesPredicates),
+                new HashMap<>(this.spanAttributeReplacements));
     }
 }
