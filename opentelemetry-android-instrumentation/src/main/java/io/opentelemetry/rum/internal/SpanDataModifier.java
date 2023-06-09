@@ -16,22 +16,25 @@
 
 package io.opentelemetry.rum.internal;
 
-import android.util.Pair;
-
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * This class is used to modify span data at export time. It is created with a delegate exporter,
+ * and can reject spans outright based on span names or span attribute content. Furthermore, it can
+ * replace span attributes with a value newly calculated at export time.
+ */
 final class SpanDataModifier implements SpanExporter {
     private final SpanExporter delegate;
     private final Predicate<String> rejectSpanNamesPredicate;
@@ -51,10 +54,8 @@ final class SpanDataModifier implements SpanExporter {
 
     @Override
     public CompletableResultCode export(Collection<SpanData> spans) {
-        List<SpanData> modified = spans.stream()
-                .filter(this::include)
-                .map(this::modify)
-                .collect(Collectors.toList());
+        List<SpanData> modified =
+                spans.stream().filter(this::include).map(this::modify).collect(Collectors.toList());
         return delegate.export(modified);
     }
 
@@ -63,12 +64,15 @@ final class SpanDataModifier implements SpanExporter {
             return false;
         }
         Attributes attributes = span.getAttributes();
-        return rejectSpanAttributesPredicates.entrySet().stream().noneMatch(e -> {
-            AttributeKey<?> key = e.getKey();
-            Predicate<? super Object> valuePredicate = (Predicate<? super Object>) e.getValue();
-            Object attributeValue = attributes.get(key);
-            return (attributeValue != null && valuePredicate.test(attributeValue));
-        });
+        return rejectSpanAttributesPredicates.entrySet().stream()
+                .noneMatch(
+                        e -> {
+                            AttributeKey<?> key = e.getKey();
+                            Predicate<? super Object> valuePredicate =
+                                    (Predicate<? super Object>) e.getValue();
+                            Object attributeValue = attributes.get(key);
+                            return (attributeValue != null && valuePredicate.test(attributeValue));
+                        });
     }
 
     private SpanData modify(SpanData span) {
@@ -77,18 +81,18 @@ final class SpanDataModifier implements SpanExporter {
         }
 
         AttributesBuilder modifiedAttributes = Attributes.builder();
-        span.getAttributes()
-                .forEach(
-                        (key, value) -> {
-                            Function<? super Object, ?> valueModifier =
-                                    (Function<? super Object, ?>)
-                                            spanAttributeReplacements.getOrDefault(
-                                                    key, Function.identity());
-                            Object newValue = valueModifier.apply(value);
-                            if (newValue != null) {
-                                modifiedAttributes.put((AttributeKey<Object>) key, newValue);
-                            }
-                        });
+        BiConsumer<AttributeKey<?>, Object> doModify =
+                (key, value) -> {
+                    Function<? super Object, ?> valueModifier =
+                            (Function<? super Object, ?>)
+                                    spanAttributeReplacements.getOrDefault(
+                                            key, Function.identity());
+                    Object newValue = valueModifier.apply(value);
+                    if (newValue != null) {
+                        modifiedAttributes.put((AttributeKey<Object>) key, newValue);
+                    }
+                };
+        span.getAttributes().forEach(doModify);
 
         return new ModifiedSpanData(span, modifiedAttributes.build());
     }

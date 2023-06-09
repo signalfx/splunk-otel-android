@@ -130,17 +130,12 @@ public final class SpanFilterBuilder {
     public Function<SpanExporter, SpanExporter> build() {
         // make a copy so that the references from the builder are not included in the returned
         // function
-        Predicate<String> rejectSpanNamesPredicate = this.rejectSpanNamesPredicate;
-        Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates =
-                new HashMap<>(this.rejectSpanAttributesPredicates);
-        Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements =
-                new HashMap<>(this.spanAttributeReplacements);
 
         return exporter ->
                 new SpanDataModifier(
                         exporter,
-                        rejectSpanNamesPredicate,
-                        rejectSpanAttributesPredicates,
-                        spanAttributeReplacements);
+                        this.rejectSpanNamesPredicate,
+                        new HashMap<>(this.rejectSpanAttributesPredicates),
+                        new HashMap<>(this.spanAttributeReplacements));
     }
 }
