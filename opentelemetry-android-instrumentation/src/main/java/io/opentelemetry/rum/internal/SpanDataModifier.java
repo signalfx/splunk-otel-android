@@ -16,19 +16,18 @@
 
 package io.opentelemetry.rum.internal;
 
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.common.AttributesBuilder;
-import io.opentelemetry.sdk.common.CompletableResultCode;
-import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.sdk.common.CompletableResultCode;
+import io.opentelemetry.sdk.trace.data.SpanData;
+import io.opentelemetry.sdk.trace.export.SpanExporter;
 
 /**
  * This class is used to modify span data at export time. It is created with a delegate exporter,
@@ -76,25 +75,26 @@ final class SpanDataModifier implements SpanExporter {
     }
 
     private SpanData modify(SpanData span) {
-        if (spanAttributeReplacements.isEmpty()) {
-            return span;
-        }
-
-        AttributesBuilder modifiedAttributes = Attributes.builder();
-        BiConsumer<AttributeKey<?>, Object> doModify =
-                (key, value) -> {
-                    Function<? super Object, ?> valueModifier =
-                            (Function<? super Object, ?>)
-                                    spanAttributeReplacements.getOrDefault(
-                                            key, Function.identity());
-                    Object newValue = valueModifier.apply(value);
-                    if (newValue != null) {
-                        modifiedAttributes.put((AttributeKey<Object>) key, newValue);
-                    }
-                };
-        span.getAttributes().forEach(doModify);
-
-        return new ModifiedSpanData(span, modifiedAttributes.build());
+        throw new IllegalStateException("TO BE DELETED");
+//        if (spanAttributeReplacements.isEmpty()) {
+//            return span;
+//        }
+//
+//        AttributesBuilder modifiedAttributes = Attributes.builder();
+//        BiConsumer<AttributeKey<?>, Object> doModify =
+//                (key, value) -> {
+//                    Function<? super Object, ?> valueModifier =
+//                            (Function<? super Object, ?>)
+//                                    spanAttributeReplacements.getOrDefault(
+//                                            key, Function.identity());
+//                    Object newValue = valueModifier.apply(value);
+//                    if (newValue != null) {
+//                        modifiedAttributes.put((AttributeKey<Object>) key, newValue);
+//                    }
+//                };
+//        span.getAttributes().forEach(doModify);
+//
+//        return new ModifiedSpanData(span, modifiedAttributes.build());
     }
 
     @Override

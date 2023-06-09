@@ -17,6 +17,8 @@
 package io.opentelemetry.rum.internal;
 
 import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.rum.export.AttributeModifyingSpanExporter;
+import io.opentelemetry.rum.export.FilteringSpanExporter;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.HashMap;
 import java.util.Map;
@@ -128,13 +130,12 @@ public final class SpanDataModifierBuilder {
     }
 
     public SpanExporter build(SpanExporter delegate) {
-        // make a copy so that the references from the builder are not included in the returned
-        // function
-
-        return new SpanDataModifier(
-                delegate,
-                this.rejectSpanNamesPredicate,
-                new HashMap<>(this.rejectSpanAttributesPredicates),
-                new HashMap<>(this.spanAttributeReplacements));
+        if(!spanAttributeReplacements.isEmpty()){
+            delegate = new AttributeModifyingSpanExporter(delegate, spanAttributeReplacements);
+        }
+        return FilteringSpanExporter.builder(delegate)
+                .rejectSpansWithAttributesMatching(rejectSpanAttributesPredicates)
+                .rejectSpansNamed(rejectSpanNamesPredicate)
+                .build();
     }
 }
