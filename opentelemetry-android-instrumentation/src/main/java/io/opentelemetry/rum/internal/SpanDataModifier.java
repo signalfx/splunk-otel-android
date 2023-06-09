@@ -68,7 +68,7 @@ final class SpanDataModifier implements SpanExporter {
             AttributeKey<?> key = e.getKey();
             Predicate<? super Object> valuePredicate = (Predicate<? super Object>) e.getValue();
             Object attributeValue = attributes.get(key);
-            if (attributeValue != null && valuePredicate.test(attributes.get(key))) {
+            if (attributeValue != null && valuePredicate.test(attributeValue)) {
                 return true;
             }
         }
