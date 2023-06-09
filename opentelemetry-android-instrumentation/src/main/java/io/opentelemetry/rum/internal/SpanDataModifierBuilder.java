@@ -27,7 +27,7 @@ import java.util.function.Predicate;
  * Allows modification of span data before it is sent to the exporter. Spans can be modified or
  * entirely rejected from export.
  */
-public final class SpanFilterBuilder {
+public final class SpanDataModifierBuilder {
 
     private Predicate<String> rejectSpanNamesPredicate = spanName -> false;
     private final Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates =
@@ -43,7 +43,7 @@ public final class SpanFilterBuilder {
      *     rejected.
      * @return {@code this}.
      */
-    public SpanFilterBuilder rejectSpansByName(Predicate<String> spanNamePredicate) {
+    public SpanDataModifierBuilder rejectSpansByName(Predicate<String> spanNamePredicate) {
         rejectSpanNamesPredicate = rejectSpanNamesPredicate.or(spanNamePredicate);
         return this;
     }
@@ -59,7 +59,7 @@ public final class SpanFilterBuilder {
      *     with matching value should be rejected.
      * @return {@code this}.
      */
-    public <T> SpanFilterBuilder rejectSpansByAttributeValue(
+    public <T> SpanDataModifierBuilder rejectSpansByAttributeValue(
             AttributeKey<T> attributeKey, Predicate<? super T> attributeValuePredicate) {
 
         rejectSpanAttributesPredicates.compute(
@@ -80,7 +80,7 @@ public final class SpanFilterBuilder {
      * @param attributeKey An attribute key to match.
      * @return {@code this}.
      */
-    public <T> SpanFilterBuilder removeSpanAttribute(AttributeKey<T> attributeKey) {
+    public <T> SpanDataModifierBuilder removeSpanAttribute(AttributeKey<T> attributeKey) {
         return removeSpanAttribute(attributeKey, value -> true);
     }
 
@@ -95,7 +95,7 @@ public final class SpanFilterBuilder {
      *     value should be removed from the span.
      * @return {@code this}.
      */
-    public <T> SpanFilterBuilder removeSpanAttribute(
+    public <T> SpanDataModifierBuilder removeSpanAttribute(
             AttributeKey<T> attributeKey, Predicate<? super T> attributeValuePredicate) {
 
         return replaceSpanAttribute(
@@ -115,7 +115,7 @@ public final class SpanFilterBuilder {
      *     the new one.
      * @return {@code this}.
      */
-    public <T> SpanFilterBuilder replaceSpanAttribute(
+    public <T> SpanDataModifierBuilder replaceSpanAttribute(
             AttributeKey<T> attributeKey, Function<? super T, ? extends T> attributeValueModifier) {
 
         spanAttributeReplacements.compute(

@@ -58,7 +58,7 @@ class SpanDataModifierTest {
     void shouldRejectSpansByName() {
         // given
         SpanExporter underTest =
-                new SpanFilterBuilder()
+                new SpanDataModifierBuilder()
                         .rejectSpansByName(spanName -> spanName.equals("span2"))
                         .rejectSpansByName(spanName -> spanName.equals("span4"))
                         .build(delegate);
@@ -87,7 +87,7 @@ class SpanDataModifierTest {
     void shouldRejectSpansByAttributeValue() {
         // given
         SpanExporter underTest =
-                new SpanFilterBuilder()
+                new SpanDataModifierBuilder()
                         .rejectSpansByAttributeValue(ATTRIBUTE, value -> value.equals("test"))
                         .rejectSpansByAttributeValue(ATTRIBUTE, value -> value.equals("rejected!"))
                         .rejectSpansByAttributeValue(LONG_ATTRIBUTE, value -> value > 100)
@@ -133,7 +133,7 @@ class SpanDataModifierTest {
     void shouldRemoveSpanAttributes() {
         // given
         SpanExporter underTest =
-                new SpanFilterBuilder()
+                new SpanDataModifierBuilder()
                         .removeSpanAttribute(ATTRIBUTE, value -> value.equals("test"))
                         // make sure that attribute types are taken into account
                         .removeSpanAttribute(stringKey("long_attribute"))
@@ -166,7 +166,7 @@ class SpanDataModifierTest {
     void shouldReplaceSpanAttributes() {
         // given
         SpanExporter underTest =
-                new SpanFilterBuilder()
+                new SpanDataModifierBuilder()
                         .replaceSpanAttribute(ATTRIBUTE, value -> value + "!!!")
                         .replaceSpanAttribute(ATTRIBUTE, value -> value + "1")
                         .replaceSpanAttribute(LONG_ATTRIBUTE, value -> value + 1)
@@ -200,7 +200,7 @@ class SpanDataModifierTest {
     void shouldReplaceSpanAttributes_removeAttributeByReturningNull() {
         // given
         SpanExporter underTest =
-                new SpanFilterBuilder()
+                new SpanDataModifierBuilder()
                         .replaceSpanAttribute(ATTRIBUTE, value -> null)
                         .build(delegate);
 
@@ -224,7 +224,7 @@ class SpanDataModifierTest {
     @Test
     void builderChangesShouldNotApplyToAlreadyDecoratedExporter() {
         // given
-        SpanFilterBuilder builder = new SpanFilterBuilder();
+        SpanDataModifierBuilder builder = new SpanDataModifierBuilder();
         SpanExporter underTest = builder.build(delegate);
 
         builder.rejectSpansByName(spanName -> spanName.equals("span"))
@@ -253,7 +253,7 @@ class SpanDataModifierTest {
 
     @Test
     void shouldDelegateCalls() {
-        SpanExporter underTest = new SpanFilterBuilder().build(delegate);
+        SpanExporter underTest = new SpanDataModifierBuilder().build(delegate);
 
         underTest.flush();
         verify(delegate).flush();
