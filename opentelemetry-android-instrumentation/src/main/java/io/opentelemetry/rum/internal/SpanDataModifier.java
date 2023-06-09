@@ -52,18 +52,18 @@ final class SpanDataModifier implements SpanExporter {
     @Override
     public CompletableResultCode export(Collection<SpanData> spans) {
         List<SpanData> modified = spans.stream()
-                .filter(span -> !reject(span))
+                .filter(this::include)
                 .map(this::modify)
                 .collect(Collectors.toList());
         return delegate.export(modified);
     }
 
-    private boolean reject(SpanData span) {
+    private boolean include(SpanData span) {
         if (rejectSpanNamesPredicate.test(span.getName())) {
-            return true;
+            return false;
         }
         Attributes attributes = span.getAttributes();
-        return rejectSpanAttributesPredicates.entrySet().stream().anyMatch(e -> {
+        return rejectSpanAttributesPredicates.entrySet().stream().noneMatch(e -> {
             AttributeKey<?> key = e.getKey();
             Predicate<? super Object> valuePredicate = (Predicate<? super Object>) e.getValue();
             Object attributeValue = attributes.get(key);
