@@ -16,6 +16,8 @@
 
 package io.opentelemetry.rum.internal;
 
+import android.util.Pair;
+
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 final class SpanDataModifier implements SpanExporter {
     private final SpanExporter delegate;
@@ -48,13 +51,10 @@ final class SpanDataModifier implements SpanExporter {
 
     @Override
     public CompletableResultCode export(Collection<SpanData> spans) {
-        List<SpanData> modified = new ArrayList<>();
-        for (SpanData span : spans) {
-            if (reject(span)) {
-                continue;
-            }
-            modified.add(modify(span));
-        }
+        List<SpanData> modified = spans.stream()
+                .filter(span -> !reject(span))
+                .map(this::modify)
+                .collect(Collectors.toList());
         return delegate.export(modified);
     }
 
@@ -63,16 +63,12 @@ final class SpanDataModifier implements SpanExporter {
             return true;
         }
         Attributes attributes = span.getAttributes();
-        for (Map.Entry<AttributeKey<?>, Predicate<?>> e :
-                rejectSpanAttributesPredicates.entrySet()) {
+        return rejectSpanAttributesPredicates.entrySet().stream().anyMatch(e -> {
             AttributeKey<?> key = e.getKey();
             Predicate<? super Object> valuePredicate = (Predicate<? super Object>) e.getValue();
             Object attributeValue = attributes.get(key);
-            if (attributeValue != null && valuePredicate.test(attributeValue)) {
-                return true;
-            }
-        }
-        return false;
+            return (attributeValue != null && valuePredicate.test(attributeValue));
+        });
     }
 
     private SpanData modify(SpanData span) {
