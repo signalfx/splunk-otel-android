@@ -24,13 +24,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * A utility that can be used to create a SpanExporter that allows filtering and modification
- * of span data before it is sent to Allows modification of span data before it is sent to
- * a delegate exporter. Spans can be rejected entirely based on their name or attribute
- * content, or their attributes may be modified.
+ * A utility that can be used to create a SpanExporter that allows filtering and modification of
+ * span data before it is sent to Allows modification of span data before it is sent to a delegate
+ * exporter. Spans can be rejected entirely based on their name or attribute content, or their
+ * attributes may be modified.
  */
 public final class SpanDataModifier {
-
 
     private final SpanExporter delegate;
     private Predicate<String> rejectSpanNamesPredicate = spanName -> false;
