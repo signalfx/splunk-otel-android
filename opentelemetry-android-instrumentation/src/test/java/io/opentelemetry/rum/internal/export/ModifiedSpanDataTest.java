@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.opentelemetry.rum.export;
+package io.opentelemetry.rum.internal.export;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static java.util.Collections.emptyList;
@@ -27,7 +27,7 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.TraceFlags;
 import io.opentelemetry.api.trace.TraceId;
 import io.opentelemetry.api.trace.TraceState;
-import io.opentelemetry.rum.export.ModifiedSpanData;
+import io.opentelemetry.rum.internal.export.ModifiedSpanData;
 import io.opentelemetry.sdk.common.InstrumentationLibraryInfo;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.testing.trace.TestSpanData;

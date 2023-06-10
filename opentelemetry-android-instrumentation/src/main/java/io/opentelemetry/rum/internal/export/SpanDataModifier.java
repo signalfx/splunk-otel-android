@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package io.opentelemetry.rum.internal;
+package io.opentelemetry.rum.internal.export;
 
 import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.rum.export.AttributeModifyingSpanExporter;
-import io.opentelemetry.rum.export.FilteringSpanExporter;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,12 +27,20 @@ import java.util.function.Predicate;
  * Allows modification of span data before it is sent to the exporter. Spans can be modified or
  * entirely rejected from export.
  */
-public final class SpanDataModifierBuilder {
+public final class SpanDataModifier {
 
     private Predicate<String> rejectSpanNamesPredicate = spanName -> false;
     private final Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates =
             new HashMap<>();
     private final Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements = new HashMap<>();
+
+    public static SpanDataModifier builder(){
+        return new SpanDataModifier();
+    }
+
+    private SpanDataModifier(){
+
+    }
 
     /**
      * Remove matching spans from the exporter pipeline.
@@ -45,7 +51,7 @@ public final class SpanDataModifierBuilder {
      *     rejected.
      * @return {@code this}.
      */
-    public SpanDataModifierBuilder rejectSpansByName(Predicate<String> spanNamePredicate) {
+    public SpanDataModifier rejectSpansByName(Predicate<String> spanNamePredicate) {
         rejectSpanNamesPredicate = rejectSpanNamesPredicate.or(spanNamePredicate);
         return this;
     }
@@ -61,7 +67,7 @@ public final class SpanDataModifierBuilder {
      *     with matching value should be rejected.
      * @return {@code this}.
      */
-    public <T> SpanDataModifierBuilder rejectSpansByAttributeValue(
+    public <T> SpanDataModifier rejectSpansByAttributeValue(
             AttributeKey<T> attributeKey, Predicate<? super T> attributeValuePredicate) {
 
         rejectSpanAttributesPredicates.compute(
@@ -82,7 +88,7 @@ public final class SpanDataModifierBuilder {
      * @param attributeKey An attribute key to match.
      * @return {@code this}.
      */
-    public <T> SpanDataModifierBuilder removeSpanAttribute(AttributeKey<T> attributeKey) {
+    public <T> SpanDataModifier removeSpanAttribute(AttributeKey<T> attributeKey) {
         return removeSpanAttribute(attributeKey, value -> true);
     }
 
@@ -97,7 +103,7 @@ public final class SpanDataModifierBuilder {
      *     value should be removed from the span.
      * @return {@code this}.
      */
-    public <T> SpanDataModifierBuilder removeSpanAttribute(
+    public <T> SpanDataModifier removeSpanAttribute(
             AttributeKey<T> attributeKey, Predicate<? super T> attributeValuePredicate) {
 
         return replaceSpanAttribute(
@@ -117,7 +123,7 @@ public final class SpanDataModifierBuilder {
      *     the new one.
      * @return {@code this}.
      */
-    public <T> SpanDataModifierBuilder replaceSpanAttribute(
+    public <T> SpanDataModifier replaceSpanAttribute(
             AttributeKey<T> attributeKey, Function<? super T, ? extends T> attributeValueModifier) {
 
         spanAttributeReplacements.compute(

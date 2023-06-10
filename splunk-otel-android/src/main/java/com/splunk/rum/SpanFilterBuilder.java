@@ -17,16 +17,15 @@
 package com.splunk.rum;
 
 import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.rum.internal.SpanDataModifierBuilder;
+import io.opentelemetry.rum.internal.export.SpanDataModifier;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-/** Delegating wrapper around otel SpanFilterBuilder. */
+/** Delegating wrapper around otel SpanDataModifier. */
 public final class SpanFilterBuilder {
 
-    private final SpanDataModifierBuilder delegate =
-            new SpanDataModifierBuilder();
+    private final SpanDataModifier delegate = SpanDataModifier.builder();
 
     /**
      * Remove matching spans from the exporter pipeline.
@@ -109,7 +108,7 @@ public final class SpanFilterBuilder {
         return this;
     }
 
-    SpanDataModifierBuilder getDelegate() {
+    SpanDataModifier getDelegate() {
         return delegate;
     }
 

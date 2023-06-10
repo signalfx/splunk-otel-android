@@ -1,4 +1,4 @@
-package io.opentelemetry.rum.export;
+package io.opentelemetry.rum.internal.export;
 
 import java.util.Collection;
 import java.util.List;

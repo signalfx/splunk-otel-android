@@ -1,4 +1,4 @@
-package io.opentelemetry.rum.export;
+package io.opentelemetry.rum.internal.export;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
