@@ -24,21 +24,27 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Allows modification of span data before it is sent to the exporter. Spans can be modified or
- * entirely rejected from export.
+ * A utility that can be used to create a SpanExporter that allows filtering and modification
+ * of span data before it is sent to Allows modification of span data before it is sent to
+ * a delegate exporter. Spans can be rejected entirely based on their name or attribute
+ * content, or their attributes may be modified.
  */
 public final class SpanDataModifier {
 
+
+    private final SpanExporter delegate;
     private Predicate<String> rejectSpanNamesPredicate = spanName -> false;
     private final Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates =
             new HashMap<>();
     private final Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements = new HashMap<>();
 
-    public static SpanDataModifier builder() {
-        return new SpanDataModifier();
+    public static SpanDataModifier builder(SpanExporter delegate) {
+        return new SpanDataModifier(delegate);
     }
 
-    private SpanDataModifier() {}
+    private SpanDataModifier(SpanExporter delegate) {
+        this.delegate = delegate;
+    }
 
     /**
      * Remove matching spans from the exporter pipeline.
@@ -133,11 +139,12 @@ public final class SpanDataModifier {
         return this;
     }
 
-    public SpanExporter build(SpanExporter delegate) {
+    public SpanExporter build() {
+        SpanExporter modifier = delegate;
         if (!spanAttributeReplacements.isEmpty()) {
-            delegate = new AttributeModifyingSpanExporter(delegate, spanAttributeReplacements);
+            modifier = new AttributeModifyingSpanExporter(delegate, spanAttributeReplacements);
         }
-        return FilteringSpanExporter.builder(delegate)
+        return FilteringSpanExporter.builder(modifier)
                 .rejectSpansWithAttributesMatching(rejectSpanAttributesPredicates)
                 .rejectSpansNamed(rejectSpanNamesPredicate)
                 .build();
