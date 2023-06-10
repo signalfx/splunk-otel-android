@@ -34,13 +34,11 @@ public final class SpanDataModifier {
             new HashMap<>();
     private final Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements = new HashMap<>();
 
-    public static SpanDataModifier builder(){
+    public static SpanDataModifier builder() {
         return new SpanDataModifier();
     }
 
-    private SpanDataModifier(){
-
-    }
+    private SpanDataModifier() {}
 
     /**
      * Remove matching spans from the exporter pipeline.
@@ -136,7 +134,7 @@ public final class SpanDataModifier {
     }
 
     public SpanExporter build(SpanExporter delegate) {
-        if(!spanAttributeReplacements.isEmpty()){
+        if (!spanAttributeReplacements.isEmpty()) {
             delegate = new AttributeModifyingSpanExporter(delegate, spanAttributeReplacements);
         }
         return FilteringSpanExporter.builder(delegate)
