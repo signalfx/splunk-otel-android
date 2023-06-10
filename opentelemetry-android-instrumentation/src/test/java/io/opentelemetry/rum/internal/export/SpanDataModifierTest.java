@@ -18,6 +18,7 @@ package io.opentelemetry.rum.internal.export;
 
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.rum.internal.export.TestSpanHelper.span;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -28,11 +29,8 @@ import static org.mockito.Mockito.when;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.sdk.common.CompletableResultCode;
-import io.opentelemetry.sdk.testing.trace.TestSpanData;
 import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.sdk.trace.data.StatusData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -260,21 +258,5 @@ class SpanDataModifierTest {
 
         underTest.shutdown();
         verify(delegate).shutdown();
-    }
-
-    private static SpanData span(String name) {
-        return span(name, Attributes.empty());
-    }
-
-    private static SpanData span(String name, Attributes attributes) {
-        return TestSpanData.builder()
-                .setName(name)
-                .setKind(SpanKind.INTERNAL)
-                .setStatus(StatusData.unset())
-                .setHasEnded(true)
-                .setStartEpochNanos(0)
-                .setEndEpochNanos(123)
-                .setAttributes(attributes)
-                .build();
     }
 }
