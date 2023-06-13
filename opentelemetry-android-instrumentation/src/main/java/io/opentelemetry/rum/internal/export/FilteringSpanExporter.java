@@ -44,7 +44,7 @@ public class FilteringSpanExporter implements SpanExporter {
     public CompletableResultCode export(Collection<SpanData> spans) {
         List<SpanData> toExport =
                 spans.stream()
-                        .filter(span -> !spanRejecter.test(span))
+                        .filter(spanRejecter.negate())
                         .collect(Collectors.toList());
         return delegate.export(toExport);
     }
