@@ -124,7 +124,7 @@ public final class SpanFilterBuilder {
         return this;
     }
 
-    public SpanExporter build(SpanExporter exporter) {
+    SpanExporter build(SpanExporter exporter) {
         SpanDataModifier builder =
                 SpanDataModifier.builder(exporter).rejectSpansByName(rejectSpanNamesPredicate);
         spanAttributeReplacements.forEach(

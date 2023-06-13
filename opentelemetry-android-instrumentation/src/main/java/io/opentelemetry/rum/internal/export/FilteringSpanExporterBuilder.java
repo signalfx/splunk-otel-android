@@ -23,11 +23,11 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class FilteringSpanExporterBuilder {
+public final class FilteringSpanExporterBuilder {
 
     private SpanExporter exporter;
 
-    public FilteringSpanExporterBuilder(SpanExporter spanExporter) {
+    FilteringSpanExporterBuilder(SpanExporter spanExporter) {
         this.exporter = spanExporter;
     }
 
