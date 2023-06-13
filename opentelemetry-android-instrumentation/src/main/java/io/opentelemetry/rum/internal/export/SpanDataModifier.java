@@ -141,10 +141,12 @@ public final class SpanDataModifier {
     public SpanExporter build() {
         SpanExporter modifier = delegate;
         if (!spanAttributeReplacements.isEmpty()) {
-            modifier = new AttributeModifyingSpanExporter(delegate, spanAttributeReplacements);
+            modifier =
+                    new AttributeModifyingSpanExporter(
+                            delegate, new HashMap<>(spanAttributeReplacements));
         }
         return FilteringSpanExporter.builder(modifier)
-                .rejectSpansWithAttributesMatching(rejectSpanAttributesPredicates)
+                .rejectSpansWithAttributesMatching(new HashMap<>(rejectSpanAttributesPredicates))
                 .rejectSpansNamed(rejectSpanNamesPredicate)
                 .build();
     }
