@@ -32,6 +32,7 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -62,6 +63,26 @@ class AttributeModifyingSpanExporterTest {
 
         CompletableResultCode result = underTest.export(spans);
         assertSame(expectedResult, result);
+    }
+
+    @Test
+    void testRemappedToNull() {
+        AttributeKey<String> key = stringKey("foo");
+        SpanData span1 = span("span1", Attributes.of(key, "bar"));
+        Collection<SpanData> originalSpans = Collections.singletonList(span1);
+
+        Map<AttributeKey<?>, Function<?, ?>> remappers = new HashMap<>();
+        remappers.put(key, s -> null);
+
+        CompletableResultCode expectedResult = mock(CompletableResultCode.class);
+        when(exporter.export(spansCaptor.capture())).thenReturn(expectedResult);
+
+        AttributeModifyingSpanExporter underTest =
+                new AttributeModifyingSpanExporter(exporter, remappers);
+
+        underTest.export(originalSpans);
+        assertThat(spansCaptor.getValue())
+                .satisfiesExactly(span -> assertThat(span).hasTotalAttributeCount(0));
     }
 
     @Test
