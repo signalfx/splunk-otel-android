@@ -25,10 +25,11 @@ import java.util.function.Predicate;
 
 public final class FilteringSpanExporterBuilder {
 
-    private SpanExporter exporter;
+    private final SpanExporter delegate;
+    private Predicate<SpanData> predicate = x -> false;
 
     FilteringSpanExporterBuilder(SpanExporter spanExporter) {
-        this.exporter = spanExporter;
+        this.delegate = spanExporter;
     }
 
     /**
@@ -72,7 +73,7 @@ public final class FilteringSpanExporterBuilder {
      * @return this
      */
     public FilteringSpanExporterBuilder rejecting(Predicate<SpanData> predicate) {
-        exporter = new FilteringSpanExporter(exporter, predicate);
+        this.predicate = this.predicate.or(predicate);
         return this;
     }
 
@@ -95,11 +96,11 @@ public final class FilteringSpanExporterBuilder {
                                                 && valuePredicate.test(attributeValue));
                                     });
                 };
-        exporter = new FilteringSpanExporter(exporter, spanRejecter);
+        this.predicate = this.predicate.or(spanRejecter);
         return this;
     }
 
     public SpanExporter build() {
-        return exporter;
+        return new FilteringSpanExporter(delegate, this.predicate);
     }
 }
