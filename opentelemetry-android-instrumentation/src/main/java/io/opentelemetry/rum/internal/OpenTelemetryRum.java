@@ -18,6 +18,7 @@ package io.opentelemetry.rum.internal;
 
 import android.app.Application;
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
 
 /**
  * Entrypoint for the OpenTelemetry Real User Monitoring library for Android.
@@ -29,11 +30,31 @@ public interface OpenTelemetryRum {
 
     /**
      * Returns a new {@link OpenTelemetryRumBuilder} for {@link OpenTelemetryRum}.
+     * Use this version if you would like to configure individual aspects of the OpenTelemetry
+     * SDK but would still prefer to allow OpenTelemetry RUM to create the SDK for you. If you
+     * would like to "bring your own" SDK, call the two-argument version.
      *
      * @param application The {@link Application} that is being instrumented.
      */
     static OpenTelemetryRumBuilder builder(Application application) {
         return new OpenTelemetryRumBuilder(application);
+    }
+
+    /**
+     * Returns a new {@link SdkPreconfiguredRumBuilder} for {@link OpenTelemetryRum}. This version
+     * requires the user to preconfigure and create their own OpenTelemetrySdk instance. If you
+     * prefer to use the builder to configure individual aspects of the OpenTelemetry SDK and to
+     * create and manage it for you, call the two-argument version.
+     *
+     * Specific consideration should be given to the creation of your provided SDK to ensure
+     * that the SdkTracerProvider, SdkMeterProvider, and SdkLoggerProvider are configured
+     * correctly for your target RUM provider.
+     *
+     * @param application The {@link Application} that is being instrumented.
+     * @param openTelemetrySdk The {@link OpenTelemetrySdk} that the user has already created.
+     */
+    static SdkPreconfiguredRumBuilder builder(Application application, OpenTelemetrySdk openTelemetrySdk){
+        return new SdkPreconfiguredRumBuilder(application, openTelemetrySdk);
     }
 
     /** Returns a no-op implementation of {@link OpenTelemetryRum}. */
