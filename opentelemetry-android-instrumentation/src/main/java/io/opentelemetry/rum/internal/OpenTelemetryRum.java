@@ -47,7 +47,7 @@ public interface OpenTelemetryRum {
      * create and manage it for you, call the two-argument version.
      *
      * Specific consideration should be given to the creation of your provided SDK to ensure
-     * that the SdkTracerProvider, SdkMeterProvider, and SdkLoggerProvider are configured
+     * that the {@link SdkTracerProvider}, {@link SdkMeterProvider}, and {@link SdkLoggerProvider} are configured
      * correctly for your target RUM provider.
      *
      * @param application The {@link Application} that is being instrumented.
