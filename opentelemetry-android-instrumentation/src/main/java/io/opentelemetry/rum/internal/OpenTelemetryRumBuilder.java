@@ -17,7 +17,6 @@
 package io.opentelemetry.rum.internal;
 
 import android.app.Application;
-import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.logs.SdkLoggerProvider;
@@ -175,7 +174,8 @@ public final class OpenTelemetryRumBuilder {
                         .setLoggerProvider(buildLoggerProvider(application))
                         .build();
 
-        SdkPreconfiguredRumBuilder delegate = new SdkPreconfiguredRumBuilder(application, sdk, sessionId);
+        SdkPreconfiguredRumBuilder delegate =
+                new SdkPreconfiguredRumBuilder(application, sdk, sessionId);
         instrumentationInstallers.forEach(delegate::addInstrumentation);
         return delegate.build();
     }

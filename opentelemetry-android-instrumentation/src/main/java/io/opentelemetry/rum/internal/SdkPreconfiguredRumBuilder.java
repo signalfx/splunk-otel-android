@@ -1,16 +1,30 @@
+/*
+ * Copyright Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.opentelemetry.rum.internal;
 
 import android.app.Application;
-
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.rum.internal.instrumentation.InstrumentedApplication;
-import io.opentelemetry.sdk.OpenTelemetrySdk;
-
-public class SdkPreconfiguredRumBuilder {
+public final class SdkPreconfiguredRumBuilder {
     private final Application application;
     private final OpenTelemetrySdk sdk;
     private final SessionId sessionId;
@@ -18,12 +32,12 @@ public class SdkPreconfiguredRumBuilder {
     private final List<Consumer<InstrumentedApplication>> instrumentationInstallers =
             new ArrayList<>();
 
-
     SdkPreconfiguredRumBuilder(Application application, OpenTelemetrySdk openTelemetrySdk) {
         this(application, openTelemetrySdk, new SessionId(new SessionIdTimeoutHandler()));
     }
 
-    SdkPreconfiguredRumBuilder(Application application, OpenTelemetrySdk openTelemetrySdk, SessionId sessionId) {
+    SdkPreconfiguredRumBuilder(
+            Application application, OpenTelemetrySdk openTelemetrySdk, SessionId sessionId) {
         this.application = application;
         this.sdk = openTelemetrySdk;
         this.sessionId = sessionId;
@@ -61,8 +75,7 @@ public class SdkPreconfiguredRumBuilder {
         sessionId.setSessionIdChangeListener(new SessionIdChangeTracer(tracer));
 
         InstrumentedApplication instrumentedApplication =
-                new InstrumentedApplicationImpl(
-                        application, sdk, applicationStateWatcher);
+                new InstrumentedApplicationImpl(application, sdk, applicationStateWatcher);
         for (Consumer<InstrumentedApplication> installer : instrumentationInstallers) {
             installer.accept(instrumentedApplication);
         }
