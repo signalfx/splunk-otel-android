@@ -19,6 +19,9 @@ package io.opentelemetry.rum.internal;
 import android.app.Application;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.logs.SdkLoggerProvider;
+import io.opentelemetry.sdk.metrics.SdkMeterProvider;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
 
 /**
  * Entrypoint for the OpenTelemetry Real User Monitoring library for Android.
