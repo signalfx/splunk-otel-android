@@ -23,8 +23,11 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation can be used to customize the {@code screen.name} attribute for an instrumented
- * Fragment or Activity. TODO: Deprecate this so the otel one can be used instead
+ * Fragment or Activity.
+ * @deprecated
+ * RumScreenName moved to io.opentelemetry.rum.internal.instrumentation package
  */
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RumScreenName {
