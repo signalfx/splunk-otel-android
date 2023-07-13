@@ -19,7 +19,6 @@ package com.splunk.rum;
 import android.app.Activity;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import io.opentelemetry.rum.internal.instrumentation.RumScreenName;
 import io.opentelemetry.rum.internal.instrumentation.ScreenNameExtractor;
 import java.util.function.Function;
 
