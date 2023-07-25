@@ -255,21 +255,7 @@ class RumInitializer {
         if (builder.deploymentEnvironment != null) {
             resourceBuilder.put(DEPLOYMENT_ENVIRONMENT, builder.deploymentEnvironment);
         }
-        // TODO: Use the splunk-specific version key and not the upstream one
-        return resourceBuilder.put(RUM_SDK_VERSION, detectRumVersion()).build();
-    }
-
-    // TODO: Remove this method that is duplicated from upstream AndroidResource
-    private String detectRumVersion() {
-        try {
-            return application
-                    .getApplicationContext()
-                    .getResources()
-                    .getString(R.string.rum_version);
-        } catch (Exception e) {
-            // ignore for now
-        }
-        return "unknown";
+        return resourceBuilder.build();
     }
 
     private void installAnrDetector(OpenTelemetryRumBuilder otelRumBuilder, Looper mainLooper) {
