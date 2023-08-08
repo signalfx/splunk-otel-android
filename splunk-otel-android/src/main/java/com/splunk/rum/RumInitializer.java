@@ -24,7 +24,6 @@ import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.rum.internal.RumConstants.APP_START_SPAN_NAME;
-import static io.opentelemetry.rum.internal.RumConstants.RUM_SDK_VERSION;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
 import static java.util.Objects.requireNonNull;
 
@@ -32,7 +31,6 @@ import android.app.Application;
 import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.splunk.android.rum.R;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
@@ -255,21 +253,7 @@ class RumInitializer {
         if (builder.deploymentEnvironment != null) {
             resourceBuilder.put(DEPLOYMENT_ENVIRONMENT, builder.deploymentEnvironment);
         }
-        // TODO: Use the splunk-specific version key and not the upstream one
-        return resourceBuilder.put(RUM_SDK_VERSION, detectRumVersion()).build();
-    }
-
-    // TODO: Remove this method that is duplicated from upstream AndroidResource
-    private String detectRumVersion() {
-        try {
-            return application
-                    .getApplicationContext()
-                    .getResources()
-                    .getString(R.string.rum_version);
-        } catch (Exception e) {
-            // ignore for now
-        }
-        return "unknown";
+        return resourceBuilder.build();
     }
 
     private void installAnrDetector(OpenTelemetryRumBuilder otelRumBuilder, Looper mainLooper) {
