@@ -19,19 +19,21 @@ package com.splunk.rum;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.rum.internal.export.SpanDataModifier;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 /** Delegating wrapper around otel SpanDataModifier. */
 public final class SpanFilterBuilder {
 
-    // TODO: Use pure upstream mechanism for this
-    private Predicate<String> rejectSpanNamesPredicate = spanName -> false;
-    private final Map<AttributeKey<?>, Predicate<?>> rejectSpanAttributesPredicates =
-            new HashMap<>();
-    private final Map<AttributeKey<?>, Function<?, ?>> spanAttributeReplacements = new HashMap<>();
+    private final SpanDataModifier spanDataModifier;
+
+    public SpanFilterBuilder(SpanExporter exporter) {
+        this(SpanDataModifier.builder(exporter));
+    }
+
+    public SpanFilterBuilder(SpanDataModifier spanDataModifier) {
+        this.spanDataModifier = spanDataModifier;
+    }
 
     /**
      * Remove matching spans from the exporter pipeline.
@@ -43,7 +45,8 @@ public final class SpanFilterBuilder {
      * @return {@code this}.
      */
     public SpanFilterBuilder rejectSpansByName(Predicate<String> spanNamePredicate) {
-        this.rejectSpanNamesPredicate = rejectSpanNamesPredicate.or(spanNamePredicate);
+        // TODO: Use pure upstream mechanism for this
+        spanDataModifier.rejectSpansByName(spanNamePredicate);
         return this;
     }
 
@@ -60,12 +63,7 @@ public final class SpanFilterBuilder {
      */
     public <T> SpanFilterBuilder rejectSpansByAttributeValue(
             AttributeKey<T> attributeKey, Predicate<? super T> attributeValuePredicate) {
-        rejectSpanAttributesPredicates.compute(
-                attributeKey,
-                (k, oldValue) ->
-                        oldValue == null
-                                ? attributeValuePredicate
-                                : ((Predicate<T>) oldValue).or(attributeValuePredicate));
+        spanDataModifier.rejectSpansByAttributeValue(attributeKey, attributeValuePredicate);
         return this;
     }
 
@@ -115,31 +113,11 @@ public final class SpanFilterBuilder {
      */
     public <T> SpanFilterBuilder replaceSpanAttribute(
             AttributeKey<T> attributeKey, Function<? super T, ? extends T> attributeValueModifier) {
-        spanAttributeReplacements.compute(
-                attributeKey,
-                (k, oldValue) ->
-                        oldValue == null
-                                ? attributeValueModifier
-                                : ((Function<T, T>) oldValue).andThen(attributeValueModifier));
+        spanDataModifier.replaceSpanAttribute(attributeKey, attributeValueModifier);
         return this;
     }
 
-    SpanExporter build(SpanExporter exporter) {
-        SpanDataModifier builder =
-                SpanDataModifier.builder(exporter).rejectSpansByName(rejectSpanNamesPredicate);
-        spanAttributeReplacements.forEach(
-                (attributeKey, function) -> {
-                    AttributeKey<? super Object> key = (AttributeKey<? super Object>) attributeKey;
-                    Function<? super Object, ? super Object> fn =
-                            (Function<? super Object, ? super Object>) function;
-                    builder.replaceSpanAttribute(key, fn);
-                });
-        rejectSpanAttributesPredicates.forEach(
-                ((attributeKey, predicate) -> {
-                    AttributeKey<? super Object> kk = (AttributeKey<? super Object>) attributeKey;
-                    Predicate<? super Object> vv = (Predicate<? super Object>) predicate;
-                    builder.rejectSpansByAttributeValue(kk, vv);
-                }));
-        return builder.build();
+    SpanExporter build() {
+        return spanDataModifier.build();
     }
 }
