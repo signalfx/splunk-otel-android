@@ -24,6 +24,7 @@ import com.android.volley.Header;
 import com.android.volley.Request;
 import com.android.volley.toolbox.HttpResponse;
 import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesGetter;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,16 @@ enum VolleyHttpClientAttributesGetter
     @Override
     public String getUrlFull(RequestWrapper requestWrapper) {
         return requestWrapper.getRequest().getUrl();
+    }
+
+    @Override
+    public String getServerAddress(RequestWrapper requestWrapper) {
+        return UrlParser.getHost(requestWrapper.getRequest().getUrl());
+    }
+
+    @Override
+    public Integer getServerPort(RequestWrapper requestWrapper) {
+        return UrlParser.getPort(requestWrapper.getRequest().getUrl());
     }
 
     @Nullable
@@ -115,5 +126,10 @@ enum VolleyHttpClientAttributesGetter
             }
         }
         return headersList;
+    }
+
+    @Override
+    public String getTransport(RequestWrapper requestWrapper, HttpResponse httpResponse) {
+        return SemanticAttributes.NetTransportValues.IP_TCP;
     }
 }
