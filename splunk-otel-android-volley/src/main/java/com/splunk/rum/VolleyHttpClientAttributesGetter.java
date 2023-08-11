@@ -132,4 +132,9 @@ enum VolleyHttpClientAttributesGetter
     public String getTransport(RequestWrapper requestWrapper, HttpResponse httpResponse) {
         return SemanticAttributes.NetTransportValues.IP_TCP;
     }
+
+    @Override
+    public String getNetworkTransport(RequestWrapper requestWrapper, HttpResponse httpResponse) {
+        return "tcp";
+    }
 }
