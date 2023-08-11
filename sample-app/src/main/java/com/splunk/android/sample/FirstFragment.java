@@ -17,7 +17,6 @@
 package com.splunk.android.sample;
 
 import static io.opentelemetry.api.common.AttributeKey.longKey;
-import static org.apache.http.conn.ssl.SSLSocketFactory.SSL;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -195,7 +194,7 @@ public class FirstFragment extends Fragment {
         try {
             // NOTE: This is really bad and dangerous. Don't ever do this in the real world.
             // it's only necessary because the demo endpoint uses a self-signed SSL cert.
-            SSLContext sslContext = SSLContext.getInstance(SSL);
+            SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
             return splunkRum.createRumOkHttpCallFactory(

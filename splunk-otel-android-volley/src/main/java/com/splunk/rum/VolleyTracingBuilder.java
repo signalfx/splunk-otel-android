@@ -40,8 +40,7 @@ public final class VolleyTracingBuilder {
     private final HttpClientAttributesExtractorBuilder<RequestWrapper, HttpResponse>
             httpClientAttributesExtractorBuilder =
                     HttpClientAttributesExtractor.builder(
-                            VolleyHttpClientAttributesGetter.INSTANCE,
-                            VolleyNetClientAttributesGetter.INSTANCE);
+                            VolleyHttpClientAttributesGetter.INSTANCE);
 
     VolleyTracingBuilder(OpenTelemetry openTelemetry) {
         this.openTelemetry = openTelemetry;

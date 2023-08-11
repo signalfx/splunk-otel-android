@@ -12,7 +12,7 @@ android {
     namespace = "com.splunk.android.sample"
 
     compileSdk = 33
-    buildToolsVersion = "30.0.3"
+    buildToolsVersion = "33.0.1"
 
     defaultConfig {
         applicationId = "com.splunk.android.sample"
