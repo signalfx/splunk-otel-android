@@ -16,6 +16,7 @@
 
 package io.opentelemetry.rum.internal;
 
+import static io.opentelemetry.rum.internal.RumConstants.RUM_SESSION_ID_KEY;
 import static io.opentelemetry.rum.internal.RumConstants.SESSION_ID_KEY;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +46,7 @@ class SessionIdSpanAppenderTest {
         underTest.onStart(Context.root(), span);
 
         verify(span).setAttribute(SESSION_ID_KEY, "42");
-
+        verify(span).setAttribute(RUM_SESSION_ID_KEY, "42");
         assertFalse(underTest.isEndRequired());
     }
 }
