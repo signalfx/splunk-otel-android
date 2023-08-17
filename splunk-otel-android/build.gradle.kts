@@ -43,7 +43,7 @@ android {
 
 val otelVersion = "1.29.0"
 val otelAlphaVersion = "$otelVersion-alpha"
-val otelInstrumentationAlphaVersion = "1.29.0-alpha-SNAPSHOT"
+val otelInstrumentationAlphaVersion = "1.30.0-alpha-SNAPSHOT"
 
 dependencies {
     implementation(project(":opentelemetry-android-instrumentation"))
