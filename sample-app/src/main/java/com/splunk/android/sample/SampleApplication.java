@@ -42,6 +42,7 @@ public class SampleApplication extends Application {
                 .setRumAccessToken(getResources().getString(R.string.rum_access_token))
                 .enableDebug()
                 .enableDiskBuffering()
+                .disableBackgroundTaskReporting(BuildConfig.APPLICATION_ID)
                 .setSlowRenderingDetectionPollInterval(Duration.ofMillis(1000))
                 .setDeploymentEnvironment("demo")
                 .limitDiskUsageMegabytes(1)

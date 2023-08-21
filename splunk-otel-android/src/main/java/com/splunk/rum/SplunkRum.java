@@ -100,9 +100,13 @@ public class SplunkRum {
             return INSTANCE;
         }
 
-        INSTANCE =
-                new RumInitializer(builder, application, startupTimer)
-                        .initialize(currentNetworkProviderFactory, Looper.getMainLooper());
+        if(builder.isBackgroundTaskReportingEnabled()) {
+            INSTANCE = NoOpSplunkRum.INSTANCE;
+        } else {
+            INSTANCE =
+                    new RumInitializer(builder, application, startupTimer)
+                            .initialize(currentNetworkProviderFactory, Looper.getMainLooper());
+        }
 
         if (builder.isDebugEnabled()) {
             Log.i(

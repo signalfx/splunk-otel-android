@@ -314,6 +314,14 @@ public final class SplunkRumBuilder {
         return SplunkRum.initialize(this, application, CurrentNetworkProvider::createAndStart);
     }
 
+    public SplunkRumBuilder disableBackgroundTaskReporting(String applicationId) {
+        Boolean isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
+        if(isBackgroundProcess) {
+            configFlags.disableBackgroundTaskDetection();
+        }
+        return this;
+    }
+
     // one day maybe these can use kotlin delegation
     ConfigFlags getConfigFlags() {
         return configFlags;
@@ -349,5 +357,9 @@ public final class SplunkRumBuilder {
 
     boolean isReactNativeSupportEnabled() {
         return configFlags.isReactNativeSupportEnabled();
+    }
+
+    boolean isBackgroundTaskReportingEnabled() {
+        return configFlags.isBackgroundTaskInstrumentationEnabled();
     }
 }
