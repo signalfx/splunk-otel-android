@@ -316,7 +316,7 @@ public final class SplunkRumBuilder {
 
     public SplunkRumBuilder disableBackgroundTaskReporting(String applicationId) {
         Boolean isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
-        if(isBackgroundProcess) {
+        if (isBackgroundProcess) {
             configFlags.disableBackgroundTaskDetection();
         }
         return this;
