@@ -43,7 +43,7 @@ android {
     }
 }
 
-val otelVersion = "1.28.0"
+val otelVersion = "1.29.0"
 val otelAlphaVersion = "$otelVersion-alpha"
 val otelInstrumentationAlphaVersion = "1.29.0-alpha-SNAPSHOT"
 
@@ -69,7 +69,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
     testImplementation("org.robolectric:robolectric:4.10.3")
-    testImplementation("org.mockito:mockito-core:5.4.0")
+    testImplementation("org.mockito:mockito-core:5.5.0")
     testImplementation("androidx.test:core:1.5.0")
     testImplementation("com.google.mockwebserver:mockwebserver:20130706")
     testImplementation("com.android.volley:volley:1.2.1")

@@ -41,13 +41,13 @@ android {
     }
 }
 
-val otelVersion = "1.28.0"
+val otelVersion = "1.29.0"
 val otelAlphaVersion = "$otelVersion-alpha"
 val otelInstrumentationAlphaVersion = "1.29.0-alpha-SNAPSHOT"
 
 dependencies {
     implementation(project(":opentelemetry-android-instrumentation"))
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.9.0"))
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.9.10"))
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core:1.10.1")
     implementation("androidx.navigation:navigation-fragment:2.6.0")
@@ -65,8 +65,8 @@ dependencies {
     api("io.opentelemetry:opentelemetry-api")
     api("com.squareup.okhttp3:okhttp:4.11.0")
 
-    testImplementation("org.mockito:mockito-core:5.4.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.4.0")
+    testImplementation("org.mockito:mockito-core:5.5.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")

@@ -43,7 +43,7 @@ public final class SplunkRumBuilder {
     Duration slowRenderingDetectionPollInterval = DEFAULT_SLOW_RENDERING_DETECTION_POLL_INTERVAL;
     Attributes globalAttributes = Attributes.empty();
     @Nullable String deploymentEnvironment;
-    private final SpanFilterBuilder spanFilterBuilder = new SpanFilterBuilder();
+    private Consumer<SpanFilterBuilder> spanFilterConfigurer = x -> {};
     int maxUsageMegabytes = DEFAULT_MAX_STORAGE_USE_MB;
     boolean sessionBasedSamplerEnabled = false;
     double sessionBasedSamplerRatio = 1.0;
@@ -242,7 +242,7 @@ public final class SplunkRumBuilder {
      * @return {@code this}
      */
     public SplunkRumBuilder filterSpans(Consumer<SpanFilterBuilder> configurer) {
-        configurer.accept(spanFilterBuilder);
+        this.spanFilterConfigurer = configurer;
         return this;
     }
 
@@ -328,7 +328,9 @@ public final class SplunkRumBuilder {
     }
 
     SpanExporter decorateWithSpanFilter(SpanExporter exporter) {
-        return spanFilterBuilder.build(exporter);
+        SpanFilterBuilder spanFilterBuilder = new SpanFilterBuilder(exporter);
+        this.spanFilterConfigurer.accept(spanFilterBuilder);
+        return spanFilterBuilder.build();
     }
 
     boolean isDebugEnabled() {

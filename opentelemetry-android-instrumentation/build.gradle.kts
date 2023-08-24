@@ -42,9 +42,9 @@ android {
     }
 }
 
-val otelVersion = "1.28.0"
+val otelVersion = "1.29.0"
 val otelAlphaVersion = "$otelVersion-alpha"
-val otelInstrumentationVersion = "1.28.0"
+val otelInstrumentationVersion = "1.29.0"
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -63,8 +63,8 @@ dependencies {
 
     api("io.opentelemetry:opentelemetry-api")
 
-    testImplementation("org.mockito:mockito-core:5.4.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.4.0")
+    testImplementation("org.mockito:mockito-core:5.5.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
