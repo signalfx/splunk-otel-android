@@ -101,7 +101,7 @@ public class SplunkRum {
         }
 
         if (!builder.isBackgroundTaskReportingEnabled() && builder.isBackgroundProcess) {
-            INSTANCE = NoOpSplunkRum.INSTANCE;
+            INSTANCE = SplunkRum.noop();
         } else {
             INSTANCE =
                     new RumInitializer(builder, application, startupTimer)
