@@ -47,6 +47,7 @@ public final class SplunkRumBuilder {
     int maxUsageMegabytes = DEFAULT_MAX_STORAGE_USE_MB;
     boolean sessionBasedSamplerEnabled = false;
     double sessionBasedSamplerRatio = 1.0;
+    boolean isBackgroundProcess = false;
 
     /**
      * Sets the application name that will be used to identify your application in the Splunk RUM
@@ -315,10 +316,8 @@ public final class SplunkRumBuilder {
     }
 
     public SplunkRumBuilder disableBackgroundTaskReporting(String applicationId) {
-        Boolean isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
-        if (isBackgroundProcess) {
-            configFlags.disableBackgroundTaskDetection();
-        }
+        isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
+        configFlags.disableBackgroundTaskDetection();
         return this;
     }
 
