@@ -24,7 +24,7 @@ import java.util.Objects;
 
 public final class BackgroundProcessDetector {
 
-    BackgroundProcessDetector() {}
+    private BackgroundProcessDetector() {}
 
     public static Boolean isBackgroundProcess(String applicationId) {
         String applicationProcessName = getApplicationProcessName();
