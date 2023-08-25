@@ -34,6 +34,7 @@ import io.opentelemetry.sdk.logs.data.Body;
 import io.opentelemetry.sdk.logs.data.LogRecordData;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.Nullable;
 
 final class LogToSpanBridge implements LogRecordProcessor {
 
@@ -44,7 +45,7 @@ final class LogToSpanBridge implements LogRecordProcessor {
     static final AttributeKey<String> LOG_SEVERITY_TEXT = stringKey("log.severity_text");
     static final AttributeKey<String> LOG_BODY = stringKey("log.body");
 
-    private volatile TracerProvider tracerProvider;
+    @Nullable private volatile TracerProvider tracerProvider = null;
 
     void setTracerProvider(TracerProvider tracerProvider) {
         this.tracerProvider = tracerProvider;
