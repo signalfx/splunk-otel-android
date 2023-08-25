@@ -23,6 +23,9 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 public final class BackgroundProcessDetector {
+
+    BackgroundProcessDetector() {}
+
     public static Boolean isBackgroundProcess(String applicationId) {
         String applicationProcessName = getApplicationProcessName();
         return Objects.equals(applicationProcessName, applicationId);
