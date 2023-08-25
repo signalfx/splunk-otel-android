@@ -47,6 +47,7 @@ public final class SplunkRumBuilder {
     int maxUsageMegabytes = DEFAULT_MAX_STORAGE_USE_MB;
     boolean sessionBasedSamplerEnabled = false;
     double sessionBasedSamplerRatio = 1.0;
+    boolean isBackgroundProcess = false;
 
     /**
      * Sets the application name that will be used to identify your application in the Splunk RUM
@@ -314,6 +315,20 @@ public final class SplunkRumBuilder {
         return SplunkRum.initialize(this, application, CurrentNetworkProvider::createAndStart);
     }
 
+    /**
+     * Disables the instrumentation of background process feature. If enabled, the background
+     * processes will be instrumented.
+     *
+     * <p>This feature is enabled by default. You can disable it by calling this method.
+     *
+     * @return {@code this}
+     */
+    public SplunkRumBuilder disableBackgroundTaskReporting(String applicationId) {
+        isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
+        configFlags.disableBackgroundTaskDetection();
+        return this;
+    }
+
     // one day maybe these can use kotlin delegation
     ConfigFlags getConfigFlags() {
         return configFlags;
@@ -351,5 +366,9 @@ public final class SplunkRumBuilder {
 
     boolean isReactNativeSupportEnabled() {
         return configFlags.isReactNativeSupportEnabled();
+    }
+
+    boolean isBackgroundTaskReportingDisabled() {
+        return !configFlags.isBackgroundTaskInstrumentationEnabled();
     }
 }
