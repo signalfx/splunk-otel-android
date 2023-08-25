@@ -20,23 +20,28 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Build;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
-public class BackgroundProcessDetector {
+public final class BackgroundProcessDetector {
     public static Boolean isBackgroundProcess(String applicationId) {
-        String applicationProcessName = "";
-        if (Build.VERSION.SDK_INT >= 28) applicationProcessName = Application.getProcessName();
-        else {
+        String applicationProcessName = getApplicationProcessName();
+        return Objects.equals(applicationProcessName, applicationId);
+    }
+
+    private static String getApplicationProcessName() {
+        if (Build.VERSION.SDK_INT >= 28) {
+            return Application.getProcessName();
+        } else {
             try {
                 @SuppressLint("PrivateApi")
                 Class<?> activityThread = Class.forName("android.app.ActivityThread");
                 String methodName = "currentProcessName";
                 @SuppressLint("PrivateApi")
                 Method getProcessName = activityThread.getDeclaredMethod(methodName);
-                applicationProcessName = (String) getProcessName.invoke(null);
+                return (String) getProcessName.invoke(null);
             } catch (Exception e) {
+                return null;
             }
         }
-
-        return applicationProcessName != null && applicationProcessName.equals(applicationId);
     }
 }

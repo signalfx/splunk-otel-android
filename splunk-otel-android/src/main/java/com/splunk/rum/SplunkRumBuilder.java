@@ -315,6 +315,14 @@ public final class SplunkRumBuilder {
         return SplunkRum.initialize(this, application, CurrentNetworkProvider::createAndStart);
     }
 
+    /**
+     * Disables the instrumentation of background process feature. If enabled, the background
+     * processes will be instrumented.
+     *
+     * <p>This feature is enabled by default. You can disable it by calling this method.
+     *
+     * @return {@code this}
+     */
     public SplunkRumBuilder disableBackgroundTaskReporting(String applicationId) {
         isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
         configFlags.disableBackgroundTaskDetection();
@@ -360,7 +368,7 @@ public final class SplunkRumBuilder {
         return configFlags.isReactNativeSupportEnabled();
     }
 
-    boolean isBackgroundTaskReportingEnabled() {
-        return configFlags.isBackgroundTaskInstrumentationEnabled();
+    boolean isBackgroundTaskReportingDisabled() {
+        return !configFlags.isBackgroundTaskInstrumentationEnabled();
     }
 }

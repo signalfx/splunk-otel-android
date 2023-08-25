@@ -100,7 +100,7 @@ public class SplunkRum {
             return INSTANCE;
         }
 
-        if (!builder.isBackgroundTaskReportingEnabled() && builder.isBackgroundProcess) {
+        if (builder.isBackgroundTaskReportingDisabled() && builder.isBackgroundProcess) {
             INSTANCE = SplunkRum.noop();
         } else {
             INSTANCE =
