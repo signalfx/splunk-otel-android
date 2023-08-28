@@ -19,6 +19,8 @@ package com.splunk.rum;
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
+import androidx.annotation.Nullable;
+
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.logs.Severity;
 import io.opentelemetry.api.trace.Span;
@@ -34,7 +36,6 @@ import io.opentelemetry.sdk.logs.data.Body;
 import io.opentelemetry.sdk.logs.data.LogRecordData;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import java.util.concurrent.TimeUnit;
-import org.jetbrains.annotations.Nullable;
 
 final class LogToSpanBridge implements LogRecordProcessor {
 
@@ -45,7 +46,8 @@ final class LogToSpanBridge implements LogRecordProcessor {
     static final AttributeKey<String> LOG_SEVERITY_TEXT = stringKey("log.severity_text");
     static final AttributeKey<String> LOG_BODY = stringKey("log.body");
 
-    @Nullable private volatile TracerProvider tracerProvider = null;
+    @Nullable
+    private volatile TracerProvider tracerProvider = null;
 
     void setTracerProvider(TracerProvider tracerProvider) {
         this.tracerProvider = tracerProvider;
