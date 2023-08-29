@@ -28,7 +28,9 @@ final class BackgroundProcessDetector {
 
     static Boolean isBackgroundProcess(String applicationId) {
         String applicationProcessName = getApplicationProcessName();
-        return Objects.equals(applicationProcessName, applicationId);
+        // If application Id is same as application processName, the app is visible to user.
+        // Using inverted condition to determine background processes.
+        return !Objects.equals(applicationProcessName, applicationId);
     }
 
     private static String getApplicationProcessName() {
