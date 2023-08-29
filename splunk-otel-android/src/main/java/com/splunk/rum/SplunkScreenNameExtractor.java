@@ -18,7 +18,7 @@ package com.splunk.rum;
 
 import android.app.Activity;
 import androidx.fragment.app.Fragment;
-import io.opentelemetry.rum.internal.instrumentation.ScreenNameExtractor;
+import io.opentelemetry.android.instrumentation.ScreenNameExtractor;
 import java.util.function.Function;
 
 /**

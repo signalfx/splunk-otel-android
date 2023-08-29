@@ -18,10 +18,10 @@ package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 
+import io.opentelemetry.android.instrumentation.crash.CrashDetails;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
-import io.opentelemetry.rum.internal.instrumentation.crash.CrashDetails;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 final class CrashComponentExtractor implements AttributesExtractor<CrashDetails, Void> {
