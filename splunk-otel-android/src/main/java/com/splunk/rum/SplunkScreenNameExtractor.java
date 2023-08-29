@@ -17,7 +17,6 @@
 package com.splunk.rum;
 
 import android.app.Activity;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import io.opentelemetry.rum.internal.instrumentation.ScreenNameExtractor;
 import java.util.function.Function;
@@ -32,19 +31,16 @@ class SplunkScreenNameExtractor implements ScreenNameExtractor {
 
     private SplunkScreenNameExtractor() {}
 
-    @Nullable
     @Override
     public String extract(Activity activity) {
         return getOrDefault(activity, DEFAULT::extract);
     }
 
-    @Nullable
     @Override
     public String extract(Fragment fragment) {
         return getOrDefault(fragment, DEFAULT::extract);
     }
 
-    @Nullable
     private <T> String getOrDefault(T obj, Function<T, String> defaultMethod) {
         RumScreenName rumScreenName = obj.getClass().getAnnotation(RumScreenName.class);
         if (rumScreenName != null) {

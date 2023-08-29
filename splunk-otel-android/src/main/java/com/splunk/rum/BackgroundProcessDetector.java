@@ -22,11 +22,11 @@ import android.os.Build;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-public final class BackgroundProcessDetector {
+final class BackgroundProcessDetector {
 
     private BackgroundProcessDetector() {}
 
-    public static Boolean isBackgroundProcess(String applicationId) {
+    static Boolean isBackgroundProcess(String applicationId) {
         String applicationProcessName = getApplicationProcessName();
         return Objects.equals(applicationProcessName, applicationId);
     }
@@ -34,17 +34,16 @@ public final class BackgroundProcessDetector {
     private static String getApplicationProcessName() {
         if (Build.VERSION.SDK_INT >= 28) {
             return Application.getProcessName();
-        } else {
-            try {
-                @SuppressLint("PrivateApi")
-                Class<?> activityThread = Class.forName("android.app.ActivityThread");
-                String methodName = "currentProcessName";
-                @SuppressLint("PrivateApi")
-                Method getProcessName = activityThread.getDeclaredMethod(methodName);
-                return (String) getProcessName.invoke(null);
-            } catch (Exception e) {
-                return null;
-            }
+        }
+        try {
+            @SuppressLint("PrivateApi")
+            Class<?> activityThread = Class.forName("android.app.ActivityThread");
+            String methodName = "currentProcessName";
+            @SuppressLint("PrivateApi")
+            Method getProcessName = activityThread.getDeclaredMethod(methodName);
+            return (String) getProcessName.invoke(null);
+        } catch (Exception e) {
+            return "";
         }
     }
 }

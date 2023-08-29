@@ -23,9 +23,11 @@ import io.opentelemetry.rum.internal.instrumentation.startup.AppStartupTimer;
 import java.util.function.Function;
 
 public class AndroidLifecycleInstrumentationBuilder {
+    private static final VisibleScreenTracker INVALID_SCREEN_TRACKER = new VisibleScreenTracker();
+    private static final AppStartupTimer INVALID_TIMER = new AppStartupTimer();
     ScreenNameExtractor screenNameExtractor = ScreenNameExtractor.DEFAULT;
-    AppStartupTimer startupTimer;
-    VisibleScreenTracker visibleScreenTracker;
+    AppStartupTimer startupTimer = INVALID_TIMER;
+    VisibleScreenTracker visibleScreenTracker = INVALID_SCREEN_TRACKER;
     Function<Tracer, Tracer> tracerCustomizer = Function.identity();
 
     public AndroidLifecycleInstrumentationBuilder setStartupTimer(AppStartupTimer timer) {
@@ -52,6 +54,12 @@ public class AndroidLifecycleInstrumentationBuilder {
     }
 
     public AndroidLifecycleInstrumentation build() {
+        if (visibleScreenTracker == INVALID_SCREEN_TRACKER) {
+            throw new IllegalStateException("visibleScreenTracker must be configured.");
+        }
+        if (startupTimer == INVALID_TIMER) {
+            throw new IllegalStateException("startupTimer must be configured.");
+        }
         return new AndroidLifecycleInstrumentation(this);
     }
 }

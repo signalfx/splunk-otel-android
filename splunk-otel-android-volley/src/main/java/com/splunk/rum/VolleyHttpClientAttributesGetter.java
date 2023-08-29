@@ -34,15 +34,18 @@ enum VolleyHttpClientAttributesGetter
     INSTANCE;
 
     @Override
+    @Nullable
     public String getUrlFull(RequestWrapper requestWrapper) {
         return requestWrapper.getRequest().getUrl();
     }
 
+    @Nullable
     @Override
     public String getServerAddress(RequestWrapper requestWrapper) {
         return UrlParser.getHost(requestWrapper.getRequest().getUrl());
     }
 
+    @Nullable
     @Override
     public Integer getServerPort(RequestWrapper requestWrapper) {
         return UrlParser.getPort(requestWrapper.getRequest().getUrl());
