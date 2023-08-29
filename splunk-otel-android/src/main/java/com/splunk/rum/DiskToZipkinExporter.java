@@ -22,7 +22,7 @@ import static java.util.Objects.requireNonNull;
 
 import android.util.Log;
 import androidx.annotation.Nullable;
-import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
+import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import java.io.File;
 import java.util.Comparator;
 import java.util.List;

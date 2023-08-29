@@ -18,9 +18,9 @@ package com.splunk.rum;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
+import io.opentelemetry.android.export.SpanDataModifier;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.rum.internal.export.SpanDataModifier;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 
 /**
