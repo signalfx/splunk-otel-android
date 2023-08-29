@@ -28,7 +28,7 @@ public final class BackgroundProcessDetector {
 
     public static Boolean isBackgroundProcess(String applicationId) {
         String applicationProcessName = getApplicationProcessName();
-        return Objects.equals(applicationProcessName, applicationId);
+        return !Objects.equals(applicationProcessName, applicationId);
     }
 
     private static String getApplicationProcessName() {
