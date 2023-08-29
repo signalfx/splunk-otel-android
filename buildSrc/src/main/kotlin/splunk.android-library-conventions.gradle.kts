@@ -95,6 +95,10 @@ project.afterEvaluate {
         val javaCompile = firstVariant.javaCompileProvider.get()
         classpath += javaCompile.classpath
         classpath += javaCompile.outputs.files
+
+        with(options as StandardJavadocDocletOptions) {
+            addBooleanOption("Xdoclint:all,-missing", true)
+        }
     }
 
     val javadocJar by tasks.registering(Jar::class) {
