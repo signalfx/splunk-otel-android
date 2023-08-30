@@ -43,7 +43,7 @@ android {
 }
 
 val otelVersion = "1.30.0-SNAPSHOT"
-val otelAlphaVersion = otelVersion.replace("-SNAPSHOT", "-alpha-SNAPSHOT")
+val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
