@@ -50,6 +50,17 @@ if (project.findProperty("release") == "true" && project.findProperty("skipSigni
 }
 
 project.afterEvaluate {
+    val javadoc by tasks.registering(Javadoc::class) {
+        source = android.sourceSets.named("main").get().java.getSourceFiles()
+        classpath += project.files(android.bootClasspath)
+
+        // grab the library variants, because apparently this is where the real classpath lives that
+        // is needed for javadoc generation.
+        val firstVariant = project.android.libraryVariants.toList().first()
+        val javaCompile = firstVariant.javaCompileProvider.get()
+        classpath += javaCompile.classpath
+        classpath += javaCompile.outputs.files
+    }
     publishing.publications {
         create<MavenPublication>("maven") {
             from(components.findByName(variantToPublish))
