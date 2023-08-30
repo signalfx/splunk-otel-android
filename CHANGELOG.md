@@ -12,7 +12,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## Version 1.1.1
 
 * Fix build to include `.aar` artifact. Please note that this version splits out an
-  additional dependency
+  additional required dependency: `com.splunk:opentelemetry-android-instrumentation`.
 
 ## Version 1.1.0
 
