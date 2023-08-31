@@ -7,16 +7,24 @@ plugins {
     id("signing")
 }
 
-android {
-    lint {
-        warningsAsErrors = true
-        // A newer version of androidx.appcompat:appcompat than 1.3.1 is available: 1.4.1 [GradleDependency]
-        // we rely on dependabot for dependency updates
-        disable.add("GradleDependency")
-    }
+android.lint {
+    warningsAsErrors = true
+    // A newer version of androidx.appcompat:appcompat than 1.3.1 is available: 1.4.1 [GradleDependency]
+    // we rely on dependabot for dependency updates
+    disable.add("GradleDependency")
 }
 
-publishing {
+val isARelease = project.hasProperty("release") && project.property("release") == "true"
+val variantToPublish = "release"
+
+android.publishing {
+    singleVariant(variantToPublish) {
+        // Adding sources and javadoc artifacts only during a release.
+        if (isARelease) {
+            withJavadocJar()
+            withSourcesJar()
+        }
+    }
     repositories {
         maven {
             val releasesRepoUrl = URI("https://oss.sonatype.org/service/local/staging/deploy/maven2")
@@ -28,8 +36,34 @@ publishing {
             }
         }
     }
-    publications {
-        register<MavenPublication>("maven") {
+}
+
+
+if (isARelease && project.findProperty("skipSigning") != "true") {
+    signing {
+        useGpgCmd()
+        val signingKey: String? by project
+        val signingPassword: String? by project
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications["maven"])
+    }
+}
+
+project.afterEvaluate {
+    val javadoc by tasks.registering(Javadoc::class) {
+        source = android.sourceSets.named("main").get().java.getSourceFiles()
+        classpath += project.files(android.bootClasspath)
+
+        // grab the library variants, because apparently this is where the real classpath lives that
+        // is needed for javadoc generation.
+        val firstVariant = project.android.libraryVariants.toList().first()
+        val javaCompile = firstVariant.javaCompileProvider.get()
+        classpath += javaCompile.classpath
+        classpath += javaCompile.outputs.files
+    }
+    publishing.publications {
+        create<MavenPublication>("maven") {
+            from(components.findByName(variantToPublish))
             groupId = "com.splunk"
             artifactId = base.archivesName.get()
 
@@ -60,56 +94,6 @@ publishing {
                     developerConnection.set("https://github.com/signalfx/splunk-otel-android.git")
                     url.set("https://github.com/signalfx/splunk-otel-android")
                 }
-            }
-        }
-    }
-}
-
-if (project.findProperty("release") == "true") {
-    signing {
-        useGpgCmd()
-        val signingKey: String? by project
-        val signingPassword: String? by project
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(publishing.publications["maven"])
-    }
-}
-
-val sourcesJar by tasks.registering(Jar::class) {
-
-    from(android.sourceSets.named("main").get().java.srcDirs)
-    archiveClassifier.set("sources")
-}
-
-project.afterEvaluate {
-
-    // note: we need to declare this here in afterEvaluate because the android plugin doesn't
-    // resolve dependencies early enough to make the libraryVariants hack work until here.
-    val javadoc by tasks.registering(Javadoc::class) {
-        source = android.sourceSets.named("main").get().java.getSourceFiles()
-        classpath += project.files(android.bootClasspath)
-
-        // grab the library variants, because apparently this is where the real classpath lives that
-        // is needed for javadoc generation.
-        val firstVariant = project.android.libraryVariants.toList().first()
-        val javaCompile = firstVariant.javaCompileProvider.get()
-        classpath += javaCompile.classpath
-        classpath += javaCompile.outputs.files
-    }
-
-    val javadocJar by tasks.registering(Jar::class) {
-        dependsOn(javadoc)
-        archiveClassifier.set("javadoc")
-        from(javadoc.get().destinationDir)
-    }
-
-    val component = project.components.findByName("release")
-    publishing {
-        publications {
-            named<MavenPublication>("maven") {
-                from(component)
-                artifact(tasks.named<Jar>("sourcesJar"))
-                artifact(javadocJar)
             }
         }
     }
