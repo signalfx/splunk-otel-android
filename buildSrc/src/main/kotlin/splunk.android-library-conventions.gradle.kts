@@ -25,22 +25,9 @@ android.publishing {
             withSourcesJar()
         }
     }
-    repositories {
-        maven {
-            val releasesRepoUrl = URI("https://oss.sonatype.org/service/local/staging/deploy/maven2")
-            val snapshotsRepoUrl = URI("https://oss.sonatype.org/content/repositories/snapshots/")
-            url = if (project.findProperty("release") == "true") releasesRepoUrl else snapshotsRepoUrl
-            credentials {
-                username = findProperty("mavenCentralUsername") as String?
-                password = findProperty("mavenCentralPassword") as String?
-            }
-        }
-    }
 }
 
-
-
-project.afterEvaluate {
+afterEvaluate {
     val javadoc by tasks.registering(Javadoc::class) {
         source = android.sourceSets.named("main").get().java.getSourceFiles()
         classpath += project.files(android.bootClasspath)
@@ -52,38 +39,51 @@ project.afterEvaluate {
         classpath += javaCompile.classpath
         classpath += javaCompile.outputs.files
     }
-    publishing.publications {
-        create<MavenPublication>("maven") {
-            from(components.findByName(variantToPublish))
-            groupId = "com.splunk"
-            artifactId = base.archivesName.get()
-
-            afterEvaluate {
-                pom.name.set("${project.extra["pomName"]}")
-                pom.description.set(project.description)
+    publishing {
+        repositories {
+            maven {
+                val releasesRepoUrl = URI("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                val snapshotsRepoUrl = URI("https://oss.sonatype.org/content/repositories/snapshots/")
+                url = if (project.findProperty("release") == "true") releasesRepoUrl else snapshotsRepoUrl
+                credentials {
+                    username = findProperty("mavenCentralUsername") as String?
+                    password = findProperty("mavenCentralPassword") as String?
+                }
             }
+        }
+        publications {
+            create<MavenPublication>("maven") {
+                from(components.findByName(variantToPublish))
+                groupId = "com.splunk"
+                artifactId = base.archivesName.get()
 
-            pom {
-                url.set("https://github.com/signalfx/splunk-otel-android")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
+                afterEvaluate {
+                    pom.name.set("${project.extra["pomName"]}")
+                    pom.description.set(project.description)
                 }
-                developers {
-                    developer {
-                        id.set("splunk")
-                        name.set("Splunk Instrumentation Authors")
-                        email.set("support+java@signalfx.com")
-                        organization.set("Splunk")
-                        organizationUrl.set("https://www.splunk.com")
-                    }
-                }
-                scm {
-                    connection.set("https://github.com/signalfx/splunk-otel-android.git")
-                    developerConnection.set("https://github.com/signalfx/splunk-otel-android.git")
+
+                pom {
                     url.set("https://github.com/signalfx/splunk-otel-android")
+                    licenses {
+                        license {
+                            name.set("The Apache License, Version 2.0")
+                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("splunk")
+                            name.set("Splunk Instrumentation Authors")
+                            email.set("support+java@signalfx.com")
+                            organization.set("Splunk")
+                            organizationUrl.set("https://www.splunk.com")
+                        }
+                    }
+                    scm {
+                        connection.set("https://github.com/signalfx/splunk-otel-android.git")
+                        developerConnection.set("https://github.com/signalfx/splunk-otel-android.git")
+                        url.set("https://github.com/signalfx/splunk-otel-android")
+                    }
                 }
             }
         }
