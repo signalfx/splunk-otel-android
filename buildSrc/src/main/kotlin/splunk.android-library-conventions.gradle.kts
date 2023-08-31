@@ -39,15 +39,6 @@ android.publishing {
 }
 
 
-if (isARelease && project.findProperty("skipSigning") != "true") {
-    signing {
-        useGpgCmd()
-        val signingKey: String? by project
-        val signingPassword: String? by project
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(publishing.publications["maven"])
-    }
-}
 
 project.afterEvaluate {
     val javadoc by tasks.registering(Javadoc::class) {
@@ -95,6 +86,15 @@ project.afterEvaluate {
                     url.set("https://github.com/signalfx/splunk-otel-android")
                 }
             }
+        }
+    }
+    if (isARelease && project.findProperty("skipSigning") != "true") {
+        signing {
+            useGpgCmd()
+            val signingKey: String? by project
+            val signingPassword: String? by project
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            sign(publishing.publications["maven"])
         }
     }
 }
