@@ -51,12 +51,12 @@ android {
     }
 }
 
-val otelVersion = "1.26.0"
-val otelAlphaVersion = "$otelVersion-alpha"
-val otelInstrumentationVersion = "1.29.0"
-val otelInstrumentationAlphaVersion = "$otelInstrumentationVersion-alpha"
+val otelVersion = "1.30.0-SNAPSHOT"
+val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
 
 dependencies {
+    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
+
     implementation(project(":opentelemetry-android-instrumentation"))
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
@@ -71,12 +71,12 @@ dependencies {
     implementation(project(":splunk-otel-android"))
     implementation(project(":splunk-otel-android-volley"))
     implementation("com.android.volley:volley:1.2.1")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:$otelInstrumentationVersion")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv:$otelInstrumentationAlphaVersion")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
 
-    implementation("io.opentelemetry:opentelemetry-api-events:$otelAlphaVersion")
-    implementation("io.opentelemetry:opentelemetry-sdk-logs:$otelAlphaVersion")
-    implementation("io.opentelemetry:opentelemetry-sdk:$otelAlphaVersion")
+    implementation("io.opentelemetry:opentelemetry-api-events")
+    implementation("io.opentelemetry:opentelemetry-sdk-logs")
+    implementation("io.opentelemetry:opentelemetry-sdk")
 
     testImplementation("junit:junit:4.13.2")
 }

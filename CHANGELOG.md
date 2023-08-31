@@ -7,7 +7,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
-* `splunk.rum.version` attribute has been renamed to `rum.sdk.version`
+* tbd
+
+## Version 1.1.1
+
+* Fix build to include `.aar` artifact. Please note that this version splits out an
+  additional required dependency: `com.splunk:opentelemetry-android-instrumentation`.
+
+## Version 1.1.0
+
+This version had a critical defect which caused the `.aar` to not be published to maven central.
+Users should skip over this version and use the patch release 1.1.1 when it is available.
+
+* `splunk.rum.version` attribute has been renamed to `rum.sdk.version` (#524)
+* new API: `OpenTelemetryRumBuilder.mergeResource()` to allow merging into resource instead of replacing (#524)
+* new API: `SplunkRumBuilder.disableBackgroundTaskReporting(applicationId)` - pass the `applicationId` to this
+  method in order to disable instrumentation for background tasks. (#614) (#624)
+* OpenTelemetry SDK updated to [1.29.0](https://github.com/open-telemetry/opentelemetry-java/releases/tag/v1.29.0)
 
 ## Version 1.0.0
 
