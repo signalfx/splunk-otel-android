@@ -39,7 +39,7 @@ android.publishing {
 }
 
 
-if (project.findProperty("release") == "true" && project.findProperty("skipSigning") != "true") {
+if (isARelease && project.findProperty("skipSigning") != "true") {
     signing {
         useGpgCmd()
         val signingKey: String? by project
