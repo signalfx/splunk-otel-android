@@ -11,13 +11,13 @@ localProperties.load(FileInputStream(rootProject.file("local.properties")))
 android {
     namespace = "com.splunk.android.sample"
 
-    compileSdk = 33
-    buildToolsVersion = "33.0.1"
+    compileSdk = 34
+    buildToolsVersion = "34.0.0"
 
     defaultConfig {
         applicationId = "com.splunk.android.sample"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -62,12 +62,12 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.webkit:webkit:1.7.0")
-    implementation("androidx.browser:browser:1.5.0")
+    implementation("androidx.webkit:webkit:1.8.0")
+    implementation("androidx.browser:browser:1.6.0")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.navigation:navigation-fragment:2.6.0")
-    implementation("androidx.navigation:navigation-ui:2.6.0")
+    implementation("androidx.navigation:navigation-fragment:2.7.2")
+    implementation("androidx.navigation:navigation-ui:2.7.2")
     implementation(project(":splunk-otel-android"))
     implementation(project(":splunk-otel-android-volley"))
     implementation("com.android.volley:volley:1.2.1")
