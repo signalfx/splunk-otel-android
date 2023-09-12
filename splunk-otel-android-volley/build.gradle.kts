@@ -10,7 +10,7 @@ android {
     namespace = "com.splunk.android.rum.volley"
 
     compileSdk = 33
-    buildToolsVersion = "33.0.1"
+    buildToolsVersion = "34.0.0"
 
     defaultConfig {
         minSdk = 21
