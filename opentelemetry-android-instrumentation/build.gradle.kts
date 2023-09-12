@@ -10,7 +10,7 @@ version = project.version.toString().replaceFirst("(-SNAPSHOT)?$".toRegex(), "-a
 android {
     namespace = "opentelemetry.rum.instrumentation"
 
-    compileSdk = 33
+    compileSdk = 34
     buildToolsVersion = "34.0.0"
 
     defaultConfig {

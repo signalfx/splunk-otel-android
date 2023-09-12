@@ -9,7 +9,7 @@ plugins {
 android {
     namespace = "com.splunk.android.rum.volley"
 
-    compileSdk = 33
+    compileSdk = 34
     buildToolsVersion = "34.0.0"
 
     defaultConfig {
@@ -48,7 +48,7 @@ val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alp
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.navigation:navigation-fragment:2.6.0")
+    implementation("androidx.navigation:navigation-fragment:2.7.2")
     compileOnly("com.android.volley:volley:1.2.1")
 
     implementation(project(":splunk-otel-android"))
