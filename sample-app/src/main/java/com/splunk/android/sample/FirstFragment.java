@@ -46,6 +46,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -87,7 +88,7 @@ public class FirstFragment extends Fragment {
                 v -> {
                     Span workflow = splunkRum.startWorkflow("User Login");
                     // not really a login, but it does make an http call
-                    makeCall("https://pmrum.o11ystore.com?user=me&pass=secret123secret", workflow);
+                    makeCall("https://mon.signalfx.com/v2/dashboardgroup?teamId=FmrVEicAsAU&limit=0", workflow);
                     // maybe this call gave us a real customer id, so let's put it into the global
                     // attributes
                     splunkRum.setGlobalAttribute(longKey("customerId"), 123456L);
@@ -144,7 +145,10 @@ public class FirstFragment extends Fragment {
     private void makeCall(String url, Span workflow) {
         // make sure the span is in the current context so it can be propagated into the async call.
         try (Scope scope = workflow.makeCurrent()) {
-            Call call = okHttpClient.newCall(new Request.Builder().url(url).get().build());
+            Headers headers = new Headers.Builder()
+                    .add("X-Sf-Token", "uDYUXIW7fUzNRlHbpAzzmg")
+                    .build();
+            Call call = okHttpClient.newCall(new Request.Builder().url(url).headers(headers).get().build());
             call.enqueue(
                     new Callback() {
                         @Override
