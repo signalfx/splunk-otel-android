@@ -81,11 +81,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpPeriodicWorker() {
-        PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
-                DemoWorker.class,
-                2,
-                TimeUnit.MINUTES
-        ).build();
+        PeriodicWorkRequest workRequest =
+                new PeriodicWorkRequest.Builder(DemoWorker.class, 2, TimeUnit.MINUTES).build();
 
         WorkManager.getInstance(this).enqueue(workRequest);
     }

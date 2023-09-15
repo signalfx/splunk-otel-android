@@ -22,13 +22,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-
 import com.splunk.rum.SplunkRum;
 import com.splunk.rum.StandardAttributes;
 import io.opentelemetry.api.common.Attributes;
 import java.time.Duration;
 import java.util.regex.Pattern;
-
 
 public class SampleApplication extends Application {
     static final String PREFERENCES = "MyPrefs";
@@ -41,13 +39,14 @@ public class SampleApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences =
+                getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         // Read the variable from SharedPreferences to know if need to initialize RUM
         boolean initRum = sharedPreferences.getBoolean(INITIALIZE_RUM_KEY, true);
         Log.d(TAG, "Initialize Rum : " + initRum);
         sharedPreferences.edit().putBoolean(INITIALIZE_RUM_KEY, true).apply();
 
-        if(initRum) {
+        if (initRum) {
             SplunkRum.builder()
                     // note: for these values to be resolved, put them in your local.properties
                     // file as rum.beacon.url and rum.access.token
@@ -69,7 +68,8 @@ public class SampleApplication extends Application {
                             spanFilter ->
                                     spanFilter
                                             .removeSpanAttribute(stringKey("http.user_agent"))
-                                            .rejectSpansByName(spanName -> spanName.contains("ignored"))
+                                            .rejectSpansByName(
+                                                    spanName -> spanName.contains("ignored"))
                                             // sensitive data in the login http.url attribute
                                             // will be redacted before it hits the exporter
                                             .replaceSpanAttribute(
