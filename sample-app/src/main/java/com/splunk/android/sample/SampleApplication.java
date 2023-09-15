@@ -19,51 +19,69 @@ package com.splunk.android.sample;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
 import com.splunk.rum.SplunkRum;
 import com.splunk.rum.StandardAttributes;
 import io.opentelemetry.api.common.Attributes;
 import java.time.Duration;
 import java.util.regex.Pattern;
 
-public class SampleApplication extends Application {
 
+public class SampleApplication extends Application {
+    static final String PREFERENCES = "MyPrefs";
+    static final String INITIALIZE_RUM_KEY = "initialize_rum";
     private static final Pattern HTTP_URL_SENSITIVE_DATA_PATTERN =
             Pattern.compile("(user|pass)=\\w+");
+
+    public static final String TAG = "SampleApplication";
 
     @Override
     public void onCreate() {
         super.onCreate();
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        // Read the variable from SharedPreferences to know if need to initialize RUM
+        boolean initRum = sharedPreferences.getBoolean(INITIALIZE_RUM_KEY, true);
+        Log.d(TAG, "Initialize Rum : " + initRum);
+        sharedPreferences.edit().putBoolean(INITIALIZE_RUM_KEY, true).apply();
 
-        SplunkRum.builder()
-                // note: for these values to be resolved, put them in your local.properties
-                // file as rum.beacon.url and rum.access.token
-                .setRealm(getResources().getString(R.string.rum_realm))
-                .setApplicationName("Android Demo App")
-                .setRumAccessToken(getResources().getString(R.string.rum_access_token))
-                .enableDebug()
-                .enableDiskBuffering()
-                .disableBackgroundTaskReporting(BuildConfig.APPLICATION_ID)
-                .setSlowRenderingDetectionPollInterval(Duration.ofMillis(1000))
-                .setDeploymentEnvironment("demo")
-                .limitDiskUsageMegabytes(1)
-                .setGlobalAttributes(
-                        Attributes.builder()
-                                .put("vendor", "Splunk")
-                                .put(StandardAttributes.APP_VERSION, BuildConfig.VERSION_NAME)
-                                .build())
-                .filterSpans(
-                        spanFilter ->
-                                spanFilter
-                                        .removeSpanAttribute(stringKey("http.user_agent"))
-                                        .rejectSpansByName(spanName -> spanName.contains("ignored"))
-                                        // sensitive data in the login http.url attribute
-                                        // will be redacted before it hits the exporter
-                                        .replaceSpanAttribute(
-                                                StandardAttributes.HTTP_URL,
-                                                value ->
-                                                        HTTP_URL_SENSITIVE_DATA_PATTERN
-                                                                .matcher(value)
-                                                                .replaceAll("$1=<redacted>")))
-                .build(this);
+        if(initRum) {
+            SplunkRum.builder()
+                    // note: for these values to be resolved, put them in your local.properties
+                    // file as rum.beacon.url and rum.access.token
+                    .setRealm(getResources().getString(R.string.rum_realm))
+                    .setApplicationName("Android Demo App")
+                    .setRumAccessToken(getResources().getString(R.string.rum_access_token))
+                    .enableDebug()
+                    .enableDiskBuffering()
+                    .disableBackgroundTaskReporting(BuildConfig.APPLICATION_ID)
+                    .setSlowRenderingDetectionPollInterval(Duration.ofMillis(1000))
+                    .setDeploymentEnvironment("demo")
+                    .limitDiskUsageMegabytes(1)
+                    .setGlobalAttributes(
+                            Attributes.builder()
+                                    .put("vendor", "Splunk")
+                                    .put(StandardAttributes.APP_VERSION, BuildConfig.VERSION_NAME)
+                                    .build())
+                    .filterSpans(
+                            spanFilter ->
+                                    spanFilter
+                                            .removeSpanAttribute(stringKey("http.user_agent"))
+                                            .rejectSpansByName(spanName -> spanName.contains("ignored"))
+                                            // sensitive data in the login http.url attribute
+                                            // will be redacted before it hits the exporter
+                                            .replaceSpanAttribute(
+                                                    StandardAttributes.HTTP_URL,
+                                                    value ->
+                                                            HTTP_URL_SENSITIVE_DATA_PATTERN
+                                                                    .matcher(value)
+                                                                    .replaceAll("$1=<redacted>")))
+                    .build(this);
+        } else {
+            // noop RUM instance
+            // SplunkRum.noop();
+        }
     }
 }

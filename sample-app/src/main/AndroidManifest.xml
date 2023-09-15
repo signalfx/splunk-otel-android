@@ -25,6 +25,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".SplunkBackgroundService"
+            android:exported="false"
+            android:process=":my_service_process"/>
+        <service
+            android:name=".DemoWorker"
+            android:exported="false" />
     </application>
 
 </manifest>

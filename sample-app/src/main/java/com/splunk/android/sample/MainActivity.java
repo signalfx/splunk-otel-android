@@ -38,6 +38,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 import com.splunk.android.sample.databinding.ActivityMainBinding;
 import com.splunk.rum.SplunkRum;
 import io.opentelemetry.api.common.Attributes;
@@ -74,12 +76,23 @@ public class MainActivity extends AppCompatActivity {
                 view -> {
                     new MailDialogFragment(this).show(getSupportFragmentManager(), "Mail");
                 });
+
+        setUpPeriodicWorker();
+    }
+
+    private void setUpPeriodicWorker() {
+        PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
+                DemoWorker.class,
+                2,
+                TimeUnit.MINUTES
+        ).build();
+
+        WorkManager.getInstance(this).enqueue(workRequest);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             startListeningForLocations();

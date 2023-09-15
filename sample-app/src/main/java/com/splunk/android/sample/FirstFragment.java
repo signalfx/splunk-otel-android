@@ -109,6 +109,11 @@ public class FirstFragment extends Fragment {
                     volleyExample.doHttpRequest();
                 });
 
+        binding.workManager.setOnClickListener(
+                v -> {
+                    WorkManagerHelper.startWorkManager(this.getContext());
+                });
+
         sessionId.postValue(splunkRum.getRumSessionId());
     }
 
