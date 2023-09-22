@@ -25,11 +25,11 @@ import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.EXCEP
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
+import io.opentelemetry.android.RumConstants;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.SpanContext;
-import io.opentelemetry.rum.internal.RumConstants;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.DelegatingSpanData;
 import io.opentelemetry.sdk.trace.data.EventData;

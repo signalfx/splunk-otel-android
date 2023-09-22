@@ -23,8 +23,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetwork;
-import io.opentelemetry.rum.internal.instrumentation.network.CurrentNetworkProvider;
+import io.opentelemetry.android.instrumentation.network.CurrentNetwork;
+import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import java.io.File;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
