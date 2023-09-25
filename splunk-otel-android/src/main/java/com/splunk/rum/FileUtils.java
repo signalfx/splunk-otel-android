@@ -77,6 +77,29 @@ class FileUtils {
         return Arrays.stream(files);
     }
 
+    Stream<File> listFilesRecursively(File directory){
+        if (directory == null) {
+            return Stream.empty();
+        }
+        ArrayList<File> fileArrayList = new ArrayList<>();
+        listFilesRecursively(directory, fileArrayList);
+        return fileArrayList.stream();
+    }
+
+    private void listFilesRecursively(File directory, ArrayList<File> fileArrayList) {
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (file.isDirectory()) {
+                listFilesRecursively(file, fileArrayList);
+            } else {
+                fileArrayList.add(file);
+            }
+        }
+    }
+
     Stream<File> listSpanFiles(File dir) {
         return listFiles(dir)
                 .filter(this::isRegularFile)
@@ -85,6 +108,10 @@ class FileUtils {
 
     long getTotalFileSizeInBytes(File dir) {
         return listFiles(dir).reduce(0L, (acc, file) -> acc + getFileSize(file), Long::sum);
+    }
+
+    long getTotalFileSizeInBytesRecursively(File dir) {
+        return listFilesRecursively(dir).reduce(0L, (acc, file) -> acc + getFileSize(file), Long::sum);
     }
 
     long getFileSize(File file) {
