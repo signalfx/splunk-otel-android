@@ -22,29 +22,27 @@ import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+
 import java.util.Collection;
 import java.util.List;
-import java.util.Queue;
 
 class MemoryBufferingExporter implements SpanExporter {
-    private static final int MAX_BACKLOG_SIZE = 100;
 
     private final CurrentNetworkProvider currentNetworkProvider;
-    private final SpanExporter delegate;
-    // note: no need to make this queue thread-safe since it will only ever be called from the
-    // BatchSpanProcessor worker thread.
-    private final Queue<SpanData> backlog = new ArrayDeque<>(MAX_BACKLOG_SIZE);
 
-    MemoryBufferingExporter(CurrentNetworkProvider currentNetworkProvider, SpanExporter delegate) {
+    private final SpanExporter delegate;
+
+    private final BacklogProvider backlogProvider;
+
+    MemoryBufferingExporter(CurrentNetworkProvider currentNetworkProvider, SpanExporter delegate, BacklogProvider backlogProvider) {
         this.currentNetworkProvider = currentNetworkProvider;
         this.delegate = delegate;
+        this.backlogProvider = backlogProvider;
     }
 
     @Override
     public CompletableResultCode export(Collection<SpanData> spans) {
-        backlog.addAll(spans);
+        backlogProvider.addAll(spans);
         if (!currentNetworkProvider.refreshNetworkStatus().isOnline()) {
             Log.i(
                     SplunkRum.LOG_TAG,
@@ -69,23 +67,17 @@ class MemoryBufferingExporter implements SpanExporter {
 
     // todo Should we favor saving certain kinds of span if we're out of space? Or favor recency?
     private void addFailedSpansToBacklog(List<SpanData> toExport) {
-        for (SpanData spanData : toExport) {
-            if (backlog.size() < MAX_BACKLOG_SIZE) {
-                backlog.add(spanData);
-            }
-        }
+        backlogProvider.addFailedSpansToBacklog(toExport);
     }
 
     @NonNull
     private List<SpanData> fillFromBacklog() {
-        List<SpanData> retries = new ArrayList<>(backlog);
-        backlog.clear();
-        return retries;
+        return backlogProvider.fillFromBacklog();
     }
 
     @Override
     public CompletableResultCode flush() {
-        if (!backlog.isEmpty()) {
+        if (!backlogProvider.isEmpty()) {
             // note: the zipkin exporter has a no-op flush() method, so no need to call it after
             // this.
             return export(fillFromBacklog());
@@ -95,7 +87,7 @@ class MemoryBufferingExporter implements SpanExporter {
 
     @Override
     public CompletableResultCode shutdown() {
-        backlog.clear();
+        backlogProvider.clear();
         return delegate.shutdown();
     }
 }

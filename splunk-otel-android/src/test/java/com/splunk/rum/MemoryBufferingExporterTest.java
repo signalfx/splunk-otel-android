@@ -45,6 +45,8 @@ class MemoryBufferingExporterTest {
             mock(CurrentNetworkProvider.class);
     private final CurrentNetwork currentNetwork = mock(CurrentNetwork.class);
 
+    private final BacklogProvider backlogProvider = mock(BacklogProvider.class);
+
     @BeforeEach
     void setUp() {
         when(currentNetworkProvider.refreshNetworkStatus()).thenReturn(currentNetwork);
@@ -52,13 +54,14 @@ class MemoryBufferingExporterTest {
 
     @Test
     void happyPath() {
+        List<SpanData> spans = Arrays.asList(mock(SpanData.class), mock(SpanData.class));
         when(currentNetwork.isOnline()).thenReturn(true);
+        when(backlogProvider.fillFromBacklog()).thenReturn(spans);
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
-                new MemoryBufferingExporter(currentNetworkProvider, delegate);
+                new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
 
-        Collection<SpanData> spans = Arrays.asList(mock(SpanData.class), mock(SpanData.class));
         when(delegate.export(spans)).thenReturn(CompletableResultCode.ofSuccess());
 
         CompletableResultCode result = bufferingExporter.export(spans);
@@ -68,24 +71,25 @@ class MemoryBufferingExporterTest {
     @Test
     void offlinePath() {
         when(currentNetwork.isOnline()).thenReturn(false, true);
+        List<SpanData> spans = Arrays.asList(mock(SpanData.class), mock(SpanData.class));
+        List<SpanData> secondBatch = new ArrayList<>(spans);
+        SpanData anotherSpan = mock(SpanData.class);
+        secondBatch.add(anotherSpan);
+        when(backlogProvider.fillFromBacklog()).thenReturn(secondBatch);
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
-                new MemoryBufferingExporter(currentNetworkProvider, delegate);
+                new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
 
-        Collection<SpanData> spans = Arrays.asList(mock(SpanData.class), mock(SpanData.class));
 
         CompletableResultCode result = bufferingExporter.export(spans);
         assertTrue(result.isSuccess());
         verify(delegate, never()).export(any());
 
-        List<SpanData> secondBatch = new ArrayList<>(spans);
-        SpanData anotherSpan = mock(SpanData.class);
-        secondBatch.add(anotherSpan);
         when(delegate.export(secondBatch)).thenReturn(CompletableResultCode.ofSuccess());
 
         // send another span now that we're back online.
-        result = bufferingExporter.export(Collections.singleton(anotherSpan));
+        result = bufferingExporter.export(secondBatch);
 
         assertTrue(result.isSuccess());
         verify(delegate).export(secondBatch);
@@ -93,18 +97,20 @@ class MemoryBufferingExporterTest {
 
     @Test
     void retryPath() {
+        SpanData one = mock(SpanData.class);
+        SpanData two = mock(SpanData.class);
+        SpanData three = mock(SpanData.class);
+        List<SpanData> spans = Arrays.asList(one, two);
+        List<SpanData> secondSpans = Arrays.asList(one, two, three);
+        when(backlogProvider.fillFromBacklog()).thenReturn(spans, secondSpans);
         when(currentNetwork.isOnline()).thenReturn(true);
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
-                new MemoryBufferingExporter(currentNetworkProvider, delegate);
+                new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
 
-        SpanData one = mock(SpanData.class);
-        SpanData two = mock(SpanData.class);
-        SpanData three = mock(SpanData.class);
-        Collection<SpanData> spans = Arrays.asList(one, two);
         when(delegate.export(spans)).thenReturn(CompletableResultCode.ofFailure());
-        when(delegate.export(Arrays.asList(one, two, three)))
+        when(delegate.export(secondSpans))
                 .thenReturn(CompletableResultCode.ofSuccess());
 
         CompletableResultCode firstResult = bufferingExporter.export(spans);
@@ -117,15 +123,17 @@ class MemoryBufferingExporterTest {
 
     @Test
     void flush_withBacklog() {
+        SpanData one = mock(SpanData.class);
+        SpanData two = mock(SpanData.class);
+        List<SpanData> spans = Arrays.asList(one, two);
+        when(backlogProvider.fillFromBacklog()).thenReturn(spans);
         when(currentNetwork.isOnline()).thenReturn(true);
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
-                new MemoryBufferingExporter(currentNetworkProvider, delegate);
+                new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
 
-        SpanData one = mock(SpanData.class);
-        SpanData two = mock(SpanData.class);
-        Collection<SpanData> spans = Arrays.asList(one, two);
+
         when(delegate.export(spans))
                 .thenReturn(CompletableResultCode.ofFailure())
                 .thenReturn(CompletableResultCode.ofSuccess());
@@ -141,11 +149,12 @@ class MemoryBufferingExporterTest {
 
     @Test
     void flush() {
+        when(backlogProvider.isEmpty()).thenReturn(true);
         when(currentNetwork.isOnline()).thenReturn(true);
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
-                new MemoryBufferingExporter(currentNetworkProvider, delegate);
+                new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
         when(delegate.flush()).thenReturn(CompletableResultCode.ofSuccess());
 
         CompletableResultCode secondResult = bufferingExporter.flush();
@@ -156,25 +165,26 @@ class MemoryBufferingExporterTest {
     @SuppressWarnings("unchecked")
     @Test
     void maxBacklog() {
-        when(currentNetwork.isOnline()).thenReturn(true);
-
-        SpanExporter delegate = mock(SpanExporter.class);
-        MemoryBufferingExporter bufferingExporter =
-                new MemoryBufferingExporter(currentNetworkProvider, delegate);
-
         List<SpanData> firstSet = new ArrayList<>();
         for (int i = 0; i < 110; i++) {
             firstSet.add(mock(SpanData.class));
         }
-        when(delegate.export(firstSet)).thenReturn(CompletableResultCode.ofFailure());
-
-        CompletableResultCode firstResult = bufferingExporter.export(firstSet);
-        assertFalse(firstResult.isSuccess());
-
         List<SpanData> secondSet = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
             secondSet.add(mock(SpanData.class));
         }
+
+        when(currentNetwork.isOnline()).thenReturn(true);
+        when(backlogProvider.fillFromBacklog()).thenReturn(firstSet, secondSet);
+
+        SpanExporter delegate = mock(SpanExporter.class);
+        MemoryBufferingExporter bufferingExporter =
+                new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
+
+        when(delegate.export(firstSet)).thenReturn(CompletableResultCode.ofFailure());
+
+        CompletableResultCode firstResult = bufferingExporter.export(firstSet);
+        assertFalse(firstResult.isSuccess());
 
         ArgumentCaptor<List<SpanData>> argumentCaptor = ArgumentCaptor.forClass(List.class);
         when(delegate.export(argumentCaptor.capture()))
@@ -192,7 +202,7 @@ class MemoryBufferingExporterTest {
     void shutdown() {
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
-                new MemoryBufferingExporter(currentNetworkProvider, delegate);
+                new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
 
         bufferingExporter.shutdown();
         verify(delegate).shutdown();
