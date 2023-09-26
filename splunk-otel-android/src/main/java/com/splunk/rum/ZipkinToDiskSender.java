@@ -30,13 +30,13 @@ import zipkin2.reporter.Sender;
 
 class ZipkinToDiskSender extends Sender {
 
-    private final File path;
+    private final SpanFileProvider spanFileProvider;
     private final FileUtils fileUtils;
     private final Clock clock;
     private final DeviceSpanStorageLimiter storageLimiter;
 
     private ZipkinToDiskSender(Builder builder) {
-        this.path = requireNonNull(builder.path);
+        this.spanFileProvider = requireNonNull(builder.fileProvider);
         this.fileUtils = builder.fileUtils;
         this.clock = builder.clock;
         this.storageLimiter = requireNonNull(builder.storageLimiter);
@@ -81,7 +81,7 @@ class ZipkinToDiskSender extends Sender {
     }
 
     private File createFilename(long now) {
-        return new File(path, now + ".spans");
+        return new File(spanFileProvider.provideSpanPath(), now + ".spans");
     }
 
     static Builder builder() {
@@ -89,13 +89,13 @@ class ZipkinToDiskSender extends Sender {
     }
 
     static class Builder {
-        @Nullable private File path;
+        @Nullable private SpanFileProvider fileProvider;
         private FileUtils fileUtils = new FileUtils();
         private Clock clock = Clock.getDefault();
         @Nullable private DeviceSpanStorageLimiter storageLimiter;
 
-        Builder path(File path) {
-            this.path = path;
+        Builder spanFileProvider(SpanFileProvider spanFileProvider) {
+            this.fileProvider = spanFileProvider;
             return this;
         }
 

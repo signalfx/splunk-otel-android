@@ -30,29 +30,17 @@ class ZipkinWriteToDiskExporterFactory {
 
     private ZipkinWriteToDiskExporterFactory() {}
 
-    static ZipkinSpanExporter create(Application application, int maxUsageMegabytes) {
-        File spansPath = FileUtils.getSpansDirectory(application);
-        if (!spansPath.exists()) {
-            if (!spansPath.mkdirs()) {
-                Log.e(
-                        SplunkRum.LOG_TAG,
-                        "Error creating path "
-                                + spansPath
-                                + " for span buffer, defaulting to parent");
-                spansPath = application.getApplicationContext().getFilesDir();
-            }
-        }
-
+    static ZipkinSpanExporter create(int maxUsageMegabytes, SpanFileProvider spanFileProvider) {
         FileUtils fileUtils = new FileUtils();
         DeviceSpanStorageLimiter limiter =
                 DeviceSpanStorageLimiter.builder()
                         .fileUtils(fileUtils)
-                        .path(spansPath)
+                        .fileProvider(spanFileProvider)
                         .maxStorageUseMb(maxUsageMegabytes)
                         .build();
         Sender sender =
                 ZipkinToDiskSender.builder()
-                        .path(spansPath)
+                        .spanFileProvider(spanFileProvider)
                         .fileUtils(fileUtils)
                         .storageLimiter(limiter)
                         .build();

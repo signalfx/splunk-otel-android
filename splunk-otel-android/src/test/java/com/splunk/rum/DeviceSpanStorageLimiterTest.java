@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,7 +39,7 @@ class DeviceSpanStorageLimiterTest {
     private static final int MAX_STORAGE_USE_MB = 3;
     private static final long MAX_STORAGE_USE_BYTES = MAX_STORAGE_USE_MB * 1024 * 1024;
     @Mock private FileUtils fileUtils;
-    @Mock private File path;
+    @Mock private SpanFileProvider spanFileProvider;
     private DeviceSpanStorageLimiter limiter;
 
     @BeforeEach
@@ -46,31 +47,38 @@ class DeviceSpanStorageLimiterTest {
         limiter =
                 DeviceSpanStorageLimiter.builder()
                         .fileUtils(fileUtils)
-                        .path(path)
+                        .fileProvider(spanFileProvider)
                         .maxStorageUseMb(MAX_STORAGE_USE_MB)
                         .build();
     }
 
     @Test
     void ensureFreeSpace_littleUsageEnoughFreeSpace() {
-        when(fileUtils.getTotalFileSizeInBytes(path)).thenReturn(10 * 1024L);
-        when(path.getFreeSpace()).thenReturn(99L); // Disk is very full
+        File mockFile = mock(File.class);
+        when(spanFileProvider.getTotalFileSizeInBytes()).thenReturn(10 * 1024L);
+        when(spanFileProvider.provideSpanPath()).thenReturn(mockFile);
+        when(mockFile.getFreeSpace()).thenReturn(99L); // Disk is very full
         assertFalse(limiter.ensureFreeSpace());
         verify(fileUtils, never()).safeDelete(any());
     }
 
     @Test
     void ensureFreeSpace_littleUsageButNotEnoughFreeSpace() {
-        when(fileUtils.getTotalFileSizeInBytes(path)).thenReturn(10 * 1024L);
-        when(path.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES * 99); // lots of room
+        File mockFile = mock(File.class);
+        when(spanFileProvider.getTotalFileSizeInBytes()).thenReturn(10 * 1024L);
+        when(spanFileProvider.provideSpanPath()).thenReturn(mockFile);
+        when(mockFile.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES * 99); // lots of room
         assertTrue(limiter.ensureFreeSpace());
         verify(fileUtils, never()).safeDelete(any());
     }
 
     @Test
     void ensureFreeSpace_underLimit() {
-        when(fileUtils.getTotalFileSizeInBytes(path)).thenReturn(MAX_STORAGE_USE_BYTES - 1);
-        when(path.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
+        File mockFile = mock(File.class);
+        when(spanFileProvider.provideSpanPath()).thenReturn(mockFile);
+
+        when(spanFileProvider.getTotalFileSizeInBytes()).thenReturn(MAX_STORAGE_USE_BYTES - 1);
+        when(mockFile.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
         boolean result = limiter.ensureFreeSpace();
         assertTrue(result);
         verify(fileUtils, never()).safeDelete(any());
@@ -82,14 +90,15 @@ class DeviceSpanStorageLimiterTest {
         File file2 = new File("younger");
         File file3 = new File("newest");
 
-        when(fileUtils.getTotalFileSizeInBytes(path)).thenReturn(MAX_STORAGE_USE_BYTES + 1);
+        File mockFile = mock(File.class);
+        when(spanFileProvider.provideSpanPath()).thenReturn(mockFile);
+        when(spanFileProvider.getTotalFileSizeInBytes()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
         when(fileUtils.getModificationTime(file1)).thenReturn(1000L);
         when(fileUtils.getModificationTime(file2)).thenReturn(1001L);
         when(fileUtils.getModificationTime(file3)).thenReturn(1002L);
         when(fileUtils.getFileSize(isA(File.class))).thenReturn(1L);
-        when(fileUtils.listSpanFiles(path)).thenReturn(Stream.of(file3, file1, file2));
-        when(path.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
-
+        when(spanFileProvider.getAllSpanFiles()).thenReturn(Stream.of(file3, file1, file2));
+        when(mockFile.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
         boolean result = limiter.ensureFreeSpace();
 
         verify(fileUtils).safeDelete(file1);

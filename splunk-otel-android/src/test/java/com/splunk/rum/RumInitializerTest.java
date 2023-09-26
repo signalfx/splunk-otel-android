@@ -75,7 +75,7 @@ class RumInitializerTest {
         RumInitializer testInitializer =
                 new RumInitializer(splunkRumBuilder, application, startupTimer) {
                     @Override
-                    SpanExporter buildFilteringExporter(CurrentNetworkProvider connectionUtil) {
+                    SpanExporter buildFilteringExporter(CurrentNetworkProvider connectionUtil, SpanFileProvider backgroundStartAwareSpanFilePath) {
                         return testExporter;
                     }
                 };
@@ -129,7 +129,7 @@ class RumInitializerTest {
         RumInitializer testInitializer =
                 new RumInitializer(splunkRumBuilder, application, startupTimer) {
                     @Override
-                    SpanExporter buildFilteringExporter(CurrentNetworkProvider connectionUtil) {
+                    SpanExporter buildFilteringExporter(CurrentNetworkProvider connectionUtil, SpanFileProvider fileProvider) {
                         return testExporter;
                     }
                 };
@@ -184,7 +184,8 @@ class RumInitializerTest {
 
         long currentTimeNanos = MILLISECONDS.toNanos(System.currentTimeMillis());
 
-        SpanExporter spanExporter = testInitializer.buildFilteringExporter(currentNetworkProvider);
+        SpanFileProvider spanFileProvider = mock(SpanFileProvider.class);
+        SpanExporter spanExporter = testInitializer.buildFilteringExporter(currentNetworkProvider, spanFileProvider);
         List<SpanData> batch1 = new ArrayList<>();
         for (int i = 0; i < 99; i++) {
             batch1.add(createTestSpan(currentTimeNanos - MINUTES.toNanos(1)));

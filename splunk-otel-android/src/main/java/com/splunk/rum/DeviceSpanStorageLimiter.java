@@ -28,12 +28,12 @@ import java.util.stream.Collectors;
 
 class DeviceSpanStorageLimiter {
     static final int DEFAULT_MAX_STORAGE_USE_MB = 25;
-    private final File path;
+    private final SpanFileProvider fileProvider;
     private final int maxStorageUseMb;
     private final FileUtils fileUtils;
 
     private DeviceSpanStorageLimiter(Builder builder) {
-        this.path = requireNonNull(builder.path);
+        this.fileProvider = requireNonNull(builder.fileProvider);
         this.maxStorageUseMb = builder.maxStorageUseMb;
         this.fileUtils = builder.fileUtils;
     }
@@ -52,17 +52,17 @@ class DeviceSpanStorageLimiter {
     boolean ensureFreeSpace() {
         tryFreeingSpace();
         // play nice if disk is getting full
-        return path.getFreeSpace() > limitInBytes();
+        return fileProvider.provideSpanPath().getFreeSpace() > limitInBytes();
     }
 
     private void tryFreeingSpace() {
-        long currentUsageInBytes = fileUtils.getTotalFileSizeInBytes(path);
+        long currentUsageInBytes = fileProvider.getTotalFileSizeInBytes();
         if (underLimit(currentUsageInBytes)) {
             return; // nothing to do
         }
         List<File> files =
-                fileUtils
-                        .listSpanFiles(path)
+                fileProvider
+                        .getAllSpanFiles()
                         .sorted(comparingLong(fileUtils::getModificationTime))
                         .collect(Collectors.toList());
         for (File file : files) {
@@ -89,12 +89,12 @@ class DeviceSpanStorageLimiter {
     }
 
     static class Builder {
-        @Nullable private File path;
+        public @Nullable SpanFileProvider fileProvider;
         private int maxStorageUseMb = DEFAULT_MAX_STORAGE_USE_MB;
         private FileUtils fileUtils = new FileUtils();
 
-        Builder path(File path) {
-            this.path = path;
+        Builder fileProvider(SpanFileProvider fileProvider) {
+            this.fileProvider = fileProvider;
             return this;
         }
 
