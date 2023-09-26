@@ -110,6 +110,11 @@ public class FirstFragment extends Fragment {
                 });
 
         sessionId.postValue(splunkRum.getRumSessionId());
+
+        binding.workManager.setOnClickListener(
+                v -> {
+                    WorkManagerHelper.startWorkManager(this.getContext());
+                });
     }
 
     private void multiThreadCrashing() {
