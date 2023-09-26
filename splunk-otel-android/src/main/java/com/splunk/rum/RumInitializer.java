@@ -127,11 +127,11 @@ class RumInitializer {
                     return tracerProviderBuilder.addSpanProcessor(screenAttributesAppender);
                 });
 
-        SpanFileProvider spanFileProvider = new StartTypeAwareSpanFileProvider(visibleScreenTracker, application);
+
         // Add batch span processor
         otelRumBuilder.addTracerProviderCustomizer(
                 (tracerProviderBuilder, app) -> {
-                    SpanExporter zipkinExporter = buildFilteringExporter(currentNetworkProvider, spanFileProvider);
+                    SpanExporter zipkinExporter = buildFilteringExporter(currentNetworkProvider, visibleScreenTracker);
                     initializationEvents.emit("exporterInitialized");
 
                     BatchSpanProcessor batchSpanProcessor =
@@ -215,6 +215,23 @@ class RumInitializer {
                 openTelemetryRum.getOpenTelemetry().getTracer(RUM_TRACER_NAME));
 
         return new SplunkRum(openTelemetryRum, globalAttributesSpanAppender);
+    }
+
+    @NonNull
+    private BacklogProvider constructBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
+        if (builder.isBackgroundTaskReportingDisabled()){
+            return new StartTypeAwareBacklogProvider(visibleScreenTracker);
+        } else {
+            return new DefaultBacklogProvider();
+        }
+    }
+    @NonNull
+    private SpanFileProvider constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
+        if (builder.isBackgroundTaskReportingDisabled()){
+            return new StartTypeAwareSpanFileProvider(visibleScreenTracker, application);
+        } else {
+            return new DefaultSpanFileProvider(application);
+        }
     }
 
     private void installLifecycleInstrumentations(
@@ -309,8 +326,8 @@ class RumInitializer {
     }
 
     // visible for testing
-    SpanExporter buildFilteringExporter(CurrentNetworkProvider currentNetworkProvider, SpanFileProvider spanFileProvider) {
-        SpanExporter exporter = buildExporter(currentNetworkProvider, spanFileProvider);
+    SpanExporter buildFilteringExporter(CurrentNetworkProvider currentNetworkProvider, VisibleScreenTracker visibleScreenTracker) {
+        SpanExporter exporter = buildExporter(currentNetworkProvider, visibleScreenTracker);
         SpanExporter splunkTranslatedExporter =
                 new SplunkSpanDataModifier(exporter, builder.isReactNativeSupportEnabled());
         SpanExporter filteredExporter = builder.decorateWithSpanFilter(splunkTranslatedExporter);
@@ -318,7 +335,7 @@ class RumInitializer {
         return filteredExporter;
     }
 
-    private SpanExporter buildExporter(CurrentNetworkProvider currentNetworkProvider, SpanFileProvider spanFileProvider) {
+    private SpanExporter buildExporter(CurrentNetworkProvider currentNetworkProvider, VisibleScreenTracker visibleScreenTracker) {
         if (builder.isDebugEnabled()) {
             // tell the Zipkin exporter to shut up already. We're on mobile, network stuff happens.
             // we'll do our best to hang on to the spans with the wrapping BufferingExporter.
@@ -327,10 +344,11 @@ class RumInitializer {
         }
 
         if (builder.isDiskBufferingEnabled()) {
-            return buildStorageBufferingExporter(currentNetworkProvider, spanFileProvider);
+            return buildStorageBufferingExporter(
+                    currentNetworkProvider, constructSpanFileProvider(visibleScreenTracker));
         }
 
-        return buildMemoryBufferingThrottledExporter(currentNetworkProvider);
+        return buildMemoryBufferingThrottledExporter(currentNetworkProvider, constructBacklogProvider(visibleScreenTracker));
     }
 
     private SpanExporter buildStorageBufferingExporter(
@@ -359,11 +377,11 @@ class RumInitializer {
     }
 
     private SpanExporter buildMemoryBufferingThrottledExporter(
-            CurrentNetworkProvider currentNetworkProvider) {
+            CurrentNetworkProvider currentNetworkProvider, BacklogProvider backlogProvider) {
         String endpoint = getEndpoint();
         SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
         return ThrottlingExporter.newBuilder(
-                        new MemoryBufferingExporter(currentNetworkProvider, zipkinSpanExporter))
+                        new MemoryBufferingExporter(currentNetworkProvider, zipkinSpanExporter, backlogProvider))
                 .categorizeByAttribute(COMPONENT_KEY)
                 .maxSpansInWindow(100)
                 .windowSize(Duration.ofSeconds(30))
