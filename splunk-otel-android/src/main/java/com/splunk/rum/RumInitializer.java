@@ -228,9 +228,9 @@ class RumInitializer {
     @NonNull
     private SpanFileProvider constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
         if (builder.isBackgroundTaskReportingDisabled()){
-            return new StartTypeAwareSpanFileProvider(visibleScreenTracker, application);
+            return new StartTypeAwareSpanFileProvider(visibleScreenTracker, application, new FileUtils());
         } else {
-            return new DefaultSpanFileProvider(application);
+            return new DefaultSpanFileProvider(application, new FileUtils());
         }
     }
 

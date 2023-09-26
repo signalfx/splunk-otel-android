@@ -8,16 +8,17 @@ import java.util.stream.Stream;
 
 public class DefaultSpanFileProvider implements SpanFileProvider {
 
-    private final FileUtils fileUtils = new FileUtils();
-    private Application application;
+    private final FileUtils fileUtils;
+    private final Application application;
 
-    public DefaultSpanFileProvider(Application application) {
+    public DefaultSpanFileProvider(Application application, FileUtils fileUtils) {
+        this.fileUtils = fileUtils;
         this.application = application;
     }
 
     @Override
     public File provideSpanPath() {
-        File spansPath = FileUtils.getSpansDirectory(application);
+        File spansPath = fileUtils.getSpansDirectory(application);
         if (!spansPath.exists()) {
             if (!spansPath.mkdirs()) {
                 Log.e(

@@ -21,27 +21,28 @@ public class StartTypeAwareSpanFileProvider implements SpanFileProvider {
 
     private final Application application;
     private final VisibleScreenTracker visibleScreenTracker;
-    private final FileUtils fileUtils = new FileUtils();
+    private final FileUtils fileUtils;
     private final String uniqueId = UUID.randomUUID().toString();
     ;
 
-    public StartTypeAwareSpanFileProvider(VisibleScreenTracker visibleScreenTracker, Application application) {
+    public StartTypeAwareSpanFileProvider(VisibleScreenTracker visibleScreenTracker, Application application, FileUtils fileUtils) {
         this.visibleScreenTracker = visibleScreenTracker;
         this.application = application;
+        this.fileUtils = fileUtils;
     }
 
     private File getCurrentSessionBackgroundPath(){
-        return new File(FileUtils.getSpansDirectory(application), "background/" + uniqueId);
+        return new File(fileUtils.getSpansDirectory(application), "background/" + uniqueId);
     }
 
     @Override
     public long getTotalFileSizeInBytes() {
-        return fileUtils.getTotalFileSizeInBytesRecursively(FileUtils.getSpansDirectory(application));
+        return fileUtils.getTotalFileSizeInBytesRecursively(fileUtils.getSpansDirectory(application));
     }
 
     @Override
     public Stream<File> getAllSpanFiles() {
-        return fileUtils.listFilesRecursively(FileUtils.getSpansDirectory(application));
+        return fileUtils.listFilesRecursively(fileUtils.getSpansDirectory(application));
     }
 
     @Override
@@ -49,12 +50,12 @@ public class StartTypeAwareSpanFileProvider implements SpanFileProvider {
         if (visibleScreenTracker.getPreviouslyVisibleScreen() != null){
             moveBackgroundSpanToPendingSpan();
         }
-        return fileUtils.listSpanFiles(FileUtils.getSpansDirectory(application));
+        return fileUtils.listSpanFiles(fileUtils.getSpansDirectory(application));
     }
 
     private void moveBackgroundSpanToPendingSpan() {
         fileUtils.listSpanFiles(getCurrentSessionBackgroundPath()).collect(Collectors.toList()).forEach(file -> {
-            File destinationFile = new File(FileUtils.getSpansDirectory(application), file.getName());
+            File destinationFile = new File(fileUtils.getSpansDirectory(application), file.getName());
             boolean isMoved = file.renameTo(destinationFile);
             Log.i(LOG_TAG, "Moved background span " + file.getPath() + " success ? " + isMoved + " for eventual send");
         });
@@ -76,7 +77,7 @@ public class StartTypeAwareSpanFileProvider implements SpanFileProvider {
     }
 
     private File getSpanPath(){
-        File spansPath = FileUtils.getSpansDirectory(application);
+        File spansPath = fileUtils.getSpansDirectory(application);
         if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
             spansPath = getCurrentSessionBackgroundPath();
         }

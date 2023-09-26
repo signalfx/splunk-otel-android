@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 // Basic wrapper around filesystem operations, primarily for testing
 class FileUtils {
 
-    static File getSpansDirectory(Application application) {
+    File getSpansDirectory(Application application) {
         File filesDir = application.getApplicationContext().getFilesDir();
         return new File(filesDir, "spans");
     }
