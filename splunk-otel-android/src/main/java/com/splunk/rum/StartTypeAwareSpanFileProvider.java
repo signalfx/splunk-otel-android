@@ -6,11 +6,14 @@ import android.app.Application;
 import android.util.Log;
 
 import java.io.File;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
+
 /***
- * Store span files to /span/background/$sessionid/ for span created when the app started in the background
+ * Store span files to /span/background/@uniqueId/ for span created when the app started in the background
  * if the app is brought to foreground and the same $sessionid still in use, the background spans are moved to /span for eventual sending
  * if the app still in background until process-kill, the background span files will eventually be deleted by @DeviceSpanStorageLimiter
  */
@@ -19,16 +22,16 @@ public class StartTypeAwareSpanFileProvider implements SpanFileProvider {
     private final Application application;
     private final VisibleScreenTracker visibleScreenTracker;
     private final FileUtils fileUtils = new FileUtils();
-    private final SessionId sessionId;
+    private final String uniqueId = UUID.randomUUID().toString();
+    ;
 
-    public StartTypeAwareSpanFileProvider(VisibleScreenTracker visibleScreenTracker, Application application, SessionId sessionId) {
+    public StartTypeAwareSpanFileProvider(VisibleScreenTracker visibleScreenTracker, Application application) {
         this.visibleScreenTracker = visibleScreenTracker;
         this.application = application;
-        this.sessionId = sessionId;
     }
 
     private File getCurrentSessionBackgroundPath(){
-        return new File(FileUtils.getSpansDirectory(application), "background/" + sessionId);
+        return new File(FileUtils.getSpansDirectory(application), "background/" + uniqueId);
     }
 
     @Override
@@ -50,12 +53,11 @@ public class StartTypeAwareSpanFileProvider implements SpanFileProvider {
     }
 
     private void moveBackgroundSpanToPendingSpan() {
-        fileUtils.listSpanFiles(getCurrentSessionBackgroundPath()).map(file -> {
+        fileUtils.listSpanFiles(getCurrentSessionBackgroundPath()).collect(Collectors.toList()).forEach(file -> {
             File destinationFile = new File(FileUtils.getSpansDirectory(application), file.getName());
-            file.renameTo(destinationFile);
-            Log.i(LOG_TAG, "Moved background span " + file.getPath() + " for eventual sending");
-            return file;
-        }).collect(Collectors.toList());
+            boolean isMoved = file.renameTo(destinationFile);
+            Log.i(LOG_TAG, "Moved background span " + file.getPath() + " success ? " + isMoved + " for eventual send");
+        });
     }
 
     @Override
