@@ -61,8 +61,8 @@ rum.access.token=<a valid Splunk RUM access token for the realm>
 
 ## Troubleshooting
 
-For troubleshooting issues with the Splunk OpenTelemetry instrumentation of Android, see 
-[Troubleshoot Android instrumentation for Splunk Observability Cloud](https://docs.splunk.com/observability/en/gdi/get-data-in/rum/android/troubleshooting.html) 
+For troubleshooting issues with the Splunk OpenTelemetry instrumentation of Android, see
+[Troubleshoot Android instrumentation for Splunk Observability Cloud](https://docs.splunk.com/observability/en/gdi/get-data-in/rum/android/troubleshooting.html)
 in the official documentation.
 
 # License
