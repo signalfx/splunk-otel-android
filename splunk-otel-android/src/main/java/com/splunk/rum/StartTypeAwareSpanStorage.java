@@ -13,9 +13,9 @@ import java.util.stream.Stream;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 
 /***
- * Store span files to /span/background/@uniqueId/ for span created when the app started in the background
- * if the app is brought to foreground and the same $sessionid still in use, the background spans are moved to /span for eventual sending
- * if the app still in background until process-kill, the background span files will eventually be deleted by @DeviceSpanStorageLimiter
+ * Store span files to /span/background/@uniqueId/ for spans created when the app started in the background.
+ * If the app is brought to foreground and the same session ID still in use, the background spans are moved to /span for eventual sending.
+ * If the app still in the background until process-kill, the background span files will eventually be deleted by the @DeviceSpanStorageLimiter.
  */
 public class StartTypeAwareSpanStorage implements SpanStorage {
 
