@@ -11,9 +11,9 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 
 public class StartTypeAwareBacklogProvider implements BacklogProvider{
 
+    private static final int MAX_BACKLOG_SIZE = 100;
     private final VisibleScreenTracker visibleScreenTracker;
 
-    private static final int MAX_BACKLOG_SIZE = 100;
     private final Queue<SpanData> backlog = new ArrayDeque<>(MAX_BACKLOG_SIZE);
 
     /**
