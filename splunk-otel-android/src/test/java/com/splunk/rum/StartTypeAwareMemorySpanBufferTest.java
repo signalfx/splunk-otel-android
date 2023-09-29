@@ -12,11 +12,11 @@ import java.util.List;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.sdk.trace.data.SpanData;
 
-public class StartTypeAwareBacklogProviderTest {
+public class StartTypeAwareMemorySpanBufferTest {
 
     private final VisibleScreenTracker visibleScreenTracker = mock(VisibleScreenTracker.class);
 
-    private final StartTypeAwareBacklogProvider backlogProvider = new StartTypeAwareBacklogProvider(
+    private final StartTypeAwareMemorySpanBuffer backlogProvider = new StartTypeAwareMemorySpanBuffer(
             visibleScreenTracker
     );
 

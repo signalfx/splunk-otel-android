@@ -9,7 +9,7 @@ import java.util.Queue;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.sdk.trace.data.SpanData;
 
-public class StartTypeAwareBacklogProvider implements MemorySpanBuffer {
+public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
 
     private final VisibleScreenTracker visibleScreenTracker;
 
@@ -20,7 +20,7 @@ public class StartTypeAwareBacklogProvider implements MemorySpanBuffer {
      */
     private final Queue<SpanData> backgroundSpanBacklog = new ArrayDeque<>();
 
-    public StartTypeAwareBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
+    public StartTypeAwareMemorySpanBuffer(VisibleScreenTracker visibleScreenTracker) {
         this.visibleScreenTracker = visibleScreenTracker;
     }
     @Override

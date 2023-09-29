@@ -220,7 +220,7 @@ class RumInitializer {
     @NonNull
     private MemorySpanBuffer constructBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
         if (builder.isBackgroundTaskReportingDisabled()){
-            return new StartTypeAwareBacklogProvider(visibleScreenTracker);
+            return new StartTypeAwareMemorySpanBuffer(visibleScreenTracker);
         } else {
             return new DefaultMemorySpanBuffer();
         }
