@@ -3,7 +3,7 @@ package com.splunk.rum;
 import java.io.File;
 import java.util.stream.Stream;
 
-public interface SpanFileProvider {
+interface SpanFileProvider {
 
     File provideSpanPath();
 
