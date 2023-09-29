@@ -29,9 +29,6 @@
             android:name=".SplunkBackgroundService"
             android:exported="false"
             android:process=":my_service_process"/>
-        <service
-            android:name=".DemoWorker"
-            android:exported="false" />
     </application>
 
 </manifest>

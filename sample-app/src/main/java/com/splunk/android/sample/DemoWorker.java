@@ -24,6 +24,10 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.splunk.rum.SplunkRum;
+
+import io.opentelemetry.api.common.Attributes;
+
 public class DemoWorker extends Worker {
 
     private Context context;
@@ -38,6 +42,8 @@ public class DemoWorker extends Worker {
     @Override
     public Result doWork() {
         try {
+            SplunkRum.getInstance().addRumEvent("DemoWorker is doing work", Attributes.empty());
+            Log.d(TAG, "DemoWorker Starting background Service");
             startBackgroundService();
             return Result.success();
         } catch (Exception e) {
