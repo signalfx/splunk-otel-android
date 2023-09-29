@@ -8,9 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.app.Application;
-import android.content.Context;
-
+import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -25,21 +23,17 @@ import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 
 public class StartTypeAwareSpanStorageTest {
 
-    private final Application application = mock();
-
-    private final Context context = mock();
     private final FileUtils fileUtils = mock();
 
-    private final File file = new File("files/spans");
+    private final File rootDir = new File("files/");
     private final VisibleScreenTracker visibleScreenTracker = mock();
 
-    private final StartTypeAwareSpanStorage fileProvider = new StartTypeAwareSpanStorage(visibleScreenTracker,application, fileUtils, application.getApplicationContext().getFilesDir());
+    private StartTypeAwareSpanStorage fileProvider;
 
     @BeforeEach
     void setup(){
-        when(fileUtils.getSpansDirectory(application)).thenReturn(file);
-        when(application.getApplicationContext()).thenReturn(context);
-        when(context.getFilesDir()).thenReturn(file);
+        when(fileUtils.getSpansDirectory(rootDir)).thenReturn(new File(rootDir, "spans"));
+        fileProvider = new StartTypeAwareSpanStorage(visibleScreenTracker, fileUtils, rootDir);
     }
 
     @Test
