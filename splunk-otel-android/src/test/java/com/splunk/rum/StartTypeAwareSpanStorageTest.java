@@ -54,11 +54,8 @@ public class StartTypeAwareSpanStorageTest {
         when(fileToMove.getName()).thenReturn("tosend.span");
         backgroundFiles.add(fileToMove);
 
-        Stream<File> mockStream = mock();
-        when(mockStream.collect(Collectors.toCollection(any()))).thenReturn(backgroundFiles);
-
         ArgumentCaptor<File> fileSourceCaptor = ArgumentCaptor.forClass(File.class);
-        when(fileUtils.listSpanFiles(fileSourceCaptor.capture())).thenReturn(mockStream);
+        when(fileUtils.listSpanFiles(fileSourceCaptor.capture())).thenReturn(backgroundFiles.stream(), backgroundFiles.stream());
 
         List<File> spans = fileProvider.getPendingFiles().collect(Collectors.toList());
 

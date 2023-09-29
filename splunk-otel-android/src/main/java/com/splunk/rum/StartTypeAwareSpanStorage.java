@@ -55,7 +55,7 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
     }
 
     private void moveBackgroundSpanToPendingSpan() {
-        fileUtils.listSpanFiles(getCurrentSessionBackgroundFile()).collect(Collectors.toList()).forEach(file -> {
+        fileUtils.listSpanFiles(getCurrentSessionBackgroundFile()).forEach(file -> {
             File destinationFile = new File(spanDir, file.getName());
             boolean isMoved = file.renameTo(destinationFile);
             Log.i(LOG_TAG, "Moved background span " + file.getPath() + " success ? " + isMoved + " for eventual send");
