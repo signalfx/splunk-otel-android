@@ -8,24 +8,19 @@ import java.util.Queue;
 
 import io.opentelemetry.sdk.trace.data.SpanData;
 
-public class DefaultBacklogProvider implements BacklogProvider {
+public class DefaultMemorySpanBuffer implements MemorySpanBuffer {
 
-    private static final int MAX_BACKLOG_SIZE = 100;
     // note: no need to make this queue thread-safe since it will only ever be called from the
     // BatchSpanProcessor worker thread.
-    private final Queue<SpanData> backlog = new ArrayDeque<>(MAX_BACKLOG_SIZE);
+    private final Queue<SpanData> backlog = new ArrayDeque<>();
     @Override
     public void addAll(Collection<SpanData> spans) {
         backlog.addAll(spans);
     }
 
     @Override
-    public void addFailedSpansToBacklog(List<SpanData> toExport) {
-        for (SpanData spanData : toExport) {
-            if (backlog.size() < MAX_BACKLOG_SIZE) {
-                backlog.add(spanData);
-            }
-        }
+    public void addFailedSpansToBacklog(SpanData spanData) {
+        backlog.add(spanData);
     }
 
     @Override
@@ -43,6 +38,11 @@ public class DefaultBacklogProvider implements BacklogProvider {
     @Override
     public void clear() {
         backlog.clear();
+    }
+
+    @Override
+    public int size() {
+        return backlog.size();
     }
 }
 

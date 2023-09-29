@@ -9,17 +9,16 @@ import java.util.Queue;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.sdk.trace.data.SpanData;
 
-public class StartTypeAwareBacklogProvider implements BacklogProvider{
+public class StartTypeAwareBacklogProvider implements MemorySpanBuffer {
 
-    private static final int MAX_BACKLOG_SIZE = 100;
     private final VisibleScreenTracker visibleScreenTracker;
 
-    private final Queue<SpanData> backlog = new ArrayDeque<>(MAX_BACKLOG_SIZE);
+    private final Queue<SpanData> backlog = new ArrayDeque<>();
 
     /**
      * @backgroundSpanBacklog will never get sent if last visible screen is null until process kill
      */
-    private final Queue<SpanData> backgroundSpanBacklog = new ArrayDeque<>(MAX_BACKLOG_SIZE);
+    private final Queue<SpanData> backgroundSpanBacklog = new ArrayDeque<>();
 
     public StartTypeAwareBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
         this.visibleScreenTracker = visibleScreenTracker;
@@ -34,19 +33,11 @@ public class StartTypeAwareBacklogProvider implements BacklogProvider{
     }
 
     @Override
-    public void addFailedSpansToBacklog(List<SpanData> toExport) {
+    public void addFailedSpansToBacklog(SpanData spanData) {
         if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
-            addFailedSpan(toExport, backgroundSpanBacklog);
+            backgroundSpanBacklog.add(spanData);
         } else {
-            addFailedSpan(toExport, backlog);
-        }
-    }
-
-    private void addFailedSpan(List<SpanData> toExport, Queue<SpanData> backlog) {
-        for (SpanData spanData : toExport) {
-            if (backlog.size() < MAX_BACKLOG_SIZE) {
-                backlog.add(spanData);
-            }
+            backlog.add(spanData);
         }
     }
 
@@ -54,12 +45,15 @@ public class StartTypeAwareBacklogProvider implements BacklogProvider{
     public List<SpanData> drain() {
         List<SpanData> retries = new ArrayList<>(backlog);
         backlog.clear();
+        drainBackgroundBacklogIfAppIsForeground(retries);
+        return retries;
+    }
 
+    private void drainBackgroundBacklogIfAppIsForeground(List<SpanData> retries) {
         if (visibleScreenTracker.getPreviouslyVisibleScreen() != null){
             retries.addAll(backgroundSpanBacklog);
             backgroundSpanBacklog.clear();
         }
-        return retries;
     }
 
     @Override
@@ -71,5 +65,14 @@ public class StartTypeAwareBacklogProvider implements BacklogProvider{
     public void clear() {
         backlog.clear();
         backgroundSpanBacklog.clear();
+    }
+
+    @Override
+    public int size() {
+        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
+            return backgroundSpanBacklog.size();
+        } else {
+            return backlog.size();
+        }
     }
 }

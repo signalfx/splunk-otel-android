@@ -5,14 +5,16 @@ import java.util.List;
 
 import io.opentelemetry.sdk.trace.data.SpanData;
 
-interface BacklogProvider {
+interface MemorySpanBuffer {
     void addAll(Collection<SpanData> spans);
 
-    void addFailedSpansToBacklog(List<SpanData> toExport);
+    void addFailedSpansToBacklog(SpanData spanData);
 
     List<SpanData> drain();
 
     boolean isEmpty();
 
     void clear();
+
+    int size();
 }

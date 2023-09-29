@@ -28,13 +28,13 @@ import java.util.List;
 
 class MemoryBufferingExporter implements SpanExporter {
 
+    private static final int MAX_BACKLOG_SIZE = 100;
     private final CurrentNetworkProvider currentNetworkProvider;
-
     private final SpanExporter delegate;
 
-    private final BacklogProvider backlogProvider;
+    private final MemorySpanBuffer backlogProvider;
 
-    MemoryBufferingExporter(CurrentNetworkProvider currentNetworkProvider, SpanExporter delegate, BacklogProvider backlogProvider) {
+    MemoryBufferingExporter(CurrentNetworkProvider currentNetworkProvider, SpanExporter delegate, MemorySpanBuffer backlogProvider) {
         this.currentNetworkProvider = currentNetworkProvider;
         this.delegate = delegate;
         this.backlogProvider = backlogProvider;
@@ -67,7 +67,11 @@ class MemoryBufferingExporter implements SpanExporter {
 
     // todo Should we favor saving certain kinds of span if we're out of space? Or favor recency?
     private void addFailedSpansToBacklog(List<SpanData> toExport) {
-        backlogProvider.addFailedSpansToBacklog(toExport);
+        for (SpanData spanData : toExport) {
+            if (backlogProvider.size() < MAX_BACKLOG_SIZE) {
+                backlogProvider.addFailedSpansToBacklog(spanData);
+            }
+        }
     }
 
     @NonNull

@@ -50,13 +50,9 @@ public class StartTypeAwareBacklogProviderTest {
 
     @Test
     void addFailedSpansToBacklog_givenInBackground_shouldAddFailedSpanToBackgroundBacklog(){
-        List<SpanData> spans = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            spans.add(mock(SpanData.class));
-        }
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
 
-        backlogProvider.addFailedSpansToBacklog(spans);
+        backlogProvider.addFailedSpansToBacklog(mock(SpanData.class));
 
         assertEquals(0, backlogProvider.drain().size());
     }
@@ -69,7 +65,7 @@ public class StartTypeAwareBacklogProviderTest {
         }
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity", null);
 
-        backlogProvider.addFailedSpansToBacklog(spans);
+        spans.forEach(backlogProvider::addFailedSpansToBacklog);
 
         assertEquals(10, backlogProvider.drain().size());
     }
@@ -82,7 +78,7 @@ public class StartTypeAwareBacklogProviderTest {
         }
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity");
 
-        backlogProvider.addFailedSpansToBacklog(spans);
+        spans.forEach(backlogProvider::addFailedSpansToBacklog);
 
         assertEquals(100, backlogProvider.drain().size());
     }

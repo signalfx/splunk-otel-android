@@ -218,11 +218,11 @@ class RumInitializer {
     }
 
     @NonNull
-    private BacklogProvider constructBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
+    private MemorySpanBuffer constructBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
         if (builder.isBackgroundTaskReportingDisabled()){
             return new StartTypeAwareBacklogProvider(visibleScreenTracker);
         } else {
-            return new DefaultBacklogProvider();
+            return new DefaultMemorySpanBuffer();
         }
     }
     @NonNull
@@ -377,7 +377,7 @@ class RumInitializer {
     }
 
     private SpanExporter buildMemoryBufferingThrottledExporter(
-            CurrentNetworkProvider currentNetworkProvider, BacklogProvider backlogProvider) {
+            CurrentNetworkProvider currentNetworkProvider, MemorySpanBuffer backlogProvider) {
         String endpoint = getEndpoint();
         SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
         return ThrottlingExporter.newBuilder(

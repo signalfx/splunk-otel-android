@@ -10,9 +10,9 @@ import java.util.List;
 
 import io.opentelemetry.sdk.trace.data.SpanData;
 
-class DefaultBacklogProviderTest {
+class DefaultMemorySpanBufferTest {
 
-    DefaultBacklogProvider backlogProvider = new DefaultBacklogProvider();
+    DefaultMemorySpanBuffer backlogProvider = new DefaultMemorySpanBuffer();
 
     @Test
     void addFailedSpansToBacklog_givenSpansMoreThanMax_shouldKeepLastMaxSpan() {
@@ -25,8 +25,8 @@ class DefaultBacklogProviderTest {
             secondSet.add(mock(SpanData.class));
         }
 
-        backlogProvider.addFailedSpansToBacklog(firstSet);
-        backlogProvider.addFailedSpansToBacklog(secondSet);
+        firstSet.forEach(backlogProvider::addFailedSpansToBacklog);
+        secondSet.forEach(backlogProvider::addFailedSpansToBacklog);
 
         assertEquals(100, backlogProvider.drain().size());
     }

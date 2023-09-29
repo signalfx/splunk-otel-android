@@ -44,7 +44,7 @@ class MemoryBufferingExporterTest {
             mock(CurrentNetworkProvider.class);
     private final CurrentNetwork currentNetwork = mock(CurrentNetwork.class);
 
-    private final BacklogProvider backlogProvider = mock(BacklogProvider.class);
+    private final MemorySpanBuffer backlogProvider = mock(MemorySpanBuffer.class);
 
     @BeforeEach
     void setUp() {
@@ -178,7 +178,7 @@ class MemoryBufferingExporterTest {
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
-                new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
+                new MemoryBufferingExporter(currentNetworkProvider, delegate, new DefaultMemorySpanBuffer());
 
         when(delegate.export(firstSet)).thenReturn(CompletableResultCode.ofFailure());
 
