@@ -6,18 +6,18 @@ import android.util.Log;
 import java.io.File;
 import java.util.stream.Stream;
 
-public class DefaultSpanFileProvider implements SpanFileProvider {
+public class DefaultSpanStorage implements SpanStorage {
 
     private final FileUtils fileUtils;
     private final Application application;
 
-    public DefaultSpanFileProvider(Application application, FileUtils fileUtils) {
+    public DefaultSpanStorage(Application application, FileUtils fileUtils) {
         this.fileUtils = fileUtils;
         this.application = application;
     }
 
     @Override
-    public File provideSpanPath() {
+    public File provideSpanFile() {
         File spansPath = fileUtils.getSpansDirectory(application);
         if (!spansPath.exists()) {
             if (!spansPath.mkdirs()) {
@@ -34,17 +34,17 @@ public class DefaultSpanFileProvider implements SpanFileProvider {
 
     @Override
     public Stream<File> getAllSpanFiles() {
-        return fileUtils.listSpanFiles(provideSpanPath());
+        return fileUtils.listSpanFiles(provideSpanFile());
     }
 
     @Override
     public long getTotalFileSizeInBytes() {
-        return fileUtils.getTotalFileSizeInBytes(provideSpanPath());
+        return fileUtils.getTotalFileSizeInBytes(provideSpanFile());
     }
 
     @Override
     public Stream<File> getPendingFiles() {
         return fileUtils
-                .listSpanFiles(provideSpanPath());
+                .listSpanFiles(provideSpanFile());
     }
 }

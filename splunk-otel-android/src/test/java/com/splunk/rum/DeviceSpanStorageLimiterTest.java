@@ -39,7 +39,7 @@ class DeviceSpanStorageLimiterTest {
     private static final int MAX_STORAGE_USE_MB = 3;
     private static final long MAX_STORAGE_USE_BYTES = MAX_STORAGE_USE_MB * 1024 * 1024;
     @Mock private FileUtils fileUtils;
-    @Mock private SpanFileProvider spanFileProvider;
+    @Mock private SpanStorage spanStorage;
     private DeviceSpanStorageLimiter limiter;
 
     @BeforeEach
@@ -47,7 +47,7 @@ class DeviceSpanStorageLimiterTest {
         limiter =
                 DeviceSpanStorageLimiter.builder()
                         .fileUtils(fileUtils)
-                        .fileProvider(spanFileProvider)
+                        .fileProvider(spanStorage)
                         .maxStorageUseMb(MAX_STORAGE_USE_MB)
                         .build();
     }
@@ -55,8 +55,8 @@ class DeviceSpanStorageLimiterTest {
     @Test
     void ensureFreeSpace_littleUsageEnoughFreeSpace() {
         File mockFile = mock(File.class);
-        when(spanFileProvider.getTotalFileSizeInBytes()).thenReturn(10 * 1024L);
-        when(spanFileProvider.provideSpanPath()).thenReturn(mockFile);
+        when(spanStorage.getTotalFileSizeInBytes()).thenReturn(10 * 1024L);
+        when(spanStorage.provideSpanFile()).thenReturn(mockFile);
         when(mockFile.getFreeSpace()).thenReturn(99L); // Disk is very full
         assertFalse(limiter.ensureFreeSpace());
         verify(fileUtils, never()).safeDelete(any());
@@ -65,8 +65,8 @@ class DeviceSpanStorageLimiterTest {
     @Test
     void ensureFreeSpace_littleUsageButNotEnoughFreeSpace() {
         File mockFile = mock(File.class);
-        when(spanFileProvider.getTotalFileSizeInBytes()).thenReturn(10 * 1024L);
-        when(spanFileProvider.provideSpanPath()).thenReturn(mockFile);
+        when(spanStorage.getTotalFileSizeInBytes()).thenReturn(10 * 1024L);
+        when(spanStorage.provideSpanFile()).thenReturn(mockFile);
         when(mockFile.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES * 99); // lots of room
         assertTrue(limiter.ensureFreeSpace());
         verify(fileUtils, never()).safeDelete(any());
@@ -75,9 +75,9 @@ class DeviceSpanStorageLimiterTest {
     @Test
     void ensureFreeSpace_underLimit() {
         File mockFile = mock(File.class);
-        when(spanFileProvider.provideSpanPath()).thenReturn(mockFile);
+        when(spanStorage.provideSpanFile()).thenReturn(mockFile);
 
-        when(spanFileProvider.getTotalFileSizeInBytes()).thenReturn(MAX_STORAGE_USE_BYTES - 1);
+        when(spanStorage.getTotalFileSizeInBytes()).thenReturn(MAX_STORAGE_USE_BYTES - 1);
         when(mockFile.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
         boolean result = limiter.ensureFreeSpace();
         assertTrue(result);
@@ -91,13 +91,13 @@ class DeviceSpanStorageLimiterTest {
         File file3 = new File("newest");
 
         File mockFile = mock(File.class);
-        when(spanFileProvider.provideSpanPath()).thenReturn(mockFile);
-        when(spanFileProvider.getTotalFileSizeInBytes()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
+        when(spanStorage.provideSpanFile()).thenReturn(mockFile);
+        when(spanStorage.getTotalFileSizeInBytes()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
         when(fileUtils.getModificationTime(file1)).thenReturn(1000L);
         when(fileUtils.getModificationTime(file2)).thenReturn(1001L);
         when(fileUtils.getModificationTime(file3)).thenReturn(1002L);
         when(fileUtils.getFileSize(isA(File.class))).thenReturn(1L);
-        when(spanFileProvider.getAllSpanFiles()).thenReturn(Stream.of(file3, file1, file2));
+        when(spanStorage.getAllSpanFiles()).thenReturn(Stream.of(file3, file1, file2));
         when(mockFile.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
         boolean result = limiter.ensureFreeSpace();
 

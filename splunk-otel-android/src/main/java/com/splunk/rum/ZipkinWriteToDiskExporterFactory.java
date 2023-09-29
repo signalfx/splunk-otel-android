@@ -16,10 +16,7 @@
 
 package com.splunk.rum;
 
-import android.app.Application;
-import android.util.Log;
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
-import java.io.File;
 import zipkin2.reporter.Sender;
 
 /**
@@ -30,17 +27,17 @@ class ZipkinWriteToDiskExporterFactory {
 
     private ZipkinWriteToDiskExporterFactory() {}
 
-    static ZipkinSpanExporter create(int maxUsageMegabytes, SpanFileProvider spanFileProvider) {
+    static ZipkinSpanExporter create(int maxUsageMegabytes, SpanStorage spanStorage) {
         FileUtils fileUtils = new FileUtils();
         DeviceSpanStorageLimiter limiter =
                 DeviceSpanStorageLimiter.builder()
                         .fileUtils(fileUtils)
-                        .fileProvider(spanFileProvider)
+                        .fileProvider(spanStorage)
                         .maxStorageUseMb(maxUsageMegabytes)
                         .build();
         Sender sender =
                 ZipkinToDiskSender.builder()
-                        .spanFileProvider(spanFileProvider)
+                        .spanFileProvider(spanStorage)
                         .fileUtils(fileUtils)
                         .storageLimiter(limiter)
                         .build();

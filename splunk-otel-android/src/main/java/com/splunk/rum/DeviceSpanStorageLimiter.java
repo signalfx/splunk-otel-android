@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 class DeviceSpanStorageLimiter {
     static final int DEFAULT_MAX_STORAGE_USE_MB = 25;
-    private final SpanFileProvider fileProvider;
+    private final SpanStorage fileProvider;
     private final int maxStorageUseMb;
     private final FileUtils fileUtils;
 
@@ -52,7 +52,7 @@ class DeviceSpanStorageLimiter {
     boolean ensureFreeSpace() {
         tryFreeingSpace();
         // play nice if disk is getting full
-        return fileProvider.provideSpanPath().getFreeSpace() > limitInBytes();
+        return fileProvider.provideSpanFile().getFreeSpace() > limitInBytes();
     }
 
     private void tryFreeingSpace() {
@@ -89,11 +89,11 @@ class DeviceSpanStorageLimiter {
     }
 
     static class Builder {
-        public @Nullable SpanFileProvider fileProvider;
+        public @Nullable SpanStorage fileProvider;
         private int maxStorageUseMb = DEFAULT_MAX_STORAGE_USE_MB;
         private FileUtils fileUtils = new FileUtils();
 
-        Builder fileProvider(SpanFileProvider fileProvider) {
+        Builder fileProvider(SpanStorage fileProvider) {
             this.fileProvider = fileProvider;
             return this;
         }

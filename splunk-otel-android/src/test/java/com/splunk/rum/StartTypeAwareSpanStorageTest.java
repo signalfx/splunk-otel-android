@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 
-public class StartTypeAwareSpanFileProviderTest {
+public class StartTypeAwareSpanStorageTest {
 
     private final Application application = mock();
 
@@ -33,7 +33,7 @@ public class StartTypeAwareSpanFileProviderTest {
     private final File file = new File("files/spans");
     private final VisibleScreenTracker visibleScreenTracker = mock();
 
-    private final StartTypeAwareSpanFileProvider fileProvider = new StartTypeAwareSpanFileProvider(visibleScreenTracker,application, fileUtils);
+    private final StartTypeAwareSpanStorage fileProvider = new StartTypeAwareSpanStorage(visibleScreenTracker,application, fileUtils);
 
     @BeforeEach
     void setup(){
@@ -82,7 +82,7 @@ public class StartTypeAwareSpanFileProviderTest {
     void getSpanPath_givenInBackground_shouldReturnBackgroundSpanPath(){
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
 
-        File path = fileProvider.provideSpanPath();
+        File path = fileProvider.provideSpanFile();
 
         assertTrue(path.getPath().startsWith("files/spans/background/"));
     }
@@ -91,7 +91,7 @@ public class StartTypeAwareSpanFileProviderTest {
     void getSpanPath_givenInForeground_shouldReturnForegroundSpanPath(){
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity");
 
-        File path = fileProvider.provideSpanPath();
+        File path = fileProvider.provideSpanFile();
 
         assertFalse(path.getPath().startsWith("files/spans/background/"));
     }

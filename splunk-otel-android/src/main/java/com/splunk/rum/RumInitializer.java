@@ -226,11 +226,11 @@ class RumInitializer {
         }
     }
     @NonNull
-    private SpanFileProvider constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
+    private SpanStorage constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
         if (builder.isBackgroundTaskReportingDisabled()){
-            return new StartTypeAwareSpanFileProvider(visibleScreenTracker, application, new FileUtils());
+            return new StartTypeAwareSpanStorage(visibleScreenTracker, application, new FileUtils());
         } else {
-            return new DefaultSpanFileProvider(application, new FileUtils());
+            return new DefaultSpanStorage(application, new FileUtils());
         }
     }
 
@@ -353,7 +353,7 @@ class RumInitializer {
 
     private SpanExporter buildStorageBufferingExporter(
             CurrentNetworkProvider currentNetworkProvider,
-            SpanFileProvider spanFileProvider) {
+            SpanStorage spanStorage) {
         Sender sender = OkHttpSender.newBuilder().endpoint(getEndpoint()).build();
         BandwidthTracker bandwidthTracker = new BandwidthTracker();
 
@@ -364,11 +364,11 @@ class RumInitializer {
                         .connectionUtil(currentNetworkProvider)
                         .fileSender(fileSender)
                         .bandwidthTracker(bandwidthTracker)
-                        .spanFileProvider(spanFileProvider)
+                        .spanFileProvider(spanStorage)
                         .build();
         diskToZipkinExporter.startPolling();
 
-        return getToDiskExporter(spanFileProvider);
+        return getToDiskExporter(spanStorage);
     }
 
     @NonNull
@@ -388,11 +388,11 @@ class RumInitializer {
                 .build();
     }
 
-    SpanExporter getToDiskExporter(SpanFileProvider spanFileProvider) {
+    SpanExporter getToDiskExporter(SpanStorage spanStorage) {
         return new LazyInitSpanExporter(
                 () ->
                         ZipkinWriteToDiskExporterFactory.create(
-                                builder.maxUsageMegabytes, spanFileProvider));
+                                builder.maxUsageMegabytes, spanStorage));
     }
 
     // visible for testing

@@ -40,7 +40,7 @@ class DiskToZipkinExporterTest {
 
     static final int BANDWIDTH_LIMIT = 20 * 1024;
     static final File spanFilesPath = new File("/path/to/thing");
-    static final SpanFileProvider spanFileProvider = mock(SpanFileProvider.class);
+    static final SpanStorage SPAN_STORAGE = mock(SpanStorage.class);
     private File file1 = null;
     private File file2 = null;
     private File imposter = null;
@@ -53,16 +53,16 @@ class DiskToZipkinExporterTest {
 
     @BeforeEach
     void setup() throws Exception {
-        Mockito.reset(spanFileProvider);
-        when(spanFileProvider.provideSpanPath()).thenReturn(spanFilesPath);
-        file1 = new File(spanFileProvider.provideSpanPath() + File.separator + "file1.spans");
-        file2 = new File(spanFileProvider.provideSpanPath() + File.separator + "file2.spans");
-        imposter = new File(spanFileProvider.provideSpanPath() + File.separator + "someImposterFile.dll");
+        Mockito.reset(SPAN_STORAGE);
+        when(SPAN_STORAGE.provideSpanFile()).thenReturn(spanFilesPath);
+        file1 = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "file1.spans");
+        file2 = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "file2.spans");
+        imposter = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "someImposterFile.dll");
 
         when(currentNetworkProvider.refreshNetworkStatus()).thenReturn(currentNetwork);
         when(currentNetwork.isOnline()).thenReturn(true);
         Stream<File> files = Stream.of(file1, imposter, file2);
-        when(spanFileProvider.getPendingFiles()).thenReturn(files);
+        when(SPAN_STORAGE.getPendingFiles()).thenReturn(files);
     }
 
     @Test
@@ -93,14 +93,14 @@ class DiskToZipkinExporterTest {
 
     @Test
     void testSkipsWhenOffline() {
-        Mockito.reset(spanFileProvider);
+        Mockito.reset(SPAN_STORAGE);
         when(currentNetwork.isOnline()).thenReturn(false);
 
         DiskToZipkinExporter exporter = buildExporter();
 
         exporter.doExportCycle();
 
-        verifyNoMoreInteractions(spanFileProvider);
+        verifyNoMoreInteractions(SPAN_STORAGE);
         verifyNoMoreInteractions(sender);
     }
 
@@ -117,7 +117,7 @@ class DiskToZipkinExporterTest {
 
     @Test
     void testOtherExceptionsHandled() {
-        when(spanFileProvider.getPendingFiles()).thenThrow(new RuntimeException("unexpected!"));
+        when(SPAN_STORAGE.getPendingFiles()).thenThrow(new RuntimeException("unexpected!"));
         DiskToZipkinExporter exporter = buildExporter();
 
         exporter.doExportCycle();
@@ -129,7 +129,7 @@ class DiskToZipkinExporterTest {
                 .fileSender(sender)
                 .bandwidthLimit(BANDWIDTH_LIMIT)
                 .bandwidthTracker(bandwidthTracker)
-                .spanFileProvider(spanFileProvider)
+                .spanFileProvider(SPAN_STORAGE)
                 .connectionUtil(currentNetworkProvider)
                 .build();
     }

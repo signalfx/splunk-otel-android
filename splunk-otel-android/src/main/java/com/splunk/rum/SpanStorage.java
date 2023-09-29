@@ -3,9 +3,9 @@ package com.splunk.rum;
 import java.io.File;
 import java.util.stream.Stream;
 
-interface SpanFileProvider {
+interface SpanStorage {
 
-    File provideSpanPath();
+    File provideSpanFile();
 
     Stream<File> getAllSpanFiles();
 

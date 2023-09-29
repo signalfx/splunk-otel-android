@@ -43,7 +43,7 @@ class ZipkinToDiskSenderTest {
 
     private final long now = System.currentTimeMillis();
     private final File path = new File("/my/great/storage/location");
-    private final SpanFileProvider spanFileProvider = mock(SpanFileProvider.class);
+    private final SpanStorage spanStorage = mock(SpanStorage.class);
 
     private final String finalFile = "/my/great/storage/location/" + now + ".spans";
     private final File finalPath = new File(finalFile);
@@ -63,11 +63,11 @@ class ZipkinToDiskSenderTest {
 
     @Test
     void testHappyPath() throws Exception {
-        when(spanFileProvider.provideSpanPath()).thenReturn(path);
+        when(spanStorage.provideSpanFile()).thenReturn(path);
 
         ZipkinToDiskSender sender =
                 ZipkinToDiskSender.builder()
-                        .spanFileProvider(spanFileProvider)
+                        .spanFileProvider(spanStorage)
                         .fileUtils(fileUtils)
                         .clock(clock)
                         .storageLimiter(limiter)
@@ -81,7 +81,7 @@ class ZipkinToDiskSenderTest {
     void testEmptyListDoesNotWriteFile() {
         ZipkinToDiskSender sender =
                 ZipkinToDiskSender.builder()
-                        .spanFileProvider(spanFileProvider)
+                        .spanFileProvider(spanStorage)
                         .fileUtils(fileUtils)
                         .storageLimiter(limiter)
                         .build();
@@ -91,12 +91,12 @@ class ZipkinToDiskSenderTest {
 
     @Test
     void testWriteFails() throws Exception {
-        when(spanFileProvider.provideSpanPath()).thenReturn(path);
+        when(spanStorage.provideSpanFile()).thenReturn(path);
         doThrow(new IOException("boom")).when(fileUtils).writeAsLines(finalPath, spans);
 
         ZipkinToDiskSender sender =
                 ZipkinToDiskSender.builder()
-                        .spanFileProvider(spanFileProvider)
+                        .spanFileProvider(spanStorage)
                         .fileUtils(fileUtils)
                         .clock(clock)
                         .storageLimiter(limiter)
@@ -113,7 +113,7 @@ class ZipkinToDiskSenderTest {
 
         ZipkinToDiskSender sender =
                 ZipkinToDiskSender.builder()
-                        .spanFileProvider(spanFileProvider)
+                        .spanFileProvider(spanStorage)
                         .fileUtils(fileUtils)
                         .clock(clock)
                         .storageLimiter(limiter)

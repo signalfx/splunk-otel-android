@@ -17,7 +17,7 @@ import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
  * if the app is brought to foreground and the same $sessionid still in use, the background spans are moved to /span for eventual sending
  * if the app still in background until process-kill, the background span files will eventually be deleted by @DeviceSpanStorageLimiter
  */
-public class StartTypeAwareSpanFileProvider implements SpanFileProvider {
+public class StartTypeAwareSpanStorage implements SpanStorage {
 
     private final Application application;
     private final VisibleScreenTracker visibleScreenTracker;
@@ -25,7 +25,7 @@ public class StartTypeAwareSpanFileProvider implements SpanFileProvider {
     private final String uniqueId = UUID.randomUUID().toString();
     ;
 
-    public StartTypeAwareSpanFileProvider(VisibleScreenTracker visibleScreenTracker, Application application, FileUtils fileUtils) {
+    public StartTypeAwareSpanStorage(VisibleScreenTracker visibleScreenTracker, Application application, FileUtils fileUtils) {
         this.visibleScreenTracker = visibleScreenTracker;
         this.application = application;
         this.fileUtils = fileUtils;
@@ -62,7 +62,7 @@ public class StartTypeAwareSpanFileProvider implements SpanFileProvider {
     }
 
     @Override
-    public File provideSpanPath() {
+    public File provideSpanFile() {
         return ensureDirExist(getSpanPath());
     }
 
