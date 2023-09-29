@@ -24,7 +24,6 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
     private final String uniqueId = UUID.randomUUID().toString();
     private final File rootDir;
     private final File spanDir;
-    ;
 
     public StartTypeAwareSpanStorage(VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir) {
         this.visibleScreenTracker = visibleScreenTracker;
