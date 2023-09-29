@@ -19,17 +19,16 @@ public class DefaultSpanStorage implements SpanStorage {
     @Override
     public File provideSpanFile() {
         File spansPath = fileUtils.getSpansDirectory(application);
-        if (!spansPath.exists()) {
-            if (!spansPath.mkdirs()) {
-                Log.e(
-                        SplunkRum.LOG_TAG,
-                        "Error creating path "
-                                + spansPath
-                                + " for span buffer, defaulting to parent");
-                spansPath = application.getApplicationContext().getFilesDir();
-            }
+        if (spansPath.exists() || spansPath.mkdirs()) {
+            return spansPath;
         }
-        return spansPath;
+
+        Log.e(
+                SplunkRum.LOG_TAG,
+                "Error creating path "
+                        + spansPath
+                        + " for span buffer, defaulting to parent");
+        return application.getApplicationContext().getFilesDir();
     }
 
     @Override
