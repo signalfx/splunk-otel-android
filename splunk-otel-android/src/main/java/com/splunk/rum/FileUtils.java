@@ -45,6 +45,10 @@ class FileUtils {
         return new File(filesDir, "spans");
     }
 
+    File getSpansDirectory(File rootDir){
+        return new File(rootDir, "spans");
+    }
+
     void writeAsLines(File file, List<byte[]> blocksOfData) throws IOException {
         AtomicFile outfile = new AtomicFile(file);
         try (FileOutputStream out = outfile.startWrite()) {

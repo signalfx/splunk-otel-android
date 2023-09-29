@@ -19,30 +19,32 @@ import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
  */
 public class StartTypeAwareSpanStorage implements SpanStorage {
 
-    private final Application application;
     private final VisibleScreenTracker visibleScreenTracker;
     private final FileUtils fileUtils;
     private final String uniqueId = UUID.randomUUID().toString();
+    private final File rootDir;
+    private final File spanDir;
     ;
 
-    public StartTypeAwareSpanStorage(VisibleScreenTracker visibleScreenTracker, Application application, FileUtils fileUtils) {
+    public StartTypeAwareSpanStorage(VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir) {
         this.visibleScreenTracker = visibleScreenTracker;
-        this.application = application;
         this.fileUtils = fileUtils;
+        this.rootDir = rootDir;
+        this.spanDir = fileUtils.getSpansDirectory(rootDir);
     }
 
-    private File getCurrentSessionBackgroundPath(){
-        return new File(fileUtils.getSpansDirectory(application), "background/" + uniqueId);
+    private File getCurrentSessionBackgroundFile(){
+        return new File(spanDir, "background/" + uniqueId);
     }
 
     @Override
     public long getTotalFileSizeInBytes() {
-        return fileUtils.getTotalFileSizeInBytesRecursively(fileUtils.getSpansDirectory(application));
+        return fileUtils.getTotalFileSizeInBytesRecursively(spanDir);
     }
 
     @Override
     public Stream<File> getAllSpanFiles() {
-        return fileUtils.listFilesRecursively(fileUtils.getSpansDirectory(application));
+        return fileUtils.listFilesRecursively(spanDir);
     }
 
     @Override
@@ -50,12 +52,12 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         if (visibleScreenTracker.getPreviouslyVisibleScreen() != null){
             moveBackgroundSpanToPendingSpan();
         }
-        return fileUtils.listSpanFiles(fileUtils.getSpansDirectory(application));
+        return fileUtils.listSpanFiles(spanDir);
     }
 
     private void moveBackgroundSpanToPendingSpan() {
-        fileUtils.listSpanFiles(getCurrentSessionBackgroundPath()).collect(Collectors.toList()).forEach(file -> {
-            File destinationFile = new File(fileUtils.getSpansDirectory(application), file.getName());
+        fileUtils.listSpanFiles(getCurrentSessionBackgroundFile()).collect(Collectors.toList()).forEach(file -> {
+            File destinationFile = new File(spanDir, file.getName());
             boolean isMoved = file.renameTo(destinationFile);
             Log.i(LOG_TAG, "Moved background span " + file.getPath() + " success ? " + isMoved + " for eventual send");
         });
@@ -63,24 +65,21 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
 
     @Override
     public File provideSpanFile() {
-        return ensureDirExist(getSpanPath());
+        return ensureDirExist(getSpanFile());
     }
 
     private File ensureDirExist(File pathToReturn) {
-        if (!pathToReturn.exists()) {
-            if (!pathToReturn.mkdirs()) {
-                Log.e(SplunkRum.LOG_TAG, "Error creating path " + pathToReturn + " for span buffer, defaulting to parent");
-                pathToReturn = application.getApplicationContext().getFilesDir();
-            }
+        if (pathToReturn.exists() || pathToReturn.mkdirs()) {
+            return pathToReturn;
         }
-        return pathToReturn;
+        Log.e(SplunkRum.LOG_TAG, "Error creating path " + pathToReturn + " for span buffer, defaulting to parent");
+        return rootDir;
     }
 
-    private File getSpanPath(){
-        File spansPath = fileUtils.getSpansDirectory(application);
+    private File getSpanFile(){
         if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
-            spansPath = getCurrentSessionBackgroundPath();
+            return getCurrentSessionBackgroundFile();
         }
-        return spansPath;
+        return spanDir;
     }
 }

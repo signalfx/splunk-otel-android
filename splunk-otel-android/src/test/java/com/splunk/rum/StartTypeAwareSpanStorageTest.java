@@ -33,7 +33,7 @@ public class StartTypeAwareSpanStorageTest {
     private final File file = new File("files/spans");
     private final VisibleScreenTracker visibleScreenTracker = mock();
 
-    private final StartTypeAwareSpanStorage fileProvider = new StartTypeAwareSpanStorage(visibleScreenTracker,application, fileUtils);
+    private final StartTypeAwareSpanStorage fileProvider = new StartTypeAwareSpanStorage(visibleScreenTracker,application, fileUtils, application.getApplicationContext().getFilesDir());
 
     @BeforeEach
     void setup(){

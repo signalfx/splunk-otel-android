@@ -1,6 +1,5 @@
 package com.splunk.rum;
 
-import android.app.Application;
 import android.util.Log;
 
 import java.io.File;
@@ -9,16 +8,16 @@ import java.util.stream.Stream;
 public class DefaultSpanStorage implements SpanStorage {
 
     private final FileUtils fileUtils;
-    private final Application application;
+    private final File rootDir;
 
-    public DefaultSpanStorage(Application application, FileUtils fileUtils) {
+    public DefaultSpanStorage(FileUtils fileUtils, File rootDir) {
         this.fileUtils = fileUtils;
-        this.application = application;
+        this.rootDir = rootDir;
     }
 
     @Override
     public File provideSpanFile() {
-        File spansPath = fileUtils.getSpansDirectory(application);
+        File spansPath = fileUtils.getSpansDirectory(rootDir);
         if (spansPath.exists() || spansPath.mkdirs()) {
             return spansPath;
         }
@@ -28,7 +27,7 @@ public class DefaultSpanStorage implements SpanStorage {
                 "Error creating path "
                         + spansPath
                         + " for span buffer, defaulting to parent");
-        return application.getApplicationContext().getFilesDir();
+        return rootDir;
     }
 
     @Override

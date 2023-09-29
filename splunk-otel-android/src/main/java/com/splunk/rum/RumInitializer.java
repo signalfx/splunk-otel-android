@@ -228,9 +228,9 @@ class RumInitializer {
     @NonNull
     private SpanStorage constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
         if (builder.isBackgroundTaskReportingDisabled()){
-            return new StartTypeAwareSpanStorage(visibleScreenTracker, application, new FileUtils());
+            return new StartTypeAwareSpanStorage(visibleScreenTracker, new FileUtils(), application.getApplicationContext().getFilesDir());
         } else {
-            return new DefaultSpanStorage(application, new FileUtils());
+            return new DefaultSpanStorage(new FileUtils(), application.getApplicationContext().getFilesDir());
         }
     }
 
