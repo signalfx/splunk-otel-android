@@ -85,23 +85,10 @@ class FileUtils {
         if (directory == null) {
             return Stream.empty();
         }
-        ArrayList<File> fileArrayList = new ArrayList<>();
-        listFilesRecursively(directory, fileArrayList);
-        return fileArrayList.stream();
-    }
-
-    private void listFilesRecursively(File directory, ArrayList<File> fileArrayList) {
         File[] files = directory.listFiles();
-        if (files == null) {
-            return;
-        }
-        for (File file : files) {
-            if (file.isDirectory()) {
-                listFilesRecursively(file, fileArrayList);
-            } else {
-                fileArrayList.add(file);
-            }
-        }
+        Stream<File> directories = Stream.of(files).filter(File::isDirectory);
+        Stream<File> plainFiles = Stream.of(files).filter(File::isFile);
+        return Stream.concat(plainFiles, directories.flatMap(this::listFilesRecursively));
     }
 
     Stream<File> listSpanFiles(File dir) {
