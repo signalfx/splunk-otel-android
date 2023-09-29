@@ -32,10 +32,6 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         this.spanDir = fileUtils.getSpansDirectory(rootDir);
     }
 
-    private File getCurrentSessionBackgroundFile(){
-        return new File(spanDir, "background/" + uniqueId);
-    }
-
     @Override
     public long getTotalFileSizeInBytes() {
         return fileUtils.getTotalFileSizeInBytesRecursively(spanDir);
@@ -62,9 +58,20 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         });
     }
 
+    private File getCurrentSessionBackgroundFile(){
+        return new File(spanDir, "background/" + uniqueId);
+    }
+
     @Override
     public File provideSpanFile() {
         return ensureDirExist(getSpanFile());
+    }
+
+    private File getSpanFile(){
+        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
+            return getCurrentSessionBackgroundFile();
+        }
+        return spanDir;
     }
 
     private File ensureDirExist(File pathToReturn) {
@@ -73,12 +80,5 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         }
         Log.e(SplunkRum.LOG_TAG, "Error creating path " + pathToReturn + " for span buffer, defaulting to parent");
         return rootDir;
-    }
-
-    private File getSpanFile(){
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
-            return getCurrentSessionBackgroundFile();
-        }
-        return spanDir;
     }
 }
