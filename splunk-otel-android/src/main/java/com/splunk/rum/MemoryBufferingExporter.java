@@ -72,7 +72,7 @@ class MemoryBufferingExporter implements SpanExporter {
 
     @NonNull
     private List<SpanData> fillFromBacklog() {
-        return backlogProvider.fillFromBacklog();
+        return backlogProvider.drain();
     }
 
     @Override

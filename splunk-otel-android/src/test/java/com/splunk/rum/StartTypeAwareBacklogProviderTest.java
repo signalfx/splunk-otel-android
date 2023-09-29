@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class StartTypeAwareBacklogProviderTest {
         backlogProvider.addAll(spans);
 
         //0 foreground spans since it's background from the start
-        assertEquals(0, backlogProvider.fillFromBacklog().size());
+        assertEquals(0, backlogProvider.drain().size());
     }
 
     @Test
@@ -46,7 +45,7 @@ public class StartTypeAwareBacklogProviderTest {
         backlogProvider.addAll(spans);
         backlogProvider.addAll(spans);
 
-        assertEquals(20, backlogProvider.fillFromBacklog().size());
+        assertEquals(20, backlogProvider.drain().size());
     }
 
     @Test
@@ -59,7 +58,7 @@ public class StartTypeAwareBacklogProviderTest {
 
         backlogProvider.addFailedSpansToBacklog(spans);
 
-        assertEquals(0, backlogProvider.fillFromBacklog().size());
+        assertEquals(0, backlogProvider.drain().size());
     }
 
     @Test
@@ -72,7 +71,7 @@ public class StartTypeAwareBacklogProviderTest {
 
         backlogProvider.addFailedSpansToBacklog(spans);
 
-        assertEquals(10, backlogProvider.fillFromBacklog().size());
+        assertEquals(10, backlogProvider.drain().size());
     }
 
     @Test
@@ -85,6 +84,6 @@ public class StartTypeAwareBacklogProviderTest {
 
         backlogProvider.addFailedSpansToBacklog(spans);
 
-        assertEquals(100, backlogProvider.fillFromBacklog().size());
+        assertEquals(100, backlogProvider.drain().size());
     }
 }

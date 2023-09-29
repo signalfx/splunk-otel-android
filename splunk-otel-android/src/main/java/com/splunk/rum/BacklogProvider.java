@@ -10,7 +10,7 @@ public interface BacklogProvider {
 
     void addFailedSpansToBacklog(List<SpanData> toExport);
 
-    List<SpanData> fillFromBacklog();
+    List<SpanData> drain();
 
     boolean isEmpty();
 

@@ -33,7 +33,6 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +55,7 @@ class MemoryBufferingExporterTest {
     void happyPath() {
         List<SpanData> spans = Arrays.asList(mock(SpanData.class), mock(SpanData.class));
         when(currentNetwork.isOnline()).thenReturn(true);
-        when(backlogProvider.fillFromBacklog()).thenReturn(spans);
+        when(backlogProvider.drain()).thenReturn(spans);
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
@@ -75,7 +74,7 @@ class MemoryBufferingExporterTest {
         List<SpanData> secondBatch = new ArrayList<>(spans);
         SpanData anotherSpan = mock(SpanData.class);
         secondBatch.add(anotherSpan);
-        when(backlogProvider.fillFromBacklog()).thenReturn(secondBatch);
+        when(backlogProvider.drain()).thenReturn(secondBatch);
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
@@ -102,7 +101,7 @@ class MemoryBufferingExporterTest {
         SpanData three = mock(SpanData.class);
         List<SpanData> spans = Arrays.asList(one, two);
         List<SpanData> secondSpans = Arrays.asList(one, two, three);
-        when(backlogProvider.fillFromBacklog()).thenReturn(spans, secondSpans);
+        when(backlogProvider.drain()).thenReturn(spans, secondSpans);
         when(currentNetwork.isOnline()).thenReturn(true);
 
         SpanExporter delegate = mock(SpanExporter.class);
@@ -126,7 +125,7 @@ class MemoryBufferingExporterTest {
         SpanData one = mock(SpanData.class);
         SpanData two = mock(SpanData.class);
         List<SpanData> spans = Arrays.asList(one, two);
-        when(backlogProvider.fillFromBacklog()).thenReturn(spans);
+        when(backlogProvider.drain()).thenReturn(spans);
         when(currentNetwork.isOnline()).thenReturn(true);
 
         SpanExporter delegate = mock(SpanExporter.class);
@@ -175,7 +174,7 @@ class MemoryBufferingExporterTest {
         }
 
         when(currentNetwork.isOnline()).thenReturn(true);
-        when(backlogProvider.fillFromBacklog()).thenReturn(firstSet, secondSet);
+        when(backlogProvider.drain()).thenReturn(firstSet, secondSet);
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =

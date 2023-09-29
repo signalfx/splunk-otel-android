@@ -28,7 +28,7 @@ class DefaultBacklogProviderTest {
         backlogProvider.addFailedSpansToBacklog(firstSet);
         backlogProvider.addFailedSpansToBacklog(secondSet);
 
-        assertEquals(100, backlogProvider.fillFromBacklog().size());
+        assertEquals(100, backlogProvider.drain().size());
     }
 
     @Test
@@ -39,7 +39,7 @@ class DefaultBacklogProviderTest {
         }
 
         backlogProvider.addAll(spans);
-        backlogProvider.fillFromBacklog();
+        backlogProvider.drain();
 
         assertTrue(backlogProvider.isEmpty());
     }

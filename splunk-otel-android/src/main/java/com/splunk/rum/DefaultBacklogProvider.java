@@ -29,7 +29,7 @@ public class DefaultBacklogProvider implements BacklogProvider {
     }
 
     @Override
-    public List<SpanData> fillFromBacklog() {
+    public List<SpanData> drain() {
         List<SpanData> retries = new ArrayList<>(backlog);
         backlog.clear();
         return retries;
