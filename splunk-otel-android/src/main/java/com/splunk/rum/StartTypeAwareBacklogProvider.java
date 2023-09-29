@@ -13,10 +13,6 @@ public class StartTypeAwareBacklogProvider implements BacklogProvider{
 
     private final VisibleScreenTracker visibleScreenTracker;
 
-    public StartTypeAwareBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
-        this.visibleScreenTracker = visibleScreenTracker;
-    }
-
     private static final int MAX_BACKLOG_SIZE = 100;
     private final Queue<SpanData> backlog = new ArrayDeque<>(MAX_BACKLOG_SIZE);
 
@@ -24,6 +20,10 @@ public class StartTypeAwareBacklogProvider implements BacklogProvider{
      * @backgroundSpanBacklog will never get sent if last visible screen is null until process kill
      */
     private final Queue<SpanData> backgroundSpanBacklog = new ArrayDeque<>(MAX_BACKLOG_SIZE);
+
+    public StartTypeAwareBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
+        this.visibleScreenTracker = visibleScreenTracker;
+    }
     @Override
     public void addAll(Collection<SpanData> spans) {
         if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
