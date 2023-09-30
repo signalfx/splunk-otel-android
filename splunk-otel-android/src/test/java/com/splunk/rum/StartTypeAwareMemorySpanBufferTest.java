@@ -16,7 +16,7 @@ public class StartTypeAwareMemorySpanBufferTest {
 
     private final VisibleScreenTracker visibleScreenTracker = mock(VisibleScreenTracker.class);
 
-    private final StartTypeAwareMemorySpanBuffer backlogProvider = new StartTypeAwareMemorySpanBuffer(
+    private final StartTypeAwareMemorySpanBuffer memorySpanBuffer = new StartTypeAwareMemorySpanBuffer(
             visibleScreenTracker
     );
 
@@ -28,10 +28,10 @@ public class StartTypeAwareMemorySpanBufferTest {
         }
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
 
-        backlogProvider.addAll(spans);
+        memorySpanBuffer.addAll(spans);
 
         //0 foreground spans since it's background from the start
-        assertEquals(0, backlogProvider.drain().size());
+        assertEquals(0, memorySpanBuffer.drain().size());
     }
 
     @Test
@@ -42,19 +42,19 @@ public class StartTypeAwareMemorySpanBufferTest {
         }
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null, "MainActivity");
 
-        backlogProvider.addAll(spans);
-        backlogProvider.addAll(spans);
+        memorySpanBuffer.addAll(spans);
+        memorySpanBuffer.addAll(spans);
 
-        assertEquals(20, backlogProvider.drain().size());
+        assertEquals(20, memorySpanBuffer.drain().size());
     }
 
     @Test
     void addFailedSpansToBacklog_givenInBackground_shouldAddFailedSpanToBackgroundBacklog(){
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
 
-        backlogProvider.addFailedSpansToBacklog(mock(SpanData.class));
+        memorySpanBuffer.addFailedSpansToBacklog(mock(SpanData.class));
 
-        assertEquals(0, backlogProvider.drain().size());
+        assertEquals(0, memorySpanBuffer.drain().size());
     }
 
     @Test
@@ -63,10 +63,10 @@ public class StartTypeAwareMemorySpanBufferTest {
         for (int i = 0; i < 10; i++) {
             spans.add(mock(SpanData.class));
         }
-        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity", null);
+        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null, "MainActivity");
 
-        spans.forEach(backlogProvider::addFailedSpansToBacklog);
+        spans.forEach(memorySpanBuffer::addFailedSpansToBacklog);
 
-        assertEquals(10, backlogProvider.drain().size());
+        assertEquals(10, memorySpanBuffer.drain().size());
     }
 }
