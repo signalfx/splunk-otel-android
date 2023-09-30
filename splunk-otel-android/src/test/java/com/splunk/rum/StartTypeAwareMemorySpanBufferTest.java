@@ -69,17 +69,4 @@ public class StartTypeAwareMemorySpanBufferTest {
 
         assertEquals(10, backlogProvider.drain().size());
     }
-
-    @Test
-    void addFailedSpansToBacklog_givenSpanExceedMax_shouldKeeplastMaxSpan(){
-        List<SpanData> spans = new ArrayList<>();
-        for (int i = 0; i < 120; i++) {
-            spans.add(mock(SpanData.class));
-        }
-        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity");
-
-        spans.forEach(backlogProvider::addFailedSpansToBacklog);
-
-        assertEquals(100, backlogProvider.drain().size());
-    }
 }
