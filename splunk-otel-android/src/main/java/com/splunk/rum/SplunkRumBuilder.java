@@ -325,7 +325,7 @@ public final class SplunkRumBuilder {
      */
     public SplunkRumBuilder disableBackgroundTaskReporting(String applicationId) {
         isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
-        configFlags.disableBackgroundTaskDetection();
+        configFlags.disableSubprocessInstrumentation();
         return this;
     }
 
@@ -368,7 +368,7 @@ public final class SplunkRumBuilder {
         return configFlags.isReactNativeSupportEnabled();
     }
 
-    boolean isBackgroundTaskReportingDisabled() {
-        return !configFlags.isBackgroundTaskInstrumentationEnabled();
+    boolean isSubprocessInstrumentationEnabled() {
+        return !configFlags.isSubprocessInstrumentationEnabled();
     }
 }

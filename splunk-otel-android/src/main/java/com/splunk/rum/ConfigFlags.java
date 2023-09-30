@@ -26,7 +26,7 @@ class ConfigFlags {
     private boolean networkMonitorEnabled = true;
     private boolean anrDetectionEnabled = true;
     private boolean slowRenderingDetectionEnabled = true;
-    private boolean backgroundTaskInstrumentationEnabled = true;
+    private boolean isSubprocessInstrumentationEnabled = true;
 
     void enableDebug() {
         debugEnabled = true;
@@ -56,16 +56,16 @@ class ConfigFlags {
         slowRenderingDetectionEnabled = false;
     }
 
-    public void disableBackgroundTaskDetection() {
-        backgroundTaskInstrumentationEnabled = false;
+    public void disableSubprocessInstrumentation() {
+        isSubprocessInstrumentationEnabled = false;
     }
 
     boolean isDebugEnabled() {
         return debugEnabled;
     }
 
-    boolean isBackgroundTaskInstrumentationEnabled() {
-        return backgroundTaskInstrumentationEnabled;
+    boolean isSubprocessInstrumentationEnabled() {
+        return isSubprocessInstrumentationEnabled;
     }
 
     boolean isAnrDetectionEnabled() {
