@@ -329,6 +329,19 @@ public final class SplunkRumBuilder {
         return this;
     }
 
+    /***
+     * Enable deffer instrumentation when app started from background start until
+     * app is brought to foreground, otherwise instrumentation data will never be
+     * sent to exporter.
+     *
+     * <p>Use case : Track only app session started by user opening app</p>
+     * @return {@code this}
+     */
+    public SplunkRumBuilder enableBackgroundInstrumentationDeferredUntilForeground(){
+        configFlags.enableBackgroundInstrumentationDeferredUntilForeground();
+        return this;
+    }
+
     // one day maybe these can use kotlin delegation
     ConfigFlags getConfigFlags() {
         return configFlags;
@@ -370,5 +383,9 @@ public final class SplunkRumBuilder {
 
     boolean isSubprocessInstrumentationEnabled() {
         return !configFlags.isSubprocessInstrumentationEnabled();
+    }
+
+    boolean isBackgroundInstrumentationDeferredUntilForeground(){
+        return configFlags.isBackgroundInstrumentationDeferredUntilForeground();
     }
 }

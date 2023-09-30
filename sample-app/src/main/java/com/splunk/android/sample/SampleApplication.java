@@ -43,6 +43,7 @@ public class SampleApplication extends Application {
                 .enableDebug()
                 .enableDiskBuffering()
                 .disableBackgroundTaskReporting(BuildConfig.APPLICATION_ID)
+                .enableBackgroundInstrumentationDeferredUntilForeground()
                 .setSlowRenderingDetectionPollInterval(Duration.ofMillis(1000))
                 .setDeploymentEnvironment("demo")
                 .limitDiskUsageMegabytes(1)

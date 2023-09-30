@@ -219,7 +219,7 @@ class RumInitializer {
 
     @NonNull
     private MemorySpanBuffer constructBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
-        if (builder.isSubprocessInstrumentationEnabled()){
+        if (builder.isBackgroundInstrumentationDeferredUntilForeground()){
             return new StartTypeAwareMemorySpanBuffer(visibleScreenTracker);
         } else {
             return new DefaultMemorySpanBuffer();
@@ -227,7 +227,7 @@ class RumInitializer {
     }
     @NonNull
     private SpanStorage constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
-        if (builder.isSubprocessInstrumentationEnabled()){
+        if (builder.isBackgroundInstrumentationDeferredUntilForeground()){
             return new StartTypeAwareSpanStorage(visibleScreenTracker, new FileUtils(), application.getApplicationContext().getFilesDir());
         } else {
             return new DefaultSpanStorage(new FileUtils(), application.getApplicationContext().getFilesDir());
