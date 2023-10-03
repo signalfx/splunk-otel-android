@@ -57,7 +57,8 @@ class DiskToZipkinExporterTest {
         when(SPAN_STORAGE.provideSpanFile()).thenReturn(spanFilesPath);
         file1 = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "file1.spans");
         file2 = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "file2.spans");
-        imposter = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "someImposterFile.dll");
+        imposter =
+                new File(SPAN_STORAGE.provideSpanFile() + File.separator + "someImposterFile.dll");
 
         when(currentNetworkProvider.refreshNetworkStatus()).thenReturn(currentNetwork);
         when(currentNetwork.isOnline()).thenReturn(true);

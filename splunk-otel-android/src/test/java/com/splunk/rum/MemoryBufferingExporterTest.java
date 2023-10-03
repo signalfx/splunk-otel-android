@@ -80,7 +80,6 @@ class MemoryBufferingExporterTest {
         MemoryBufferingExporter bufferingExporter =
                 new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
 
-
         CompletableResultCode result = bufferingExporter.export(spans);
         assertTrue(result.isSuccess());
         verify(delegate, never()).export(any());
@@ -109,8 +108,7 @@ class MemoryBufferingExporterTest {
                 new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
 
         when(delegate.export(spans)).thenReturn(CompletableResultCode.ofFailure());
-        when(delegate.export(secondSpans))
-                .thenReturn(CompletableResultCode.ofSuccess());
+        when(delegate.export(secondSpans)).thenReturn(CompletableResultCode.ofSuccess());
 
         CompletableResultCode firstResult = bufferingExporter.export(spans);
         assertFalse(firstResult.isSuccess());
@@ -131,7 +129,6 @@ class MemoryBufferingExporterTest {
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
                 new MemoryBufferingExporter(currentNetworkProvider, delegate, backlogProvider);
-
 
         when(delegate.export(spans))
                 .thenReturn(CompletableResultCode.ofFailure())
@@ -178,7 +175,8 @@ class MemoryBufferingExporterTest {
 
         SpanExporter delegate = mock(SpanExporter.class);
         MemoryBufferingExporter bufferingExporter =
-                new MemoryBufferingExporter(currentNetworkProvider, delegate, new DefaultMemorySpanBuffer());
+                new MemoryBufferingExporter(
+                        currentNetworkProvider, delegate, new DefaultMemorySpanBuffer());
 
         when(delegate.export(firstSet)).thenReturn(CompletableResultCode.ofFailure());
 

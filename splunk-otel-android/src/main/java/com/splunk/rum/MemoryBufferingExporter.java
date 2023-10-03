@@ -22,7 +22,6 @@ import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -34,7 +33,10 @@ class MemoryBufferingExporter implements SpanExporter {
 
     private final MemorySpanBuffer backlogProvider;
 
-    MemoryBufferingExporter(CurrentNetworkProvider currentNetworkProvider, SpanExporter delegate, MemorySpanBuffer backlogProvider) {
+    MemoryBufferingExporter(
+            CurrentNetworkProvider currentNetworkProvider,
+            SpanExporter delegate,
+            MemorySpanBuffer backlogProvider) {
         this.currentNetworkProvider = currentNetworkProvider;
         this.delegate = delegate;
         this.backlogProvider = backlogProvider;

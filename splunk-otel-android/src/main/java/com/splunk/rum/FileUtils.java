@@ -45,7 +45,7 @@ class FileUtils {
         return new File(filesDir, "spans");
     }
 
-    File getSpansDirectory(File rootDir){
+    File getSpansDirectory(File rootDir) {
         return new File(rootDir, "spans");
     }
 
@@ -81,7 +81,7 @@ class FileUtils {
         return Arrays.stream(files);
     }
 
-    Stream<File> listFilesRecursively(File directory){
+    Stream<File> listFilesRecursively(File directory) {
         if (directory == null) {
             return Stream.empty();
         }
@@ -102,7 +102,8 @@ class FileUtils {
     }
 
     long getTotalFileSizeInBytesRecursively(File dir) {
-        return listFilesRecursively(dir).reduce(0L, (acc, file) -> acc + getFileSize(file), Long::sum);
+        return listFilesRecursively(dir)
+                .reduce(0L, (acc, file) -> acc + getFileSize(file), Long::sum);
     }
 
     long getFileSize(File file) {

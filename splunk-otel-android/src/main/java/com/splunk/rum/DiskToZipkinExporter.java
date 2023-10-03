@@ -106,7 +106,8 @@ class DiskToZipkinExporter {
     }
 
     private List<File> getPendingFiles() {
-        return spanStorage.getPendingFiles()
+        return spanStorage
+                .getPendingFiles()
                 .sorted(Comparator.comparing(File::getName))
                 .collect(Collectors.toList());
     }

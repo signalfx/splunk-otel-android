@@ -337,7 +337,7 @@ public final class SplunkRumBuilder {
      * <p>Use case : Track only app session started by user opening app</p>
      * @return {@code this}
      */
-    public SplunkRumBuilder enableBackgroundInstrumentationDeferredUntilForeground(){
+    public SplunkRumBuilder enableBackgroundInstrumentationDeferredUntilForeground() {
         configFlags.enableBackgroundInstrumentationDeferredUntilForeground();
         return this;
     }
@@ -385,7 +385,7 @@ public final class SplunkRumBuilder {
         return !configFlags.isSubprocessInstrumentationEnabled();
     }
 
-    boolean isBackgroundInstrumentationDeferredUntilForeground(){
+    boolean isBackgroundInstrumentationDeferredUntilForeground() {
         return configFlags.isBackgroundInstrumentationDeferredUntilForeground();
     }
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.splunk.rum;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,16 +24,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
+import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 public class StartTypeAwareSpanStorageTest {
 
@@ -29,20 +43,21 @@ public class StartTypeAwareSpanStorageTest {
     private StartTypeAwareSpanStorage fileProvider;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         when(fileUtils.getSpansDirectory(rootDir)).thenReturn(new File(rootDir, "spans"));
         fileProvider = new StartTypeAwareSpanStorage(visibleScreenTracker, fileUtils, rootDir);
     }
 
     @Test
-    void getPendingFiles_givenInBackground_shouldReturnForegoundOnlySpan(){
+    void getPendingFiles_givenInBackground_shouldReturnForegoundOnlySpan() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
         List<File> spans = fileProvider.getPendingFiles().collect(Collectors.toList());
         assertEquals(0, spans.size());
     }
 
     @Test
-    void getPendingFiles_givenPrevouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending(){
+    void
+            getPendingFiles_givenPrevouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity");
 
         List<File> backgroundFiles = new ArrayList<>();
@@ -53,7 +68,8 @@ public class StartTypeAwareSpanStorageTest {
         backgroundFiles.add(fileToMove);
 
         ArgumentCaptor<File> fileSourceCaptor = ArgumentCaptor.forClass(File.class);
-        when(fileUtils.listSpanFiles(fileSourceCaptor.capture())).thenReturn(backgroundFiles.stream(), backgroundFiles.stream());
+        when(fileUtils.listSpanFiles(fileSourceCaptor.capture()))
+                .thenReturn(backgroundFiles.stream(), backgroundFiles.stream());
 
         List<File> spans = fileProvider.getPendingFiles().collect(Collectors.toList());
 
@@ -68,7 +84,7 @@ public class StartTypeAwareSpanStorageTest {
     }
 
     @Test
-    void getSpanPath_givenInBackground_shouldReturnBackgroundSpanPath(){
+    void getSpanPath_givenInBackground_shouldReturnBackgroundSpanPath() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
 
         File path = fileProvider.provideSpanFile();
@@ -77,12 +93,11 @@ public class StartTypeAwareSpanStorageTest {
     }
 
     @Test
-    void getSpanPath_givenInForeground_shouldReturnForegroundSpanPath(){
+    void getSpanPath_givenInForeground_shouldReturnForegroundSpanPath() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity");
 
         File path = fileProvider.provideSpanFile();
 
         assertFalse(path.getPath().startsWith("files/spans/background/"));
     }
-
 }

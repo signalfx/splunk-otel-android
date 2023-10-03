@@ -1,13 +1,28 @@
+/*
+ * Copyright Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.splunk.rum;
 
+import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
+import io.opentelemetry.sdk.trace.data.SpanData;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
-
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
-import io.opentelemetry.sdk.trace.data.SpanData;
 
 public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
 
@@ -23,9 +38,10 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
     public StartTypeAwareMemorySpanBuffer(VisibleScreenTracker visibleScreenTracker) {
         this.visibleScreenTracker = visibleScreenTracker;
     }
+
     @Override
     public void addAll(Collection<SpanData> spans) {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
+        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null) {
             backgroundSpanBacklog.addAll(spans);
         } else {
             backlog.addAll(spans);
@@ -34,7 +50,7 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
 
     @Override
     public void addFailedSpansToBacklog(SpanData spanData) {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
+        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null) {
             backgroundSpanBacklog.add(spanData);
         } else {
             backlog.add(spanData);
@@ -50,7 +66,7 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
     }
 
     private void drainBackgroundBacklogIfAppIsForeground(List<SpanData> retries) {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() != null){
+        if (visibleScreenTracker.getPreviouslyVisibleScreen() != null) {
             retries.addAll(backgroundSpanBacklog);
             backgroundSpanBacklog.clear();
         }
@@ -69,7 +85,7 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
 
     @Override
     public int size() {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
+        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null) {
             return backgroundSpanBacklog.size();
         } else {
             return backlog.size();

@@ -61,7 +61,7 @@ class ConfigFlags {
         isSubprocessInstrumentationEnabled = false;
     }
 
-    public void enableBackgroundInstrumentationDeferredUntilForeground(){
+    public void enableBackgroundInstrumentationDeferredUntilForeground() {
         isBackgroundInstrumentationDeferredUntilForeground = true;
     }
 
@@ -73,9 +73,10 @@ class ConfigFlags {
         return isSubprocessInstrumentationEnabled;
     }
 
-    boolean isBackgroundInstrumentationDeferredUntilForeground(){
+    boolean isBackgroundInstrumentationDeferredUntilForeground() {
         return isBackgroundInstrumentationDeferredUntilForeground;
     }
+
     boolean isAnrDetectionEnabled() {
         return anrDetectionEnabled;
     }

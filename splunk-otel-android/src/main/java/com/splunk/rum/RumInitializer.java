@@ -127,11 +127,11 @@ class RumInitializer {
                     return tracerProviderBuilder.addSpanProcessor(screenAttributesAppender);
                 });
 
-
         // Add batch span processor
         otelRumBuilder.addTracerProviderCustomizer(
                 (tracerProviderBuilder, app) -> {
-                    SpanExporter zipkinExporter = buildFilteringExporter(currentNetworkProvider, visibleScreenTracker);
+                    SpanExporter zipkinExporter =
+                            buildFilteringExporter(currentNetworkProvider, visibleScreenTracker);
                     initializationEvents.emit("exporterInitialized");
 
                     BatchSpanProcessor batchSpanProcessor =
@@ -219,18 +219,23 @@ class RumInitializer {
 
     @NonNull
     private MemorySpanBuffer constructBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
-        if (builder.isBackgroundInstrumentationDeferredUntilForeground()){
+        if (builder.isBackgroundInstrumentationDeferredUntilForeground()) {
             return new StartTypeAwareMemorySpanBuffer(visibleScreenTracker);
         } else {
             return new DefaultMemorySpanBuffer();
         }
     }
+
     @NonNull
     private SpanStorage constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
-        if (builder.isBackgroundInstrumentationDeferredUntilForeground()){
-            return new StartTypeAwareSpanStorage(visibleScreenTracker, new FileUtils(), application.getApplicationContext().getFilesDir());
+        if (builder.isBackgroundInstrumentationDeferredUntilForeground()) {
+            return new StartTypeAwareSpanStorage(
+                    visibleScreenTracker,
+                    new FileUtils(),
+                    application.getApplicationContext().getFilesDir());
         } else {
-            return new DefaultSpanStorage(new FileUtils(), application.getApplicationContext().getFilesDir());
+            return new DefaultSpanStorage(
+                    new FileUtils(), application.getApplicationContext().getFilesDir());
         }
     }
 
@@ -326,7 +331,9 @@ class RumInitializer {
     }
 
     // visible for testing
-    SpanExporter buildFilteringExporter(CurrentNetworkProvider currentNetworkProvider, VisibleScreenTracker visibleScreenTracker) {
+    SpanExporter buildFilteringExporter(
+            CurrentNetworkProvider currentNetworkProvider,
+            VisibleScreenTracker visibleScreenTracker) {
         SpanExporter exporter = buildExporter(currentNetworkProvider, visibleScreenTracker);
         SpanExporter splunkTranslatedExporter =
                 new SplunkSpanDataModifier(exporter, builder.isReactNativeSupportEnabled());
@@ -335,7 +342,9 @@ class RumInitializer {
         return filteredExporter;
     }
 
-    private SpanExporter buildExporter(CurrentNetworkProvider currentNetworkProvider, VisibleScreenTracker visibleScreenTracker) {
+    private SpanExporter buildExporter(
+            CurrentNetworkProvider currentNetworkProvider,
+            VisibleScreenTracker visibleScreenTracker) {
         if (builder.isDebugEnabled()) {
             // tell the Zipkin exporter to shut up already. We're on mobile, network stuff happens.
             // we'll do our best to hang on to the spans with the wrapping BufferingExporter.
@@ -348,12 +357,12 @@ class RumInitializer {
                     currentNetworkProvider, constructSpanFileProvider(visibleScreenTracker));
         }
 
-        return buildMemoryBufferingThrottledExporter(currentNetworkProvider, constructBacklogProvider(visibleScreenTracker));
+        return buildMemoryBufferingThrottledExporter(
+                currentNetworkProvider, constructBacklogProvider(visibleScreenTracker));
     }
 
     private SpanExporter buildStorageBufferingExporter(
-            CurrentNetworkProvider currentNetworkProvider,
-            SpanStorage spanStorage) {
+            CurrentNetworkProvider currentNetworkProvider, SpanStorage spanStorage) {
         Sender sender = OkHttpSender.newBuilder().endpoint(getEndpoint()).build();
         BandwidthTracker bandwidthTracker = new BandwidthTracker();
 
@@ -381,7 +390,8 @@ class RumInitializer {
         String endpoint = getEndpoint();
         SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
         return ThrottlingExporter.newBuilder(
-                        new MemoryBufferingExporter(currentNetworkProvider, zipkinSpanExporter, backlogProvider))
+                        new MemoryBufferingExporter(
+                                currentNetworkProvider, zipkinSpanExporter, backlogProvider))
                 .categorizeByAttribute(COMPONENT_KEY)
                 .maxSpansInWindow(100)
                 .windowSize(Duration.ofSeconds(30))

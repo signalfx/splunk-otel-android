@@ -1,16 +1,28 @@
+/*
+ * Copyright Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.LOG_TAG;
 
-import android.app.Application;
 import android.util.Log;
-
+import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import java.io.File;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 
 /***
  * Store span files to /span/background/@uniqueId/ for spans created when the app started in the background.
@@ -25,7 +37,8 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
     private final File rootDir;
     private final File spanDir;
 
-    public StartTypeAwareSpanStorage(VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir) {
+    public StartTypeAwareSpanStorage(
+            VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir) {
         this.visibleScreenTracker = visibleScreenTracker;
         this.fileUtils = fileUtils;
         this.rootDir = rootDir;
@@ -44,21 +57,30 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
 
     @Override
     public Stream<File> getPendingFiles() {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() != null){
+        if (visibleScreenTracker.getPreviouslyVisibleScreen() != null) {
             moveBackgroundSpanToPendingSpan();
         }
         return fileUtils.listSpanFiles(spanDir);
     }
 
     private void moveBackgroundSpanToPendingSpan() {
-        fileUtils.listSpanFiles(getCurrentSessionBackgroundFile()).forEach(file -> {
-            File destinationFile = new File(spanDir, file.getName());
-            boolean isMoved = file.renameTo(destinationFile);
-            Log.d(LOG_TAG, "Moved background span " + file.getPath() + " success ? " + isMoved + " for eventual send");
-        });
+        fileUtils
+                .listSpanFiles(getCurrentSessionBackgroundFile())
+                .forEach(
+                        file -> {
+                            File destinationFile = new File(spanDir, file.getName());
+                            boolean isMoved = file.renameTo(destinationFile);
+                            Log.d(
+                                    LOG_TAG,
+                                    "Moved background span "
+                                            + file.getPath()
+                                            + " success ? "
+                                            + isMoved
+                                            + " for eventual send");
+                        });
     }
 
-    private File getCurrentSessionBackgroundFile(){
+    private File getCurrentSessionBackgroundFile() {
         return new File(spanDir, "background/" + uniqueId);
     }
 
@@ -67,8 +89,8 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         return ensureDirExist(getSpanFile());
     }
 
-    private File getSpanFile(){
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null){
+    private File getSpanFile() {
+        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null) {
             return getCurrentSessionBackgroundFile();
         }
         return spanDir;
@@ -78,7 +100,9 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         if (pathToReturn.exists() || pathToReturn.mkdirs()) {
             return pathToReturn;
         }
-        Log.e(SplunkRum.LOG_TAG, "Error creating path " + pathToReturn + " for span buffer, defaulting to parent");
+        Log.e(
+                SplunkRum.LOG_TAG,
+                "Error creating path " + pathToReturn + " for span buffer, defaulting to parent");
         return rootDir;
     }
 }
