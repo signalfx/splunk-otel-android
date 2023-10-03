@@ -16,16 +16,13 @@
 
 package com.splunk.android.sample;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-
 import com.splunk.rum.SplunkRum;
-
 import io.opentelemetry.api.common.Attributes;
 
 public class DemoWorker extends Worker {
