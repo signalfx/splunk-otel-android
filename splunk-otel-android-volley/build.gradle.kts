@@ -48,7 +48,7 @@ val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alp
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.navigation:navigation-fragment:2.7.3")
+    implementation("androidx.navigation:navigation-fragment:2.7.4")
     compileOnly("com.android.volley:volley:1.2.1")
 
     implementation(project(":splunk-otel-android"))
