@@ -86,7 +86,7 @@ class FileUtils {
             return Stream.empty();
         }
         File[] files = directory.listFiles();
-        if (files == null){
+        if (files == null) {
             return Stream.empty();
         }
         Stream<File> directories = Stream.of(files).filter(File::isDirectory);
@@ -94,9 +94,9 @@ class FileUtils {
         return Stream.concat(plainFiles, directories.flatMap(this::listFilesRecursively));
     }
 
-    Stream<File> listDirectories(File directory){
+    Stream<File> listDirectories(File directory) {
         File[] files = directory.listFiles();
-        if (files == null){
+        if (files == null) {
             return Stream.empty();
         }
         return Stream.of(files).filter(File::isDirectory);

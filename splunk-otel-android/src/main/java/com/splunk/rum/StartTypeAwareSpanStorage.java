@@ -44,7 +44,7 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         this.rootDir = rootDir;
         this.spanDir = fileUtils.getSpansDirectory(rootDir);
         this.uniqueId = UUID.randomUUID().toString();
-        //if new id then background span directory with old ids can be deleted
+        // if new id then background span directory with old ids can be deleted
         cleanUpUnsentBackgroundSpan();
     }
 
@@ -67,7 +67,9 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
     }
 
     private boolean isAppForeground() {
-        return (visibleScreenTracker.getCurrentlyVisibleScreen() != null && !visibleScreenTracker.getCurrentlyVisibleScreen().equals("unknown")) || visibleScreenTracker.getPreviouslyVisibleScreen() != null;
+        return (visibleScreenTracker.getCurrentlyVisibleScreen() != null
+                        && !visibleScreenTracker.getCurrentlyVisibleScreen().equals("unknown"))
+                || visibleScreenTracker.getPreviouslyVisibleScreen() != null;
     }
 
     private void moveBackgroundSpanToPendingSpan() {
@@ -98,14 +100,10 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
 
     private File getSpanFile() {
         if (!isAppForeground()) {
-            Log.d(
-                    LOG_TAG,
-                    "Creating background span " + uniqueId);
+            Log.d(LOG_TAG, "Creating background span " + uniqueId);
             return getCurrentSessionBackgroundFile();
         }
-        Log.d(
-                LOG_TAG,
-                "Creating foreground span " + uniqueId);
+        Log.d(LOG_TAG, "Creating foreground span " + uniqueId);
         return spanDir;
     }
 
@@ -119,17 +117,20 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         return rootDir;
     }
 
-    private void cleanUpUnsentBackgroundSpan(){
-        fileUtils.listDirectories(new File(spanDir, "background/"))
-                .filter(file -> {
-                    String path = file.getPath();
-                    String pathId = path.substring(path.lastIndexOf("/") + 1);
-                    return !pathId.equals(uniqueId);
-                })
-                .forEach(file -> {
-                    Log.d(SplunkRum.LOG_TAG, "Cleaning up " + file.getPath());
-                    fileUtils.listFilesRecursively(file).forEach(fileUtils::safeDelete);
-                    fileUtils.safeDelete(file);
-                });
+    private void cleanUpUnsentBackgroundSpan() {
+        fileUtils
+                .listDirectories(new File(spanDir, "background/"))
+                .filter(
+                        file -> {
+                            String path = file.getPath();
+                            String pathId = path.substring(path.lastIndexOf("/") + 1);
+                            return !pathId.equals(uniqueId);
+                        })
+                .forEach(
+                        file -> {
+                            Log.d(SplunkRum.LOG_TAG, "Cleaning up " + file.getPath());
+                            fileUtils.listFilesRecursively(file).forEach(fileUtils::safeDelete);
+                            fileUtils.safeDelete(file);
+                        });
     }
 }

@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -52,7 +50,7 @@ public class StartTypeAwareSpanStorageTest {
     }
 
     @Test
-    void constructor_onNewId_shouldCleanOldBackgroundFiles(){
+    void constructor_onNewId_shouldCleanOldBackgroundFiles() {
         File file = mock();
         when(file.getPath()).thenReturn("files/spans/background/123");
         when(fileUtils.listDirectories(any())).thenReturn(Stream.of(file));
@@ -73,7 +71,8 @@ public class StartTypeAwareSpanStorageTest {
     }
 
     @Test
-    void getPendingFiles_givenPrevouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending() {
+    void
+            getPendingFiles_givenPrevouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity");
         when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn("MainActivity");
 
