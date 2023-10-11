@@ -94,6 +94,14 @@ class FileUtils {
         return Stream.concat(plainFiles, directories.flatMap(this::listFilesRecursively));
     }
 
+    Stream<File> listDirectories(File directory){
+        File[] files = directory.listFiles();
+        if (files == null){
+            return Stream.empty();
+        }
+        return Stream.of(files).filter(File::isDirectory);
+    }
+
     Stream<File> listSpanFiles(File dir) {
         return listFiles(dir)
                 .filter(this::isRegularFile)

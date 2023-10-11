@@ -33,7 +33,7 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
 
     private final VisibleScreenTracker visibleScreenTracker;
     private final FileUtils fileUtils;
-    private final String uniqueId = UUID.randomUUID().toString();
+    private final String uniqueId;
     private final File rootDir;
     private final File spanDir;
 
@@ -43,6 +43,9 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         this.fileUtils = fileUtils;
         this.rootDir = rootDir;
         this.spanDir = fileUtils.getSpansDirectory(rootDir);
+        this.uniqueId = UUID.randomUUID().toString();
+        //if new id then background span directory with old ids can be deleted
+        cleanUpUnsentBackgroundSpan();
     }
 
     @Override
@@ -114,5 +117,19 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
                 SplunkRum.LOG_TAG,
                 "Error creating path " + pathToReturn + " for span buffer, defaulting to parent");
         return rootDir;
+    }
+
+    private void cleanUpUnsentBackgroundSpan(){
+        fileUtils.listDirectories(new File(spanDir, "background/"))
+                .filter(file -> {
+                    String path = file.getPath();
+                    String pathId = path.substring(path.lastIndexOf("/") + 1);
+                    return !pathId.equals(uniqueId);
+                })
+                .forEach(file -> {
+                    Log.d(SplunkRum.LOG_TAG, "Cleaning up " + file.getPath());
+                    fileUtils.listFilesRecursively(file).forEach(fileUtils::safeDelete);
+                    fileUtils.safeDelete(file);
+                });
     }
 }
