@@ -57,10 +57,14 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
 
     @Override
     public Stream<File> getPendingFiles() {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() != null) {
+        if (isAppForeground()) {
             moveBackgroundSpanToPendingSpan();
         }
         return fileUtils.listSpanFiles(spanDir);
+    }
+
+    private boolean isAppForeground() {
+        return (visibleScreenTracker.getCurrentlyVisibleScreen() != null && !visibleScreenTracker.getCurrentlyVisibleScreen().equals("unknown")) || visibleScreenTracker.getPreviouslyVisibleScreen() != null;
     }
 
     private void moveBackgroundSpanToPendingSpan() {
@@ -90,9 +94,15 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
     }
 
     private File getSpanFile() {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null) {
+        if (!isAppForeground()) {
+            Log.d(
+                    LOG_TAG,
+                    "Creating background span " + uniqueId);
             return getCurrentSessionBackgroundFile();
         }
+        Log.d(
+                LOG_TAG,
+                "Creating foreground span " + uniqueId);
         return spanDir;
     }
 
