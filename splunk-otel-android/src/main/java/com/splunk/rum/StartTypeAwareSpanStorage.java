@@ -37,7 +37,13 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
     private final File rootDir;
     private final File spanDir;
 
-    public StartTypeAwareSpanStorage(
+    static StartTypeAwareSpanStorage create(VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir){
+        StartTypeAwareSpanStorage startTypeAwareSpanStorage = new StartTypeAwareSpanStorage(visibleScreenTracker, fileUtils, rootDir);
+        startTypeAwareSpanStorage.cleanupUnsentBackgroundSpans();
+        return startTypeAwareSpanStorage;
+    }
+
+    private StartTypeAwareSpanStorage(
             VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir) {
         this.visibleScreenTracker = visibleScreenTracker;
         this.fileUtils = fileUtils;

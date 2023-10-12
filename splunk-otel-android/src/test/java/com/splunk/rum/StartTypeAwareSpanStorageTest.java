@@ -46,17 +46,17 @@ public class StartTypeAwareSpanStorageTest {
     @BeforeEach
     void setup() {
         when(fileUtils.getSpansDirectory(rootDir)).thenReturn(new File(rootDir, "spans"));
-        fileProvider = new StartTypeAwareSpanStorage(visibleScreenTracker, fileUtils, rootDir);
+        fileProvider = StartTypeAwareSpanStorage.create(visibleScreenTracker, fileUtils, rootDir);
     }
 
     @Test
-    void constructor_onNewId_shouldCleanOldBackgroundFiles() {
+    void create_onNewId_shouldCleanOldBackgroundFiles() {
         File file = mock();
         when(file.getPath()).thenReturn("files/spans/background/123");
         when(fileUtils.listDirectories(any())).thenReturn(Stream.of(file));
         ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
 
-        fileProvider = new StartTypeAwareSpanStorage(visibleScreenTracker, fileUtils, rootDir);
+        fileProvider = StartTypeAwareSpanStorage.create(visibleScreenTracker, fileUtils, rootDir);
 
         verify(fileUtils).safeDelete(fileArgumentCaptor.capture());
         assertEquals(file.getPath(), fileArgumentCaptor.getValue().getPath());

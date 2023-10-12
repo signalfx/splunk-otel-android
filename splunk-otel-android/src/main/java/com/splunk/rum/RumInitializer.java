@@ -229,7 +229,7 @@ class RumInitializer {
     @NonNull
     private SpanStorage constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
         if (builder.isBackgroundInstrumentationDeferredUntilForeground()) {
-            return new StartTypeAwareSpanStorage(
+            return StartTypeAwareSpanStorage.create(
                     visibleScreenTracker,
                     new FileUtils(),
                     application.getApplicationContext().getFilesDir());
