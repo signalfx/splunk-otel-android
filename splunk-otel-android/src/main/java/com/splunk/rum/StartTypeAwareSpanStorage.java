@@ -126,8 +126,8 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         fileUtils
                 .listDirectories(new File(spanDir, "background/"))
                 .filter(
-                        file -> {
-                            String path = file.getPath();
+                        dir -> {
+                            String path = dir.getPath();
                             String pathId = path.substring(path.lastIndexOf("/") + 1);
                             return !pathId.equals(uniqueId);
                         })
