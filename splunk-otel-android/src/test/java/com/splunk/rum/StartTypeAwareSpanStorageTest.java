@@ -71,9 +71,8 @@ public class StartTypeAwareSpanStorageTest {
     }
 
     @Test
-    void
-            getPendingFiles_givenPrevouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending() {
-        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity");
+    void getPendingFiles_givenPrevouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending() {
+        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("LauncherActivity");
         when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn("MainActivity");
 
         List<File> backgroundFiles = new ArrayList<>();
@@ -111,7 +110,7 @@ public class StartTypeAwareSpanStorageTest {
 
     @Test
     void getSpanPath_givenInForeground_shouldReturnForegroundSpanPath() {
-        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("MainActivity");
+        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("LauncherActivity");
         when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn("MainActivity");
 
         File path = fileProvider.provideSpanFile();
