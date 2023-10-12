@@ -45,7 +45,7 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         this.spanDir = fileUtils.getSpansDirectory(rootDir);
         this.uniqueId = UUID.randomUUID().toString();
         // if new id then background span directory with old ids can be deleted
-        cleanUpUnsentBackgroundSpan();
+        cleanupUnsentBackgroundSpans();
     }
 
     @Override
@@ -117,7 +117,7 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         return rootDir;
     }
 
-    private void cleanUpUnsentBackgroundSpan() {
+    private void cleanupUnsentBackgroundSpans() {
         fileUtils
                 .listDirectories(new File(spanDir, "background/"))
                 .filter(
