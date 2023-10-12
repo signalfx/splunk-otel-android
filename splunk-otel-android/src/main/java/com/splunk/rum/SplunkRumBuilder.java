@@ -381,7 +381,7 @@ public final class SplunkRumBuilder {
         return configFlags.isReactNativeSupportEnabled();
     }
 
-    boolean isSubprocessInstrumentationEnabled() {
+    boolean isSubprocessInstrumentationDisabled() {
         return !configFlags.isSubprocessInstrumentationEnabled();
     }
 
