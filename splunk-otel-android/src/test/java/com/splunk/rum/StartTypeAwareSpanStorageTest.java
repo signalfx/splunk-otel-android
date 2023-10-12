@@ -71,7 +71,8 @@ public class StartTypeAwareSpanStorageTest {
     }
 
     @Test
-    void getPendingFiles_givenPrevouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending() {
+    void
+            getPendingFiles_givenPrevouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("LauncherActivity");
         when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn("MainActivity");
 
