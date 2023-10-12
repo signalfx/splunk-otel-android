@@ -132,10 +132,10 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
                             return !pathId.equals(uniqueId);
                         })
                 .forEach(
-                        file -> {
-                            Log.d(SplunkRum.LOG_TAG, "Cleaning up " + file.getPath());
-                            fileUtils.listFilesRecursively(file).forEach(fileUtils::safeDelete);
-                            fileUtils.safeDelete(file);
+                        dir -> {
+                            Log.d(SplunkRum.LOG_TAG, "Cleaning up " + dir.getPath());
+                            fileUtils.listFilesRecursively(dir).forEach(fileUtils::safeDelete);
+                            fileUtils.safeDelete(dir);
                         });
     }
 }
