@@ -26,8 +26,8 @@ class ConfigFlags {
     private boolean networkMonitorEnabled = true;
     private boolean anrDetectionEnabled = true;
     private boolean slowRenderingDetectionEnabled = true;
-    private boolean isSubprocessInstrumentationEnabled = true;
-    private boolean isBackgroundInstrumentationDeferredUntilForeground = false;
+    private boolean subprocessInstrumentationEnabled = true;
+    private boolean backgroundInstrumentationDeferredUntilForeground = false;
 
     void enableDebug() {
         debugEnabled = true;
@@ -58,11 +58,11 @@ class ConfigFlags {
     }
 
     public void disableSubprocessInstrumentation() {
-        isSubprocessInstrumentationEnabled = false;
+        subprocessInstrumentationEnabled = false;
     }
 
     public void enableBackgroundInstrumentationDeferredUntilForeground() {
-        isBackgroundInstrumentationDeferredUntilForeground = true;
+        backgroundInstrumentationDeferredUntilForeground = true;
     }
 
     boolean isDebugEnabled() {
@@ -70,11 +70,11 @@ class ConfigFlags {
     }
 
     boolean isSubprocessInstrumentationEnabled() {
-        return isSubprocessInstrumentationEnabled;
+        return subprocessInstrumentationEnabled;
     }
 
     boolean isBackgroundInstrumentationDeferredUntilForeground() {
-        return isBackgroundInstrumentationDeferredUntilForeground;
+        return backgroundInstrumentationDeferredUntilForeground;
     }
 
     boolean isAnrDetectionEnabled() {
