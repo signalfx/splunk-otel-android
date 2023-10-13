@@ -47,7 +47,7 @@ public final class SplunkRumBuilder {
     int maxUsageMegabytes = DEFAULT_MAX_STORAGE_USE_MB;
     boolean sessionBasedSamplerEnabled = false;
     double sessionBasedSamplerRatio = 1.0;
-    boolean isBackgroundProcess = false;
+    boolean isSubprocess = false;
 
     /**
      * Sets the application name that will be used to identify your application in the Splunk RUM
@@ -324,7 +324,7 @@ public final class SplunkRumBuilder {
      * @return {@code this}
      */
     public SplunkRumBuilder disableSubprocessInstrumentation(String applicationId) {
-        isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
+        isSubprocess = SubprocessDetector.isSubprocess(applicationId);
         configFlags.disableSubprocessInstrumentation();
         return this;
     }

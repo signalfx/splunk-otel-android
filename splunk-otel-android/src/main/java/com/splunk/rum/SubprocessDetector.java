@@ -22,11 +22,11 @@ import android.os.Build;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-final class BackgroundProcessDetector {
+final class SubprocessDetector {
 
-    private BackgroundProcessDetector() {}
+    private SubprocessDetector() {}
 
-    static Boolean isBackgroundProcess(String applicationId) {
+    static Boolean isSubprocess(String applicationId) {
         String applicationProcessName = getApplicationProcessName();
         // If application Id is same as application processName, the app is visible to user.
         // Using inverted condition to determine background processes.

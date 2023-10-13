@@ -100,7 +100,7 @@ public class SplunkRum {
             return INSTANCE;
         }
 
-        if (builder.isSubprocessInstrumentationDisabled() && builder.isBackgroundProcess) {
+        if (builder.isSubprocessInstrumentationDisabled() && builder.isSubprocess) {
             INSTANCE = SplunkRum.noop();
         } else {
             INSTANCE =
