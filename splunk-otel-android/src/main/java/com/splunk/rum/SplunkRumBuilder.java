@@ -316,14 +316,14 @@ public final class SplunkRumBuilder {
     }
 
     /**
-     * Disables the instrumentation of background process feature. If enabled, the background
-     * processes will be instrumented.
+     * Disables the instrumentation of subprocess feature. If enabled,
+     * subprocesses will be instrumented.
      *
      * <p>This feature is enabled by default. You can disable it by calling this method.
      *
      * @return {@code this}
      */
-    public SplunkRumBuilder disableBackgroundTaskReporting(String applicationId) {
+    public SplunkRumBuilder disableSubprocessInstrumentation(String applicationId) {
         isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
         configFlags.disableSubprocessInstrumentation();
         return this;
