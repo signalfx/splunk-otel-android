@@ -22,6 +22,18 @@ import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.semconv.SemanticAttributes.EXCEPTION_MESSAGE;
 import static io.opentelemetry.semconv.SemanticAttributes.EXCEPTION_STACKTRACE;
 import static io.opentelemetry.semconv.SemanticAttributes.EXCEPTION_TYPE;
+import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_ICC;
+import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_MCC;
+import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_MNC;
+import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_NAME;
+import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CONNECTION_SUBTYPE;
+import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CONNECTION_TYPE;
+import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_ICC;
+import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_MCC;
+import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_MNC;
+import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_NAME;
+import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CONNECTION_SUBTYPE;
+import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CONNECTION_TYPE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
@@ -103,6 +115,9 @@ final class SplunkSpanDataModifier implements SpanExporter {
             spanContext = original.getSpanContext();
         }
 
+        // Convert new net semconv to old
+        modifiedAttributes = downgradeNetworkAttrNames(original.getAttributes(), modifiedAttributes);
+
         // zipkin eats the event attributes that are recorded by default, so we need to convert
         // the exception event to span attributes
         for (EventData event : original.getEvents()) {
@@ -127,6 +142,19 @@ final class SplunkSpanDataModifier implements SpanExporter {
         }
 
         return new SplunkSpan(original, spanContext, modifiedEvents, modifiedAttributes.build());
+    }
+
+    // At least until we can leverage the new names...
+    private AttributesBuilder downgradeNetworkAttrNames(Attributes originalAttributes,
+                                                        AttributesBuilder attributes) {
+        return AttributeReplacer.with(originalAttributes, attributes)
+                .update(NETWORK_CONNECTION_TYPE, NET_HOST_CONNECTION_TYPE)
+                .update(NETWORK_CONNECTION_SUBTYPE, NET_HOST_CONNECTION_SUBTYPE)
+                .update(NETWORK_CARRIER_ICC, NET_HOST_CARRIER_ICC)
+                .update(NETWORK_CARRIER_MCC, NET_HOST_CARRIER_MCC)
+                .update(NETWORK_CARRIER_MNC, NET_HOST_CARRIER_MNC)
+                .update(NETWORK_CARRIER_NAME, NET_HOST_CARRIER_NAME)
+                .finish();
     }
 
     private SpanContext extractReactNativeIdsIfPresent(SpanData original) {
@@ -228,6 +256,33 @@ final class SplunkSpanDataModifier implements SpanExporter {
         @Override
         public int getTotalAttributeCount() {
             return modifiedAttributes.size();
+        }
+    }
+
+    private static class AttributeReplacer {
+        private final Attributes original;
+        private final AttributesBuilder attributes;
+
+        private static AttributeReplacer with(Attributes original, AttributesBuilder attributes) {
+            return new AttributeReplacer(original, attributes);
+        }
+
+        private AttributeReplacer(Attributes original, AttributesBuilder attributes) {
+            this.original = original;
+            this.attributes = attributes;
+        }
+
+        <T> AttributeReplacer update(AttributeKey<T> currentName, AttributeKey<T> replacementName){
+            T value = original.get(currentName);
+            if(value != null){
+                attributes.remove(currentName);
+                attributes.put(replacementName, value);
+            }
+            return this;
+        }
+
+        AttributesBuilder finish(){
+            return attributes;
         }
     }
 }
