@@ -41,16 +41,18 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
 
     @Override
     public void addAll(Collection<SpanData> spans) {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null) {
+        if (!isAppForeground()) {
             backgroundSpanBacklog.addAll(spans);
         } else {
+            backlog.addAll(backgroundSpanBacklog);
+            backgroundSpanBacklog.clear();
             backlog.addAll(spans);
         }
     }
 
     @Override
     public void addFailedSpansToBacklog(SpanData spanData) {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null) {
+        if (!isAppForeground()) {
             backgroundSpanBacklog.add(spanData);
         } else {
             backlog.add(spanData);
@@ -66,7 +68,7 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
     }
 
     private void drainBackgroundBacklogIfAppIsForeground(List<SpanData> retries) {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() != null) {
+        if (isAppForeground()) {
             retries.addAll(backgroundSpanBacklog);
             backgroundSpanBacklog.clear();
         }
@@ -85,10 +87,16 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
 
     @Override
     public int size() {
-        if (visibleScreenTracker.getPreviouslyVisibleScreen() == null) {
+        if (!isAppForeground()) {
             return backgroundSpanBacklog.size();
         } else {
             return backlog.size();
         }
+    }
+
+    private boolean isAppForeground() {
+        return (visibleScreenTracker.getCurrentlyVisibleScreen() != null
+                && !visibleScreenTracker.getCurrentlyVisibleScreen().equals("unknown"))
+                || visibleScreenTracker.getPreviouslyVisibleScreen() != null;
     }
 }

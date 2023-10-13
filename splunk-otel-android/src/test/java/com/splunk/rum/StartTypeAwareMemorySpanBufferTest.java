@@ -40,6 +40,7 @@ public class StartTypeAwareMemorySpanBufferTest {
             spans.add(mock(SpanData.class));
         }
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
+        when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn(null);
 
         memorySpanBuffer.addAll(spans);
 
@@ -54,9 +55,12 @@ public class StartTypeAwareMemorySpanBufferTest {
         for (int i = 0; i < 10; i++) {
             spans.add(mock(SpanData.class));
         }
-        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null, "MainActivity");
+        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null,null, "MainActivity");
+        when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn(null, null,"MainFragment");
 
         memorySpanBuffer.addAll(spans);
+        assertEquals(0, memorySpanBuffer.drain().size());
+
         memorySpanBuffer.addAll(spans);
 
         assertEquals(20, memorySpanBuffer.drain().size());
@@ -65,6 +69,7 @@ public class StartTypeAwareMemorySpanBufferTest {
     @Test
     void addFailedSpansToBacklog_givenInBackground_shouldAddFailedSpanToBackgroundBacklog() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
+        when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn(null);
 
         memorySpanBuffer.addFailedSpansToBacklog(mock(SpanData.class));
 
@@ -78,6 +83,7 @@ public class StartTypeAwareMemorySpanBufferTest {
             spans.add(mock(SpanData.class));
         }
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null, "MainActivity");
+        when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn(null, "MainFragment");
 
         spans.forEach(memorySpanBuffer::addFailedSpansToBacklog);
 
