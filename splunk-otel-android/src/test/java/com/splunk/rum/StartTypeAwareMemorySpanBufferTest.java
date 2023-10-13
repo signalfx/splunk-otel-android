@@ -55,8 +55,10 @@ public class StartTypeAwareMemorySpanBufferTest {
         for (int i = 0; i < 10; i++) {
             spans.add(mock(SpanData.class));
         }
-        when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null,null, "MainActivity");
-        when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn(null, null,"MainFragment");
+        when(visibleScreenTracker.getPreviouslyVisibleScreen())
+                .thenReturn(null, null, "MainActivity");
+        when(visibleScreenTracker.getCurrentlyVisibleScreen())
+                .thenReturn(null, null, "MainFragment");
 
         memorySpanBuffer.addAll(spans);
         assertEquals(0, memorySpanBuffer.drain().size());

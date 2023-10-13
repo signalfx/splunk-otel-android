@@ -96,7 +96,7 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
 
     private boolean isAppForeground() {
         return (visibleScreenTracker.getCurrentlyVisibleScreen() != null
-                && !visibleScreenTracker.getCurrentlyVisibleScreen().equals("unknown"))
+                        && !visibleScreenTracker.getCurrentlyVisibleScreen().equals("unknown"))
                 || visibleScreenTracker.getPreviouslyVisibleScreen() != null;
     }
 }

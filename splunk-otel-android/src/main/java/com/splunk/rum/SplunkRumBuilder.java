@@ -316,8 +316,8 @@ public final class SplunkRumBuilder {
     }
 
     /**
-     * Disables the instrumentation of subprocess feature. If enabled,
-     * subprocesses will be instrumented.
+     * Disables the instrumentation of subprocess feature. If enabled, subprocesses will be
+     * instrumented.
      *
      * <p>This feature is enabled by default. You can disable it by calling this method.
      *
