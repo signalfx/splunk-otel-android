@@ -25,7 +25,7 @@ import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import io.opentelemetry.sdk.testing.junit4.OpenTelemetryRule;
 import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
