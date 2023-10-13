@@ -116,7 +116,8 @@ final class SplunkSpanDataModifier implements SpanExporter {
         }
 
         // Convert new net semconv to old
-        modifiedAttributes = downgradeNetworkAttrNames(original.getAttributes(), modifiedAttributes);
+        modifiedAttributes =
+                downgradeNetworkAttrNames(original.getAttributes(), modifiedAttributes);
 
         // zipkin eats the event attributes that are recorded by default, so we need to convert
         // the exception event to span attributes
@@ -145,8 +146,8 @@ final class SplunkSpanDataModifier implements SpanExporter {
     }
 
     // At least until we can leverage the new names...
-    private AttributesBuilder downgradeNetworkAttrNames(Attributes originalAttributes,
-                                                        AttributesBuilder attributes) {
+    private AttributesBuilder downgradeNetworkAttrNames(
+            Attributes originalAttributes, AttributesBuilder attributes) {
         return AttributeReplacer.with(originalAttributes, attributes)
                 .update(NETWORK_CONNECTION_TYPE, NET_HOST_CONNECTION_TYPE)
                 .update(NETWORK_CONNECTION_SUBTYPE, NET_HOST_CONNECTION_SUBTYPE)
@@ -272,16 +273,16 @@ final class SplunkSpanDataModifier implements SpanExporter {
             this.attributes = attributes;
         }
 
-        <T> AttributeReplacer update(AttributeKey<T> currentName, AttributeKey<T> replacementName){
+        <T> AttributeReplacer update(AttributeKey<T> currentName, AttributeKey<T> replacementName) {
             T value = original.get(currentName);
-            if(value != null){
+            if (value != null) {
                 attributes.remove(currentName);
                 attributes.put(replacementName, value);
             }
             return this;
         }
 
-        AttributesBuilder finish(){
+        AttributesBuilder finish() {
             return attributes;
         }
     }
