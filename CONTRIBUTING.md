@@ -74,7 +74,7 @@ GitHub provides additional documentation on [forking a
 repository](https://help.github.com/articles/fork-a-repo/) and [creating a pull
 request](https://help.github.com/articles/creating-a-pull-request/).
 
-You may be asked to sign our
+Before your contribution can be accepted, you will be asked to sign our
 [Splunk Contributor License Agreement (CLA)](https://github.com/splunk/cla-agreement/blob/main/CLA.md).
 
 ## Finding contributions to work on
