@@ -21,11 +21,11 @@ import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import io.opentelemetry.android.export.SpanDataModifier;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.SemanticAttributes;
 
 /**
  * This class hold {@link AttributeKey}s for standard RUM-related attributes that are not in the
- * OpenTelemetry {@link io.opentelemetry.semconv.trace.attributes.SemanticAttributes} definitions.
+ * OpenTelemetry {@link io.opentelemetry.semconv.SemanticAttributes} definitions.
  */
 public final class StandardAttributes {
     /**

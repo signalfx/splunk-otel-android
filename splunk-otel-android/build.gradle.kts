@@ -41,6 +41,7 @@ android {
 
 val otelVersion = "1.30.0-SNAPSHOT"
 val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
+val otelSemconvVersion = "1.21.0-alpha"
 
 dependencies {
     api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
@@ -56,7 +57,7 @@ dependencies {
     implementation("io.zipkin.reporter2:zipkin-sender-okhttp3")
     implementation("io.opentelemetry:opentelemetry-exporter-logging")
 
-    implementation("io.opentelemetry:opentelemetry-semconv")
+    implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
     implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0")
 
     api("io.opentelemetry:opentelemetry-api")
