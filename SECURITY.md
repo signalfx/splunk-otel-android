@@ -10,8 +10,8 @@ https://www.splunk.com/en_us/product-security/report.html).
 
 This project relies on a variety of external dependencies.
 These dependencies are monitored by
-[Dependabot](https://docs.github.com/en/code-security/supply-chain-security/configuring-dependabot-security-updates).
-Dependencies are [checked
+[Renovate](https://github.com/apps/renovate).
+Renovate checks for Dependencies are [checked
 daily](https://github.com/signalfx/splunk-otel-java/blob/main/.github/dependabot.yml)
 and associated pull requests are opened automatically. Upgrading to the [latest
 release](https://github.com/signalfx/splunk-otel-android/releases)
