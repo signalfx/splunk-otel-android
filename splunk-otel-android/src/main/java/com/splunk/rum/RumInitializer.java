@@ -57,7 +57,6 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import java.io.File;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.function.Function;
@@ -131,7 +130,8 @@ class RumInitializer {
         // Add batch span processor
         otelRumBuilder.addTracerProviderCustomizer(
                 (tracerProviderBuilder, app) -> {
-                    SpanExporter zipkinExporter = buildFilteringExporter(currentNetworkProvider);
+                    SpanExporter zipkinExporter =
+                            buildFilteringExporter(currentNetworkProvider, visibleScreenTracker);
                     initializationEvents.emit("exporterInitialized");
 
                     BatchSpanProcessor batchSpanProcessor =
@@ -215,6 +215,28 @@ class RumInitializer {
                 openTelemetryRum.getOpenTelemetry().getTracer(RUM_TRACER_NAME));
 
         return new SplunkRum(openTelemetryRum, globalAttributesSpanAppender);
+    }
+
+    @NonNull
+    private MemorySpanBuffer constructBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
+        if (builder.isBackgroundInstrumentationDeferredUntilForeground()) {
+            return new StartTypeAwareMemorySpanBuffer(visibleScreenTracker);
+        } else {
+            return new DefaultMemorySpanBuffer();
+        }
+    }
+
+    @NonNull
+    private SpanStorage constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
+        if (builder.isBackgroundInstrumentationDeferredUntilForeground()) {
+            return StartTypeAwareSpanStorage.create(
+                    visibleScreenTracker,
+                    new FileUtils(),
+                    application.getApplicationContext().getFilesDir());
+        } else {
+            return new DefaultSpanStorage(
+                    new FileUtils(), application.getApplicationContext().getFilesDir());
+        }
     }
 
     private void installLifecycleInstrumentations(
@@ -309,8 +331,10 @@ class RumInitializer {
     }
 
     // visible for testing
-    SpanExporter buildFilteringExporter(CurrentNetworkProvider currentNetworkProvider) {
-        SpanExporter exporter = buildExporter(currentNetworkProvider);
+    SpanExporter buildFilteringExporter(
+            CurrentNetworkProvider currentNetworkProvider,
+            VisibleScreenTracker visibleScreenTracker) {
+        SpanExporter exporter = buildExporter(currentNetworkProvider, visibleScreenTracker);
         SpanExporter splunkTranslatedExporter =
                 new SplunkSpanDataModifier(exporter, builder.isReactNativeSupportEnabled());
         SpanExporter filteredExporter = builder.decorateWithSpanFilter(splunkTranslatedExporter);
@@ -318,7 +342,9 @@ class RumInitializer {
         return filteredExporter;
     }
 
-    private SpanExporter buildExporter(CurrentNetworkProvider currentNetworkProvider) {
+    private SpanExporter buildExporter(
+            CurrentNetworkProvider currentNetworkProvider,
+            VisibleScreenTracker visibleScreenTracker) {
         if (builder.isDebugEnabled()) {
             // tell the Zipkin exporter to shut up already. We're on mobile, network stuff happens.
             // we'll do our best to hang on to the spans with the wrapping BufferingExporter.
@@ -327,16 +353,17 @@ class RumInitializer {
         }
 
         if (builder.isDiskBufferingEnabled()) {
-            return buildStorageBufferingExporter(currentNetworkProvider);
+            return buildStorageBufferingExporter(
+                    currentNetworkProvider, constructSpanFileProvider(visibleScreenTracker));
         }
 
-        return buildMemoryBufferingThrottledExporter(currentNetworkProvider);
+        return buildMemoryBufferingThrottledExporter(
+                currentNetworkProvider, constructBacklogProvider(visibleScreenTracker));
     }
 
     private SpanExporter buildStorageBufferingExporter(
-            CurrentNetworkProvider currentNetworkProvider) {
+            CurrentNetworkProvider currentNetworkProvider, SpanStorage spanStorage) {
         Sender sender = OkHttpSender.newBuilder().endpoint(getEndpoint()).build();
-        File spanFilesPath = FileUtils.getSpansDirectory(application);
         BandwidthTracker bandwidthTracker = new BandwidthTracker();
 
         FileSender fileSender =
@@ -346,11 +373,11 @@ class RumInitializer {
                         .connectionUtil(currentNetworkProvider)
                         .fileSender(fileSender)
                         .bandwidthTracker(bandwidthTracker)
-                        .spanFilesPath(spanFilesPath)
+                        .spanFileProvider(spanStorage)
                         .build();
         diskToZipkinExporter.startPolling();
 
-        return getToDiskExporter();
+        return getToDiskExporter(spanStorage);
     }
 
     @NonNull
@@ -359,22 +386,23 @@ class RumInitializer {
     }
 
     private SpanExporter buildMemoryBufferingThrottledExporter(
-            CurrentNetworkProvider currentNetworkProvider) {
+            CurrentNetworkProvider currentNetworkProvider, MemorySpanBuffer backlogProvider) {
         String endpoint = getEndpoint();
         SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
         return ThrottlingExporter.newBuilder(
-                        new MemoryBufferingExporter(currentNetworkProvider, zipkinSpanExporter))
+                        new MemoryBufferingExporter(
+                                currentNetworkProvider, zipkinSpanExporter, backlogProvider))
                 .categorizeByAttribute(COMPONENT_KEY)
                 .maxSpansInWindow(100)
                 .windowSize(Duration.ofSeconds(30))
                 .build();
     }
 
-    SpanExporter getToDiskExporter() {
+    SpanExporter getToDiskExporter(SpanStorage spanStorage) {
         return new LazyInitSpanExporter(
                 () ->
                         ZipkinWriteToDiskExporterFactory.create(
-                                application, builder.maxUsageMegabytes));
+                                builder.maxUsageMegabytes, spanStorage));
     }
 
     // visible for testing

@@ -47,7 +47,7 @@ public final class SplunkRumBuilder {
     int maxUsageMegabytes = DEFAULT_MAX_STORAGE_USE_MB;
     boolean sessionBasedSamplerEnabled = false;
     double sessionBasedSamplerRatio = 1.0;
-    boolean isBackgroundProcess = false;
+    boolean isSubprocess = false;
 
     /**
      * Sets the application name that will be used to identify your application in the Splunk RUM
@@ -316,16 +316,29 @@ public final class SplunkRumBuilder {
     }
 
     /**
-     * Disables the instrumentation of background process feature. If enabled, the background
-     * processes will be instrumented.
+     * Disables the instrumentation of subprocess feature. If enabled, subprocesses will be
+     * instrumented.
      *
      * <p>This feature is enabled by default. You can disable it by calling this method.
      *
      * @return {@code this}
      */
-    public SplunkRumBuilder disableBackgroundTaskReporting(String applicationId) {
-        isBackgroundProcess = BackgroundProcessDetector.isBackgroundProcess(applicationId);
-        configFlags.disableBackgroundTaskDetection();
+    public SplunkRumBuilder disableSubprocessInstrumentation(String applicationId) {
+        isSubprocess = SubprocessDetector.isSubprocess(applicationId);
+        configFlags.disableSubprocessInstrumentation();
+        return this;
+    }
+
+    /***
+     * Enable deffer instrumentation when app started from background start until
+     * app is brought to foreground, otherwise instrumentation data will never be
+     * sent to exporter.
+     *
+     * <p>Use case : Track only app session started by user opening app</p>
+     * @return {@code this}
+     */
+    public SplunkRumBuilder enableBackgroundInstrumentationDeferredUntilForeground() {
+        configFlags.enableBackgroundInstrumentationDeferredUntilForeground();
         return this;
     }
 
@@ -368,7 +381,11 @@ public final class SplunkRumBuilder {
         return configFlags.isReactNativeSupportEnabled();
     }
 
-    boolean isBackgroundTaskReportingDisabled() {
-        return !configFlags.isBackgroundTaskInstrumentationEnabled();
+    boolean isSubprocessInstrumentationDisabled() {
+        return !configFlags.isSubprocessInstrumentationEnabled();
+    }
+
+    boolean isBackgroundInstrumentationDeferredUntilForeground() {
+        return configFlags.isBackgroundInstrumentationDeferredUntilForeground();
     }
 }

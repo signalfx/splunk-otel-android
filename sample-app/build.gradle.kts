@@ -71,6 +71,7 @@ dependencies {
     implementation(project(":splunk-otel-android"))
     implementation(project(":splunk-otel-android-volley"))
     implementation("com.android.volley:volley:1.2.1")
+    implementation("androidx.work:work-runtime:2.8.1")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
 

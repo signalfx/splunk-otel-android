@@ -18,6 +18,7 @@ package com.splunk.rum;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -39,12 +40,10 @@ class DiskToZipkinExporterTest {
 
     static final int BANDWIDTH_LIMIT = 20 * 1024;
     static final File spanFilesPath = new File("/path/to/thing");
-    private final File file1 =
-            new File(spanFilesPath.getAbsolutePath() + File.separator + "file1.spans");
-    private final File file2 =
-            new File(spanFilesPath.getAbsolutePath() + File.separator + "file2.spans");
-    private final File imposter =
-            new File(spanFilesPath.getAbsolutePath() + File.separator + "someImposterFile.dll");
+    static final SpanStorage SPAN_STORAGE = mock(SpanStorage.class);
+    private File file1 = null;
+    private File file2 = null;
+    private File imposter = null;
 
     @Mock private CurrentNetworkProvider currentNetworkProvider;
     @Mock private FileUtils fileUtils;
@@ -54,10 +53,17 @@ class DiskToZipkinExporterTest {
 
     @BeforeEach
     void setup() throws Exception {
+        Mockito.reset(SPAN_STORAGE);
+        when(SPAN_STORAGE.provideSpanFile()).thenReturn(spanFilesPath);
+        file1 = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "file1.spans");
+        file2 = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "file2.spans");
+        imposter =
+                new File(SPAN_STORAGE.provideSpanFile() + File.separator + "someImposterFile.dll");
+
         when(currentNetworkProvider.refreshNetworkStatus()).thenReturn(currentNetwork);
         when(currentNetwork.isOnline()).thenReturn(true);
         Stream<File> files = Stream.of(file1, imposter, file2);
-        when(fileUtils.listSpanFiles(spanFilesPath)).thenReturn(files);
+        when(SPAN_STORAGE.getPendingFiles()).thenReturn(files);
     }
 
     @Test
@@ -88,14 +94,14 @@ class DiskToZipkinExporterTest {
 
     @Test
     void testSkipsWhenOffline() {
-        Mockito.reset(fileUtils);
+        Mockito.reset(SPAN_STORAGE);
         when(currentNetwork.isOnline()).thenReturn(false);
 
         DiskToZipkinExporter exporter = buildExporter();
 
         exporter.doExportCycle();
 
-        verifyNoMoreInteractions(fileUtils);
+        verifyNoMoreInteractions(SPAN_STORAGE);
         verifyNoMoreInteractions(sender);
     }
 
@@ -112,7 +118,7 @@ class DiskToZipkinExporterTest {
 
     @Test
     void testOtherExceptionsHandled() {
-        when(fileUtils.listSpanFiles(spanFilesPath)).thenThrow(new RuntimeException("unexpected!"));
+        when(SPAN_STORAGE.getPendingFiles()).thenThrow(new RuntimeException("unexpected!"));
         DiskToZipkinExporter exporter = buildExporter();
 
         exporter.doExportCycle();
@@ -121,11 +127,10 @@ class DiskToZipkinExporterTest {
 
     private DiskToZipkinExporter buildExporter() {
         return DiskToZipkinExporter.builder()
-                .fileUtils(fileUtils)
                 .fileSender(sender)
                 .bandwidthLimit(BANDWIDTH_LIMIT)
                 .bandwidthTracker(bandwidthTracker)
-                .spanFilesPath(spanFilesPath)
+                .spanFileProvider(SPAN_STORAGE)
                 .connectionUtil(currentNetworkProvider)
                 .build();
     }

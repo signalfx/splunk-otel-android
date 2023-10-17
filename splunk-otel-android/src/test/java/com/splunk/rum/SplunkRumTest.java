@@ -52,7 +52,6 @@ import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
-import java.io.File;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -94,7 +93,6 @@ public class SplunkRumTest {
                         .disableAnrDetection();
 
         when(application.getApplicationContext()).thenReturn(context);
-        when(context.getFilesDir()).thenReturn(new File("/my/storage/spot"));
 
         SplunkRum singleton =
                 SplunkRum.initialize(splunkRumBuilder, application, app -> currentNetworkProvider);
@@ -124,7 +122,6 @@ public class SplunkRumTest {
                         .disableAnrDetection();
 
         when(application.getApplicationContext()).thenReturn(context);
-        when(context.getFilesDir()).thenReturn(new File("/my/storage/spot"));
 
         SplunkRum singleton =
                 SplunkRum.initialize(splunkRumBuilder, application, app -> currentNetworkProvider);
@@ -144,7 +141,6 @@ public class SplunkRumTest {
         Context context = mock(Context.class);
 
         when(application.getApplicationContext()).thenReturn(context);
-        when(context.getFilesDir()).thenReturn(new File("/my/storage/spot"));
 
         SplunkRumBuilder splunkRumBuilder =
                 new SplunkRumBuilder()
@@ -241,7 +237,6 @@ public class SplunkRumTest {
         WebView webView = mock(WebView.class);
 
         when(application.getApplicationContext()).thenReturn(context);
-        when(context.getFilesDir()).thenReturn(new File("/my/storage/spot"));
 
         SplunkRumBuilder splunkRumBuilder =
                 new SplunkRumBuilder()

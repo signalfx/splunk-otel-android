@@ -42,7 +42,7 @@ class DiskToZipkinExporter {
     private final ScheduledExecutorService threadPool;
     private final CurrentNetworkProvider currentNetworkProvider;
     private final FileSender fileSender;
-    private final File spanFilesPath;
+    private final SpanStorage spanStorage;
     private final FileUtils fileUtils;
     private final BandwidthTracker bandwidthTracker;
     private final double bandwidthLimit;
@@ -51,7 +51,7 @@ class DiskToZipkinExporter {
         this.threadPool = builder.threadPool;
         this.currentNetworkProvider = requireNonNull(builder.currentNetworkProvider);
         this.fileSender = requireNonNull(builder.fileSender);
-        this.spanFilesPath = requireNonNull(builder.spanFilesPath);
+        this.spanStorage = requireNonNull(builder.spanStorage);
         this.fileUtils = builder.fileUtils;
         this.bandwidthTracker = requireNonNull(builder.bandwidthTracker);
         this.bandwidthLimit = builder.bandwidthLimit;
@@ -106,8 +106,8 @@ class DiskToZipkinExporter {
     }
 
     private List<File> getPendingFiles() {
-        return fileUtils
-                .listSpanFiles(spanFilesPath)
+        return spanStorage
+                .getPendingFiles()
                 .sorted(Comparator.comparing(File::getName))
                 .collect(Collectors.toList());
     }
@@ -125,7 +125,7 @@ class DiskToZipkinExporter {
         @Nullable private BandwidthTracker bandwidthTracker;
         private ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor();
         @Nullable private CurrentNetworkProvider currentNetworkProvider;
-        @Nullable private File spanFilesPath;
+        @Nullable private SpanStorage spanStorage;
         private FileUtils fileUtils = new FileUtils();
         private double bandwidthLimit = DEFAULT_MAX_UNCOMPRESSED_BANDWIDTH;
 
@@ -154,8 +154,8 @@ class DiskToZipkinExporter {
             return this;
         }
 
-        Builder spanFilesPath(File spanFilesPath) {
-            this.spanFilesPath = spanFilesPath;
+        Builder spanFileProvider(SpanStorage spanStorage) {
+            this.spanStorage = spanStorage;
             return this;
         }
 

@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Context;
 import android.os.Looper;
+import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.android.instrumentation.network.CurrentNetwork;
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
@@ -75,7 +76,9 @@ class RumInitializerTest {
         RumInitializer testInitializer =
                 new RumInitializer(splunkRumBuilder, application, startupTimer) {
                     @Override
-                    SpanExporter buildFilteringExporter(CurrentNetworkProvider connectionUtil) {
+                    SpanExporter buildFilteringExporter(
+                            CurrentNetworkProvider connectionUtil,
+                            VisibleScreenTracker visibleScreenTracker) {
                         return testExporter;
                     }
                 };
@@ -129,7 +132,9 @@ class RumInitializerTest {
         RumInitializer testInitializer =
                 new RumInitializer(splunkRumBuilder, application, startupTimer) {
                     @Override
-                    SpanExporter buildFilteringExporter(CurrentNetworkProvider connectionUtil) {
+                    SpanExporter buildFilteringExporter(
+                            CurrentNetworkProvider connectionUtil,
+                            VisibleScreenTracker visibleScreenTracker) {
                         return testExporter;
                     }
                 };
@@ -184,7 +189,9 @@ class RumInitializerTest {
 
         long currentTimeNanos = MILLISECONDS.toNanos(System.currentTimeMillis());
 
-        SpanExporter spanExporter = testInitializer.buildFilteringExporter(currentNetworkProvider);
+        SpanExporter spanExporter =
+                testInitializer.buildFilteringExporter(
+                        currentNetworkProvider, new VisibleScreenTracker());
         List<SpanData> batch1 = new ArrayList<>();
         for (int i = 0; i < 99; i++) {
             batch1.add(createTestSpan(currentTimeNanos - MINUTES.toNanos(1)));

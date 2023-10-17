@@ -40,9 +40,13 @@ import java.util.stream.Stream;
 // Basic wrapper around filesystem operations, primarily for testing
 class FileUtils {
 
-    static File getSpansDirectory(Application application) {
+    File getSpansDirectory(Application application) {
         File filesDir = application.getApplicationContext().getFilesDir();
         return new File(filesDir, "spans");
+    }
+
+    File getSpansDirectory(File rootDir) {
+        return new File(rootDir, "spans");
     }
 
     void writeAsLines(File file, List<byte[]> blocksOfData) throws IOException {
@@ -77,6 +81,27 @@ class FileUtils {
         return Arrays.stream(files);
     }
 
+    Stream<File> listFilesRecursively(File directory) {
+        if (directory == null) {
+            return Stream.empty();
+        }
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return Stream.empty();
+        }
+        Stream<File> directories = Stream.of(files).filter(File::isDirectory);
+        Stream<File> plainFiles = Stream.of(files).filter(File::isFile);
+        return Stream.concat(plainFiles, directories.flatMap(this::listFilesRecursively));
+    }
+
+    Stream<File> listDirectories(File directory) {
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return Stream.empty();
+        }
+        return Stream.of(files).filter(File::isDirectory);
+    }
+
     Stream<File> listSpanFiles(File dir) {
         return listFiles(dir)
                 .filter(this::isRegularFile)
@@ -85,6 +110,11 @@ class FileUtils {
 
     long getTotalFileSizeInBytes(File dir) {
         return listFiles(dir).reduce(0L, (acc, file) -> acc + getFileSize(file), Long::sum);
+    }
+
+    long getTotalFileSizeInBytesRecursively(File dir) {
+        return listFilesRecursively(dir)
+                .reduce(0L, (acc, file) -> acc + getFileSize(file), Long::sum);
     }
 
     long getFileSize(File file) {

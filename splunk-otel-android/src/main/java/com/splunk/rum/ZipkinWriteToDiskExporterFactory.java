@@ -16,10 +16,7 @@
 
 package com.splunk.rum;
 
-import android.app.Application;
-import android.util.Log;
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
-import java.io.File;
 import zipkin2.reporter.Sender;
 
 /**
@@ -30,29 +27,17 @@ class ZipkinWriteToDiskExporterFactory {
 
     private ZipkinWriteToDiskExporterFactory() {}
 
-    static ZipkinSpanExporter create(Application application, int maxUsageMegabytes) {
-        File spansPath = FileUtils.getSpansDirectory(application);
-        if (!spansPath.exists()) {
-            if (!spansPath.mkdirs()) {
-                Log.e(
-                        SplunkRum.LOG_TAG,
-                        "Error creating path "
-                                + spansPath
-                                + " for span buffer, defaulting to parent");
-                spansPath = application.getApplicationContext().getFilesDir();
-            }
-        }
-
+    static ZipkinSpanExporter create(int maxUsageMegabytes, SpanStorage spanStorage) {
         FileUtils fileUtils = new FileUtils();
         DeviceSpanStorageLimiter limiter =
                 DeviceSpanStorageLimiter.builder()
                         .fileUtils(fileUtils)
-                        .path(spansPath)
+                        .fileProvider(spanStorage)
                         .maxStorageUseMb(maxUsageMegabytes)
                         .build();
         Sender sender =
                 ZipkinToDiskSender.builder()
-                        .path(spansPath)
+                        .spanFileProvider(spanStorage)
                         .fileUtils(fileUtils)
                         .storageLimiter(limiter)
                         .build();
