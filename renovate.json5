@@ -31,9 +31,11 @@
       "enabled": false
     },
     {
-      // somehow renovate gets confused by the android property in gradle.properties,
-      // so let's just exclude it and hopefully clean up the dashboard
-      "matchPackageNames": ["string:rum.version"],
+      // some strings that are picked up that should be ignored
+      "matchPackageNames": [
+        "string:rum.version",
+        "docker-hub.repo.splunkdev.net/eclipse-temurin"
+      ],
       "enabled": false
     }
   ]
