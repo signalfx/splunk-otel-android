@@ -19,9 +19,7 @@ package com.splunk.rum;
 import static com.splunk.rum.SplunkRum.LOG_TAG;
 
 import android.util.Log;
-
 import androidx.annotation.VisibleForTesting;
-
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import java.io.File;
 import java.util.UUID;
@@ -49,18 +47,25 @@ class StartTypeAwareSpanStorage implements SpanStorage {
 
     @VisibleForTesting
     static StartTypeAwareSpanStorage create(
-            VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir,
-            File spansDir, String uniqueId) {
+            VisibleScreenTracker visibleScreenTracker,
+            FileUtils fileUtils,
+            File rootDir,
+            File spansDir,
+            String uniqueId) {
         StartTypeAwareSpanStorage startTypeAwareSpanStorage =
-                new StartTypeAwareSpanStorage(visibleScreenTracker, fileUtils, rootDir, spansDir, uniqueId);
+                new StartTypeAwareSpanStorage(
+                        visibleScreenTracker, fileUtils, rootDir, spansDir, uniqueId);
         startTypeAwareSpanStorage.cleanupUnsentBackgroundSpans();
         return startTypeAwareSpanStorage;
     }
 
     @VisibleForTesting
     StartTypeAwareSpanStorage(
-            VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir,
-            File spansDir, String uniqueId) {
+            VisibleScreenTracker visibleScreenTracker,
+            FileUtils fileUtils,
+            File rootDir,
+            File spansDir,
+            String uniqueId) {
         this.visibleScreenTracker = visibleScreenTracker;
         this.fileUtils = fileUtils;
         this.rootDir = rootDir;
@@ -154,7 +159,7 @@ class StartTypeAwareSpanStorage implements SpanStorage {
                             fileUtils.safeDelete(dir);
                         });
         File backgroundDir = getCurrentSessionBackgroundDirectory();
-        if(!fileUtils.listFilesRecursively(backgroundDir).findAny().isPresent()){
+        if (!fileUtils.listFilesRecursively(backgroundDir).findAny().isPresent()) {
             fileUtils.safeDelete(backgroundDir);
         }
     }

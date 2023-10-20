@@ -25,18 +25,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
+import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class StartTypeAwareSpanStorageTest {
 
@@ -69,7 +67,8 @@ class StartTypeAwareSpanStorageTest {
 
         verify(fileUtils, times(2)).safeDelete(fileArgumentCaptor.capture());
         assertEquals(file, fileArgumentCaptor.getAllValues().get(0));
-        assertEquals(fileProvider.provideSpansDirectory(), fileArgumentCaptor.getAllValues().get(1));
+        assertEquals(
+                fileProvider.provideSpansDirectory(), fileArgumentCaptor.getAllValues().get(1));
     }
 
     @Test
@@ -88,7 +87,9 @@ class StartTypeAwareSpanStorageTest {
         when(fileUtils.listFilesRecursively(new File(spansDir, "background/" + uniqueId)))
                 .thenReturn(Stream.of(file2));
 
-        fileProvider = StartTypeAwareSpanStorage.create(visibleScreenTracker, fileUtils, rootDir, spansDir, uniqueId);
+        fileProvider =
+                StartTypeAwareSpanStorage.create(
+                        visibleScreenTracker, fileUtils, rootDir, spansDir, uniqueId);
 
         verify(fileUtils).safeDelete(fileArgumentCaptor.capture());
         assertEquals(file, fileArgumentCaptor.getAllValues().get(0));
