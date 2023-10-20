@@ -56,7 +56,7 @@ class DeviceSpanStorageLimiterTest {
     void ensureFreeSpace_littleUsageEnoughFreeSpace() {
         File mockFile = mock(File.class);
         when(spanStorage.getTotalFileSizeInBytes()).thenReturn(10 * 1024L);
-        when(spanStorage.provideSpanFile()).thenReturn(mockFile);
+        when(spanStorage.provideSpansDirectory()).thenReturn(mockFile);
         when(mockFile.getFreeSpace()).thenReturn(99L); // Disk is very full
         assertFalse(limiter.ensureFreeSpace());
         verify(fileUtils, never()).safeDelete(any());
@@ -66,7 +66,7 @@ class DeviceSpanStorageLimiterTest {
     void ensureFreeSpace_littleUsageButNotEnoughFreeSpace() {
         File mockFile = mock(File.class);
         when(spanStorage.getTotalFileSizeInBytes()).thenReturn(10 * 1024L);
-        when(spanStorage.provideSpanFile()).thenReturn(mockFile);
+        when(spanStorage.provideSpansDirectory()).thenReturn(mockFile);
         when(mockFile.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES * 99); // lots of room
         assertTrue(limiter.ensureFreeSpace());
         verify(fileUtils, never()).safeDelete(any());
@@ -75,7 +75,7 @@ class DeviceSpanStorageLimiterTest {
     @Test
     void ensureFreeSpace_underLimit() {
         File mockFile = mock(File.class);
-        when(spanStorage.provideSpanFile()).thenReturn(mockFile);
+        when(spanStorage.provideSpansDirectory()).thenReturn(mockFile);
 
         when(spanStorage.getTotalFileSizeInBytes()).thenReturn(MAX_STORAGE_USE_BYTES - 1);
         when(mockFile.getFreeSpace()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
@@ -91,7 +91,7 @@ class DeviceSpanStorageLimiterTest {
         File file3 = new File("newest");
 
         File mockFile = mock(File.class);
-        when(spanStorage.provideSpanFile()).thenReturn(mockFile);
+        when(spanStorage.provideSpansDirectory()).thenReturn(mockFile);
         when(spanStorage.getTotalFileSizeInBytes()).thenReturn(MAX_STORAGE_USE_BYTES + 1);
         when(fileUtils.getModificationTime(file1)).thenReturn(1000L);
         when(fileUtils.getModificationTime(file2)).thenReturn(1001L);

@@ -26,10 +26,9 @@ import java.util.stream.Stream;
 interface SpanStorage {
 
     /***
-     * Provide location of storing spans
-     * @return
+     * Returns the location where spans are buffered.
      */
-    File provideSpanFile();
+    File provideSpansDirectory();
 
     /***
      * @return all spans including those that can be sent or not

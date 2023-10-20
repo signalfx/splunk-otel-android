@@ -19,6 +19,9 @@ package com.splunk.rum;
 import static com.splunk.rum.SplunkRum.LOG_TAG;
 
 import android.util.Log;
+
+import androidx.annotation.VisibleForTesting;
+
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import java.io.File;
 import java.util.UUID;
@@ -29,7 +32,7 @@ import java.util.stream.Stream;
  * If the app is brought to foreground and the same session ID still in use, the background spans are moved to /span for eventual sending.
  * If the app still in the background until process-kill, the background span files will eventually be deleted by the @DeviceSpanStorageLimiter.
  */
-public class StartTypeAwareSpanStorage implements SpanStorage {
+class StartTypeAwareSpanStorage implements SpanStorage {
 
     private final VisibleScreenTracker visibleScreenTracker;
     private final FileUtils fileUtils;
@@ -39,19 +42,30 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
 
     static StartTypeAwareSpanStorage create(
             VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir) {
+        File spansDir = fileUtils.getSpansDirectory(rootDir);
+        String uniqueId = UUID.randomUUID().toString();
+        return create(visibleScreenTracker, fileUtils, rootDir, spansDir, uniqueId);
+    }
+
+    @VisibleForTesting
+    static StartTypeAwareSpanStorage create(
+            VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir,
+            File spansDir, String uniqueId) {
         StartTypeAwareSpanStorage startTypeAwareSpanStorage =
-                new StartTypeAwareSpanStorage(visibleScreenTracker, fileUtils, rootDir);
+                new StartTypeAwareSpanStorage(visibleScreenTracker, fileUtils, rootDir, spansDir, uniqueId);
         startTypeAwareSpanStorage.cleanupUnsentBackgroundSpans();
         return startTypeAwareSpanStorage;
     }
 
-    private StartTypeAwareSpanStorage(
-            VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir) {
+    @VisibleForTesting
+    StartTypeAwareSpanStorage(
+            VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir,
+            File spansDir, String uniqueId) {
         this.visibleScreenTracker = visibleScreenTracker;
         this.fileUtils = fileUtils;
         this.rootDir = rootDir;
-        this.spanDir = fileUtils.getSpansDirectory(rootDir);
-        this.uniqueId = UUID.randomUUID().toString();
+        this.spanDir = spansDir;
+        this.uniqueId = uniqueId;
     }
 
     @Override
@@ -80,7 +94,7 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
 
     private void moveBackgroundSpanToPendingSpan() {
         fileUtils
-                .listSpanFiles(getCurrentSessionBackgroundFile())
+                .listSpanFiles(getCurrentSessionBackgroundDirectory())
                 .forEach(
                         file -> {
                             File destinationFile = new File(spanDir, file.getName());
@@ -96,19 +110,19 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
         cleanupUnsentBackgroundSpans();
     }
 
-    private File getCurrentSessionBackgroundFile() {
+    private File getCurrentSessionBackgroundDirectory() {
         return new File(spanDir, "background/" + uniqueId);
     }
 
     @Override
-    public File provideSpanFile() {
-        return ensureDirExist(getSpanFile());
+    public File provideSpansDirectory() {
+        return ensureDirExist(getSpansDirectory());
     }
 
-    private File getSpanFile() {
+    private File getSpansDirectory() {
         if (!isAppForeground()) {
             Log.d(LOG_TAG, "Creating background span " + uniqueId);
-            return getCurrentSessionBackgroundFile();
+            return getCurrentSessionBackgroundDirectory();
         }
         Log.d(LOG_TAG, "Creating foreground span " + uniqueId);
         return spanDir;
@@ -139,5 +153,9 @@ public class StartTypeAwareSpanStorage implements SpanStorage {
                             fileUtils.listFilesRecursively(dir).forEach(fileUtils::safeDelete);
                             fileUtils.safeDelete(dir);
                         });
+        File backgroundDir = getCurrentSessionBackgroundDirectory();
+        if(!fileUtils.listFilesRecursively(backgroundDir).findAny().isPresent()){
+            fileUtils.safeDelete(backgroundDir);
+        }
     }
 }
