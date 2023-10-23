@@ -31,7 +31,7 @@ public class DefaultSpanStorage implements SpanStorage {
     }
 
     @Override
-    public File provideSpanFile() {
+    public File provideSpansDirectory() {
         File spansPath = fileUtils.getSpansDirectory(rootDir);
         if (spansPath.exists() || spansPath.mkdirs()) {
             return spansPath;
@@ -45,16 +45,16 @@ public class DefaultSpanStorage implements SpanStorage {
 
     @Override
     public Stream<File> getAllSpanFiles() {
-        return fileUtils.listSpanFiles(provideSpanFile());
+        return fileUtils.listSpanFiles(provideSpansDirectory());
     }
 
     @Override
     public long getTotalFileSizeInBytes() {
-        return fileUtils.getTotalFileSizeInBytes(provideSpanFile());
+        return fileUtils.getTotalFileSizeInBytes(provideSpansDirectory());
     }
 
     @Override
     public Stream<File> getPendingFiles() {
-        return fileUtils.listSpanFiles(provideSpanFile());
+        return fileUtils.listSpanFiles(provideSpansDirectory());
     }
 }

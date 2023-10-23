@@ -63,7 +63,7 @@ class ZipkinToDiskSenderTest {
 
     @Test
     void testHappyPath() throws Exception {
-        when(spanStorage.provideSpanFile()).thenReturn(path);
+        when(spanStorage.provideSpansDirectory()).thenReturn(path);
 
         ZipkinToDiskSender sender =
                 ZipkinToDiskSender.builder()
@@ -91,7 +91,7 @@ class ZipkinToDiskSenderTest {
 
     @Test
     void testWriteFails() throws Exception {
-        when(spanStorage.provideSpanFile()).thenReturn(path);
+        when(spanStorage.provideSpansDirectory()).thenReturn(path);
         doThrow(new IOException("boom")).when(fileUtils).writeAsLines(finalPath, spans);
 
         ZipkinToDiskSender sender =

@@ -52,7 +52,7 @@ class DeviceSpanStorageLimiter {
     boolean ensureFreeSpace() {
         tryFreeingSpace();
         // play nice if disk is getting full
-        return fileProvider.provideSpanFile().getFreeSpace() > limitInBytes();
+        return fileProvider.provideSpansDirectory().getFreeSpace() > limitInBytes();
     }
 
     private void tryFreeingSpace() {

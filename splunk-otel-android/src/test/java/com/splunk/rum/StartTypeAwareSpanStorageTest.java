@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,23 +29,25 @@ import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-public class StartTypeAwareSpanStorageTest {
+class StartTypeAwareSpanStorageTest {
 
-    private final FileUtils fileUtils = mock();
-
-    private final File rootDir = new File("files/");
-    private final VisibleScreenTracker visibleScreenTracker = mock();
+    final File rootDir = new File("files/");
+    VisibleScreenTracker visibleScreenTracker;
+    FileUtils fileUtils;
 
     private StartTypeAwareSpanStorage fileProvider;
 
     @BeforeEach
     void setup() {
+        visibleScreenTracker = mock();
+        fileUtils = mock();
         when(fileUtils.getSpansDirectory(rootDir)).thenReturn(new File(rootDir, "spans"));
         fileProvider = StartTypeAwareSpanStorage.create(visibleScreenTracker, fileUtils, rootDir);
     }
@@ -52,18 +55,48 @@ public class StartTypeAwareSpanStorageTest {
     @Test
     void create_onNewId_shouldCleanOldBackgroundFiles() {
         File file = mock();
-        when(file.getPath()).thenReturn("files/spans/background/123");
-        when(fileUtils.listDirectories(any())).thenReturn(Stream.of(file));
         ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
+        when(file.getPath()).thenReturn("files/spans/background/123");
+
+        fileProvider = StartTypeAwareSpanStorage.create(visibleScreenTracker, fileUtils, rootDir);
+        fileUtils = mock(FileUtils.class);
+        when(fileUtils.listDirectories(any())).thenReturn(Stream.of(file));
+        when(fileUtils.listFiles(file)).thenReturn(Stream.of(file));
 
         fileProvider = StartTypeAwareSpanStorage.create(visibleScreenTracker, fileUtils, rootDir);
 
-        verify(fileUtils).safeDelete(fileArgumentCaptor.capture());
-        assertEquals(file.getPath(), fileArgumentCaptor.getValue().getPath());
+        verify(fileUtils, times(2)).safeDelete(fileArgumentCaptor.capture());
+        assertEquals(file, fileArgumentCaptor.getAllValues().get(0));
+        assertEquals(
+                fileProvider.provideSpansDirectory(), fileArgumentCaptor.getAllValues().get(1));
     }
 
     @Test
-    void getPendingFiles_givenInBackground_shouldReturnForegoundOnlySpan() {
+    void create_cleanDoesntRemoveDirIfNotEmpty() {
+        String uniqueId = UUID.randomUUID().toString();
+        File spansDir = new File("files/spans");
+        File file = mock();
+        File file2 = mock();
+        fileUtils = mock(FileUtils.class);
+
+        ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
+        when(file.getPath()).thenReturn("files/spans/background/123");
+
+        when(fileUtils.listDirectories(any())).thenReturn(Stream.of(file));
+        when(fileUtils.listFiles(file)).thenReturn(Stream.of(file));
+        when(fileUtils.listFilesRecursively(new File(spansDir, "background/" + uniqueId)))
+                .thenReturn(Stream.of(file2));
+
+        fileProvider =
+                StartTypeAwareSpanStorage.create(
+                        visibleScreenTracker, fileUtils, rootDir, spansDir, uniqueId);
+
+        verify(fileUtils).safeDelete(fileArgumentCaptor.capture());
+        assertEquals(file, fileArgumentCaptor.getAllValues().get(0));
+    }
+
+    @Test
+    void getPendingFiles_givenInBackground_shouldReturnForegroundOnlySpan() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
         when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn("unknown");
         List<File> spans = fileProvider.getPendingFiles().collect(Collectors.toList());
@@ -72,7 +105,7 @@ public class StartTypeAwareSpanStorageTest {
 
     @Test
     void
-            getPendingFiles_givenPrevouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending() {
+            getPendingFiles_givenPreviouslyInBackground_shouldMoveBackgroundSpanToForegroundSpanForSending() {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("LauncherActivity");
         when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn("MainActivity");
 
@@ -104,7 +137,7 @@ public class StartTypeAwareSpanStorageTest {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn(null);
         when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn("unknown");
 
-        File path = fileProvider.provideSpanFile();
+        File path = fileProvider.provideSpansDirectory();
 
         assertTrue(path.getPath().startsWith("files/spans/background/"));
     }
@@ -114,7 +147,7 @@ public class StartTypeAwareSpanStorageTest {
         when(visibleScreenTracker.getPreviouslyVisibleScreen()).thenReturn("LauncherActivity");
         when(visibleScreenTracker.getCurrentlyVisibleScreen()).thenReturn("MainActivity");
 
-        File path = fileProvider.provideSpanFile();
+        File path = fileProvider.provideSpansDirectory();
 
         assertFalse(path.getPath().startsWith("files/spans/background/"));
     }

@@ -81,7 +81,7 @@ class ZipkinToDiskSender extends Sender {
     }
 
     private File createFilename(long now) {
-        return new File(spanStorage.provideSpanFile(), now + ".spans");
+        return new File(spanStorage.provideSpansDirectory(), now + ".spans");
     }
 
     static Builder builder() {

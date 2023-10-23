@@ -54,11 +54,14 @@ class DiskToZipkinExporterTest {
     @BeforeEach
     void setup() throws Exception {
         Mockito.reset(SPAN_STORAGE);
-        when(SPAN_STORAGE.provideSpanFile()).thenReturn(spanFilesPath);
-        file1 = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "file1.spans");
-        file2 = new File(SPAN_STORAGE.provideSpanFile() + File.separator + "file2.spans");
+        when(SPAN_STORAGE.provideSpansDirectory()).thenReturn(spanFilesPath);
+        file1 = new File(SPAN_STORAGE.provideSpansDirectory() + File.separator + "file1.spans");
+        file2 = new File(SPAN_STORAGE.provideSpansDirectory() + File.separator + "file2.spans");
         imposter =
-                new File(SPAN_STORAGE.provideSpanFile() + File.separator + "someImposterFile.dll");
+                new File(
+                        SPAN_STORAGE.provideSpansDirectory()
+                                + File.separator
+                                + "someImposterFile.dll");
 
         when(currentNetworkProvider.refreshNetworkStatus()).thenReturn(currentNetwork);
         when(currentNetwork.isOnline()).thenReturn(true);
