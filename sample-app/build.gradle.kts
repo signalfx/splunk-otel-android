@@ -57,7 +57,7 @@ val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alp
 dependencies {
     api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
 
-    implementation("io.opentelemetry.android:instrumentation:0.2.0-alpha-SNAPSHOT")
+    implementation("io.opentelemetry.android:instrumentation:0.2.0-alpha")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
