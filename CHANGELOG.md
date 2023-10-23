@@ -17,8 +17,8 @@ as [documented here](https://docs.splunk.com/observability/en/gdi/get-data-in/ru
   your application is launched in the background. This buffered telemetry is sent when the
   app is foregrounded, or dropped when a new app session is started. Thanks to @rezastallone
   for this contribution. (#648)
-* Update to 
-  
+* Update to opentelemetry-java sdk [1.31.0](https://github.com/open-telemetry/opentelemetry-java/releases/tag/v1.31.0)
+* Update to opentelemetry-java-instrumentation [1.31.0](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.31.0)
 
 ## Version 1.1.1
 
