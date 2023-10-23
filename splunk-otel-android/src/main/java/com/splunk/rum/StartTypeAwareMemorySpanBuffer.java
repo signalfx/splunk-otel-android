@@ -31,7 +31,7 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
     private final Queue<SpanData> backlog = new ArrayDeque<>();
 
     /**
-     * @backgroundSpanBacklog will never get sent if last visible screen is null until process kill
+     * backgroundSpanBacklog will never get sent if last visible screen is null until process kill.
      */
     private final Queue<SpanData> backgroundSpanBacklog = new ArrayDeque<>();
 
