@@ -20,7 +20,6 @@ import android.annotation.SuppressLint;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
-import android.util.Log;
 
 @SuppressLint("SpecifyJobSchedulerIdRange")
 public class SplunkJobService extends JobService {
@@ -30,15 +29,11 @@ public class SplunkJobService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        //        Intent serviceIntent = new Intent(context, SplunkBackgroundService.class);
         return true;
     }
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        //        Intent serviceIntent = new Intent(context, SplunkBackgroundService.class);
-        //        context.stopService(serviceIntent);
-        Log.d(TAG, "Job paused.");
         return true;
     }
 }
