@@ -24,6 +24,3 @@ jobs:
 
       - name: Build and test
         run: touch ./local.properties; ./gradlew build javadoc --no-daemon
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.4
