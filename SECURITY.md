@@ -11,10 +11,11 @@ https://www.splunk.com/en_us/product-security/report.html).
 This project relies on a variety of external dependencies.
 These dependencies are monitored by
 [Renovate](https://github.com/apps/renovate).
-Renovate checks for Dependencies are [checked
-daily](https://github.com/signalfx/splunk-otel-java/blob/main/.github/dependabot.yml)
-and associated pull requests are opened automatically. Upgrading to the [latest
-release](https://github.com/signalfx/splunk-otel-android/releases)
+Renovate regularly checks for dependencies and updates
+[the Dependency Dashboard](https://github.com/signalfx/splunk-otel-android/issues/667)
+when newer versions are available. It also opens associated pull requests automatically.
+
+Upgrading to the [latest release](https://github.com/signalfx/splunk-otel-android/releases)
 is recommended to ensure you have the latest security updates. If a security
 vulnerability is detected for a dependency of this project then either:
 
