@@ -7,7 +7,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
-* tbd
+This is the first version of `splunk-otel-android` that is based on the upstream version of
+`opentelemetry-android`. Please note that this requires an additional project dependency,
+as [documented here](https://docs.splunk.com/observability/en/gdi/get-data-in/rum/android/install-rum-android.html#install-the-android-agent-as-a-dependency).
+
+* Depend on upstream [opentelemetry-android](https://github.com/open-telemetry/opentelemetry-android) (#640)
+* Depend on updated java semantic conventions (#658)
+* Feature enhancement: The instrumentation can now be configured to buffer telemetry created when
+  your application is launched in the background. This buffered telemetry is sent when the
+  app is foregrounded, or dropped when a new app session is started. Thanks to @rezastallone
+  for this contribution. (#648)
+* Update to opentelemetry-java sdk [1.31.0](https://github.com/open-telemetry/opentelemetry-java/releases/tag/v1.31.0)
+* Update to opentelemetry-java-instrumentation [1.31.0](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.31.0)
 
 ## Version 1.1.1
 

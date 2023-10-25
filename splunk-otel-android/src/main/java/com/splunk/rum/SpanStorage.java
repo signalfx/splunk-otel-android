@@ -31,17 +31,17 @@ interface SpanStorage {
     File provideSpansDirectory();
 
     /***
-     * @return all spans including those that can be sent or not
+     * Returns a stream containing all spans, including those that can be sent or not.
      */
     Stream<File> getAllSpanFiles();
 
     /***
-     * @return total size of all span that can be sent or not
+     * Returns the total size of all spans that can be sent or not.
      */
     long getTotalFileSizeInBytes();
 
     /***
-     * @return all spans that can be sent
+     * Returns all spans that can be sent.
      */
     Stream<File> getPendingFiles();
 }
