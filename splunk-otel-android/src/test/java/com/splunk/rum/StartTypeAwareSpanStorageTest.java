@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,6 +63,7 @@ class StartTypeAwareSpanStorageTest {
         fileUtils = mock(FileUtils.class);
         when(fileUtils.listDirectories(any())).thenReturn(Stream.of(file));
         when(fileUtils.listFiles(file)).thenReturn(Stream.of(file));
+        when(fileUtils.exists(any())).thenReturn(true);
 
         fileProvider = StartTypeAwareSpanStorage.create(visibleScreenTracker, fileUtils, rootDir);
 
@@ -69,6 +71,19 @@ class StartTypeAwareSpanStorageTest {
         assertEquals(file, fileArgumentCaptor.getAllValues().get(0));
         assertEquals(
                 fileProvider.provideSpansDirectory(), fileArgumentCaptor.getAllValues().get(1));
+    }
+
+    @Test
+    void doesNotAttemptIfBackgroundDirNotExist() {
+        fileProvider = StartTypeAwareSpanStorage.create(visibleScreenTracker, fileUtils, rootDir);
+        fileUtils = mock(FileUtils.class);
+        when(fileUtils.exists(any())).thenReturn(false);
+        when(fileUtils.listDirectories(any())).thenReturn(Stream.empty());
+
+        fileProvider = StartTypeAwareSpanStorage.create(visibleScreenTracker, fileUtils, rootDir);
+
+        verify(fileUtils, never()).listFiles(any());
+        verify(fileUtils, never()).safeDelete(any());
     }
 
     @Test
