@@ -267,7 +267,7 @@ public class SplunkRumTest {
                             return null;
                         })
                 .when(globalAttributes)
-                .update(any());
+                .update(isA(Consumer.class));
 
         SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes);
 
