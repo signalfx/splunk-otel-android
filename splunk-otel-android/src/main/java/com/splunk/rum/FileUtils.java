@@ -146,4 +146,8 @@ class FileUtils {
             Log.w(LOG_TAG, "Error deleting file " + file);
         }
     }
+
+    public boolean exists(File file) {
+        return file.exists();
+    }
 }

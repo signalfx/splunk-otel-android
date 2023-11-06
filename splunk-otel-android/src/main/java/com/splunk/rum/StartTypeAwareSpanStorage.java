@@ -159,6 +159,9 @@ class StartTypeAwareSpanStorage implements SpanStorage {
                             fileUtils.safeDelete(dir);
                         });
         File backgroundDir = getCurrentSessionBackgroundDirectory();
+        if (!fileUtils.exists(backgroundDir)) {
+            return;
+        }
         if (!fileUtils.listFilesRecursively(backgroundDir).findAny().isPresent()) {
             fileUtils.safeDelete(backgroundDir);
         }
