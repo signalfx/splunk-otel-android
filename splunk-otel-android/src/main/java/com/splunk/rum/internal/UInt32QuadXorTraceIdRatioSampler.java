@@ -63,6 +63,7 @@ public class UInt32QuadXorTraceIdRatioSampler implements Sampler {
         } else if (ratio == 1.0) {
             idUpperBound = Long.MAX_VALUE;
         } else {
+            // ratio * UInt32 max value
             idUpperBound = (long) (ratio * 0xFFFFFFFFL);
         }
         String description =
