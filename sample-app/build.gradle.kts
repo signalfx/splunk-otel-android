@@ -59,7 +59,7 @@ dependencies {
 
     implementation("io.opentelemetry.android:instrumentation:0.3.0-alpha-SNAPSHOT")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.webkit:webkit:1.9.0")

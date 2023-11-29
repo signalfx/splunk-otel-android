@@ -74,7 +74,7 @@ dependencies {
     testImplementation("androidx.test:core:1.5.0")
     testImplementation("org.assertj:assertj-core:3.24.2")
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
 
 tasks.withType<Test> {
