@@ -36,6 +36,9 @@ import android.app.Application;
 import android.content.Context;
 import android.location.Location;
 import android.webkit.WebView;
+
+import com.splunk.rum.internal.GlobalAttributesSupplier;
+
 import io.opentelemetry.android.GlobalAttributesSpanAppender;
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
@@ -69,7 +72,7 @@ public class SplunkRumTest {
     private Tracer tracer;
 
     @Mock private OpenTelemetryRum openTelemetryRum;
-    @Mock private GlobalAttributesSpanAppender globalAttributes;
+    @Mock private GlobalAttributesSupplier globalAttributes;
 
     @BeforeEach
     public void setup() {
@@ -255,7 +258,7 @@ public class SplunkRumTest {
     @Test
     void updateLocation() {
         AtomicReference<Attributes> updatedAttributes = new AtomicReference<>();
-        GlobalAttributesSpanAppender globalAttributes = mock(GlobalAttributesSpanAppender.class);
+        GlobalAttributesSupplier globalAttributes = mock(GlobalAttributesSupplier.class);
         doAnswer(
                         invocation -> {
                             Consumer<AttributesBuilder> updater = invocation.getArgument(0);

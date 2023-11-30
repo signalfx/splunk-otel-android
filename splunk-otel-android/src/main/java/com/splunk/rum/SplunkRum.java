@@ -26,7 +26,9 @@ import android.os.Looper;
 import android.util.Log;
 import android.webkit.WebView;
 import androidx.annotation.Nullable;
-import io.opentelemetry.android.GlobalAttributesSpanAppender;
+
+import com.splunk.rum.internal.GlobalAttributesSupplier;
+
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
@@ -73,14 +75,14 @@ public class SplunkRum {
     @Nullable private static SplunkRum INSTANCE;
 
     private final OpenTelemetryRum openTelemetryRum;
-    private final GlobalAttributesSpanAppender globalAttributes;
+    private final GlobalAttributesSupplier globalAttributes;
 
     static {
         Handler handler = new Handler(Looper.getMainLooper());
         startupTimer.detectBackgroundStart(handler);
     }
 
-    SplunkRum(OpenTelemetryRum openTelemetryRum, GlobalAttributesSpanAppender globalAttributes) {
+    SplunkRum(OpenTelemetryRum openTelemetryRum, GlobalAttributesSupplier globalAttributes) {
         this.openTelemetryRum = openTelemetryRum;
         this.globalAttributes = globalAttributes;
     }
