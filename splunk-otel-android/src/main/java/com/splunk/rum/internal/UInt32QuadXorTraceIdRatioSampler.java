@@ -68,7 +68,7 @@ public class UInt32QuadXorTraceIdRatioSampler implements Sampler {
         }
         String description =
                 String.format(
-                        Locale.getDefault(), "UInt32QuadXorTraceIdRatioSampler{radio:%f}", ratio);
+                        Locale.getDefault(), "UInt32QuadXorTraceIdRatioSampler{ratio:%f}", ratio);
         return new UInt32QuadXorTraceIdRatioSampler(idUpperBound, sessionIdSupplier, description);
     }
 
