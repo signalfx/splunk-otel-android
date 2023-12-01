@@ -22,20 +22,28 @@ import static com.splunk.rum.SplunkRum.COMPONENT_ERROR;
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
+import static java.util.Objects.requireNonNull;
 import static io.opentelemetry.android.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.semconv.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
-import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.UInt32QuadXorTraceIdRatioSampler;
-import io.opentelemetry.android.GlobalAttributesSpanAppender;
+import com.splunk.rum.internal.GlobalAttributesSupplier;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.logging.Level;
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.OpenTelemetryRumBuilder;
 import io.opentelemetry.android.RuntimeDetailsExtractor;
+import io.opentelemetry.android.config.OtelRumConfig;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.android.instrumentation.anr.AnrDetector;
 import io.opentelemetry.android.instrumentation.crash.CrashReporter;
@@ -58,12 +66,6 @@ import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
-import java.time.Duration;
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.logging.Level;
 import zipkin2.reporter.Sender;
 import zipkin2.reporter.okhttp3.OkHttpSender;
 
@@ -92,7 +94,12 @@ class RumInitializer {
         VisibleScreenTracker visibleScreenTracker = new VisibleScreenTracker();
 
         initializationEvents.begin();
-        OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application);
+
+        OtelRumConfig config = new OtelRumConfig();
+        GlobalAttributesSupplier globalAttributeSupplier = new GlobalAttributesSupplier(builder.globalAttributes);
+        config.setGlobalAttributes(globalAttributeSupplier);
+
+        OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
 
         otelRumBuilder.mergeResource(createSplunkResource());
         initializationEvents.emit("resourceInitialized");
@@ -103,14 +110,6 @@ class RumInitializer {
 
         // TODO: How truly important is the order of these span processors? The location of event
         // generation should probably not be altered...
-
-        GlobalAttributesSpanAppender globalAttributesSpanAppender =
-                GlobalAttributesSpanAppender.create(builder.globalAttributes);
-
-        // Add span processor that appends global attributes.
-        otelRumBuilder.addTracerProviderCustomizer(
-                (tracerProviderBuilder, app) ->
-                        tracerProviderBuilder.addSpanProcessor(globalAttributesSpanAppender));
 
         // Add span processor that appends network attributes.
         otelRumBuilder.addTracerProviderCustomizer(
@@ -225,7 +224,7 @@ class RumInitializer {
                 builder.getConfigFlags(),
                 openTelemetryRum.getOpenTelemetry().getTracer(RUM_TRACER_NAME));
 
-        return new SplunkRum(openTelemetryRum, globalAttributesSpanAppender);
+        return new SplunkRum(openTelemetryRum, globalAttributeSupplier);
     }
 
     @NonNull
