@@ -119,15 +119,6 @@ class RumInitializer {
                     return tracerProviderBuilder.addSpanProcessor(networkAttributesSpanAppender);
                 });
 
-        // Add span processor that appends screen attributes and generate init event.
-        otelRumBuilder.addTracerProviderCustomizer(
-                (tracerProviderBuilder, app) -> {
-                    ScreenAttributesAppender screenAttributesAppender =
-                            new ScreenAttributesAppender(visibleScreenTracker);
-                    initializationEvents.emit("attributeAppenderInitialized");
-                    return tracerProviderBuilder.addSpanProcessor(screenAttributesAppender);
-                });
-
         // Add batch span processor
         otelRumBuilder.addTracerProviderCustomizer(
                 (tracerProviderBuilder, app) -> {
