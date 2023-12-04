@@ -26,7 +26,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.webkit.WebView;
 import androidx.annotation.Nullable;
-
 import com.splunk.rum.internal.GlobalAttributesSupplier;
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
