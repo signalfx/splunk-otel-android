@@ -22,14 +22,13 @@ import static com.splunk.rum.SplunkRum.COMPONENT_ERROR;
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
-import static java.util.Objects.requireNonNull;
 import static io.opentelemetry.android.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.semconv.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
+import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.os.Looper;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
@@ -86,7 +85,8 @@ class RumInitializer {
         initializationEvents.begin();
 
         OtelRumConfig config = new OtelRumConfig();
-        GlobalAttributesSupplier globalAttributeSupplier = new GlobalAttributesSupplier(builder.globalAttributes);
+        GlobalAttributesSupplier globalAttributeSupplier =
+                new GlobalAttributesSupplier(builder.globalAttributes);
         config.setGlobalAttributes(globalAttributeSupplier);
 
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
