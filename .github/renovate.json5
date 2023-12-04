@@ -37,6 +37,10 @@
         "docker-hub.repo.splunkdev.net/eclipse-temurin"
       ],
       "enabled": false
+    },
+    {
+      "matchPackagePrefixes": ["com.diffplug.spotless"],
+      "groupName": "spotless packages"
     }
   ]
 }
