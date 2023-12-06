@@ -31,11 +31,11 @@ import android.app.Application;
 import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.splunk.rum.internal.UInt32QuadXorTraceIdRatioSampler;
 import io.opentelemetry.android.GlobalAttributesSpanAppender;
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.OpenTelemetryRumBuilder;
 import io.opentelemetry.android.RuntimeDetailsExtractor;
-import io.opentelemetry.android.SessionIdRatioBasedSampler;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.android.instrumentation.anr.AnrDetector;
 import io.opentelemetry.android.instrumentation.crash.CrashReporter;
@@ -57,8 +57,10 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -149,13 +151,20 @@ class RumInitializer {
                                         .build()));
 
         // Set up the sampler, if enabled
+        // TODO: Make this better...
+        // This holder is required because we cannot reasonably get the session id until after
+        // OpenTelemetryRum has been created. So this is spackled into place below.
+        AtomicReference<Supplier<String>> sessionSupplierHolder = new AtomicReference<>(() -> null);
         if (builder.sessionBasedSamplerEnabled) {
             otelRumBuilder.addTracerProviderCustomizer(
                     (tracerProviderBuilder, app) -> {
-                        SessionIdRatioBasedSampler sampler =
-                                new SessionIdRatioBasedSampler(
+                        Sampler sampler =
+                                UInt32QuadXorTraceIdRatioSampler.create(
                                         builder.sessionBasedSamplerRatio,
-                                        otelRumBuilder.getSessionId());
+                                        () -> {
+                                            Supplier<String> supplier = sessionSupplierHolder.get();
+                                            return supplier == null ? null : supplier.get();
+                                        });
                         return tracerProviderBuilder.setSampler(sampler);
                     });
         }
@@ -209,6 +218,8 @@ class RumInitializer {
         installLifecycleInstrumentations(otelRumBuilder, visibleScreenTracker);
 
         OpenTelemetryRum openTelemetryRum = otelRumBuilder.build();
+
+        sessionSupplierHolder.set(openTelemetryRum::getRumSessionId);
 
         initializationEvents.recordInitializationSpans(
                 builder.getConfigFlags(),
