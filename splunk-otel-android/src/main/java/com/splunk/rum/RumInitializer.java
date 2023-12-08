@@ -42,7 +42,6 @@ import io.opentelemetry.android.instrumentation.anr.AnrDetector;
 import io.opentelemetry.android.instrumentation.crash.CrashReporter;
 import io.opentelemetry.android.instrumentation.lifecycle.AndroidLifecycleInstrumentation;
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
-import io.opentelemetry.android.instrumentation.network.NetworkAttributesSpanAppender;
 import io.opentelemetry.android.instrumentation.network.NetworkChangeMonitor;
 import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingDetector;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
@@ -53,7 +52,6 @@ import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.sdk.trace.SpanLimits;
-import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
@@ -102,7 +100,8 @@ class RumInitializer {
         otelRumBuilder.mergeResource(createSplunkResource());
         initializationEvents.emit("resourceInitialized");
 
-        CurrentNetworkProvider currentNetworkProvider = CurrentNetworkProvider.createAndStart(application);
+        CurrentNetworkProvider currentNetworkProvider =
+                CurrentNetworkProvider.createAndStart(application);
         otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
         initializationEvents.emit("connectionUtilInitialized");
 
@@ -183,9 +182,6 @@ class RumInitializer {
 
         if (builder.isAnrDetectionEnabled()) {
             installAnrDetector(otelRumBuilder, mainLooper);
-        }
-        if (builder.isNetworkMonitorEnabled()) {
-            installNetworkMonitor(otelRumBuilder, currentNetworkProvider);
         }
         if (builder.isSlowRenderingDetectionEnabled()) {
             installSlowRenderingDetector(otelRumBuilder);
@@ -279,16 +275,6 @@ class RumInitializer {
                             .installOn(instrumentedApplication);
 
                     initializationEvents.emit("anrMonitorInitialized");
-                });
-    }
-
-    private void installNetworkMonitor(
-            OpenTelemetryRumBuilder otelRumBuilder, CurrentNetworkProvider currentNetworkProvider) {
-        otelRumBuilder.addInstrumentation(
-                instrumentedApplication -> {
-                    NetworkChangeMonitor.create(currentNetworkProvider)
-                            .installOn(instrumentedApplication);
-                    initializationEvents.emit("networkMonitorInitialized");
                 });
     }
 

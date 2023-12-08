@@ -92,8 +92,7 @@ public class SplunkRumTest {
 
         when(application.getApplicationContext()).thenReturn(context);
 
-        SplunkRum singleton =
-                SplunkRum.initialize(splunkRumBuilder, application);
+        SplunkRum singleton = SplunkRum.initialize(splunkRumBuilder, application);
         SplunkRum sameInstance = splunkRumBuilder.build(application);
 
         assertSame(singleton, sameInstance);
@@ -119,8 +118,7 @@ public class SplunkRumTest {
 
         when(application.getApplicationContext()).thenReturn(context);
 
-        SplunkRum singleton =
-                SplunkRum.initialize(splunkRumBuilder, application);
+        SplunkRum singleton = SplunkRum.initialize(splunkRumBuilder, application);
         assertSame(singleton, SplunkRum.getInstance());
     }
 
@@ -143,8 +141,7 @@ public class SplunkRumTest {
                         .setRumAccessToken("abracadabra")
                         .disableAnrDetection();
 
-        SplunkRum splunkRum =
-                SplunkRum.initialize(splunkRumBuilder, application);
+        SplunkRum splunkRum = SplunkRum.initialize(splunkRumBuilder, application);
         assertNotNull(splunkRum.getOpenTelemetry());
         assertNotNull(splunkRum.getRumSessionId());
     }
@@ -237,8 +234,7 @@ public class SplunkRumTest {
                         .setRumAccessToken("abracadabra")
                         .disableAnrDetection();
 
-        SplunkRum splunkRum =
-                SplunkRum.initialize(splunkRumBuilder, application);
+        SplunkRum splunkRum = SplunkRum.initialize(splunkRumBuilder, application);
         splunkRum.integrateWithBrowserRum(webView);
 
         verify(webView)

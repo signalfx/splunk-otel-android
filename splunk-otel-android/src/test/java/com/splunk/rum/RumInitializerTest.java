@@ -24,7 +24,6 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -82,8 +81,7 @@ class RumInitializerTest {
                         return testExporter;
                     }
                 };
-        SplunkRum splunkRum =
-                testInitializer.initialize(mainLooper);
+        SplunkRum splunkRum = testInitializer.initialize(mainLooper);
         startupTimer.runCompletionCallback();
         splunkRum.flushSpans();
 
@@ -137,8 +135,7 @@ class RumInitializerTest {
                         return testExporter;
                     }
                 };
-        SplunkRum splunkRum =
-                testInitializer.initialize(mainLooper);
+        SplunkRum splunkRum = testInitializer.initialize(mainLooper);
         splunkRum.flushSpans();
 
         testExporter.reset();
