@@ -103,18 +103,11 @@ class RumInitializer {
         initializationEvents.emit("resourceInitialized");
 
         CurrentNetworkProvider currentNetworkProvider = CurrentNetworkProvider.createAndStart(application);
+        otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
         initializationEvents.emit("connectionUtilInitialized");
 
         // TODO: How truly important is the order of these span processors? The location of event
         // generation should probably not be altered...
-
-        // Add span processor that appends network attributes.
-        otelRumBuilder.addTracerProviderCustomizer(
-                (tracerProviderBuilder, app) -> {
-                    SpanProcessor networkAttributesSpanAppender =
-                            NetworkAttributesSpanAppender.create(currentNetworkProvider);
-                    return tracerProviderBuilder.addSpanProcessor(networkAttributesSpanAppender);
-                });
 
         // Add batch span processor
         otelRumBuilder.addTracerProviderCustomizer(
