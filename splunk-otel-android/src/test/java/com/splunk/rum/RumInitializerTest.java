@@ -83,8 +83,7 @@ class RumInitializerTest {
                     }
                 };
         SplunkRum splunkRum =
-                testInitializer.initialize(
-                        app -> mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS), mainLooper);
+                testInitializer.initialize(mainLooper);
         startupTimer.runCompletionCallback();
         splunkRum.flushSpans();
 
@@ -139,8 +138,7 @@ class RumInitializerTest {
                     }
                 };
         SplunkRum splunkRum =
-                testInitializer.initialize(
-                        app -> mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS), mainLooper);
+                testInitializer.initialize(mainLooper);
         splunkRum.flushSpans();
 
         testExporter.reset();
@@ -232,10 +230,6 @@ class RumInitializerTest {
 
         when(application.getApplicationContext()).thenReturn(context);
 
-        CurrentNetworkProvider currentNetworkProvider =
-                mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS);
-        when(currentNetworkProvider.refreshNetworkStatus().isOnline()).thenReturn(true);
-
         AppStartupTimer appStartupTimer = new AppStartupTimer();
         RumInitializer initializer =
                 new RumInitializer(splunkRumBuilder, application, appStartupTimer) {
@@ -245,7 +239,7 @@ class RumInitializerTest {
                     }
                 };
 
-        SplunkRum splunkRum = initializer.initialize(app -> currentNetworkProvider, mainLooper);
+        SplunkRum splunkRum = initializer.initialize(mainLooper);
         appStartupTimer.runCompletionCallback();
 
         Exception e = new IllegalArgumentException("booom!");

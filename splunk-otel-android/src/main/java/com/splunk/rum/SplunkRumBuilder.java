@@ -312,7 +312,7 @@ public final class SplunkRumBuilder {
             throw new IllegalStateException(
                     "You must provide a rumAccessToken, a realm (or full beaconEndpoint), and an applicationName to create a valid Config instance.");
         }
-        return SplunkRum.initialize(this, application, CurrentNetworkProvider::createAndStart);
+        return SplunkRum.initialize(this, application);
     }
 
     /**

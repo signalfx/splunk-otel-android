@@ -87,9 +87,7 @@ class RumInitializer {
         this.initializationEvents = new InitializationEvents(startupTimer);
     }
 
-    SplunkRum initialize(
-            Function<Application, CurrentNetworkProvider> currentNetworkProviderFactory,
-            Looper mainLooper) {
+    SplunkRum initialize(Looper mainLooper) {
         VisibleScreenTracker visibleScreenTracker = new VisibleScreenTracker();
 
         initializationEvents.begin();
@@ -104,8 +102,7 @@ class RumInitializer {
         otelRumBuilder.mergeResource(createSplunkResource());
         initializationEvents.emit("resourceInitialized");
 
-        CurrentNetworkProvider currentNetworkProvider =
-                currentNetworkProviderFactory.apply(application);
+        CurrentNetworkProvider currentNetworkProvider = CurrentNetworkProvider.createAndStart(application);
         initializationEvents.emit("connectionUtilInitialized");
 
         // TODO: How truly important is the order of these span processors? The location of event

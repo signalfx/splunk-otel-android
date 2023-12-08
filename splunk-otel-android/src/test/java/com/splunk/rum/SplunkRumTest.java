@@ -40,7 +40,6 @@ import com.splunk.rum.internal.GlobalAttributesSupplier;
 
 import com.splunk.rum.internal.GlobalAttributesSupplier;
 import io.opentelemetry.android.OpenTelemetryRum;
-import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Span;
@@ -82,8 +81,6 @@ public class SplunkRumTest {
     @Test
     void initialization_onlyOnce() {
         Application application = mock(Application.class, RETURNS_DEEP_STUBS);
-        CurrentNetworkProvider currentNetworkProvider =
-                mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS);
         Context context = mock(Context.class);
 
         SplunkRumBuilder splunkRumBuilder =
@@ -96,7 +93,7 @@ public class SplunkRumTest {
         when(application.getApplicationContext()).thenReturn(context);
 
         SplunkRum singleton =
-                SplunkRum.initialize(splunkRumBuilder, application, app -> currentNetworkProvider);
+                SplunkRum.initialize(splunkRumBuilder, application);
         SplunkRum sameInstance = splunkRumBuilder.build(application);
 
         assertSame(singleton, sameInstance);
@@ -111,8 +108,6 @@ public class SplunkRumTest {
     @Test
     void getInstance() {
         Application application = mock(Application.class, RETURNS_DEEP_STUBS);
-        CurrentNetworkProvider currentNetworkProvider =
-                mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS);
         Context context = mock(Context.class);
 
         SplunkRumBuilder splunkRumBuilder =
@@ -125,7 +120,7 @@ public class SplunkRumTest {
         when(application.getApplicationContext()).thenReturn(context);
 
         SplunkRum singleton =
-                SplunkRum.initialize(splunkRumBuilder, application, app -> currentNetworkProvider);
+                SplunkRum.initialize(splunkRumBuilder, application);
         assertSame(singleton, SplunkRum.getInstance());
     }
 
@@ -137,8 +132,6 @@ public class SplunkRumTest {
     @Test
     void nonNullMethods() {
         Application application = mock(Application.class, RETURNS_DEEP_STUBS);
-        CurrentNetworkProvider currentNetworkProvider =
-                mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS);
         Context context = mock(Context.class);
 
         when(application.getApplicationContext()).thenReturn(context);
@@ -151,7 +144,7 @@ public class SplunkRumTest {
                         .disableAnrDetection();
 
         SplunkRum splunkRum =
-                SplunkRum.initialize(splunkRumBuilder, application, app -> currentNetworkProvider);
+                SplunkRum.initialize(splunkRumBuilder, application);
         assertNotNull(splunkRum.getOpenTelemetry());
         assertNotNull(splunkRum.getRumSessionId());
     }
@@ -232,8 +225,6 @@ public class SplunkRumTest {
     @Test
     void integrateWithBrowserRum() {
         Application application = mock(Application.class, RETURNS_DEEP_STUBS);
-        CurrentNetworkProvider currentNetworkProvider =
-                mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS);
         Context context = mock(Context.class);
         WebView webView = mock(WebView.class);
 
@@ -247,7 +238,7 @@ public class SplunkRumTest {
                         .disableAnrDetection();
 
         SplunkRum splunkRum =
-                SplunkRum.initialize(splunkRumBuilder, application, app -> currentNetworkProvider);
+                SplunkRum.initialize(splunkRumBuilder, application);
         splunkRum.integrateWithBrowserRum(webView);
 
         verify(webView)

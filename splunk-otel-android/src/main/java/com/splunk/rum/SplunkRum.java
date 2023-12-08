@@ -93,8 +93,7 @@ public class SplunkRum {
     // for testing purposes
     static SplunkRum initialize(
             SplunkRumBuilder builder,
-            Application application,
-            Function<Application, CurrentNetworkProvider> currentNetworkProviderFactory) {
+            Application application) {
         if (INSTANCE != null) {
             Log.w(LOG_TAG, "Singleton SplunkRum instance has already been initialized.");
             return INSTANCE;
@@ -105,7 +104,7 @@ public class SplunkRum {
         } else {
             INSTANCE =
                     new RumInitializer(builder, application, startupTimer)
-                            .initialize(currentNetworkProviderFactory, Looper.getMainLooper());
+                            .initialize(Looper.getMainLooper());
         }
 
         if (builder.isDebugEnabled()) {
