@@ -99,7 +99,8 @@ class RumInitializer {
         otelRumBuilder.mergeResource(createSplunkResource());
         initializationEvents.emit("resourceInitialized");
 
-        CurrentNetworkProvider currentNetworkProvider = CurrentNetworkProvider.createAndStart(application);
+        CurrentNetworkProvider currentNetworkProvider =
+                CurrentNetworkProvider.createAndStart(application);
         otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
         initializationEvents.emit("connectionUtilInitialized");
 

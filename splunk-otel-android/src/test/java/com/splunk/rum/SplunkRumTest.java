@@ -37,10 +37,6 @@ import android.content.Context;
 import android.location.Location;
 import android.webkit.WebView;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
-
-import com.splunk.rum.internal.GlobalAttributesSupplier;
-
-import com.splunk.rum.internal.GlobalAttributesSupplier;
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
