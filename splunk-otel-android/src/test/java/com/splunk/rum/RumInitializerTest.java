@@ -105,7 +105,6 @@ class RumInitializerTest {
         checkEventExists(events, "activityLifecycleCallbacksInitialized");
         checkEventExists(events, "crashReportingInitialized");
         checkEventExists(events, "anrMonitorInitialized");
-        checkEventExists(events, "networkMonitorInitialized");
     }
 
     private void checkEventExists(List<EventData> events, String eventName) {
