@@ -93,6 +93,9 @@ class RumInitializer {
         GlobalAttributesSupplier globalAttributeSupplier =
                 new GlobalAttributesSupplier(builder.globalAttributes);
         config.setGlobalAttributes(globalAttributeSupplier);
+        if(!builder.isNetworkMonitorEnabled()){
+            config.disableNetworkChangeMonitoring();
+        }
 
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
 
