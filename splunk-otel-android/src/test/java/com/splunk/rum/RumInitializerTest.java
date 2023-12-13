@@ -24,7 +24,6 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -82,9 +81,7 @@ class RumInitializerTest {
                         return testExporter;
                     }
                 };
-        SplunkRum splunkRum =
-                testInitializer.initialize(
-                        app -> mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS), mainLooper);
+        SplunkRum splunkRum = testInitializer.initialize(mainLooper);
         startupTimer.runCompletionCallback();
         splunkRum.flushSpans();
 
@@ -108,7 +105,6 @@ class RumInitializerTest {
         checkEventExists(events, "activityLifecycleCallbacksInitialized");
         checkEventExists(events, "crashReportingInitialized");
         checkEventExists(events, "anrMonitorInitialized");
-        checkEventExists(events, "networkMonitorInitialized");
     }
 
     private void checkEventExists(List<EventData> events, String eventName) {
@@ -138,9 +134,7 @@ class RumInitializerTest {
                         return testExporter;
                     }
                 };
-        SplunkRum splunkRum =
-                testInitializer.initialize(
-                        app -> mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS), mainLooper);
+        SplunkRum splunkRum = testInitializer.initialize(mainLooper);
         splunkRum.flushSpans();
 
         testExporter.reset();
@@ -232,10 +226,6 @@ class RumInitializerTest {
 
         when(application.getApplicationContext()).thenReturn(context);
 
-        CurrentNetworkProvider currentNetworkProvider =
-                mock(CurrentNetworkProvider.class, RETURNS_DEEP_STUBS);
-        when(currentNetworkProvider.refreshNetworkStatus().isOnline()).thenReturn(true);
-
         AppStartupTimer appStartupTimer = new AppStartupTimer();
         RumInitializer initializer =
                 new RumInitializer(splunkRumBuilder, application, appStartupTimer) {
@@ -245,7 +235,7 @@ class RumInitializerTest {
                     }
                 };
 
-        SplunkRum splunkRum = initializer.initialize(app -> currentNetworkProvider, mainLooper);
+        SplunkRum splunkRum = initializer.initialize(mainLooper);
         appStartupTimer.runCompletionCallback();
 
         Exception e = new IllegalArgumentException("booom!");

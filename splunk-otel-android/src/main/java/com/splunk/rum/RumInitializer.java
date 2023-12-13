@@ -42,8 +42,6 @@ import io.opentelemetry.android.instrumentation.anr.AnrDetector;
 import io.opentelemetry.android.instrumentation.crash.CrashReporter;
 import io.opentelemetry.android.instrumentation.lifecycle.AndroidLifecycleInstrumentation;
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
-import io.opentelemetry.android.instrumentation.network.NetworkAttributesSpanAppender;
-import io.opentelemetry.android.instrumentation.network.NetworkChangeMonitor;
 import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingDetector;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.api.trace.Tracer;
@@ -53,7 +51,6 @@ import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.sdk.trace.SpanLimits;
-import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
@@ -87,9 +84,7 @@ class RumInitializer {
         this.initializationEvents = new InitializationEvents(startupTimer);
     }
 
-    SplunkRum initialize(
-            Function<Application, CurrentNetworkProvider> currentNetworkProviderFactory,
-            Looper mainLooper) {
+    SplunkRum initialize(Looper mainLooper) {
         VisibleScreenTracker visibleScreenTracker = new VisibleScreenTracker();
 
         initializationEvents.begin();
@@ -98,6 +93,9 @@ class RumInitializer {
         GlobalAttributesSupplier globalAttributeSupplier =
                 new GlobalAttributesSupplier(builder.globalAttributes);
         config.setGlobalAttributes(globalAttributeSupplier);
+        if (!builder.isNetworkMonitorEnabled()) {
+            config.disableNetworkChangeMonitoring();
+        }
 
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
 
@@ -105,19 +103,12 @@ class RumInitializer {
         initializationEvents.emit("resourceInitialized");
 
         CurrentNetworkProvider currentNetworkProvider =
-                currentNetworkProviderFactory.apply(application);
+                CurrentNetworkProvider.createAndStart(application);
+        otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
         initializationEvents.emit("connectionUtilInitialized");
 
         // TODO: How truly important is the order of these span processors? The location of event
         // generation should probably not be altered...
-
-        // Add span processor that appends network attributes.
-        otelRumBuilder.addTracerProviderCustomizer(
-                (tracerProviderBuilder, app) -> {
-                    SpanProcessor networkAttributesSpanAppender =
-                            NetworkAttributesSpanAppender.create(currentNetworkProvider);
-                    return tracerProviderBuilder.addSpanProcessor(networkAttributesSpanAppender);
-                });
 
         // Add batch span processor
         otelRumBuilder.addTracerProviderCustomizer(
@@ -193,9 +184,6 @@ class RumInitializer {
 
         if (builder.isAnrDetectionEnabled()) {
             installAnrDetector(otelRumBuilder, mainLooper);
-        }
-        if (builder.isNetworkMonitorEnabled()) {
-            installNetworkMonitor(otelRumBuilder, currentNetworkProvider);
         }
         if (builder.isSlowRenderingDetectionEnabled()) {
             installSlowRenderingDetector(otelRumBuilder);
@@ -289,16 +277,6 @@ class RumInitializer {
                             .installOn(instrumentedApplication);
 
                     initializationEvents.emit("anrMonitorInitialized");
-                });
-    }
-
-    private void installNetworkMonitor(
-            OpenTelemetryRumBuilder otelRumBuilder, CurrentNetworkProvider currentNetworkProvider) {
-        otelRumBuilder.addInstrumentation(
-                instrumentedApplication -> {
-                    NetworkChangeMonitor.create(currentNetworkProvider)
-                            .installOn(instrumentedApplication);
-                    initializationEvents.emit("networkMonitorInitialized");
                 });
     }
 

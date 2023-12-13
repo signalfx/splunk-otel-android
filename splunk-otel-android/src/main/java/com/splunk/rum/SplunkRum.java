@@ -28,7 +28,6 @@ import android.webkit.WebView;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
 import io.opentelemetry.android.OpenTelemetryRum;
-import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
@@ -40,7 +39,6 @@ import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTelemetry;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 
@@ -91,10 +89,7 @@ public class SplunkRum {
     }
 
     // for testing purposes
-    static SplunkRum initialize(
-            SplunkRumBuilder builder,
-            Application application,
-            Function<Application, CurrentNetworkProvider> currentNetworkProviderFactory) {
+    static SplunkRum initialize(SplunkRumBuilder builder, Application application) {
         if (INSTANCE != null) {
             Log.w(LOG_TAG, "Singleton SplunkRum instance has already been initialized.");
             return INSTANCE;
@@ -105,7 +100,7 @@ public class SplunkRum {
         } else {
             INSTANCE =
                     new RumInitializer(builder, application, startupTimer)
-                            .initialize(currentNetworkProviderFactory, Looper.getMainLooper());
+                            .initialize(Looper.getMainLooper());
         }
 
         if (builder.isDebugEnabled()) {
