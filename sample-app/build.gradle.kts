@@ -67,7 +67,7 @@ dependencies {
     implementation("androidx.browser:browser:1.6.0")
     implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.navigation:navigation-fragment:2.7.5")
+    implementation("androidx.navigation:navigation-fragment:2.7.6")
     implementation("androidx.navigation:navigation-ui:2.7.6")
     implementation(project(":splunk-otel-android"))
     implementation(project(":splunk-otel-android-volley"))
