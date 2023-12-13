@@ -9,6 +9,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * tbd
 
+## Version 1.3.0 - 2023-12-13
+
+This is a standard release following the regular upstream `opentelemetry-android` release.
+
+* Update to use upstream `opentelemetry-android` 0.3.0 (#714)
+* Reduce unnecessary attempts at directory deletion for disk buffered telemetry (#683)
+* Change session sampling strategy to be consistent with other splunk RUM implementations (#698)
+* Global attributes and screen attributes are now handled by upstream (#710)
+* Network monitoring and network attributes appender now handle by upstream (#713)
+* Fix broken url targets in sample app (#715)
+
 ## Version 1.2.0 - 2023-10-25
 
 This is the first version of `splunk-otel-android` that is based on the upstream version of
