@@ -50,7 +50,7 @@ val otelSemconvVersion = "1.21.0-alpha"
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.navigation:navigation-fragment:2.7.5")
+    implementation("androidx.navigation:navigation-fragment:2.7.6")
     compileOnly("com.android.volley:volley:1.2.1")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
