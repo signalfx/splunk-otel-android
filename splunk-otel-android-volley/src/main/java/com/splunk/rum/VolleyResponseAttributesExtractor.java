@@ -26,6 +26,7 @@ import com.android.volley.toolbox.HttpResponse;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
+import io.opentelemetry.semconv.SemanticAttributes;
 
 class VolleyResponseAttributesExtractor
         implements AttributesExtractor<RequestWrapper, HttpResponse> {
@@ -61,6 +62,12 @@ class VolleyResponseAttributesExtractor
         if (ids.length == 2) {
             attributes.put(LINK_TRACE_ID_KEY, ids[0]);
             attributes.put(LINK_SPAN_ID_KEY, ids[1]);
+        }
+
+        String contentLength = getHeader(response, "Content-Length");
+        if (contentLength != null) {
+            attributes.put(
+                    SemanticAttributes.HTTP_RESPONSE_BODY_SIZE, Long.parseLong(contentLength));
         }
     }
 
