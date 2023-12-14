@@ -52,8 +52,9 @@ android {
     }
 }
 
-val otelVersion = "1.32.0-SNAPSHOT"
+val otelVersion = "1.33.0-SNAPSHOT"
 val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
+val otelSemconvVersion = "1.23.1-alpha"
 
 dependencies {
     api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
@@ -64,7 +65,7 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.webkit:webkit:1.9.0")
-    implementation("androidx.browser:browser:1.6.0")
+    implementation("androidx.browser:browser:1.7.0")
     implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-fragment:2.7.6")
@@ -74,7 +75,8 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1")
     implementation("androidx.work:work-runtime:2.9.0")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
+    implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
+
 
     implementation("io.opentelemetry:opentelemetry-api-events")
     implementation("io.opentelemetry:opentelemetry-sdk-logs")

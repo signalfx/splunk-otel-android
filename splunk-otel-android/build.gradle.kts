@@ -39,9 +39,9 @@ android {
     }
 }
 
-val otelVersion = "1.32.0"
+val otelVersion = "1.33.0-SNAPSHOT"
 val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
-val otelSemconvVersion = "1.21.0-alpha"
+val otelSemconvVersion = "1.23.1-alpha"
 
 dependencies {
     api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
