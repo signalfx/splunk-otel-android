@@ -9,9 +9,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * tbd
 
+## Version 1.3.1 - 2023-12-14
+
+The previous release was mistakenly built against an OpenTelemetry `SNAPSHOT` build.
+This remedies that and compiles against the 1.32.0 non-SNAPSHOT bom.
+
+* Compile against OpenTelemetry Java Instrumentation 1.32.0 (no SNAPSHOT).
+
 ## Version 1.3.0 - 2023-12-13
 
 This is a standard release following the regular upstream `opentelemetry-android` release.
+This version is succeeded by a patch release: Users should use 1.3.1 instead of 1.3.0.
 
 * Update to use upstream `opentelemetry-android` 0.3.0 (#714)
 * Reduce unnecessary attempts at directory deletion for disk buffered telemetry (#683)
