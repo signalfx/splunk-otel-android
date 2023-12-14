@@ -259,14 +259,15 @@ public class TracingHurlStackTest {
         assertThat(span.getKind()).isEqualTo(SpanKind.CLIENT);
 
         Attributes spanAttributes = span.getAttributes();
-        assertThat(spanAttributes.get(SemanticAttributes.HTTP_STATUS_CODE)).isEqualTo(status);
-        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_PORT)).isEqualTo(url.getPort());
-        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_NAME)).isEqualTo(url.getHost());
-        assertThat(spanAttributes.get(SemanticAttributes.HTTP_URL)).isEqualTo(url.toString());
-        assertThat(spanAttributes.get(SemanticAttributes.HTTP_METHOD)).isEqualTo("GET");
+        assertThat(spanAttributes.get(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE))
+                .isEqualTo(status);
+        assertThat(spanAttributes.get(SemanticAttributes.SERVER_PORT)).isEqualTo(url.getPort());
+        assertThat(spanAttributes.get(SemanticAttributes.SERVER_ADDRESS)).isEqualTo(url.getHost());
+        assertThat(spanAttributes.get(SemanticAttributes.URL_FULL)).isEqualTo(url.toString());
+        assertThat(spanAttributes.get(SemanticAttributes.HTTP_REQUEST_METHOD)).isEqualTo("GET");
 
         if (responseBody != null) {
-            assertThat(span.getAttributes().get(SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH))
+            assertThat(span.getAttributes().get(SemanticAttributes.HTTP_RESPONSE_BODY_SIZE))
                     .isEqualTo(responseBody.length());
         }
     }
