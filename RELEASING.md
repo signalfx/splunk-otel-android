@@ -25,7 +25,8 @@ This is the process to use to do a release:
 
 6) Create a PR to update the version in the `gradle.properties` to the next development
    version. This PR can and probably should also include updating any documentation (CHANGELOG.md,
-   README.md, etc) that mentions the previous version.
+   README.md, etc) that mentions the previous version. Make sure the badget in the top README.md
+   reflects the accurate upstream otel version.
 
 7) Once this PR is merged, create a release in Github that points at the newly created version,
    and make sure to provide release notes that at least mirror the contents of the CHANGELOG.md
