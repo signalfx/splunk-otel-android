@@ -77,7 +77,6 @@ dependencies {
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
     implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
 
-
     implementation("io.opentelemetry:opentelemetry-api-events")
     implementation("io.opentelemetry:opentelemetry-sdk-logs")
     implementation("io.opentelemetry:opentelemetry-sdk")
