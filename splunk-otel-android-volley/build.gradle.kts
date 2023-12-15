@@ -46,7 +46,7 @@ android {
 
 val otelVersion = "1.32.0-SNAPSHOT"
 val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
-val otelSemconvVersion = "1.21.0-alpha"
+val otelSemconvVersion = "1.23.1-alpha"
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -60,11 +60,9 @@ dependencies {
     api("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
-    implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
-
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
+    implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")

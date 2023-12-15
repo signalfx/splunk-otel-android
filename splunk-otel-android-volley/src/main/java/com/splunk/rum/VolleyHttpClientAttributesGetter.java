@@ -23,8 +23,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Header;
 import com.android.volley.Request;
 import com.android.volley.toolbox.HttpResponse;
-import io.opentelemetry.instrumentation.api.instrumenter.http.HttpClientAttributesGetter;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesGetter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -129,11 +128,6 @@ enum VolleyHttpClientAttributesGetter
             }
         }
         return headersList;
-    }
-
-    @Override
-    public String getTransport(RequestWrapper requestWrapper, HttpResponse httpResponse) {
-        return SemanticAttributes.NetTransportValues.IP_TCP;
     }
 
     @Override

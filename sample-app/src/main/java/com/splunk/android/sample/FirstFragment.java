@@ -50,7 +50,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 
 public class FirstFragment extends Fragment {
 
@@ -206,7 +205,6 @@ public class FirstFragment extends Fragment {
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
             return splunkRum.createRumOkHttpCallFactory(
                     builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0])
-                            .hostnameVerifier(new AllowAllHostnameVerifier())
                             .build());
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             e.printStackTrace();
