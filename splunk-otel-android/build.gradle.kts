@@ -47,7 +47,7 @@ dependencies {
     api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
     implementation("io.opentelemetry.android:instrumentation:0.3.0-alpha")
 
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.9.21"))
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.9.22"))
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.core:core:1.12.0")
     implementation("androidx.navigation:navigation-fragment:2.7.6")
