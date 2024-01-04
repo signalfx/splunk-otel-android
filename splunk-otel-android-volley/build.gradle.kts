@@ -65,7 +65,7 @@ dependencies {
     implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("org.assertj:assertj-core:3.25.1")
     testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
     testImplementation("org.robolectric:robolectric:4.11.1")
     testImplementation("org.mockito:mockito-core:5.8.0")
