@@ -342,7 +342,7 @@ class RumInitializer {
 
     private SpanExporter buildStorageBufferingExporter(
             CurrentNetworkProvider currentNetworkProvider, SpanStorage spanStorage) {
-        Sender sender = OkHttpSender.newBuilder().endpoint(getEndpoint()).build();
+        Sender sender = buildSender(getEndpoint());
         BandwidthTracker bandwidthTracker = new BandwidthTracker();
 
         FileSender fileSender =
@@ -391,10 +391,20 @@ class RumInitializer {
                 () ->
                         ZipkinSpanExporter.builder()
                                 .setEncoder(new CustomZipkinEncoder())
-                                .setEndpoint(endpoint)
+                                .setSender(buildSender(endpoint))
                                 // remove the local IP address
                                 .setLocalIpAddressSupplier(() -> null)
                                 .build());
+    }
+
+    Sender buildSender(String endpoint) {
+        OkHttpSender.Builder senderBuilder = OkHttpSender.newBuilder()
+                .endpoint(endpoint)
+                .compressionEnabled(builder.gzipCompressionEnabled);
+        if(builder.headersSupplier != null) {
+            senderBuilder.clientBuilder().addInterceptor(new CustomHeadersRequestInterceptor(builder.headersSupplier));
+        }
+        return senderBuilder.build();
     }
 
     private static class LazyInitSpanExporter implements SpanExporter {

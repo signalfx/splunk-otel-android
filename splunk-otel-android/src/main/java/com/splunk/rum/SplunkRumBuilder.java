@@ -24,7 +24,9 @@ import androidx.annotation.Nullable;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.time.Duration;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /** A builder of {@link SplunkRum}. */
 public final class SplunkRumBuilder {
@@ -47,6 +49,10 @@ public final class SplunkRumBuilder {
     boolean sessionBasedSamplerEnabled = false;
     double sessionBasedSamplerRatio = 1.0;
     boolean isSubprocess = false;
+
+    @Nullable Supplier<Map<String, String>> headersSupplier;
+
+    boolean gzipCompressionEnabled = true;
 
     /**
      * Sets the application name that will be used to identify your application in the Splunk RUM
@@ -289,6 +295,28 @@ public final class SplunkRumBuilder {
 
         this.sessionBasedSamplerEnabled = true;
         this.sessionBasedSamplerRatio = ratio;
+        return this;
+    }
+
+    /***
+     * Sets the supplier of headers, that will be added to every rum request.
+     * It can be used to provide additional Authorization headers.
+     *
+     * @param headersSupplier Headers supplier, that returns map of header names and header values
+     * @return {@code this}
+     */
+    public SplunkRumBuilder setHeadersSupplier(Supplier<Map<String, String>> headersSupplier) {
+        this.headersSupplier = headersSupplier;
+        return this;
+    }
+
+    /***
+     * Disables gzip compression of the rum requests.
+     *
+     * @return {@code this}
+     */
+    public SplunkRumBuilder disableGzipCompression() {
+        this.gzipCompressionEnabled = false;
         return this;
     }
 

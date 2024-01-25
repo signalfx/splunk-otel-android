@@ -27,6 +27,9 @@ import android.app.Application;
 import io.opentelemetry.api.common.Attributes;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 class SplunkRumBuilderTest {
 
     @Test
@@ -89,5 +92,26 @@ class SplunkRumBuilderTest {
         SplunkRumBuilder builder =
                 SplunkRum.builder().setRealm("us0").setBeaconEndpoint("http://beacon");
         assertEquals("http://beacon", builder.beaconEndpoint);
+    }
+
+    @Test
+    void disableGzipCompression() {
+        SplunkRumBuilder builder =
+                SplunkRum.builder().disableGzipCompression();
+        assertFalse(builder.gzipCompressionEnabled);
+    }
+
+    @Test
+    void setHeadersSupplier() {
+        Map<String, String> headers = new HashMap<String, String>() {{
+            put("Authorization", "Bearer xyz");
+            put("name", "value");
+        } };
+        SplunkRumBuilder builder =
+                SplunkRum.builder().setHeadersSupplier( () -> headers);
+        assertEquals(headers.keySet(), builder.headersSupplier.get().keySet());
+        headers.forEach((key, value) ->
+                assertEquals(value, builder.headersSupplier.get().get(key))
+        );
     }
 }
