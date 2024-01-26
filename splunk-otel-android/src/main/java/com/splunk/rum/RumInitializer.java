@@ -397,15 +397,13 @@ class RumInitializer {
         // return a lazy init exporter so the main thread doesn't block on the setup.
         return new LazyInitSpanExporter(
                 () -> {
-                    ZipkinSpanExporter exp =
-                            ZipkinSpanExporter.builder()
-                                    .setEncoder(new CustomZipkinEncoder())
-                                    .setEndpoint(endpoint)
-                                    // remove the local IP address
-                                    .setLocalIpAddressSupplier(() -> null)
-                                    .setSender(buildCustomizedZipkinSender())
-                                    .build();
-                    return exp;
+                    return ZipkinSpanExporter.builder()
+                            .setEncoder(new CustomZipkinEncoder())
+                            .setEndpoint(endpoint)
+                            // remove the local IP address
+                            .setLocalIpAddressSupplier(() -> null)
+                            .setSender(buildCustomizedZipkinSender())
+                            .build();
                 });
     }
 
