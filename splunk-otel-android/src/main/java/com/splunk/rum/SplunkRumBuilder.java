@@ -21,6 +21,7 @@ import static com.splunk.rum.DeviceSpanStorageLimiter.DEFAULT_MAX_STORAGE_USE_MB
 import android.app.Application;
 import android.util.Log;
 import androidx.annotation.Nullable;
+import com.splunk.rum.incubating.HttpSenderCustomizer;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.time.Duration;
@@ -42,6 +43,7 @@ public final class SplunkRumBuilder {
     Duration slowRenderingDetectionPollInterval = DEFAULT_SLOW_RENDERING_DETECTION_POLL_INTERVAL;
     Attributes globalAttributes = Attributes.empty();
     @Nullable String deploymentEnvironment;
+    HttpSenderCustomizer httpSenderCustomizer = HttpSenderCustomizer.DEFAULT;
     private Consumer<SpanFilterBuilder> spanFilterConfigurer = x -> {};
     int maxUsageMegabytes = DEFAULT_MAX_STORAGE_USE_MB;
     boolean sessionBasedSamplerEnabled = false;
@@ -75,6 +77,23 @@ public final class SplunkRumBuilder {
             realm = null;
         }
         this.beaconEndpoint = beaconEndpoint;
+        return this;
+    }
+
+    /**
+     * This method can be used to provide a customizer that will have access to the
+     * OkHttpSender.Builder before the sender is created. Typical use cases for this are to provide
+     * custom headers or to modify compression settings. This is a pretty large hammer and should be
+     * used with caution.
+     *
+     * <p>This API is considered incubating and is subject to change.
+     *
+     * @param customizer that can make changes to the OkHttpSender.Builder
+     * @return {@code this}
+     * @since 1.4.0
+     */
+    public SplunkRumBuilder setHttpSenderCustomizer(HttpSenderCustomizer customizer) {
+        this.httpSenderCustomizer = customizer;
         return this;
     }
 

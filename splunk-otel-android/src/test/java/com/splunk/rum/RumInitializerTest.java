@@ -23,6 +23,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Context;
 import android.os.Looper;
+import com.splunk.rum.incubating.HttpSenderCustomizer;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.android.instrumentation.network.CurrentNetwork;
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
@@ -48,10 +50,12 @@ import io.opentelemetry.semconv.SemanticAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import zipkin2.reporter.okhttp3.OkHttpSender;
 
 @ExtendWith(MockitoExtension.class)
 class RumInitializerTest {
@@ -212,6 +216,30 @@ class RumInitializerTest {
                 .setHasEnded(true)
                 .setEndEpochNanos(startTimeNanos)
                 .build();
+    }
+
+    @Test
+    void canCustomizeHttpSender() {
+        AtomicReference<OkHttpSender.Builder> seenBuilder = new AtomicReference<>();
+        HttpSenderCustomizer customizer = seenBuilder::set;
+        SplunkRumBuilder splunkRumBuilder =
+                new SplunkRumBuilder()
+                        .setRealm("us0")
+                        .setRumAccessToken("secret!")
+                        .setApplicationName("test")
+                        .disableAnrDetection()
+                        .setHttpSenderCustomizer(customizer);
+
+        when(application.getApplicationContext()).thenReturn(context);
+
+        RumInitializer testInitializer =
+                new RumInitializer(splunkRumBuilder, application, new AppStartupTimer());
+        SplunkRum rum = testInitializer.initialize(mainLooper);
+        rum.addRumEvent("foo", Attributes.empty()); // need to trigger export
+        rum.flushSpans();
+
+        assertNotNull(rum);
+        assertNotNull(seenBuilder.get());
     }
 
     @Test

@@ -54,7 +54,6 @@ dependencies {
 
     implementation("io.opentelemetry:opentelemetry-sdk")
     implementation("io.opentelemetry:opentelemetry-exporter-zipkin")
-    implementation("io.zipkin.reporter2:zipkin-sender-okhttp3")
     implementation("io.opentelemetry:opentelemetry-exporter-logging")
 
     implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
@@ -62,6 +61,7 @@ dependencies {
 
     api("io.opentelemetry:opentelemetry-api")
     api("com.squareup.okhttp3:okhttp:4.12.0")
+    api("io.zipkin.reporter2:zipkin-sender-okhttp3")
 
     testImplementation("org.mockito:mockito-core:5.8.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.8.0")
