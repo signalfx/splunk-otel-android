@@ -24,6 +24,7 @@ import com.splunk.rum.StandardAttributes;
 import io.opentelemetry.api.common.Attributes;
 import java.time.Duration;
 import java.util.regex.Pattern;
+import okhttp3.Request;
 
 public class SampleApplication extends Application {
 
@@ -65,6 +66,20 @@ public class SampleApplication extends Application {
                                                         HTTP_URL_SENSITIVE_DATA_PATTERN
                                                                 .matcher(value)
                                                                 .replaceAll("$1=<redacted>")))
+                .setHttpSenderCustomizer(
+                        okHttpBuilder -> {
+                            okHttpBuilder.compressionEnabled(true);
+                            okHttpBuilder
+                                    .clientBuilder()
+                                    .addInterceptor(
+                                            chain -> {
+                                                Request.Builder requestBuilder =
+                                                        chain.request().newBuilder();
+                                                requestBuilder.header(
+                                                        "X-My-Custom-Header", "abc123");
+                                                return chain.proceed(requestBuilder.build());
+                                            });
+                        })
                 .build(this);
     }
 }

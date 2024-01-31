@@ -342,7 +342,8 @@ class RumInitializer {
 
     private SpanExporter buildStorageBufferingExporter(
             CurrentNetworkProvider currentNetworkProvider, SpanStorage spanStorage) {
-        Sender sender = OkHttpSender.newBuilder().endpoint(getEndpoint()).build();
+        Sender sender = buildCustomizedZipkinSender();
+
         BandwidthTracker bandwidthTracker = new BandwidthTracker();
 
         FileSender fileSender =
@@ -357,6 +358,13 @@ class RumInitializer {
         diskToZipkinExporter.startPolling();
 
         return getToDiskExporter(spanStorage);
+    }
+
+    @NonNull
+    private Sender buildCustomizedZipkinSender() {
+        OkHttpSender.Builder okBuilder = OkHttpSender.newBuilder().endpoint(getEndpoint());
+        builder.httpSenderCustomizer.customize(okBuilder);
+        return okBuilder.build();
     }
 
     @NonNull
@@ -388,13 +396,15 @@ class RumInitializer {
     SpanExporter getCoreSpanExporter(String endpoint) {
         // return a lazy init exporter so the main thread doesn't block on the setup.
         return new LazyInitSpanExporter(
-                () ->
-                        ZipkinSpanExporter.builder()
-                                .setEncoder(new CustomZipkinEncoder())
-                                .setEndpoint(endpoint)
-                                // remove the local IP address
-                                .setLocalIpAddressSupplier(() -> null)
-                                .build());
+                () -> {
+                    return ZipkinSpanExporter.builder()
+                            .setEncoder(new CustomZipkinEncoder())
+                            .setEndpoint(endpoint)
+                            // remove the local IP address
+                            .setLocalIpAddressSupplier(() -> null)
+                            .setSender(buildCustomizedZipkinSender())
+                            .build();
+                });
     }
 
     private static class LazyInitSpanExporter implements SpanExporter {

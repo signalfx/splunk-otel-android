@@ -7,7 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
-* tbd
+* Add new incubating API: `SplunkRumBuilder.setHttpSenderCustomizer()` to allow customization
+  of the HTTP client used for sending data to Splunk. This can be useful when devices are
+  behind a proxy or API gateway.
 
 ## Version 1.3.1 - 2023-12-14
 
