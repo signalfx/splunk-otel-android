@@ -61,7 +61,7 @@ import zipkin2.reporter.okhttp3.OkHttpSender;
 @ExtendWith(MockitoExtension.class)
 class RumInitializerTest {
 
-    final static String APP_NAME = "Sick test app";
+    static final String APP_NAME = "Sick test app";
 
     @Mock Looper mainLooper;
     @Mock Application application;
@@ -121,8 +121,7 @@ class RumInitializerTest {
     }
 
     private void verifyResource(SpanData span) {
-        assertThat(span.getResource().getAttribute(stringKey("service.name")))
-                .isEqualTo(APP_NAME);
+        assertThat(span.getResource().getAttribute(stringKey("service.name"))).isEqualTo(APP_NAME);
     }
 
     private void checkEventExists(List<EventData> events, String eventName) {
