@@ -259,8 +259,7 @@ class RumInitializer {
     private Resource createSplunkResource() {
         // applicationName can't be null at this stage
         String applicationName = requireNonNull(builder.applicationName);
-        ResourceBuilder resourceBuilder =
-                Resource.getDefault().toBuilder().put(APP_NAME_KEY, applicationName);
+        ResourceBuilder resourceBuilder = Resource.builder().put(APP_NAME_KEY, applicationName);
         if (builder.deploymentEnvironment != null) {
             resourceBuilder.put(DEPLOYMENT_ENVIRONMENT, builder.deploymentEnvironment);
         }

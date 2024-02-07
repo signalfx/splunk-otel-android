@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.os.Looper;
 import com.splunk.rum.incubating.HttpSenderCustomizer;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
@@ -60,6 +61,8 @@ import zipkin2.reporter.okhttp3.OkHttpSender;
 @ExtendWith(MockitoExtension.class)
 class RumInitializerTest {
 
+    static final String APP_NAME = "Sick test app";
+
     @Mock Looper mainLooper;
     @Mock Application application;
     @Mock Context context;
@@ -72,7 +75,12 @@ class RumInitializerTest {
                         .setApplicationName("testApp")
                         .setRumAccessToken("accessToken");
 
+        ApplicationInfo appInfo = new ApplicationInfo();
+        appInfo.labelRes = 14;
+
         when(application.getApplicationContext()).thenReturn(context);
+        when(context.getApplicationInfo()).thenReturn(appInfo);
+        when(context.getString(appInfo.labelRes)).thenReturn(APP_NAME);
 
         InMemorySpanExporter testExporter = InMemorySpanExporter.create();
         AppStartupTimer startupTimer = new AppStartupTimer();
@@ -95,6 +103,7 @@ class RumInitializerTest {
         assertEquals(
                 initSpan.getParentSpanContext(), startupTimer.getStartupSpan().getSpanContext());
 
+        verifyResource(initSpan);
         assertEquals("SplunkRum.initialize", initSpan.getName());
         assertEquals("appstart", initSpan.getAttributes().get(COMPONENT_KEY));
         assertEquals(
@@ -109,6 +118,10 @@ class RumInitializerTest {
         checkEventExists(events, "activityLifecycleCallbacksInitialized");
         checkEventExists(events, "crashReportingInitialized");
         checkEventExists(events, "anrMonitorInitialized");
+    }
+
+    private void verifyResource(SpanData span) {
+        assertThat(span.getResource().getAttribute(stringKey("service.name"))).isEqualTo(APP_NAME);
     }
 
     private void checkEventExists(List<EventData> events, String eventName) {
