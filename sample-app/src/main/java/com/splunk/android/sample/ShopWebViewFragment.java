@@ -51,7 +51,7 @@ public class ShopWebViewFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        String storeUrl = "https://frontend-us.o11ystore.com/";
+        String storeUrl = "https://frontend-us.splunko11y.com/";
         binding.webView.setWebViewClient(
                 new WebViewClientCompat() {
                     @Override
