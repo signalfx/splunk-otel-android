@@ -42,7 +42,7 @@ import java.util.concurrent.Executors;
 public class VolleyExample {
 
     private static final String URL =
-            "https://frontend-us.o11ystore.com?user=me&pass=secret123secret";
+            "https://frontend-us.splunko11y.com?user=me&pass=secret123secret";
     private final SplunkRum splunkRum;
 
     public VolleyExample(SplunkRum splunkRum) {
