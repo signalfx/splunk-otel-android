@@ -46,7 +46,7 @@ val otelSemconvVersion = "1.23.1-alpha"
 
 dependencies {
     api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
-    api(platform("io.opentelemetry:opentelemetry-bom:1.35.0"))
+    api(platform("io.opentelemetry:opentelemetry-bom:$otelSdkVersion"))
 
     implementation("io.opentelemetry.android:instrumentation:0.3.0-alpha")
 

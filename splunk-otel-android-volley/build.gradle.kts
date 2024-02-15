@@ -58,7 +58,7 @@ dependencies {
     implementation(project(":splunk-otel-android"))
 
     api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
-    api(platform("io.opentelemetry:opentelemetry-bom:1.35.0"))
+    api(platform("io.opentelemetry:opentelemetry-bom:$otelSdkVersion"))
 
     api("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
