@@ -64,7 +64,6 @@ dependencies {
 
     api("io.opentelemetry:opentelemetry-api")
     api("com.squareup.okhttp3:okhttp:4.12.0")
-//    api("io.zipkin.reporter2:zipkin-sender-okhttp3:2.17.2")
     api("io.zipkin.reporter2:zipkin-sender-okhttp3:3.3.0")
 
     testImplementation("org.mockito:mockito-core:5.10.0")
