@@ -39,12 +39,15 @@ android {
     }
 }
 
-val otelVersion = "1.33.0-SNAPSHOT"
+val otelVersion = "1.32.1"
+val otelSdkVersion = "1.35.0"
 val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
 val otelSemconvVersion = "1.23.1-alpha"
 
 dependencies {
     api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
+    api(platform("io.opentelemetry:opentelemetry-bom:$otelSdkVersion"))
+
     implementation("io.opentelemetry.android:instrumentation:0.3.0-alpha")
 
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.9.22"))
@@ -61,7 +64,7 @@ dependencies {
 
     api("io.opentelemetry:opentelemetry-api")
     api("com.squareup.okhttp3:okhttp:4.12.0")
-    api("io.zipkin.reporter2:zipkin-sender-okhttp3:2.17.2")
+    api("io.zipkin.reporter2:zipkin-sender-okhttp3:3.3.0")
 
     testImplementation("org.mockito:mockito-core:5.10.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")

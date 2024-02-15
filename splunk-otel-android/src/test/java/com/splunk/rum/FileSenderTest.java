@@ -20,6 +20,8 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -37,8 +39,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import zipkin2.Call;
-import zipkin2.reporter.Sender;
+import zipkin2.reporter.BytesMessageSender;
 
 @ExtendWith(MockitoExtension.class)
 class FileSenderTest {
@@ -51,14 +52,12 @@ class FileSenderTest {
 
     @Mock private FileUtils fileUtils;
     @Mock private BandwidthTracker bandwidthTracker;
-    @Mock private Sender delegate;
-    @Mock private Call<Void> httpCall;
+    @Mock private BytesMessageSender delegate;
     @Mock private Consumer<Integer> backoff;
 
     @BeforeEach
     void setup() throws Exception {
         when(fileUtils.readFileCompletely(file)).thenReturn(fileSpans);
-        when(delegate.sendSpans(fileSpans)).thenReturn(httpCall);
     }
 
     @Test
@@ -67,7 +66,7 @@ class FileSenderTest {
         Mockito.reset(delegate);
         File file = new File("/asdflkajsdfoij");
         when(fileUtils.readFileCompletely(file)).thenReturn(emptyList());
-        FileSender sender = buildSender();
+        FileSender sender = buildFileSender();
         boolean result = sender.handleFileOnDisk(file);
         assertFalse(result);
         verify(fileUtils).safeDelete(file);
@@ -75,7 +74,7 @@ class FileSenderTest {
 
     @Test
     void happyPathSendSpans() {
-        FileSender sender = buildSender();
+        FileSender sender = buildFileSender();
         boolean result = sender.handleFileOnDisk(file);
         assertTrue(result);
         verify(bandwidthTracker).tick(fileSpans);
@@ -83,8 +82,8 @@ class FileSenderTest {
 
     @Test
     void sendFailsButNotExceeded() throws Exception {
-        when(httpCall.execute()).thenThrow(new IOException("boom"));
-        FileSender sender = buildSender();
+        doThrow(new IOException("boom")).when(delegate).send(anyList());
+        FileSender sender = buildFileSender();
         boolean result = sender.handleFileOnDisk(file);
         assertFalse(result);
         verify(fileUtils, never()).safeDelete(any());
@@ -93,8 +92,8 @@ class FileSenderTest {
 
     @Test
     void senderFailureRetriesExhausted() throws Exception {
-        when(httpCall.execute()).thenThrow(new IOException("boom"));
-        FileSender sender = buildSender(3);
+        doThrow(new IOException("boom")).when(delegate).send(anyList());
+        FileSender sender = buildFileSender(3);
         boolean result = sender.handleFileOnDisk(file);
         assertFalse(result);
         verify(fileUtils, never()).safeDelete(any());
@@ -114,18 +113,18 @@ class FileSenderTest {
         Mockito.reset(fileUtils);
         Mockito.reset(delegate);
         when(fileUtils.readFileCompletely(file)).thenThrow(new IOException("boom"));
-        FileSender sender = buildSender();
+        FileSender sender = buildFileSender();
         boolean result = sender.handleFileOnDisk(file);
         assertFalse(result);
         verifyNoMoreInteractions(bandwidthTracker);
         verifyNoMoreInteractions(delegate);
     }
 
-    private FileSender buildSender() {
-        return buildSender(10);
+    private FileSender buildFileSender() {
+        return buildFileSender(10);
     }
 
-    private FileSender buildSender(int maxRetries) {
+    private FileSender buildFileSender(int maxRetries) {
         return FileSender.builder()
                 .backoff(backoff)
                 .bandwidthTracker(bandwidthTracker)

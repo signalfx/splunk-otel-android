@@ -29,14 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import zipkin2.Call;
-import zipkin2.reporter.Sender;
+import zipkin2.reporter.BytesMessageSender;
 
 class FileSender {
 
     private static final int DEFAULT_MAX_RETRIES = 20;
 
-    private final Sender sender;
+    private final BytesMessageSender sender;
     private final FileUtils fileUtils;
     private final BandwidthTracker bandwidthTracker;
     private final RetryTracker retryTracker;
@@ -78,8 +77,7 @@ class FileSender {
     private boolean attemptSend(File file, List<byte[]> encodedSpans) {
         try {
             bandwidthTracker.tick(encodedSpans);
-            Call<Void> httpCall = sender.sendSpans(encodedSpans);
-            httpCall.execute();
+            sender.send(encodedSpans);
             Log.d(LOG_TAG, "File content " + file + " successfully uploaded");
             return true;
         } catch (IOException e) {
@@ -154,13 +152,13 @@ class FileSender {
 
     static class Builder {
 
-        @Nullable private Sender sender;
+        @Nullable private BytesMessageSender sender;
         private FileUtils fileUtils = new FileUtils();
         @Nullable private BandwidthTracker bandwidthTracker;
         private int maxRetries = DEFAULT_MAX_RETRIES;
         private Consumer<Integer> backoff = new DefaultBackoff();
 
-        Builder sender(Sender sender) {
+        Builder sender(BytesMessageSender sender) {
             this.sender = sender;
             return this;
         }

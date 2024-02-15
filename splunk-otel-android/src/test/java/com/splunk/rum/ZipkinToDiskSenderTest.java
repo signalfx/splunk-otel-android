@@ -72,20 +72,20 @@ class ZipkinToDiskSenderTest {
                         .clock(clock)
                         .storageLimiter(limiter)
                         .build();
-        sender.sendSpans(spans);
+        sender.send(spans);
 
         verify(fileUtils).writeAsLines(finalPath, spans);
     }
 
     @Test
-    void testEmptyListDoesNotWriteFile() {
+    void testEmptyListDoesNotWriteFile() throws Exception {
         ZipkinToDiskSender sender =
                 ZipkinToDiskSender.builder()
                         .spanFileProvider(spanStorage)
                         .fileUtils(fileUtils)
                         .storageLimiter(limiter)
                         .build();
-        sender.sendSpans(emptyList());
+        sender.send(emptyList());
         verifyNoInteractions(fileUtils);
     }
 
@@ -102,12 +102,12 @@ class ZipkinToDiskSenderTest {
                         .storageLimiter(limiter)
                         .build();
 
-        sender.sendSpans(spans);
+        sender.send(spans);
         // Exception not thrown
     }
 
     @Test
-    void testLimitExceeded() {
+    void testLimitExceeded() throws Exception {
         Mockito.reset(clock);
         when(limiter.ensureFreeSpace()).thenReturn(false);
 
@@ -119,7 +119,7 @@ class ZipkinToDiskSenderTest {
                         .storageLimiter(limiter)
                         .build();
 
-        sender.sendSpans(spans);
+        sender.send(spans);
 
         verifyNoMoreInteractions(clock);
         verifyNoMoreInteractions(fileUtils);
