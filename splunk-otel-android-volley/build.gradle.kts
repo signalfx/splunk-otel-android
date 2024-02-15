@@ -63,7 +63,6 @@ dependencies {
     api("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
-//    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
     implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
 
