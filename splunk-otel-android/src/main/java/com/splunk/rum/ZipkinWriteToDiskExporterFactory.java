@@ -17,7 +17,7 @@
 package com.splunk.rum;
 
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
-import zipkin2.reporter.Sender;
+import zipkin2.reporter.BytesMessageSender;
 
 /**
  * Creates a ZipkinSpanExporter that is configured with an instance of a ZipkinToDiskSender that
@@ -35,7 +35,7 @@ class ZipkinWriteToDiskExporterFactory {
                         .fileProvider(spanStorage)
                         .maxStorageUseMb(maxUsageMegabytes)
                         .build();
-        Sender sender =
+        BytesMessageSender sender =
                 ZipkinToDiskSender.builder()
                         .spanFileProvider(spanStorage)
                         .fileUtils(fileUtils)

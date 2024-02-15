@@ -17,13 +17,12 @@
 package com.splunk.rum;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import zipkin2.Span;
-import zipkin2.codec.BytesEncoder;
-import zipkin2.codec.Encoding;
 import zipkin2.internal.JsonCodec;
 import zipkin2.internal.V2SpanWriter;
 import zipkin2.internal.WriteBuffer;
+import zipkin2.reporter.BytesEncoder;
+import zipkin2.reporter.Encoding;
 
 /**
  * We need a custom encoder to correct for the fact that the zipkin Span.Builder lowercases all Span
@@ -59,11 +58,5 @@ class CustomZipkinEncoder implements BytesEncoder<Span> {
                                 "\"name\":\"" + span.name() + "\"",
                                 "\"name\":\"" + properSpanName + "\"");
         return renamedResult.getBytes(StandardCharsets.UTF_8);
-    }
-
-    @Override
-    public byte[] encodeList(List<Span> spans) {
-        // note: this doesn't appear to be called in our current code paths, so let's leave it be.
-        return JsonCodec.writeList(this.writer, spans);
     }
 }

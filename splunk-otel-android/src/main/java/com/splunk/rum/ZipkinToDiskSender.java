@@ -24,11 +24,10 @@ import io.opentelemetry.sdk.common.Clock;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import zipkin2.Call;
-import zipkin2.codec.Encoding;
-import zipkin2.reporter.Sender;
+import zipkin2.reporter.BytesMessageSender;
+import zipkin2.reporter.Encoding;
 
-class ZipkinToDiskSender extends Sender {
+class ZipkinToDiskSender implements BytesMessageSender {
 
     private final SpanStorage spanStorage;
     private final FileUtils fileUtils;
@@ -58,9 +57,9 @@ class ZipkinToDiskSender extends Sender {
     }
 
     @Override
-    public Call<Void> sendSpans(List<byte[]> encodedSpans) {
+    public void send(List<byte[]> encodedSpans) throws IOException {
         if (encodedSpans.isEmpty()) {
-            return Call.create(null);
+            return;
         }
         if (!storageLimiter.ensureFreeSpace()) {
             Log.e(
@@ -68,7 +67,7 @@ class ZipkinToDiskSender extends Sender {
                     "Dropping "
                             + encodedSpans.size()
                             + " spans: Too much telemetry has been buffered or not enough space on device.");
-            return Call.create(null);
+            return;
         }
         long now = clock.now();
         File filename = createFilename(now);
@@ -77,7 +76,11 @@ class ZipkinToDiskSender extends Sender {
         } catch (IOException e) {
             Log.e(SplunkRum.LOG_TAG, "Error writing spans to storage", e);
         }
-        return Call.create(null);
+    }
+
+    @Override
+    public int messageSizeInBytes(int encodedSizeInBytes) {
+        return encoding().listSizeInBytes(encodedSizeInBytes);
     }
 
     private File createFilename(long now) {
@@ -87,6 +90,9 @@ class ZipkinToDiskSender extends Sender {
     static Builder builder() {
         return new Builder();
     }
+
+    @Override
+    public void close() throws IOException {}
 
     static class Builder {
         @Nullable private SpanStorage fileProvider;
