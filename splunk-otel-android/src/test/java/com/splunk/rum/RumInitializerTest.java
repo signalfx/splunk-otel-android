@@ -79,6 +79,7 @@ class RumInitializerTest {
         appInfo.labelRes = 14;
 
         when(application.getApplicationContext()).thenReturn(context);
+        when(application.getMainLooper()).thenReturn(mainLooper);
         when(context.getApplicationInfo()).thenReturn(appInfo);
         when(context.getString(appInfo.labelRes)).thenReturn(APP_NAME);
 
@@ -139,6 +140,7 @@ class RumInitializerTest {
                         .setRumAccessToken("accessToken");
 
         when(application.getApplicationContext()).thenReturn(context);
+        when(application.getMainLooper()).thenReturn(mainLooper);
 
         InMemorySpanExporter testExporter = InMemorySpanExporter.create();
         AppStartupTimer startupTimer = new AppStartupTimer();
@@ -244,6 +246,7 @@ class RumInitializerTest {
                         .setHttpSenderCustomizer(customizer);
 
         when(application.getApplicationContext()).thenReturn(context);
+        when(application.getMainLooper()).thenReturn(mainLooper);
 
         RumInitializer testInitializer =
                 new RumInitializer(splunkRumBuilder, application, new AppStartupTimer());
@@ -265,6 +268,7 @@ class RumInitializerTest {
                         .setRumAccessToken("secret!")
                         .setApplicationName("test");
 
+        when(application.getMainLooper()).thenReturn(mainLooper);
         when(application.getApplicationContext()).thenReturn(context);
 
         AppStartupTimer appStartupTimer = new AppStartupTimer();
