@@ -66,8 +66,8 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:4.12.0")
     api("io.zipkin.reporter2:zipkin-sender-okhttp3:3.3.0")
 
-    testImplementation("org.mockito:mockito-core:5.10.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
+    testImplementation("org.mockito:mockito-core:5.11.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
