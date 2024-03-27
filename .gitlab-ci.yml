@@ -10,8 +10,8 @@ image:
   name: "docker-hub.repo.splunkdev.net/eclipse-temurin:17.0.6_10-jdk"
 
 variables:
-  ANDROID_COMPILE_SDK: "30"
-  ANDROID_BUILD_TOOLS: "30.0.3"
+  ANDROID_COMPILE_SDK: "34"
+  ANDROID_BUILD_TOOLS: "34.0.0"
   ANDROID_COMMAND_LINE_TOOLS: "7302050"
 
 .prepare-android-environment:
