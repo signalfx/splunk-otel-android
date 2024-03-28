@@ -46,6 +46,7 @@ import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingDetec
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
@@ -256,7 +257,12 @@ class RumInitializer {
                 });
     }
 
+    /**
+     * Creates a minimal Splunk-specific resource. This will be blended with the upstream
+     * AndroidResource.
+     */
     private Resource createSplunkResource() {
+
         // applicationName can't be null at this stage
         String applicationName = requireNonNull(builder.applicationName);
         ResourceBuilder resourceBuilder = Resource.builder().put(APP_NAME_KEY, applicationName);
@@ -361,23 +367,29 @@ class RumInitializer {
 
     @NonNull
     private Sender buildCustomizedZipkinSender() {
-        OkHttpSender.Builder okBuilder = OkHttpSender.newBuilder().endpoint(getEndpoint());
+        OkHttpSender.Builder okBuilder =
+                OkHttpSender.newBuilder().endpoint(getZipkinStyleBeaconAuthEndpoint());
         builder.httpSenderCustomizer.customize(okBuilder);
         return okBuilder.build();
     }
 
     @NonNull
-    private String getEndpoint() {
+    private String getZipkinStyleBeaconAuthEndpoint() {
         return builder.beaconEndpoint + "?auth=" + builder.rumAccessToken;
     }
 
     private SpanExporter buildMemoryBufferingThrottledExporter(
             CurrentNetworkProvider currentNetworkProvider, MemorySpanBuffer backlogProvider) {
-        String endpoint = getEndpoint();
-        SpanExporter zipkinSpanExporter = getCoreSpanExporter(endpoint);
-        return ThrottlingExporter.newBuilder(
-                        new MemoryBufferingExporter(
-                                currentNetworkProvider, zipkinSpanExporter, backlogProvider))
+        SpanExporter zipkinSpanExporter = getCoreSpanExporter();
+        MemoryBufferingExporter memoryBufferingExporter =
+                new MemoryBufferingExporter(
+                        currentNetworkProvider, zipkinSpanExporter, backlogProvider);
+        return buildThrottlingExporter(memoryBufferingExporter);
+    }
+
+    private static ThrottlingExporter buildThrottlingExporter(
+            MemoryBufferingExporter memoryBufferingExporter) {
+        return ThrottlingExporter.newBuilder(memoryBufferingExporter)
                 .categorizeByAttribute(COMPONENT_KEY)
                 .maxSpansInWindow(100)
                 .windowSize(Duration.ofSeconds(30))
@@ -392,18 +404,37 @@ class RumInitializer {
     }
 
     // visible for testing
-    SpanExporter getCoreSpanExporter(String endpoint) {
+    SpanExporter getCoreSpanExporter() {
+        Supplier<SpanExporter> exporterSupplier = supplyZipkinExporter();
+        if (builder.shouldUseOtlpExporter()) {
+            exporterSupplier = supplyOtlpExporter();
+        }
         // return a lazy init exporter so the main thread doesn't block on the setup.
-        return new LazyInitSpanExporter(
-                () -> {
-                    return ZipkinSpanExporter.builder()
-                            .setEncoder(new CustomZipkinEncoder())
-                            .setEndpoint(endpoint)
-                            // remove the local IP address
-                            .setLocalIpAddressSupplier(() -> null)
-                            .setSender(buildCustomizedZipkinSender())
-                            .build();
-                });
+        return new LazyInitSpanExporter(exporterSupplier);
+    }
+
+    @NonNull
+    private Supplier<SpanExporter> supplyOtlpExporter() {
+        // TODO: Do we want/need to append the auth query parameter like zipkin?
+        String endpoint = builder.beaconEndpoint;
+        return () ->
+                OtlpHttpSpanExporter.builder()
+                        .setEndpoint(endpoint)
+                        .addHeader("X-SF-Token", builder.rumAccessToken)
+                        .build();
+    }
+
+    @NonNull
+    private Supplier<SpanExporter> supplyZipkinExporter() {
+        String endpoint = getZipkinStyleBeaconAuthEndpoint();
+        return () ->
+                ZipkinSpanExporter.builder()
+                        .setEncoder(new CustomZipkinEncoder())
+                        .setEndpoint(endpoint)
+                        // remove the local IP address
+                        .setLocalIpAddressSupplier(() -> null)
+                        .setSender(buildCustomizedZipkinSender())
+                        .build();
     }
 
     private static class LazyInitSpanExporter implements SpanExporter {
