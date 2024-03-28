@@ -19,7 +19,7 @@ jobs:
           java-version: 17
 
       - name: Build and test
-        run: touch ./local.properties; ./gradlew check javadoc
+        run: touch ./local.properties; ./gradlew check javadoc assemble
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4.1.1
   check_links:

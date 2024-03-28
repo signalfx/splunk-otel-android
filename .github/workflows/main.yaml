@@ -23,4 +23,4 @@ jobs:
           java-version: 17
 
       - name: Build and test
-        run: touch ./local.properties; ./gradlew build javadoc --no-daemon
+        run: touch ./local.properties; ./gradlew build javadoc assemble
