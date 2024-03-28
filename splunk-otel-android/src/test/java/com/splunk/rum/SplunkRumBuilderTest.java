@@ -16,6 +16,7 @@
 
 package com.splunk.rum;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -89,5 +90,38 @@ class SplunkRumBuilderTest {
         SplunkRumBuilder builder =
                 SplunkRum.builder().setRealm("us0").setBeaconEndpoint("http://beacon");
         assertEquals("http://beacon", builder.beaconEndpoint);
+    }
+
+    @Test
+    void otlpNotEnabledByDefault() {
+        SplunkRumBuilder builder = SplunkRum.builder().setRealm("jp0");
+        assertThat(builder.getConfigFlags().shouldUseOtlpExporter()).isFalse();
+    }
+
+    @Test
+    void enableOtlp() {
+        SplunkRumBuilder builder =
+                SplunkRum.builder().setRealm("jp0").enableExperimentalOtlpExporter();
+        assertThat(builder.getConfigFlags().shouldUseOtlpExporter()).isTrue();
+    }
+
+    @Test
+    void otlpFailsWhenDiskBufferingEnabled() {
+        SplunkRumBuilder builder =
+                SplunkRum.builder()
+                        .setRealm("us0")
+                        .enableDiskBuffering()
+                        .enableExperimentalOtlpExporter();
+        assertThat(builder.getConfigFlags().shouldUseOtlpExporter()).isFalse();
+    }
+
+    @Test
+    void enableDiskBufferAfterOtlp() {
+        SplunkRumBuilder builder =
+                SplunkRum.builder()
+                        .setRealm("us0")
+                        .enableExperimentalOtlpExporter()
+                        .enableDiskBuffering();
+        assertThat(builder.getConfigFlags().shouldUseOtlpExporter()).isFalse();
     }
 }
