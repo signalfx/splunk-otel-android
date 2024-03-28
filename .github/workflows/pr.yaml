@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v4.2.1
         with:
           distribution: temurin
-          java-version: 17.0.6
+          java-version: 17
 
       - name: Build and test
         run: touch ./local.properties; ./gradlew check javadoc
