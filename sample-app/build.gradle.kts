@@ -61,6 +61,8 @@ dependencies {
 
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    androidTestImplementation("androidx.test:core:1.5.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.webkit:webkit:1.10.0")
@@ -80,5 +82,6 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-sdk-logs")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
+    implementation("junit:junit:4.13.2")
     testImplementation("junit:junit:4.13.2")
 }
