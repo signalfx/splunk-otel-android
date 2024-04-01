@@ -81,6 +81,7 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-api-events")
     implementation("io.opentelemetry:opentelemetry-sdk-logs")
     implementation("io.opentelemetry:opentelemetry-sdk")
+    implementation("io.opentelemetry:opentelemetry-exporter-sender-okhttp")
 
     implementation("junit:junit:4.13.2")
     testImplementation("junit:junit:4.13.2")

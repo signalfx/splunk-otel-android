@@ -189,7 +189,7 @@ class RumInitializerTest {
         RumInitializer testInitializer =
                 new RumInitializer(splunkRumBuilder, application, startupTimer) {
                     @Override
-                    SpanExporter getCoreSpanExporter(String endpoint) {
+                    SpanExporter getCoreSpanExporter() {
                         return testExporter;
                     }
                 };
@@ -275,7 +275,7 @@ class RumInitializerTest {
         RumInitializer initializer =
                 new RumInitializer(splunkRumBuilder, application, appStartupTimer) {
                     @Override
-                    SpanExporter getCoreSpanExporter(String endpoint) {
+                    SpanExporter getCoreSpanExporter() {
                         return spanExporter;
                     }
                 };
