@@ -26,14 +26,16 @@ import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 
 /**
- * This class is responsible for parsing the Server-Timing header and setting the
- * linked trace id and span id attributes.
+ * This class is responsible for parsing the Server-Timing header and setting the linked trace id
+ * and span id attributes.
  */
-class VolleyServerTimingAttributesExtractor implements AttributesExtractor<RequestWrapper, HttpResponse> {
+class VolleyServerTimingAttributesExtractor
+        implements AttributesExtractor<RequestWrapper, HttpResponse> {
 
     private final ServerTimingHeaderParser serverTimingHeaderParser;
 
-    public VolleyServerTimingAttributesExtractor(ServerTimingHeaderParser serverTimingHeaderParser) {
+    public VolleyServerTimingAttributesExtractor(
+            ServerTimingHeaderParser serverTimingHeaderParser) {
         this.serverTimingHeaderParser = serverTimingHeaderParser;
     }
 
@@ -48,7 +50,7 @@ class VolleyServerTimingAttributesExtractor implements AttributesExtractor<Reque
             RequestWrapper requestWrapper,
             HttpResponse httpResponse,
             Throwable error) {
-        if(httpResponse == null){
+        if (httpResponse == null) {
             return;
         }
         String serverTimingHeader = getHeader(httpResponse, "Server-Timing");

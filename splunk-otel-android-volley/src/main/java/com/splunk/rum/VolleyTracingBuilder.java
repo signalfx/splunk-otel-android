@@ -94,7 +94,9 @@ public final class VolleyTracingBuilder {
                         .addAttributesExtractor(httpClientAttributesExtractorBuilder.build())
                         .addAttributesExtractor(new VolleyComponentKeySetter())
                         .addAttributesExtractor(new VolleyContentLengthAttributesExtractor())
-                        .addAttributesExtractor(new VolleyServerTimingAttributesExtractor(new ServerTimingHeaderParser()))
+                        .addAttributesExtractor(
+                                new VolleyServerTimingAttributesExtractor(
+                                        new ServerTimingHeaderParser()))
                         .addAttributesExtractors(additionalExtractors)
                         .buildClientInstrumenter(ClientRequestHeaderSetter.INSTANCE);
 

@@ -23,10 +23,9 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 
-
 /**
- * This class is just responsible for setting the COMPONENT_KEY attribute to "http"
- * on Volley client spans.
+ * This class is just responsible for setting the COMPONENT_KEY attribute to "http" on Volley client
+ * spans.
  */
 class VolleyComponentKeySetter implements AttributesExtractor<RequestWrapper, HttpResponse> {
     @Override

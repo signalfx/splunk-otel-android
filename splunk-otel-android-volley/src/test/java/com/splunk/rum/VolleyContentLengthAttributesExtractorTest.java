@@ -16,21 +16,18 @@
 
 package com.splunk.rum;
 
+import static io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZE;
 
 import com.android.volley.Header;
 import com.android.volley.Request;
 import com.android.volley.toolbox.HttpResponse;
-
-import org.junit.Test;
-
-import java.util.Collections;
-import java.util.List;
-
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
+import java.util.Collections;
+import java.util.List;
+import org.junit.Test;
 
 public class VolleyContentLengthAttributesExtractorTest {
 
@@ -43,7 +40,8 @@ public class VolleyContentLengthAttributesExtractorTest {
                 new RequestWrapper(mock(Request.class), Collections.emptyMap());
         HttpResponse response = new HttpResponse(200, responseHeaders, "zzz".getBytes());
 
-        VolleyContentLengthAttributesExtractor attributesExtractor = new VolleyContentLengthAttributesExtractor();
+        VolleyContentLengthAttributesExtractor attributesExtractor =
+                new VolleyContentLengthAttributesExtractor();
         AttributesBuilder attributesBuilder = Attributes.builder();
         attributesExtractor.onEnd(attributesBuilder, null, fakeRequest, response, null);
         attributesExtractor.onStart(attributesBuilder, null, fakeRequest);

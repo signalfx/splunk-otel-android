@@ -16,11 +16,10 @@
 
 package com.splunk.rum;
 
+import static io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
-
-import static io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZE;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;

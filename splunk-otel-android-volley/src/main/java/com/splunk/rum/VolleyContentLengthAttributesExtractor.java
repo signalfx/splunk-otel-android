@@ -26,8 +26,8 @@ import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.semconv.SemanticAttributes;
 
 /**
- * This class is responsible for extracting the Content-Length header and assigning
- * the value to an attribute.
+ * This class is responsible for extracting the Content-Length header and assigning the value to an
+ * attribute.
  */
 class VolleyContentLengthAttributesExtractor
         implements AttributesExtractor<RequestWrapper, HttpResponse> {
