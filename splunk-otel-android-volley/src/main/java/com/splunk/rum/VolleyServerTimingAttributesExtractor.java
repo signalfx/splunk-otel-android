@@ -16,68 +16,47 @@
 
 package com.splunk.rum;
 
-import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.LINK_SPAN_ID_KEY;
 import static com.splunk.rum.SplunkRum.LINK_TRACE_ID_KEY;
+import static com.splunk.rum.VolleyResponseUtils.getHeader;
 
-import androidx.annotation.Nullable;
-import com.android.volley.Header;
 import com.android.volley.toolbox.HttpResponse;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
-import io.opentelemetry.semconv.SemanticAttributes;
 
-class VolleyResponseAttributesExtractor
-        implements AttributesExtractor<RequestWrapper, HttpResponse> {
+/**
+ * This class is responsible for parsing the Server-Timing header and setting the
+ * linked trace id and span id attributes.
+ */
+class VolleyServerTimingAttributesExtractor implements AttributesExtractor<RequestWrapper, HttpResponse> {
 
     private final ServerTimingHeaderParser serverTimingHeaderParser;
 
-    public VolleyResponseAttributesExtractor(ServerTimingHeaderParser serverTimingHeaderParser) {
+    public VolleyServerTimingAttributesExtractor(ServerTimingHeaderParser serverTimingHeaderParser) {
         this.serverTimingHeaderParser = serverTimingHeaderParser;
     }
 
     @Override
     public void onStart(
-            AttributesBuilder attributes, Context parentContext, RequestWrapper requestWrapper) {
-        attributes.put(COMPONENT_KEY, "http");
-    }
+            AttributesBuilder attributes, Context parentContext, RequestWrapper requestWrapper) {}
 
     @Override
     public void onEnd(
             AttributesBuilder attributes,
             Context context,
             RequestWrapper requestWrapper,
-            @Nullable HttpResponse response,
-            @Nullable Throwable error) {
-        if (response != null) {
-            onResponse(attributes, response);
+            HttpResponse httpResponse,
+            Throwable error) {
+        if(httpResponse == null){
+            return;
         }
-    }
-
-    private void onResponse(AttributesBuilder attributes, HttpResponse response) {
-        String serverTimingHeader = getHeader(response, "Server-Timing");
+        String serverTimingHeader = getHeader(httpResponse, "Server-Timing");
 
         String[] ids = serverTimingHeaderParser.parse(serverTimingHeader);
         if (ids.length == 2) {
             attributes.put(LINK_TRACE_ID_KEY, ids[0]);
             attributes.put(LINK_SPAN_ID_KEY, ids[1]);
         }
-
-        String contentLength = getHeader(response, "Content-Length");
-        if (contentLength != null) {
-            attributes.put(
-                    SemanticAttributes.HTTP_RESPONSE_BODY_SIZE, Long.parseLong(contentLength));
-        }
-    }
-
-    @Nullable
-    private String getHeader(HttpResponse response, String headerName) {
-        for (Header header : response.getHeaders()) {
-            if (header.getName().equals(headerName)) {
-                return header.getValue();
-            }
-        }
-        return null;
     }
 }
