@@ -74,7 +74,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.junit.vintage:junit-vintage-engine")
     testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
-    testImplementation("org.robolectric:robolectric:4.11.1")
+    testImplementation("org.robolectric:robolectric:4.12")
     testImplementation("androidx.test:core:1.5.0")
     testImplementation("org.assertj:assertj-core:3.25.3")
 
