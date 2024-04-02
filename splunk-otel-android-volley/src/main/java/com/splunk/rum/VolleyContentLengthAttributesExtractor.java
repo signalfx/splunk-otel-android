@@ -16,32 +16,25 @@
 
 package com.splunk.rum;
 
-import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
-import static com.splunk.rum.SplunkRum.LINK_SPAN_ID_KEY;
-import static com.splunk.rum.SplunkRum.LINK_TRACE_ID_KEY;
+import static com.splunk.rum.VolleyResponseUtils.getHeader;
 
 import androidx.annotation.Nullable;
-import com.android.volley.Header;
 import com.android.volley.toolbox.HttpResponse;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.semconv.SemanticAttributes;
 
-class VolleyResponseAttributesExtractor
+/**
+ * This class is responsible for extracting the Content-Length header and assigning the value to an
+ * attribute.
+ */
+class VolleyContentLengthAttributesExtractor
         implements AttributesExtractor<RequestWrapper, HttpResponse> {
-
-    private final ServerTimingHeaderParser serverTimingHeaderParser;
-
-    public VolleyResponseAttributesExtractor(ServerTimingHeaderParser serverTimingHeaderParser) {
-        this.serverTimingHeaderParser = serverTimingHeaderParser;
-    }
 
     @Override
     public void onStart(
-            AttributesBuilder attributes, Context parentContext, RequestWrapper requestWrapper) {
-        attributes.put(COMPONENT_KEY, "http");
-    }
+            AttributesBuilder attributes, Context parentContext, RequestWrapper requestWrapper) {}
 
     @Override
     public void onEnd(
@@ -56,28 +49,10 @@ class VolleyResponseAttributesExtractor
     }
 
     private void onResponse(AttributesBuilder attributes, HttpResponse response) {
-        String serverTimingHeader = getHeader(response, "Server-Timing");
-
-        String[] ids = serverTimingHeaderParser.parse(serverTimingHeader);
-        if (ids.length == 2) {
-            attributes.put(LINK_TRACE_ID_KEY, ids[0]);
-            attributes.put(LINK_SPAN_ID_KEY, ids[1]);
-        }
-
         String contentLength = getHeader(response, "Content-Length");
         if (contentLength != null) {
             attributes.put(
                     SemanticAttributes.HTTP_RESPONSE_BODY_SIZE, Long.parseLong(contentLength));
         }
-    }
-
-    @Nullable
-    private String getHeader(HttpResponse response, String headerName) {
-        for (Header header : response.getHeaders()) {
-            if (header.getName().equals(headerName)) {
-                return header.getValue();
-            }
-        }
-        return null;
     }
 }

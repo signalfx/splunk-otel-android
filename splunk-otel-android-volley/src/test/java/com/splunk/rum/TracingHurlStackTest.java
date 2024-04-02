@@ -16,6 +16,7 @@
 
 package com.splunk.rum;
 
+import static io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
@@ -269,7 +270,7 @@ public class TracingHurlStackTest {
         assertThat(spanAttributes.get(SemanticAttributes.HTTP_METHOD)).isEqualTo("GET");
 
         if (responseBody != null) {
-            assertThat(span.getAttributes().get(SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH))
+            assertThat(span.getAttributes().get(HTTP_RESPONSE_BODY_SIZE))
                     .isEqualTo(responseBody.length());
         }
     }

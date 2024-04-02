@@ -92,8 +92,10 @@ public final class VolleyTracingBuilder {
                                 openTelemetry, INSTRUMENTATION_NAME, spanNameExtractor)
                         .setSpanStatusExtractor(spanStatusExtractor)
                         .addAttributesExtractor(httpClientAttributesExtractorBuilder.build())
+                        .addAttributesExtractor(new VolleyComponentKeySetter())
+                        .addAttributesExtractor(new VolleyContentLengthAttributesExtractor())
                         .addAttributesExtractor(
-                                new VolleyResponseAttributesExtractor(
+                                new VolleyServerTimingAttributesExtractor(
                                         new ServerTimingHeaderParser()))
                         .addAttributesExtractors(additionalExtractors)
                         .buildClientInstrumenter(ClientRequestHeaderSetter.INSTANCE);
