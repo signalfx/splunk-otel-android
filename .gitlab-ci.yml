@@ -55,10 +55,13 @@ sast-scan:
     alert_mode: "policy"
 
 oss-scan:
+  extends: .oss-scan
   stage: verify
+  before_script:
+    - JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+    - PATH=$JAVA_HOME/bin:$PATH
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
-  extends: .oss-scan
 
 release:
   stage: release
