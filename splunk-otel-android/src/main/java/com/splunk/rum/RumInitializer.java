@@ -368,13 +368,13 @@ class RumInitializer {
     @NonNull
     private Sender buildCustomizedZipkinSender() {
         OkHttpSender.Builder okBuilder =
-                OkHttpSender.newBuilder().endpoint(getZipkinStyleBeaconAuthEndpoint());
+                OkHttpSender.newBuilder().endpoint(getEndpointWithAuthTokenQueryParam());
         builder.httpSenderCustomizer.customize(okBuilder);
         return okBuilder.build();
     }
 
     @NonNull
-    private String getZipkinStyleBeaconAuthEndpoint() {
+    private String getEndpointWithAuthTokenQueryParam() {
         return builder.beaconEndpoint + "?auth=" + builder.rumAccessToken;
     }
 
@@ -415,8 +415,7 @@ class RumInitializer {
 
     @NonNull
     private Supplier<SpanExporter> supplyOtlpExporter() {
-        // TODO: Do we want/need to append the auth query parameter like zipkin?
-        String endpoint = builder.beaconEndpoint;
+        String endpoint = getEndpointWithAuthTokenQueryParam();
         return () ->
                 OtlpHttpSpanExporter.builder()
                         .setEndpoint(endpoint)
@@ -426,7 +425,7 @@ class RumInitializer {
 
     @NonNull
     private Supplier<SpanExporter> supplyZipkinExporter() {
-        String endpoint = getZipkinStyleBeaconAuthEndpoint();
+        String endpoint = getEndpointWithAuthTokenQueryParam();
         return () ->
                 ZipkinSpanExporter.builder()
                         .setEncoder(new CustomZipkinEncoder())
