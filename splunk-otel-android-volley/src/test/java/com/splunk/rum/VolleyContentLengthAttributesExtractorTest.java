@@ -43,8 +43,8 @@ public class VolleyContentLengthAttributesExtractorTest {
         VolleyContentLengthAttributesExtractor attributesExtractor =
                 new VolleyContentLengthAttributesExtractor();
         AttributesBuilder attributesBuilder = Attributes.builder();
-        attributesExtractor.onEnd(attributesBuilder, null, fakeRequest, response, null);
         attributesExtractor.onStart(attributesBuilder, null, fakeRequest);
+        attributesExtractor.onEnd(attributesBuilder, null, fakeRequest, response, null);
         Attributes attributes = attributesBuilder.build();
 
         assertThat(attributes.get(HTTP_RESPONSE_BODY_SIZE)).isEqualTo(90210L);
