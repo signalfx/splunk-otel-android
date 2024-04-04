@@ -60,6 +60,7 @@ oss-scan:
   before_script:
     - JAVA_HOME=/usr/lib/jvm/java-17-openjdk
     - PATH=$JAVA_HOME/bin:$PATH
+    - touch local.properties
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
 
