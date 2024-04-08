@@ -45,7 +45,7 @@ android {
 }
 
 val otelVersion = "1.32.1"
-val otelSdkVersion = "1.35.0"
+val otelSdkVersion = "1.37.0"
 val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
 val otelSemconvVersion = "1.23.1-alpha"
 
