@@ -50,7 +50,7 @@ import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.ExceptionAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -115,7 +115,7 @@ class RumInitializerTest {
                 initSpan.getAttributes().get(stringKey("config_settings")));
 
         List<EventData> events = initSpan.getEvents();
-        assertTrue(events.size() > 0);
+        assertThat(events).isNotEmpty();
         checkEventExists(events, "connectionUtilInitialized");
         checkEventExists(events, "exporterInitialized");
         checkEventExists(events, "tracerProviderInitialized");
@@ -310,21 +310,21 @@ class RumInitializerTest {
                                                                         stringKey("attribute"),
                                                                         "oh no!")
                                                                 .containsEntry(
-                                                                        SemanticAttributes
+                                                                        ExceptionAttributes
                                                                                 .EXCEPTION_TYPE,
                                                                         "IllegalArgumentException")
                                                                 .containsEntry(
                                                                         SplunkRum.ERROR_TYPE_KEY,
                                                                         "IllegalArgumentException")
                                                                 .containsEntry(
-                                                                        SemanticAttributes
+                                                                        ExceptionAttributes
                                                                                 .EXCEPTION_MESSAGE,
                                                                         "booom!")
                                                                 .containsEntry(
                                                                         SplunkRum.ERROR_MESSAGE_KEY,
                                                                         "booom!")
                                                                 .containsKey(
-                                                                        SemanticAttributes
+                                                                        ExceptionAttributes
                                                                                 .EXCEPTION_STACKTRACE))
                                         .hasEvents(emptyList()));
     }

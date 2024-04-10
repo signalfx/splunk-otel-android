@@ -23,7 +23,6 @@ import com.android.volley.toolbox.HttpResponse;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
-import io.opentelemetry.semconv.SemanticAttributes;
 import io.opentelemetry.semconv.incubating.HttpIncubatingAttributes;
 
 /**
@@ -53,7 +52,8 @@ class VolleyContentLengthAttributesExtractor
         String contentLength = getHeader(response, "Content-Length");
         if (contentLength != null) {
             attributes.put(
-                    HttpIncubatingAttributes.HTTP_RESPONSE_BODY_SIZE, Long.parseLong(contentLength));
+                    HttpIncubatingAttributes.HTTP_RESPONSE_BODY_SIZE,
+                    Long.parseLong(contentLength));
         }
     }
 }
