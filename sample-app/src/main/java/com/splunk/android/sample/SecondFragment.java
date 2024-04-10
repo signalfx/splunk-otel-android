@@ -32,6 +32,8 @@ import com.splunk.rum.SplunkRum;
 import io.opentelemetry.android.instrumentation.RumScreenName;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.incubator.events.EventLogger;
+import io.opentelemetry.api.incubator.events.EventLogger;
+import io.opentelemetry.api.incubator.events.EventLoggerProvider;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
