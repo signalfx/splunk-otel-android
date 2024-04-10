@@ -114,7 +114,7 @@ class LogToSpanBridgeTest {
         assertThat(spans).hasSize(1);
         assertThat(spans.get(0))
                 .hasInstrumentationScopeInfo(InstrumentationScopeInfo.create("test"))
-                .hasName("androidApp/buttonClick")
+                .hasName("androidApp.buttonClick")
                 .startsAt(epochNanos)
                 .endsAt(epochNanos)
                 .hasAttributes(
