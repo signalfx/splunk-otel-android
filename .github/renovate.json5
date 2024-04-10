@@ -9,7 +9,7 @@
       "matchPackageNames": [
         "io.opentelemetry:opentelemetry-api-incubator",
         "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha",
-        "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv",
+        "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator",
         "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0"
       ],
       // Renovate's default behavior is only to update from unstable -> unstable if it's for the
