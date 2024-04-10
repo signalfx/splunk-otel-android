@@ -24,6 +24,7 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.incubating.HttpIncubatingAttributes;
 
 /**
  * This class is responsible for extracting the Content-Length header and assigning the value to an
@@ -52,7 +53,7 @@ class VolleyContentLengthAttributesExtractor
         String contentLength = getHeader(response, "Content-Length");
         if (contentLength != null) {
             attributes.put(
-                    SemanticAttributes.HTTP_RESPONSE_BODY_SIZE, Long.parseLong(contentLength));
+                    HttpIncubatingAttributes.HTTP_RESPONSE_BODY_SIZE, Long.parseLong(contentLength));
         }
     }
 }
