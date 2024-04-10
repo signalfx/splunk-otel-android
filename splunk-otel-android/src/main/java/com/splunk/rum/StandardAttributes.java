@@ -25,7 +25,7 @@ import io.opentelemetry.semconv.SemanticAttributes;
 
 /**
  * This class hold {@link AttributeKey}s for standard RUM-related attributes that are not in the
- * OpenTelemetry {@link io.opentelemetry.semconv.SemanticAttributes} definitions.
+ * OpenTelemetry semantic definitions.
  */
 public final class StandardAttributes {
     /**
@@ -34,6 +34,8 @@ public final class StandardAttributes {
      * @see SplunkRumBuilder#setGlobalAttributes(Attributes)
      */
     public static final AttributeKey<String> APP_VERSION = stringKey("app.version");
+
+    public final static String EXCEPTION_EVENT_NAME = "exception";
 
     /**
      * The build type of your app (typically one of debug or release). Useful for adding to global

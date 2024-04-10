@@ -18,22 +18,23 @@ package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.ERROR_MESSAGE_KEY;
 import static com.splunk.rum.SplunkRum.ERROR_TYPE_KEY;
+import static com.splunk.rum.StandardAttributes.EXCEPTION_EVENT_NAME;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
-import static io.opentelemetry.semconv.SemanticAttributes.EXCEPTION_MESSAGE;
-import static io.opentelemetry.semconv.SemanticAttributes.EXCEPTION_STACKTRACE;
-import static io.opentelemetry.semconv.SemanticAttributes.EXCEPTION_TYPE;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_ICC;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_MCC;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_MNC;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_NAME;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CONNECTION_SUBTYPE;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CONNECTION_TYPE;
+import static io.opentelemetry.semconv.ExceptionAttributes.EXCEPTION_MESSAGE;
+import static io.opentelemetry.semconv.ExceptionAttributes.EXCEPTION_STACKTRACE;
+import static io.opentelemetry.semconv.ExceptionAttributes.EXCEPTION_TYPE;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_ICC;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_MCC;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_MNC;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_NAME;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CONNECTION_SUBTYPE;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CONNECTION_TYPE;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_ICC;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_MCC;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_MNC;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_NAME;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CONNECTION_SUBTYPE;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CONNECTION_TYPE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
@@ -49,6 +50,10 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.semconv.ResourceAttributes;
 import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.incubating.DeploymentIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.OsIncubatingAttributes;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -68,12 +73,12 @@ final class SplunkSpanDataModifier implements SpanExporter {
             unmodifiableSet(
                     new HashSet<>(
                             asList(
-                                    ResourceAttributes.DEPLOYMENT_ENVIRONMENT,
-                                    ResourceAttributes.DEVICE_MODEL_NAME,
-                                    ResourceAttributes.DEVICE_MODEL_IDENTIFIER,
-                                    ResourceAttributes.OS_NAME,
-                                    ResourceAttributes.OS_TYPE,
-                                    ResourceAttributes.OS_VERSION,
+                                    DeploymentIncubatingAttributes.DEPLOYMENT_ENVIRONMENT,
+                                    DeviceIncubatingAttributes.DEVICE_MODEL_NAME,
+                                    DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER,
+                                    OsIncubatingAttributes.OS_NAME,
+                                    OsIncubatingAttributes.OS_TYPE,
+                                    OsIncubatingAttributes.OS_VERSION,
                                     RumConstants.RUM_SDK_VERSION,
                                     SplunkRum.APP_NAME_KEY,
                                     SplunkRum.RUM_VERSION_KEY)));
@@ -131,7 +136,7 @@ final class SplunkSpanDataModifier implements SpanExporter {
             // zipkin eats the event attributes that are recorded by default, so we need to convert
             // the exception event to span attributes
             for (EventData event : original.getEvents()) {
-                if (event.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME)) {
+                if (event.getName().equals(EXCEPTION_EVENT_NAME)) {
                     modifiedAttributes.putAll(extractExceptionAttributes(event));
                 } else {
                     // if it's not an exception, leave the event as it is

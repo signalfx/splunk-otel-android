@@ -33,7 +33,7 @@ import io.opentelemetry.sdk.logs.LogRecordProcessor;
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord;
 import io.opentelemetry.sdk.logs.data.Body;
 import io.opentelemetry.sdk.logs.data.LogRecordData;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.incubating.EventIncubatingAttributes;
 import java.util.concurrent.TimeUnit;
 
 final class LogToSpanBridge implements LogRecordProcessor {
@@ -89,11 +89,9 @@ final class LogToSpanBridge implements LogRecordProcessor {
         if (operationName != null) {
             return operationName;
         }
-        String eventDomain = log.getAttributes().get(SemanticAttributes.EVENT_DOMAIN);
-        String eventName = log.getAttributes().get(SemanticAttributes.EVENT_NAME);
-        if (eventDomain != null || eventName != null) {
-            return (eventDomain == null ? "" : eventDomain + "/")
-                    + (eventName == null ? "" : eventName);
+        String eventName = log.getAttributes().get(EventIncubatingAttributes.EVENT_NAME);
+        if (eventName != null) {
+            return eventName;
         }
         return "Log";
     }
