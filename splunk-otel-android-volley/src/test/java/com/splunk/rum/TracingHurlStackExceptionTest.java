@@ -27,9 +27,6 @@ import com.android.volley.toolbox.StringRequest;
 import io.opentelemetry.sdk.testing.junit4.OpenTelemetryRule;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.semconv.ExceptionAttributes;
-import io.opentelemetry.semconv.SemanticAttributes;
-import io.opentelemetry.semconv.incubating.ExceptionIncubatingAttributes;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
@@ -84,7 +81,8 @@ public class TracingHurlStackExceptionTest {
                                                 a ->
                                                         assertThat(a)
                                                                 .containsEntry(
-                                                                        ExceptionAttributes.EXCEPTION_TYPE,
+                                                                        ExceptionAttributes
+                                                                                .EXCEPTION_TYPE,
                                                                         "java.lang.RuntimeException")
                                                                 .containsEntry(
                                                                         ExceptionAttributes
