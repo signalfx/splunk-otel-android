@@ -48,12 +48,9 @@ import io.opentelemetry.sdk.trace.data.DelegatingSpanData;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import io.opentelemetry.semconv.ResourceAttributes;
-import io.opentelemetry.semconv.SemanticAttributes;
 import io.opentelemetry.semconv.incubating.DeploymentIncubatingAttributes;
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes;
 import io.opentelemetry.semconv.incubating.OsIncubatingAttributes;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;

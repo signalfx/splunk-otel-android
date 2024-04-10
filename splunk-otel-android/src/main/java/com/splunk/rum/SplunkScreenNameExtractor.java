@@ -27,7 +27,7 @@ import java.util.function.Function;
  */
 class SplunkScreenNameExtractor implements ScreenNameExtractor {
 
-    static ScreenNameExtractor INSTANCE = new SplunkScreenNameExtractor();
+    static final ScreenNameExtractor INSTANCE = new SplunkScreenNameExtractor();
 
     private SplunkScreenNameExtractor() {}
 

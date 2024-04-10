@@ -35,7 +35,7 @@ public final class StandardAttributes {
      */
     public static final AttributeKey<String> APP_VERSION = stringKey("app.version");
 
-    public final static String EXCEPTION_EVENT_NAME = "exception";
+    public static final String EXCEPTION_EVENT_NAME = "exception";
 
     /**
      * The build type of your app (typically one of debug or release). Useful for adding to global
