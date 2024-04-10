@@ -33,11 +33,14 @@ import io.opentelemetry.android.instrumentation.RumScreenName;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.events.EventEmitter;
 import io.opentelemetry.api.events.EventEmitterProvider;
+import io.opentelemetry.api.incubator.events.EventLogger;
+import io.opentelemetry.api.incubator.events.EventLoggerProvider;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
-import io.opentelemetry.sdk.logs.internal.SdkEventEmitterProvider;
+import io.opentelemetry.sdk.logs.internal.SdkEventLoggerProvider;
+
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -220,14 +223,13 @@ public class SecondFragment extends Fragment {
     }
 
     public static void emitEvent(SplunkRum splunkRum, String eventDomain, String eventName) {
-        EventEmitterProvider eventEmitterProvider =
-                SdkEventEmitterProvider.create(
+        EventLoggerProvider eventEmitterProvider =
+                SdkEventLoggerProvider.create(
                         ((OpenTelemetrySdk) splunkRum.getOpenTelemetry()).getSdkLoggerProvider());
-        EventEmitter eventEmitter =
+        EventLogger eventLogger =
                 eventEmitterProvider
-                        .eventEmitterBuilder("test")
-                        .setEventDomain(eventDomain)
+                        .eventLoggerBuilder("test")
                         .build();
-        eventEmitter.emit(eventName, Attributes.empty());
+        eventLogger.builder(eventName).emit();
     }
 }
