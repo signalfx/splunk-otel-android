@@ -29,7 +29,7 @@ opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testi
 
 zipkin-sender-okhttp = "io.zipkin.reporter2:zipkin-sender-okhttp3:3.3.0"
 
-androidx-browser = "androidx.browser:browser:1.7.0"
+androidx-browser = "androidx.browser:browser:1.8.0"
 androidx-core = "androidx.core:core:1.12.0"
 androidx-navigation-fragment = "androidx.navigation:navigation-fragment:2.7.7"
 androidx-navigation-ui = "androidx.navigation:navigation-ui:2.7.7"
@@ -38,7 +38,6 @@ androidx-webkit = "androidx.webkit:webkit:1.10.0"
 
 # Volley
 android-volley = "com.android.volley:volley:1.2.1"
-
 
 #Test tools
 androidx-junit = "androidx.test.ext:junit:1.1.5"
@@ -65,4 +64,3 @@ junit = ["junit-jupiter-api", "junit-jupiter-engine", "junit-vintage-engine"]
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
-#publishPlugin = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
