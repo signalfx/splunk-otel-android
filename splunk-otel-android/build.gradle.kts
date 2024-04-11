@@ -39,11 +39,6 @@ android {
     }
 }
 
-//val otelVersion = "1.33.1"
-//val otelSdkVersion = "1.36.0"
-//val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
-//val otelSemconvVersion = "1.23.1-alpha"
-
 dependencies {
     api(platform(libs.opentelemetry.instrumentation.bom))
     api(platform(libs.opentelemetry.bom))
@@ -54,36 +49,9 @@ dependencies {
     implementation(libs.opentelemetry.exporter.zipkin)
     implementation(libs.opentelemetry.exporter.otlp)
     implementation(libs.opentelemetry.exporter.logging)
-
-//    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
-//    api(platform("io.opentelemetry:opentelemetry-bom:$otelSdkVersion"))
-//
-//    api("io.opentelemetry.android:instrumentation:0.4.0-alpha")
-//
-//    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.9.23"))
-//    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation(libs.androidx.core)
     implementation(libs.androidx.navigation.fragment)
-//
-//
-//    implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
-//
-//    api("io.opentelemetry:opentelemetry-api")
-//    api("com.squareup.okhttp3:okhttp:4.12.0")
     api(libs.zipkin.sender.okhttp)
-//
-//    testImplementation("org.mockito:mockito-core:5.11.0")
-//    testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
-//    testImplementation(platform("org.junit:junit-bom:5.10.2"))
-//    testImplementation("org.junit.jupiter:junit-jupiter-api")
-//    testImplementation("org.junit.jupiter:junit-jupiter-engine")
-//    testImplementation("org.junit.vintage:junit-vintage-engine")
-//    testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
-//    testImplementation("org.robolectric:robolectric:4.12.1")
-//    testImplementation("androidx.test:core:1.5.0")
-//    testImplementation("org.assertj:assertj-core:3.25.3")
-//
-//    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
 
 tasks.withType<Test> {
