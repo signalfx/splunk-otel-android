@@ -5,7 +5,7 @@
 #val otelSemconvVersion = "1.23.1-alpha"
 
 opentelemetry-core = "1.36.0"
-opentelemetry-core-alpha = "1.36.0"
+opentelemetry-core-alpha = "1.36.0-alpha"
 opentelemetry-alpha = "1.33.1-alpha"
 opentelemetry-android = "0.4.0-alpha"
 opentelemetry-semconv = "1.25.0-alpha"
@@ -22,6 +22,7 @@ opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation
 opentelemetry-bom = { module = "io.opentelemetry:opentelemetry-bom", version.ref = "opentelemetry-core-alpha" }
 opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-core" }
 opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry-core" }
+opentelemetry-api-events = { module = "io.opentelemetry:opentelemetry-api-events", version.ref = "opentelemetry-core-alpha" }
 opentelemetry-android = { module = "io.opentelemetry.android:instrumentation", version.ref = "opentelemetry-android" }
 opentelemetry-instrumenter-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api", version.ref = "opentelemetry-alpha" }
 opentelemetry-instrumenter-api-semconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv", version.ref = "opentelemetry-alpha" }
@@ -33,8 +34,12 @@ opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testi
 
 zipkin-sender-okhttp = "io.zipkin.reporter2:zipkin-sender-okhttp3:3.3.0"
 
+androidx-browser = "androidx.browser:browser:1.7.0"
 androidx-core = "androidx.core:core:1.12.0"
 androidx-navigation-fragment = "androidx.navigation:navigation-fragment:2.7.7"
+androidx-navigation-ui = "androidx.navigation:navigation-ui:2.7.7"
+androidx-work = "androidx.work:work-runtime:2.9.0"
+androidx-webkit = "androidx.webkit:webkit:1.10.0"
 
 # Volley
 android-volley = "com.android.volley:volley:1.2.1"
@@ -56,7 +61,8 @@ android-volley = "com.android.volley:volley:1.2.1"
 
 #Test tools
 #opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version.ref = "opentelemetry" }
-#androidx-test-core = "androidx.test:core:1.5.0"
+androidx-junit = "androidx.test.ext:junit:1.1.5"
+androidx-test-core = "androidx.test:core:1.5.0"
 #androidx-test-runner = "androidx.test:runner:1.5.2"
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }

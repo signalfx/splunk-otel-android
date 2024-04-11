@@ -52,37 +52,22 @@ android {
     }
 }
 
-val otelVersion = "1.33.1"
-val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
-val otelSemconvVersion = "1.23.1-alpha"
-
 dependencies {
-    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
+    api(platform(libs.opentelemetry.instrumentation.bom))
 
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
-    androidTestImplementation("androidx.test:core:1.5.0")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.webkit:webkit:1.10.0")
-    implementation("androidx.browser:browser:1.7.0")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.navigation:navigation-fragment:2.7.7")
-    implementation("androidx.navigation:navigation-ui:2.7.7")
     implementation(project(":splunk-otel-android"))
     implementation(project(":splunk-otel-android-volley"))
-    implementation("com.android.volley:volley:1.2.1")
-    implementation("androidx.work:work-runtime:2.9.0")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
-    implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
 
-    implementation("io.opentelemetry:opentelemetry-api-events")
-    implementation("io.opentelemetry:opentelemetry-sdk-logs")
-    implementation("io.opentelemetry:opentelemetry-sdk")
-    implementation("io.opentelemetry:opentelemetry-exporter-sender-okhttp")
+    coreLibraryDesugaring(libs.desugarJdkLibs)
 
-    implementation("junit:junit:4.13.2")
-    testImplementation("junit:junit:4.13.2")
+    implementation(libs.androidx.webkit)
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
+    implementation(libs.android.volley)
+    implementation(libs.androidx.work)
+    implementation(libs.opentelemetry.sdk)
+    implementation(libs.opentelemetry.api.events)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.junit)
 }
