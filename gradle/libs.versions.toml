@@ -1,6 +1,6 @@
 [versions]
-opentelemetry-core = "1.36.0"
-opentelemetry-core-alpha = "1.36.0-alpha"
+opentelemetry-core = "1.37.0"
+opentelemetry-core-alpha = "1.37.0"
 opentelemetry-alpha = "1.33.1-alpha"
 opentelemetry-android = "0.4.0-alpha"
 mockito = "5.11.0"
