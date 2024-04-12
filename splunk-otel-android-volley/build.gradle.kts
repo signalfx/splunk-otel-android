@@ -44,39 +44,17 @@ android {
     }
 }
 
-val otelVersion = "1.32.1"
-val otelSdkVersion = "1.35.0"
-val otelAlphaVersion = otelVersion.replaceFirst("(-SNAPSHOT)?$".toRegex(), "-alpha$1")
-val otelSemconvVersion = "1.23.1-alpha"
-
 dependencies {
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.navigation:navigation-fragment:2.7.7")
-    compileOnly("com.android.volley:volley:1.2.1")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
-
     implementation(project(":splunk-otel-android"))
-
-    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$otelAlphaVersion"))
-    api(platform("io.opentelemetry:opentelemetry-bom:$otelSdkVersion"))
-
-    api("io.opentelemetry:opentelemetry-api")
-    implementation("io.opentelemetry:opentelemetry-sdk")
-
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api")
-    implementation("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv")
-
-    implementation("io.opentelemetry.semconv:opentelemetry-semconv:$otelSemconvVersion")
-
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.assertj:assertj-core:3.25.3")
-    testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
-    testImplementation("org.robolectric:robolectric:4.12.1")
-    testImplementation("org.mockito:mockito-core:5.11.0")
-    testImplementation("androidx.test:core:1.5.0")
-    testImplementation("com.google.mockwebserver:mockwebserver:20130706")
-    testImplementation("com.android.volley:volley:1.2.1")
-    testImplementation("org.apache.httpcomponents:httpclient:4.5.14")
+    api(platform(libs.opentelemetry.instrumentation.bom))
+    api(platform(libs.opentelemetry.bom))
+    compileOnly(libs.opentelemetry.api)
+    implementation(libs.opentelemetry.instrumenter.api)
+    implementation(libs.opentelemetry.instrumenter.api.semconv)
+    compileOnly(libs.android.volley)
+    implementation(libs.androidx.core)
+    testImplementation(libs.mockwebserver)
+    testImplementation(libs.android.volley)
 }
 
 tasks.withType<Test>().configureEach {

@@ -1,0 +1,61 @@
+[versions]
+opentelemetry-core = "1.36.0"
+opentelemetry-core-alpha = "1.36.0-alpha"
+opentelemetry-alpha = "1.33.1-alpha"
+opentelemetry-android = "0.4.0-alpha"
+mockito = "5.11.0"
+junit = "5.10.2"
+spotless = "6.25.0"
+
+[libraries]
+opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha", version.ref = "opentelemetry-alpha" }
+opentelemetry-bom = { module = "io.opentelemetry:opentelemetry-bom", version.ref = "opentelemetry-core-alpha" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-core" }
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry-core" }
+opentelemetry-api-events = { module = "io.opentelemetry:opentelemetry-api-events", version.ref = "opentelemetry-core-alpha" }
+opentelemetry-android = { module = "io.opentelemetry.android:instrumentation", version.ref = "opentelemetry-android" }
+opentelemetry-instrumenter-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api", version.ref = "opentelemetry-alpha" }
+opentelemetry-instrumenter-api-semconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv", version.ref = "opentelemetry-alpha" }
+opentelemetry-instrumentation-okhttp = { module = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0", version.ref = "opentelemetry-alpha" }
+opentelemetry-exporter-zipkin = { module = "io.opentelemetry:opentelemetry-exporter-zipkin", version.ref = "opentelemetry-core" }
+opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry-core" }
+opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging", version.ref = "opentelemetry-core" }
+opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version.ref = "opentelemetry-core" }
+
+zipkin-sender-okhttp = "io.zipkin.reporter2:zipkin-sender-okhttp3:3.3.0"
+
+androidx-browser = "androidx.browser:browser:1.8.0"
+androidx-core = "androidx.core:core:1.12.0"
+androidx-navigation-fragment = "androidx.navigation:navigation-fragment:2.7.7"
+androidx-navigation-ui = "androidx.navigation:navigation-ui:2.7.7"
+androidx-work = "androidx.work:work-runtime:2.9.0"
+androidx-webkit = "androidx.webkit:webkit:1.10.0"
+
+# Volley
+android-volley = "com.android.volley:volley:1.2.1"
+
+#Test tools
+androidx-junit = "androidx.test.ext:junit:1.1.5"
+androidx-test-core = "androidx.test:core:1.5.0"
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit" }
+mockwebserver = "com.google.mockwebserver:mockwebserver:20130706"
+robolectric = "org.robolectric:robolectric:4.12.1"
+assertj-core = "org.assertj:assertj-core:3.25.3"
+
+#Compilation tools
+desugarJdkLibs = "com.android.tools:desugar_jdk_libs:2.0.4"
+android-plugin = "com.android.tools.build:gradle:8.3.2"
+errorprone-plugin = "net.ltgt.gradle:gradle-errorprone-plugin:3.1.0"
+nullaway-plugin = "net.ltgt.gradle:gradle-nullaway-plugin:2.0.0"
+spotless-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
+
+[bundles]
+mocking = ["mockito-core", "mockito-junit-jupiter"]
+junit = ["junit-jupiter-api", "junit-jupiter-engine", "junit-vintage-engine"]
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
