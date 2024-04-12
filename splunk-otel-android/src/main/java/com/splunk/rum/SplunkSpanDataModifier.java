@@ -80,10 +80,17 @@ final class SplunkSpanDataModifier implements SpanExporter {
 
     private final SpanExporter delegate;
     private final boolean reactNativeEnabled;
+    private final boolean otlpExportIsEnabled;
 
     SplunkSpanDataModifier(SpanExporter delegate, boolean reactNativeEnabled) {
+        this(delegate, reactNativeEnabled, false);
+    }
+
+    SplunkSpanDataModifier(
+            SpanExporter delegate, boolean reactNativeEnabled, boolean otlpExportIsEnabled) {
         this.delegate = delegate;
         this.reactNativeEnabled = reactNativeEnabled;
+        this.otlpExportIsEnabled = otlpExportIsEnabled;
     }
 
     @Override
@@ -92,7 +99,6 @@ final class SplunkSpanDataModifier implements SpanExporter {
     }
 
     private SpanData modify(SpanData original) {
-        List<EventData> modifiedEvents = new ArrayList<>(original.getEvents().size());
         AttributesBuilder modifiedAttributes = original.getAttributes().toBuilder();
 
         // Copy the native session id name into the splunk name
@@ -119,14 +125,18 @@ final class SplunkSpanDataModifier implements SpanExporter {
         modifiedAttributes =
                 downgradeNetworkAttrNames(original.getAttributes(), modifiedAttributes);
 
-        // zipkin eats the event attributes that are recorded by default, so we need to convert
-        // the exception event to span attributes
-        for (EventData event : original.getEvents()) {
-            if (event.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME)) {
-                modifiedAttributes.putAll(extractExceptionAttributes(event));
-            } else {
-                // if it's not an exception, leave the event as it is
-                modifiedEvents.add(event);
+        List<EventData> modifiedEvents = new ArrayList<>(original.getEvents());
+        if (!otlpExportIsEnabled) {
+            modifiedEvents = new ArrayList<>(original.getEvents().size());
+            // zipkin eats the event attributes that are recorded by default, so we need to convert
+            // the exception event to span attributes
+            for (EventData event : original.getEvents()) {
+                if (event.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME)) {
+                    modifiedAttributes.putAll(extractExceptionAttributes(event));
+                } else {
+                    // if it's not an exception, leave the event as it is
+                    modifiedEvents.add(event);
+                }
             }
         }
 
@@ -134,11 +144,13 @@ final class SplunkSpanDataModifier implements SpanExporter {
         // name on the wire.
         modifiedAttributes.put(SPLUNK_OPERATION_KEY, original.getName());
 
-        // zipkin does not have resource attributes, we'll need to copy them to span level
-        for (AttributeKey<String> key : resourceAttributesToCopy) {
-            String value = original.getResource().getAttribute(key);
-            if (value != null) {
-                modifiedAttributes.put(key, value);
+        if (!otlpExportIsEnabled) {
+            // zipkin does not have resource attributes, we'll need to copy them to span level
+            for (AttributeKey<String> key : resourceAttributesToCopy) {
+                String value = original.getResource().getAttribute(key);
+                if (value != null) {
+                    modifiedAttributes.put(key, value);
+                }
             }
         }
 

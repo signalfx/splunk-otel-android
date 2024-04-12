@@ -53,6 +53,31 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class SplunkSpanDataModifierTest {
 
+    public static final Resource RESOURCE =
+            Resource.create(
+                    Attributes.builder()
+                            .put("custom.ignored.attribute", "something")
+                            .put(ResourceAttributes.SERVICE_NAME, "myApp")
+                            .put(ResourceAttributes.DEPLOYMENT_ENVIRONMENT, "dev")
+                            .put(ResourceAttributes.DEVICE_MODEL_NAME, "phone")
+                            .put(ResourceAttributes.DEVICE_MODEL_IDENTIFIER, "phone 12345")
+                            .put(ResourceAttributes.OS_NAME, "Android")
+                            .put(ResourceAttributes.OS_TYPE, "linux")
+                            .put(ResourceAttributes.OS_VERSION, "13")
+                            .put(SplunkRum.APP_NAME_KEY, "myApp")
+                            .put(SplunkRum.RUM_VERSION_KEY, "1.0.0")
+                            .build());
+    static final EventData BASIC_EVENT =
+            EventData.create(123, "test", Attributes.of(stringKey("attribute"), "value"));
+    static final EventData EXCEPTION_EVENT =
+            EventData.create(
+                    456,
+                    SemanticAttributes.EXCEPTION_EVENT_NAME,
+                    Attributes.builder()
+                            .put(SemanticAttributes.EXCEPTION_TYPE, "com.example.Error")
+                            .put(SemanticAttributes.EXCEPTION_MESSAGE, "failed")
+                            .put(SemanticAttributes.EXCEPTION_STACKTRACE, "<stacktrace>")
+                            .build());
     @Mock private SpanExporter delegate;
     @Captor private ArgumentCaptor<Collection<SpanData>> exportedSpansCaptor;
 
@@ -107,22 +132,7 @@ class SplunkSpanDataModifierTest {
                                                 123,
                                                 "test",
                                                 Attributes.of(stringKey("attribute"), "value")),
-                                        EventData.create(
-                                                456,
-                                                SemanticAttributes.EXCEPTION_EVENT_NAME,
-                                                Attributes.builder()
-                                                        .put(
-                                                                SemanticAttributes.EXCEPTION_TYPE,
-                                                                "com.example.Error")
-                                                        .put(
-                                                                SemanticAttributes
-                                                                        .EXCEPTION_MESSAGE,
-                                                                "failed")
-                                                        .put(
-                                                                SemanticAttributes
-                                                                        .EXCEPTION_STACKTRACE,
-                                                                "<stacktrace>")
-                                                        .build())))
+                                        EXCEPTION_EVENT))
                         .setAttributes(Attributes.of(stringKey("attribute"), "value"))
                         .build();
 
@@ -139,9 +149,7 @@ class SplunkSpanDataModifierTest {
         assertThat(exportedSpans.iterator().next())
                 .hasName("test")
                 .hasKind(SpanKind.CLIENT)
-                .hasEvents(
-                        EventData.create(
-                                123, "test", Attributes.of(stringKey("attribute"), "value")))
+                .hasEvents(BASIC_EVENT)
                 .hasTotalRecordedEvents(1)
                 .hasAttributesSatisfyingExactly(
                         equalTo(SPLUNK_OPERATION_KEY, "test"),
@@ -152,6 +160,35 @@ class SplunkSpanDataModifierTest {
                         equalTo(SplunkRum.ERROR_MESSAGE_KEY, "failed"),
                         equalTo(SemanticAttributes.EXCEPTION_STACKTRACE, "<stacktrace>"))
                 .hasTotalAttributeCount(7);
+    }
+
+    @Test
+    void otlpDoesNotMessWithSpanEvents() {
+        SpanData original =
+                startBuilder()
+                        .setEvents(Arrays.asList(BASIC_EVENT, EXCEPTION_EVENT))
+                        .setAttributes(Attributes.of(stringKey("attribute"), "value"))
+                        .build();
+
+        CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
+        when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
+
+        SpanExporter underTest = new SplunkSpanDataModifier(delegate, false, true);
+        CompletableResultCode actual = underTest.export(singleton(original));
+
+        assertThat(actual).isSameAs(exportResult);
+
+        Collection<SpanData> exportedSpans = exportedSpansCaptor.getValue();
+        assertThat(exportedSpans).hasSize(1);
+        assertThat(exportedSpans.iterator().next())
+                .hasName("test")
+                .hasKind(SpanKind.CLIENT)
+                .hasEvents(BASIC_EVENT, EXCEPTION_EVENT)
+                .hasTotalRecordedEvents(2)
+                .hasAttributesSatisfyingExactly(
+                        equalTo(SPLUNK_OPERATION_KEY, "test"),
+                        equalTo(stringKey("attribute"), "value"))
+                .hasTotalAttributeCount(2);
     }
 
     @Test
@@ -175,21 +212,6 @@ class SplunkSpanDataModifierTest {
 
     @Test
     void shouldCopySelectedResourceAttributes() {
-        Resource resource =
-                Resource.create(
-                        Attributes.builder()
-                                .put("custom.ignored.attribute", "something")
-                                .put(ResourceAttributes.SERVICE_NAME, "myApp")
-                                .put(ResourceAttributes.DEPLOYMENT_ENVIRONMENT, "dev")
-                                .put(ResourceAttributes.DEVICE_MODEL_NAME, "phone")
-                                .put(ResourceAttributes.DEVICE_MODEL_IDENTIFIER, "phone 12345")
-                                .put(ResourceAttributes.OS_NAME, "Android")
-                                .put(ResourceAttributes.OS_TYPE, "linux")
-                                .put(ResourceAttributes.OS_VERSION, "13")
-                                .put(SplunkRum.APP_NAME_KEY, "myApp")
-                                .put(SplunkRum.RUM_VERSION_KEY, "1.0.0")
-                                .build());
-
         SpanData original =
                 TestSpanData.builder()
                         .setName("SplunkRumSpan")
@@ -198,7 +220,7 @@ class SplunkSpanDataModifierTest {
                         .setStartEpochNanos(12345)
                         .setEndEpochNanos(67890)
                         .setHasEnded(true)
-                        .setResource(resource)
+                        .setResource(RESOURCE)
                         .build();
 
         CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
@@ -223,6 +245,36 @@ class SplunkSpanDataModifierTest {
                         equalTo(ResourceAttributes.OS_VERSION, "13"),
                         equalTo(SplunkRum.APP_NAME_KEY, "myApp"),
                         equalTo(SplunkRum.RUM_VERSION_KEY, "1.0.0"));
+    }
+
+    @Test
+    void otlpDoesNotMessWithResourceAttributes() {
+
+        SpanData original =
+                TestSpanData.builder()
+                        .setName("SplunkRumSpan")
+                        .setKind(SpanKind.CLIENT)
+                        .setStatus(StatusData.unset())
+                        .setStartEpochNanos(12345)
+                        .setEndEpochNanos(67890)
+                        .setHasEnded(true)
+                        .setResource(RESOURCE)
+                        .build();
+
+        CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
+        when(delegate.export(exportedSpansCaptor.capture())).thenReturn(exportResult);
+
+        SpanExporter underTest = new SplunkSpanDataModifier(delegate, false, true);
+        CompletableResultCode actual = underTest.export(singleton(original));
+
+        assertThat(actual).isSameAs(exportResult);
+
+        Collection<SpanData> exportedSpans = exportedSpansCaptor.getValue();
+        assertThat(exportedSpans).hasSize(1);
+        assertThat(exportedSpans.iterator().next())
+                .hasName("SplunkRumSpan")
+                .hasResource(RESOURCE)
+                .hasAttributesSatisfyingExactly(equalTo(SPLUNK_OPERATION_KEY, "SplunkRumSpan"));
     }
 
     @Test

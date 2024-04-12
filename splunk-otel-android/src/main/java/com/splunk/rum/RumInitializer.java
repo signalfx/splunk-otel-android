@@ -320,7 +320,10 @@ class RumInitializer {
             VisibleScreenTracker visibleScreenTracker) {
         SpanExporter exporter = buildExporter(currentNetworkProvider, visibleScreenTracker);
         SpanExporter splunkTranslatedExporter =
-                new SplunkSpanDataModifier(exporter, builder.isReactNativeSupportEnabled());
+                new SplunkSpanDataModifier(
+                        exporter,
+                        builder.isReactNativeSupportEnabled(),
+                        builder.shouldUseOtlpExporter());
         SpanExporter filteredExporter = builder.decorateWithSpanFilter(splunkTranslatedExporter);
         initializationEvents.emit("zipkin exporter initialized");
         return filteredExporter;
