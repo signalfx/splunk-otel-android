@@ -16,7 +16,8 @@
 
 package com.splunk.rum;
 
-import static io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZE;
+import static io.opentelemetry.semconv.HttpAttributes.HTTP_RESPONSE_STATUS_CODE;
+import static io.opentelemetry.semconv.incubating.HttpIncubatingAttributes.HTTP_RESPONSE_BODY_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
@@ -35,7 +36,9 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.sdk.testing.junit4.OpenTelemetryRule;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.HttpAttributes;
+import io.opentelemetry.semconv.ServerAttributes;
+import io.opentelemetry.semconv.UrlAttributes;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
@@ -168,7 +171,7 @@ public class TracingHurlStackTest {
 
         assertThat(span.getEvents())
                 .hasSize(1)
-                .allSatisfy(e -> e.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME));
+                .allSatisfy(e -> e.getName().equals(StandardAttributes.EXCEPTION_EVENT_NAME));
 
         verifyAttributes(span, url, null, null);
     }
@@ -261,13 +264,11 @@ public class TracingHurlStackTest {
 
         Attributes spanAttributes = span.getAttributes();
 
-        // We continue using deprecated semconv for now. When 2.0.0 hits we will need to update
-        // these.
-        assertThat(spanAttributes.get(SemanticAttributes.HTTP_STATUS_CODE)).isEqualTo(status);
-        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_PORT)).isEqualTo(url.getPort());
-        assertThat(spanAttributes.get(SemanticAttributes.NET_PEER_NAME)).isEqualTo(url.getHost());
-        assertThat(spanAttributes.get(SemanticAttributes.HTTP_URL)).isEqualTo(url.toString());
-        assertThat(spanAttributes.get(SemanticAttributes.HTTP_METHOD)).isEqualTo("GET");
+        assertThat(spanAttributes.get(HTTP_RESPONSE_STATUS_CODE)).isEqualTo(status);
+        assertThat(spanAttributes.get(ServerAttributes.SERVER_PORT)).isEqualTo(url.getPort());
+        assertThat(spanAttributes.get(ServerAttributes.SERVER_ADDRESS)).isEqualTo(url.getHost());
+        assertThat(spanAttributes.get(UrlAttributes.URL_FULL)).isEqualTo(url.toString());
+        assertThat(spanAttributes.get(HttpAttributes.HTTP_REQUEST_METHOD)).isEqualTo("GET");
 
         if (responseBody != null) {
             assertThat(span.getAttributes().get(HTTP_RESPONSE_BODY_SIZE))

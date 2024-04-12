@@ -27,7 +27,7 @@ import io.opentelemetry.api.common.Attributes;
 
 public class DemoWorker extends Worker {
 
-    private Context context;
+    private final Context context;
     public static final String TAG = "SplunkRum";
 
     public DemoWorker(@NonNull Context context, @NonNull WorkerParameters params) {
