@@ -1,22 +1,23 @@
 [versions]
 opentelemetry-core = "1.36.0"
 opentelemetry-core-alpha = "1.36.0-alpha"
-opentelemetry-alpha = "1.33.1-alpha"
+opentelemetry-inst = "1.33.1"
+opentelemetry-inst-alpha = "1.33.1-alpha"
 opentelemetry-android = "0.4.0-alpha"
 mockito = "5.11.0"
 junit = "5.10.2"
 spotless = "6.25.0"
 
 [libraries]
-opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha", version.ref = "opentelemetry-alpha" }
+opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom", version.ref = "opentelemetry-inst" }
 opentelemetry-bom = { module = "io.opentelemetry:opentelemetry-bom", version.ref = "opentelemetry-core-alpha" }
 opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-core" }
 opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry-core" }
 opentelemetry-api-events = { module = "io.opentelemetry:opentelemetry-api-events", version.ref = "opentelemetry-core-alpha" }
 opentelemetry-android = { module = "io.opentelemetry.android:instrumentation", version.ref = "opentelemetry-android" }
-opentelemetry-instrumenter-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api", version.ref = "opentelemetry-alpha" }
-opentelemetry-instrumenter-api-semconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv", version.ref = "opentelemetry-alpha" }
-opentelemetry-instrumentation-okhttp = { module = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0", version.ref = "opentelemetry-alpha" }
+opentelemetry-instrumenter-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api", version.ref = "opentelemetry-inst" }
+opentelemetry-instrumenter-api-semconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv", version.ref = "opentelemetry-inst-alpha" }
+opentelemetry-instrumentation-okhttp = { module = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0", version.ref = "opentelemetry-inst-alpha" }
 opentelemetry-exporter-zipkin = { module = "io.opentelemetry:opentelemetry-exporter-zipkin", version.ref = "opentelemetry-core" }
 opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry-core" }
 opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging", version.ref = "opentelemetry-core" }
