@@ -2,7 +2,7 @@
 opentelemetry-core = "1.36.0"
 opentelemetry-core-alpha = "1.36.0-alpha"
 opentelemetry-inst = "1.33.1"
-opentelemetry-inst-alpha = "1.33.1-alpha"
+opentelemetry-inst-alpha = "1.33.2-alpha"
 opentelemetry-android = "0.4.0-alpha"
 mockito = "5.11.0"
 junit = "5.10.2"
