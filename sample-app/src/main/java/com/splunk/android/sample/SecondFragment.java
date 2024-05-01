@@ -190,7 +190,8 @@ public class SecondFragment extends Fragment {
         if (spamTask == null) {
             resetLabel();
             spamTask =
-                    spammer.scheduleAtFixedRate(this::createSpamSpan, 0, 50, TimeUnit.MILLISECONDS);
+                    spammer.scheduleWithFixedDelay(
+                            this::createSpamSpan, 0, 50, TimeUnit.MILLISECONDS);
             binding.buttonSpam.setText(R.string.stop_spam);
         } else {
             spamTask.cancel(false);

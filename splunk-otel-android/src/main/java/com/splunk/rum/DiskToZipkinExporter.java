@@ -58,7 +58,7 @@ class DiskToZipkinExporter {
     // the returned future is very unlikely to fail
     @SuppressWarnings("FutureReturnValueIgnored")
     void startPolling() {
-        threadPool.scheduleAtFixedRate(this::doExportCycle, 5, 5, TimeUnit.SECONDS);
+        threadPool.scheduleWithFixedDelay(this::doExportCycle, 5, 5, TimeUnit.SECONDS);
     }
 
     // Visible for testing
