@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.2
+      - uses: actions/checkout@v4.1.4
 
       - name: Set up JDK 17 for running Gradle
         uses: actions/setup-java@v4.2.1
