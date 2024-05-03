@@ -38,4 +38,3 @@ nexusPublishing.repositories {
         password.set(System.getenv("SONATYPE_KEY"))
     }
 }
-
