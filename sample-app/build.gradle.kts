@@ -67,7 +67,7 @@ dependencies {
     implementation(libs.android.volley)
     implementation(libs.androidx.work)
     implementation(libs.opentelemetry.sdk)
-    implementation(libs.opentelemetry.api.events)
+    implementation(libs.opentelemetry.api.incubator)
     testImplementation(libs.bundles.junit)
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.junit)

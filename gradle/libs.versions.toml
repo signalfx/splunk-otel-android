@@ -1,7 +1,7 @@
 [versions]
-opentelemetry-core = "1.36.0"
-opentelemetry-core-alpha = "1.36.0-alpha"
-opentelemetry-inst = "1.33.1"
+opentelemetry-core = "1.37.0"
+opentelemetry-core-alpha = "1.37.0-alpha"
+opentelemetry-inst = "1.33.2"
 opentelemetry-inst-alpha = "1.33.2-alpha"
 opentelemetry-android = "0.4.0-alpha"
 mockito = "5.11.0"
@@ -13,7 +13,7 @@ opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation
 opentelemetry-bom = { module = "io.opentelemetry:opentelemetry-bom", version.ref = "opentelemetry-core-alpha" }
 opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-core" }
 opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry-core" }
-opentelemetry-api-events = { module = "io.opentelemetry:opentelemetry-api-events", version.ref = "opentelemetry-core-alpha" }
+opentelemetry-api-incubator = { module = "io.opentelemetry:opentelemetry-api-incubator", version.ref = "opentelemetry-core-alpha" }
 opentelemetry-android = { module = "io.opentelemetry.android:instrumentation", version.ref = "opentelemetry-android" }
 opentelemetry-instrumenter-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api", version.ref = "opentelemetry-inst" }
 opentelemetry-instrumenter-api-semconv = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv", version.ref = "opentelemetry-inst-alpha" }
