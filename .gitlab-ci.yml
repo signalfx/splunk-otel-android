@@ -42,8 +42,6 @@ build:
   extends: .prepare-android-environment
   script:
     - touch local.properties
-    - export SONATYPE_USER="$SONATYPE_USERNAME"
-    - export SONATYPE_KEY="$SONATYPE_PASSWORD"
     - ./gradlew build publish
 
 sast-scan:
@@ -76,6 +74,4 @@ release:
     - touch local.properties
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
-    - export SONATYPE_USER="$SONATYPE_USERNAME"
-    - export SONATYPE_KEY="$SONATYPE_PASSWORD"
     - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype closeAndReleaseSonatypeStagingRepository
