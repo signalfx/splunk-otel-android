@@ -44,13 +44,6 @@ afterEvaluate {
         }
     }
     publishing {
-        repositories {
-            maven {
-                val releasesRepoUrl = URI("https://oss.sonatype.org/service/local/staging/deploy/maven2")
-                val snapshotsRepoUrl = URI("https://oss.sonatype.org/content/repositories/snapshots/")
-                url = if (project.findProperty("release") == "true") releasesRepoUrl else snapshotsRepoUrl
-            }
-        }
         publications {
             create<MavenPublication>("maven") {
                 from(components.findByName(variantToPublish))
