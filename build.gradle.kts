@@ -19,9 +19,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-        }
     }
     if (findProperty("release") != "true") {
         version = "$version-SNAPSHOT"
@@ -34,7 +31,7 @@ subprojects {
 
 nexusPublishing.repositories {
     sonatype {
-        username.set(System.getenv("SONATYPE_USER"))
-        password.set(System.getenv("SONATYPE_KEY"))
+        username.set(System.getenv("SONATYPE_USERNAME"))
+        password.set(System.getenv("SONATYPE_PASSWORD"))
     }
 }
