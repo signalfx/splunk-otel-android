@@ -6,12 +6,13 @@ buildscript {
     }
     dependencies {
         // keep this version in sync with /buildSrc/build.gradle.kts
-        classpath("com.android.tools.build:gradle:8.4.0")
+        classpath(libs.android.plugin)
     }
 }
 
 plugins {
     id("splunk.spotless-conventions")
+    alias(libs.plugins.publishPlugin)
 }
 
 allprojects {
@@ -29,4 +30,11 @@ allprojects {
 
 subprojects {
     apply(plugin = "splunk.spotless-conventions")
+}
+
+nexusPublishing.repositories {
+    sonatype {
+        username.set(System.getenv("SONATYPE_USER"))
+        password.set(System.getenv("SONATYPE_KEY"))
+    }
 }
