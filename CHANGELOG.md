@@ -7,6 +7,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 1.5.0 - 2024-05-07
+
+This is a regular maintenance. Due to incompatible changes in upstream, `opentelemetry-android`
+has been held at v0.4.0. Expect `splunk-otel-android` to have an alpha of 2.x soon.
+
+This version depends on these upstream versions:
+* `opentelemetry-android` v0.4.0
+* `opentelemetry-instrumentation-api` v1.33.2
+* `opentelemetry-sdk` v1.37.0
+
+Enhancements:
+
+* Add experimental OTLP exporter support ([#788](https://github.com/signalfx/splunk-otel-android/pull/788)).
+  Note: OTLP support is incompatible with disk-buffering. 
+
 ### Version 1.4.0 - 2024-03-06
 
 This regular release follows the upstream `opentelemetry-android` release.
