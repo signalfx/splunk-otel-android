@@ -20,7 +20,7 @@ This version depends on these upstream versions:
 Enhancements:
 
 * Add experimental OTLP exporter support ([#788](https://github.com/signalfx/splunk-otel-android/pull/788)).
-  Note: OTLP support is incompatible with disk-buffering. 
+  Note: OTLP support is incompatible with disk-buffering.
 
 ### Version 1.4.0 - 2024-03-06
 
