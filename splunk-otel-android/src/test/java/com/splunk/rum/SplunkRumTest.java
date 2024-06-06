@@ -17,11 +17,14 @@
 package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
+import static io.opentelemetry.android.RumConstants.LAST_SCREEN_NAME_KEY;
+import static io.opentelemetry.android.RumConstants.SCREEN_NAME_KEY;
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
@@ -70,8 +73,12 @@ public class SplunkRumTest {
     @Mock private OpenTelemetryRum openTelemetryRum;
     @Mock private GlobalAttributesSupplier globalAttributes;
 
+    private ExplicitVisibleScreenNameTracker screenNameTracker;
+
     @BeforeEach
     public void setup() {
+        screenNameTracker = new ExplicitVisibleScreenNameTracker();
+
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
         SplunkRum.resetSingletonForTest();
     }
@@ -148,7 +155,7 @@ public class SplunkRumTest {
     void addEvent() {
         when(openTelemetryRum.getOpenTelemetry()).thenReturn(otelTesting.getOpenTelemetry());
 
-        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes);
+        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameTracker);
 
         Attributes attributes = Attributes.of(stringKey("one"), "1", longKey("two"), 2L);
         splunkRum.addRumEvent("foo", attributes);
@@ -166,7 +173,7 @@ public class SplunkRumTest {
 
         when(openTelemetryRum.getOpenTelemetry()).thenReturn(testSdk);
 
-        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes);
+        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameTracker);
 
         NullPointerException exception = new NullPointerException("oopsie");
         Attributes attributes = Attributes.of(stringKey("one"), "1", longKey("two"), 2L);
@@ -197,7 +204,7 @@ public class SplunkRumTest {
     void createAndEnd() {
         when(openTelemetryRum.getOpenTelemetry()).thenReturn(otelTesting.getOpenTelemetry());
 
-        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes);
+        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameTracker);
 
         Span span = splunkRum.startWorkflow("workflow");
         Span inner = tracer.spanBuilder("foo").startSpan();
@@ -255,7 +262,7 @@ public class SplunkRumTest {
                 .when(globalAttributes)
                 .update(isA(Consumer.class));
 
-        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes);
+        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameTracker);
 
         Location location = mock(Location.class);
         when(location.getLatitude()).thenReturn(42d);
@@ -273,5 +280,38 @@ public class SplunkRumTest {
         splunkRum.updateLocation(null);
 
         assertTrue(updatedAttributes.get().isEmpty());
+    }
+
+    @Test
+    void canSetScreenName() {
+        when(openTelemetryRum.getOpenTelemetry()).thenReturn(otelTesting.getOpenTelemetry());
+
+        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameTracker);
+        splunkRum.setScreenName("screen-1");
+        splunkRum.setScreenName("screen-2");
+
+        // pause and resume
+        splunkRum.setScreenName(null);
+        splunkRum.setScreenName("screen-2", "Resumed");
+
+        // exit the view with explicit screen names
+        // both last screen name and second last screen name have to be cleared, hence the doubled call
+        splunkRum.setScreenName(null);
+        splunkRum.setScreenName(null);
+
+        List<SpanData> spans = otelTesting.getSpans();
+        assertEquals(3, spans.size());
+
+        assertEquals("Created", spans.get(0).getName());
+        assertEquals("screen-1", spans.get(0).getAttributes().get(SCREEN_NAME_KEY));
+        assertNull(spans.get(0).getAttributes().get(LAST_SCREEN_NAME_KEY));
+
+        assertEquals("Created", spans.get(1).getName());
+        assertEquals("screen-2", spans.get(1).getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals("screen-1", spans.get(1).getAttributes().get(LAST_SCREEN_NAME_KEY));
+
+        assertEquals("Resumed", spans.get(2).getName());
+        assertEquals("screen-2", spans.get(2).getAttributes().get(SCREEN_NAME_KEY));
+        assertNull(spans.get(2).getAttributes().get(LAST_SCREEN_NAME_KEY));
     }
 }

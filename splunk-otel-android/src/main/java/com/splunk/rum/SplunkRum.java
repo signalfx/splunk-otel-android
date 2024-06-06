@@ -16,6 +16,8 @@
 
 package com.splunk.rum;
 
+import static io.opentelemetry.android.RumConstants.LAST_SCREEN_NAME_KEY;
+import static io.opentelemetry.android.RumConstants.SCREEN_NAME_KEY;
 import static io.opentelemetry.api.common.AttributeKey.doubleKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
@@ -28,6 +30,7 @@ import android.webkit.WebView;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
 import io.opentelemetry.android.OpenTelemetryRum;
+import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
@@ -72,15 +75,17 @@ public class SplunkRum {
 
     private final OpenTelemetryRum openTelemetryRum;
     private final GlobalAttributesSupplier globalAttributes;
+    private final ExplicitVisibleScreenNameTracker visibleScreenTracker;
 
     static {
         Handler handler = new Handler(Looper.getMainLooper());
         startupTimer.detectBackgroundStart(handler);
     }
 
-    SplunkRum(OpenTelemetryRum openTelemetryRum, GlobalAttributesSupplier globalAttributes) {
+    SplunkRum(OpenTelemetryRum openTelemetryRum, GlobalAttributesSupplier globalAttributes, ExplicitVisibleScreenNameTracker visibleScreenTracker) {
         this.openTelemetryRum = openTelemetryRum;
         this.globalAttributes = globalAttributes;
+        this.visibleScreenTracker = visibleScreenTracker;
     }
 
     /** Creates a new {@link SplunkRumBuilder}, used to set up a {@link SplunkRum} instance. */
@@ -111,6 +116,24 @@ public class SplunkRum {
         }
 
         return INSTANCE;
+    }
+
+    public void setScreenName(String screenName, String spanType) {
+        visibleScreenTracker.setExplicitScreenName(screenName);
+
+        if (screenName != null) {
+            Span span = getTracer()
+                    .spanBuilder(spanType)
+                    .setAttribute(COMPONENT_KEY, "ui")
+                    .startSpan();
+            span.setAttribute(SCREEN_NAME_KEY, screenName);
+            span.setAttribute(LAST_SCREEN_NAME_KEY, visibleScreenTracker.getPreviouslyVisibleScreen());
+            span.end();
+        }
+    }
+
+    public void setScreenName(String screenName) {
+        setScreenName(screenName, "Created");
     }
 
     /** Returns {@code true} if the Splunk RUM library has been successfully initialized. */

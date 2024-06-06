@@ -80,6 +80,10 @@ public class FirstFragment extends Fragment {
                         NavHostFragment.findNavController(FirstFragment.this)
                                 .navigate(R.id.action_FirstFragment_to_SecondFragment));
 
+        binding.buttonScreenName.setOnClickListener(v -> {
+            SplunkRum.getInstance().setScreenName("custom-screen");
+        });
+
         binding.crash.setOnClickListener(v -> multiThreadCrashing());
 
         binding.httpMe.setOnClickListener(
@@ -184,12 +188,22 @@ public class FirstFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+
+        SplunkRum.getInstance().setScreenName(null);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         sessionId.postValue(splunkRum.getRumSessionId());
+
+        SplunkRum.getInstance().setScreenName("custom-resumed-name", "Resumed");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        SplunkRum.getInstance().setScreenName(null);
     }
 
     @SuppressLint("AllowAllHostnameVerifier")

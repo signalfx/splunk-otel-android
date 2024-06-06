@@ -43,6 +43,12 @@
                 android:text="@string/next" />
 
             <Button
+                android:id="@+id/button_screen_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/screen_name" />
+
+            <Button
                 android:id="@+id/crash"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
