@@ -36,4 +36,5 @@
     <string name="draw_speed_normally">Draw Normally</string>
     <string name="draw_speed_slowly">Draw Slowly</string>
     <string name="send_email">send email</string>
+    <string name="title_activity_jetpack_compose">JetpackComposeActivity</string>
 </resources>

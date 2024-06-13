@@ -19,6 +19,7 @@ package com.splunk.android.sample;
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,7 +83,7 @@ public class FirstFragment extends Fragment {
 
         binding.buttonScreenName.setOnClickListener(
                 v -> {
-                    SplunkRum.getInstance().experimentalSetScreenName("custom-screen");
+                    startActivity(new Intent(this.getView().getContext(), JetpackComposeActivity.class));
                 });
 
         binding.crash.setOnClickListener(v -> multiThreadCrashing());

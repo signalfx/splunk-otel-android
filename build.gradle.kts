@@ -13,6 +13,8 @@ buildscript {
 plugins {
     id("splunk.spotless-conventions")
     alias(libs.plugins.publishPlugin)
+    alias(libs.plugins.jetbrainsKotlinAndroid) apply false
+    alias(libs.plugins.compose) apply false
 }
 
 allprojects {

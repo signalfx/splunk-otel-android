@@ -3,6 +3,8 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
+    alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.compose)
 }
 
 val localProperties = Properties()
@@ -22,12 +24,16 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildFeatures {
         dataBinding = true
         viewBinding = true
         buildConfig = true
+        compose = true
     }
 
     buildTypes {
@@ -50,6 +56,18 @@ android {
         sourceCompatibility(JavaVersion.VERSION_1_8)
         targetCompatibility(JavaVersion.VERSION_1_8)
     }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+
+composeCompiler {
+    enableStrongSkippingMode = true
 }
 
 dependencies {
@@ -57,6 +75,15 @@ dependencies {
 
     implementation(project(":splunk-otel-android"))
     implementation(project(":splunk-otel-android-volley"))
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
 
     coreLibraryDesugaring(libs.desugarJdkLibs)
 
@@ -71,4 +98,6 @@ dependencies {
     testImplementation(libs.bundles.junit)
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.junit)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
