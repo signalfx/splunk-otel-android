@@ -30,7 +30,6 @@ import android.webkit.WebView;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
 import io.opentelemetry.android.OpenTelemetryRum;
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
@@ -118,7 +117,7 @@ public class SplunkRum {
         return INSTANCE;
     }
 
-    public void setScreenName(String screenName, String spanType) {
+    public void experimentalSetScreenName(String screenName, String spanType) {
         visibleScreenTracker.setExplicitScreenName(screenName);
 
         if (screenName != null) {
@@ -132,8 +131,8 @@ public class SplunkRum {
         }
     }
 
-    public void setScreenName(String screenName) {
-        setScreenName(screenName, "Created");
+    public void experimentalSetScreenName(String screenName) {
+        experimentalSetScreenName(screenName, "Created");
     }
 
     /** Returns {@code true} if the Splunk RUM library has been successfully initialized. */

@@ -51,7 +51,7 @@ class NoOpSplunkRumTest {
         Location location = mock(Location.class);
         instance.updateLocation(location);
 
-        instance.setScreenName("explicit-screen-name");
+        instance.experimentalSetScreenName("explicit-screen-name");
         instance.flushSpans();
     }
 }

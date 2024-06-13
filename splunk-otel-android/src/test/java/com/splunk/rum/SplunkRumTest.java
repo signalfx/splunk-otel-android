@@ -287,17 +287,17 @@ public class SplunkRumTest {
         when(openTelemetryRum.getOpenTelemetry()).thenReturn(otelTesting.getOpenTelemetry());
 
         SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameTracker);
-        splunkRum.setScreenName("screen-1");
-        splunkRum.setScreenName("screen-2");
+        splunkRum.experimentalSetScreenName("screen-1");
+        splunkRum.experimentalSetScreenName("screen-2");
 
         // pause and resume
-        splunkRum.setScreenName(null);
-        splunkRum.setScreenName("screen-2", "Resumed");
+        splunkRum.experimentalSetScreenName(null);
+        splunkRum.experimentalSetScreenName("screen-2", "Resumed");
 
         // exit the view with explicit screen names
         // both last screen name and second last screen name have to be cleared, hence the doubled call
-        splunkRum.setScreenName(null);
-        splunkRum.setScreenName(null);
+        splunkRum.experimentalSetScreenName(null);
+        splunkRum.experimentalSetScreenName(null);
 
         List<SpanData> spans = otelTesting.getSpans();
         assertEquals(3, spans.size());

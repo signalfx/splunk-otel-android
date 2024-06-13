@@ -81,7 +81,7 @@ class NoOpSplunkRum extends SplunkRum {
     }
 
     @Override
-    public void setScreenName(String screenName) {
+    public void experimentalSetScreenName(String screenName) {
         // no-op
     }
 }
