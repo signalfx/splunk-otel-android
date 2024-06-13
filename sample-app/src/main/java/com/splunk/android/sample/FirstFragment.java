@@ -81,9 +81,10 @@ public class FirstFragment extends Fragment {
                         NavHostFragment.findNavController(FirstFragment.this)
                                 .navigate(R.id.action_FirstFragment_to_SecondFragment));
 
-        binding.buttonScreenName.setOnClickListener(
+        binding.buttonJcompose.setOnClickListener(
                 v -> {
-                    startActivity(new Intent(this.getView().getContext(), JetpackComposeActivity.class));
+                    startActivity(
+                            new Intent(this.getView().getContext(), JetpackComposeActivity.class));
                 });
 
         binding.crash.setOnClickListener(v -> multiThreadCrashing());
@@ -184,28 +185,6 @@ public class FirstFragment extends Fragment {
 
     public LiveData<String> getSessionId() {
         return sessionId;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-
-        SplunkRum.getInstance().experimentalSetScreenName(null);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        sessionId.postValue(splunkRum.getRumSessionId());
-
-        SplunkRum.getInstance().experimentalSetScreenName("custom-resumed-name", "Resumed");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        SplunkRum.getInstance().experimentalSetScreenName(null);
     }
 
     @SuppressLint("AllowAllHostnameVerifier")
