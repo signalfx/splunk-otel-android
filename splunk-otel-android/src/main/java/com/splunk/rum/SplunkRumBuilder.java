@@ -21,11 +21,14 @@ import static com.splunk.rum.DeviceSpanStorageLimiter.DEFAULT_MAX_STORAGE_USE_MB
 import android.app.Application;
 import android.util.Log;
 import androidx.annotation.Nullable;
+
+import com.splunk.rum.incubating.CurrentlyVisibleScreen;
 import com.splunk.rum.incubating.HttpSenderCustomizer;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import java.time.Duration;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /** A builder of {@link SplunkRum}. */
 public final class SplunkRumBuilder {
@@ -49,6 +52,9 @@ public final class SplunkRumBuilder {
     boolean sessionBasedSamplerEnabled = false;
     double sessionBasedSamplerRatio = 1.0;
     boolean isSubprocess = false;
+
+    @Nullable
+    Function<CurrentlyVisibleScreen, CurrentlyVisibleScreen> experimentalCurrentScreenCustomizer;
 
     /**
      * Sets the application name that will be used to identify your application in the Splunk RUM
@@ -394,6 +400,23 @@ public final class SplunkRumBuilder {
         return this;
     }
 
+    /**
+     * This method can be used to provide a customer that is able of altering the
+     * value of the "current screen". Typically, SplunkRum will track Fragment and
+     * Activity state changes to automatically determine the name of the current "screen".
+     * By passing a customizer Function here, you can override the default behavior
+     * by customizing (at initialization time) the instance of CurrentlyVisibleScreen
+     * that will be used when setting the screen.name attribute on telemetry.
+     * Note that this does not alter the screen.name assigned to spans created by
+     * the ActivityTracer and FragmentTracer. Those will continue to mirror the name
+     * of the Activity or Fragment.
+     * Status: Experimental. API is subject to potential change or removal in the future.
+     */
+    public SplunkRumBuilder setExperimentalCurrentScreenCustomizer(Function<CurrentlyVisibleScreen,CurrentlyVisibleScreen> customizer){
+        this.experimentalCurrentScreenCustomizer = customizer;
+        return this;
+    }
+
     // one day maybe these can use kotlin delegation
     ConfigFlags getConfigFlags() {
         return configFlags;
@@ -443,5 +466,9 @@ public final class SplunkRumBuilder {
 
     boolean isBackgroundInstrumentationDeferredUntilForeground() {
         return configFlags.isBackgroundInstrumentationDeferredUntilForeground();
+    }
+
+    public boolean hasExperimentalVisibleScreenCustomization() {
+        return experimentalCurrentScreenCustomizer != null;
     }
 }

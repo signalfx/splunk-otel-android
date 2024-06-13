@@ -80,6 +80,8 @@ public class SampleApplication extends Application {
                                                 return chain.proceed(requestBuilder.build());
                                             });
                         })
+                .setExperimentalCurrentScreenCustomizer(vs ->
+                        () -> "customized: " + vs.get())
                 .build(this);
     }
 }

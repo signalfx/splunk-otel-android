@@ -31,6 +31,9 @@ import android.app.Application;
 import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.splunk.rum.incubating.CurrentlyVisibleScreen;
+import com.splunk.rum.incubating.internal.CurrentlyVisibleScreenAttributeSpanProcessor;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
 import com.splunk.rum.internal.UInt32QuadXorTraceIdRatioSampler;
 import io.opentelemetry.android.OpenTelemetryRum;
@@ -52,6 +55,7 @@ import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.sdk.trace.SpanLimits;
+import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
@@ -96,6 +100,9 @@ class RumInitializer {
         config.setGlobalAttributes(globalAttributeSupplier);
         if (!builder.isNetworkMonitorEnabled()) {
             config.disableNetworkChangeMonitoring();
+        }
+        if(builder.hasExperimentalVisibleScreenCustomization()){
+            config.disableScreenAttributes();
         }
 
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
@@ -193,6 +200,10 @@ class RumInitializer {
             installCrashReporter(otelRumBuilder);
         }
 
+        if(builder.hasExperimentalVisibleScreenCustomization()){
+            customizeCurrentlyVisibleScreen(otelRumBuilder, visibleScreenTracker);
+        }
+
         // Lifecycle events instrumentation are always installed.
         installLifecycleInstrumentations(otelRumBuilder, visibleScreenTracker);
 
@@ -205,6 +216,21 @@ class RumInitializer {
                 openTelemetryRum.getOpenTelemetry().getTracer(RUM_TRACER_NAME));
 
         return new SplunkRum(openTelemetryRum, globalAttributeSupplier);
+    }
+
+    private void customizeCurrentlyVisibleScreen(OpenTelemetryRumBuilder otelRumBuilder, VisibleScreenTracker visibleScreenTracker) {
+        if(builder.experimentalCurrentScreenCustomizer == null){
+            return;
+        }
+        Function<CurrentlyVisibleScreen, CurrentlyVisibleScreen> customizer = builder.experimentalCurrentScreenCustomizer;
+        otelRumBuilder.addTracerProviderCustomizer(
+                (tracerProviderBuilder, app) -> {
+                    CurrentlyVisibleScreen visibleScreen = visibleScreenTracker::getCurrentlyVisibleScreen;
+                    CurrentlyVisibleScreen customized = customizer.apply(visibleScreen);
+                    SpanProcessor screenAttributesAppender =
+                            new CurrentlyVisibleScreenAttributeSpanProcessor(customized);
+                    return tracerProviderBuilder.addSpanProcessor(screenAttributesAppender);
+                });
     }
 
     @NonNull
