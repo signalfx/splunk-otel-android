@@ -32,7 +32,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Looper;
-
 import com.splunk.rum.incubating.CurrentlyVisibleScreen;
 import com.splunk.rum.incubating.HttpSenderCustomizer;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
@@ -55,7 +54,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -263,9 +261,10 @@ class RumInitializerTest {
     }
 
     @Test
-    void canCustomizeCurrentScreenName(){
+    void canCustomizeCurrentScreenName() {
         InMemorySpanExporter testExporter = InMemorySpanExporter.create();
-        Function<CurrentlyVisibleScreen, CurrentlyVisibleScreen> customizer = cvs -> () -> "custom:" + cvs.get();
+        Function<CurrentlyVisibleScreen, CurrentlyVisibleScreen> customizer =
+                cvs -> () -> "custom:" + cvs.get();
         SplunkRumBuilder splunkRumBuilder =
                 new SplunkRumBuilder()
                         .setRealm("us0")
@@ -278,7 +277,7 @@ class RumInitializerTest {
         when(application.getMainLooper()).thenReturn(mainLooper);
 
         RumInitializer testInitializer =
-                new RumInitializer(splunkRumBuilder, application, new AppStartupTimer()){
+                new RumInitializer(splunkRumBuilder, application, new AppStartupTimer()) {
                     @Override
                     SpanExporter getCoreSpanExporter() {
                         return testExporter;
@@ -291,7 +290,8 @@ class RumInitializerTest {
         List<SpanData> spans = testExporter.getFinishedSpanItems();
         assertThat(spans.size()).isEqualTo(1);
         assertThat(spans.get(0).getName()).isEqualTo("foo");
-        assertThat(spans.get(0).getAttributes().get(stringKey("screen.name"))).isEqualTo("custom:unknown");
+        assertThat(spans.get(0).getAttributes().get(stringKey("screen.name")))
+                .isEqualTo("custom:unknown");
     }
 
     @Test

@@ -31,7 +31,6 @@ import android.app.Application;
 import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.splunk.rum.incubating.CurrentlyVisibleScreen;
 import com.splunk.rum.incubating.internal.CurrentlyVisibleScreenAttributeSpanProcessor;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
@@ -101,7 +100,7 @@ class RumInitializer {
         if (!builder.isNetworkMonitorEnabled()) {
             config.disableNetworkChangeMonitoring();
         }
-        if(builder.hasExperimentalVisibleScreenCustomization()){
+        if (builder.hasExperimentalVisibleScreenCustomization()) {
             config.disableScreenAttributes();
         }
 
@@ -200,7 +199,7 @@ class RumInitializer {
             installCrashReporter(otelRumBuilder);
         }
 
-        if(builder.hasExperimentalVisibleScreenCustomization()){
+        if (builder.hasExperimentalVisibleScreenCustomization()) {
             customizeCurrentlyVisibleScreen(otelRumBuilder, visibleScreenTracker);
         }
 
@@ -218,14 +217,17 @@ class RumInitializer {
         return new SplunkRum(openTelemetryRum, globalAttributeSupplier);
     }
 
-    private void customizeCurrentlyVisibleScreen(OpenTelemetryRumBuilder otelRumBuilder, VisibleScreenTracker visibleScreenTracker) {
-        if(builder.experimentalCurrentScreenCustomizer == null){
+    private void customizeCurrentlyVisibleScreen(
+            OpenTelemetryRumBuilder otelRumBuilder, VisibleScreenTracker visibleScreenTracker) {
+        if (builder.experimentalCurrentScreenCustomizer == null) {
             return;
         }
-        Function<CurrentlyVisibleScreen, CurrentlyVisibleScreen> customizer = builder.experimentalCurrentScreenCustomizer;
+        Function<CurrentlyVisibleScreen, CurrentlyVisibleScreen> customizer =
+                builder.experimentalCurrentScreenCustomizer;
         otelRumBuilder.addTracerProviderCustomizer(
                 (tracerProviderBuilder, app) -> {
-                    CurrentlyVisibleScreen visibleScreen = visibleScreenTracker::getCurrentlyVisibleScreen;
+                    CurrentlyVisibleScreen visibleScreen =
+                            visibleScreenTracker::getCurrentlyVisibleScreen;
                     CurrentlyVisibleScreen customized = customizer.apply(visibleScreen);
                     SpanProcessor screenAttributesAppender =
                             new CurrentlyVisibleScreenAttributeSpanProcessor(customized);
