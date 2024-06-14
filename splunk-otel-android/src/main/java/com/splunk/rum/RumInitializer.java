@@ -36,7 +36,6 @@ import com.splunk.rum.internal.UInt32QuadXorTraceIdRatioSampler;
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.OpenTelemetryRumBuilder;
 import io.opentelemetry.android.RuntimeDetailsExtractor;
-import io.opentelemetry.android.ScreenAttributesSpanProcessor;
 import io.opentelemetry.android.config.OtelRumConfig;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.android.instrumentation.anr.AnrDetector;
@@ -53,7 +52,6 @@ import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.sdk.trace.SpanLimits;
-import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
@@ -88,7 +86,7 @@ class RumInitializer {
     }
 
     SplunkRum initialize(Looper mainLooper) {
-        ExplicitVisibleScreenNameTracker visibleScreenTracker = new ExplicitVisibleScreenNameTracker();
+        VisibleScreenTracker visibleScreenTracker = new VisibleScreenTracker();
 
         initializationEvents.begin();
 
@@ -196,12 +194,10 @@ class RumInitializer {
             installCrashReporter(otelRumBuilder);
         }
 
+        SettableScreenAttributesAppender screenAttributesAppender =
+                new SettableScreenAttributesAppender(visibleScreenTracker);
         otelRumBuilder.addTracerProviderCustomizer(
-                (tracerProviderBuilder, app) -> {
-                    SpanProcessor screenAttributesAppender =
-                            new ScreenAttributesSpanProcessor(visibleScreenTracker);
-                    return tracerProviderBuilder.addSpanProcessor(screenAttributesAppender);
-                });
+                (tracerProviderBuilder, app) -> tracerProviderBuilder.addSpanProcessor(screenAttributesAppender));
 
         // Lifecycle events instrumentation are always installed.
         installLifecycleInstrumentations(otelRumBuilder, visibleScreenTracker);
@@ -214,7 +210,7 @@ class RumInitializer {
                 builder.getConfigFlags(),
                 openTelemetryRum.getOpenTelemetry().getTracer(RUM_TRACER_NAME));
 
-        return new SplunkRum(openTelemetryRum, globalAttributeSupplier, visibleScreenTracker);
+        return new SplunkRum(openTelemetryRum, globalAttributeSupplier, screenAttributesAppender);
     }
 
     @NonNull

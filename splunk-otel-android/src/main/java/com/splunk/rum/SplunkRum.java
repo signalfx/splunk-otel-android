@@ -74,17 +74,17 @@ public class SplunkRum {
 
     private final OpenTelemetryRum openTelemetryRum;
     private final GlobalAttributesSupplier globalAttributes;
-    private final ExplicitVisibleScreenNameTracker visibleScreenTracker;
+    private final SettableScreenAttributesAppender screenAttributesAppender;
 
     static {
         Handler handler = new Handler(Looper.getMainLooper());
         startupTimer.detectBackgroundStart(handler);
     }
 
-    SplunkRum(OpenTelemetryRum openTelemetryRum, GlobalAttributesSupplier globalAttributes, ExplicitVisibleScreenNameTracker visibleScreenTracker) {
+    SplunkRum(OpenTelemetryRum openTelemetryRum, GlobalAttributesSupplier globalAttributes, SettableScreenAttributesAppender screenAttributesAppender) {
         this.openTelemetryRum = openTelemetryRum;
         this.globalAttributes = globalAttributes;
-        this.visibleScreenTracker = visibleScreenTracker;
+        this.screenAttributesAppender = screenAttributesAppender;
     }
 
     /** Creates a new {@link SplunkRumBuilder}, used to set up a {@link SplunkRum} instance. */
@@ -118,16 +118,15 @@ public class SplunkRum {
     }
 
     public void experimentalSetScreenName(String screenName, String spanType) {
-        visibleScreenTracker.setExplicitScreenName(screenName);
+        screenAttributesAppender.setScreenName(screenName);
 
         if (screenName != null) {
-            Span span = getTracer()
+            // no need to set the screen name attributes, span processor will do it
+            getTracer()
                     .spanBuilder(spanType)
                     .setAttribute(COMPONENT_KEY, "ui")
-                    .startSpan();
-            span.setAttribute(SCREEN_NAME_KEY, screenName);
-            span.setAttribute(LAST_SCREEN_NAME_KEY, visibleScreenTracker.getPreviouslyVisibleScreen());
-            span.end();
+                    .startSpan()
+                    .end();
         }
     }
 
