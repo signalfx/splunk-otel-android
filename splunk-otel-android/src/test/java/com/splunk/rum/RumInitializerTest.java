@@ -359,7 +359,8 @@ class RumInitializerTest {
         splunkRum.experimentalSetScreenName("screen-2", "Resumed");
 
         // exit the view with explicit screen names
-        // both last screen name and second last screen name have to be cleared, hence the doubled call
+        // both last screen name and second last screen name have to be cleared, hence the doubled
+        // call
         splunkRum.experimentalSetScreenName(null);
         splunkRum.experimentalSetScreenName(null);
 

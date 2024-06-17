@@ -16,8 +16,6 @@
 
 package com.splunk.rum;
 
-import static io.opentelemetry.android.RumConstants.LAST_SCREEN_NAME_KEY;
-import static io.opentelemetry.android.RumConstants.SCREEN_NAME_KEY;
 import static io.opentelemetry.api.common.AttributeKey.doubleKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
@@ -81,7 +79,10 @@ public class SplunkRum {
         startupTimer.detectBackgroundStart(handler);
     }
 
-    SplunkRum(OpenTelemetryRum openTelemetryRum, GlobalAttributesSupplier globalAttributes, SettableScreenAttributesAppender screenAttributesAppender) {
+    SplunkRum(
+            OpenTelemetryRum openTelemetryRum,
+            GlobalAttributesSupplier globalAttributes,
+            SettableScreenAttributesAppender screenAttributesAppender) {
         this.openTelemetryRum = openTelemetryRum;
         this.globalAttributes = globalAttributes;
         this.screenAttributesAppender = screenAttributesAppender;
@@ -117,19 +118,26 @@ public class SplunkRum {
         return INSTANCE;
     }
 
+    /**
+     * Starts a UI navigation span and remembers the last screen name.
+     *
+     * @param screenName Name of the new screen or null when exiting explicit UI navigation mode.
+     * @param spanType "Created", "Restarted", or "Resumed"
+     */
     public void experimentalSetScreenName(String screenName, String spanType) {
         screenAttributesAppender.setScreenName(screenName);
 
         if (screenName != null) {
             // no need to set the screen name attributes, span processor will do it
-            getTracer()
-                    .spanBuilder(spanType)
-                    .setAttribute(COMPONENT_KEY, "ui")
-                    .startSpan()
-                    .end();
+            getTracer().spanBuilder(spanType).setAttribute(COMPONENT_KEY, "ui").startSpan().end();
         }
     }
 
+    /**
+     * Starts a "Created" UI navigation span and remembers the last screen name.
+     *
+     * @param screenName Name of the new screen or null when exiting explicit UI navigation mode.
+     */
     public void experimentalSetScreenName(String screenName) {
         experimentalSetScreenName(screenName, "Created");
     }

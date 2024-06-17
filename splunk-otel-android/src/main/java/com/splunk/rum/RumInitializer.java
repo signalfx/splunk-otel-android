@@ -197,7 +197,8 @@ class RumInitializer {
         SettableScreenAttributesAppender screenAttributesAppender =
                 new SettableScreenAttributesAppender(visibleScreenTracker);
         otelRumBuilder.addTracerProviderCustomizer(
-                (tracerProviderBuilder, app) -> tracerProviderBuilder.addSpanProcessor(screenAttributesAppender));
+                (tracerProviderBuilder, app) ->
+                        tracerProviderBuilder.addSpanProcessor(screenAttributesAppender));
 
         // Lifecycle events instrumentation are always installed.
         installLifecycleInstrumentations(otelRumBuilder, visibleScreenTracker);

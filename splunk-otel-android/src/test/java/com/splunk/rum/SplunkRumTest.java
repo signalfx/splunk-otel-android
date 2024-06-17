@@ -17,14 +17,11 @@
 package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
-import static io.opentelemetry.android.RumConstants.LAST_SCREEN_NAME_KEY;
-import static io.opentelemetry.android.RumConstants.SCREEN_NAME_KEY;
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
