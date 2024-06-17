@@ -17,6 +17,8 @@
 package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
+import static io.opentelemetry.android.RumConstants.LAST_SCREEN_NAME_KEY;
+import static io.opentelemetry.android.RumConstants.SCREEN_NAME_KEY;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -24,6 +26,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -324,6 +327,58 @@ class RumInitializerTest {
                                                                         SemanticAttributes
                                                                                 .EXCEPTION_STACKTRACE))
                                         .hasEvents(emptyList()));
+    }
+
+    @Test
+    void canSetScreenName() {
+        InMemorySpanExporter testExporter = InMemorySpanExporter.create();
+        SplunkRumBuilder splunkRumBuilder =
+                new SplunkRumBuilder()
+                        .setRealm("us0")
+                        .setRumAccessToken("secret!")
+                        .setApplicationName("test")
+                        .disableAnrDetection();
+
+        when(application.getApplicationContext()).thenReturn(context);
+        when(application.getMainLooper()).thenReturn(mainLooper);
+
+        RumInitializer testInitializer =
+                new RumInitializer(splunkRumBuilder, application, new AppStartupTimer()) {
+                    @Override
+                    SpanExporter getCoreSpanExporter() {
+                        return testExporter;
+                    }
+                };
+
+        SplunkRum splunkRum = testInitializer.initialize(mainLooper);
+        splunkRum.experimentalSetScreenName("screen-1");
+        splunkRum.experimentalSetScreenName("screen-2");
+
+        // pause and resume
+        splunkRum.experimentalSetScreenName(null);
+        splunkRum.experimentalSetScreenName("screen-2", "Resumed");
+
+        // exit the view with explicit screen names
+        // both last screen name and second last screen name have to be cleared, hence the doubled
+        // call
+        splunkRum.experimentalSetScreenName(null);
+        splunkRum.experimentalSetScreenName(null);
+
+        splunkRum.flushSpans();
+        List<SpanData> spans = testExporter.getFinishedSpanItems();
+        assertEquals(3, spans.size());
+
+        assertEquals("Created", spans.get(0).getName());
+        assertEquals("screen-1", spans.get(0).getAttributes().get(SCREEN_NAME_KEY));
+        assertNull(spans.get(0).getAttributes().get(LAST_SCREEN_NAME_KEY));
+
+        assertEquals("Created", spans.get(1).getName());
+        assertEquals("screen-2", spans.get(1).getAttributes().get(SCREEN_NAME_KEY));
+        assertEquals("screen-1", spans.get(1).getAttributes().get(LAST_SCREEN_NAME_KEY));
+
+        assertEquals("Resumed", spans.get(2).getName());
+        assertEquals("screen-2", spans.get(2).getAttributes().get(SCREEN_NAME_KEY));
+        assertNull(spans.get(2).getAttributes().get(LAST_SCREEN_NAME_KEY));
     }
 
     private String makeString(char c, int count) {

@@ -38,6 +38,7 @@ import android.location.Location;
 import android.webkit.WebView;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
 import io.opentelemetry.android.OpenTelemetryRum;
+import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Span;
@@ -70,8 +71,12 @@ public class SplunkRumTest {
     @Mock private OpenTelemetryRum openTelemetryRum;
     @Mock private GlobalAttributesSupplier globalAttributes;
 
+    private SettableScreenAttributesAppender screenNameAppender;
+
     @BeforeEach
     public void setup() {
+        screenNameAppender = new SettableScreenAttributesAppender(new VisibleScreenTracker());
+
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
         SplunkRum.resetSingletonForTest();
     }
@@ -148,7 +153,7 @@ public class SplunkRumTest {
     void addEvent() {
         when(openTelemetryRum.getOpenTelemetry()).thenReturn(otelTesting.getOpenTelemetry());
 
-        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes);
+        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameAppender);
 
         Attributes attributes = Attributes.of(stringKey("one"), "1", longKey("two"), 2L);
         splunkRum.addRumEvent("foo", attributes);
@@ -166,7 +171,7 @@ public class SplunkRumTest {
 
         when(openTelemetryRum.getOpenTelemetry()).thenReturn(testSdk);
 
-        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes);
+        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameAppender);
 
         NullPointerException exception = new NullPointerException("oopsie");
         Attributes attributes = Attributes.of(stringKey("one"), "1", longKey("two"), 2L);
@@ -197,7 +202,7 @@ public class SplunkRumTest {
     void createAndEnd() {
         when(openTelemetryRum.getOpenTelemetry()).thenReturn(otelTesting.getOpenTelemetry());
 
-        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes);
+        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameAppender);
 
         Span span = splunkRum.startWorkflow("workflow");
         Span inner = tracer.spanBuilder("foo").startSpan();
@@ -255,7 +260,7 @@ public class SplunkRumTest {
                 .when(globalAttributes)
                 .update(isA(Consumer.class));
 
-        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes);
+        SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameAppender);
 
         Location location = mock(Location.class);
         when(location.getLatitude()).thenReturn(42d);

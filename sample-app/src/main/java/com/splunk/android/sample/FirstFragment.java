@@ -19,6 +19,7 @@ package com.splunk.android.sample;
 import static io.opentelemetry.api.common.AttributeKey.longKey;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,6 +80,12 @@ public class FirstFragment extends Fragment {
                 v ->
                         NavHostFragment.findNavController(FirstFragment.this)
                                 .navigate(R.id.action_FirstFragment_to_SecondFragment));
+
+        binding.buttonJcompose.setOnClickListener(
+                v -> {
+                    startActivity(
+                            new Intent(this.getView().getContext(), JetpackComposeActivity.class));
+                });
 
         binding.crash.setOnClickListener(v -> multiThreadCrashing());
 
@@ -178,18 +185,6 @@ public class FirstFragment extends Fragment {
 
     public LiveData<String> getSessionId() {
         return sessionId;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        sessionId.postValue(splunkRum.getRumSessionId());
     }
 
     @SuppressLint("AllowAllHostnameVerifier")

@@ -43,6 +43,12 @@
                 android:text="@string/next" />
 
             <Button
+                android:id="@+id/button_jcompose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/jcompose" />
+
+            <Button
                 android:id="@+id/crash"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -7,6 +7,11 @@ opentelemetry-android = "0.4.0-alpha"
 mockito = "5.12.0"
 junit = "5.10.2"
 spotless = "6.25.0"
+kotlin = "2.0.0"
+lifecycle-runtime-ktx = "2.8.1"
+activity-compose = "1.9.0"
+compose-bom = "2023.08.00"
+navigationCompose = "2.7.7"
 
 [libraries]
 opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom", version.ref = "opentelemetry-inst" }
@@ -53,6 +58,17 @@ android-plugin = "com.android.tools.build:gradle:8.5.0"
 errorprone-plugin = "net.ltgt.gradle:gradle-errorprone-plugin:4.0.0"
 nullaway-plugin = "net.ltgt.gradle:gradle-nullaway-plugin:2.0.0"
 spotless-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 [bundles]
 mocking = ["mockito-core", "mockito-junit-jupiter"]
@@ -61,3 +77,5 @@ junit = ["junit-jupiter-api", "junit-jupiter-engine", "junit-vintage-engine"]
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 publishPlugin = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
+jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

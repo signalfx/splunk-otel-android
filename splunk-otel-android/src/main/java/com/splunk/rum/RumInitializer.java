@@ -98,6 +98,7 @@ class RumInitializer {
             config.disableNetworkChangeMonitoring();
         }
 
+        config.disableScreenAttributes();
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
 
         otelRumBuilder.mergeResource(createSplunkResource());
@@ -193,6 +194,12 @@ class RumInitializer {
             installCrashReporter(otelRumBuilder);
         }
 
+        SettableScreenAttributesAppender screenAttributesAppender =
+                new SettableScreenAttributesAppender(visibleScreenTracker);
+        otelRumBuilder.addTracerProviderCustomizer(
+                (tracerProviderBuilder, app) ->
+                        tracerProviderBuilder.addSpanProcessor(screenAttributesAppender));
+
         // Lifecycle events instrumentation are always installed.
         installLifecycleInstrumentations(otelRumBuilder, visibleScreenTracker);
 
@@ -204,7 +211,7 @@ class RumInitializer {
                 builder.getConfigFlags(),
                 openTelemetryRum.getOpenTelemetry().getTracer(RUM_TRACER_NAME));
 
-        return new SplunkRum(openTelemetryRum, globalAttributeSupplier);
+        return new SplunkRum(openTelemetryRum, globalAttributeSupplier, screenAttributesAppender);
     }
 
     @NonNull

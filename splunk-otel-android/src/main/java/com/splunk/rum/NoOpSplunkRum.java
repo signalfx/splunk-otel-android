@@ -32,7 +32,7 @@ class NoOpSplunkRum extends SplunkRum {
     // passing null values here is fine, they'll never get used anyway
     @SuppressWarnings("NullAway")
     private NoOpSplunkRum() {
-        super(OpenTelemetryRum.noop(), null);
+        super(OpenTelemetryRum.noop(), null, null);
     }
 
     @Override
@@ -77,6 +77,16 @@ class NoOpSplunkRum extends SplunkRum {
 
     @Override
     void flushSpans() {
+        // no-op
+    }
+
+    @Override
+    public void experimentalSetScreenName(String screenName) {
+        // no-op
+    }
+
+    @Override
+    public void experimentalSetScreenName(String screenName, String spanType) {
         // no-op
     }
 }
