@@ -41,7 +41,7 @@ androidx-webkit = "androidx.webkit:webkit:1.11.0"
 android-volley = "com.android.volley:volley:1.2.1"
 
 #Test tools
-androidx-junit = "androidx.test.ext:junit:1.1.5"
+androidx-junit = "androidx.test.ext:junit:1.2.0"
 androidx-test-core = "androidx.test:core:1.5.0"
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
