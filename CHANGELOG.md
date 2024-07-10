@@ -7,9 +7,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 1.6.0 - 2024-07-10
+
+This is a regular maintenance release.
+
+* Update to OpenTelemetry Java Instrumentation 1.33.4
+* Add experimental API to allow manually setting the current screen name. ([#851](https://github.com/signalfx/splunk-otel-android/pull/851))
+
 ### Version 1.5.0 - 2024-05-07
 
-This is a regular maintenance. Due to incompatible changes in upstream, `opentelemetry-android`
+This is a regular maintenance release. Due to incompatible changes in upstream, `opentelemetry-android`
 has been held at v0.4.0. Expect `splunk-otel-android` to have an alpha of 2.x soon.
 
 This version depends on these upstream versions:

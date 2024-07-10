@@ -12,7 +12,7 @@
 
 <p align="center">
   <img alt="Stable" src="https://img.shields.io/badge/status-stable-informational?style=for-the-badge">
-  <a href="https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.32.1">
+  <a href="https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.33.4">
     <img alt="OpenTelemetry Instrumentation for Java Version" src="https://img.shields.io/badge/otel-1.32.1-blueviolet?style=for-the-badge">
   </a>
   <a href="https://github.com/signalfx/gdi-specification/releases/tag/v1.4.0">
