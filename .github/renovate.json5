@@ -43,6 +43,10 @@
     {
       "matchPackagePrefixes": ["com.diffplug.spotless"],
       "groupName": "spotless packages"
+    },
+    {
+      "matchPackagePrefixes": ["io.opentelemetry.instrumentation"],
+      "groupName": "upstream otel instrumentation"
     }
   ]
 }
