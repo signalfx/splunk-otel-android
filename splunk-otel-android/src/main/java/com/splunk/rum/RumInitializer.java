@@ -32,6 +32,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
+import com.splunk.rum.internal.NoOpSpanExporter;
 import com.splunk.rum.internal.UInt32QuadXorTraceIdRatioSampler;
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.OpenTelemetryRumBuilder;
@@ -124,6 +125,9 @@ class RumInitializer {
                     initializationEvents.emit("batchSpanProcessorInitialized");
                     return tracerProviderBuilder.addSpanProcessor(batchSpanProcessor);
                 });
+
+        // Inhibit the upstream exporter because we add our own BatchSpanProcessor
+        otelRumBuilder.addSpanExporterCustomizer(x -> new NoOpSpanExporter());
 
         // Set span limits
         otelRumBuilder.addTracerProviderCustomizer(
