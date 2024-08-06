@@ -31,6 +31,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
 import com.splunk.android.sample.databinding.FragmentFirstBinding;
 import com.splunk.rum.SplunkRum;
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.context.Scope;
@@ -40,6 +41,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -94,7 +96,7 @@ public class FirstFragment extends Fragment {
                     Span workflow = splunkRum.startWorkflow("User Login");
                     // not really a login, but it does make an http call
                     makeCall(
-                            "https://frontend-us.splunko11y.com/?user=me&pass=secret123secret",
+                            "https://online-boutique-us.splunko11y.com/?user=me&pass=secret123secret",
                             workflow);
                     // maybe this call gave us a real customer id, so let's put it into the global
                     // attributes
@@ -108,7 +110,7 @@ public class FirstFragment extends Fragment {
         binding.httpMeNotFound.setOnClickListener(
                 v -> {
                     Span workflow = splunkRum.startWorkflow("Workflow with 404");
-                    makeCall("https://frontend-us.splunko11y.com/foobarbaz", workflow);
+                    makeCall("https://online-boutique-us.splunko11y.com/foobarbaz", workflow);
                 });
 
         binding.volleyRequest.setOnClickListener(
@@ -122,6 +124,14 @@ public class FirstFragment extends Fragment {
         binding.workManager.setOnClickListener(
                 v -> {
                     WorkManagerHelper.startWorkManager(this.getContext());
+                });
+
+        AtomicLong customCount = new AtomicLong();
+        binding.customEvent.setOnClickListener(
+                v -> {
+                    splunkRum.addRumEvent(
+                            "kustom",
+                            Attributes.of(longKey("counted"), customCount.incrementAndGet()));
                 });
     }
 
