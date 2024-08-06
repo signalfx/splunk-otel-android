@@ -33,6 +33,7 @@
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textview_first">
 
@@ -46,6 +47,7 @@
                 android:id="@+id/button_jcompose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="@string/jcompose" />
 
             <Button
@@ -90,16 +92,23 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/worker" />
 
+            <Button
+                android:id="@+id/custom_event"
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/custom_event" />
+
             <TextView
                 android:id="@+id/session_id"
-                android:layout_width="wrap_content"
+                android:layout_width="253dp"
                 android:layout_height="30dp"
                 android:layout_marginTop="8dp"
                 android:enabled="true"
                 android:focusable="true"
                 android:longClickable="true"
-                android:textIsSelectable="true"
-                android:text="@{firstFragment.sessionId}" />
+                android:text="@{firstFragment.sessionId}"
+                android:textIsSelectable="true" />
 
             <TextView
                 android:id="@+id/http_result"
@@ -107,6 +116,7 @@
                 android:layout_height="30dp"
                 android:layout_marginTop="8dp"
                 android:text="@{firstFragment.httpResponse}" />
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

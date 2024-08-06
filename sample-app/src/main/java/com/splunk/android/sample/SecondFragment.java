@@ -117,7 +117,7 @@ public class SecondFragment extends Fragment {
 
         binding.buttonToCustomTab.setOnClickListener(
                 v -> {
-                    String url = "https://frontend-us.splunko11y.com/";
+                    String url = "https://online-boutique-us.splunko11y.com/";
                     customChromeTabTimer =
                             SplunkRum.getInstance().startWorkflow("Visit to Chrome Custom Tab");
                     new CustomTabsIntent.Builder()
