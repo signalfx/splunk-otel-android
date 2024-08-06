@@ -129,6 +129,8 @@ public class FirstFragment extends Fragment {
         AtomicLong customCount = new AtomicLong();
         binding.customEvent.setOnClickListener(
                 v -> {
+                    // Without being in a workflow, this will still show up in the UI but wil not be
+                    // grouped under the "Custom Events" tab.
                     splunkRum.addRumEvent(
                             "kustom",
                             Attributes.of(longKey("counted"), customCount.incrementAndGet()));
