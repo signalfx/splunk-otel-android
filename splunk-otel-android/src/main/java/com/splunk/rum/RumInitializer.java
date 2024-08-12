@@ -22,7 +22,7 @@ import static com.splunk.rum.SplunkRum.COMPONENT_ERROR;
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
-import static io.opentelemetry.android.RumConstants.APP_START_SPAN_NAME;
+import static io.opentelemetry.android.common.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.semconv.incubating.DeploymentIncubatingAttributes.DEPLOYMENT_ENVIRONMENT;
 import static java.util.Objects.requireNonNull;
@@ -357,6 +357,7 @@ class RumInitializer {
                 currentNetworkProvider, constructBacklogProvider(visibleScreenTracker));
     }
 
+    //TODO: Make this use OTLP buffering via upstream
     private SpanExporter buildStorageBufferingExporter(
             CurrentNetworkProvider currentNetworkProvider, SpanStorage spanStorage) {
         Sender sender = buildCustomizedZipkinSender();
@@ -435,6 +436,7 @@ class RumInitializer {
                         .build();
     }
 
+    //TODO: This needs to go away as part of 2.0, OTLP only
     @NonNull
     private Supplier<SpanExporter> supplyZipkinExporter() {
         String endpoint = getEndpointWithAuthTokenQueryParam();
