@@ -4,6 +4,7 @@ opentelemetry-core-alpha = "1.42.1-alpha"
 opentelemetry-inst = "2.6.0"
 opentelemetry-inst-alpha = "2.6.0-alpha"
 opentelemetry-android = "0.7.0-alpha-SNAPSHOT"
+opentelemetry-semconv = "1.26.0-alpha"
 mockito = "5.14.2"
 junit = "5.11.3"
 spotless = "6.25.0"
@@ -26,6 +27,8 @@ opentelemetry-instrumentation-okhttp = { module = "io.opentelemetry.instrumentat
 opentelemetry-exporter-zipkin = { module = "io.opentelemetry:opentelemetry-exporter-zipkin", version.ref = "opentelemetry-core" }
 opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry-core" }
 opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging", version.ref = "opentelemetry-core" }
+opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
+opentelemetry-semconv-incubating = { module = "io.opentelemetry.semconv:opentelemetry-semconv-incubating", version.ref = "opentelemetry-semconv" }
 opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version.ref = "opentelemetry-core" }
 
 zipkin-sender-okhttp = "io.zipkin.reporter2:zipkin-sender-okhttp3:3.4.2"
