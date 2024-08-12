@@ -38,7 +38,7 @@ import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NE
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
-import io.opentelemetry.android.RumConstants;
+import io.opentelemetry.android.common.RumConstants;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
