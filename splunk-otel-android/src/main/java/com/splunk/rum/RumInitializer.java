@@ -189,9 +189,9 @@ class RumInitializer {
         // make sure the TracerProvider gets set as the very first thing, before any other
         // instrumentations
         otelRumBuilder.addInstrumentation(
-                instrumentedApplication ->
+                (app, otelRum) ->
                         logBridge.setTracerProvider(
-                                instrumentedApplication.getOpenTelemetrySdk().getTracerProvider()));
+                                otelRum.getOpenTelemetry().getTracerProvider()));
 
         if (builder.isAnrDetectionEnabled()) {
             installAnrDetector(otelRumBuilder, mainLooper);
@@ -315,7 +315,7 @@ class RumInitializer {
 
     private void installCrashReporter(OpenTelemetryRumBuilder otelRumBuilder) {
         otelRumBuilder.addInstrumentation(
-                instrumentedApplication -> {
+                (app,otelRum) -> {
                     ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
                     ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
                     String applicationId = errorIdentifierInfo.getApplicationId();
@@ -325,9 +325,7 @@ class RumInitializer {
                     CrashReporterBuilder builder = CrashReporter.builder();
                     builder.addAttributesExtractor(
                                     RuntimeDetailsExtractor.create(
-                                            instrumentedApplication
-                                                    .getApplication()
-                                                    .getApplicationContext()))
+                                            app.getApplicationContext()))
                             .addAttributesExtractor(new CrashComponentExtractor());
 
                     if (applicationId != null)
@@ -350,7 +348,7 @@ class RumInitializer {
                             .setSlowRenderingDetectionPollInterval(
                                     builder.slowRenderingDetectionPollInterval)
                             .build()
-                            .installOn(instrumentedApplication);
+                            .installOn(app);
                     initializationEvents.emit("slowRenderingDetectorInitialized");
                 });
     }
