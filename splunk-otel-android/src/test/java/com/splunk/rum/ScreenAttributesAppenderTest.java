@@ -16,8 +16,8 @@
 
 package com.splunk.rum;
 
-import static io.opentelemetry.android.RumConstants.LAST_SCREEN_NAME_KEY;
-import static io.opentelemetry.android.RumConstants.SCREEN_NAME_KEY;
+import static io.opentelemetry.android.common.RumConstants.LAST_SCREEN_NAME_KEY;
+import static io.opentelemetry.android.common.RumConstants.SCREEN_NAME_KEY;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
