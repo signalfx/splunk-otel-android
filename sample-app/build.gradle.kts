@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.compose)
 }
 
+
 val localProperties = Properties()
 localProperties.load(FileInputStream(rootProject.file("local.properties")))
 
@@ -70,6 +71,14 @@ composeCompiler {
     enableStrongSkippingMode = true
 }
 
+repositories {
+    // TODO: Remove after android-agent 0.7.0-alpha is released
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+//    mavenCentral()
+//    google()
+//    gradlePluginPortal()
+}
+
 dependencies {
     api(platform(libs.opentelemetry.instrumentation.bom))
 
@@ -95,7 +104,7 @@ dependencies {
     implementation(libs.android.volley)
     implementation(libs.androidx.work)
     implementation(libs.opentelemetry.sdk)
-    implementation(libs.opentelemetry.api.incubator)
+    implementation(libs.opentelemetry.instrumenter.api.incubator)
     testImplementation(libs.bundles.junit)
     testRuntimeOnly(libs.junit.platform.launcher)
     androidTestImplementation(libs.androidx.test.core)

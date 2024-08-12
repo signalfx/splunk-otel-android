@@ -21,6 +21,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // TODO: Remove after android-agent 0.7.0-alpha is released
+        maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
     }
     if (findProperty("release") != "true") {
         version = "$version-SNAPSHOT"
