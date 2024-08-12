@@ -184,9 +184,9 @@ class RumInitializer {
         // make sure the TracerProvider gets set as the very first thing, before any other
         // instrumentations
         otelRumBuilder.addInstrumentation(
-                instrumentedApplication ->
+                (app, otelRum) ->
                         logBridge.setTracerProvider(
-                                instrumentedApplication.getOpenTelemetrySdk().getTracerProvider()));
+                                otelRum.getOpenTelemetry().getTracerProvider()));
 
         if (builder.isAnrDetectionEnabled()) {
             installAnrDetector(otelRumBuilder, mainLooper);
@@ -310,16 +310,14 @@ class RumInitializer {
 
     private void installCrashReporter(OpenTelemetryRumBuilder otelRumBuilder) {
         otelRumBuilder.addInstrumentation(
-                instrumentedApplication -> {
+                (app,otelRum) -> {
                     CrashReporter.builder()
                             .addAttributesExtractor(
                                     RuntimeDetailsExtractor.create(
-                                            instrumentedApplication
-                                                    .getApplication()
-                                                    .getApplicationContext()))
+                                            app.getApplicationContext()))
                             .addAttributesExtractor(new CrashComponentExtractor())
                             .build()
-                            .installOn(instrumentedApplication);
+                            .installOn(app);
 
                     initializationEvents.emit("crashReportingInitialized");
                 });

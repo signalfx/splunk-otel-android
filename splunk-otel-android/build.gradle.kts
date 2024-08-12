@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.opentelemetry.exporter.zipkin)
     implementation(libs.opentelemetry.exporter.otlp)
     implementation(libs.opentelemetry.exporter.logging)
+    implementation(libs.opentelemetry.semconv)
+    implementation(libs.opentelemetry.semconv.incubating)
     implementation(libs.androidx.core)
     implementation(libs.androidx.navigation.fragment)
     api(libs.zipkin.sender.okhttp)
