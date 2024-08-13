@@ -41,10 +41,6 @@ import io.opentelemetry.android.config.OtelRumConfig;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.android.instrumentation.anr.AnrDetector;
 import io.opentelemetry.android.instrumentation.crash.CrashReporter;
-import io.opentelemetry.android.instrumentation.lifecycle.AndroidLifecycleInstrumentation;
-import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
-import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingDetector;
-import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
@@ -95,9 +91,11 @@ class RumInitializer {
         GlobalAttributesSupplier globalAttributeSupplier =
                 new GlobalAttributesSupplier(builder.globalAttributes);
         config.setGlobalAttributes(globalAttributeSupplier);
-        if (!builder.isNetworkMonitorEnabled()) {
-            config.disableNetworkChangeMonitoring();
-        }
+
+        // TODO: Note/document this instrumentation is now opt-in via application classpath via build settings
+//        if (!builder.isNetworkMonitorEnabled()) {
+//            config.disableNetworkChangeMonitoring();
+//        }
 
         config.disableScreenAttributes();
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
@@ -105,10 +103,12 @@ class RumInitializer {
         otelRumBuilder.mergeResource(createSplunkResource());
         initializationEvents.emit("resourceInitialized");
 
-        CurrentNetworkProvider currentNetworkProvider =
-                CurrentNetworkProvider.createAndStart(application);
-        otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
-        initializationEvents.emit("connectionUtilInitialized");
+        // TODO: now spelled rum.sdk.init.net.provider and currently mixed up in network
+        // attributes enabled config in upstream
+//        CurrentNetworkProvider currentNetworkProvider =
+//                CurrentNetworkProvider.createAndStart(application);
+//        otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
+//        initializationEvents.emit("connectionUtilInitialized");
 
         // TODO: How truly important is the order of these span processors? The location of event
         // generation should probably not be altered...
