@@ -100,9 +100,11 @@ class RumInitializer {
         GlobalAttributesSupplier globalAttributeSupplier =
                 new GlobalAttributesSupplier(builder.globalAttributes);
         config.setGlobalAttributes(globalAttributeSupplier);
-        if (!builder.isNetworkMonitorEnabled()) {
-            config.disableNetworkChangeMonitoring();
-        }
+
+        // TODO: Note/document this instrumentation is now opt-in via application classpath via build settings
+//        if (!builder.isNetworkMonitorEnabled()) {
+//            config.disableNetworkChangeMonitoring();
+//        }
 
         config.disableScreenAttributes();
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
@@ -110,10 +112,12 @@ class RumInitializer {
         otelRumBuilder.mergeResource(createSplunkResource());
         initializationEvents.emit("resourceInitialized");
 
-        CurrentNetworkProvider currentNetworkProvider =
-                CurrentNetworkProvider.createAndStart(application);
-        otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
-        initializationEvents.emit("connectionUtilInitialized");
+        // TODO: now spelled rum.sdk.init.net.provider and currently mixed up in network
+        // attributes enabled config in upstream
+//        CurrentNetworkProvider currentNetworkProvider =
+//                CurrentNetworkProvider.createAndStart(application);
+//        otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
+//        initializationEvents.emit("connectionUtilInitialized");
 
         // TODO: How truly important is the order of these span processors? The location of event
         // generation should probably not be altered...
