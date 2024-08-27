@@ -42,7 +42,7 @@ android {
 dependencies {
     api(platform(libs.opentelemetry.instrumentation.bom))
     api(platform(libs.opentelemetry.bom))
-    api(libs.opentelemetry.android)
+    api(libs.opentelemetry.android.agent)
 
     implementation(libs.opentelemetry.sdk)
     implementation(libs.opentelemetry.instrumentation.okhttp)

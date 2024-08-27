@@ -433,6 +433,7 @@ class RumInitializer {
                 OtlpHttpSpanExporter.builder()
                         .setEndpoint(endpoint)
                         .addHeader("X-SF-Token", builder.rumAccessToken)
+                        .
                         .build();
     }
 
