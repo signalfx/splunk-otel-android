@@ -26,7 +26,7 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.when;
 
-import io.opentelemetry.android.RumConstants;
+import io.opentelemetry.android.common.RumConstants;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.SpanKind;

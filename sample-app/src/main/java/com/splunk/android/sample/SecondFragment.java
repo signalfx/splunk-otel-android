@@ -29,11 +29,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
 import com.splunk.android.sample.databinding.FragmentSecondBinding;
 import com.splunk.rum.SplunkRum;
-import io.opentelemetry.android.instrumentation.RumScreenName;
+
+import io.opentelemetry.android.instrumentation.annotations.RumScreenName;
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.incubator.events.EventLogger;
-import io.opentelemetry.api.incubator.events.EventLogger;
-import io.opentelemetry.api.incubator.events.EventLoggerProvider;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
@@ -104,8 +102,8 @@ public class SecondFragment extends Fragment {
         binding.buttonToWebview.setOnClickListener(
                 v -> {
                     SplunkRum.getInstance()
-                            .addRumEvent("this span will be ignored", Attributes.empty());
-                    emitEvent(SplunkRum.getInstance(), "SecondFragment", "toWebViewClick");
+                            .emitEvent("this span will be ignored", Attributes.empty());
+                    emitEvent(SplunkRum.getInstance(), "SecondFragment.toWebViewClick");
 
                     NavHostFragment.findNavController(SecondFragment.this)
                             .navigate(R.id.action_SecondFragment_to_webViewFragment);
@@ -221,11 +219,7 @@ public class SecondFragment extends Fragment {
         updateLabel();
     }
 
-    public static void emitEvent(SplunkRum splunkRum, String eventDomain, String eventName) {
-        SdkEventLoggerProvider eventEmitterProvider =
-                SdkEventLoggerProvider.create(
-                        ((OpenTelemetrySdk) splunkRum.getOpenTelemetry()).getSdkLoggerProvider());
-        EventLogger eventLogger = eventEmitterProvider.eventLoggerBuilder("test").build();
-        eventLogger.builder(eventName).emit();
+    public static void emitEvent(SplunkRum splunkRum, String eventName) {
+        splunkRum.emitEvent(eventName, Attributes.empty());
     }
 }

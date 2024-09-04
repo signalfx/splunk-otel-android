@@ -43,7 +43,8 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import com.splunk.android.sample.databinding.ActivityMainBinding;
 import com.splunk.rum.SplunkRum;
-import io.opentelemetry.android.instrumentation.RumScreenName;
+
+import io.opentelemetry.android.instrumentation.annotations.RumScreenName;
 import io.opentelemetry.api.common.Attributes;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
