@@ -19,7 +19,7 @@ package com.splunk.rum;
 import static com.splunk.rum.SplunkRum.COMPONENT_APPSTART;
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 
-import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
+import io.opentelemetry.android.instrumentation.activity.startup.AppStartupTimer;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+// TODO: See if we can remove this in favor of upstream InitializationEvents
+// might need to map the events back to spans tho...
 class InitializationEvents {
     private final AppStartupTimer startupTimer;
     private final List<Event> events = new ArrayList<>();

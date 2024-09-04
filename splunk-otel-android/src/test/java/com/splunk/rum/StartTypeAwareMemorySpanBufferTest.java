@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
+import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 public class StartTypeAwareMemorySpanBufferTest {
 
-    private final VisibleScreenTracker visibleScreenTracker = mock(VisibleScreenTracker.class);
+    private final VisibleScreenService visibleScreenTracker = mock(VisibleScreenService.class);
 
     private final StartTypeAwareMemorySpanBuffer memorySpanBuffer =
             new StartTypeAwareMemorySpanBuffer(visibleScreenTracker);

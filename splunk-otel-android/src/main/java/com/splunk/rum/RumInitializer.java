@@ -23,54 +23,53 @@ import static com.splunk.rum.SplunkRum.COMPONENT_APPSTART;
 import static com.splunk.rum.SplunkRum.COMPONENT_ERROR;
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
+import static com.splunk.rum.SplunkRum.LOG_TAG;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
 import static com.splunk.rum.SplunkRum.SPLUNK_OLLY_UUID_KEY;
+import static java.util.Objects.requireNonNull;
 import static io.opentelemetry.android.common.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.semconv.incubating.DeploymentIncubatingAttributes.DEPLOYMENT_ENVIRONMENT;
-import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.os.Looper;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
 import com.splunk.rum.internal.GlobalAttributesSupplier;
 import com.splunk.rum.internal.NoOpSpanExporter;
 import com.splunk.rum.internal.UInt32QuadXorTraceIdRatioSampler;
+
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.OpenTelemetryRumBuilder;
-import io.opentelemetry.android.RuntimeDetailsExtractor;
 import io.opentelemetry.android.config.OtelRumConfig;
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
-import io.opentelemetry.android.instrumentation.anr.AnrDetector;
+import io.opentelemetry.android.instrumentation.AndroidInstrumentationLoader;
+import io.opentelemetry.android.instrumentation.activity.ActivityLifecycleInstrumentation;
+import io.opentelemetry.android.instrumentation.activity.startup.AppStartupTimer;
+import io.opentelemetry.android.instrumentation.anr.AnrInstrumentation;
 import io.opentelemetry.android.instrumentation.anr.AnrDetectorBuilder;
-import io.opentelemetry.android.instrumentation.crash.CrashReporter;
+import io.opentelemetry.android.instrumentation.crash.CrashReporterInstrumentation;
+import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingInstrumentation;
 import io.opentelemetry.android.instrumentation.crash.CrashReporterBuilder;
 import io.opentelemetry.android.instrumentation.lifecycle.AndroidLifecycleInstrumentation;
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingDetector;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
-import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.android.internal.services.ServiceManager;
+import io.opentelemetry.android.internal.services.network.CurrentNetworkProvider;
+import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
-import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter;
-import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.sdk.trace.SpanLimits;
-import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
-import java.time.Duration;
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.logging.Level;
-import zipkin2.reporter.Sender;
-import zipkin2.reporter.okhttp3.OkHttpSender;
 
 class RumInitializer {
 
@@ -92,7 +91,6 @@ class RumInitializer {
     }
 
     SplunkRum initialize(Looper mainLooper) {
-        VisibleScreenTracker visibleScreenTracker = new VisibleScreenTracker();
 
         initializationEvents.begin();
 
@@ -112,28 +110,38 @@ class RumInitializer {
         otelRumBuilder.mergeResource(createSplunkResource());
         initializationEvents.emit("resourceInitialized");
 
+        ServiceManager.initialize(application);
+        ServiceManager serviceManager = ServiceManager.get();
+        CurrentNetworkProvider currentNetworkProvider = serviceManager.getCurrentNetworkProvider();
+        VisibleScreenService visibleScreenService = serviceManager.getVisibleScreenService();
+
         // TODO: now spelled rum.sdk.init.net.provider and currently mixed up in network
         // attributes enabled config in upstream
-//        CurrentNetworkProvider currentNetworkProvider =
-//                CurrentNetworkProvider.createAndStart(application);
+////        CurrentNetworkProvider currentNetworkProvider =
+////                CurrentNetworkProvider.create(application);
+//        currentNetworkProvider.start();
 //        otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
-//        initializationEvents.emit("connectionUtilInitialized");
+        initializationEvents.emit("connectionUtilInitialized");
 
         // TODO: How truly important is the order of these span processors? The location of event
         // generation should probably not be altered...
 
-        // Add batch span processor
-        otelRumBuilder.addTracerProviderCustomizer(
-                (tracerProviderBuilder, app) -> {
-                    SpanExporter zipkinExporter =
-                            buildFilteringExporter(currentNetworkProvider, visibleScreenTracker);
-                    initializationEvents.emit("exporterInitialized");
+        // Get exporters going...
+        otelRumBuilder.addSpanExporterCustomizer(this::buildSpanExporter);
+//        otelRumBuilder.addLogRecordExporterCustomizer(xxx todo );
 
-                    BatchSpanProcessor batchSpanProcessor =
-                            BatchSpanProcessor.builder(zipkinExporter).build();
-                    initializationEvents.emit("batchSpanProcessorInitialized");
-                    return tracerProviderBuilder.addSpanProcessor(batchSpanProcessor);
-                });
+//        // Add batch span processor
+//        otelRumBuilder.addTracerProviderCustomizer(
+//                (tracerProviderBuilder, app) -> {
+//                    SpanExporter zipkinExporter =
+//                            buildFilteringExporter(currentNetworkProvider, visibleScreenService);
+//                    initializationEvents.emit("exporterInitialized");
+//
+//                    BatchSpanProcessor batchSpanProcessor =
+//                            BatchSpanProcessor.builder(zipkinExporter).build();
+//                    initializationEvents.emit("batchSpanProcessorInitialized");
+//                    return tracerProviderBuilder.addSpanProcessor(batchSpanProcessor);
+//                });
 
         // Inhibit the upstream exporter because we add our own BatchSpanProcessor
         otelRumBuilder.addSpanExporterCustomizer(x -> new NoOpSpanExporter());
@@ -198,23 +206,23 @@ class RumInitializer {
                                 otelRum.getOpenTelemetry().getTracerProvider()));
 
         if (builder.isAnrDetectionEnabled()) {
-            installAnrDetector(otelRumBuilder, mainLooper);
+            configureAnrInstrumentation();
         }
         if (builder.isSlowRenderingDetectionEnabled()) {
-            installSlowRenderingDetector(otelRumBuilder);
+            configureSlowRenderingInstrumentation(otelRumBuilder);
         }
         if (builder.isCrashReportingEnabled()) {
-            installCrashReporter(otelRumBuilder);
+            configureCrashReporter(otelRumBuilder);
         }
 
         SettableScreenAttributesAppender screenAttributesAppender =
-                new SettableScreenAttributesAppender(visibleScreenTracker);
+                new SettableScreenAttributesAppender(visibleScreenService);
         otelRumBuilder.addTracerProviderCustomizer(
                 (tracerProviderBuilder, app) ->
                         tracerProviderBuilder.addSpanProcessor(screenAttributesAppender));
 
         // Lifecycle events instrumentation are always installed.
-        installLifecycleInstrumentations(otelRumBuilder, visibleScreenTracker);
+        configureLifecycleInstrumentations();
 
         OpenTelemetryRum openTelemetryRum = otelRumBuilder.build();
 
@@ -228,19 +236,19 @@ class RumInitializer {
     }
 
     @NonNull
-    private MemorySpanBuffer constructBacklogProvider(VisibleScreenTracker visibleScreenTracker) {
+    private MemorySpanBuffer constructBacklogProvider(VisibleScreenService visibleScreenService) {
         if (builder.isBackgroundInstrumentationDeferredUntilForeground()) {
-            return new StartTypeAwareMemorySpanBuffer(visibleScreenTracker);
+            return new StartTypeAwareMemorySpanBuffer(visibleScreenService);
         } else {
             return new DefaultMemorySpanBuffer();
         }
     }
 
     @NonNull
-    private SpanStorage constructSpanFileProvider(VisibleScreenTracker visibleScreenTracker) {
+    private SpanStorage constructSpanFileProvider(VisibleScreenService visibleScreenService) {
         if (builder.isBackgroundInstrumentationDeferredUntilForeground()) {
             return StartTypeAwareSpanStorage.create(
-                    visibleScreenTracker,
+                    visibleScreenService,
                     new FileUtils(),
                     application.getApplicationContext().getFilesDir());
         } else {
@@ -249,32 +257,23 @@ class RumInitializer {
         }
     }
 
-    private void installLifecycleInstrumentations(
-            OpenTelemetryRumBuilder otelRumBuilder, VisibleScreenTracker visibleScreenTracker) {
-
-        otelRumBuilder.addInstrumentation(
-                instrumentedApp -> {
-                    Function<Tracer, Tracer> tracerCustomizer =
-                            tracer ->
-                                    (Tracer)
-                                            spanName -> {
-                                                String component =
-                                                        spanName.equals(APP_START_SPAN_NAME)
-                                                                ? COMPONENT_APPSTART
-                                                                : COMPONENT_UI;
-                                                return tracer.spanBuilder(spanName)
-                                                        .setAttribute(COMPONENT_KEY, component);
-                                            };
-                    AndroidLifecycleInstrumentation instrumentation =
-                            AndroidLifecycleInstrumentation.builder()
-                                    .setVisibleScreenTracker(visibleScreenTracker)
-                                    .setStartupTimer(startupTimer)
-                                    .setTracerCustomizer(tracerCustomizer)
-                                    .setScreenNameExtractor(SplunkScreenNameExtractor.INSTANCE)
-                                    .build();
-                    instrumentation.installOn(instrumentedApp);
-                    initializationEvents.emit("activityLifecycleCallbacksInitialized");
+    private void configureLifecycleInstrumentations() {
+        ActivityLifecycleInstrumentation instrumentation = AndroidInstrumentationLoader.getInstrumentation(ActivityLifecycleInstrumentation.class);
+        if(instrumentation == null){
+            Log.w(LOG_TAG, "Activity rendering instrumentation was not loaded! Skipping configuration.");
+            return;
+        }
+        instrumentation.setTracerCustomizer(tracer ->
+                spanName -> {
+                    String component =
+                            spanName.equals(APP_START_SPAN_NAME)
+                                    ? COMPONENT_APPSTART
+                                    : COMPONENT_UI;
+                    return tracer.spanBuilder(spanName)
+                            .setAttribute(COMPONENT_KEY, component);
                 });
+        instrumentation.setScreenNameExtractor(SplunkScreenNameExtractor.INSTANCE);
+        initializationEvents.emit("activityLifecycleCallbacksInitialized");
     }
 
     /**
@@ -282,7 +281,6 @@ class RumInitializer {
      * AndroidResource.
      */
     private Resource createSplunkResource() {
-
         // applicationName can't be null at this stage
         String applicationName = requireNonNull(builder.applicationName);
         ResourceBuilder resourceBuilder = Resource.builder().put(APP_NAME_KEY, applicationName);
@@ -292,233 +290,229 @@ class RumInitializer {
         return resourceBuilder.build();
     }
 
-    private void installAnrDetector(OpenTelemetryRumBuilder otelRumBuilder, Looper mainLooper) {
-        otelRumBuilder.addInstrumentation(
-                instrumentedApplication -> {
-                    ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
-                    ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
-                    String applicationId = errorIdentifierInfo.getApplicationId();
-                    String versionCode = errorIdentifierInfo.getVersionCode();
-                    String uuid = errorIdentifierInfo.getCustomUUID();
+    private void configureAnrInstrumentation() {
+        AnrInstrumentation instrumentation = AndroidInstrumentationLoader.getInstrumentation(AnrInstrumentation.class);
+        if(instrumentation == null){
+            Log.w(LOG_TAG, "ANR instrumentation was not loaded! Skipping configuration.");
+            return;
+        }
+        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
+        ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
+        String applicationId = errorIdentifierInfo.getApplicationId();
+        String versionCode = errorIdentifierInfo.getVersionCode();
+        String uuid = errorIdentifierInfo.getCustomUUID();
 
-                    AnrDetectorBuilder builder = AnrDetector.builder();
-                    builder.addAttributesExtractor(constant(COMPONENT_KEY, COMPONENT_ERROR));
+        instrumentation.addAttributesExtractor(constant(COMPONENT_KEY, COMPONENT_ERROR));
 
-                    if (applicationId != null)
-                        builder.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
-                    if (versionCode != null)
-                        builder.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
-                    if (uuid != null)
-                        builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
+        if (applicationId != null){
+            instrumentation.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
+        }
+        if (versionCode != null){
+            instrumentation.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
+        }
+        if (uuid != null){
+            instrumentation.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
+        }
 
-                    builder.setMainLooper(mainLooper).build().installOn(instrumentedApplication);
-
-                    initializationEvents.emit("anrMonitorInitialized");
-                });
+        initializationEvents.emit("anrMonitorInitialized");
     }
 
-    private void installCrashReporter(OpenTelemetryRumBuilder otelRumBuilder) {
-        otelRumBuilder.addInstrumentation(
-                (app,otelRum) -> {
-                    ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
-                    ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
-                    String applicationId = errorIdentifierInfo.getApplicationId();
-                    String versionCode = errorIdentifierInfo.getVersionCode();
-                    String uuid = errorIdentifierInfo.getCustomUUID();
-
-                    CrashReporterBuilder builder = CrashReporter.builder();
-                    builder.addAttributesExtractor(
-                                    RuntimeDetailsExtractor.create(
-                                            app.getApplicationContext()))
-                            .addAttributesExtractor(new CrashComponentExtractor());
-
-                    if (applicationId != null)
-                        builder.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
-                    if (versionCode != null)
-                        builder.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
-                    if (uuid != null)
-                        builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
-
-                    builder.build().installOn(instrumentedApplication);
-
-                    initializationEvents.emit("crashReportingInitialized");
-                });
+    private void configureSlowRenderingInstrumentation(OpenTelemetryRumBuilder otelRumBuilder) {
+        SlowRenderingInstrumentation instrumentation = AndroidInstrumentationLoader.getInstrumentation(SlowRenderingInstrumentation.class);
+        if(instrumentation == null){
+            Log.w(LOG_TAG, "Slow rendering instrumentation was not loaded! Skipping configuration.");
+            return;
+        }
+        instrumentation.setSlowRenderingDetectionPollInterval(builder.slowRenderingDetectionPollInterval);
+        initializationEvents.emit("slowRenderingDetectorInitialized");
     }
 
-    private void installSlowRenderingDetector(OpenTelemetryRumBuilder otelRumBuilder) {
-        otelRumBuilder.addInstrumentation(
-                instrumentedApplication -> {
-                    SlowRenderingDetector.builder()
-                            .setSlowRenderingDetectionPollInterval(
-                                    builder.slowRenderingDetectionPollInterval)
-                            .build()
-                            .installOn(app);
-                    initializationEvents.emit("slowRenderingDetectorInitialized");
-                });
+    private void configureCrashReporter(OpenTelemetryRumBuilder otelRumBuilder) {
+        CrashReporterInstrumentation instrumentation = AndroidInstrumentationLoader.getInstrumentation(CrashReporterInstrumentation.class);
+        if(instrumentation == null){
+            Log.w(LOG_TAG, "Crash reporter instrumentation was not loaded! Skipping configuration.");
+            return;
+        }
+        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
+        ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
+        String applicationId = errorIdentifierInfo.getApplicationId();
+        String versionCode = errorIdentifierInfo.getVersionCode();
+        String uuid = errorIdentifierInfo.getCustomUUID();
+
+        instrumentation.addAttributesExtractor(
+                        RuntimeDetailsExtractor.create(
+                                app.getApplicationContext()))
+                .addAttributesExtractor(new CrashComponentExtractor());
+
+        if (applicationId != null){
+            instrumentation.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
+        }
+        if (versionCode != null){
+            instrumentation.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
+        }
+        if (uuid != null){
+            instrumentation.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
+        }
+
+        initializationEvents.emit("crashReportingInitialized");
     }
 
     // visible for testing
-    SpanExporter buildFilteringExporter(
-            CurrentNetworkProvider currentNetworkProvider,
-            VisibleScreenTracker visibleScreenTracker) {
-        SpanExporter exporter = buildExporter(currentNetworkProvider, visibleScreenTracker);
+    @NonNull
+    SpanExporter buildSpanExporter(SpanExporter delegate) {
+        OtlpHttpSpanExporter otlp = OtlpHttpSpanExporter.builder()
+                .setEndpoint(builder.beaconEndpoint)
+                .addHeader("X-SF-Token", builder.rumAccessToken)
+                .build();
         SpanExporter splunkTranslatedExporter =
                 new SplunkSpanDataModifier(
-                        exporter,
+                        otlp,
                         builder.isReactNativeSupportEnabled(),
-                        builder.shouldUseOtlpExporter());
+                        true);
         SpanExporter filteredExporter = builder.decorateWithSpanFilter(splunkTranslatedExporter);
-        initializationEvents.emit("zipkin exporter initialized");
+        initializationEvents.emit("otlp span exporter initialized");
         return filteredExporter;
     }
 
-    private SpanExporter buildExporter(
-            CurrentNetworkProvider currentNetworkProvider,
-            VisibleScreenTracker visibleScreenTracker) {
-        if (builder.isDebugEnabled()) {
-            // tell the Zipkin exporter to shut up already. We're on mobile, network stuff happens.
-            // we'll do our best to hang on to the spans with the wrapping BufferingExporter.
-            ZipkinSpanExporter.baseLogger.setLevel(Level.SEVERE);
-            initializationEvents.emit("logger setup complete");
-        }
-
-        if (builder.isDiskBufferingEnabled()) {
-            return buildStorageBufferingExporter(
-                    currentNetworkProvider, constructSpanFileProvider(visibleScreenTracker));
-        }
-
-        return buildMemoryBufferingThrottledExporter(
-                currentNetworkProvider, constructBacklogProvider(visibleScreenTracker));
-    }
-
-    //TODO: Make this use OTLP buffering via upstream
-    private SpanExporter buildStorageBufferingExporter(
-            CurrentNetworkProvider currentNetworkProvider, SpanStorage spanStorage) {
-        Sender sender = buildCustomizedZipkinSender();
-
-        BandwidthTracker bandwidthTracker = new BandwidthTracker();
-
-        FileSender fileSender =
-                FileSender.builder().sender(sender).bandwidthTracker(bandwidthTracker).build();
-        DiskToZipkinExporter diskToZipkinExporter =
-                DiskToZipkinExporter.builder()
-                        .connectionUtil(currentNetworkProvider)
-                        .fileSender(fileSender)
-                        .bandwidthTracker(bandwidthTracker)
-                        .spanFileProvider(spanStorage)
-                        .build();
-        diskToZipkinExporter.startPolling();
-
-        return getToDiskExporter(spanStorage);
-    }
-
-    @NonNull
-    private Sender buildCustomizedZipkinSender() {
-        OkHttpSender.Builder okBuilder =
-                OkHttpSender.newBuilder().endpoint(getEndpointWithAuthTokenQueryParam());
-        builder.httpSenderCustomizer.customize(okBuilder);
-        return okBuilder.build();
-    }
+//
+//    private SpanExporter buildExporter(
+//            CurrentNetworkProvider currentNetworkProvider,
+//            VisibleScreenService visibleScreenService) {
+//        xxxx
+//        if (builder.isDebugEnabled()) {
+//            // tell the Zipkin exporter to shut up already. We're on mobile, network stuff happens.
+//            // we'll do our best to hang on to the spans with the wrapping BufferingExporter.
+//            ZipkinSpanExporter.baseLogger.setLevel(Level.SEVERE);
+//            initializationEvents.emit("logger setup complete");
+//        }
+//
+//        if (builder.isDiskBufferingEnabled()) {
+//            return buildStorageBufferingExporter(
+//                    currentNetworkProvider, constructSpanFileProvider(visibleScreenService));
+//        }
+//
+//        return buildMemoryBufferingThrottledExporter(
+//                currentNetworkProvider, constructBacklogProvider(visibleScreenService));
+//    }
+//
+//    //TODO: Make this use OTLP buffering via upstream
+//    private SpanExporter buildStorageBufferingExporter(
+//            CurrentNetworkProvider currentNetworkProvider, SpanStorage spanStorage) {
+//        Sender sender = buildCustomizedZipkinSender();
+//
+//        BandwidthTracker bandwidthTracker = new BandwidthTracker();
+//
+//        FileSender fileSender =
+//                FileSender.builder().sender(sender).bandwidthTracker(bandwidthTracker).build();
+//        DiskToZipkinExporter diskToZipkinExporter =
+//                DiskToZipkinExporter.builder()
+//                        .connectionUtil(currentNetworkProvider)
+//                        .fileSender(fileSender)
+//                        .bandwidthTracker(bandwidthTracker)
+//                        .spanFileProvider(spanStorage)
+//                        .build();
+//        diskToZipkinExporter.startPolling();
+//
+//        return getToDiskExporter(spanStorage);
+//    }
+//
+//    @NonNull
+//    private Sender buildCustomizedZipkinSender() {
+//        OkHttpSender.Builder okBuilder =
+//                OkHttpSender.newBuilder().endpoint(getEndpointWithAuthTokenQueryParam());
+//        builder.httpSenderCustomizer.customize(okBuilder);
+//        return okBuilder.build();
+//    }
 
     @NonNull
     private String getEndpointWithAuthTokenQueryParam() {
         return builder.beaconEndpoint + "?auth=" + builder.rumAccessToken;
     }
 
-    private SpanExporter buildMemoryBufferingThrottledExporter(
-            CurrentNetworkProvider currentNetworkProvider, MemorySpanBuffer backlogProvider) {
-        SpanExporter zipkinSpanExporter = getCoreSpanExporter();
-        MemoryBufferingExporter memoryBufferingExporter =
-                new MemoryBufferingExporter(
-                        currentNetworkProvider, zipkinSpanExporter, backlogProvider);
-        return buildThrottlingExporter(memoryBufferingExporter);
-    }
+//    private SpanExporter buildMemoryBufferingThrottledExporter(
+//            CurrentNetworkProvider currentNetworkProvider, MemorySpanBuffer backlogProvider) {
+//        SpanExporter zipkinSpanExporter = getCoreSpanExporter();
+//        MemoryBufferingExporter memoryBufferingExporter =
+//                new MemoryBufferingExporter(
+//                        currentNetworkProvider, zipkinSpanExporter, backlogProvider);
+//        return buildThrottlingExporter(memoryBufferingExporter);
+//    }
 
-    private static ThrottlingExporter buildThrottlingExporter(
-            MemoryBufferingExporter memoryBufferingExporter) {
-        return ThrottlingExporter.newBuilder(memoryBufferingExporter)
-                .categorizeByAttribute(COMPONENT_KEY)
-                .maxSpansInWindow(100)
-                .windowSize(Duration.ofSeconds(30))
-                .build();
-    }
+//    private static ThrottlingExporter buildThrottlingExporter(
+//            MemoryBufferingExporter memoryBufferingExporter) {
+//        return ThrottlingExporter.newBuilder(memoryBufferingExporter)
+//                .categorizeByAttribute(COMPONENT_KEY)
+//                .maxSpansInWindow(100)
+//                .windowSize(Duration.ofSeconds(30))
+//                .build();
+//    }
 
-    SpanExporter getToDiskExporter(SpanStorage spanStorage) {
-        return new LazyInitSpanExporter(
-                () ->
-                        ZipkinWriteToDiskExporterFactory.create(
-                                builder.maxUsageMegabytes, spanStorage));
-    }
+//    SpanExporter getToDiskExporter(SpanStorage spanStorage) {
+//        return new LazyInitSpanExporter(
+//                () ->
+//                        ZipkinWriteToDiskExporterFactory.create(
+//                                builder.maxUsageMegabytes, spanStorage));
+//    }
+//
+//    // visible for testing
+//    SpanExporter getCoreSpanExporter() {
+//        Supplier<SpanExporter> exporterSupplier = supplyZipkinExporter();
+//        if (builder.shouldUseOtlpExporter()) {
+//            exporterSupplier = supplyOtlpExporter();
+//        }
+//        // return a lazy init exporter so the main thread doesn't block on the setup.
+//        return new LazyInitSpanExporter(exporterSupplier);
+//    }
 
-    // visible for testing
-    SpanExporter getCoreSpanExporter() {
-        Supplier<SpanExporter> exporterSupplier = supplyZipkinExporter();
-        if (builder.shouldUseOtlpExporter()) {
-            exporterSupplier = supplyOtlpExporter();
-        }
-        // return a lazy init exporter so the main thread doesn't block on the setup.
-        return new LazyInitSpanExporter(exporterSupplier);
-    }
-
-    @NonNull
-    private Supplier<SpanExporter> supplyOtlpExporter() {
-        String endpoint = getEndpointWithAuthTokenQueryParam();
-        return () ->
-                OtlpHttpSpanExporter.builder()
-                        .setEndpoint(endpoint)
-                        .addHeader("X-SF-Token", builder.rumAccessToken)
-                        .
-                        .build();
-    }
-
-    //TODO: This needs to go away as part of 2.0, OTLP only
-    @NonNull
-    private Supplier<SpanExporter> supplyZipkinExporter() {
-        String endpoint = getEndpointWithAuthTokenQueryParam();
-        return () ->
-                ZipkinSpanExporter.builder()
-                        .setEncoder(new CustomZipkinEncoder())
-                        .setEndpoint(endpoint)
-                        // remove the local IP address
-                        .setLocalIpAddressSupplier(() -> null)
-                        .setSender(buildCustomizedZipkinSender())
-                        .build();
-    }
-
-    private static class LazyInitSpanExporter implements SpanExporter {
-        @Nullable private volatile SpanExporter delegate;
-        private final Supplier<SpanExporter> s;
-
-        public LazyInitSpanExporter(Supplier<SpanExporter> s) {
-            this.s = s;
-        }
-
-        private SpanExporter getDelegate() {
-            SpanExporter d = delegate;
-            if (d == null) {
-                synchronized (this) {
-                    d = delegate;
-                    if (d == null) {
-                        delegate = d = s.get();
-                    }
-                }
-            }
-            return d;
-        }
-
-        @Override
-        public CompletableResultCode export(Collection<SpanData> spans) {
-            return getDelegate().export(spans);
-        }
-
-        @Override
-        public CompletableResultCode flush() {
-            return getDelegate().flush();
-        }
-
-        @Override
-        public CompletableResultCode shutdown() {
-            return getDelegate().shutdown();
-        }
-    }
+//
+//    //TODO: This needs to go away as part of 2.0, OTLP only
+//    @NonNull
+//    private Supplier<SpanExporter> supplyZipkinExporter() {
+//        String endpoint = getEndpointWithAuthTokenQueryParam();
+//        return () ->
+//                ZipkinSpanExporter.builder()
+//                        .setEncoder(new CustomZipkinEncoder())
+//                        .setEndpoint(endpoint)
+//                        // remove the local IP address
+//                        .setLocalIpAddressSupplier(() -> null)
+//                        .setSender(buildCustomizedZipkinSender())
+//                        .build();
+//    }
+//
+//    private static class LazyInitSpanExporter implements SpanExporter {
+//        @Nullable private volatile SpanExporter delegate;
+//        private final Supplier<SpanExporter> s;
+//
+//        public LazyInitSpanExporter(Supplier<SpanExporter> s) {
+//            this.s = s;
+//        }
+//
+//        private SpanExporter getDelegate() {
+//            SpanExporter d = delegate;
+//            if (d == null) {
+//                synchronized (this) {
+//                    d = delegate;
+//                    if (d == null) {
+//                        delegate = d = s.get();
+//                    }
+//                }
+//            }
+//            return d;
+//        }
+//
+//        @Override
+//        public CompletableResultCode export(Collection<SpanData> spans) {
+//            return getDelegate().export(spans);
+//        }
+//
+//        @Override
+//        public CompletableResultCode flush() {
+//            return getDelegate().flush();
+//        }
+//
+//        @Override
+//        public CompletableResultCode shutdown() {
+//            return getDelegate().shutdown();
+//        }
+//    }
 }

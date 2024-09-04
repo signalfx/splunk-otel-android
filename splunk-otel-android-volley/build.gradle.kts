@@ -51,6 +51,7 @@ dependencies {
     compileOnly(libs.opentelemetry.api)
     implementation(libs.opentelemetry.instrumenter.api)
     implementation(libs.opentelemetry.instrumenter.api.incubator)
+    implementation(libs.opentelemetry.semconv.incubating)
     compileOnly(libs.android.volley)
     implementation(libs.androidx.core)
     testImplementation(libs.mockwebserver)

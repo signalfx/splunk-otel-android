@@ -131,7 +131,7 @@ public class FirstFragment extends Fragment {
                 v -> {
                     // Without being in a workflow, this will still show up in the UI but wil not be
                     // grouped under the "Custom Events" tab.
-                    splunkRum.addRumEvent(
+                    splunkRum.emitEvent(
                             "kustom",
                             Attributes.of(longKey("counted"), customCount.incrementAndGet()));
                 });

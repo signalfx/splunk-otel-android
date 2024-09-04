@@ -98,7 +98,7 @@ public class WebViewFragment extends Fragment {
 
         @JavascriptInterface
         public void showToast(String toast) {
-            SplunkRum.getInstance().addRumEvent("WebViewButtonClicked", Attributes.empty());
+            SplunkRum.getInstance().emitEvent("WebViewButtonClicked", Attributes.empty());
             Toast.makeText(context, toast, Toast.LENGTH_LONG).show();
         }
 

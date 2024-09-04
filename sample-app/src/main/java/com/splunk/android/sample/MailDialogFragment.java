@@ -46,7 +46,7 @@ public class MailDialogFragment extends DialogFragment {
                         R.string.cancel,
                         (dialog, id) ->
                                 SplunkRum.getInstance()
-                                        .addRumEvent("User Rejected Help", HELPER_ATTRIBUTES));
+                                        .emitEvent("User Rejected Help", HELPER_ATTRIBUTES));
         return builder.create();
     }
 }
