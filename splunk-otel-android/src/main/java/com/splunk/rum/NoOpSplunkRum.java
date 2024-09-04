@@ -61,7 +61,7 @@ class NoOpSplunkRum extends SplunkRum {
     }
 
     @Override
-    public void addRumEvent(String name, Attributes attributes) {
+    public void emitEvent(String name, Attributes attributes) {
         // no-op
     }
 

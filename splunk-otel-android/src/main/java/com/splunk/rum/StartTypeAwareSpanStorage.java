@@ -19,11 +19,14 @@ package com.splunk.rum;
 import static com.splunk.rum.SplunkRum.LOG_TAG;
 
 import android.util.Log;
+
 import androidx.annotation.VisibleForTesting;
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
+
 import java.io.File;
 import java.util.UUID;
 import java.util.stream.Stream;
+
+import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 
 /***
  * Store span files to /span/background/@uniqueId/ for spans created when the app started in the background.
@@ -32,41 +35,41 @@ import java.util.stream.Stream;
  */
 class StartTypeAwareSpanStorage implements SpanStorage {
 
-    private final VisibleScreenTracker visibleScreenTracker;
+    private final VisibleScreenService visibleScreenService;
     private final FileUtils fileUtils;
     private final String uniqueId;
     private final File rootDir;
     private final File spanDir;
 
     static StartTypeAwareSpanStorage create(
-            VisibleScreenTracker visibleScreenTracker, FileUtils fileUtils, File rootDir) {
+            VisibleScreenService visibleScreenService, FileUtils fileUtils, File rootDir) {
         File spansDir = fileUtils.getSpansDirectory(rootDir);
         String uniqueId = UUID.randomUUID().toString();
-        return create(visibleScreenTracker, fileUtils, rootDir, spansDir, uniqueId);
+        return create(visibleScreenService, fileUtils, rootDir, spansDir, uniqueId);
     }
 
     @VisibleForTesting
     static StartTypeAwareSpanStorage create(
-            VisibleScreenTracker visibleScreenTracker,
+            VisibleScreenService visibleScreenService,
             FileUtils fileUtils,
             File rootDir,
             File spansDir,
             String uniqueId) {
         StartTypeAwareSpanStorage startTypeAwareSpanStorage =
                 new StartTypeAwareSpanStorage(
-                        visibleScreenTracker, fileUtils, rootDir, spansDir, uniqueId);
+                        visibleScreenService, fileUtils, rootDir, spansDir, uniqueId);
         startTypeAwareSpanStorage.cleanupUnsentBackgroundSpans();
         return startTypeAwareSpanStorage;
     }
 
     @VisibleForTesting
     StartTypeAwareSpanStorage(
-            VisibleScreenTracker visibleScreenTracker,
+            VisibleScreenService visibleScreenService,
             FileUtils fileUtils,
             File rootDir,
             File spansDir,
             String uniqueId) {
-        this.visibleScreenTracker = visibleScreenTracker;
+        this.visibleScreenService = visibleScreenService;
         this.fileUtils = fileUtils;
         this.rootDir = rootDir;
         this.spanDir = spansDir;
@@ -92,9 +95,9 @@ class StartTypeAwareSpanStorage implements SpanStorage {
     }
 
     private boolean isAppForeground() {
-        return (visibleScreenTracker.getCurrentlyVisibleScreen() != null
-                        && !visibleScreenTracker.getCurrentlyVisibleScreen().equals("unknown"))
-                || visibleScreenTracker.getPreviouslyVisibleScreen() != null;
+        return (visibleScreenService.getCurrentlyVisibleScreen() != null
+                        && !visibleScreenService.getCurrentlyVisibleScreen().equals("unknown"))
+                || visibleScreenService.getPreviouslyVisibleScreen() != null;
     }
 
     private void moveBackgroundSpanToPendingSpan() {

@@ -45,6 +45,7 @@ dependencies {
     api(libs.opentelemetry.android.agent)
 
     implementation(libs.opentelemetry.sdk)
+    implementation(libs.opentelemetry.api.incubator)
     implementation(libs.opentelemetry.instrumentation.okhttp)
     implementation(libs.opentelemetry.exporter.zipkin)
     implementation(libs.opentelemetry.exporter.otlp)
