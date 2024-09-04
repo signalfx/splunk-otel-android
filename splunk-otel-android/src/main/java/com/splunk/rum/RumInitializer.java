@@ -173,19 +173,6 @@ class RumInitializer {
                     });
         }
 
-        // Wire up the logging exporter, if enabled.
-        if (builder.isDebugEnabled()) {
-            otelRumBuilder.addTracerProviderCustomizer(
-                    (tracerProviderBuilder, app) -> {
-                        tracerProviderBuilder.addSpanProcessor(
-                                SimpleSpanProcessor.create(
-                                        builder.decorateWithSpanFilter(
-                                                LoggingSpanExporter.create())));
-                        initializationEvents.emit("debugSpanExporterInitialized");
-                        return tracerProviderBuilder;
-                    });
-        }
-
         // Add final event showing tracer provider init finished
         otelRumBuilder.addTracerProviderCustomizer(
                 (tracerProviderBuilder, app) -> {
@@ -371,6 +358,12 @@ class RumInitializer {
                         true);
         SpanExporter filteredExporter = builder.decorateWithSpanFilter(splunkTranslatedExporter);
         initializationEvents.emit("otlp span exporter initialized");
+
+        // Wire up the logging exporter, if enabled.
+        if (builder.isDebugEnabled()) {
+            initializationEvents.emit("debugSpanExporterInitialized");
+            return SpanExporter.composite(LoggingSpanExporter.create(), filteredExporter);
+        }
         return filteredExporter;
     }
 
