@@ -9,7 +9,7 @@ junit = "5.11.0"
 spotless = "6.25.0"
 kotlin = "2.0.20"
 lifecycle-runtime-ktx = "2.8.4"
-activity-compose = "1.9.1"
+activity-compose = "1.9.2"
 compose-bom = "2024.08.00"
 navigationCompose = "2.7.7"
 
