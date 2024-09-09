@@ -47,6 +47,7 @@ import java.util.function.Supplier;
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.OpenTelemetryRumBuilder;
 import io.opentelemetry.android.config.OtelRumConfig;
+import io.opentelemetry.android.features.diskbuffering.DiskBufferingConfiguration;
 import io.opentelemetry.android.instrumentation.AndroidInstrumentationLoader;
 import io.opentelemetry.android.instrumentation.activity.ActivityLifecycleInstrumentation;
 import io.opentelemetry.android.instrumentation.activity.startup.AppStartupTimer;
@@ -98,6 +99,11 @@ class RumInitializer {
         GlobalAttributesSupplier globalAttributeSupplier =
                 new GlobalAttributesSupplier(builder.globalAttributes);
         config.setGlobalAttributes(globalAttributeSupplier);
+
+        config.setDiskBufferingConfiguration(DiskBufferingConfiguration.builder()
+                .setEnabled(true)
+                .setMaxCacheSize(100_000_000)
+                .build());
 
         // TODO: Note/document this instrumentation is now opt-in via application classpath via build settings
 //        if (!builder.isNetworkMonitorEnabled()) {
@@ -362,7 +368,8 @@ class RumInitializer {
         // Wire up the logging exporter, if enabled.
         if (builder.isDebugEnabled()) {
             initializationEvents.emit("debugSpanExporterInitialized");
-            return SpanExporter.composite(LoggingSpanExporter.create(), filteredExporter);
+            SpanExporter result = SpanExporter.composite(LoggingSpanExporter.create(), filteredExporter);
+            return result;
         }
         return filteredExporter;
     }
