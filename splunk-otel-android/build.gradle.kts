@@ -43,6 +43,7 @@ dependencies {
     api(platform(libs.opentelemetry.instrumentation.bom))
     api(platform(libs.opentelemetry.bom))
     api(libs.opentelemetry.android.agent)
+    api(libs.opentelemetry.android.instrumentation.commonapi) // not included in agent
 
     implementation(libs.opentelemetry.sdk)
     implementation(libs.opentelemetry.api.incubator)

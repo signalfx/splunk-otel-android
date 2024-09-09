@@ -22,6 +22,7 @@ opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref
 opentelemetry-api-incubator = { module = "io.opentelemetry:opentelemetry-api-incubator" }
 opentelemetry-api-events = { module = "io.opentelemetry:opentelemetry-api-events", version.ref = "opentelemetry-core-alpha" }
 opentelemetry-android-agent = { module = "io.opentelemetry.android:android-agent", version.ref = "opentelemetry-android" }
+opentelemetry-android-instrumentation-commonapi = { module = "io.opentelemetry.android:instrumentation-common-api", version.ref = "opentelemetry-android" }
 opentelemetry-instrumenter-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api", version.ref = "opentelemetry-inst" }
 opentelemetry-instrumenter-api-incubator = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator", version.ref = "opentelemetry-inst-alpha" }
 opentelemetry-instrumentation-okhttp = { module = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0", version.ref = "opentelemetry-inst-alpha" }

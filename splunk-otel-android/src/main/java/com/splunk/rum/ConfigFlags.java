@@ -102,18 +102,6 @@ class ConfigFlags {
         return reactNativeSupportEnabled;
     }
 
-    void enableOtlpExporter() {
-        exportUsingOtlp = true;
-    }
-
-    void disableOtlpExporter() {
-        exportUsingOtlp = false;
-    }
-
-    boolean shouldUseOtlpExporter() {
-        return exportUsingOtlp;
-    }
-
     @NonNull
     @Override
     public String toString() {
