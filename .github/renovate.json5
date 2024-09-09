@@ -19,6 +19,15 @@
       "ignoreUnstable": false
     },
     {
+      // Don't bump to 2.x in the 1.x line
+      "matchUpdateTypes": ["major"],
+      "matchPackagePatterns": [
+        "^io.opentelemetry.instrumentation"
+      ],
+      "matchBaseBranches": ["v1.7.x"],
+      "enabled": false
+    },
+    {
       // navigation-fragment 2.7.0 and above require android api 34+, which we are not ready for
       // yet due to android gradle plugin only supporting min 33.
       "matchPackagePrefixes": ["androidx.navigation"],
