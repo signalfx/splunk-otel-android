@@ -111,16 +111,9 @@ public final class SplunkRumBuilder {
                     "beaconEndpoint has already been set. Realm configuration will be ignored.");
             return this;
         }
-        this.beaconEndpoint = "https://rum-ingest." + realm + ".signalfx.com/v1/rum";
         this.realm = realm;
-        if (shouldUseOtlpExporter()) {
-            configureBeaconForOtlp();
-        }
+        this.beaconEndpoint = "https://rum-ingest." + this.realm + ".signalfx.com/v1/rumotlp";
         return this;
-    }
-
-    private void configureBeaconForOtlp() {
-        this.beaconEndpoint = "https://rum-ingest." + realm + ".signalfx.com/v1/rumotlp";
     }
 
     /**
@@ -155,14 +148,7 @@ public final class SplunkRumBuilder {
      * @return {@code this}
      */
     public SplunkRumBuilder enableDiskBuffering() {
-        if (shouldUseOtlpExporter()) {
-            Log.w(SplunkRum.LOG_TAG, "OTLP export is not yet compatible with disk buffering!");
-            Log.w(
-                    SplunkRum.LOG_TAG,
-                    "Because disk buffering is enabled, OTLP export is now disabled!");
-            configFlags.disableOtlpExporter();
-        }
-
+        // TODO: Default to enabled, switch this perhaps to allow disabling
         configFlags.enableDiskBuffering();
         return this;
     }
@@ -380,19 +366,19 @@ public final class SplunkRumBuilder {
      *
      * @return {@code this}
      */
-    public SplunkRumBuilder enableExperimentalOtlpExporter() {
-        if (isDiskBufferingEnabled()) {
-            Log.w(SplunkRum.LOG_TAG, "OTLP export is not yet compatible with disk buffering!");
-            Log.w(SplunkRum.LOG_TAG, "Please disable disk buffering in order to use OTLP export.");
-            Log.w(SplunkRum.LOG_TAG, "OTLP is not enabled.");
-            return this;
-        }
-        configFlags.enableOtlpExporter();
-        if (this.realm != null) {
-            configureBeaconForOtlp();
-        }
-        return this;
-    }
+//    public SplunkRumBuilder enableExperimentalOtlpExporter() {
+//        if (isDiskBufferingEnabled()) {
+//            Log.w(SplunkRum.LOG_TAG, "OTLP export is not yet compatible with disk buffering!");
+//            Log.w(SplunkRum.LOG_TAG, "Please disable disk buffering in order to use OTLP export.");
+//            Log.w(SplunkRum.LOG_TAG, "OTLP is not enabled.");
+//            return this;
+//        }
+//        configFlags.enableOtlpExporter();
+//        if (this.realm != null) {
+//            configureBeaconForOtlp();
+//        }
+//        return this;
+//    }
 
     // one day maybe these can use kotlin delegation
     ConfigFlags getConfigFlags() {
@@ -427,10 +413,6 @@ public final class SplunkRumBuilder {
 
     boolean isDiskBufferingEnabled() {
         return configFlags.isDiskBufferingEnabled();
-    }
-
-    boolean shouldUseOtlpExporter() {
-        return configFlags.shouldUseOtlpExporter();
     }
 
     boolean isReactNativeSupportEnabled() {
