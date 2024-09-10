@@ -1,6 +1,6 @@
 [versions]
-opentelemetry-core = "1.42.0"
-opentelemetry-core-alpha = "1.42.0-alpha"
+opentelemetry-core = "1.42.1"
+opentelemetry-core-alpha = "1.42.1-alpha"
 opentelemetry-inst = "1.33.6"
 opentelemetry-inst-alpha = "1.33.6-alpha"
 opentelemetry-android = "0.4.0-alpha"
