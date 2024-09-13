@@ -38,7 +38,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.splunk.rum.internal.GlobalAttributesSupplier;
-import com.splunk.rum.internal.NoOpSpanExporter;
 import com.splunk.rum.internal.UInt32QuadXorTraceIdRatioSampler;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -68,7 +67,6 @@ import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.sdk.trace.SpanLimits;
-import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 
@@ -129,28 +127,8 @@ class RumInitializer {
 //        otelRumBuilder.setCurrentNetworkProvider(currentNetworkProvider);
         initializationEvents.emit("connectionUtilInitialized");
 
-        // TODO: How truly important is the order of these span processors? The location of event
-        // generation should probably not be altered...
-
         // Get exporters going...
         otelRumBuilder.addSpanExporterCustomizer(this::buildSpanExporter);
-//        otelRumBuilder.addLogRecordExporterCustomizer(xxx todo );
-
-//        // Add batch span processor
-//        otelRumBuilder.addTracerProviderCustomizer(
-//                (tracerProviderBuilder, app) -> {
-//                    SpanExporter zipkinExporter =
-//                            buildFilteringExporter(currentNetworkProvider, visibleScreenService);
-//                    initializationEvents.emit("exporterInitialized");
-//
-//                    BatchSpanProcessor batchSpanProcessor =
-//                            BatchSpanProcessor.builder(zipkinExporter).build();
-//                    initializationEvents.emit("batchSpanProcessorInitialized");
-//                    return tracerProviderBuilder.addSpanProcessor(batchSpanProcessor);
-//                });
-
-        // Inhibit the upstream exporter because we add our own BatchSpanProcessor
-//        otelRumBuilder.addSpanExporterCustomizer(x -> new NoOpSpanExporter());
 
         // Set span limits
         otelRumBuilder.addTracerProviderCustomizer(
