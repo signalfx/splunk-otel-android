@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.compose)
 }
 
+
 val localProperties = Properties()
 localProperties.load(FileInputStream(rootProject.file("local.properties")))
 
@@ -70,6 +71,10 @@ composeCompiler {
     enableStrongSkippingMode = true
 }
 
+repositories {
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+}
+
 dependencies {
     api(platform(libs.opentelemetry.instrumentation.bom))
 
@@ -95,7 +100,7 @@ dependencies {
     implementation(libs.android.volley)
     implementation(libs.androidx.work)
     implementation(libs.opentelemetry.sdk)
-    implementation(libs.opentelemetry.api.incubator)
+    implementation(libs.opentelemetry.instrumenter.api.incubator)
     testImplementation(libs.bundles.junit)
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.junit)

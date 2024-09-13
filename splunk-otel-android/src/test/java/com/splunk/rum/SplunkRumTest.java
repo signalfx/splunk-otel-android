@@ -38,7 +38,7 @@ import android.location.Location;
 import android.webkit.WebView;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
 import io.opentelemetry.android.OpenTelemetryRum;
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
+import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Span;
@@ -62,20 +62,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class SplunkRumTest {
+class SplunkRumTest {
 
     @RegisterExtension final OpenTelemetryExtension otelTesting = OpenTelemetryExtension.create();
 
-    private Tracer tracer;
+    Tracer tracer;
 
-    @Mock private OpenTelemetryRum openTelemetryRum;
-    @Mock private GlobalAttributesSupplier globalAttributes;
+    @Mock OpenTelemetryRum openTelemetryRum;
+    @Mock GlobalAttributesSupplier globalAttributes;
 
-    private SettableScreenAttributesAppender screenNameAppender;
+    SettableScreenAttributesAppender screenNameAppender;
+    Application application;
 
     @BeforeEach
-    public void setup() {
-        screenNameAppender = new SettableScreenAttributesAppender(new VisibleScreenTracker());
+    void setup() {
+        application = mock(Application.class, RETURNS_DEEP_STUBS);
+        screenNameAppender = new SettableScreenAttributesAppender(new VisibleScreenService(application));
 
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
         SplunkRum.resetSingletonForTest();
@@ -83,7 +85,6 @@ public class SplunkRumTest {
 
     @Test
     void initialization_onlyOnce() {
-        Application application = mock(Application.class, RETURNS_DEEP_STUBS);
         Context context = mock(Context.class);
 
         SplunkRumBuilder splunkRumBuilder =
@@ -156,7 +157,7 @@ public class SplunkRumTest {
         SplunkRum splunkRum = new SplunkRum(openTelemetryRum, globalAttributes, screenNameAppender);
 
         Attributes attributes = Attributes.of(stringKey("one"), "1", longKey("two"), 2L);
-        splunkRum.addRumEvent("foo", attributes);
+        splunkRum.emitEvent("foo", attributes);
 
         List<SpanData> spans = otelTesting.getSpans();
         assertEquals(1, spans.size());

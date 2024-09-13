@@ -28,7 +28,7 @@ import io.opentelemetry.sdk.logs.data.Body;
 import io.opentelemetry.sdk.logs.data.LogRecordData;
 import io.opentelemetry.sdk.testing.junit5.OpenTelemetryExtension;
 import io.opentelemetry.sdk.trace.data.SpanData;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.incubating.EventIncubatingAttributes;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -99,8 +99,7 @@ class LogToSpanBridgeTest {
         when(log.getAttributes())
                 .thenReturn(
                         Attributes.builder()
-                                .put(SemanticAttributes.EVENT_DOMAIN, "androidApp")
-                                .put(SemanticAttributes.EVENT_NAME, "buttonClick")
+                                .put(EventIncubatingAttributes.EVENT_NAME, "androidApp.buttonClick")
                                 .put("attr", "value")
                                 .build());
         when(log.getTimestampEpochNanos()).thenReturn(epochNanos);
@@ -115,13 +114,12 @@ class LogToSpanBridgeTest {
         assertThat(spans).hasSize(1);
         assertThat(spans.get(0))
                 .hasInstrumentationScopeInfo(InstrumentationScopeInfo.create("test"))
-                .hasName("androidApp/buttonClick")
+                .hasName("androidApp.buttonClick")
                 .startsAt(epochNanos)
                 .endsAt(epochNanos)
                 .hasAttributes(
                         Attributes.builder()
-                                .put(SemanticAttributes.EVENT_DOMAIN, "androidApp")
-                                .put(SemanticAttributes.EVENT_NAME, "buttonClick")
+                                .put(EventIncubatingAttributes.EVENT_NAME, "androidApp.buttonClick")
                                 .put("attr", "value")
                                 .build());
     }

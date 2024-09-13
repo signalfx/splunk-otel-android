@@ -42,13 +42,17 @@ android {
 dependencies {
     api(platform(libs.opentelemetry.instrumentation.bom))
     api(platform(libs.opentelemetry.bom))
-    api(libs.opentelemetry.android)
+    api(libs.opentelemetry.android.agent)
+    api(libs.opentelemetry.android.instrumentation.commonapi) // not included in agent
 
     implementation(libs.opentelemetry.sdk)
+    implementation(libs.opentelemetry.api.incubator)
     implementation(libs.opentelemetry.instrumentation.okhttp)
     implementation(libs.opentelemetry.exporter.zipkin)
     implementation(libs.opentelemetry.exporter.otlp)
     implementation(libs.opentelemetry.exporter.logging)
+    implementation(libs.opentelemetry.semconv)
+    implementation(libs.opentelemetry.semconv.incubating)
     implementation(libs.androidx.core)
     implementation(libs.androidx.navigation.fragment)
     api(libs.zipkin.sender.okhttp)
