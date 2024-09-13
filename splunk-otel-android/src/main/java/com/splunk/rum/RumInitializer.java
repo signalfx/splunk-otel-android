@@ -150,7 +150,7 @@ class RumInitializer {
 //                });
 
         // Inhibit the upstream exporter because we add our own BatchSpanProcessor
-        otelRumBuilder.addSpanExporterCustomizer(x -> new NoOpSpanExporter());
+//        otelRumBuilder.addSpanExporterCustomizer(x -> new NoOpSpanExporter());
 
         // Set span limits
         otelRumBuilder.addTracerProviderCustomizer(
