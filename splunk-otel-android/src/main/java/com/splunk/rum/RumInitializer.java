@@ -206,6 +206,7 @@ class RumInitializer {
         return new SplunkRum(openTelemetryRum, globalAttributeSupplier, screenAttributesAppender);
     }
 
+    // TODO: Wire this stuff back up so that we can defer background spans again?....
     @NonNull
     private MemorySpanBuffer constructBacklogProvider(VisibleScreenService visibleScreenService) {
         if (builder.isBackgroundInstrumentationDeferredUntilForeground()) {
