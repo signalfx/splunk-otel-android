@@ -10,14 +10,12 @@
   </strong>
 </p>
 
-<p align="center">
 [![Stable][stable-image]
 [![OpenTelemetry Instrumentation for Java Version][otel-image][otel-link]
 [![OpenTelemetry Instrumentation for Android Version][android-image][android-link]
 [![Splunk GDI specification][gdi-image][gdi-link]
 [![Maven Central][mave-image][maven-link]
 [![Build Status][build-image][build-link]
-</p>
 
 ---
 
