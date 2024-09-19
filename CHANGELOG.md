@@ -7,6 +7,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 1.7.0 - 2024-08-12
+
+This is a regular maintenance release.
+
+This version depends on these upstream versions:
+
+* opentelemetry-android v0.4.0
+* opentelemetry-instrumentation-api v1.33.5
+* opentelemetry-sdk v1.41.0
+
+Enhancements:
+
+* Disable console exporter from upstream (#894)
+
 ### Version 1.6.0 - 2024-07-10
 
 This is a regular maintenance release.
