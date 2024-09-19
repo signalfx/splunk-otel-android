@@ -10,24 +10,12 @@
   </strong>
 </p>
 
-<p align="center">
-  <img alt="Stable" src="https://img.shields.io/badge/status-stable-informational?style=for-the-badge">
-  <a href="https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.33.5">
-    <img alt="OpenTelemetry Instrumentation for Java Version" src="https://img.shields.io/badge/otel-1.33.5-blueviolet?style=for-the-badge">
-  </a>
-  <a href="https://github.com/signalfx/gdi-specification/releases/tag/v1.4.0">
-    <img alt="Splunk GDI specification" src="https://img.shields.io/badge/GDI-1.4.0-blueviolet?style=for-the-badge">
-  </a>
-  <a href="https://github.com/signalfx/splunk-otel-android/releases">
-    <img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/signalfx/splunk-otel-android?include_prereleases&style=for-the-badge">
-  </a>
-  <a href="https://maven-badges.herokuapp.com/maven-central/com.splunk/splunk-otel-android">
-    <img alt="Maven Central" src="https://img.shields.io/maven-central/v/com.splunk/splunk-otel-android?style=for-the-badge">
-  </a>
-  <a href="https://github.com/signalfx/splunk-otel-android/actions/workflows/main.yaml">
-    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/signalfx/splunk-otel-android/main.yaml?branch=main&style=for-the-badge">
-  </a>
-</p>
+![Stable][stable-image]
+[![OpenTelemetry Instrumentation for Java Version][otel-image]][otel-link]
+[![OpenTelemetry Instrumentation for Android Version][android-image]][android-link]
+[![Splunk GDI specification][gdi-image]][gdi-link]
+[![Maven Central][maven-image]][maven-link]
+[![Build Status][build-image]][build-link]
 
 ---
 
@@ -69,3 +57,15 @@ in the official documentation.
 
 The Splunk Android RUM Instrumentation is licensed under the terms of the Apache Software License
 version 2.0. See [the license file](./LICENSE) for more details.
+
+[stable-image]: https://img.shields.io/badge/status-stable-informational?style=for-the-badge
+[otel-image]: https://img.shields.io/badge/otel-1.33.5-blueviolet?style=for-the-badge
+[otel-link]: https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.33.5
+[android-image]: https://img.shields.io/github/v/release/signalfx/splunk-otel-android?include_prereleases&style=for-the-badge
+[android-link]: https://github.com/signalfx/splunk-otel-android/releases
+[gdi-image]: https://img.shields.io/badge/GDI-1.4.0-blueviolet?style=for-the-badge
+[gdi-link]: https://github.com/signalfx/gdi-specification/releases/tag/v1.4.0
+[maven-image]: https://img.shields.io/maven-central/v/com.splunk/splunk-otel-android?style=for-the-badge
+[maven-link]: https://mvnrepository.com/artifact/com.splunk/splunk-otel-android/latest
+[build-image]: https://img.shields.io/github/actions/workflow/status/signalfx/splunk-otel-android/main.yaml?branch=main&style=for-the-badge
+[build-link]: https://github.com/signalfx/splunk-otel-android/actions/workflows/main.yaml
