@@ -46,7 +46,6 @@ public class ErrorIdentifierExtractor {
                 packageManager.getApplicationInfo(
                         context.getPackageName(), PackageManager.GET_META_DATA);
 
-        // Initialize values
         this.applicationId = applicationInfo.packageName;
         this.versionCode = retrieveVersionCode();
         this.customUUID = retrieveCustomUUID();
