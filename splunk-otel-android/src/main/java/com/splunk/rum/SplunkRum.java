@@ -55,6 +55,7 @@ public class SplunkRum {
     static final AttributeKey<Double> LOCATION_LATITUDE_KEY = doubleKey("location.lat");
     static final AttributeKey<Double> LOCATION_LONGITUDE_KEY = doubleKey("location.long");
 
+
     static final String COMPONENT_APPSTART = "appstart";
     static final String COMPONENT_UI = "ui";
     static final String COMPONENT_CRASH = "crash";
@@ -67,6 +68,9 @@ public class SplunkRum {
 
     static final AttributeKey<String> APP_NAME_KEY = stringKey("app");
     static final AttributeKey<String> RUM_VERSION_KEY = stringKey("splunk.rum.version");
+    static final AttributeKey<String> APPLICATION_ID_KEY = stringKey("app.application.id");
+    static final AttributeKey<String> APP_VERSION_CODE_KEY = stringKey("app.version.code");
+    static final AttributeKey<String> SPLUNK_OLLY_UUID_KEY = stringKey("app.splunk.olly.uuid");
 
     @Nullable private static SplunkRum INSTANCE;
 
