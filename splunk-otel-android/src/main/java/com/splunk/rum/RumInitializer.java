@@ -32,7 +32,6 @@ import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.os.Looper;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
@@ -295,7 +294,8 @@ class RumInitializer {
                     String applicationId = null;
                     String versionCode = null;
                     String uuid = null;
-                    ErrorIdentifierExtractor extractor = ErrorIdentifierExtractor.getInstance(application);
+                    ErrorIdentifierExtractor extractor =
+                            ErrorIdentifierExtractor.getInstance(application);
 
                     if (extractor != null) {
                         applicationId = extractor.getApplicationId();
@@ -316,14 +316,11 @@ class RumInitializer {
                         builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
                     }
 
-                    builder.setMainLooper(mainLooper)
-                            .build()
-                            .installOn(instrumentedApplication);
+                    builder.setMainLooper(mainLooper).build().installOn(instrumentedApplication);
 
                     initializationEvents.emit("anrMonitorInitialized");
                 });
     }
-
 
     private void installCrashReporter(OpenTelemetryRumBuilder otelRumBuilder) {
         otelRumBuilder.addInstrumentation(
@@ -331,7 +328,8 @@ class RumInitializer {
                     String applicationId = null;
                     String versionCode = null;
                     String uuid = null;
-                    ErrorIdentifierExtractor extractor = ErrorIdentifierExtractor.getInstance(application);
+                    ErrorIdentifierExtractor extractor =
+                            ErrorIdentifierExtractor.getInstance(application);
 
                     if (extractor != null) {
                         applicationId = extractor.getApplicationId();
@@ -340,9 +338,12 @@ class RumInitializer {
                     }
 
                     CrashReporterBuilder builder = CrashReporter.builder();
-                    builder.addAttributesExtractor(RuntimeDetailsExtractor.create(
-                            instrumentedApplication.getApplication().getApplicationContext())).
-                            addAttributesExtractor(new CrashComponentExtractor());
+                    builder.addAttributesExtractor(
+                                    RuntimeDetailsExtractor.create(
+                                            instrumentedApplication
+                                                    .getApplication()
+                                                    .getApplicationContext()))
+                            .addAttributesExtractor(new CrashComponentExtractor());
 
                     if (applicationId != null && !applicationId.isEmpty()) {
                         builder.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
@@ -354,8 +355,7 @@ class RumInitializer {
                         builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
                     }
 
-                    builder.build()
-                            .installOn(instrumentedApplication);
+                    builder.build().installOn(instrumentedApplication);
 
                     initializationEvents.emit("crashReportingInitialized");
                 });

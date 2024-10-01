@@ -55,7 +55,6 @@ public class SplunkRum {
     static final AttributeKey<Double> LOCATION_LATITUDE_KEY = doubleKey("location.lat");
     static final AttributeKey<Double> LOCATION_LONGITUDE_KEY = doubleKey("location.long");
 
-
     static final String COMPONENT_APPSTART = "appstart";
     static final String COMPONENT_UI = "ui";
     static final String COMPONENT_CRASH = "crash";

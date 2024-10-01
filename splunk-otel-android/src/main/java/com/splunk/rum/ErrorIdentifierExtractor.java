@@ -1,3 +1,19 @@
+/*
+ * Copyright Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.splunk.rum;
 
 import android.app.Application;
@@ -7,30 +23,28 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
 
 public class ErrorIdentifierExtractor {
 
     private static final String SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_OLLY_CUSTOM_UUID";
-    @Nullable
-    private static ErrorIdentifierExtractor instance = null;
+    @Nullable private static ErrorIdentifierExtractor instance = null;
 
     private final Context context;
     private final PackageManager packageManager;
     private final ApplicationInfo applicationInfo;
 
-    @Nullable
-    private final String applicationId;
-    @Nullable
-    private final String versionCode;
-    @Nullable
-    private final String customUUID;
+    @Nullable private final String applicationId;
+    @Nullable private final String versionCode;
+    @Nullable private final String customUUID;
 
-    private ErrorIdentifierExtractor(Application application) throws PackageManager.NameNotFoundException {
+    private ErrorIdentifierExtractor(Application application)
+            throws PackageManager.NameNotFoundException {
         this.context = application.getApplicationContext();
         this.packageManager = context.getPackageManager();
-        this.applicationInfo = packageManager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+        this.applicationInfo =
+                packageManager.getApplicationInfo(
+                        context.getPackageName(), PackageManager.GET_META_DATA);
 
         // Initialize values
         this.applicationId = applicationInfo.packageName;
@@ -44,7 +58,9 @@ public class ErrorIdentifierExtractor {
             try {
                 instance = new ErrorIdentifierExtractor(application);
             } catch (PackageManager.NameNotFoundException e) {
-                Log.e(SplunkRum.LOG_TAG, "Failed to initialize ErrorIdentifierExtractor: " + e.getMessage());
+                Log.e(
+                        SplunkRum.LOG_TAG,
+                        "Failed to initialize ErrorIdentifierExtractor: " + e.getMessage());
             }
         }
         return instance;
