@@ -69,7 +69,7 @@ public class ErrorIdentifierExtractor {
             PackageInfo packageInfo =
                     packageManager.getPackageInfo(application.getPackageName(), 0);
             return String.valueOf(packageInfo.versionCode);
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (Exception e) {
             Log.e(SplunkRum.LOG_TAG, "Failed to get application version code", e);
             return null;
         }
