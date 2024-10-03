@@ -20,6 +20,7 @@ import static io.opentelemetry.semconv.SemanticAttributes.HTTP_RESPONSE_BODY_SIZ
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.Assert.assertTrue;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -168,7 +169,10 @@ public class TracingHurlStackTest {
 
         assertThat(span.getEvents())
                 .hasSize(1)
-                .allSatisfy(e -> e.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME));
+                .allSatisfy(
+                        e ->
+                                assertThat(e.getName())
+                                        .isEqualTo(SemanticAttributes.EXCEPTION_EVENT_NAME));
 
         verifyAttributes(span, url, null, null);
     }
@@ -191,7 +195,7 @@ public class TracingHurlStackTest {
         testQueue.addToQueue(stringRequest);
         testQueue.addToQueue(stringRequest);
 
-        testResponseListener.countDownLatch.await(10, TimeUnit.SECONDS);
+        assertTrue(testResponseListener.countDownLatch.await(10, TimeUnit.SECONDS));
 
         assertThat(server.getRequestCount()).isEqualTo(2);
 
@@ -241,16 +245,11 @@ public class TracingHurlStackTest {
         }
 
         latch.countDown();
-        testResponseListener.countDownLatch.await(10, TimeUnit.SECONDS);
+        assertTrue(testResponseListener.countDownLatch.await(10, TimeUnit.SECONDS));
 
         assertThat(server.getRequestCount()).isEqualTo(50);
 
-        otelTesting
-                .getSpans()
-                .forEach(
-                        span -> {
-                            verifyAttributes(span, url, 200L, "success");
-                        });
+        otelTesting.getSpans().forEach(span -> verifyAttributes(span, url, 200L, "success"));
 
         pool.shutdown();
     }
