@@ -30,18 +30,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class ErrorIdentifierExtractorTest {
-    private static final String SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_OLLY_CUSTOM_UUID";
+    private static final String SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_O11Y_CUSTOM_UUID";
+    private static final String TEST_PACKAGE_NAME = "splunk.test.package.name";
+    private static final String TEST_VERSION_CODE = "123";
+    private static final String TEST_UUID = "test-uuid";
 
     @Mock private Application mockApplication;
-
     @Mock private PackageManager mockPackageManager;
-
     @Mock private PackageInfo mockPackageInfo;
-
     @Mock private ApplicationInfo mockApplicationInfo;
-
-    private ErrorIdentifierExtractor extractor;
-
     @Mock private Bundle mockMetadata;
 
     @Before
@@ -50,36 +47,76 @@ public class ErrorIdentifierExtractorTest {
 
         when(mockApplication.getApplicationContext()).thenReturn(mockApplication);
         when(mockApplication.getPackageManager()).thenReturn(mockPackageManager);
-        when(mockApplication.getPackageName()).thenReturn("com.splunk.test");
+        when(mockApplication.getPackageName()).thenReturn(TEST_PACKAGE_NAME);
 
-        mockApplicationInfo.packageName = "com.splunk.test";
+        mockApplicationInfo.packageName = TEST_PACKAGE_NAME;
         mockApplicationInfo.metaData = mockMetadata;
 
-        when(mockPackageManager.getApplicationInfo("com.splunk.test", PackageManager.GET_META_DATA))
+        when(mockPackageManager.getApplicationInfo(TEST_PACKAGE_NAME, PackageManager.GET_META_DATA))
                 .thenReturn(mockApplicationInfo);
-        when(mockMetadata.getString(SPLUNK_UUID_MANIFEST_KEY)).thenReturn("test-uuid");
+        when(mockMetadata.getString(SPLUNK_UUID_MANIFEST_KEY)).thenReturn(TEST_UUID);
 
         mockPackageInfo.versionCode = 123;
-        when(mockPackageManager.getPackageInfo("com.splunk.test", 0)).thenReturn(mockPackageInfo);
-
-        extractor = ErrorIdentifierExtractor.getInstance(mockApplication);
+        when(mockPackageManager.getPackageInfo(TEST_PACKAGE_NAME, 0)).thenReturn(mockPackageInfo);
     }
 
     @Test
     public void testGetApplicationId() {
-        assertEquals("com.splunk.test", extractor.getApplicationId());
+        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
+        assertEquals(TEST_PACKAGE_NAME, extractor.extractInfo().getApplicationId());
     }
 
     @Test
     public void testGetVersionCode() {
-        assertEquals("123", extractor.getVersionCode());
+        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
+        assertEquals(TEST_VERSION_CODE, extractor.extractInfo().getVersionCode());
     }
 
     @Test
     public void testGetCustomUUID() {
-        extractor = ErrorIdentifierExtractor.getInstance(mockApplication);
+        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
+        assertEquals(TEST_UUID, extractor.extractInfo().getCustomUUID());
+    }
 
-        assert extractor != null;
-        assertEquals("test-uuid", extractor.getCustomUUID());
+    @Test
+    public void testCustomUUIDButDoesNotExist() {
+        when(mockMetadata.getString(SPLUNK_UUID_MANIFEST_KEY)).thenReturn(null);
+        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
+        assertNull(extractor.extractInfo().getCustomUUID());
+    }
+
+    @Test
+    public void testApplicationInfoMetaDataIsNull() throws PackageManager.NameNotFoundException {
+        ApplicationInfo applicationInfoWithNullMetaData = new ApplicationInfo();
+        applicationInfoWithNullMetaData.packageName = TEST_PACKAGE_NAME;
+
+        when(mockPackageManager.getApplicationInfo(TEST_PACKAGE_NAME, PackageManager.GET_META_DATA))
+                .thenReturn(applicationInfoWithNullMetaData);
+
+        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
+        assertNull(extractor.extractInfo().getCustomUUID());
+    }
+
+    @Test
+    public void testRetrieveVersionCodeIsNull() throws PackageManager.NameNotFoundException {
+        when(mockPackageManager.getPackageInfo(TEST_PACKAGE_NAME, 0))
+                .thenThrow(new PackageManager.NameNotFoundException());
+
+        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
+        assertNull(extractor.extractInfo().getVersionCode());
+    }
+
+    @Test
+    public void testExtractInfoWhenApplicationInfoIsNull()
+            throws PackageManager.NameNotFoundException {
+        when(mockPackageManager.getApplicationInfo(TEST_PACKAGE_NAME, PackageManager.GET_META_DATA))
+                .thenThrow(new PackageManager.NameNotFoundException());
+
+        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
+
+        ErrorIdentifierInfo info = extractor.extractInfo();
+        assertNull(info.getApplicationId());
+        assertEquals(TEST_VERSION_CODE, info.getVersionCode());
+        assertNull(info.getCustomUUID());
     }
 }

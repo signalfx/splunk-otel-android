@@ -17,73 +17,57 @@
 package com.splunk.rum;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class ErrorIdentifierExtractor {
 
-    private static final String SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_OLLY_CUSTOM_UUID";
-    @Nullable private static ErrorIdentifierExtractor instance = null;
-
-    private final Context context;
+    private static final String SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_O11Y_CUSTOM_UUID";
+    private final Application application;
     private final PackageManager packageManager;
-    private final ApplicationInfo applicationInfo;
+    @Nullable private final ApplicationInfo applicationInfo;
 
-    @Nullable private final String applicationId;
-    @Nullable private final String versionCode;
-    @Nullable private final String customUUID;
-
-    private ErrorIdentifierExtractor(Application application)
-            throws PackageManager.NameNotFoundException {
-        this.context = application.getApplicationContext();
-        this.packageManager = context.getPackageManager();
-        this.applicationInfo =
-                packageManager.getApplicationInfo(
-                        context.getPackageName(), PackageManager.GET_META_DATA);
-
-        this.applicationId = applicationInfo.packageName;
-        this.versionCode = retrieveVersionCode();
-        this.customUUID = retrieveCustomUUID();
-    }
-
-    @Nullable
-    public static synchronized ErrorIdentifierExtractor getInstance(Application application) {
-        if (instance == null) {
-            try {
-                instance = new ErrorIdentifierExtractor(application);
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.e(
-                        SplunkRum.LOG_TAG,
-                        "Failed to initialize ErrorIdentifierExtractor: " + e.getMessage());
-            }
+    public ErrorIdentifierExtractor(@NonNull Application application) {
+        this.application = application;
+        this.packageManager = application.getPackageManager();
+        ApplicationInfo appInfo;
+        try {
+            appInfo =
+                    packageManager.getApplicationInfo(
+                            application.getPackageName(), PackageManager.GET_META_DATA);
+        } catch (Exception e) {
+            Log.e(
+                    SplunkRum.LOG_TAG,
+                    "Failed to initialize ErrorIdentifierExtractor: " + e.getMessage());
+            appInfo = null;
         }
-        return instance;
+        this.applicationInfo = appInfo;
     }
 
-    @Nullable
-    public String getApplicationId() {
-        return applicationId;
-    }
+    public ErrorIdentifierInfo extractInfo() {
+        String applicationId = null;
+        String versionCode = retrieveVersionCode();
+        String customUUID = retrieveCustomUUID();
 
-    @Nullable
-    public String getVersionCode() {
-        return versionCode;
-    }
+        if (applicationInfo != null) {
+            applicationId = applicationInfo.packageName;
+        } else {
+            Log.e(SplunkRum.LOG_TAG, "ApplicationInfo is null, cannot extract applicationId");
+        }
 
-    @Nullable
-    public String getCustomUUID() {
-        return customUUID;
+        return new ErrorIdentifierInfo(applicationId, versionCode, customUUID);
     }
 
     @Nullable
     private String retrieveVersionCode() {
         try {
-            PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            PackageInfo packageInfo =
+                    packageManager.getPackageInfo(application.getPackageName(), 0);
             return String.valueOf(packageInfo.versionCode);
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(SplunkRum.LOG_TAG, "Failed to get application version code", e);
@@ -93,8 +77,11 @@ public class ErrorIdentifierExtractor {
 
     @Nullable
     private String retrieveCustomUUID() {
+        if (applicationInfo == null) {
+            Log.e(SplunkRum.LOG_TAG, "ApplicationInfo is null; cannot retrieve Custom UUID.");
+            return null;
+        }
         Bundle bundle = applicationInfo.metaData;
-
         if (bundle != null) {
             return bundle.getString(SPLUNK_UUID_MANIFEST_KEY);
         } else {

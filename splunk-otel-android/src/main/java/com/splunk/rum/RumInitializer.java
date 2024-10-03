@@ -291,30 +291,21 @@ class RumInitializer {
     private void installAnrDetector(OpenTelemetryRumBuilder otelRumBuilder, Looper mainLooper) {
         otelRumBuilder.addInstrumentation(
                 instrumentedApplication -> {
-                    String applicationId = null;
-                    String versionCode = null;
-                    String uuid = null;
-                    ErrorIdentifierExtractor extractor =
-                            ErrorIdentifierExtractor.getInstance(application);
-
-                    if (extractor != null) {
-                        applicationId = extractor.getApplicationId();
-                        versionCode = extractor.getVersionCode();
-                        uuid = extractor.getCustomUUID();
-                    }
+                    ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
+                    ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
+                    String applicationId = errorIdentifierInfo.getApplicationId();
+                    String versionCode = errorIdentifierInfo.getVersionCode();
+                    String uuid = errorIdentifierInfo.getCustomUUID();
 
                     AnrDetectorBuilder builder = AnrDetector.builder();
                     builder.addAttributesExtractor(constant(COMPONENT_KEY, COMPONENT_ERROR));
 
-                    if (applicationId != null && !applicationId.isEmpty()) {
+                    if (applicationId != null)
                         builder.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
-                    }
-                    if (versionCode != null && !versionCode.isEmpty()) {
+                    if (versionCode != null)
                         builder.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
-                    }
-                    if (uuid != null && !uuid.isEmpty()) {
+                    if (uuid != null)
                         builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
-                    }
 
                     builder.setMainLooper(mainLooper).build().installOn(instrumentedApplication);
 
@@ -325,17 +316,11 @@ class RumInitializer {
     private void installCrashReporter(OpenTelemetryRumBuilder otelRumBuilder) {
         otelRumBuilder.addInstrumentation(
                 instrumentedApplication -> {
-                    String applicationId = null;
-                    String versionCode = null;
-                    String uuid = null;
-                    ErrorIdentifierExtractor extractor =
-                            ErrorIdentifierExtractor.getInstance(application);
-
-                    if (extractor != null) {
-                        applicationId = extractor.getApplicationId();
-                        versionCode = extractor.getVersionCode();
-                        uuid = extractor.getCustomUUID();
-                    }
+                    ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
+                    ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
+                    String applicationId = errorIdentifierInfo.getApplicationId();
+                    String versionCode = errorIdentifierInfo.getVersionCode();
+                    String uuid = errorIdentifierInfo.getCustomUUID();
 
                     CrashReporterBuilder builder = CrashReporter.builder();
                     builder.addAttributesExtractor(
@@ -345,15 +330,12 @@ class RumInitializer {
                                                     .getApplicationContext()))
                             .addAttributesExtractor(new CrashComponentExtractor());
 
-                    if (applicationId != null && !applicationId.isEmpty()) {
+                    if (applicationId != null)
                         builder.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
-                    }
-                    if (versionCode != null && !versionCode.isEmpty()) {
+                    if (versionCode != null)
                         builder.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
-                    }
-                    if (uuid != null && !uuid.isEmpty()) {
+                    if (uuid != null)
                         builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
-                    }
 
                     builder.build().installOn(instrumentedApplication);
 
