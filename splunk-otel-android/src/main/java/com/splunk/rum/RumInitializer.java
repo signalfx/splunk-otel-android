@@ -16,12 +16,15 @@
 
 package com.splunk.rum;
 
+import static com.splunk.rum.SplunkRum.APPLICATION_ID_KEY;
 import static com.splunk.rum.SplunkRum.APP_NAME_KEY;
+import static com.splunk.rum.SplunkRum.APP_VERSION_CODE_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_APPSTART;
 import static com.splunk.rum.SplunkRum.COMPONENT_ERROR;
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
+import static com.splunk.rum.SplunkRum.SPLUNK_OLLY_UUID_KEY;
 import static io.opentelemetry.android.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.semconv.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
@@ -40,7 +43,9 @@ import io.opentelemetry.android.RuntimeDetailsExtractor;
 import io.opentelemetry.android.config.OtelRumConfig;
 import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
 import io.opentelemetry.android.instrumentation.anr.AnrDetector;
+import io.opentelemetry.android.instrumentation.anr.AnrDetectorBuilder;
 import io.opentelemetry.android.instrumentation.crash.CrashReporter;
+import io.opentelemetry.android.instrumentation.crash.CrashReporterBuilder;
 import io.opentelemetry.android.instrumentation.lifecycle.AndroidLifecycleInstrumentation;
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingDetector;
@@ -286,13 +291,55 @@ class RumInitializer {
     private void installAnrDetector(OpenTelemetryRumBuilder otelRumBuilder, Looper mainLooper) {
         otelRumBuilder.addInstrumentation(
                 instrumentedApplication -> {
-                    AnrDetector.builder()
-                            .addAttributesExtractor(constant(COMPONENT_KEY, COMPONENT_ERROR))
-                            .setMainLooper(mainLooper)
-                            .build()
-                            .installOn(instrumentedApplication);
+                    ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
+                    ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
+                    String applicationId = errorIdentifierInfo.getApplicationId();
+                    String versionCode = errorIdentifierInfo.getVersionCode();
+                    String uuid = errorIdentifierInfo.getCustomUUID();
+
+                    AnrDetectorBuilder builder = AnrDetector.builder();
+                    builder.addAttributesExtractor(constant(COMPONENT_KEY, COMPONENT_ERROR));
+
+                    if (applicationId != null)
+                        builder.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
+                    if (versionCode != null)
+                        builder.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
+                    if (uuid != null)
+                        builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
+
+                    builder.setMainLooper(mainLooper).build().installOn(instrumentedApplication);
 
                     initializationEvents.emit("anrMonitorInitialized");
+                });
+    }
+
+    private void installCrashReporter(OpenTelemetryRumBuilder otelRumBuilder) {
+        otelRumBuilder.addInstrumentation(
+                instrumentedApplication -> {
+                    ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
+                    ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
+                    String applicationId = errorIdentifierInfo.getApplicationId();
+                    String versionCode = errorIdentifierInfo.getVersionCode();
+                    String uuid = errorIdentifierInfo.getCustomUUID();
+
+                    CrashReporterBuilder builder = CrashReporter.builder();
+                    builder.addAttributesExtractor(
+                                    RuntimeDetailsExtractor.create(
+                                            instrumentedApplication
+                                                    .getApplication()
+                                                    .getApplicationContext()))
+                            .addAttributesExtractor(new CrashComponentExtractor());
+
+                    if (applicationId != null)
+                        builder.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
+                    if (versionCode != null)
+                        builder.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
+                    if (uuid != null)
+                        builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
+
+                    builder.build().installOn(instrumentedApplication);
+
+                    initializationEvents.emit("crashReportingInitialized");
                 });
     }
 
@@ -305,23 +352,6 @@ class RumInitializer {
                             .build()
                             .installOn(instrumentedApplication);
                     initializationEvents.emit("slowRenderingDetectorInitialized");
-                });
-    }
-
-    private void installCrashReporter(OpenTelemetryRumBuilder otelRumBuilder) {
-        otelRumBuilder.addInstrumentation(
-                instrumentedApplication -> {
-                    CrashReporter.builder()
-                            .addAttributesExtractor(
-                                    RuntimeDetailsExtractor.create(
-                                            instrumentedApplication
-                                                    .getApplication()
-                                                    .getApplicationContext()))
-                            .addAttributesExtractor(new CrashComponentExtractor())
-                            .build()
-                            .installOn(instrumentedApplication);
-
-                    initializationEvents.emit("crashReportingInitialized");
                 });
     }
 
