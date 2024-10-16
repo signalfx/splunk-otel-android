@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.1
       - name: Link Checker
-        uses: lycheeverse/lychee-action@v1.10.0
+        uses: lycheeverse/lychee-action@v2.0.0
         with:
           fail: true
-          lycheeVersion: 0.10.3
+          lycheeVersion: v0.16.1
