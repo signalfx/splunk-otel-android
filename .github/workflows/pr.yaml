@@ -30,4 +30,4 @@ jobs:
         uses: lycheeverse/lychee-action@v2.0.2
         with:
           fail: true
-          lycheeVersion: 0.10.3
+          lycheeVersion: v0.16.1
