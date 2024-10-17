@@ -70,6 +70,10 @@ composeCompiler {
     enableStrongSkippingMode = true
 }
 
+repositories {
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+}
+
 dependencies {
     api(platform(libs.opentelemetry.instrumentation.bom))
 
@@ -95,7 +99,7 @@ dependencies {
     implementation(libs.android.volley)
     implementation(libs.androidx.work)
     implementation(libs.opentelemetry.sdk)
-    implementation(libs.opentelemetry.api.incubator)
+    implementation(libs.opentelemetry.instrumenter.api.incubator)
     testImplementation(libs.bundles.junit)
     testRuntimeOnly(libs.junit.platform.launcher)
     androidTestImplementation(libs.androidx.test.core)

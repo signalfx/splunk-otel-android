@@ -18,7 +18,8 @@ package com.splunk.rum;
 
 import android.app.Activity;
 import androidx.fragment.app.Fragment;
-import io.opentelemetry.android.instrumentation.ScreenNameExtractor;
+import io.opentelemetry.android.instrumentation.annotations.RumScreenName;
+import io.opentelemetry.android.instrumentation.common.ScreenNameExtractor;
 import java.util.function.Function;
 
 /**
@@ -27,7 +28,7 @@ import java.util.function.Function;
  */
 class SplunkScreenNameExtractor implements ScreenNameExtractor {
 
-    static ScreenNameExtractor INSTANCE = new SplunkScreenNameExtractor();
+    static final ScreenNameExtractor INSTANCE = new SplunkScreenNameExtractor();
 
     private SplunkScreenNameExtractor() {}
 

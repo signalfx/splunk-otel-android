@@ -16,7 +16,7 @@
 
 package com.splunk.rum;
 
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
+import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.Queue;
 
 public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
 
-    private final VisibleScreenTracker visibleScreenTracker;
+    private final VisibleScreenService visibleScreenTracker;
 
     private final Queue<SpanData> backlog = new ArrayDeque<>();
 
@@ -35,7 +35,7 @@ public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
      */
     private final Queue<SpanData> backgroundSpanBacklog = new ArrayDeque<>();
 
-    public StartTypeAwareMemorySpanBuffer(VisibleScreenTracker visibleScreenTracker) {
+    public StartTypeAwareMemorySpanBuffer(VisibleScreenService visibleScreenTracker) {
         this.visibleScreenTracker = visibleScreenTracker;
     }
 
