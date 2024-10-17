@@ -29,14 +29,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
 import com.splunk.android.sample.databinding.FragmentSecondBinding;
 import com.splunk.rum.SplunkRum;
-
 import io.opentelemetry.android.instrumentation.annotations.RumScreenName;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
-import io.opentelemetry.sdk.OpenTelemetrySdk;
-import io.opentelemetry.sdk.logs.internal.SdkEventLoggerProvider;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

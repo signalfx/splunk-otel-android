@@ -77,7 +77,8 @@ class SplunkRumTest {
     @BeforeEach
     void setup() {
         application = mock(Application.class, RETURNS_DEEP_STUBS);
-        screenNameAppender = new SettableScreenAttributesAppender(new VisibleScreenService(application));
+        screenNameAppender =
+                new SettableScreenAttributesAppender(new VisibleScreenService(application));
 
         tracer = otelTesting.getOpenTelemetry().getTracer("testTracer");
         SplunkRum.resetSingletonForTest();

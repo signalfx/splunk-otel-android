@@ -16,14 +16,13 @@
 
 package com.splunk.rum;
 
+import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
+import io.opentelemetry.sdk.trace.data.SpanData;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
-
-import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
-import io.opentelemetry.sdk.trace.data.SpanData;
 
 public class StartTypeAwareMemorySpanBuffer implements MemorySpanBuffer {
 

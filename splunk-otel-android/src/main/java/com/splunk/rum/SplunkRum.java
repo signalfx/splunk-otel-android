@@ -39,10 +39,9 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTelemetry;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.logs.internal.SdkEventLoggerProvider;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import io.opentelemetry.sdk.logs.internal.SdkEventLoggerProvider;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 
@@ -214,7 +213,8 @@ public class SplunkRum {
      * Emits a custom event to RUM monitoring. This can be useful to capture business events, or
      * simply add instrumentation to your application.
      *
-     * <p>This event will be sent to the RUM ingest along with other, auto-generated spans and events.
+     * <p>This event will be sent to the RUM ingest along with other, auto-generated spans and
+     * events.
      *
      * @param name The name of the event.
      * @param attributes Any {@link Attributes} to associate with the event.
@@ -226,12 +226,12 @@ public class SplunkRum {
 
     public void emitEvent(String name, String instrumentationScope, Attributes attributes) {
         LoggerProvider loggerProvider = openTelemetryRum.getOpenTelemetry().getLogsBridge();
-        EventLogger eventLogger = SdkEventLoggerProvider.create(loggerProvider)
-                .get(instrumentationScope);
+        EventLogger eventLogger =
+                SdkEventLoggerProvider.create(loggerProvider).get(instrumentationScope);
         eventLogger.builder(name).setAttributes(attributes).emit();
     }
 
-    //TODO: Allow emitEvent() with a custom Body
+    // TODO: Allow emitEvent() with a custom Body
 
     /**
      * Start a Span to time a named workflow.
