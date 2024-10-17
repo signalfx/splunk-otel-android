@@ -53,6 +53,7 @@ import io.opentelemetry.android.internal.services.network.CurrentNetworkProvider
 import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
+import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.sdk.trace.SpanLimits;
@@ -60,6 +61,7 @@ import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 class RumInitializer {
@@ -202,10 +204,10 @@ class RumInitializer {
             configureAnrInstrumentation();
         }
         if (builder.isSlowRenderingDetectionEnabled()) {
-            configureSlowRenderingInstrumentation(otelRumBuilder);
+            configureSlowRenderingInstrumentation();
         }
         if (builder.isCrashReportingEnabled()) {
-            configureCrashReporter(otelRumBuilder);
+            configureCrashReporter();
         }
 
         SettableScreenAttributesAppender screenAttributesAppender =
@@ -295,28 +297,13 @@ class RumInitializer {
             Log.w(LOG_TAG, "ANR instrumentation was not loaded! Skipping configuration.");
             return;
         }
-        ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
-        ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
-        String applicationId = errorIdentifierInfo.getApplicationId();
-        String versionCode = errorIdentifierInfo.getVersionCode();
-        String uuid = errorIdentifierInfo.getCustomUUID();
-
         instrumentation.addAttributesExtractor(constant(COMPONENT_KEY, COMPONENT_ERROR));
-
-        if (applicationId != null) {
-            instrumentation.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
-        }
-        if (versionCode != null) {
-            instrumentation.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
-        }
-        if (uuid != null) {
-            instrumentation.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
-        }
+        addErrorIdentifyingAttributes(instrumentation::addAttributesExtractor);
 
         initializationEvents.emit("anrMonitorInitialized");
     }
 
-    private void configureSlowRenderingInstrumentation(OpenTelemetryRumBuilder otelRumBuilder) {
+    private void configureSlowRenderingInstrumentation() {
         SlowRenderingInstrumentation instrumentation =
                 AndroidInstrumentationLoader.getInstrumentation(SlowRenderingInstrumentation.class);
         if (instrumentation == null) {
@@ -330,7 +317,7 @@ class RumInitializer {
         initializationEvents.emit("slowRenderingDetectorInitialized");
     }
 
-    private void configureCrashReporter(OpenTelemetryRumBuilder otelRumBuilder) {
+    private void configureCrashReporter() {
         CrashReporterInstrumentation instrumentation =
                 AndroidInstrumentationLoader.getInstrumentation(CrashReporterInstrumentation.class);
         if (instrumentation == null) {
@@ -339,27 +326,29 @@ class RumInitializer {
                     "Crash reporter instrumentation was not loaded! Skipping configuration.");
             return;
         }
+        instrumentation.addAttributesExtractor(
+                RuntimeDetailsExtractor.create(application.getApplicationContext()));
+        instrumentation.addAttributesExtractor(new CrashComponentExtractor());
+        addErrorIdentifyingAttributes(instrumentation::addAttributesExtractor);
+
+        initializationEvents.emit("crashReportingInitialized");
+    }
+
+    private <REQ, RES> void addErrorIdentifyingAttributes(
+            Consumer<AttributesExtractor<REQ, RES>> consumer) {
         ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(application);
         ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
         String applicationId = errorIdentifierInfo.getApplicationId();
         String versionCode = errorIdentifierInfo.getVersionCode();
-        String uuid = errorIdentifierInfo.getCustomUUID();
-
-        instrumentation.addAttributesExtractor(
-                RuntimeDetailsExtractor.create(application.getApplicationContext()));
-        instrumentation.addAttributesExtractor(new CrashComponentExtractor());
-
         if (applicationId != null) {
-            instrumentation.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
+            consumer.accept(constant(APPLICATION_ID_KEY, applicationId));
         }
         if (versionCode != null) {
-            instrumentation.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
+            consumer.accept(constant(APP_VERSION_CODE_KEY, versionCode));
         }
-        if (uuid != null) {
-            instrumentation.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
+        if (errorIdentifierInfo.getCustomUUID() != null) {
+            consumer.accept(constant(SPLUNK_OLLY_UUID_KEY, errorIdentifierInfo.getCustomUUID()));
         }
-
-        initializationEvents.emit("crashReportingInitialized");
     }
 
     // visible for testing
