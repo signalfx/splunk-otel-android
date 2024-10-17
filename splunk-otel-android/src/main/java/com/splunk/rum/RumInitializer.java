@@ -42,6 +42,7 @@ import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.OpenTelemetryRumBuilder;
 import io.opentelemetry.android.RuntimeDetailsExtractor;
 import io.opentelemetry.android.config.OtelRumConfig;
+import io.opentelemetry.android.features.diskbuffering.DiskBufferingConfiguration;
 import io.opentelemetry.android.instrumentation.AndroidInstrumentationLoader;
 import io.opentelemetry.android.instrumentation.activity.ActivityLifecycleInstrumentation;
 import io.opentelemetry.android.instrumentation.activity.startup.AppStartupTimer;
@@ -51,6 +52,7 @@ import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingInstr
 import io.opentelemetry.android.internal.services.ServiceManager;
 import io.opentelemetry.android.internal.services.network.CurrentNetworkProvider;
 import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
@@ -92,6 +94,8 @@ class RumInitializer {
                 new GlobalAttributesSupplier(builder.globalAttributes);
         config.setGlobalAttributes(globalAttributeSupplier);
 
+
+
         // TODO: Note/document this instrumentation is now opt-in via application classpath via
         // build settings
         //        if (!builder.isNetworkMonitorEnabled()) {
@@ -99,6 +103,12 @@ class RumInitializer {
         //        }
 
         config.disableScreenAttributes();
+        DiskBufferingConfiguration diskBufferingConfig = DiskBufferingConfiguration.builder()
+                .setEnabled(builder.isDiskBufferingEnabled())
+                .setMaxCacheSize(100_000_000)
+                .build();
+        config.setDiskBufferingConfiguration(diskBufferingConfig);
+
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
 
         otelRumBuilder.mergeResource(createSplunkResource());
@@ -139,7 +149,7 @@ class RumInitializer {
         //                });
 
         // Inhibit the upstream exporter because we add our own BatchSpanProcessor
-        otelRumBuilder.addSpanExporterCustomizer(x -> new NoOpSpanExporter());
+//        otelRumBuilder.addSpanExporterCustomizer(x -> new NoOpSpanExporter());
 
         // Set span limits
         otelRumBuilder.addTracerProviderCustomizer(
@@ -366,71 +376,10 @@ class RumInitializer {
         return filteredExporter;
     }
 
-    //
-    //    private SpanExporter buildExporter(
-    //            CurrentNetworkProvider currentNetworkProvider,
-    //            VisibleScreenService visibleScreenService) {
-    //        xxxx
-    //        if (builder.isDebugEnabled()) {
-    //            // tell the Zipkin exporter to shut up already. We're on mobile, network stuff
-    // happens.
-    //            // we'll do our best to hang on to the spans with the wrapping BufferingExporter.
-    //            ZipkinSpanExporter.baseLogger.setLevel(Level.SEVERE);
-    //            initializationEvents.emit("logger setup complete");
-    //        }
-    //
-    //        if (builder.isDiskBufferingEnabled()) {
-    //            return buildStorageBufferingExporter(
-    //                    currentNetworkProvider, constructSpanFileProvider(visibleScreenService));
-    //        }
-    //
-    //        return buildMemoryBufferingThrottledExporter(
-    //                currentNetworkProvider, constructBacklogProvider(visibleScreenService));
-    //    }
-    //
-    //    //TODO: Make this use OTLP buffering via upstream
-    //    private SpanExporter buildStorageBufferingExporter(
-    //            CurrentNetworkProvider currentNetworkProvider, SpanStorage spanStorage) {
-    //        Sender sender = buildCustomizedZipkinSender();
-    //
-    //        BandwidthTracker bandwidthTracker = new BandwidthTracker();
-    //
-    //        FileSender fileSender =
-    //
-    // FileSender.builder().sender(sender).bandwidthTracker(bandwidthTracker).build();
-    //        DiskToZipkinExporter diskToZipkinExporter =
-    //                DiskToZipkinExporter.builder()
-    //                        .connectionUtil(currentNetworkProvider)
-    //                        .fileSender(fileSender)
-    //                        .bandwidthTracker(bandwidthTracker)
-    //                        .spanFileProvider(spanStorage)
-    //                        .build();
-    //        diskToZipkinExporter.startPolling();
-    //
-    //        return getToDiskExporter(spanStorage);
-    //    }
-    //
-    //    @NonNull
-    //    private Sender buildCustomizedZipkinSender() {
-    //        OkHttpSender.Builder okBuilder =
-    //                OkHttpSender.newBuilder().endpoint(getEndpointWithAuthTokenQueryParam());
-    //        builder.httpSenderCustomizer.customize(okBuilder);
-    //        return okBuilder.build();
-    //    }
-
     @NonNull
     private String getEndpointWithAuthTokenQueryParam() {
         return builder.beaconEndpoint + "?auth=" + builder.rumAccessToken;
     }
-
-    //    private SpanExporter buildMemoryBufferingThrottledExporter(
-    //            CurrentNetworkProvider currentNetworkProvider, MemorySpanBuffer backlogProvider) {
-    //        SpanExporter zipkinSpanExporter = getCoreSpanExporter();
-    //        MemoryBufferingExporter memoryBufferingExporter =
-    //                new MemoryBufferingExporter(
-    //                        currentNetworkProvider, zipkinSpanExporter, backlogProvider);
-    //        return buildThrottlingExporter(memoryBufferingExporter);
-    //    }
 
     //    private static ThrottlingExporter buildThrottlingExporter(
     //            MemoryBufferingExporter memoryBufferingExporter) {
@@ -439,13 +388,6 @@ class RumInitializer {
     //                .maxSpansInWindow(100)
     //                .windowSize(Duration.ofSeconds(30))
     //                .build();
-    //    }
-
-    //    SpanExporter getToDiskExporter(SpanStorage spanStorage) {
-    //        return new LazyInitSpanExporter(
-    //                () ->
-    //                        ZipkinWriteToDiskExporterFactory.create(
-    //                                builder.maxUsageMegabytes, spanStorage));
     //    }
     //
     //    // visible for testing
