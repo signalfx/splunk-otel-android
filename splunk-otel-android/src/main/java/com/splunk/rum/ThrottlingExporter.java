@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-//TODO: jjp - This class is no longer wired up and could be removed
+// TODO: jjp - This class is no longer wired up and could be removed
 class ThrottlingExporter implements SpanExporter {
     private final SpanExporter delegate;
     private final Function<SpanData, String> categoryFunction;
