@@ -36,7 +36,6 @@ import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
-import com.splunk.rum.internal.NoOpSpanExporter;
 import com.splunk.rum.internal.UInt32QuadXorTraceIdRatioSampler;
 import io.opentelemetry.android.OpenTelemetryRum;
 import io.opentelemetry.android.OpenTelemetryRumBuilder;
@@ -52,7 +51,6 @@ import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingInstr
 import io.opentelemetry.android.internal.services.ServiceManager;
 import io.opentelemetry.android.internal.services.network.CurrentNetworkProvider;
 import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
-import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
@@ -94,8 +92,6 @@ class RumInitializer {
                 new GlobalAttributesSupplier(builder.globalAttributes);
         config.setGlobalAttributes(globalAttributeSupplier);
 
-
-
         // TODO: Note/document this instrumentation is now opt-in via application classpath via
         // build settings
         //        if (!builder.isNetworkMonitorEnabled()) {
@@ -103,10 +99,11 @@ class RumInitializer {
         //        }
 
         config.disableScreenAttributes();
-        DiskBufferingConfiguration diskBufferingConfig = DiskBufferingConfiguration.builder()
-                .setEnabled(builder.isDiskBufferingEnabled())
-                .setMaxCacheSize(100_000_000)
-                .build();
+        DiskBufferingConfiguration diskBufferingConfig =
+                DiskBufferingConfiguration.builder()
+                        .setEnabled(builder.isDiskBufferingEnabled())
+                        .setMaxCacheSize(100_000_000)
+                        .build();
         config.setDiskBufferingConfiguration(diskBufferingConfig);
 
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
@@ -149,7 +146,7 @@ class RumInitializer {
         //                });
 
         // Inhibit the upstream exporter because we add our own BatchSpanProcessor
-//        otelRumBuilder.addSpanExporterCustomizer(x -> new NoOpSpanExporter());
+        //        otelRumBuilder.addSpanExporterCustomizer(x -> new NoOpSpanExporter());
 
         // Set span limits
         otelRumBuilder.addTracerProviderCustomizer(
