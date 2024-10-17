@@ -21,14 +21,11 @@ import static io.opentelemetry.android.common.RumConstants.LAST_SCREEN_NAME_KEY;
 import static io.opentelemetry.android.common.RumConstants.SCREEN_NAME_KEY;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static java.util.Collections.emptyList;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
@@ -36,10 +33,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Looper;
 import com.splunk.rum.incubating.HttpSenderCustomizer;
-
 import io.opentelemetry.android.instrumentation.activity.startup.AppStartupTimer;
-import io.opentelemetry.android.internal.services.network.CurrentNetworkProvider;
-import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanKind;
@@ -49,9 +43,7 @@ import io.opentelemetry.sdk.testing.trace.TestSpanData;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
-import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.semconv.ExceptionAttributes;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -88,16 +80,17 @@ class RumInitializerTest {
 
         InMemorySpanExporter testExporter = InMemorySpanExporter.create();
         AppStartupTimer startupTimer = new AppStartupTimer();
-        RumInitializer testInitializer = new RumInitializer(splunkRumBuilder, application, startupTimer);
-        //TODO: This is probably broken
-//                {
-//                    @Override
-//                    SpanExporter buildFilteringExporter(
-//                            CurrentNetworkProvider connectionUtil,
-//                            VisibleScreenService visibleScreenService) {
-//                        return testExporter;
-//                    }
-//                };
+        RumInitializer testInitializer =
+                new RumInitializer(splunkRumBuilder, application, startupTimer);
+        // TODO: This is probably broken
+        //                {
+        //                    @Override
+        //                    SpanExporter buildFilteringExporter(
+        //                            CurrentNetworkProvider connectionUtil,
+        //                            VisibleScreenService visibleScreenService) {
+        //                        return testExporter;
+        //                    }
+        //                };
         SplunkRum splunkRum = testInitializer.initialize(mainLooper);
         startupTimer.runCompletionCallback();
         splunkRum.flushSpans();
@@ -150,16 +143,16 @@ class RumInitializerTest {
         AppStartupTimer startupTimer = new AppStartupTimer();
         RumInitializer testInitializer =
                 new RumInitializer(splunkRumBuilder, application, startupTimer);
-        //TODO: This is probably broken
+        // TODO: This is probably broken
 
-//                {
-//                    @Override
-//                    SpanExporter buildFilteringExporter(
-//                            CurrentNetworkProvider connectionUtil,
-//                            VisibleScreenTracker visibleScreenTracker) {
-//                        return testExporter;
-//                    }
-//                };
+        //                {
+        //                    @Override
+        //                    SpanExporter buildFilteringExporter(
+        //                            CurrentNetworkProvider connectionUtil,
+        //                            VisibleScreenTracker visibleScreenTracker) {
+        //                        return testExporter;
+        //                    }
+        //                };
         SplunkRum splunkRum = testInitializer.initialize(mainLooper);
         splunkRum.flushSpans();
 
@@ -182,55 +175,55 @@ class RumInitializerTest {
         assertEquals(makeString('a', RumInitializer.MAX_ATTRIBUTE_LENGTH), truncatedValue);
     }
 
-    //TODO: Delete or rebuild this
+    // TODO: Delete or rebuild this
     /** Verify that we have buffering in place in our exporter implementation. */
-//    @Test
-//    void verifyExporterBuffering() {
-//        SplunkRumBuilder splunkRumBuilder =
-//                new SplunkRumBuilder()
-//                        .setRealm("dev")
-//                        .setApplicationName("testApp")
-//                        .setRumAccessToken("accessToken");
-//        AppStartupTimer startupTimer = new AppStartupTimer();
-//        InMemorySpanExporter testExporter = InMemorySpanExporter.create();
-//
-//        RumInitializer testInitializer =
-//                new RumInitializer(splunkRumBuilder, application, startupTimer);
-//        //TODO: This is probably broken
-////                {
-////                    @Override
-////                    SpanExporter getCoreSpanExporter() {
-////                        return testExporter;
-////                    }
-////                };
-//
-//        CurrentNetworkProvider currentNetworkProvider = mock(CurrentNetworkProvider.class);
-//        CurrentNetwork currentNetwork = mock(CurrentNetwork.class);
-//
-//        when(currentNetworkProvider.refreshNetworkStatus()).thenReturn(currentNetwork);
-//        when(currentNetwork.isOnline()).thenReturn(false, true);
-//
-//        long currentTimeNanos = MILLISECONDS.toNanos(System.currentTimeMillis());
-//
-//        SpanExporter spanExporter =
-//                testInitializer.buildFilteringExporter(
-//                        currentNetworkProvider, new VisibleScreenTracker());
-//        List<SpanData> batch1 = new ArrayList<>();
-//        for (int i = 0; i < 99; i++) {
-//            batch1.add(createTestSpan(currentTimeNanos - MINUTES.toNanos(1)));
-//        }
-//        // space out the two batches, so they are well under the rate limit
-//        List<SpanData> batch2 = new ArrayList<>();
-//        for (int i = 0; i < 99; i++) {
-//            batch2.add(createTestSpan(currentTimeNanos));
-//        }
-//        spanExporter.export(batch1);
-//        spanExporter.export(batch2);
-//
-//        // we want to verify that everything got exported, including everything buffered while
-//        // offline.
-//        assertEquals(198, testExporter.getFinishedSpanItems().size());
-//    }
+    //    @Test
+    //    void verifyExporterBuffering() {
+    //        SplunkRumBuilder splunkRumBuilder =
+    //                new SplunkRumBuilder()
+    //                        .setRealm("dev")
+    //                        .setApplicationName("testApp")
+    //                        .setRumAccessToken("accessToken");
+    //        AppStartupTimer startupTimer = new AppStartupTimer();
+    //        InMemorySpanExporter testExporter = InMemorySpanExporter.create();
+    //
+    //        RumInitializer testInitializer =
+    //                new RumInitializer(splunkRumBuilder, application, startupTimer);
+    //        //TODO: This is probably broken
+    ////                {
+    ////                    @Override
+    ////                    SpanExporter getCoreSpanExporter() {
+    ////                        return testExporter;
+    ////                    }
+    ////                };
+    //
+    //        CurrentNetworkProvider currentNetworkProvider = mock(CurrentNetworkProvider.class);
+    //        CurrentNetwork currentNetwork = mock(CurrentNetwork.class);
+    //
+    //        when(currentNetworkProvider.refreshNetworkStatus()).thenReturn(currentNetwork);
+    //        when(currentNetwork.isOnline()).thenReturn(false, true);
+    //
+    //        long currentTimeNanos = MILLISECONDS.toNanos(System.currentTimeMillis());
+    //
+    //        SpanExporter spanExporter =
+    //                testInitializer.buildFilteringExporter(
+    //                        currentNetworkProvider, new VisibleScreenTracker());
+    //        List<SpanData> batch1 = new ArrayList<>();
+    //        for (int i = 0; i < 99; i++) {
+    //            batch1.add(createTestSpan(currentTimeNanos - MINUTES.toNanos(1)));
+    //        }
+    //        // space out the two batches, so they are well under the rate limit
+    //        List<SpanData> batch2 = new ArrayList<>();
+    //        for (int i = 0; i < 99; i++) {
+    //            batch2.add(createTestSpan(currentTimeNanos));
+    //        }
+    //        spanExporter.export(batch1);
+    //        spanExporter.export(batch2);
+    //
+    //        // we want to verify that everything got exported, including everything buffered while
+    //        // offline.
+    //        assertEquals(198, testExporter.getFinishedSpanItems().size());
+    //    }
 
     private TestSpanData createTestSpan(long startTimeNanos) {
         return TestSpanData.builder()
@@ -284,13 +277,13 @@ class RumInitializerTest {
         AppStartupTimer appStartupTimer = new AppStartupTimer();
         RumInitializer initializer =
                 new RumInitializer(splunkRumBuilder, application, appStartupTimer);
-        //TODO: Fix this is probably broken
-//                {
-//                    @Override
-//                    SpanExporter getCoreSpanExporter() {
-//                        return spanExporter;
-//                    }
-//                };
+        // TODO: Fix this is probably broken
+        //                {
+        //                    @Override
+        //                    SpanExporter getCoreSpanExporter() {
+        //                        return spanExporter;
+        //                    }
+        //                };
 
         SplunkRum splunkRum = initializer.initialize(mainLooper);
         appStartupTimer.runCompletionCallback();
@@ -351,15 +344,15 @@ class RumInitializerTest {
         when(application.getApplicationContext()).thenReturn(context);
         when(application.getMainLooper()).thenReturn(mainLooper);
 
-        //TODO: Fix this is probably broken
+        // TODO: Fix this is probably broken
         RumInitializer testInitializer =
                 new RumInitializer(splunkRumBuilder, application, new AppStartupTimer());
-//                {
-//                    @Override
-//                    SpanExporter getCoreSpanExporter() {
-//                        return testExporter;
-//                    }
-//                };
+        //                {
+        //                    @Override
+        //                    SpanExporter getCoreSpanExporter() {
+        //                        return testExporter;
+        //                    }
+        //                };
 
         SplunkRum splunkRum = testInitializer.initialize(mainLooper);
         splunkRum.experimentalSetScreenName("screen-1");

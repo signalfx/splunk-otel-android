@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.compose)
 }
 
-
 val localProperties = Properties()
 localProperties.load(FileInputStream(rootProject.file("local.properties")))
 

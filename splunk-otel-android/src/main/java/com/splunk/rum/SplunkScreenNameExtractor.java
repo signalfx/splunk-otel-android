@@ -18,10 +18,9 @@ package com.splunk.rum;
 
 import android.app.Activity;
 import androidx.fragment.app.Fragment;
-import java.util.function.Function;
-
 import io.opentelemetry.android.instrumentation.annotations.RumScreenName;
 import io.opentelemetry.android.instrumentation.common.ScreenNameExtractor;
+import java.util.function.Function;
 
 /**
  * Screen name extractor that supports the original Splunk annotation but falls back to

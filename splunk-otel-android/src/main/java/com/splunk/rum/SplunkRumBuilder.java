@@ -366,19 +366,21 @@ public final class SplunkRumBuilder {
      *
      * @return {@code this}
      */
-//    public SplunkRumBuilder enableExperimentalOtlpExporter() {
-//        if (isDiskBufferingEnabled()) {
-//            Log.w(SplunkRum.LOG_TAG, "OTLP export is not yet compatible with disk buffering!");
-//            Log.w(SplunkRum.LOG_TAG, "Please disable disk buffering in order to use OTLP export.");
-//            Log.w(SplunkRum.LOG_TAG, "OTLP is not enabled.");
-//            return this;
-//        }
-//        configFlags.enableOtlpExporter();
-//        if (this.realm != null) {
-//            configureBeaconForOtlp();
-//        }
-//        return this;
-//    }
+    //    public SplunkRumBuilder enableExperimentalOtlpExporter() {
+    //        if (isDiskBufferingEnabled()) {
+    //            Log.w(SplunkRum.LOG_TAG, "OTLP export is not yet compatible with disk
+    // buffering!");
+    //            Log.w(SplunkRum.LOG_TAG, "Please disable disk buffering in order to use OTLP
+    // export.");
+    //            Log.w(SplunkRum.LOG_TAG, "OTLP is not enabled.");
+    //            return this;
+    //        }
+    //        configFlags.enableOtlpExporter();
+    //        if (this.realm != null) {
+    //            configureBeaconForOtlp();
+    //        }
+    //        return this;
+    //    }
 
     // one day maybe these can use kotlin delegation
     ConfigFlags getConfigFlags() {

@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 
 class StartTypeAwareSpanStorageTest {
 

@@ -19,14 +19,11 @@ package com.splunk.rum;
 import static com.splunk.rum.SplunkRum.LOG_TAG;
 
 import android.util.Log;
-
 import androidx.annotation.VisibleForTesting;
-
+import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 import java.io.File;
 import java.util.UUID;
 import java.util.stream.Stream;
-
-import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 
 /***
  * Store span files to /span/background/@uniqueId/ for spans created when the app started in the background.
