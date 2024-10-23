@@ -1,9 +1,7 @@
 [versions]
-opentelemetry-core = "1.42.1"
-opentelemetry-core-alpha = "1.42.1-alpha"
-opentelemetry-inst = "2.6.0"
-opentelemetry-inst-alpha = "2.6.0-alpha"
-opentelemetry-android = "0.7.0-alpha"
+opentelemetry-inst = "2.9.0"
+opentelemetry-inst-alpha = "2.9.0-alpha"
+opentelemetry-android = "0.8.0-alpha"
 opentelemetry-semconv = "1.26.0-alpha"
 mockito = "5.14.2"
 junit = "5.11.3"
@@ -16,22 +14,21 @@ navigationCompose = "2.7.7"
 
 [libraries]
 opentelemetry-instrumentation-bom = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom", version.ref = "opentelemetry-inst" }
-opentelemetry-bom = { module = "io.opentelemetry:opentelemetry-bom", version.ref = "opentelemetry-core" }
-opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry-core" }
-opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry-core" }
+opentelemetry-bom = { module = "io.opentelemetry:opentelemetry-bom" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk" }
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api" }
 opentelemetry-api-incubator = { module = "io.opentelemetry:opentelemetry-api-incubator" }
-opentelemetry-api-events = { module = "io.opentelemetry:opentelemetry-api-events", version.ref = "opentelemetry-core-alpha" }
+opentelemetry-api-events = { module = "io.opentelemetry:opentelemetry-api-events" }
 opentelemetry-android-agent = { module = "io.opentelemetry.android:android-agent", version.ref = "opentelemetry-android" }
 opentelemetry-android-instrumentation-commonapi = { module = "io.opentelemetry.android:instrumentation-common-api", version.ref = "opentelemetry-android" }
 opentelemetry-instrumenter-api = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api", version.ref = "opentelemetry-inst" }
 opentelemetry-instrumenter-api-incubator = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator", version.ref = "opentelemetry-inst-alpha" }
 opentelemetry-instrumentation-okhttp = { module = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0", version.ref = "opentelemetry-inst-alpha" }
-opentelemetry-exporter-zipkin = { module = "io.opentelemetry:opentelemetry-exporter-zipkin", version.ref = "opentelemetry-core" }
-opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry-core" }
-opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging", version.ref = "opentelemetry-core" }
+opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp" }
+opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging" }
 opentelemetry-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "opentelemetry-semconv" }
 opentelemetry-semconv-incubating = { module = "io.opentelemetry.semconv:opentelemetry-semconv-incubating", version.ref = "opentelemetry-semconv" }
-opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version.ref = "opentelemetry-core" }
+opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing" }
 
 zipkin-sender-okhttp = "io.zipkin.reporter2:zipkin-sender-okhttp3:3.4.2"
 

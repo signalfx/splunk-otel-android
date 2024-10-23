@@ -94,9 +94,11 @@ class RumInitializer {
 
         // TODO: Note/document this instrumentation is now opt-in via application classpath via
         // build settings
-        //        if (!builder.isNetworkMonitorEnabled()) {
-        //            config.disableNetworkChangeMonitoring();
-        //        }
+        if (!builder.isNetworkMonitorEnabled()) {
+            // Can we simply suppress the spans? Is there more to it?
+            //            config.fil
+            //            config.disableNetworkChangeMonitoring();
+        }
 
         config.disableScreenAttributes();
         DiskBufferingConfiguration diskBufferingConfig =
@@ -392,20 +394,6 @@ class RumInitializer {
     //        return new LazyInitSpanExporter(exporterSupplier);
     //    }
 
-    //
-    //    //TODO: This needs to go away as part of 2.0, OTLP only
-    //    @NonNull
-    //    private Supplier<SpanExporter> supplyZipkinExporter() {
-    //        String endpoint = getEndpointWithAuthTokenQueryParam();
-    //        return () ->
-    //                ZipkinSpanExporter.builder()
-    //                        .setEncoder(new CustomZipkinEncoder())
-    //                        .setEndpoint(endpoint)
-    //                        // remove the local IP address
-    //                        .setLocalIpAddressSupplier(() -> null)
-    //                        .setSender(buildCustomizedZipkinSender())
-    //                        .build();
-    //    }
     //
     //    private static class LazyInitSpanExporter implements SpanExporter {
     //        @Nullable private volatile SpanExporter delegate;
