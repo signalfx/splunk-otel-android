@@ -52,7 +52,6 @@ import io.opentelemetry.semconv.incubating.DeploymentIncubatingAttributes;
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes;
 import io.opentelemetry.semconv.incubating.OsIncubatingAttributes;
 import io.opentelemetry.semconv.incubating.SessionIncubatingAttributes;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
