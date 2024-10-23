@@ -28,7 +28,6 @@ class ConfigFlags {
     private boolean slowRenderingDetectionEnabled = true;
     private boolean subprocessInstrumentationEnabled = true;
     private boolean backgroundInstrumentationDeferredUntilForeground = false;
-    private boolean exportUsingOtlp = false;
 
     void enableDebug() {
         debugEnabled = true;
