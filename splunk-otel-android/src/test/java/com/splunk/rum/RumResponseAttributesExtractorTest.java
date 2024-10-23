@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
+import okhttp3.Interceptor;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -40,10 +41,10 @@ class RumResponseAttributesExtractorTest {
         when(headerParser.parse("headerValue"))
                 .thenReturn(new String[] {"9499195c502eb217c448a68bfe0f967c", "fe16eca542cd5d86"});
 
-        Request fakeRequest = mock(Request.class);
+        Interceptor.Chain fakeChain = mock(Interceptor.Chain.class);
         Response response =
                 new Response.Builder()
-                        .request(fakeRequest)
+                        .request(mock(Request.class))
                         .protocol(Protocol.HTTP_1_1)
                         .message("hello")
                         .code(200)
@@ -53,8 +54,8 @@ class RumResponseAttributesExtractorTest {
         RumResponseAttributesExtractor attributesExtractor =
                 new RumResponseAttributesExtractor(headerParser);
         AttributesBuilder attributesBuilder = Attributes.builder();
-        attributesExtractor.onStart(attributesBuilder, Context.root(), fakeRequest);
-        attributesExtractor.onEnd(attributesBuilder, Context.root(), fakeRequest, response, null);
+        attributesExtractor.onStart(attributesBuilder, Context.root(), fakeChain);
+        attributesExtractor.onEnd(attributesBuilder, Context.root(), fakeChain, response, null);
         Attributes attributes = attributesBuilder.build();
 
         assertThat(attributes)
@@ -69,10 +70,10 @@ class RumResponseAttributesExtractorTest {
         ServerTimingHeaderParser headerParser = mock(ServerTimingHeaderParser.class);
         when(headerParser.parse(null)).thenReturn(new String[0]);
 
-        Request fakeRequest = mock(Request.class);
+        Interceptor.Chain fakeChain = mock(Interceptor.Chain.class);
         Response response =
                 new Response.Builder()
-                        .request(fakeRequest)
+                        .request(mock(Request.class))
                         .protocol(Protocol.HTTP_1_1)
                         .message("hello")
                         .code(200)
@@ -81,8 +82,8 @@ class RumResponseAttributesExtractorTest {
         RumResponseAttributesExtractor attributesExtractor =
                 new RumResponseAttributesExtractor(headerParser);
         AttributesBuilder attributesBuilder = Attributes.builder();
-        attributesExtractor.onEnd(attributesBuilder, Context.root(), fakeRequest, response, null);
-        attributesExtractor.onStart(attributesBuilder, Context.root(), fakeRequest);
+        attributesExtractor.onEnd(attributesBuilder, Context.root(), fakeChain, response, null);
+        attributesExtractor.onStart(attributesBuilder, Context.root(), fakeChain);
         Attributes attributes = attributesBuilder.build();
 
         assertThat(attributes).containsOnly(entry(COMPONENT_KEY, "http"));

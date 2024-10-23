@@ -41,6 +41,8 @@ import io.opentelemetry.sdk.trace.data.StatusData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.semconv.ResourceAttributes;
 import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.incubating.SessionIncubatingAttributes;
+
 import java.util.Arrays;
 import java.util.Collection;
 import org.junit.jupiter.api.Test;
@@ -84,7 +86,7 @@ class SplunkSpanDataModifierTest {
     @Test
     void changesSpanIdAttrName() {
         String sessionId = "abc123fonzie";
-        Attributes attrs = Attributes.of(RumConstants.SESSION_ID_KEY, sessionId);
+        Attributes attrs = Attributes.of(SessionIncubatingAttributes.SESSION_ID, sessionId);
         SpanData original = startBuilder().setAttributes(attrs).build();
 
         CompletableResultCode exportResult = CompletableResultCode.ofSuccess();
@@ -98,7 +100,7 @@ class SplunkSpanDataModifierTest {
         SpanData first = exported.iterator().next();
         assertThat(first.getAttributes().get(StandardAttributes.SESSION_ID_KEY))
                 .isEqualTo(sessionId);
-        assertThat(first.getAttributes().get(RumConstants.SESSION_ID_KEY)).isEqualTo(sessionId);
+        assertThat(first.getAttributes().get(SessionIncubatingAttributes.SESSION_ID)).isEqualTo(sessionId);
     }
 
     @Test
