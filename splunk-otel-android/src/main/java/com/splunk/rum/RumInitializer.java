@@ -373,11 +373,6 @@ class RumInitializer {
         return filteredExporter;
     }
 
-    @NonNull
-    private String getEndpointWithAuthTokenQueryParam() {
-        return builder.beaconEndpoint + "?auth=" + builder.rumAccessToken;
-    }
-
     //    private static ThrottlingExporter buildThrottlingExporter(
     //            MemoryBufferingExporter memoryBufferingExporter) {
     //        return ThrottlingExporter.newBuilder(memoryBufferingExporter)
