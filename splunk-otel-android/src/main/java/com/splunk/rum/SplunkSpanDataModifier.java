@@ -51,6 +51,8 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
 import io.opentelemetry.semconv.incubating.DeploymentIncubatingAttributes;
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes;
 import io.opentelemetry.semconv.incubating.OsIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.SessionIncubatingAttributes;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -104,12 +106,12 @@ final class SplunkSpanDataModifier implements SpanExporter {
         AttributesBuilder modifiedAttributes = original.getAttributes().toBuilder();
 
         // Copy the native session id name into the splunk name
-        String sessionId = original.getAttributes().get(RumConstants.SESSION_ID_KEY);
+        String sessionId = original.getAttributes().get(SessionIncubatingAttributes.SESSION_ID);
         modifiedAttributes.put(StandardAttributes.SESSION_ID_KEY, sessionId);
 
         // Copy previous session id to splunk name, if applicable.
         String previousSessionId =
-                original.getAttributes().get(RumConstants.PREVIOUS_SESSION_ID_KEY);
+                original.getAttributes().get(SessionIncubatingAttributes.SESSION_PREVIOUS_ID);
         if (previousSessionId != null) {
             modifiedAttributes.put(StandardAttributes.PREVIOUS_SESSION_ID_KEY, previousSessionId);
         }
