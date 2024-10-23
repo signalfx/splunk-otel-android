@@ -18,26 +18,27 @@ package com.splunk.rum;
 
 import static com.splunk.rum.SplunkRum.ERROR_MESSAGE_KEY;
 import static com.splunk.rum.SplunkRum.ERROR_TYPE_KEY;
+import static com.splunk.rum.StandardAttributes.EXCEPTION_EVENT_NAME;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
-import static io.opentelemetry.semconv.SemanticAttributes.EXCEPTION_MESSAGE;
-import static io.opentelemetry.semconv.SemanticAttributes.EXCEPTION_STACKTRACE;
-import static io.opentelemetry.semconv.SemanticAttributes.EXCEPTION_TYPE;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_ICC;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_MCC;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_MNC;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CARRIER_NAME;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CONNECTION_SUBTYPE;
-import static io.opentelemetry.semconv.SemanticAttributes.NETWORK_CONNECTION_TYPE;
+import static io.opentelemetry.semconv.ExceptionAttributes.EXCEPTION_MESSAGE;
+import static io.opentelemetry.semconv.ExceptionAttributes.EXCEPTION_STACKTRACE;
+import static io.opentelemetry.semconv.ExceptionAttributes.EXCEPTION_TYPE;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_ICC;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_MCC;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_MNC;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CARRIER_NAME;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CONNECTION_SUBTYPE;
 import static io.opentelemetry.semconv.SemanticAttributes.NET_HOST_CONNECTION_TYPE;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_ICC;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_MCC;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_MNC;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_NAME;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CONNECTION_SUBTYPE;
+import static io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CONNECTION_TYPE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
-import io.opentelemetry.android.RumConstants;
+import io.opentelemetry.android.common.RumConstants;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
@@ -47,8 +48,10 @@ import io.opentelemetry.sdk.trace.data.DelegatingSpanData;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import io.opentelemetry.semconv.ResourceAttributes;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.incubating.DeploymentIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.OsIncubatingAttributes;
+import io.opentelemetry.semconv.incubating.SessionIncubatingAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -68,12 +71,12 @@ final class SplunkSpanDataModifier implements SpanExporter {
             unmodifiableSet(
                     new HashSet<>(
                             asList(
-                                    ResourceAttributes.DEPLOYMENT_ENVIRONMENT,
-                                    ResourceAttributes.DEVICE_MODEL_NAME,
-                                    ResourceAttributes.DEVICE_MODEL_IDENTIFIER,
-                                    ResourceAttributes.OS_NAME,
-                                    ResourceAttributes.OS_TYPE,
-                                    ResourceAttributes.OS_VERSION,
+                                    DeploymentIncubatingAttributes.DEPLOYMENT_ENVIRONMENT,
+                                    DeviceIncubatingAttributes.DEVICE_MODEL_NAME,
+                                    DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER,
+                                    OsIncubatingAttributes.OS_NAME,
+                                    OsIncubatingAttributes.OS_TYPE,
+                                    OsIncubatingAttributes.OS_VERSION,
                                     RumConstants.RUM_SDK_VERSION,
                                     SplunkRum.APP_NAME_KEY,
                                     SplunkRum.RUM_VERSION_KEY)));
@@ -102,12 +105,12 @@ final class SplunkSpanDataModifier implements SpanExporter {
         AttributesBuilder modifiedAttributes = original.getAttributes().toBuilder();
 
         // Copy the native session id name into the splunk name
-        String sessionId = original.getAttributes().get(RumConstants.SESSION_ID_KEY);
+        String sessionId = original.getAttributes().get(SessionIncubatingAttributes.SESSION_ID);
         modifiedAttributes.put(StandardAttributes.SESSION_ID_KEY, sessionId);
 
         // Copy previous session id to splunk name, if applicable.
         String previousSessionId =
-                original.getAttributes().get(RumConstants.PREVIOUS_SESSION_ID_KEY);
+                original.getAttributes().get(SessionIncubatingAttributes.SESSION_PREVIOUS_ID);
         if (previousSessionId != null) {
             modifiedAttributes.put(StandardAttributes.PREVIOUS_SESSION_ID_KEY, previousSessionId);
         }
@@ -131,7 +134,7 @@ final class SplunkSpanDataModifier implements SpanExporter {
             // zipkin eats the event attributes that are recorded by default, so we need to convert
             // the exception event to span attributes
             for (EventData event : original.getEvents()) {
-                if (event.getName().equals(SemanticAttributes.EXCEPTION_EVENT_NAME)) {
+                if (event.getName().equals(EXCEPTION_EVENT_NAME)) {
                     modifiedAttributes.putAll(extractExceptionAttributes(event));
                 } else {
                     // if it's not an exception, leave the event as it is

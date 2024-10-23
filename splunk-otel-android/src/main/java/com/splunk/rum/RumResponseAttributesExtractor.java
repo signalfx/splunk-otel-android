@@ -23,10 +23,10 @@ import static com.splunk.rum.SplunkRum.LINK_TRACE_ID_KEY;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
-import okhttp3.Request;
+import okhttp3.Interceptor;
 import okhttp3.Response;
 
-class RumResponseAttributesExtractor implements AttributesExtractor<Request, Response> {
+class RumResponseAttributesExtractor implements AttributesExtractor<Interceptor.Chain, Response> {
 
     private final ServerTimingHeaderParser serverTimingHeaderParser;
 
@@ -35,7 +35,8 @@ class RumResponseAttributesExtractor implements AttributesExtractor<Request, Res
     }
 
     @Override
-    public void onStart(AttributesBuilder attributes, Context parentContext, Request request) {
+    public void onStart(
+            AttributesBuilder attributes, Context parentContext, Interceptor.Chain chain) {
         attributes.put(COMPONENT_KEY, "http");
     }
 
@@ -43,7 +44,7 @@ class RumResponseAttributesExtractor implements AttributesExtractor<Request, Res
     public void onEnd(
             AttributesBuilder attributes,
             Context context,
-            Request request,
+            Interceptor.Chain chain,
             Response response,
             Throwable error) {
         if (response != null) {

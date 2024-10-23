@@ -28,7 +28,6 @@ class ConfigFlags {
     private boolean slowRenderingDetectionEnabled = true;
     private boolean subprocessInstrumentationEnabled = true;
     private boolean backgroundInstrumentationDeferredUntilForeground = false;
-    private boolean exportUsingOtlp = false;
 
     void enableDebug() {
         debugEnabled = true;
@@ -100,18 +99,6 @@ class ConfigFlags {
 
     boolean isReactNativeSupportEnabled() {
         return reactNativeSupportEnabled;
-    }
-
-    void enableOtlpExporter() {
-        exportUsingOtlp = true;
-    }
-
-    void disableOtlpExporter() {
-        exportUsingOtlp = false;
-    }
-
-    boolean shouldUseOtlpExporter() {
-        return exportUsingOtlp;
     }
 
     @NonNull

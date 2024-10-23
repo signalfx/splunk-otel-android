@@ -32,7 +32,7 @@ class NoOpSplunkRumTest {
     @Test
     void doesNotThrow() {
         NoOpSplunkRum instance = NoOpSplunkRum.INSTANCE;
-        instance.addRumEvent("foo", Attributes.empty());
+        instance.emitEvent("foo", Attributes.empty());
         instance.addRumException(new RuntimeException(), Attributes.empty());
 
         assertNotNull(instance.getOpenTelemetry());

@@ -16,10 +16,10 @@
 
 package com.splunk.rum;
 
-import static io.opentelemetry.android.RumConstants.LAST_SCREEN_NAME_KEY;
-import static io.opentelemetry.android.RumConstants.SCREEN_NAME_KEY;
+import static io.opentelemetry.android.common.RumConstants.LAST_SCREEN_NAME_KEY;
+import static io.opentelemetry.android.common.RumConstants.SCREEN_NAME_KEY;
 
-import io.opentelemetry.android.instrumentation.activity.VisibleScreenTracker;
+import io.opentelemetry.android.internal.services.visiblescreen.VisibleScreenService;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
@@ -28,11 +28,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class SettableScreenAttributesAppender implements SpanProcessor {
 
-    private final VisibleScreenTracker visibleScreenTracker;
+    private final VisibleScreenService visibleScreenTracker;
     private final AtomicReference<String> lastScreenName = new AtomicReference<>();
     private final AtomicReference<String> previouslyLastScreenName = new AtomicReference<>();
 
-    public SettableScreenAttributesAppender(VisibleScreenTracker visibleScreenTracker) {
+    public SettableScreenAttributesAppender(VisibleScreenService visibleScreenTracker) {
         this.visibleScreenTracker = visibleScreenTracker;
     }
 
