@@ -7,7 +7,7 @@ plugins {
 android {
     namespace = "com.splunk.android.rum"
 
-    compileSdk = 34
+    compileSdk = 35
     buildToolsVersion = "34.0.0"
 
     defaultConfig {
