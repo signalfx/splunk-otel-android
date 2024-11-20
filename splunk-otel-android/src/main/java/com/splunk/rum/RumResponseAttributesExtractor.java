@@ -28,6 +28,7 @@ import okhttp3.Response;
 
 class RumResponseAttributesExtractor implements AttributesExtractor<Request, Response> {
 
+    public static final String SERVER_TIMING_HEADER = "server-timing";
     private final ServerTimingHeaderParser serverTimingHeaderParser;
 
     public RumResponseAttributesExtractor(ServerTimingHeaderParser serverTimingHeaderParser) {
@@ -52,11 +53,16 @@ class RumResponseAttributesExtractor implements AttributesExtractor<Request, Res
     }
 
     private void onResponse(AttributesBuilder attributes, Response response) {
-        String serverTimingHeader = response.header("Server-Timing");
-        String[] ids = serverTimingHeaderParser.parse(serverTimingHeader);
-        if (ids.length == 2) {
-            attributes.put(LINK_TRACE_ID_KEY, ids[0]);
-            attributes.put(LINK_SPAN_ID_KEY, ids[1]);
-        }
+        response.headers().forEach(header -> {
+            if (!header.getFirst().equalsIgnoreCase(SERVER_TIMING_HEADER)) {
+                return;
+            }
+
+            String[] ids = serverTimingHeaderParser.parse(header.getSecond());
+            if (ids.length == 2) {
+                attributes.put(LINK_TRACE_ID_KEY, ids[0]);
+                attributes.put(LINK_SPAN_ID_KEY, ids[1]);
+            }
+        });
     }
 }

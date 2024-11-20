@@ -36,10 +36,6 @@ class RumResponseAttributesExtractorTest {
 
     @Test
     void spanDecoration() {
-        ServerTimingHeaderParser headerParser = mock(ServerTimingHeaderParser.class);
-        when(headerParser.parse("headerValue"))
-                .thenReturn(new String[] {"9499195c502eb217c448a68bfe0f967c", "fe16eca542cd5d86"});
-
         Request fakeRequest = mock(Request.class);
         Response response =
                 new Response.Builder()
@@ -47,11 +43,13 @@ class RumResponseAttributesExtractorTest {
                         .protocol(Protocol.HTTP_1_1)
                         .message("hello")
                         .code(200)
-                        .addHeader("Server-Timing", "headerValue")
+                        .addHeader("Server-Timing", "othervalue 1")
+                        .addHeader("Server-Timing", "traceparent;desc=\"00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01\"")
+                        .addHeader("Server-Timing", "othervalue 2")
                         .build();
 
         RumResponseAttributesExtractor attributesExtractor =
-                new RumResponseAttributesExtractor(headerParser);
+                new RumResponseAttributesExtractor(new ServerTimingHeaderParser());
         AttributesBuilder attributesBuilder = Attributes.builder();
         attributesExtractor.onStart(attributesBuilder, Context.root(), fakeRequest);
         attributesExtractor.onEnd(attributesBuilder, Context.root(), fakeRequest, response, null);
