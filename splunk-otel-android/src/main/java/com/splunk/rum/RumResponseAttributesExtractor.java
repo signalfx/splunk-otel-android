@@ -53,16 +53,18 @@ class RumResponseAttributesExtractor implements AttributesExtractor<Request, Res
     }
 
     private void onResponse(AttributesBuilder attributes, Response response) {
-        response.headers().forEach(header -> {
-            if (!header.getFirst().equalsIgnoreCase(SERVER_TIMING_HEADER)) {
-                return;
-            }
+        response.headers()
+                .forEach(
+                        header -> {
+                            if (!header.getFirst().equalsIgnoreCase(SERVER_TIMING_HEADER)) {
+                                return;
+                            }
 
-            String[] ids = serverTimingHeaderParser.parse(header.getSecond());
-            if (ids.length == 2) {
-                attributes.put(LINK_TRACE_ID_KEY, ids[0]);
-                attributes.put(LINK_SPAN_ID_KEY, ids[1]);
-            }
-        });
+                            String[] ids = serverTimingHeaderParser.parse(header.getSecond());
+                            if (ids.length == 2) {
+                                attributes.put(LINK_TRACE_ID_KEY, ids[0]);
+                                attributes.put(LINK_SPAN_ID_KEY, ids[1]);
+                            }
+                        });
     }
 }

@@ -38,28 +38,62 @@ class RumResponseAttributesExtractorTest {
     void spanDecoration() {
         Request fakeRequest = mock(Request.class);
         Response response =
-                new Response.Builder()
-                        .request(fakeRequest)
-                        .protocol(Protocol.HTTP_1_1)
-                        .message("hello")
-                        .code(200)
-                        .addHeader("Server-Timing", "othervalue 1")
-                        .addHeader("Server-Timing", "traceparent;desc=\"00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01\"")
-                        .addHeader("Server-Timing", "othervalue 2")
+                getBaseRuestBuilder(fakeRequest)
+                        .addHeader(
+                                "Server-Timing",
+                                "traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"")
                         .build();
-
-        RumResponseAttributesExtractor attributesExtractor =
-                new RumResponseAttributesExtractor(new ServerTimingHeaderParser());
-        AttributesBuilder attributesBuilder = Attributes.builder();
-        attributesExtractor.onStart(attributesBuilder, Context.root(), fakeRequest);
-        attributesExtractor.onEnd(attributesBuilder, Context.root(), fakeRequest, response, null);
-        Attributes attributes = attributesBuilder.build();
+        Attributes attributes = performAttributesExtraction(fakeRequest, response);
 
         assertThat(attributes)
                 .containsOnly(
                         entry(COMPONENT_KEY, "http"),
-                        entry(LINK_TRACE_ID_KEY, "9499195c502eb217c448a68bfe0f967c"),
-                        entry(LINK_SPAN_ID_KEY, "fe16eca542cd5d86"));
+                        entry(LINK_TRACE_ID_KEY, "00000000000000000000000000000001"),
+                        entry(LINK_SPAN_ID_KEY, "0000000000000001"));
+    }
+
+    @Test
+    void ignoresMalformed() {
+        Request fakeRequest = mock(Request.class);
+        Response response =
+                getBaseRuestBuilder(fakeRequest)
+                        .addHeader("Server-Timing", "othervalue 1")
+                        .addHeader(
+                                "Server-Timing",
+                                "traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"")
+                        .addHeader("Server-Timing", "othervalue 2")
+                        .build();
+        Attributes attributes = performAttributesExtraction(fakeRequest, response);
+
+        assertThat(attributes)
+                .containsOnly(
+                        entry(COMPONENT_KEY, "http"),
+                        entry(LINK_TRACE_ID_KEY, "00000000000000000000000000000001"),
+                        entry(LINK_SPAN_ID_KEY, "0000000000000001"));
+    }
+
+    @Test
+    void lastMatchingWins() {
+        Request fakeRequest = mock(Request.class);
+        Response response =
+                getBaseRuestBuilder(fakeRequest)
+                        .addHeader(
+                                "Server-Timing",
+                                "traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"")
+                        .addHeader(
+                                "Server-Timing",
+                                "traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\"")
+                        .addHeader(
+                                "Server-Timing",
+                                "traceparent;desc=\"00-00000000000000000000000000000003-0000000000000003-01\"")
+                        .build();
+        Attributes attributes = performAttributesExtraction(fakeRequest, response);
+
+        assertThat(attributes)
+                .containsOnly(
+                        entry(COMPONENT_KEY, "http"),
+                        entry(LINK_TRACE_ID_KEY, "00000000000000000000000000000003"),
+                        entry(LINK_SPAN_ID_KEY, "0000000000000003"));
     }
 
     @Test
@@ -68,21 +102,27 @@ class RumResponseAttributesExtractorTest {
         when(headerParser.parse(null)).thenReturn(new String[0]);
 
         Request fakeRequest = mock(Request.class);
-        Response response =
-                new Response.Builder()
-                        .request(fakeRequest)
-                        .protocol(Protocol.HTTP_1_1)
-                        .message("hello")
-                        .code(200)
-                        .build();
-
-        RumResponseAttributesExtractor attributesExtractor =
-                new RumResponseAttributesExtractor(headerParser);
-        AttributesBuilder attributesBuilder = Attributes.builder();
-        attributesExtractor.onEnd(attributesBuilder, Context.root(), fakeRequest, response, null);
-        attributesExtractor.onStart(attributesBuilder, Context.root(), fakeRequest);
-        Attributes attributes = attributesBuilder.build();
+        Response response = getBaseRuestBuilder(fakeRequest).build();
+        Attributes attributes = performAttributesExtraction(fakeRequest, response);
 
         assertThat(attributes).containsOnly(entry(COMPONENT_KEY, "http"));
+    }
+
+    private static Attributes performAttributesExtraction(Request fakeRequest, Response response) {
+        RumResponseAttributesExtractor attributesExtractor =
+                new RumResponseAttributesExtractor(new ServerTimingHeaderParser());
+        AttributesBuilder attributesBuilder = Attributes.builder();
+        attributesExtractor.onStart(attributesBuilder, Context.root(), fakeRequest);
+        attributesExtractor.onEnd(attributesBuilder, Context.root(), fakeRequest, response, null);
+        Attributes attributes = attributesBuilder.build();
+        return attributes;
+    }
+
+    private Response.Builder getBaseRuestBuilder(Request fakeRequest) {
+        return new Response.Builder()
+                .request(fakeRequest)
+                .protocol(Protocol.HTTP_1_1)
+                .message("hello")
+                .code(200);
     }
 }
