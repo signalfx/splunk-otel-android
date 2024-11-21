@@ -50,7 +50,7 @@ junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", vers
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "1.11.3" }
 junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit" }
 mockwebserver = "com.google.mockwebserver:mockwebserver:20130706"
-robolectric = "org.robolectric:robolectric:4.14"
+robolectric = "org.robolectric:robolectric:4.14.1"
 assertj-core = "org.assertj:assertj-core:3.26.3"
 
 #Compilation tools
