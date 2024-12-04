@@ -7,6 +7,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 1.8.0 - 2024-12-04
+
+This is a regular maintenance release.
+
+This version depends on these upstream versions:
+
+* opentelemetry-android v0.4.0
+* opentelemetry-instrumentation-api [v1.33.6](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.33.6)
+* opentelemetry-sdk [v1.41.0](https://github.com/open-telemetry/opentelemetry-java/releases/tag/v1.41.0)
+
+📈 Enhancements:
+
+* Add ability to support multiple `Server-Timing` HTTP headers ([#1077](https://github.com/signalfx/splunk-otel-android/pull/1077))
+* Add unique build identifiers to ANRs, crashes, and slow renders. Note: This enhancement uses experimental attribute names that are subject to change in a future release. ([#1093](https://github.com/signalfx/splunk-otel-android/pull/1093))
+
 ### Version 1.7.0 - 2024-08-12
 
 This is a regular maintenance release.

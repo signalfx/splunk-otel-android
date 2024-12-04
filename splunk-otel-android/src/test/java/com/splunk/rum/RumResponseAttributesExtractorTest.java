@@ -38,7 +38,7 @@ class RumResponseAttributesExtractorTest {
     void spanDecoration() {
         Request fakeRequest = mock(Request.class);
         Response response =
-                getBaseRuestBuilder(fakeRequest)
+                getBaseRequestBuilder(fakeRequest)
                         .addHeader(
                                 "Server-Timing",
                                 "traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"")
@@ -56,7 +56,7 @@ class RumResponseAttributesExtractorTest {
     void ignoresMalformed() {
         Request fakeRequest = mock(Request.class);
         Response response =
-                getBaseRuestBuilder(fakeRequest)
+                getBaseRequestBuilder(fakeRequest)
                         .addHeader("Server-Timing", "othervalue 1")
                         .addHeader(
                                 "Server-Timing",
@@ -76,7 +76,7 @@ class RumResponseAttributesExtractorTest {
     void lastMatchingWins() {
         Request fakeRequest = mock(Request.class);
         Response response =
-                getBaseRuestBuilder(fakeRequest)
+                getBaseRequestBuilder(fakeRequest)
                         .addHeader(
                                 "Server-Timing",
                                 "traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"")
@@ -102,7 +102,7 @@ class RumResponseAttributesExtractorTest {
         when(headerParser.parse(null)).thenReturn(new String[0]);
 
         Request fakeRequest = mock(Request.class);
-        Response response = getBaseRuestBuilder(fakeRequest).build();
+        Response response = getBaseRequestBuilder(fakeRequest).build();
         Attributes attributes = performAttributesExtraction(fakeRequest, response);
 
         assertThat(attributes).containsOnly(entry(COMPONENT_KEY, "http"));
@@ -118,7 +118,7 @@ class RumResponseAttributesExtractorTest {
         return attributes;
     }
 
-    private Response.Builder getBaseRuestBuilder(Request fakeRequest) {
+    private Response.Builder getBaseRequestBuilder(Request fakeRequest) {
         return new Response.Builder()
                 .request(fakeRequest)
                 .protocol(Protocol.HTTP_1_1)
