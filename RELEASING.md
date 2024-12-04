@@ -10,9 +10,9 @@ This is the process to use to do a release:
    libraries' versions, and making sure that the project version in the `gradle.properties` file is
    correctly set to the next planned release version.
 
-2) Run the `scripts/tag-release.sh` script with latest release version number to create and push a 
-   signed release tag. Note that it assumes that the remote is named `origin`, if you named yours 
-   differently you might have to push the tag manually.
+2) Run the `scripts/tag-release.sh` script with latest release version number, 
+   eg: ./tag-release.sh 1.2.3 to create and push a signed release tag. Note that it assumes that the 
+   remote is named `origin`, if you named yours differently you might have to push the tag manually.
 
 3) Wait for gitlab android-releaser to run the release job. If all goes well, it will automatically 
    close and release the "staging" repository...which means the build has been published to sonatype
@@ -26,4 +26,4 @@ This is the process to use to do a release:
    README.md, etc) that mentions the previous version. Make sure the badge in the top README.md
    reflects the accurate upstream otel version.
 
-6) Go to Slack and update #o11y-android-instrumentation on release 
+6) Go to Slack and notify relevant about release
