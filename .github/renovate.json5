@@ -3,7 +3,7 @@
   "extends": [
     "config:base"
   ],
-  "baseBranches": ["main", "v1.7.x"],
+  "baseBranches": ["main"],
   "packageRules": [
     {
       "matchPackageNames": [
