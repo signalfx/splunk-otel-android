@@ -1,0 +1,9 @@
+<resources>
+    <color name="white">#fff</color>
+    <color name="black">#000</color>
+    <color name="gray_light">#bbb</color>
+    <color name="blue">#143188</color>
+    <color name="blue_transparent">#88143188</color>
+    <color name="blue_light">#266ba9</color>
+    <color name="blue_light_transparent">#88266ba9</color>
+</resources>

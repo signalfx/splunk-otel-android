@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/root"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<androidx.appcompat.widget.Toolbar
+		android:id="@+id/toolbar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="@drawable/bcg_gradient_blue"
+		app:navigationIcon="@drawable/ic_back"
+		app:subtitleTextAppearance="@style/ToolbarSubtitle"
+		app:subtitleTextColor="@color/gray_light"
+		app:titleTextColor="@color/white"
+		tools:subtitle="Subtitle"
+		tools:title="Title" />
+
+	<androidx.fragment.app.FragmentContainerView
+		android:id="@+id/container"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+
+</LinearLayout>

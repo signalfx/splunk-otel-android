@@ -1,0 +1,12 @@
+<resources>
+	<declare-styleable name="ColoredLinearLayout">
+		<attr name="colored_itemsCount" format="integer" />
+		<attr name="colored_itemWidth" format="dimension" />
+		<attr name="colored_itemHeight" format="dimension" />
+	</declare-styleable>
+
+	<declare-styleable name="ShadowView">
+		<attr name="shadow_fillColor" format="color" />
+		<attr name="shadow_shadowColor" format="color" />
+	</declare-styleable>
+</resources>

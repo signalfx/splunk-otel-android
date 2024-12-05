@@ -1,0 +1,511 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/scroller"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:padding="20dp">
+
+		<TextView
+			android:id="@+id/record_title"
+			style="@style/Header"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/menu_screenshot_title"
+			app:layout_constraintTop_toTopOf="parent" />
+
+		<TextView
+			android:id="@+id/screenshot_views"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_screenshot_views"
+			app:layout_constraintTop_toBottomOf="@id/record_title" />
+
+		<TextView
+			android:id="@+id/screenshot_regions"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="10dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_screenshot_regions"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_views" />
+
+		<TextView
+			android:id="@+id/screenshot_masks"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="10dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_screenshot_masks"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_regions" />
+
+		<TextView
+			android:id="@+id/record_fragment_animations"
+			style="@style/Header2"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="20dp"
+			android:text="@string/menu_screenshot_fragment_animation_title"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_masks" />
+
+		<TextView
+			android:id="@+id/screenshot_fragment_animation_none"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_screenshot_fragment_animation_none"
+			app:layout_constraintTop_toBottomOf="@id/record_fragment_animations" />
+
+		<TextView
+			android:id="@+id/screenshot_fragment_animation_fade_1"
+			style="@style/Button"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginEnd="2.5dp"
+			android:text="@string/menu_screenshot_fragment_animation_fade_1"
+			app:layout_constraintEnd_toStartOf="@id/screenshot_fragment_animation_fade_2"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_fragment_animation_none" />
+
+		<TextView
+			android:id="@+id/screenshot_fragment_animation_fade_2"
+			style="@style/Button"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="2.5dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginEnd="2.5dp"
+			android:text="@string/menu_screenshot_fragment_animation_fade_2"
+			app:layout_constraintEnd_toStartOf="@id/screenshot_fragment_animation_fade"
+			app:layout_constraintStart_toEndOf="@id/screenshot_fragment_animation_fade_1"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_fragment_animation_none" />
+
+		<TextView
+			android:id="@+id/screenshot_fragment_animation_fade"
+			style="@style/Button"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="2.5dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginEnd="20dp"
+			android:text="@string/menu_screenshot_fragment_animation_fade"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@id/screenshot_fragment_animation_fade_2"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_fragment_animation_none" />
+
+		<TextView
+			android:id="@+id/screenshot_fragment_animation_translate_1"
+			style="@style/Button"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginEnd="2.5dp"
+			android:text="@string/menu_screenshot_fragment_animation_translation_1"
+			app:layout_constraintEnd_toStartOf="@id/screenshot_fragment_animation_translate_2"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_fragment_animation_fade" />
+
+		<TextView
+			android:id="@+id/screenshot_fragment_animation_translate_2"
+			style="@style/Button"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="2.5dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginEnd="2.5dp"
+			android:text="@string/menu_screenshot_fragment_animation_translation_2"
+			app:layout_constraintEnd_toStartOf="@id/screenshot_fragment_animation_translate"
+			app:layout_constraintStart_toEndOf="@id/screenshot_fragment_animation_translate_1"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_fragment_animation_fade" />
+
+		<TextView
+			android:id="@+id/screenshot_fragment_animation_translate"
+			style="@style/Button"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="2.5dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginEnd="20dp"
+			android:text="@string/menu_screenshot_fragment_animation_translation"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@id/screenshot_fragment_animation_translate_2"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_fragment_animation_fade" />
+
+		<TextView
+			android:id="@+id/wireframe_title"
+			style="@style/Header"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="30dp"
+			android:text="@string/menu_wireframe_title"
+			app:layout_constraintTop_toBottomOf="@id/screenshot_fragment_animation_translate" />
+
+		<TextView
+			android:id="@+id/wireframe_views"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_wireframe_views"
+			app:layout_constraintTop_toBottomOf="@id/wireframe_title" />
+
+		<TextView
+			android:id="@+id/wireframe_collapsing_layout"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_wireframe_collapsing_layout"
+			app:layout_constraintTop_toBottomOf="@id/wireframe_views" />
+
+		<TextView
+			android:id="@+id/wireframe_ordering"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_wireframe_ordering"
+			app:layout_constraintTop_toBottomOf="@id/wireframe_collapsing_layout" />
+
+		<TextView
+			android:id="@+id/wireframe_list"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_wireframe_list"
+			app:layout_constraintTop_toBottomOf="@id/wireframe_ordering" />
+
+		<TextView
+			android:id="@+id/wireframe_web_view"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_wireframe_web_view"
+			app:layout_constraintTop_toBottomOf="@id/wireframe_list" />
+
+
+		<TextView
+			android:id="@+id/bridge_interface"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_bridge_interface"
+			app:layout_constraintTop_toBottomOf="@id/wireframe_web_view" />
+
+		<TextView
+			android:id="@+id/interactions_title"
+			style="@style/Header"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="30dp"
+			android:text="@string/menu_interactions_title"
+			app:layout_constraintTop_toBottomOf="@id/bridge_interface" />
+
+		<TextView
+			android:id="@+id/interactions_focus"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_interactions_focus_title"
+			app:layout_constraintTop_toBottomOf="@id/interactions_title" />
+
+		<TextView
+			android:id="@+id/compose_title"
+			style="@style/Header"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="30dp"
+			android:text="@string/menu_compose_title"
+			app:layout_constraintTop_toBottomOf="@id/interactions_focus" />
+
+		<TextView
+			android:id="@+id/compose_list"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_list"
+			app:layout_constraintTop_toBottomOf="@id/compose_title" />
+
+		<TextView
+			android:id="@+id/compose_draw_order"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_draw_order"
+			app:layout_constraintTop_toBottomOf="@id/compose_list" />
+
+		<TextView
+			android:id="@+id/compose_view_draw_order"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_view_draw_order"
+			app:layout_constraintTop_toBottomOf="@id/compose_draw_order" />
+
+		<TextView
+			android:id="@+id/compose_draw_recomposition"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_draw_recomposition"
+			app:layout_constraintTop_toBottomOf="@id/compose_view_draw_order" />
+
+		<TextView
+			android:id="@+id/compose_measure_recomposition"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_measure_recomposition"
+			app:layout_constraintTop_toBottomOf="@id/compose_draw_recomposition" />
+
+		<TextView
+			android:id="@+id/compose_surface"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_surface"
+			app:layout_constraintTop_toBottomOf="@id/compose_measure_recomposition" />
+
+		<TextView
+			android:id="@+id/compose_camera"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_camera"
+			app:layout_constraintTop_toBottomOf="@id/compose_surface" />
+
+		<TextView
+			android:id="@+id/compose_video"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_video"
+			app:layout_constraintTop_toBottomOf="@id/compose_camera" />
+
+		<TextView
+			android:id="@+id/compose_text_field"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_text_field"
+			app:layout_constraintTop_toBottomOf="@id/compose_video" />
+
+		<TextView
+			android:id="@+id/compose_web_view"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_compose_web_view"
+			app:layout_constraintTop_toBottomOf="@id/compose_text_field" />
+
+		<TextView
+			android:id="@+id/crash_reports_title"
+			style="@style/Header"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="30dp"
+			android:text="@string/menu_crash_reports_title"
+			android:textSize="18sp"
+			android:textStyle="bold"
+			app:layout_constraintTop_toBottomOf="@id/compose_web_view" />
+
+		<TextView
+			android:id="@+id/crash_reports_illegal"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_crash_reports_illegal"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports_title" />
+
+		<TextView
+			android:id="@+id/crash_reports_main_thread"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_crash_on_main_thread"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports_illegal" />
+
+		<TextView
+			android:id="@+id/crash_reports_in_background"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_crash_in_background"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports_main_thread" />
+
+		<TextView
+			android:id="@+id/crash_reports_no_app_code"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_crash_with_no_app_code"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports_in_background" />
+
+		<TextView
+			android:id="@+id/crash_reports_no_stacktrace"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_crash_with_no_stacktrace"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports_no_app_code" />
+
+		<TextView
+			android:id="@+id/crash_reports_out_of_memory_error"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_crash_with_out_of_memory_error"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports_no_stacktrace" />
+
+		<TextView
+			android:id="@+id/crash_reports_with_chained_exceptions"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_crash_with_chained_exceptions"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports_out_of_memory_error" />
+
+		<TextView
+			android:id="@+id/crash_reports_null"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_crash_reports_null"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports_with_chained_exceptions" />
+
+		<TextView
+			android:id="@+id/anr_event"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_trigger_anr"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports_null" />
+
+		<TextView
+			android:id="@+id/network_request_title"
+			style="@style/Header"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="30dp"
+			android:text="@string/menu_network_request_title"
+			android:textSize="18sp"
+			android:textStyle="bold"
+			app:layout_constraintTop_toBottomOf="@id/anr_event" />
+
+		<TextView
+			android:id="@+id/okhttp_sample_calls"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_okhttp_sample_calls"
+			app:layout_constraintTop_toBottomOf="@id/network_request_title" />
+
+		<TextView
+			android:id="@+id/httpurlconnection"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_httpurlconnection_title"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/okhttp_sample_calls" />
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

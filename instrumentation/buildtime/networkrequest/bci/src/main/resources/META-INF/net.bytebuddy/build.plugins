@@ -1,0 +1,3 @@
+com.cisco.android.rum.bci.httpurlconnection.HttpUrlConnectionPlugin
+com.cisco.android.rum.bci.okhttp3.OkHttpClientPlugin
+com.cisco.android.rum.bci.okhttp3.OkHttpCallbackPlugin

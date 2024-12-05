@@ -1,0 +1,34 @@
+// Common modules
+include ':common:otel:api',
+        ':common:otel:internal'
+
+// Instrumentation modules
+include ':instrumentation:runtime:crash',
+        ':instrumentation:runtime:anr'
+
+// Integration
+include ':integration:agent:api',
+        ':integration:agent:module',
+        ':integration:agent:internal'
+
+// Integration tests
+// TODO disable it for now because of different artifactory include ':integration-run'
+
+// Test App
+include ':app'
+
+// Main entry point
+include ':agent'
+
+// Automatic network request instrumentation modules
+include ':instrumentation:buildtime:networkrequest:bci'
+include ':instrumentation:runtime:networkrequest:library'
+include ':instrumentation:buildtime:plugin'
+include ':integration:networkrequest'
+
+// Build Info Injection portion of buildtime gradle plugin
+include ':instrumentation:buildtime:build-info-injector'
+
+// Crash and ANR config modules
+include ':integration:crash'
+include ':integration:anr'

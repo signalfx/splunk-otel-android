@@ -1,0 +1,66 @@
+<resources>
+
+	<style name="ActivityTheme" parent="@style/Theme.MaterialComponents.Light.NoActionBar">
+		<item name="colorPrimary">@color/blue</item>
+		<item name="colorPrimaryDark">@color/black</item>
+		<item name="colorAccent">@color/blue</item>
+	</style>
+
+	<style name="ActivityNoAnim" parent="ActivityTheme">
+		<item name="android:windowAnimationStyle">@null</item>
+	</style>
+
+	<style name="ActivityDialog" parent="@style/Theme.MaterialComponents.Light.Dialog">
+		<item name="colorPrimary">@color/blue</item>
+		<item name="colorPrimaryDark">@color/black</item>
+		<item name="colorAccent">@color/blue</item>
+	</style>
+
+	<style name="Header">
+		<item name="android:textColor">@color/blue</item>
+		<item name="android:textSize">18sp</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+
+	<style name="Header2">
+		<item name="android:textColor">@color/black</item>
+		<item name="android:textSize">16sp</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+
+	<style name="H2">
+		<item name="android:textColor">#000</item>
+		<item name="android:textSize">18sp</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+
+	<style name="Description">
+		<item name="android:textColor">#999</item>
+		<item name="android:textSize">10sp</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+
+	<style name="Button">
+		<item name="android:background">@drawable/sel_button</item>
+		<item name="android:minHeight">35dp</item>
+		<item name="android:gravity">center</item>
+		<item name="android:textSize">13sp</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textColor">#fff</item>
+	</style>
+
+	<style name="ToolbarSubtitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+		<item name="android:textSize">12sp</item>
+	</style>
+
+	<style name="TextAppearance.AppTheme.Toolbar.Collapsed.Title" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+		<item name="android:textStyle">bold</item>
+		<item name="android:letterSpacing">0.02</item>
+		<item name="android:textColor">#fff</item>
+	</style>
+
+	<style name="TextAppearance.AppTheme.Toolbar.Expanded.Title" parent="TextAppearance.AppTheme.Toolbar.Collapsed.Title">
+		<item name="android:textSize">28sp</item>
+		<item name="lineHeight">37sp</item>
+	</style>
+</resources>

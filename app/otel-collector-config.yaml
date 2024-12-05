@@ -1,0 +1,51 @@
+processors:
+  batch:
+  resource:
+    attributes:
+      - key: service.namespace
+        action: upsert
+        value: "smartlook-android"
+      - key: service.name
+        action: upsert
+        value: "android-service"
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        cors:
+          allowed_origins:
+            - http://*
+            - https://*
+        endpoint: 0.0.0.0:4318
+        traces_url_path: "/eum/v1/traces"
+        logs_url_path: "/eum/v1/logs"
+
+exporters:
+  file:
+    path: ./exports.json
+  debug:
+    verbosity: detailed
+  zipkin:
+    endpoint: "http://zipkin:9411/api/v2/spans"
+
+extensions:
+  health_check:
+  pprof:
+    endpoint: :1888
+  zpages:
+    endpoint: :55679
+
+service:
+  extensions: [pprof, zpages, health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [resource]
+      exporters: [zipkin, debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]

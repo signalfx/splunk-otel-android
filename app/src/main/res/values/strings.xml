@@ -1,0 +1,97 @@
+<resources>
+    <string name="app_name" translatable="false">Smartlook</string>
+
+    <string name="menu_title">Menu</string>
+    <string name="menu_screenshot_title">Screenshot</string>
+    <string name="menu_screenshot_views">Views</string>
+    <string name="menu_screenshot_regions">Regions</string>
+    <string name="menu_screenshot_masks">Toggle masks</string>
+    <string name="menu_screenshot_fragment_animation_title">Fragment animation</string>
+    <string name="menu_screenshot_fragment_animation_none">None</string>
+    <string name="menu_screenshot_fragment_animation_fade">Fade</string>
+    <string name="menu_screenshot_fragment_animation_fade_1">Fade 1</string>
+    <string name="menu_screenshot_fragment_animation_fade_2">Fade 2</string>
+    <string name="menu_screenshot_fragment_animation_translation_1">Translate 1</string>
+    <string name="menu_screenshot_fragment_animation_translation_2">Translate 2</string>
+    <string name="menu_screenshot_fragment_animation_translation">Translate</string>
+    <string name="menu_wireframe_title">Wireframe</string>
+    <string name="menu_wireframe_views">Views</string>
+    <string name="menu_wireframe_collapsing_layout">Collapsing layout</string>
+    <string name="menu_wireframe_ordering">View ordering</string>
+    <string name="menu_wireframe_list">List</string>
+    <string name="menu_wireframe_web_view">WebView</string>
+    <string name="menu_bridge_interface">BridgeInterface</string>
+    <string name="menu_interactions_title">Interactions</string>
+    <string name="menu_interactions_focus_title">Focus</string>
+    <string name="menu_compose_title">Jetpack Compose</string>
+    <string name="menu_compose_list">List</string>
+    <string name="menu_compose_draw_order">Draw order</string>
+    <string name="menu_compose_view_draw_order">Draw order with View</string>
+    <string name="menu_compose_draw_recomposition">Draw recomposition</string>
+    <string name="menu_compose_measure_recomposition">Measure recomposition</string>
+    <string name="menu_compose_surface">Surface</string>
+    <string name="menu_compose_camera">Camera</string>
+    <string name="menu_compose_video">Video</string>
+    <string name="menu_compose_text_field">TextField</string>
+    <string name="menu_compose_web_view">WebView</string>
+    <string name="menu_crash_reports_title">Crash Reports</string>
+    <string name="menu_crash_reports_illegal">IllegalArgumentException</string>
+    <string name="menu_crash_on_main_thread">Crash on Main Thread</string>
+    <string name="menu_crash_in_background">Crash in Background</string>
+    <string name="menu_crash_with_no_app_code">Crash with no App Code</string>
+    <string name="menu_crash_with_no_stacktrace">Crash with no Stacktrace</string>
+    <string name="menu_crash_with_out_of_memory_error">Crash with Out of Memory Error</string>
+    <string name="menu_crash_with_chained_exceptions">Crash with Chained Exceptions</string>
+    <string name="menu_crash_reports_null">NullPointerException</string>
+    <string name="menu_trigger_anr">Trigger ANR</string>
+    <string name="menu_okhttp_sample_calls">Okhttp sample calls</string>
+    <string name="menu_network_request_title">Network Requests</string>
+    <string name="menu_httpurlconnection_title">HttpURLConnection</string>
+
+    <string name="screenshot_fragment_views_title">Views</string>
+    <string name="screenshot_fragment_regions_title">Regions</string>
+    <string name="screenshot_fragment_animation_title">Fragment transactions</string>
+
+    <string name="wireframe_title">Wireframe</string>
+    <string name="web_view_title">WebView</string>
+    <string name="bridge_interface_title">BridgeInterface</string>
+    <string name="wireframe_native_subtitle">Native elements</string>
+    <string name="wireframe_collapsing_layout_subtitle">Collapsing layout</string>
+    <string name="wireframe_ordering_message">This is empty Activity to test correct View ordering.</string>
+    <string name="okhttp_title">OkHttp</string>
+    <string name="list_title">ListView</string>
+    <string name="httpurlconnection_title">HttpURLConnection</string>
+
+    <!-- Fragment Okhttp -->
+    <string name="synchronous_get">Synchronous GET</string>
+    <string name="asynchronous_get">Asynchronous GET</string>
+    <string name="concurrent_asynchronous_get">Concurrent asynchronous GET</string>
+    <string name="parent_context_propagation_async_get">Parent Context Prop Async GET</string>
+    <string name="retry_request">Retry request</string>
+    <string name="multiple_headers">Multiple headers</string>
+    <string name="post_markdown">Post markdown</string>
+    <string name="post_streaming">Post streaming</string>
+    <string name="post_file">Post file</string>
+    <string name="post_form_parameters">Post form parameters</string>
+    <string name="post_mutlipart_request">Post mutlipart request</string>
+    <string name="network_error">Network Error</string>
+    <string name="response_caching">Response caching</string>
+    <string name="canceled_call">Canceled call</string>
+    <string name="http_toast">%s(): Done!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Fragment HttpURLConnection -->
+    <string name="custom_url_section_title">Test with Custom URL</string>
+    <string name="custom_url">URL</string>
+    <string name="custom_url_get">GET</string>
+    <string name="others_section_title">Other Tests</string>
+    <string name="successful_get">Successful GET</string>
+    <string name="unsuccessful_get">Unsuccessful GET</string>
+    <string name="get_without_input_stream">GET w/o Input Stream</string>
+    <string name="four_concurrent_get_requests">Four Concurrent GET Requests</string>
+    <string name="post">Post</string>
+    <string name="sustained_connection">Sustained Connection</string>
+    <string name="stalled_request">Stalled Request</string>
+
+</resources>
