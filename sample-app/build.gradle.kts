@@ -13,7 +13,7 @@ localProperties.load(FileInputStream(rootProject.file("local.properties")))
 android {
     namespace = "com.splunk.android.sample"
 
-    compileSdk = 35
+    compileSdk = 34
     buildToolsVersion = "34.0.0"
 
     defaultConfig {
