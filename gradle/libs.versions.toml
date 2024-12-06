@@ -31,10 +31,10 @@ opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testi
 zipkin-sender-okhttp = "io.zipkin.reporter2:zipkin-sender-okhttp3:3.4.2"
 
 androidx-browser = "androidx.browser:browser:1.8.0"
-androidx-core = "androidx.core:core:1.15.0"
+androidx-core = "androidx.core:core:1.13.1"
 androidx-navigation-fragment = "androidx.navigation:navigation-fragment:2.7.7"
 androidx-navigation-ui = "androidx.navigation:navigation-ui:2.7.7"
-androidx-work = "androidx.work:work-runtime:2.10.0"
+androidx-work = "androidx.work:work-runtime:2.9.1"
 androidx-webkit = "androidx.webkit:webkit:1.12.1"
 
 # Volley

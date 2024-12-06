@@ -9,7 +9,7 @@ plugins {
 android {
     namespace = "com.splunk.android.rum.volley"
 
-    compileSdk = 35
+    compileSdk = 34
     buildToolsVersion = "34.0.0"
 
     defaultConfig {
