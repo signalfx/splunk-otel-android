@@ -13,6 +13,7 @@ This is the process to use to do a release:
 2) Run the `scripts/tag-release.sh` script with latest release version number,
    eg: ./tag-release.sh 1.2.3 to create and push a signed release tag. Note that it assumes that the
    remote is named `origin`, if you named yours differently you might have to push the tag manually.
+   (Following step 4 should manually push the tag.)
 
 3) Wait for gitlab android-releaser to run the release job. If all goes well, it will automatically
    close and release the "staging" repository...which means the build has been published to sonatype
@@ -26,4 +27,18 @@ This is the process to use to do a release:
    README.md, etc) that mentions the previous version. Make sure the badge in the top README.md
    reflects the accurate upstream otel version.
 
-6) Go to Slack and notify relevant about release
+6) Go to Slack and notify relevant channels about the release.
+
+## Releasing a patch version for a previously released version
+
+1) If not already available, create a branch from the tag of the previously released version for
+   which you're creating the patch. For example, create a v1.8.x branch. All changes for the patch
+   release should be made on this branch.
+
+2) Follow steps 1 to 4 outlined in the "Releasing a New Version" section.
+
+3) Update the `main` branch with similar fixes. This PR can and probably should also include updating
+   any documentation (CHANGELOG.md, README.md, etc) to reflect the version you just released. Make
+   sure the badge in the top README.md reflects the accurate upstream otel version.
+
+4) Go to Slack and notify relevant channels about the release.
