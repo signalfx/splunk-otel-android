@@ -57,6 +57,15 @@
     {
       "matchPackagePrefixes": ["io.opentelemetry.instrumentation"],
       "groupName": "upstream otel instrumentation"
+    },
+    {
+      // Various androidx libraries released after Aug 7th, 2024 requires android compileSDK 35,
+      // forcing customers to require the same and further to upgrade their AGP and gradle
+      "matchPackageNames": [
+        "androidx.core:core",
+        "androidx.work:work-runtime"
+      ],
+      "enabled": false
     }
   ]
 }
