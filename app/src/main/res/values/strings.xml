@@ -2,38 +2,6 @@
     <string name="app_name" translatable="false">Smartlook</string>
 
     <string name="menu_title">Menu</string>
-    <string name="menu_screenshot_title">Screenshot</string>
-    <string name="menu_screenshot_views">Views</string>
-    <string name="menu_screenshot_regions">Regions</string>
-    <string name="menu_screenshot_masks">Toggle masks</string>
-    <string name="menu_screenshot_fragment_animation_title">Fragment animation</string>
-    <string name="menu_screenshot_fragment_animation_none">None</string>
-    <string name="menu_screenshot_fragment_animation_fade">Fade</string>
-    <string name="menu_screenshot_fragment_animation_fade_1">Fade 1</string>
-    <string name="menu_screenshot_fragment_animation_fade_2">Fade 2</string>
-    <string name="menu_screenshot_fragment_animation_translation_1">Translate 1</string>
-    <string name="menu_screenshot_fragment_animation_translation_2">Translate 2</string>
-    <string name="menu_screenshot_fragment_animation_translation">Translate</string>
-    <string name="menu_wireframe_title">Wireframe</string>
-    <string name="menu_wireframe_views">Views</string>
-    <string name="menu_wireframe_collapsing_layout">Collapsing layout</string>
-    <string name="menu_wireframe_ordering">View ordering</string>
-    <string name="menu_wireframe_list">List</string>
-    <string name="menu_wireframe_web_view">WebView</string>
-    <string name="menu_bridge_interface">BridgeInterface</string>
-    <string name="menu_interactions_title">Interactions</string>
-    <string name="menu_interactions_focus_title">Focus</string>
-    <string name="menu_compose_title">Jetpack Compose</string>
-    <string name="menu_compose_list">List</string>
-    <string name="menu_compose_draw_order">Draw order</string>
-    <string name="menu_compose_view_draw_order">Draw order with View</string>
-    <string name="menu_compose_draw_recomposition">Draw recomposition</string>
-    <string name="menu_compose_measure_recomposition">Measure recomposition</string>
-    <string name="menu_compose_surface">Surface</string>
-    <string name="menu_compose_camera">Camera</string>
-    <string name="menu_compose_video">Video</string>
-    <string name="menu_compose_text_field">TextField</string>
-    <string name="menu_compose_web_view">WebView</string>
     <string name="menu_crash_reports_title">Crash Reports</string>
     <string name="menu_crash_reports_illegal">IllegalArgumentException</string>
     <string name="menu_crash_on_main_thread">Crash on Main Thread</string>
@@ -48,18 +16,7 @@
     <string name="menu_network_request_title">Network Requests</string>
     <string name="menu_httpurlconnection_title">HttpURLConnection</string>
 
-    <string name="screenshot_fragment_views_title">Views</string>
-    <string name="screenshot_fragment_regions_title">Regions</string>
-    <string name="screenshot_fragment_animation_title">Fragment transactions</string>
-
-    <string name="wireframe_title">Wireframe</string>
-    <string name="web_view_title">WebView</string>
-    <string name="bridge_interface_title">BridgeInterface</string>
-    <string name="wireframe_native_subtitle">Native elements</string>
-    <string name="wireframe_collapsing_layout_subtitle">Collapsing layout</string>
-    <string name="wireframe_ordering_message">This is empty Activity to test correct View ordering.</string>
     <string name="okhttp_title">OkHttp</string>
-    <string name="list_title">ListView</string>
     <string name="httpurlconnection_title">HttpURLConnection</string>
 
     <!-- Fragment Okhttp -->

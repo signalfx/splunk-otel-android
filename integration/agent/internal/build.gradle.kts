@@ -25,9 +25,9 @@ android {
 dependencies {
     api(project(":integration:agent:module"))
 
-    // TODO implementation(project(":common:http"))
-    // TODO implementation(project(":common:id"))
-    // TODO implementation(project(":common:utils"))
-    // TODO implementation(project(":common:storage"))
+    implementation(project(":common:http"))
+    implementation(project(":common:id"))
+    implementation(project(":common:utils"))
+    implementation(project(":common:storage"))
     implementation(project(":common:otel:internal"))
 }

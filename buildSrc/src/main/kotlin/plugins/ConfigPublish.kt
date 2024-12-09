@@ -21,7 +21,6 @@ import toBoxString
 import utils.artifactIdProperty
 import utils.defaultGroupId
 import utils.versionProperty
-import java.io.File
 
 class ConfigPublish : Plugin<Project> by local plugin {
     apply(plugin = "maven-publish")

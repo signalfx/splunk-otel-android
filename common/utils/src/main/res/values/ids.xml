@@ -1,0 +1,5 @@
+<resources>
+	<item name="sl_tag_window_callback_frame_callback" type="id" />
+	<item name="sl_tag_window_callback_expected_callbacks" type="id" />
+	<item name="sl_tag_id" format="string" type="id" />
+</resources>

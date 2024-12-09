@@ -27,11 +27,11 @@ dependencies {
     compileOnly(Dependencies.Android.annotation)
 
     implementation(project(":common:otel:internal"))
-    // TODO implementation(project(":common:job"))
-    // TODO implementation(project(":common:http"))
-    // TODO implementation(project(":common:storage"))
-    // TODO implementation(project(":common:logger"))
-    // TODO implementation(project(":common:utils"))
+    implementation(project(":common:job"))
+    implementation(project(":common:http"))
+    implementation(project(":common:storage"))
+    implementation(project(":common:logger"))
+    implementation(project(":common:utils"))
 
     api(Dependencies.Otel.sdk)
     api(Dependencies.Otel.api)

@@ -28,8 +28,8 @@ dependencies {
     api(project(":integration:agent:module"))
 
     implementation(project(":common:otel:internal"))
-    // TODO implementation(project(":common:logger"))
-    // TODO implementation(project(":common:storage"))
+    implementation(project(":common:logger"))
+    implementation(project(":common:storage"))
     implementation(project(":integration:agent:internal"))
-    // TODO implementation(project(":common:utils"))
+    implementation(project(":common:utils"))
 }

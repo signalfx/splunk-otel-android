@@ -1,6 +1,12 @@
 // Common modules
 include ':common:otel:api',
-        ':common:otel:internal'
+        ':common:otel:internal',
+        ':common:storage',
+        ':common:logger',
+        ':common:utils',
+        ':common:http',
+        ':common:job',
+        ':common:id'
 
 // Instrumentation modules
 include ':instrumentation:runtime:crash',
@@ -16,6 +22,9 @@ include ':integration:agent:api',
 
 // Test App
 include ':app'
+
+// API module
+include ':api'
 
 // Main entry point
 include ':agent'
