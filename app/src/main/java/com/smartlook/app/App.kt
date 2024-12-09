@@ -19,8 +19,6 @@ package com.smartlook.app
 import android.app.Application
 import com.cisco.android.rum.integration.agent.api.AgentConfiguration
 import com.cisco.android.rum.integration.agent.api.CiscoRUMAgent
-import com.cisco.android.rum.integration.recording.api.SessionReplayModuleConfiguration
-import com.cisco.android.rum.integration.recording.api.extension.sessionReplay
 import java.net.URL
 
 class App : Application() {
@@ -40,12 +38,12 @@ class App : Application() {
             application = this,
             agentConfiguration = agentConfig,
             moduleConfigurations = arrayOf(
-                SessionReplayModuleConfiguration()
+                // SessionReplayModuleConfiguration()
             )
         )
 
         // MARK temp comment
         // agent.sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
-        agent.sessionReplay.start()
+        // agent.sessionReplay.start()
     }
 }

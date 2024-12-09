@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.3.1" type="baseline" client="gradle" dependencies="false" name="AGP (7.3.1)" variant="all" version="7.3.1">
+
+    <issue
+        id="DiscouragedApi"
+        message="Use of this function is discouraged because it makes internal calls to `getIdentifier()`, which uses resource reflection. Reflection makes it harder to perform build optimizations and compile-time verification of code. It is much more efficient to retrieve resource values by identifier (e.g. `getValue(R.foo.bar, outValue, true)`) than by name (e.g. `getValue(&quot;foo&quot;, outvalue, true)`)."
+        errorLine1="    getValue(name, value, resolveRefs)"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/main/java/com/smartlook/sdk/common/utils/extensions/ResourcesExt.kt"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Use of this function is discouraged because it makes internal calls to `getIdentifier()`, which uses resource reflection. Reflection makes it harder to perform build optimizations and compile-time verification of code. It is much more efficient to retrieve resource values by identifier (e.g. `getValue(R.foo.bar, outValue, true)`) than by name (e.g. `getValue(&quot;foo&quot;, outvalue, true)`)."
+        errorLine1="            resources.getValue(name, value, false)"
+        errorLine2="                      ~~~~~~~~">
+        <location
+            file="src/main/java/com/smartlook/sdk/common/utils/extensions/ViewExt.kt"
+            line="157"
+            column="23"/>
+    </issue>
+
+</issues>

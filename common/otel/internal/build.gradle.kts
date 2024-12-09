@@ -25,6 +25,5 @@ android {
 
 dependencies {
     compileOnly(Dependencies.Android.annotation)
-
-    // TODO implementation(project(":common:storage"))
+    implementation(project(":common:storage"))
 }

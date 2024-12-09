@@ -24,8 +24,8 @@ android {
 }
 
 dependencies {
-    // TODO implementation(project(":common:utils"))
-    // TODO implementation(project(":common:logger"))
+    implementation(project(":common:utils"))
+    implementation(project(":common:logger"))
     implementation(project(":common:otel:api"))
 
     testImplementation(Dependencies.Test.junit)

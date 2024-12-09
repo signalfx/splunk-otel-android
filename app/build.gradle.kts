@@ -2,7 +2,6 @@ import Dependencies.kotlinStdlibJdk8
 import plugins.ConfigAndroidApp
 import java.net.InetAddress
 
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -84,7 +83,7 @@ dependencies {
     // TODO: this is here just so we do not have duplicate logic, it is not publicly available
     //implementation("com.cisco.android:rum-common-utils:24.4.10-2246")
 
-    // TODO implementation(project(":common:utils"))
+    implementation(project(":common:utils"))
     implementation(project(":agent"))
     //TODO: Below dependency can be removed once we uncomment the plugin id.
     implementation(project(":instrumentation:runtime:networkrequest:library"))

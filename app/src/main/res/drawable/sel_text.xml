@@ -1,5 +1,0 @@
-<selector xmlns:android="http://schemas.android.com/apk/res/android" android:constantSize="true" android:enterFadeDuration="100" android:exitFadeDuration="100" android:variablePadding="false">
-	<item android:color="#8ef" android:state_pressed="true" />
-	<item android:color="#888" android:state_enabled="false"/>
-	<item android:color="#143188" />
-</selector>

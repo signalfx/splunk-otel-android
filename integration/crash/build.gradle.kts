@@ -23,8 +23,8 @@ android {
 }
 
 dependencies {
-    // TODO implementation(project(":common:logger"))
-    // TODO implementation(project(":common:utils"))
+    implementation(project(":common:logger"))
+    implementation(project(":common:utils"))
     implementation(project(":integration:agent:internal"))
     implementation(project(":instrumentation:runtime:crash"))
 }

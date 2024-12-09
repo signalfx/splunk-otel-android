@@ -24,54 +24,5 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-
-		<activity android:name=".ui.wireframe.EmptyActivity" />
-
-		<activity android:name=".ui.interaction.FocusActivity" />
-
-		<activity
-			android:name=".ui.dialog.DialogActivity"
-			android:theme="@style/ActivityDialog" />
-
-		<activity
-			android:name=".ui.compose.ListComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
-		<activity
-			android:name=".ui.compose.DrawOrderComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
-		<activity
-			android:name=".ui.compose.ViewDrawOrderComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
-		<activity
-			android:name=".ui.compose.DrawRecompositionComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
-		<activity
-			android:name=".ui.compose.MeasureRecompositionComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
-		<activity
-			android:name=".ui.compose.SurfaceComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
-		<activity
-			android:name=".ui.compose.CameraComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
-		<activity
-			android:name=".ui.compose.VideoComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
-		<activity
-			android:name=".ui.compose.TextFieldComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
-		<activity
-			android:name=".ui.compose.WebViewComposeActivity"
-			android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
-
 	</application>
 </manifest>
