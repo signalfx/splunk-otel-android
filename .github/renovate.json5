@@ -3,8 +3,16 @@
   "extends": [
     "config:base"
   ],
-  "baseBranches": ["main", "v1.7.x"],
+  "baseBranches": ["main"],
   "packageRules": [
+    {
+      // Don't bump upstream otel versions
+      "matchPackagePatterns": [
+        "^io.opentelemetry",
+        "^io.opentelemetry.instrumentation"
+      ],
+      "enabled": false
+    },
     {
       "matchPackageNames": [
         "io.opentelemetry:opentelemetry-api-incubator",
@@ -17,15 +25,6 @@
       // of that release instead of the unstable version for a future release (but there's never any
       // stable version of opentelemetry-instrumentation-bom-alpha so this logic doesn't apply
       "ignoreUnstable": false
-    },
-    {
-      // Don't bump to 2.x in the 1.x line
-      "matchUpdateTypes": ["major"],
-      "matchPackagePatterns": [
-        "^io.opentelemetry.instrumentation"
-      ],
-      "matchBaseBranches": ["v1.7.x"],
-      "enabled": false
     },
     {
       // navigation-fragment 2.7.0 and above require android api 34+, which we are not ready for
