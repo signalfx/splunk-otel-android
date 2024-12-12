@@ -25,25 +25,14 @@ android {
         testInstrumentationRunnerArguments.put("clearPackageData", "true")
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = project.file("keystore.jks")
-            storePassword = "${project.findProperty("splunk_test_app_store_password")}"
-            keyAlias = "${project.findProperty("splunk_test_app_key_alias")}"
-            keyPassword = "${project.findProperty("splunk_test_app_key_password")}"
-        }
-    }
-
     buildTypes {
         getByName("debug") {
             resValue("bool", "leak_canary_add_launcher_icon", "false")
-            signingConfig = signingConfigs.getByName("release")
             val ip = InetAddress.getLocalHost().hostAddress
             buildConfigField("String", "IP_ADDRESS", "\"$ip\"")
         }
         getByName("release") {
             isMinifyEnabled = true
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
