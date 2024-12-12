@@ -64,27 +64,14 @@ object Dependencies {
 
     object Android {
 
-        /**
-         * Play services maps 18.2.0 is the latest version.
-         * This version includes services basement transitively with vulnerabilities, we explicitly set the services basement version to a safer one.
-         */
-        private const val playServicesMapVersion = "18.2.0"
-        private const val playServiceBasementVersion = "18.1.0"
-
         private const val annotationVersion = "1.6.0"
         private const val appcompatVersion = "1.6.1"
-        private const val multidexVersion = "2.0.1"
         private const val recyclerVersion = "1.2.1"
-        private const val cardVersion = "1.0.0"
         private const val materialVersion = "1.9.0"
 
         const val annotation = "androidx.annotation:annotation:$annotationVersion"
         const val appcompat = "androidx.appcompat:appcompat:$appcompatVersion"
-        const val playServicesMap = "com.google.android.gms:play-services-maps:$playServicesMapVersion"
-        const val playServicesBasement = "com.google.android.gms:play-services-basement:$playServiceBasementVersion"
-        const val multidex = "androidx.multidex:multidex:$multidexVersion"
         const val recycler = "androidx.recyclerview:recyclerview:$recyclerVersion"
-        const val cardView = "androidx.cardview:cardview:$cardVersion"
         const val material = "com.google.android.material:material:$materialVersion"
 
         // Test application
@@ -92,33 +79,15 @@ object Dependencies {
         private const val constraintLayoutVersion = "2.1.4"
         private const val activityKtxVersion = "1.2.2"
         private const val fragmentKtxVersion = "1.3.3"
-        private const val fragmentVersion = "1.3.3"
-        private const val cameraVersion = "1.2.0"
-        private const val exoPlayerVersion = "2.19.1"
 
         const val constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
         const val activityKtx = "androidx.activity:activity-ktx:$activityKtxVersion"
         const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
-        const val fragment = "androidx.fragment:fragment:$fragmentVersion"
-        const val cameraLifecycle = "androidx.camera:camera-lifecycle:$cameraVersion"
-        const val cameraExtensions = "androidx.camera:camera-extensions:$cameraVersion"
-        const val cameraView = "androidx.camera:camera-view:$cameraVersion"
-        const val exoPlayer = "com.google.android.exoplayer:exoplayer:$exoPlayerVersion"
 
-        object Compose { // FIXME Update when fix obfuscation-director compatibility with Kotlin 1.8.0+
-            private const val version = "1.2.1"
-            private const val materialVersion = "1.2.1"
-            private const val activityVersion = "1.3.1"
+        object SessionReplay {
+            private const val version = "1.0.10"
 
-            const val compilerVersion = "1.3.2"
-
-            const val activity = "androidx.activity:activity-compose:$activityVersion"
-            const val ui = "androidx.compose.ui:ui:$version"
-            const val uiTooling = "androidx.compose.ui:ui-tooling:$version"
-            const val toolingPreview = "androidx.compose.ui:ui-tooling-preview:$version"
-            const val material = "androidx.compose.material:material:$materialVersion"
-            const val materialIconsExtended = "androidx.compose.material:material-icons-extended:$materialVersion"
-            const val animation = "androidx.compose.animation:animation:$version"
+            const val logger = "com.cisco.android:sr-common-logger:$version"
         }
     }
 

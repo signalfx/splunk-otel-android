@@ -30,4 +30,6 @@ dependencies {
     implementation(project(":common:utils"))
     implementation(project(":common:storage"))
     implementation(project(":common:otel:internal"))
+
+    implementation(Dependencies.Android.SessionReplay.logger)
 }
