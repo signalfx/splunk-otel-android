@@ -57,11 +57,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = Dependencies.Android.Compose.compilerVersion
     }
 
     packagingOptions {
@@ -92,22 +87,7 @@ dependencies {
     implementation(Dependencies.Android.constraintLayout)
     implementation(Dependencies.Android.activityKtx)
     implementation(Dependencies.Android.fragmentKtx)
-
-    /**
-     * Play services basement must be explicitly included since a newer version is being enforced than what is transitively used by play services maps.
-     */
-    implementation(Dependencies.Android.playServicesMap)
-    implementation(Dependencies.Android.playServicesBasement)
-
-    implementation(Dependencies.Android.cardView)
     implementation(Dependencies.Android.material)
-
-    implementation(Dependencies.Android.Compose.activity)
-    implementation(Dependencies.Android.Compose.ui)
-    implementation(Dependencies.Android.Compose.material)
-    implementation(Dependencies.Android.Compose.animation)
-    implementation(Dependencies.Android.Compose.materialIconsExtended)
-    implementation(Dependencies.Android.Compose.toolingPreview)
 
     /**
      * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
@@ -115,7 +95,6 @@ dependencies {
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okio)
 
-    debugImplementation(Dependencies.Android.Compose.uiTooling)
     debugImplementation(Dependencies.AndroidDebug.leakCanary)
 
     /**
@@ -152,15 +131,10 @@ dependencies {
 
     androidTestUtil(Dependencies.AndroidTest.testOrchestrator)
 
-    implementation(Dependencies.Android.cameraLifecycle)
-    implementation(Dependencies.Android.cameraExtensions)
-    implementation(Dependencies.Android.cameraView)
-
     /**
      * Explicit version of guava jre must be forced because ext truth uses one with vulnerabilities.
      */
     implementation(Dependencies.guavaAndroid)
-    implementation(Dependencies.Android.exoPlayer)
 }
 
 tasks.register<Exec>("startOtelCollectorForTests") {
