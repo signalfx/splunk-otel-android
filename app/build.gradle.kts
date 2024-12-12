@@ -25,25 +25,14 @@ android {
         testInstrumentationRunnerArguments.put("clearPackageData", "true")
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = project.file("keystore.jks")
-            storePassword = "${project.findProperty("splunk_test_app_store_password")}"
-            keyAlias = "${project.findProperty("splunk_test_app_key_alias")}"
-            keyPassword = "${project.findProperty("splunk_test_app_key_password")}"
-        }
-    }
-
     buildTypes {
         getByName("debug") {
             resValue("bool", "leak_canary_add_launcher_icon", "false")
-            signingConfig = signingConfigs.getByName("release")
             val ip = InetAddress.getLocalHost().hostAddress
             buildConfigField("String", "IP_ADDRESS", "\"$ip\"")
         }
         getByName("release") {
             isMinifyEnabled = true
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -57,11 +46,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = Dependencies.Android.Compose.compilerVersion
     }
 
     packagingOptions {
@@ -92,22 +76,7 @@ dependencies {
     implementation(Dependencies.Android.constraintLayout)
     implementation(Dependencies.Android.activityKtx)
     implementation(Dependencies.Android.fragmentKtx)
-
-    /**
-     * Play services basement must be explicitly included since a newer version is being enforced than what is transitively used by play services maps.
-     */
-    implementation(Dependencies.Android.playServicesMap)
-    implementation(Dependencies.Android.playServicesBasement)
-
-    implementation(Dependencies.Android.cardView)
     implementation(Dependencies.Android.material)
-
-    implementation(Dependencies.Android.Compose.activity)
-    implementation(Dependencies.Android.Compose.ui)
-    implementation(Dependencies.Android.Compose.material)
-    implementation(Dependencies.Android.Compose.animation)
-    implementation(Dependencies.Android.Compose.materialIconsExtended)
-    implementation(Dependencies.Android.Compose.toolingPreview)
 
     /**
      * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
@@ -115,7 +84,6 @@ dependencies {
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okio)
 
-    debugImplementation(Dependencies.Android.Compose.uiTooling)
     debugImplementation(Dependencies.AndroidDebug.leakCanary)
 
     /**
@@ -152,15 +120,10 @@ dependencies {
 
     androidTestUtil(Dependencies.AndroidTest.testOrchestrator)
 
-    implementation(Dependencies.Android.cameraLifecycle)
-    implementation(Dependencies.Android.cameraExtensions)
-    implementation(Dependencies.Android.cameraView)
-
     /**
      * Explicit version of guava jre must be forced because ext truth uses one with vulnerabilities.
      */
     implementation(Dependencies.guavaAndroid)
-    implementation(Dependencies.Android.exoPlayer)
 }
 
 tasks.register<Exec>("startOtelCollectorForTests") {

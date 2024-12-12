@@ -20,7 +20,6 @@ object Configurations {
 
     object Artifactory {
         const val bareRepositoryURL = "https://artifactory.bare.appdynamics.com/artifactory/maven-releases/"
-        const val repositoryURL = "https://artifactory.ci.smartlook.cloud/artifactory/libs-release-local"
     }
 
     const val sdkVersionCode = 1
