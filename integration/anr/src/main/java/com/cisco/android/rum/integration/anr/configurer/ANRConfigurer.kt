@@ -18,15 +18,14 @@ package com.cisco.android.rum.integration.anr.configurer
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.cisco.android.common.logger.Logger
+import com.cisco.android.rum.anr.AnrReportingHandler
 import com.cisco.android.rum.integration.agent.internal.AgentIntegration
 import com.cisco.android.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.cisco.android.rum.integration.agent.internal.config.RemoteModuleConfiguration
 import com.cisco.android.rum.integration.agent.internal.extension.find
-import com.smartlook.sdk.common.logger.Logger
 import com.smartlook.sdk.common.utils.extensions.optBooleanNull
 import com.smartlook.sdk.common.utils.extensions.optLongNull
-import com.smartlook.sdk.log.LogAspect
-import com.cisco.android.rum.anr.AnrReportingHandler
 
 @SuppressLint("LongLogTag")
 object ANRConfigurer {
@@ -44,19 +43,18 @@ object ANRConfigurer {
     var thresholdSeconds: Long = DEFAULT_TIMEOUT
 
     init {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "init()" })
+        Logger.d(TAG, "init()")
         AgentIntegration.registerModule(MODULE_NAME)
     }
 
     fun attach(context: Context) {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "attach()" })
+        Logger.d(TAG, "attach()")
         AgentIntegration.obtainInstance(context).listeners += installationListener
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
-        override fun onRemoteModuleConfigurationsChanged(
-            manager: ModuleConfigurationManager, remoteConfigurations: List<RemoteModuleConfiguration>) {
-            Logger.privateD(LogAspect.SDK_METHODS, TAG, { "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)" })
+        override fun onRemoteModuleConfigurationsChanged(manager: ModuleConfigurationManager, remoteConfigurations: List<RemoteModuleConfiguration>) {
+            Logger.d(TAG, "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)")
             setModuleConfiguration(remoteConfigurations)
 
             if (ANRConfigurer::anrHandler.isInitialized) {
@@ -71,7 +69,7 @@ object ANRConfigurer {
     }
 
     private fun setModuleConfiguration(remoteConfigurations: List<RemoteModuleConfiguration>) {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)" })
+        Logger.d(TAG, "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)")
         val remoteConfig = remoteConfigurations.find(MODULE_NAME)?.config
         isANRReportingEnabled = remoteConfig?.optBooleanNull("enabled") ?: DEFAULT_IS_ENABLED
         thresholdSeconds = remoteConfig?.optLongNull("thresholdAndroid") ?: DEFAULT_TIMEOUT
@@ -79,7 +77,7 @@ object ANRConfigurer {
 
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(context: Context) {
-            Logger.privateD(LogAspect.SDK_METHODS, TAG, { "onInstall()" })
+            Logger.d(TAG, "onInstall()")
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
 

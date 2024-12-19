@@ -18,14 +18,13 @@ package com.cisco.android.rum.integration.crash.configurer
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.cisco.android.common.logger.Logger
+import com.cisco.android.rum.crash.CrashReportingHandler
 import com.cisco.android.rum.integration.agent.internal.AgentIntegration
 import com.cisco.android.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.cisco.android.rum.integration.agent.internal.config.RemoteModuleConfiguration
 import com.cisco.android.rum.integration.agent.internal.extension.find
-import com.smartlook.sdk.common.logger.Logger
 import com.smartlook.sdk.common.utils.extensions.optBooleanNull
-import com.smartlook.sdk.log.LogAspect
-import com.cisco.android.rum.crash.CrashReportingHandler
 
 @SuppressLint("LongLogTag")
 object CrashConfigurer {
@@ -39,19 +38,20 @@ object CrashConfigurer {
     var isCrashReportingEnabled: Boolean = DEFAULT_IS_ENABLED
 
     init {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "init()" })
+        Logger.d(TAG, "init()")
         AgentIntegration.registerModule(MODULE_NAME)
     }
 
     fun attach(context: Context) {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "attach()" })
+        Logger.d(TAG, "attach()")
         AgentIntegration.obtainInstance(context).listeners += installationListener
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
         override fun onRemoteModuleConfigurationsChanged(
-            manager: ModuleConfigurationManager, remoteConfigurations: List<RemoteModuleConfiguration>) {
-            Logger.privateD(LogAspect.SDK_METHODS, TAG, { "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)" })
+            manager: ModuleConfigurationManager, remoteConfigurations: List<RemoteModuleConfiguration>
+        ) {
+            Logger.d(TAG, "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)")
 
             setModuleConfiguration(remoteConfigurations)
 
@@ -66,7 +66,7 @@ object CrashConfigurer {
     }
 
     private fun setModuleConfiguration(remoteConfigurations: List<RemoteModuleConfiguration>) {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)" })
+        Logger.d(TAG, "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)")
 
         val remoteConfig = remoteConfigurations.find(MODULE_NAME)?.config
 
@@ -75,7 +75,7 @@ object CrashConfigurer {
 
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(context: Context) {
-            Logger.privateD(LogAspect.SDK_METHODS, TAG, { "onInstall()" })
+            Logger.d(TAG, "onInstall()")
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
 

@@ -1,9 +1,8 @@
 package com.smartlook.sdk.common.storage.policy
 
-import com.smartlook.sdk.common.utils.thread.NamedThreadFactory
-import com.smartlook.sdk.log.LogAspect
-import com.smartlook.sdk.common.logger.Logger
+import com.cisco.android.common.logger.Logger
 import com.smartlook.sdk.common.utils.extensions.safeSubmit
+import com.smartlook.sdk.common.utils.thread.NamedThreadFactory
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -37,7 +36,7 @@ internal object SizeCache {
                     runCatching {
                         cache[dir.path] = SizeCacheEntry(calculateDirSize(dir))
                     }.onFailure {
-                        Logger.e(LogAspect.STORAGE, TAG) { "Failed to calculate dir size" }
+                        Logger.e(TAG, "Failed to calculate dir size")
                     }
                 }
             }

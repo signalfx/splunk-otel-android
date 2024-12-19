@@ -16,11 +16,10 @@
 
 package com.cisco.android.rum.integration.agent.api.sessionId
 
-import com.cisco.mrum.common.otel.api.OpenTelemetry
-import com.smartlook.sdk.common.logger.Logger
+import com.cisco.android.common.logger.Logger
 import com.cisco.android.rum.integration.agent.api.attributes.AttributeConstants
 import com.cisco.android.rum.integration.agent.internal.session.SessionManager
-import com.smartlook.sdk.log.LogAspect
+import com.cisco.mrum.common.otel.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import java.util.concurrent.TimeUnit
@@ -28,7 +27,7 @@ import java.util.concurrent.TimeUnit
 internal class SessionStartEventManager(sessionManager: SessionManager) {
 
     init {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "init()" })
+        Logger.d(TAG, "init()")
 
         sessionManager.sessionListeners += object : SessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String) {
@@ -38,7 +37,7 @@ internal class SessionStartEventManager(sessionManager: SessionManager) {
     }
 
     private fun createSessionStartEvent(sessionId: String, userId: String) {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "createSessionStartEvent() sessionId: $sessionId, userId: $userId" })
+        Logger.d(TAG, "createSessionStartEvent() sessionId: $sessionId, userId: $userId")
 
         val instance = OpenTelemetry.instance ?: return
 

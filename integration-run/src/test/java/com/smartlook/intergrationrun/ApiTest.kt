@@ -25,7 +25,6 @@ import com.smartlook.android.core.api.Smartlook
 import com.smartlook.android.core.api.User
 import com.smartlook.android.core.api.model.Properties
 import com.smartlook.android.core.api.model.RecordingMask
-import com.smartlook.sdk.log.LogAspect
 import com.smartlook.sdk.log.LogListener
 import org.junit.Test
 import org.junit.runner.RunWith
