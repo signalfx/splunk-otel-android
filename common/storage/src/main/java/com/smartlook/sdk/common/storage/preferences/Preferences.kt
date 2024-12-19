@@ -1,8 +1,7 @@
 package com.smartlook.sdk.common.storage.preferences
 
+import com.cisco.android.common.logger.Logger
 import com.smartlook.sdk.common.utils.Lock
-import com.smartlook.sdk.log.LogAspect
-import com.smartlook.sdk.common.logger.Logger
 import com.smartlook.sdk.common.utils.extensions.safeSubmit
 import org.json.JSONException
 import java.util.concurrent.Executors
@@ -126,9 +125,7 @@ class Preferences(private val permanentCache: IPermanentCache) : IPreferences {
                 } catch (e: JSONException) {
                     // If cache gets corrupted because of sudden crash it needs to be cleared
                     commit()
-                    Logger.w(LogAspect.STORAGE, TAG) {
-                        "deserializeAndFillMap(): Failed to deserialize a String due to ${e.message}!"
-                    }
+                    Logger.w(TAG, "deserializeAndFillMap(): Failed to deserialize a String due to ${e.message}!")
 
                     lockLoad.unlock()
                     return@safeSubmit

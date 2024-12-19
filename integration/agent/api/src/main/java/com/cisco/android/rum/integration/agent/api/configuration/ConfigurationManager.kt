@@ -17,10 +17,9 @@
 package com.cisco.android.rum.integration.agent.api.configuration
 
 import android.content.Context
-import com.cisco.mrum.common.otel.internal.storage.OtelStorage
-import com.smartlook.sdk.common.logger.Logger
+import com.cisco.android.common.logger.Logger
 import com.cisco.android.rum.integration.agent.api.AgentConfiguration
-import com.smartlook.sdk.log.LogAspect
+import com.cisco.mrum.common.otel.internal.storage.OtelStorage
 
 internal class ConfigurationManager private constructor(
     private val otelStorage: OtelStorage
@@ -36,7 +35,7 @@ internal class ConfigurationManager private constructor(
 
         otelStorage.writeBaseUrl(config.url.toExternalForm())
 
-        Logger.d(LogAspect.SDK_METHODS, TAG) { "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config" }
+        Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
 
         return config
     }

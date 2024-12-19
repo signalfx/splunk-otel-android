@@ -24,7 +24,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":common:logger"))
     implementation(project(":common:utils"))
     implementation(project(":common:storage"))
+
+    implementation(Dependencies.Android.SessionReplay.logger)
 }

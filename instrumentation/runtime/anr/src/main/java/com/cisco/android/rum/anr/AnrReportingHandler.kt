@@ -16,21 +16,20 @@
 
 package com.cisco.android.rum.anr
 
+import android.app.Application
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import com.smartlook.sdk.log.LogAspect
+import com.cisco.android.common.logger.Logger
+import com.cisco.mrum.common.otel.api.OpenTelemetry
+import com.smartlook.sdk.common.utils.AppStateObserver
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.logs.Severity
 import org.json.JSONObject
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
-import com.cisco.mrum.common.otel.api.OpenTelemetry
-import com.smartlook.sdk.common.logger.Logger
-import android.app.Application
-import android.content.Context
-import com.smartlook.sdk.common.utils.AppStateObserver
-import io.opentelemetry.api.logs.Severity
 
 class AnrReportingHandler(
     context: Context
@@ -67,7 +66,7 @@ class AnrReportingHandler(
             anrWatchDog = ANRWatchDog(Handler(Looper.getMainLooper()), object : ANRWatchDog.ANRListener {
                 override fun onAppNotResponding() {
                     val timestamp = System.currentTimeMillis() // Current timestamp immediately when anr happens
-                    Logger.privateD(LogAspect.CRASH_TRACKING, TAG, { "onAppNotResponding() called" })
+                    Logger.d(TAG, "onAppNotResponding() called")
 
                     val inst = OpenTelemetry.instance
                     val loggerProvider = inst?.sdkLoggerProvider
