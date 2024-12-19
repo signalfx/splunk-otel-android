@@ -30,7 +30,6 @@ dependencies {
     implementation(project(":common:job"))
     implementation(project(":common:http"))
     implementation(project(":common:storage"))
-    implementation(project(":common:logger"))
     implementation(project(":common:utils"))
 
     api(Dependencies.Otel.sdk)
@@ -41,4 +40,6 @@ dependencies {
         exclude(group = "com.squareup.okhttp3", module = "okhttp")
     }
     api(Dependencies.Otel.semConv)
+
+    implementation(Dependencies.Android.SessionReplay.logger)
 }

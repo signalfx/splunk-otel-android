@@ -23,14 +23,13 @@ import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
 import android.os.PersistableBundle
+import com.cisco.android.common.logger.Logger
 import com.cisco.mrum.common.otel.internal.storage.OtelStorage
 import com.smartlook.android.common.http.HttpClient
 import com.smartlook.android.common.http.model.Header
 import com.smartlook.android.common.http.model.Response
 import com.smartlook.sdk.common.job.JobIdStorage
-import com.smartlook.sdk.common.logger.Logger
 import com.smartlook.sdk.common.storage.Storage
-import com.smartlook.sdk.log.LogAspect
 import java.net.UnknownHostException
 
 @SuppressLint("NewApi")
@@ -42,24 +41,24 @@ internal class UploadOtelLogRecordDataJob : JobService() {
     private val otelStorage by lazy { OtelStorage.obtainInstance(storage.preferences) }
 
     override fun onStopJob(params: JobParameters?): Boolean {
-        Logger.privateD(LogAspect.JOB, TAG, { "onStopJob()" })
+        Logger.d(TAG, "onStopJob()")
         return true
     }
 
     override fun onStartJob(params: JobParameters?): Boolean {
-        Logger.privateD(LogAspect.JOB, TAG, { "onStartJob()" })
+        Logger.d(TAG, "onStartJob()")
         startUpload(params)
         return true
     }
 
     private fun startUpload(params: JobParameters?) {
         params?.extras?.getString(DATA_SERIALIZE_KEY)?.let { id ->
-            Logger.privateD(LogAspect.JOB, TAG, { "startUpload() id: $id" })
+            Logger.d(TAG, "startUpload() id: $id")
 
             val url = otelStorage.readBaseUrl()?.let { "$it/eum/v1/logs" }
 
             if (url == null) {
-                Logger.privateD(LogAspect.JOB, TAG, { "startUpload() url is not valid" })
+                Logger.d(TAG, "startUpload() url is not valid")
                 jobFinished(params, false)
                 return
             }
@@ -71,7 +70,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                 body = storage.getOtelLogDataFile(id),
                 callback = object : HttpClient.Callback {
                     override fun onSuccess(response: Response) {
-                        Logger.privateD(LogAspect.JOB, TAG, { "startUpload() onSuccess: response=$response, code=${response.code}, body=${response.body.toString(Charsets.UTF_8)}" })
+                        Logger.d(TAG, "startUpload() onSuccess: response=$response, code=${response.code}, body=${response.body.toString(Charsets.UTF_8)}")
                         deleteData(id)
                         if (response.isSuccessful) {
                             jobFinished(params, false)
@@ -82,7 +81,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                     }
 
                     override fun onFailed(e: Exception) {
-                        Logger.privateD(LogAspect.JOB, TAG, { "startUpload() onFailed: e=$e" })
+                        Logger.d(TAG, "startUpload() onFailed: e=$e")
                         when (e) {
                             is UnknownHostException -> jobFinished(params, true)
                             else -> {

@@ -16,18 +16,17 @@
 
 package com.cisco.android.rum.integration.agent.api.sessionPulse
 
-import com.cisco.mrum.common.otel.api.OpenTelemetry
+import com.cisco.android.common.logger.Logger
 import com.cisco.android.rum.integration.agent.api.attributes.AttributeConstants
 import com.cisco.android.rum.integration.agent.internal.session.SessionManager
-import com.smartlook.sdk.common.logger.Logger
-import com.smartlook.sdk.log.LogAspect
+import com.cisco.mrum.common.otel.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
 import java.util.concurrent.TimeUnit
 
 internal class SessionPulseEventManager(sessionManager: SessionManager) {
 
     init {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "init()" })
+        Logger.d(TAG, "init()")
 
         sessionManager.pulseListeners += object : SessionManager.PulseListener {
             override fun onPulseEvent() {
@@ -37,7 +36,7 @@ internal class SessionPulseEventManager(sessionManager: SessionManager) {
     }
 
     private fun createSessionPulseEvent(sessionId: String) {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "createSessionPulseEvent() sessionId: $sessionId" })
+        Logger.d(TAG, "createSessionPulseEvent() sessionId: $sessionId")
 
         val instance = OpenTelemetry.instance ?: return
 

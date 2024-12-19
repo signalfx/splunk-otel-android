@@ -16,25 +16,25 @@
 
 package com.cisco.android.rum.crash
 
+import android.app.Application
 import android.content.Context
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.Log
+import com.cisco.android.common.logger.Logger
 import com.cisco.mrum.common.otel.api.OpenTelemetry
-import com.smartlook.sdk.common.logger.Logger
-import com.smartlook.sdk.log.LogAspect
+import com.smartlook.sdk.common.utils.AppStateObserver
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import org.json.JSONObject
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.concurrent.TimeUnit
-import com.smartlook.sdk.common.utils.AppStateObserver
-import android.app.Application
-import android.os.Handler
-import android.os.HandlerThread
 
 class CrashReportingHandler(
     context: Context,
-) {    companion object {
+) {
+    companion object {
         private const val TAG = "CrashReportingHandler"
         private const val CRASH_EVENT_NAME = "device.app.crash"
         private const val CHECK_INTERVAL: Long = 10000 // Check every 10 seconds
@@ -72,7 +72,7 @@ class CrashReportingHandler(
 
     fun register() {
         if (!isRegistered) {
-            Logger.privateD(LogAspect.CRASH_TRACKING, TAG, { "CrashReportingHandler register() called" })
+            Logger.d(TAG, "CrashReportingHandler register() called")
             originalUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
             Thread.setDefaultUncaughtExceptionHandler(ourExceptionHandler)
 
@@ -83,7 +83,7 @@ class CrashReportingHandler(
 
     fun unregister() {
         if (isRegistered) {
-            Logger.privateD(LogAspect.CRASH_TRACKING, TAG, { "CrashReportingHandler unregister() called" })
+            Logger.d(TAG, "CrashReportingHandler unregister() called")
             originalUncaughtExceptionHandler?.let {
                 Thread.setDefaultUncaughtExceptionHandler(it)
             }
@@ -96,10 +96,7 @@ class CrashReportingHandler(
         val currentHandler = Thread.getDefaultUncaughtExceptionHandler()
         if (currentHandler !== ourExceptionHandler) {
             // Another SDK or component has overridden the handler
-            Logger.privateD(LogAspect.CRASH_TRACKING, TAG, {
-                "Cisco CrashReportingHandler may be conflicting with another third party library," +
-                        " crash log events may not be generated as the default exception handler has been overridden"
-            })
+            Logger.d(TAG, "Cisco CrashReportingHandler may be conflicting with another third party library, crash log events may not be generated as the default exception handler has been overridden")
             // Stop task
             handler.removeCallbacks(checkExceptionHandlerTask)
         } else {
@@ -110,7 +107,7 @@ class CrashReportingHandler(
 
     private fun uncaughtException(thread: Thread, throwable: Throwable) {
         val timestamp = System.currentTimeMillis() // Current timestamp immediately when crash happens
-        Logger.w(LogAspect.CRASH_TRACKING, TAG) { Log.getStackTraceString(throwable) }
+        Logger.w(TAG, Log.getStackTraceString(throwable))
 
         val inst = OpenTelemetry.instance
         val loggerProvider = inst?.sdkLoggerProvider

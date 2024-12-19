@@ -28,8 +28,9 @@ dependencies {
     api(project(":integration:agent:module"))
 
     implementation(project(":common:otel:internal"))
-    implementation(project(":common:logger"))
     implementation(project(":common:storage"))
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:utils"))
+
+    implementation(Dependencies.Android.SessionReplay.logger)
 }

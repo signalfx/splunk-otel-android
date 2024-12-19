@@ -16,10 +16,9 @@
 
 package com.cisco.android.rum.integration.agent.api.sessionId
 
+import com.cisco.android.common.logger.Logger
 import com.cisco.android.rum.integration.agent.api.attributes.AttributeConstants.SESSION_ID_KEY
 import com.cisco.android.rum.integration.agent.internal.session.SessionManager
-import com.smartlook.sdk.common.logger.Logger
-import com.smartlook.sdk.log.LogAspect
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord
@@ -27,7 +26,7 @@ import io.opentelemetry.sdk.logs.ReadWriteLogRecord
 internal class SessionIdLogProcessor(private val sessionManager: SessionManager) : LogRecordProcessor {
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
         val sessionId = sessionManager.sessionId
-        Logger.privateD(LogAspect.EXPORT, "SessionIdLogProcessor", message = { "onEmit sessionId: $sessionId, ${logRecord.toLogRecordData().attributes}" })
+        Logger.d("SessionIdLogProcessor", "onEmit sessionId: $sessionId, ${logRecord.toLogRecordData().attributes}")
         logRecord.setAttribute(SESSION_ID_KEY, sessionId)
     }
 }

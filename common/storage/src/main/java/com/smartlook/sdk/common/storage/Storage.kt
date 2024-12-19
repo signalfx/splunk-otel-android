@@ -2,9 +2,7 @@ package com.smartlook.sdk.common.storage
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.smartlook.sdk.common.utils.runOnBackgroundThread
-import com.smartlook.sdk.log.LogAspect
-import com.smartlook.sdk.common.logger.Logger
+import com.cisco.android.common.logger.Logger
 import com.smartlook.sdk.common.storage.extensions.MB
 import com.smartlook.sdk.common.storage.extensions.createNewFileOnPath
 import com.smartlook.sdk.common.storage.extensions.oldestChildDir
@@ -13,6 +11,7 @@ import com.smartlook.sdk.common.storage.policy.SizeCache
 import com.smartlook.sdk.common.storage.policy.StoragePolicy
 import com.smartlook.sdk.common.storage.preferences.FilePermanentCache
 import com.smartlook.sdk.common.storage.preferences.Preferences
+import com.smartlook.sdk.common.utils.runOnBackgroundThread
 import java.io.File
 import java.lang.Long.min
 
@@ -26,21 +25,21 @@ class Storage private constructor(context: Context) : IStorage {
     override val freeSpace: Long
         get() {
             val freeSpace = paths.systemRootDir.statFsFreeSpace
-            Logger.privateV(LogAspect.STORAGE, TAG, { "freeSpace: $freeSpace" })
+            Logger.v(TAG, "freeSpace: $freeSpace")
             return freeSpace
         }
 
     override val consistentDirPath: String
         get() {
             val path = paths.rootDir.path
-            Logger.privateV(LogAspect.STORAGE, TAG, { "consistentDirPath: $path" })
+            Logger.v(TAG, "consistentDirPath: $path")
             return path
         }
 
     override val isSessionStorageFull: Boolean
         get() {
             val isFull = !checkPolicy(StoragePolicy(paths.sessionsDir, 1000.MB, 0.2f, 50.MB))
-            Logger.privateV(LogAspect.STORAGE, TAG, { "isSessionStorageFull: $isFull" })
+            Logger.v(TAG, "isSessionStorageFull: $isFull")
             return isFull
         }
 
@@ -58,12 +57,7 @@ class Storage private constructor(context: Context) : IStorage {
             true
         }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "writeRecord(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success"
-            }
-        )
+        Logger.d(TAG, "writeRecord(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success")
 
         return success
     }
@@ -72,12 +66,7 @@ class Storage private constructor(context: Context) : IStorage {
         val recordFile: File = paths.recordFile(sessionId, recordIndex)
         val record = runCatching { recordFile.readText() }.getOrNull()
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "readRecord(): sessionId = $sessionId, recordIndex = $recordIndex, isNullOrBlank = ${record.isNullOrBlank()}"
-            }
-        )
+        Logger.d(TAG, "readRecord(): sessionId = $sessionId, recordIndex = $recordIndex, isNullOrBlank = ${record.isNullOrBlank()}")
 
         return record
     }
@@ -89,12 +78,7 @@ class Storage private constructor(context: Context) : IStorage {
             true
         }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "deleteRecord(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success"
-            }
-        )
+        Logger.d(TAG, "deleteRecord(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success")
 
         return success
     }
@@ -108,12 +92,7 @@ class Storage private constructor(context: Context) : IStorage {
             paths.sessionsDir.listFiles()?.map { it.name } ?: emptyList()
         }.getOrElse { emptyList() }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "getSessionIds(): sessionIds = [${sessionIds.joinToString()}]"
-            }
-        )
+        Logger.d(TAG, "getSessionIds(): sessionIds = [${sessionIds.joinToString()}]")
 
         return sessionIds
     }
@@ -132,12 +111,7 @@ class Storage private constructor(context: Context) : IStorage {
             !isSessionDirEmpty && !isRecordDirEmpty
         }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "hasSessionData(): sessionId = $sessionId, hasData = $hasData"
-            }
-        )
+        Logger.d(TAG, "hasSessionData(): sessionId = $sessionId, hasData = $hasData")
 
         return hasData
     }
@@ -148,12 +122,7 @@ class Storage private constructor(context: Context) : IStorage {
             recordsDir.listFiles()?.map { it.name.toInt() } ?: emptyList()
         }.getOrElse { emptyList() }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "getRecordIndexes(): recordIndexes = [${recordIndexes.joinToString()}]"
-            }
-        )
+        Logger.d(TAG, "getRecordIndexes(): recordIndexes = [${recordIndexes.joinToString()}]")
 
         return recordIndexes
     }
@@ -165,12 +134,7 @@ class Storage private constructor(context: Context) : IStorage {
             true
         }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "deleteSession(): sessionId = $sessionId, success = $success"
-            }
-        )
+        Logger.d(TAG, "deleteSession(): sessionId = $sessionId, success = $success")
 
         return success
     }
@@ -187,12 +151,7 @@ class Storage private constructor(context: Context) : IStorage {
             }
         }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "deleteOldestSession(): deletedSessionId = $deletedSessionId, successfulDelete = $successfulDelete"
-            }
-        )
+        Logger.d(TAG, "deleteOldestSession(): deletedSessionId = $deletedSessionId, successfulDelete = $successfulDelete")
 
         return deletedSessionId
     }
@@ -209,7 +168,7 @@ class Storage private constructor(context: Context) : IStorage {
         val wireframeFile: File = paths.wireframeFile(sessionId, recordIndex)
         val isAvailable = runCatching { wireframeFile.exists() }.getOrElse { false }
 
-        Logger.privateD(LogAspect.STORAGE, TAG, { "isWireframeFileAvailable(): isAvailable = $isAvailable" })
+        Logger.d(TAG, "isWireframeFileAvailable(): isAvailable = $isAvailable")
 
         return isAvailable
     }
@@ -222,10 +181,7 @@ class Storage private constructor(context: Context) : IStorage {
             true
         }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE,
-            TAG,
-            { "writeWireframe(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success" })
+        Logger.d(TAG, "writeWireframe(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success")
 
         return success
     }
@@ -242,10 +198,7 @@ class Storage private constructor(context: Context) : IStorage {
             true
         }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE,
-            TAG,
-            { "writeMetrics(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success" })
+        Logger.d(TAG, "writeMetrics(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success")
 
         return success
     }
@@ -254,12 +207,7 @@ class Storage private constructor(context: Context) : IStorage {
         val metricsFile: File = paths.metricsFile(sessionId, recordIndex)
         val metrics = runCatching { metricsFile.readText() }.getOrNull()
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "readMetrics(): sessionId = $sessionId, recordIndex = $recordIndex, isNullOrBlank = ${metrics.isNullOrBlank()}"
-            }
-        )
+        Logger.d(TAG, "readMetrics(): sessionId = $sessionId, recordIndex = $recordIndex, isNullOrBlank = ${metrics.isNullOrBlank()}")
 
         return metrics
     }
@@ -284,12 +232,7 @@ class Storage private constructor(context: Context) : IStorage {
             true
         }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "writeVideoConfig(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success"
-            }
-        )
+        Logger.d(TAG, "writeVideoConfig(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success")
 
         return success
     }
@@ -298,12 +241,7 @@ class Storage private constructor(context: Context) : IStorage {
         val videoConfigFile = paths.videoConfigFile(sessionId, recordIndex)
         val videoConfig = runCatching { videoConfigFile.readText() }.getOrNull()
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "readVideoConfig(): sessionId = $sessionId, recordIndex = $recordIndex, isNullOrBlank = ${videoConfig.isNullOrBlank()}"
-            }
-        )
+        Logger.d(TAG, "readVideoConfig(): sessionId = $sessionId, recordIndex = $recordIndex, isNullOrBlank = ${videoConfig.isNullOrBlank()}")
 
         return videoConfig
     }
@@ -330,13 +268,7 @@ class Storage private constructor(context: Context) : IStorage {
             true
         }.getOrElse { false }
 
-        Logger.privateV(
-            LogAspect.STORAGE, TAG,
-            {
-                "writeVideoFrame(): sessionId = $sessionId, recordIndex = $recordIndex," +
-                    " frameIndex = $frameIndex, success = $success, width: ${frame.width}, height: ${frame.height}"
-            }
-        )
+        Logger.v(TAG, "writeVideoFrame(): sessionId = $sessionId, recordIndex = $recordIndex, frameIndex = $frameIndex, success = $success, width: ${frame.width}, height: ${frame.height}")
 
         return success
     }
@@ -354,12 +286,7 @@ class Storage private constructor(context: Context) : IStorage {
             }
         }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "deleteAllVideoFrames(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success"
-            }
-        )
+        Logger.d(TAG, "deleteAllVideoFrames(): sessionId = $sessionId, recordIndex = $recordIndex, success = $success")
 
         return success
     }
@@ -380,12 +307,7 @@ class Storage private constructor(context: Context) : IStorage {
         val videoFile = paths.videoFile(sessionId, recordIndex)
         val isAvailable = runCatching { videoFile.exists() }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "isVideoFileAvailable(): sessionId = $sessionId, recordIndex = $recordIndex, isAvailable = $isAvailable"
-            }
-        )
+        Logger.d(TAG, "isVideoFileAvailable(): sessionId = $sessionId, recordIndex = $recordIndex, isAvailable = $isAvailable")
 
         return isAvailable
     }
@@ -402,12 +324,7 @@ class Storage private constructor(context: Context) : IStorage {
             true
         }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "writeIdentification(): visitorId = $visitorId, success = $success"
-            }
-        )
+        Logger.d(TAG, "writeIdentification(): visitorId = $visitorId, success = $success")
 
         return success
     }
@@ -416,12 +333,7 @@ class Storage private constructor(context: Context) : IStorage {
         val identificationFile = paths.identificationFile(visitorId)
         val identification = runCatching { identificationFile.readText() }.getOrElse { null }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "readIdentification(): visitorId = $visitorId, isNullOrBlank = ${identification.isNullOrBlank()}"
-            }
-        )
+        Logger.d(TAG, "readIdentification(): visitorId = $visitorId, isNullOrBlank = ${identification.isNullOrBlank()}")
 
         return identification
     }
@@ -433,12 +345,7 @@ class Storage private constructor(context: Context) : IStorage {
             true
         }.getOrElse { false }
 
-        Logger.privateD(
-            LogAspect.STORAGE, TAG,
-            {
-                "deleteIdentification(): visitorId = $visitorId, success = $success"
-            }
-        )
+        Logger.d(TAG, "deleteIdentification(): visitorId = $visitorId, success = $success")
 
         return success
     }
@@ -455,7 +362,7 @@ class Storage private constructor(context: Context) : IStorage {
                 true
             }.getOrElse { false }
 
-            Logger.w(LogAspect.STORAGE, TAG) { "deleteInconsistentDir(): path = $path, success = $success" }
+            Logger.w(TAG, "deleteInconsistentDir(): path = $path, success = $success")
         }
     }
 
@@ -715,7 +622,7 @@ class Storage private constructor(context: Context) : IStorage {
         private var storage: Storage? = null
 
         fun attach(context: Context): Storage {
-            Logger.privateV(LogAspect.STORAGE, TAG, { "attach(): Storage attached." })
+            Logger.v(TAG, "attach(): Storage attached.")
             return storage ?: Storage(context).also { storage = it }
         }
 
