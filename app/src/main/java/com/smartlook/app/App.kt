@@ -19,6 +19,8 @@ package com.smartlook.app
 import android.app.Application
 import com.cisco.android.rum.integration.agent.api.AgentConfiguration
 import com.cisco.android.rum.integration.agent.api.CiscoRUMAgent
+import com.smartlook.sdk.common.logger.Logger
+import com.smartlook.sdk.log.LogAspect
 import java.net.URL
 
 class App : Application() {
@@ -27,6 +29,8 @@ class App : Application() {
 
         // TODO: Reenable with the bridge support
         // BridgeManager.bridgeInterfaces += TomasBridgeInterface()
+
+        Logger.allowedLogAspects = LogAspect.ALL
 
         val agentConfig = AgentConfiguration(
             url = URL("https://alameda-eum-qe.saas.appd-test.com"),
