@@ -1,7 +1,6 @@
 package com.smartlook.sdk.common.storage.preferences
 
-import com.smartlook.sdk.log.LogAspect
-import com.smartlook.sdk.common.logger.Logger
+import com.cisco.android.common.logger.Logger
 import java.io.File
 
 class FilePermanentCache(private val file: File) : IPermanentCache {
@@ -15,9 +14,7 @@ class FilePermanentCache(private val file: File) : IPermanentCache {
         try {
             jsonString = file.readText()
         } catch (e: Exception) {
-            Logger.w(
-                LogAspect.STORAGE, Preferences.TAG
-            ) { "loadFromFile(): Failed to load from a file due to ${e.message}!" }
+            Logger.w(Preferences.TAG, "loadFromFile(): Failed to load from a file due to ${e.message}!")
         }
 
         return jsonString
@@ -27,7 +24,7 @@ class FilePermanentCache(private val file: File) : IPermanentCache {
         try {
             file.writeText(jsonString)
         } catch (e: Exception) {
-            Logger.w(LogAspect.STORAGE, Preferences.TAG) { "commit(): Failed to write text due to ${e.message}!" }
+            Logger.w(Preferences.TAG, "commit(): Failed to write text due to ${e.message}!")
         }
     }
 }

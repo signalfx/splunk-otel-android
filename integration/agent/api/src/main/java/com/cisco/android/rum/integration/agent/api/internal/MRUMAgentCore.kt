@@ -17,8 +17,7 @@
 package com.cisco.android.rum.integration.agent.api.internal
 
 import android.app.Application
-import com.cisco.mrum.common.otel.api.OpenTelemetryInitializer
-import com.cisco.mrum.common.otel.internal.storage.OtelStorage
+import com.cisco.android.common.logger.Logger
 import com.cisco.android.rum.integration.agent.api.AgentConfiguration
 import com.cisco.android.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
 import com.cisco.android.rum.integration.agent.api.configuration.ConfigurationManager
@@ -32,10 +31,10 @@ import com.cisco.android.rum.integration.agent.internal.AgentIntegration
 import com.cisco.android.rum.integration.agent.internal.BuildConfig
 import com.cisco.android.rum.integration.agent.internal.state.StateManager
 import com.cisco.android.rum.integration.agent.module.ModuleConfiguration
-import com.smartlook.sdk.common.logger.Logger
+import com.cisco.mrum.common.otel.api.OpenTelemetryInitializer
+import com.cisco.mrum.common.otel.internal.storage.OtelStorage
 import com.smartlook.sdk.common.storage.Storage
 import com.smartlook.sdk.common.utils.HashCalculationUtils
-import com.smartlook.sdk.log.LogAspect
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.resources.ResourceBuilder
@@ -47,7 +46,7 @@ internal object MRUMAgentCore {
     private const val SERVICE_HASH_RESOURCE_KEY = "service.hash"
 
     fun install(application: Application, agentConfiguration: AgentConfiguration, moduleConfigurations: List<ModuleConfiguration>) {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)" })
+        Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
         val storage = Storage.attach(application)
         val otelStorage = OtelStorage.obtainInstance(storage.preferences)
@@ -89,7 +88,7 @@ internal object MRUMAgentCore {
     fun obtainServiceHashResource(application: Application): Resource? {
         val sourceDir = application.applicationInfo.sourceDir
         if (sourceDir == null) {
-            Logger.privateD(LogAspect.SDK_METHODS, TAG, { "Unable to calculate service hash, application source directory null" })
+            Logger.d(TAG, "Unable to calculate service hash, application source directory null")
             return null
         }
 
