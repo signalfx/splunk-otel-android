@@ -55,7 +55,7 @@ class MappingFileModifier(private val pluginLogger: Logger) {
             val filesFromRecursiveSearch = searchProjectForMappingFiles(projectDir)
             val mostRecentMappingFile = filesFromRecursiveSearch.maxByOrNull { it.lastModified() }
             if (mostRecentMappingFile != null) {
-                pluginLogger.info("Could not locate mapping file in default location: ${mappingFilePath}" +
+                pluginLogger.info("Could not locate mapping file in default location: $mappingFilePath" +
                         ", found and using mapping.txt file in: ${mostRecentMappingFile.path}")
             }
             return mostRecentMappingFile
