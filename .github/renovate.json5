@@ -4,6 +4,10 @@
     "config:base"
   ],
   "baseBranches": ["main"],
+  // Run monthly once before 5am UTC for the main branch
+  "schedule": [
+    "* 0-4 1 * *"
+  ]
   "packageRules": [
     {
       // Don't bump upstream otel versions
