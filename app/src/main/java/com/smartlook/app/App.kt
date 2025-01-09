@@ -17,6 +17,8 @@
 package com.smartlook.app
 
 import android.app.Application
+import com.cisco.android.common.logger.Logger
+import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.cisco.android.rum.integration.agent.api.AgentConfiguration
 import com.cisco.android.rum.integration.agent.api.CiscoRUMAgent
 import java.net.URL
@@ -24,6 +26,9 @@ import java.net.URL
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
+
+        if (BuildConfig.DEBUG)
+            Logger.consumers += AndroidLogConsumer()
 
         // TODO: Reenable with the bridge support
         // BridgeManager.bridgeInterfaces += TomasBridgeInterface()

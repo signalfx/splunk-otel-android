@@ -18,7 +18,6 @@ package com.cisco.android.rum.integration.agent.internal
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
-import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.cisco.android.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.cisco.android.rum.integration.agent.internal.config.RemoteModuleConfiguration
 import com.cisco.android.rum.integration.agent.internal.session.SessionManager
@@ -46,8 +45,6 @@ class AgentIntegration private constructor(
     val listeners: MutableSet<Listener> = HashSet()
 
     init {
-        Logger.consumers += AndroidLogConsumer()
-
         registerModule(MODULE_NAME)
 
         val storage = Storage.attach(context)
