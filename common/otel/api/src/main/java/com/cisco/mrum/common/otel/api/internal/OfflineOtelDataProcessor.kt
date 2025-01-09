@@ -16,14 +16,13 @@
 
 package com.cisco.mrum.common.otel.api.internal
 
-import com.smartlook.sdk.common.job.IJobManager
-import com.smartlook.sdk.common.job.JobIdStorage
-import com.smartlook.sdk.common.logger.Logger
-import com.smartlook.sdk.common.storage.IStorage
-import com.smartlook.sdk.common.utils.extensions.safeSubmit
-import com.smartlook.sdk.log.LogAspect
+import com.cisco.android.common.logger.Logger
 import com.cisco.mrum.common.otel.api.logRecord.UploadOtelLogRecordData
 import com.cisco.mrum.common.otel.api.span.UploadOtelSpanData
+import com.smartlook.sdk.common.job.IJobManager
+import com.smartlook.sdk.common.job.JobIdStorage
+import com.smartlook.sdk.common.storage.IStorage
+import com.smartlook.sdk.common.utils.extensions.safeSubmit
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -38,12 +37,12 @@ internal class OfflineOtelDataProcessor(
 
     fun start() {
         executor.safeSubmit {
-            Logger.d(LogAspect.SDK_METHODS, TAG) { "start(): called" }
+            Logger.d(TAG, "start(): called")
 
             if (!loadedLocalData.getAndSet(true)) {
                 startProcessingLocalData()
             } else {
-                Logger.d(LogAspect.SDK_METHODS, TAG) { "start(): already called! Not doing anything." }
+                Logger.d(TAG, "start(): already called! Not doing anything.")
             }
         }
     }
