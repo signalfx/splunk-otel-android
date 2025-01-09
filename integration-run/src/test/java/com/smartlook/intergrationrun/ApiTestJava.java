@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.smartlook.intergrationrun;
+package com.splunk.intergrationrun;
 
 import android.app.Activity;
 import android.content.Context;
@@ -22,13 +22,13 @@ import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
-import com.smartlook.android.core.api.Preferences;
-import com.smartlook.android.core.api.Sensitivity;
-import com.smartlook.android.core.api.Smartlook;
-import com.smartlook.android.core.api.User;
-import com.smartlook.android.core.api.enumeration.Status;
-import com.smartlook.android.core.api.model.Properties;
-import com.smartlook.android.core.api.model.RecordingMask;
+import com.splunk.android.core.api.Preferences;
+import com.splunk.android.core.api.Sensitivity;
+import com.splunk.android.core.api.Smartlook;
+import com.splunk.android.core.api.User;
+import com.splunk.android.core.api.enumeration.Status;
+import com.splunk.android.core.api.model.Properties;
+import com.splunk.android.core.api.model.RecordingMask;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -21,9 +21,9 @@ import com.cisco.mrum.common.otel.api.internal.Resources
 import com.cisco.mrum.common.otel.api.logRecord.AndroidLogRecordExporter
 import com.cisco.mrum.common.otel.api.span.AndroidSpanExporter
 import com.cisco.mrum.common.otel.internal.storage.OtelStorage
-import com.smartlook.sdk.common.job.JobIdStorage
-import com.smartlook.sdk.common.job.JobManager
-import com.smartlook.sdk.common.storage.Storage
+import com.splunk.sdk.common.job.JobIdStorage
+import com.splunk.sdk.common.job.JobManager
+import com.splunk.sdk.common.storage.Storage
 import io.opentelemetry.api.baggage.propagation.W3CBaggagePropagator
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator
 import io.opentelemetry.context.propagation.ContextPropagators

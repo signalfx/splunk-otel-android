@@ -1,1 +1,1 @@
--repackageclasses 'com.cisco.android.rum.crash'
+-repackageclasses 'com.splunk.rum.crash'

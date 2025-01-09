@@ -19,10 +19,10 @@ package com.cisco.mrum.common.otel.api.internal
 import com.cisco.android.common.logger.Logger
 import com.cisco.mrum.common.otel.api.logRecord.UploadOtelLogRecordData
 import com.cisco.mrum.common.otel.api.span.UploadOtelSpanData
-import com.smartlook.sdk.common.job.IJobManager
-import com.smartlook.sdk.common.job.JobIdStorage
-import com.smartlook.sdk.common.storage.IStorage
-import com.smartlook.sdk.common.utils.extensions.safeSubmit
+import com.splunk.sdk.common.job.IJobManager
+import com.splunk.sdk.common.job.JobIdStorage
+import com.splunk.sdk.common.storage.IStorage
+import com.splunk.sdk.common.utils.extensions.safeSubmit
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 

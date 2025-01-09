@@ -21,7 +21,7 @@ ext {
 }
 
 android {
-    namespace = "com.cisco.android.rum.anr"
+    namespace = "com.splunk.rum.anr"
 }
 
 dependencies {

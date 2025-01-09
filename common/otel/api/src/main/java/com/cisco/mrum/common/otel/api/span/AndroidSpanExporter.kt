@@ -16,9 +16,9 @@
 
 package com.cisco.mrum.common.otel.api.span
 
-import com.smartlook.sdk.common.job.IJobManager
-import com.smartlook.sdk.common.job.JobIdStorage
-import com.smartlook.sdk.common.storage.IStorage
+import com.splunk.sdk.common.job.IJobManager
+import com.splunk.sdk.common.job.JobIdStorage
+import com.splunk.sdk.common.storage.IStorage
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData

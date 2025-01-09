@@ -17,7 +17,7 @@ ext {
 }
 
 android {
-    namespace = "com.cisco.android.rum.networkrequest.library"
+    namespace = "com.splunk.rum.networkrequest.library"
     compileSdk = 33
 
     defaultConfig {

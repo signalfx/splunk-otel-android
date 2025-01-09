@@ -25,11 +25,11 @@ import android.content.Context
 import android.os.PersistableBundle
 import com.cisco.android.common.logger.Logger
 import com.cisco.mrum.common.otel.internal.storage.OtelStorage
-import com.smartlook.android.common.http.HttpClient
-import com.smartlook.android.common.http.model.Header
-import com.smartlook.android.common.http.model.Response
-import com.smartlook.sdk.common.job.JobIdStorage
-import com.smartlook.sdk.common.storage.Storage
+import com.splunk.android.common.http.HttpClient
+import com.splunk.android.common.http.model.Header
+import com.splunk.android.common.http.model.Response
+import com.splunk.sdk.common.job.JobIdStorage
+import com.splunk.sdk.common.storage.Storage
 import java.net.UnknownHostException
 
 @SuppressLint("NewApi")

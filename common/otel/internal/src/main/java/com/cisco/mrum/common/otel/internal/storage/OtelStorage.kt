@@ -16,7 +16,7 @@
 
 package com.cisco.mrum.common.otel.internal.storage
 
-import com.smartlook.sdk.common.storage.preferences.IPreferences
+import com.splunk.sdk.common.storage.preferences.IPreferences
 
 class OtelStorage private constructor(
     private val preferences: IPreferences

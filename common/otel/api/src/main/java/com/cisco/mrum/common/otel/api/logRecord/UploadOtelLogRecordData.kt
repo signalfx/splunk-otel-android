@@ -20,8 +20,8 @@ import android.app.job.JobInfo
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.smartlook.sdk.common.job.JobIdStorage
-import com.smartlook.sdk.common.job.JobType
+import com.splunk.sdk.common.job.JobIdStorage
+import com.splunk.sdk.common.job.JobType
 
 internal data class UploadOtelLogRecordData(val id: String, val jobIdStorage: JobIdStorage) : JobType {
 
