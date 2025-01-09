@@ -24,9 +24,6 @@ include ':integration:agent:api',
 // Test App
 include ':app'
 
-// API module
-include ':api'
-
 // Main entry point
 include ':agent'
 
