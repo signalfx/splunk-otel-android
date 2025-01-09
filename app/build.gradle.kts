@@ -72,6 +72,8 @@ dependencies {
     //TODO: Below dependency can be removed once we uncomment the plugin id.
     implementation(project(":instrumentation:runtime:networkrequest:library"))
 
+    implementation(Dependencies.Android.SessionReplay.logger)
+
     implementation(Dependencies.Android.appcompat)
     implementation(Dependencies.Android.constraintLayout)
     implementation(Dependencies.Android.activityKtx)

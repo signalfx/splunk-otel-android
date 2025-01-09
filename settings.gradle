@@ -9,12 +9,14 @@ include ':common:otel:api',
 
 // Instrumentation modules
 include ':instrumentation:runtime:crash',
-        ':instrumentation:runtime:anr'
+        ':instrumentation:runtime:anr',
+        ':instrumentation:runtime:startup'
 
 // Integration
 include ':integration:agent:api',
         ':integration:agent:module',
-        ':integration:agent:internal'
+        ':integration:agent:internal',
+        ':integration:startup'
 
 // Integration tests
 // TODO disable it for now because of different artifactory include ':integration-run'
