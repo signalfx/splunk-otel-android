@@ -67,11 +67,12 @@ dependencies {
     // TODO: this is here just so we do not have duplicate logic, it is not publicly available
     //implementation("com.cisco.android:rum-common-utils:24.4.10-2246")
 
-    implementation(project(":common:logger"))
     implementation(project(":common:utils"))
     implementation(project(":agent"))
     //TODO: Below dependency can be removed once we uncomment the plugin id.
     implementation(project(":instrumentation:runtime:networkrequest:library"))
+
+    implementation(Dependencies.Android.SessionReplay.logger)
 
     implementation(Dependencies.Android.appcompat)
     implementation(Dependencies.Android.constraintLayout)

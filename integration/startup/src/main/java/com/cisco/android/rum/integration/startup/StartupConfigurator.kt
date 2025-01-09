@@ -17,14 +17,13 @@
 package com.cisco.android.rum.integration.startup
 
 import android.content.Context
+import com.cisco.android.common.logger.Logger
 import com.cisco.android.rum.integration.agent.internal.AgentIntegration
 import com.cisco.android.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.cisco.android.rum.integration.agent.internal.config.RemoteModuleConfiguration
 import com.cisco.android.rum.integration.agent.internal.extension.find
 import com.cisco.android.rum.startup.ApplicationStartupTimekeeper
-import com.smartlook.sdk.common.logger.Logger
 import com.smartlook.sdk.common.utils.extensions.optBooleanNull
-import com.smartlook.sdk.log.LogAspect
 
 internal object StartupConfigurator {
 
@@ -43,30 +42,30 @@ internal object StartupConfigurator {
 
     private val applicationStartupTimekeeperListener = object : ApplicationStartupTimekeeper.Listener {
         override fun onColdStarted(duration: Long) {
-            Logger.d(LogAspect.SDK_METHODS, TAG) { "onColdStarted(duration: $duration ms)" }
+            Logger.d(TAG, "onColdStarted(duration: $duration ms)")
             // TODO send data
         }
 
         override fun onWarmStarted(duration: Long) {
-            Logger.d(LogAspect.SDK_METHODS, TAG) { "onWarmStarted(duration: $duration ms)" }
+            Logger.d(TAG, "onWarmStarted(duration: $duration ms)")
             // TODO send data
         }
 
         override fun onHotStarted(duration: Long) {
-            Logger.d(LogAspect.SDK_METHODS, TAG) { "onHotStarted(duration: $duration ms)" }
+            Logger.d(TAG, "onHotStarted(duration: $duration ms)")
             // TODO send data
         }
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
         override fun onRemoteModuleConfigurationsChanged(manager: ModuleConfigurationManager, remoteConfigurations: List<RemoteModuleConfiguration>) {
-            Logger.privateD(LogAspect.SDK_METHODS, TAG, { "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)" })
+            Logger.d(TAG, "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)")
             setModuleConfiguration(remoteConfigurations)
         }
     }
 
     private fun setModuleConfiguration(remoteConfigurations: List<RemoteModuleConfiguration>) {
-        Logger.privateD(LogAspect.SDK_METHODS, TAG, { "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)" })
+        Logger.d(TAG, "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)")
 
         val remoteConfig = remoteConfigurations.find(MODULE_NAME)?.config
 
@@ -75,7 +74,7 @@ internal object StartupConfigurator {
 
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(context: Context) {
-            Logger.privateD(LogAspect.SDK_METHODS, TAG, { "onInstall()" })
+            Logger.d(TAG, "onInstall()")
 
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener

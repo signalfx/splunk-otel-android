@@ -46,8 +46,6 @@ class AgentIntegration private constructor(
     val listeners: MutableSet<Listener> = HashSet()
 
     init {
-        Logger.consumers += AndroidLogConsumer()
-
         registerModule(MODULE_NAME)
 
         val storage = Storage.attach(context)
