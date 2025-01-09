@@ -19,8 +19,6 @@ package com.splunk.rum.integration.agent.api;
 import android.app.Application;
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration;
-import com.cisco.android.rum.integration.agent.api.AgentConfiguration;
-import com.cisco.android.rum.integration.agent.api.CiscoRUMAgent;
 
 import java.net.MalformedURLException;
 import java.net.URL;

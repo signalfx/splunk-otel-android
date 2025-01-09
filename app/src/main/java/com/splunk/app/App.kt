@@ -17,8 +17,8 @@
 package com.splunk.app
 
 import android.app.Application
-import com.cisco.android.rum.integration.agent.api.AgentConfiguration
-import com.cisco.android.rum.integration.agent.api.CiscoRUMAgent
+import com.splunk.rum.integration.agent.api.AgentConfiguration
+import com.splunk.rum.integration.agent.api.CiscoRUMAgent
 import java.net.URL
 
 class App : Application() {

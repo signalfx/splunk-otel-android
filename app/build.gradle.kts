@@ -14,10 +14,10 @@ plugins {
 apply<ConfigAndroidApp>()
 
 android {
-    namespace = "com.smartlook.app"
+    namespace = "com.splunk.app"
 
     defaultConfig {
-        applicationId = "com.smartlook.app"
+        applicationId = "com.splunk.app"
         versionCode = Configurations.sdkVersionCode
         versionName = Configurations.sdkVersionName
 
