@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
-import com.cisco.android.rum.integration.agent.api.internal.MRUMAgentCore
+import com.splunk.rum.integration.agent.api.internal.MRUMAgentCore
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
 /**
@@ -39,7 +39,6 @@ class CiscoRUMAgent private constructor() {
         @get:JvmStatic
         val instance: CiscoRUMAgent
             get() = instanceInternal ?: throw RuntimeException("Must call install() before fetching instance")
-
 
         /**
          * Initializes the RUM agent with the provided application context and configurations.

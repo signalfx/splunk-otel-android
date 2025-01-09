@@ -18,7 +18,7 @@ package com.splunk.rum.integration.agent.api.configuration
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
-import com.cisco.android.rum.integration.agent.api.AgentConfiguration
+import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.cisco.mrum.common.otel.internal.storage.OtelStorage
 
 internal class ConfigurationManager private constructor(

@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.api.attributes
 
-import com.splunk.android.rum.integration.agent.api.attributes.AttributeConstants.DOMAIN
+import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.DOMAIN
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord

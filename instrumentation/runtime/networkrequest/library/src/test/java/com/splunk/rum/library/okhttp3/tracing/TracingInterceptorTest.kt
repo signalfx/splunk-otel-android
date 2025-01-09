@@ -16,8 +16,6 @@
 
 package com.splunk.rum.library.okhttp3.tracing
 
-import com.splunk.rum.library.okhttp3.tracing.OkHttpInterceptorUtils
-import com.splunk.rum.library.okhttp3.tracing.TracingInterceptor
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.every

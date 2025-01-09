@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.agent.api.sessionId
 
 import com.cisco.android.common.logger.Logger
-import com.splunk.android.rum.integration.agent.api.attributes.AttributeConstants
+import com.splunk.rum.integration.agent.api.attributes.AttributeConstants
 import com.splunk.rum.integration.agent.internal.session.SessionManager
 import com.cisco.mrum.common.otel.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 internal class SessionStartEventManager(sessionManager: SessionManager) {
 
     init {
-        Logger.d(com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager.Companion.TAG, "init()")
+        Logger.d(TAG, "init()")
 
         sessionManager.sessionListeners += object : SessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String) {
@@ -37,13 +37,13 @@ internal class SessionStartEventManager(sessionManager: SessionManager) {
     }
 
     private fun createSessionStartEvent(sessionId: String, userId: String) {
-        Logger.d(com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager.Companion.TAG, "createSessionStartEvent() sessionId: $sessionId, userId: $userId")
+        Logger.d(TAG, "createSessionStartEvent() sessionId: $sessionId, userId: $userId")
 
         val instance = OpenTelemetry.instance ?: return
 
         val now = System.currentTimeMillis()
         val attributes = Attributes.of(
-            com.splunk.android.rum.integration.agent.api.attributes.AttributeConstants.NAME, "session_start",
+            AttributeConstants.NAME, "session_start",
             AttributeKey.stringKey("enduser.anon_id"), userId,
         )
         // TODO Scope
@@ -58,13 +58,13 @@ internal class SessionStartEventManager(sessionManager: SessionManager) {
 
     companion object {
         private const val TAG = "SessionStartEventManager"
-        private var instanceInternal: com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager? = null
-        fun obtainInstance(sessionManager: SessionManager): com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager {
-            if (com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager.Companion.instanceInternal == null)
-                com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager.Companion.instanceInternal =
-                    com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager(sessionManager)
+        private var instanceInternal: SessionStartEventManager? = null
+        fun obtainInstance(sessionManager: SessionManager): SessionStartEventManager {
+            if (instanceInternal == null)
+                instanceInternal =
+                    SessionStartEventManager(sessionManager)
 
-            return requireNotNull(com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager.Companion.instanceInternal)
+            return requireNotNull(instanceInternal)
         }
     }
 }

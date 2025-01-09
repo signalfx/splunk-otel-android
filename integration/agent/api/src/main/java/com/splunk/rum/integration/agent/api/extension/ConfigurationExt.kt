@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.api.extension
 
-import com.cisco.android.rum.integration.agent.api.AgentConfiguration
+import com.splunk.rum.integration.agent.api.AgentConfiguration
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.semconv.ResourceAttributes.SERVICE_NAME
 import io.opentelemetry.semconv.ResourceAttributes.SERVICE_VERSION

@@ -19,7 +19,6 @@ package com.splunk.rum.library.httpurlconnection
 import android.os.SystemClock
 import android.util.Log
 import com.splunk.rum.library.common.HttpConfigUtil
-import com.splunk.rum.library.httpurlconnection.HttpUrlReplacements
 import com.splunk.rum.library.httpurlconnection.tracing.HttpUrlConnectionSingletons
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -921,7 +920,6 @@ class HttpUrlReplacementsTest {
         // Then
         assertEquals(expectedValue, result)
         verifyReplaceAndReplaceThrowableFunctionalityIsCalled(mockUrlConnection)
-
     }
 
     @Test

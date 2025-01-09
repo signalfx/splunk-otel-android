@@ -26,6 +26,7 @@ import org.junit.Test
 
 class HttpUrlConnectionTest : BaseTest() {
     private var startingMillis: Long = System.currentTimeMillis()
+
     @Before
     fun getIntoScreen() {
         screen<MainScreen> {

@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.agent.api.sessionId
 
 import com.cisco.android.common.logger.Logger
-import com.splunk.android.rum.integration.agent.api.attributes.AttributeConstants.SESSION_ID_KEY
+import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.session.SessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor

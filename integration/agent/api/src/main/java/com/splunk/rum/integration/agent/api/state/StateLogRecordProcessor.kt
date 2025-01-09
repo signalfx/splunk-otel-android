@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.api.state
 
-import com.splunk.android.rum.integration.agent.api.attributes.AttributeConstants.STATE
+import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.STATE
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor

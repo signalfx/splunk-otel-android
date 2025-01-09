@@ -23,7 +23,7 @@ import com.splunk.app.screens.screen
 import com.splunk.app.tests.e2e.BaseTestE2E
 import org.junit.Test
 
-class NetworkRequestsTest: BaseTestE2E() {
+class NetworkRequestsTest : BaseTestE2E() {
 
     @Test
     fun selectSeveralNetworkRequests() {

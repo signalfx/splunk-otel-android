@@ -17,9 +17,9 @@
 package com.splunk.rum.integration.agent.api.sessionPulse
 
 import com.cisco.android.common.logger.Logger
-import com.splunk.android.rum.integration.agent.api.attributes.AttributeConstants
-import com.splunk.rum.integration.agent.internal.session.SessionManager
 import com.cisco.mrum.common.otel.api.OpenTelemetry
+import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.NAME
+import com.splunk.rum.integration.agent.internal.session.SessionManager
 import io.opentelemetry.api.common.Attributes
 import java.util.concurrent.TimeUnit
 
@@ -42,7 +42,7 @@ internal class SessionPulseEventManager(sessionManager: SessionManager) {
 
         val now = System.currentTimeMillis()
         val attributes = Attributes.of(
-            com.splunk.android.rum.integration.agent.api.attributes.AttributeConstants.NAME, "session_pulse",
+            NAME, "session_pulse",
         )
         // TODO Scope
         instance.sdkLoggerProvider

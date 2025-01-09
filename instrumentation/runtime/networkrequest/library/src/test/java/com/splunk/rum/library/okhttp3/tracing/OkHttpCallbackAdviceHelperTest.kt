@@ -16,7 +16,6 @@
 
 package com.splunk.rum.library.okhttp3.tracing
 
-import com.splunk.rum.library.okhttp3.tracing.OkHttpCallbackAdviceHelper
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

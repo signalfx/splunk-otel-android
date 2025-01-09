@@ -26,7 +26,6 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import android.view.Choreographer
-import com.splunk.rum.crash.CrashReportingHandler
 import io.mockk.mockkStatic
 import io.mockk.Runs
 import io.mockk.just

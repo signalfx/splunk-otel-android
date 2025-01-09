@@ -17,7 +17,6 @@
 package com.splunk.rum.anr
 
 import android.os.Handler
-import com.splunk.rum.anr.ANRWatchDog
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

@@ -32,7 +32,6 @@ import org.junit.Assert.assertNull
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import com.cisco.mrum.common.otel.api.OpenTelemetry
-import com.splunk.rum.anr.AnrReportingHandler
 import io.mockk.Runs
 import io.mockk.mockkObject
 import io.mockk.just
@@ -231,10 +230,10 @@ class AnrReportingHandlerTest {
     }
 
     private fun TestSetup.thenANRLogRecordBodyContainsExpectedElements(result: String) {
-        assertTrue(result.contains("\"exception.stacktrace\":\"java.base\\/java.lang.Thread.getStackTrace"));
-        assertTrue(result.contains("\"thread.id\":1"));
-        assertTrue(result.contains("\"thread.name\":\"TestThread\""));
-        assertTrue(result.contains("\"android.state\":\"created\""));
+        assertTrue(result.contains("\"exception.stacktrace\":\"java.base\\/java.lang.Thread.getStackTrace"))
+        assertTrue(result.contains("\"thread.id\":1"))
+        assertTrue(result.contains("\"thread.name\":\"TestThread\""))
+        assertTrue(result.contains("\"android.state\":\"created\""))
     }
 
     private fun TestSetup.givenOpentelemetryInstanceAndLogRecordBuilder(): Pair<LogRecordBuilder, SdkLoggerProvider> {

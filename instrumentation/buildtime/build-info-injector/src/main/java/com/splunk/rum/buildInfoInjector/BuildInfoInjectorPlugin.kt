@@ -28,7 +28,7 @@ import java.io.FileInputStream
 import java.security.MessageDigest
 import java.util.Locale
 
-class BuildInfoInjectorPlugin : Plugin<Project>  {
+class BuildInfoInjectorPlugin : Plugin<Project> {
 
     // TODO: ADD SONAR COVERAGE TO THIS AND UTILS CLASSES
 
@@ -39,7 +39,7 @@ class BuildInfoInjectorPlugin : Plugin<Project>  {
         val extension = project.extensions.getByName("androidComponents") as ApplicationAndroidComponentsExtension
         extension.onVariants { variant ->
             project.afterEvaluate {
-                executePluginTask(project,  variant)
+                executePluginTask(project, variant)
             }
         }
     }
@@ -80,7 +80,7 @@ class BuildInfoInjectorPlugin : Plugin<Project>  {
         packageTask?.finalizedBy(appendBuildInfoToMappingFileTask)
     }
 
-    private fun obtainApkFile(project: Project,  logger: Logger, variantName: String, buildTypeName: String?, flavorName: String?): File? {
+    private fun obtainApkFile(project: Project, logger: Logger, variantName: String, buildTypeName: String?, flavorName: String?): File? {
         if (buildTypeName == null) {
             logger.error("APK file is needed to calculate build info," +
                     " unable to determine the buildType and apk directory for build variant: $variantName" )
