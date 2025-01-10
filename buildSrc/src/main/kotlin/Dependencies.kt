@@ -88,6 +88,8 @@ object Dependencies {
             private const val version = "1.0.10"
 
             const val logger = "com.cisco.android:sr-common-logger:$version"
+            const val frameCapturer = "com.cisco.android:sr-instrumentation-session-recording-frame-capturer:$version"
+            const val interactions = "com.cisco.android:sr-instrumentation-session-recording-interactions:$version"
         }
     }
 
