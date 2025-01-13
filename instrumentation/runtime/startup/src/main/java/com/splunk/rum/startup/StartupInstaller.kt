@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.cisco.android.rum.integration.startup
+package com.splunk.rum.startup
 
+import android.app.Application
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
@@ -24,7 +25,7 @@ import android.net.Uri
 internal class StartupInstaller : ContentProvider() {
 
     override fun onCreate(): Boolean {
-        StartupConfigurator.attach(context!!)
+        ApplicationStartupTimekeeper.onCreate(context as Application)
         return true
     }
 
@@ -37,4 +38,11 @@ internal class StartupInstaller : ContentProvider() {
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int = 0
 
     override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int = 0
+
+    private companion object {
+
+        init {
+            ApplicationStartupTimekeeper.onInit()
+        }
+    }
 }

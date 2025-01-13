@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.cisco.android.rum.integration.startup
+package com.splunk.rum.integration.startup
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
-import com.cisco.android.rum.integration.agent.internal.AgentIntegration
-import com.cisco.android.rum.integration.agent.internal.config.ModuleConfigurationManager
-import com.cisco.android.rum.integration.agent.internal.config.RemoteModuleConfiguration
-import com.cisco.android.rum.integration.agent.internal.extension.find
-import com.cisco.android.rum.startup.ApplicationStartupTimekeeper
-import com.smartlook.sdk.common.utils.extensions.optBooleanNull
+import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
+import com.splunk.rum.integration.agent.internal.config.RemoteModuleConfiguration
+import com.splunk.rum.integration.agent.internal.extension.find
+import com.splunk.rum.startup.ApplicationStartupTimekeeper
+import com.splunk.sdk.common.utils.extensions.optBooleanNull
 
 internal object StartupConfigurator {
 

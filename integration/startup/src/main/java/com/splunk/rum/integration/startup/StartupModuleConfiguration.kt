@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package com.cisco.android.rum.integration.startup
+package com.splunk.rum.integration.startup
 
-import com.cisco.android.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
 class StartupModuleConfiguration : ModuleConfiguration

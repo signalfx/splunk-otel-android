@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.cisco.android.rum.startup
+package com.splunk.rum.startup
 
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import com.smartlook.sdk.common.utils.adapters.ActivityLifecycleCallbacksAdapter
-import com.smartlook.sdk.common.utils.extensions.forEachFast
+import com.splunk.sdk.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.sdk.common.utils.extensions.forEachFast
 
 object ApplicationStartupTimekeeper {
 
