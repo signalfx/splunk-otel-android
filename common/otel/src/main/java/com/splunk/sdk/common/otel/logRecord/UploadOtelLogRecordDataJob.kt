@@ -73,7 +73,6 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                         if (response.isSuccessful) {
                             jobFinished(params, false)
                         } else {
-                            // TODO: Maybe there is a case when we would like to reschedule.
                             jobFinished(params, false)
                         }
                     }

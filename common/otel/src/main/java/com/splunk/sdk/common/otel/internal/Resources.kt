@@ -17,7 +17,7 @@
 package com.splunk.sdk.common.otel.internal
 
 import android.os.Build
-import com.cisco.mrum.common.otel.internal.BuildConfig
+import com.splunk.sdk.otel.BuildConfig
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.semconv.ResourceAttributes.DEVICE_ID
