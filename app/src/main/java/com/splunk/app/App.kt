@@ -25,6 +25,9 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        if (BuildConfig.DEBUG)
+            Logger.consumers += AndroidLogConsumer()
+
         // TODO: Reenable with the bridge support
         // BridgeManager.bridgeInterfaces += TomasBridgeInterface()
 

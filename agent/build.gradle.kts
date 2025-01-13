@@ -25,5 +25,6 @@ dependencies {
     api(project(":integration:crash"))
     api(project(":integration:anr"))
     api(project(":integration:networkrequest"))
+    api(project(":integration:startup"))
 }
 
