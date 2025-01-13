@@ -1,1 +1,1 @@
--repackageclasses 'com.cisco.android.rum.integration.agent.internal'
+-repackageclasses 'com.splunk.rum.integration.agent.internal'

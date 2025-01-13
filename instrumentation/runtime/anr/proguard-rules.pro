@@ -1,1 +1,1 @@
--repackageclasses 'com.cisco.android.rum.anr'
+-repackageclasses 'com.splunk.rum.anr'

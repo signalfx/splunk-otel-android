@@ -46,7 +46,7 @@ gradlePlugin {
     plugins {
         create("androidInstrumentationPlugin") {
             id = "$defaultGroupId.${artifactPrefix}plugin"
-            implementationClass = "com.cisco.android.rum.plugin.AndroidInstrumentationPlugin"
+            implementationClass = "com.splunk.rum.plugin.AndroidInstrumentationPlugin"
             displayName = "Cisco Android Auto-Instrumentation Plugin"
         }
     }

@@ -2,7 +2,7 @@
 
     <application>
         <provider
-            android:name=".StartupInstaller"
+            android:name="com.splunk.rum.startup.StartupInstaller"
             android:authorities="${applicationId}.startup-installer"
             android:enabled="true"
             android:exported="false" />
