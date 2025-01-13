@@ -18,7 +18,6 @@ package com.splunk.rum.integration.agent.internal
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
-import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.config.RemoteModuleConfiguration
 import com.splunk.rum.integration.agent.internal.session.SessionManager

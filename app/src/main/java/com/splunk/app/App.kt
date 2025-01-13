@@ -17,6 +17,8 @@
 package com.splunk.app
 
 import android.app.Application
+import com.cisco.android.common.logger.Logger
+import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.CiscoRUMAgent
 import java.net.URL
