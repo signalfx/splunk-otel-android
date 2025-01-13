@@ -25,11 +25,11 @@ android {
 
 dependencies {
     implementation(project(":common:utils"))
-    implementation(project(":common:otel:api"))
+    implementation(project(":common:otel"))
 
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.jsonassert)
     testImplementation(Dependencies.Test.mockk)
 
-    implementation(Dependencies.Android.SessionReplay.logger)
+    implementation(Dependencies.SessionReplay.commonLogger)
 }

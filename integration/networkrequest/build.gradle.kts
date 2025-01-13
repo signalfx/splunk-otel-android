@@ -26,5 +26,5 @@ dependencies {
     implementation(project(":common:utils"))
     implementation(project(":integration:agent:internal"))
 
-    implementation(Dependencies.Android.SessionReplay.logger)
+    implementation(Dependencies.SessionReplay.commonLogger)
 }

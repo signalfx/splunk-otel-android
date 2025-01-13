@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2024 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,22 @@
  * limitations under the License.
  */
 
-package com.splunk.sdk.common.storage.extensions
+package com.splunk.sdk.common.otel
 
-internal val Int.MB: Long
-    get() = (this * 1024 * 1024).toLong()
+import io.opentelemetry.sdk.OpenTelemetrySdk
+
+object OpenTelemetry {
+    var instance: OpenTelemetrySdk? = null
+    val listeners: MutableCollection<Listener> = HashSet()
+
+    fun shutdown() {
+        listeners.forEach { it.onShutdown() }
+
+        instance?.shutdown()
+        instance = null
+    }
+
+    interface Listener {
+        fun onShutdown()
+    }
+}

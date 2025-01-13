@@ -83,12 +83,26 @@ object Dependencies {
         const val constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
         const val activityKtx = "androidx.activity:activity-ktx:$activityKtxVersion"
         const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+    }
 
-        object SessionReplay {
-            private const val version = "1.0.10"
+    object SessionReplay {
+        private const val version = "1.0.10"
 
-            const val logger = "com.cisco.android:sr-common-logger:$version"
-        }
+        const val bridge = "com.cisco.android:sr-bridge:$version"
+        const val commonEncoder = "com.cisco.android:sr-common-encoder:$version"
+        const val commonHttp = "com.cisco.android:sr-common-http:$version"
+        const val commonId = "com.cisco.android:sr-common-id:$version"
+        const val commonJob = "com.cisco.android:sr-common-job:$version"
+        const val commonStorage = "com.cisco.android:sr-common-storage:$version"
+        const val commonUtils = "com.cisco.android:sr-common-utils:$version"
+        const val commonLogger = "com.cisco.android:sr-common-logger:$version"
+
+        const val instrumentationSessionRecordingFrameCapturer = "com.cisco.android:sr-instrumentation-session-recording-frame-capturer:$version"
+        const val instrumentationSessionRecordingInteractions = "com.cisco.android:sr-instrumentation-session-recording-interactions:$version"
+        const val instrumentationSessionRecordingScreenshot = "com.cisco.android:sr-instrumentation-session-recording-screenshot:$version"
+        const val instrumentationSessionRecordingWireframe = "com.cisco.android:sr-instrumentation-session-recording-wireframe:$version"
+
+        const val debugger = "com.cisco.android:sr-debugger:$version"
     }
 
     object Otel {

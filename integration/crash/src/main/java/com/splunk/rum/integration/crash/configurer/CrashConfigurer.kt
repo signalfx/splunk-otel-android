@@ -22,9 +22,6 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.crash.CrashReportingHandler
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
-import com.splunk.rum.integration.agent.internal.config.RemoteModuleConfiguration
-import com.splunk.rum.integration.agent.internal.extension.find
-import com.splunk.sdk.common.utils.extensions.optBooleanNull
 
 @SuppressLint("LongLogTag")
 object CrashConfigurer {
@@ -48,29 +45,6 @@ object CrashConfigurer {
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
-        override fun onRemoteModuleConfigurationsChanged(
-            manager: ModuleConfigurationManager, remoteConfigurations: List<RemoteModuleConfiguration>
-        ) {
-            Logger.d(TAG, "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)")
-
-            setModuleConfiguration(remoteConfigurations)
-
-            if (CrashConfigurer::crashHandler.isInitialized) {
-                if (!isCrashReportingEnabled) {
-                    crashHandler.unregister()
-                } else {
-                    crashHandler.register()
-                }
-            }
-        }
-    }
-
-    private fun setModuleConfiguration(remoteConfigurations: List<RemoteModuleConfiguration>) {
-        Logger.d(TAG, "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)")
-
-        val remoteConfig = remoteConfigurations.find(MODULE_NAME)?.config
-
-        isCrashReportingEnabled = remoteConfig?.optBooleanNull("enabled") ?: DEFAULT_IS_ENABLED
     }
 
     private val installationListener = object : AgentIntegration.Listener {
@@ -78,8 +52,6 @@ object CrashConfigurer {
             Logger.d(TAG, "onInstall()")
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
-
-            setModuleConfiguration(integration.moduleConfigurationManager.remoteConfigurations)
 
             // Registers crash handler if crash reporting enabled
             if (!CrashConfigurer::crashHandler.isInitialized) {

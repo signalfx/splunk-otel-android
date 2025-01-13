@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.agent.api.sessionPulse
 
 import com.cisco.android.common.logger.Logger
-import com.cisco.mrum.common.otel.api.OpenTelemetry
+import com.splunk.sdk.common.otel.OpenTelemetry
 import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.NAME
 import com.splunk.rum.integration.agent.internal.session.SessionManager
 import io.opentelemetry.api.common.Attributes

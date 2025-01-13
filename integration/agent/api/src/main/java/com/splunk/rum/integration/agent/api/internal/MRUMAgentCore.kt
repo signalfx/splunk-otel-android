@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
 import com.cisco.android.common.logger.Logger
+import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
@@ -31,9 +32,7 @@ import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
-import com.cisco.mrum.common.otel.api.OpenTelemetryInitializer
-import com.cisco.mrum.common.otel.internal.storage.OtelStorage
-import com.splunk.sdk.common.storage.Storage
+import com.splunk.sdk.common.storage.AgentStorage
 import com.splunk.sdk.common.utils.HashCalculationUtils
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.sdk.resources.Resource
@@ -46,13 +45,12 @@ internal object MRUMAgentCore {
     private const val SERVICE_HASH_RESOURCE_KEY = "service.hash"
 
     fun install(application: Application, agentConfiguration: AgentConfiguration, moduleConfigurations: List<ModuleConfiguration>) {
-        Logger.d(com.splunk.rum.integration.agent.api.internal.MRUMAgentCore.TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
+        Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
-        val storage = Storage.attach(application)
-        val otelStorage = OtelStorage.obtainInstance(storage.preferences)
+        val storage = AgentStorage.attach(application)
 
         val finalConfiguration = ConfigurationManager
-            .obtainInstance(otelStorage)
+            .obtainInstance(storage)
             .preProcessConfiguration(application, agentConfiguration)
 
         val agentIntegration = AgentIntegration
@@ -75,7 +73,7 @@ internal object MRUMAgentCore {
             .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
 
-        val hash = com.splunk.rum.integration.agent.api.internal.MRUMAgentCore.obtainServiceHashResource(application)
+        val hash = obtainServiceHashResource(application)
         if (hash != null) {
             openTelemetryInitializer.joinResources(hash)
         }
@@ -88,7 +86,7 @@ internal object MRUMAgentCore {
     fun obtainServiceHashResource(application: Application): Resource? {
         val sourceDir = application.applicationInfo.sourceDir
         if (sourceDir == null) {
-            Logger.d(com.splunk.rum.integration.agent.api.internal.MRUMAgentCore.TAG, "Unable to calculate service hash, application source directory null")
+            Logger.d(TAG, "Unable to calculate service hash, application source directory null")
             return null
         }
 

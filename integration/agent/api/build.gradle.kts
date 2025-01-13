@@ -24,13 +24,13 @@ android {
 }
 
 dependencies {
-    api(project(":common:otel:api"))
+    api(project(":common:otel"))
     api(project(":integration:agent:module"))
 
-    implementation(project(":common:otel:internal"))
-    implementation(project(":common:storage"))
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:utils"))
+    implementation(project(":common:storage"))
 
-    implementation(Dependencies.Android.SessionReplay.logger)
+    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.commonStorage)
 }

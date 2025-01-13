@@ -22,7 +22,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import com.cisco.android.common.logger.Logger
-import com.cisco.mrum.common.otel.api.OpenTelemetry
+import com.splunk.sdk.common.otel.OpenTelemetry
 import com.splunk.sdk.common.utils.AppStateObserver
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes

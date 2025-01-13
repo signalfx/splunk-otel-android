@@ -16,7 +16,7 @@
 
 package com.splunk.rum.library.httpurlconnection.tracing;
 
-import com.cisco.mrum.common.otel.api.OpenTelemetry;
+import com.splunk.sdk.common.otel.OpenTelemetry;
 import com.splunk.rum.library.common.HttpInstrumentationConfig;
 
 import java.net.URLConnection;

@@ -43,7 +43,7 @@ dependencies {
     implementation(Dependencies.Otel.instrumentationSemConv)
     implementation(Dependencies.Otel.instrumentationApi)
     implementation(Dependencies.Otel.instrumentationOkhttp3)
-    implementation(project(":common:otel:api"))
+    implementation(project(":common:otel"))
     implementation(project(":integration:networkrequest"))
     compileOnly(Dependencies.okhttp)
     compileOnly(Dependencies.okio)
