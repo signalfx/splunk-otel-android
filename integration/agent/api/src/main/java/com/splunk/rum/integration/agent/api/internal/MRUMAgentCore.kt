@@ -83,14 +83,14 @@ internal object MRUMAgentCore {
         agentIntegration.install(application)
     }
 
-    fun obtainServiceHashResource(application: Application): Resource? {
+    private fun obtainServiceHashResource(application: Application): Resource? {
         val sourceDir = application.applicationInfo.sourceDir
         if (sourceDir == null) {
             Logger.d(TAG, "Unable to calculate service hash, application source directory null")
             return null
         }
 
-        return ResourceBuilder().put(AttributeKey.stringKey(com.splunk.rum.integration.agent.api.internal.MRUMAgentCore.SERVICE_HASH_RESOURCE_KEY),
+        return ResourceBuilder().put(AttributeKey.stringKey(SERVICE_HASH_RESOURCE_KEY),
             HashCalculationUtils.calculateSha256(File(sourceDir)))
             .build()
     }

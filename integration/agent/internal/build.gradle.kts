@@ -25,11 +25,11 @@ android {
 dependencies {
     api(project(":integration:agent:module"))
 
-    implementation(project(":common:utils"))
     implementation(project(":common:storage"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonId)
     implementation(Dependencies.SessionReplay.commonHttp)
     implementation(Dependencies.SessionReplay.commonStorage)
+    implementation(Dependencies.SessionReplay.commonUtils)
 }

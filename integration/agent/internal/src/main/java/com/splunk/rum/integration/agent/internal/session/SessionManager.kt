@@ -21,10 +21,10 @@ import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
 import com.cisco.android.common.id.NanoId
+import com.cisco.android.common.utils.AppStateObserver
+import com.cisco.android.common.utils.extensions.forEachFast
+import com.cisco.android.common.utils.extensions.safeSchedule
 import com.splunk.sdk.common.storage.IAgentStorage
-import com.splunk.sdk.common.utils.AppStateObserver
-import com.splunk.sdk.common.utils.extensions.forEachFast
-import com.splunk.sdk.common.utils.extensions.safeSchedule
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 

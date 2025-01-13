@@ -24,12 +24,13 @@ android {
 }
 
 dependencies {
-    implementation(project(":common:utils"))
     implementation(project(":common:otel"))
 
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.jsonassert)
     testImplementation(Dependencies.Test.mockk)
+    testImplementation(Dependencies.Android.fragmentKtx)
 
     implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.commonUtils)
 }

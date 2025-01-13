@@ -25,10 +25,10 @@ import com.cisco.android.common.storage.extensions.noBackupFilesDirCompat
 import com.cisco.android.common.storage.filemanager.EncryptedFileManager
 import com.cisco.android.common.storage.filemanager.FileManagerFactory
 import com.cisco.android.common.storage.preferences.Preferences
+import com.cisco.android.common.utils.runOnBackgroundThread
 import com.splunk.sdk.common.storage.extensions.MB
 import com.splunk.sdk.common.storage.extensions.statFsFreeSpace
 import com.splunk.sdk.common.storage.policy.StoragePolicy
-import com.splunk.sdk.common.utils.runOnBackgroundThread
 import java.io.File
 
 /**

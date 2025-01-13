@@ -17,8 +17,8 @@
 package com.splunk.sdk.common.storage.policy
 
 import com.cisco.android.common.logger.Logger
-import com.splunk.sdk.common.utils.extensions.safeSubmit
-import com.splunk.sdk.common.utils.thread.NamedThreadFactory
+import com.cisco.android.common.utils.extensions.safeSubmit
+import com.cisco.android.common.utils.thread.NamedThreadFactory
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors

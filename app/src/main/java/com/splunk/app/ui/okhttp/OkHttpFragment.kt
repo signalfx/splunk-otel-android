@@ -23,12 +23,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.cisco.android.common.utils.extensions.safeSchedule
+import com.cisco.android.common.utils.runOnBackgroundThread
+import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentOkhttpBinding
 import com.splunk.app.ui.BaseFragment
-import com.splunk.sdk.common.utils.extensions.safeSchedule
-import com.splunk.sdk.common.utils.runOnBackgroundThread
-import com.splunk.sdk.common.utils.runOnUiThread
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.trace.SdkTracerProvider

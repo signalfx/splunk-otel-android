@@ -28,9 +28,10 @@ dependencies {
     api(project(":integration:agent:module"))
 
     implementation(project(":integration:agent:internal"))
-    implementation(project(":common:utils"))
     implementation(project(":common:storage"))
+    implementation(project(":common:utils"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonStorage)
+    implementation(Dependencies.SessionReplay.commonUtils)
 }

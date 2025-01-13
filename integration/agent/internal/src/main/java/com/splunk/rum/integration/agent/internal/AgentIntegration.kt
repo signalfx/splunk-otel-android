@@ -18,11 +18,11 @@ package com.splunk.rum.integration.agent.internal
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.session.SessionManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.storage.AgentStorage
-import com.splunk.sdk.common.utils.extensions.forEachFast
 
 class AgentIntegration private constructor(
     context: Context

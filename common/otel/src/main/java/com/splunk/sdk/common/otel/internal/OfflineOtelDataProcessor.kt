@@ -19,8 +19,8 @@ package com.splunk.sdk.common.otel.internal
 import com.cisco.android.common.job.IJobManager
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.logger.Logger
+import com.cisco.android.common.utils.extensions.safeSubmit
 import com.splunk.sdk.common.storage.IAgentStorage
-import com.splunk.sdk.common.utils.extensions.safeSubmit
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 

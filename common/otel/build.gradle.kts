@@ -26,7 +26,6 @@ android {
 dependencies {
     compileOnly(Dependencies.Android.annotation)
 
-    implementation(project(":common:utils"))
     implementation(project(":common:storage"))
 
     api(Dependencies.Otel.sdk)
@@ -42,4 +41,5 @@ dependencies {
     implementation(Dependencies.SessionReplay.commonJob)
     implementation(Dependencies.SessionReplay.commonHttp)
     implementation(Dependencies.SessionReplay.commonStorage)
+    implementation(Dependencies.SessionReplay.commonUtils)
 }

@@ -21,8 +21,8 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import com.cisco.android.common.logger.Logger
+import com.cisco.android.common.utils.AppStateObserver
 import com.splunk.sdk.common.otel.OpenTelemetry
-import com.splunk.sdk.common.utils.AppStateObserver
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.logs.Severity
