@@ -19,7 +19,8 @@ include ':integration:agent:api',
         ':integration:startup',
         ':integration:networkrequest',
         ':integration:anr',
-        ':integration:crash'
+        ':integration:crash',
+        ':integration:sessionreplay'
 
 // Test App
 include ':app'

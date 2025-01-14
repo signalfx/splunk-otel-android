@@ -1,0 +1,2 @@
+-keep public class com.splunk.rum.integration.sessionreplay.SessionReplayInstaller
+-repackageclasses 'com.splunk.rum.integration.sessionreplay'

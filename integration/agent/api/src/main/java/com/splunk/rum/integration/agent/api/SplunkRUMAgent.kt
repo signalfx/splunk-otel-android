@@ -21,23 +21,23 @@ import com.splunk.rum.integration.agent.api.internal.MRUMAgentCore
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
 /**
- * The [CiscoRUMAgent] class is responsible for initializing and providing access to the RUM agent.
+ * The [SplunkRUMAgent] class is responsible for initializing and providing access to the RUM agent.
  * Agent is initialized through the [install] method.
  */
-class CiscoRUMAgent private constructor() {
+class SplunkRUMAgent private constructor() {
 
     companion object {
 
-        private var instanceInternal: CiscoRUMAgent? = null
+        private var instanceInternal: SplunkRUMAgent? = null
 
         /**
-         * Provides access to the initialized instance of [CiscoRUMAgent].
+         * Provides access to the initialized instance of [SplunkRUMAgent].
          *
-         * @return The single instance of [CiscoRUMAgent] that has been initialized.
+         * @return The single instance of [SplunkRUMAgent] that has been initialized.
          * @throws RuntimeException if the [install] method has not been called prior to accessing the instance.
          */
         @get:JvmStatic
-        val instance: CiscoRUMAgent
+        val instance: SplunkRUMAgent
             get() = instanceInternal ?: throw RuntimeException("Must call install() before fetching instance")
 
         /**
@@ -49,16 +49,16 @@ class CiscoRUMAgent private constructor() {
          * @param application The application context used to initialize the RUM agent.
          * @param agentConfiguration Configuration parameters for the RUM agent.
          * @param moduleConfigurations An array of module configurations.
-         * @return The initialized [CiscoRUMAgent] instance.
+         * @return The initialized [SplunkRUMAgent] instance.
          */
         @JvmStatic
-        fun install(application: Application, agentConfiguration: com.splunk.rum.integration.agent.api.AgentConfiguration, vararg moduleConfigurations: ModuleConfiguration): CiscoRUMAgent {
+        fun install(application: Application, agentConfiguration: com.splunk.rum.integration.agent.api.AgentConfiguration, vararg moduleConfigurations: ModuleConfiguration): SplunkRUMAgent {
             if (instanceInternal != null)
                 return instance
 
             MRUMAgentCore.install(application, agentConfiguration, moduleConfigurations.toList())
 
-            instanceInternal = CiscoRUMAgent()
+            instanceInternal = SplunkRUMAgent()
 
             return instance
         }

@@ -97,6 +97,7 @@ object Dependencies {
         const val commonUtils = "com.cisco.android:sr-common-utils:$version"
         const val commonLogger = "com.cisco.android:sr-common-logger:$version"
 
+        const val instrumentationSessionRecordingCore = "com.cisco.android:sr-instrumentation-session-recording-core:$version"
         const val instrumentationSessionRecordingFrameCapturer = "com.cisco.android:sr-instrumentation-session-recording-frame-capturer:$version"
         const val instrumentationSessionRecordingInteractions = "com.cisco.android:sr-instrumentation-session-recording-interactions:$version"
         const val instrumentationSessionRecordingScreenshot = "com.cisco.android:sr-instrumentation-session-recording-screenshot:$version"

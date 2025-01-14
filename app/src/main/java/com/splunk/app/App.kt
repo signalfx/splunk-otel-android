@@ -19,8 +19,10 @@ package com.splunk.app
 import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.logger.consumers.AndroidLogConsumer
+import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
-import com.splunk.rum.integration.agent.api.CiscoRUMAgent
+import com.splunk.rum.integration.agent.api.SplunkRUMAgent
+import com.splunk.rum.integration.sessionreplay.api.sessionReplay
 import java.net.URL
 
 class App : Application() {
@@ -39,7 +41,7 @@ class App : Application() {
             appVersion = "0.1"
         )
 
-        val agent = CiscoRUMAgent.install(
+        val agent = SplunkRUMAgent.install(
             application = this,
             agentConfiguration = agentConfig,
             moduleConfigurations = arrayOf(
@@ -48,7 +50,7 @@ class App : Application() {
         )
 
         // MARK temp comment
-        // agent.sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
-        // agent.sessionReplay.start()
+        agent.sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
+        agent.sessionReplay.start()
     }
 }
