@@ -40,7 +40,7 @@ internal class AndroidSpanExporter(
         val id = UUID.randomUUID().toString()
 
         // Save data to our storage.
-        agentStorage.createOtelSpanDataFile(id).outputStream().buffered().use {
+        agentStorage.writeOtelSpanData(id).outputStream().buffered().use {
             exportRequest.writeBinaryTo(it)
             it.flush()
         }
