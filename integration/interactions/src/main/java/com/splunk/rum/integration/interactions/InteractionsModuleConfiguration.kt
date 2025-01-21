@@ -16,6 +16,6 @@
 
 package com.splunk.rum.integration.interactions
 
-import com.cisco.android.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
 class InteractionsModuleConfiguration : ModuleConfiguration

@@ -26,9 +26,9 @@ import com.cisco.android.instrumentation.recording.interactions.model.Interactio
 import com.cisco.android.instrumentation.recording.interactions.model.LegacyData
 import com.cisco.android.instrumentation.recording.wireframe.model.Wireframe
 import com.cisco.android.instrumentation.recording.wireframe.stats.WireframeStats
-import com.cisco.android.rum.integration.agent.internal.AgentIntegration
-import com.cisco.android.rum.integration.agent.internal.config.ModuleConfigurationManager
-import com.cisco.android.rum.integration.agent.internal.config.RemoteModuleConfiguration
+import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
+import com.splunk.rum.integration.agent.internal.config.RemoteModuleConfiguration
 
 internal object InteractionsConfigurator {
 

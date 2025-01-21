@@ -20,7 +20,6 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import com.splunk.rum.integration.interactions.InteractionsConfigurator
 
 internal class InteractionsInstaller : ContentProvider() {
 
