@@ -16,7 +16,8 @@ include ':instrumentation:runtime:crash',
 include ':integration:agent:api',
         ':integration:agent:module',
         ':integration:agent:internal',
-        ':integration:startup'
+        ':integration:startup',
+        ':integration:interactions'
 
 // Integration tests
 // TODO disable it for now because of different artifactory include ':integration-run'
