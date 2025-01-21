@@ -3,7 +3,7 @@
 
     <application>
         <provider
-            android:name="com.cisco.android.rum.integration.anr.installer.ANRInstaller"
+            android:name="com.splunk.rum.integration.anr.installer.ANRInstaller"
             android:authorities="${applicationId}.ANRReportingInstaller"
             android:enabled="true"
             android:exported="false" />

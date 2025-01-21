@@ -3,7 +3,7 @@
 
     <application>
         <provider
-            android:name="com.cisco.android.rum.integration.networkrequest.installer.NetworkRequestInstaller"
+            android:name="com.splunk.rum.integration.networkrequest.installer.NetworkRequestInstaller"
             android:authorities="${applicationId}.NetworkRequestInstaller"
             android:enabled="true"
             android:exported="false" />

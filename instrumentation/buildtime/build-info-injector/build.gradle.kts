@@ -41,7 +41,7 @@ gradlePlugin {
     plugins {
         create("androidBuildInfoInjectorPlugin") {
             id = "$defaultGroupId.${artifactPrefix}build-info-injector-plugin"
-            implementationClass = "com.cisco.android.rum.buildInfoInjector.BuildInfoInjectorPlugin"
+            implementationClass = "com.splunk.rum.buildInfoInjector.BuildInfoInjectorPlugin"
             displayName = "Cisco Android Build Info Injector Plugin"
         }
     }

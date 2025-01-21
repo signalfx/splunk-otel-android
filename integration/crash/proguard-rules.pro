@@ -1,6 +1,6 @@
--keep public class com.cisco.android.rum.integration.crash.installer.CrashInstaller
--keep public class com.cisco.android.rum.integration.crash.configurer.CrashConfigurer
--keepclassmembers class com.cisco.android.rum.integration.crash.configurer.CrashConfigurer {
+-keep public class com.splunk.rum.integration.crash.installer.CrashInstaller
+-keep public class com.splunk.rum.integration.crash.configurer.CrashConfigurer
+-keepclassmembers class com.splunk.rum.integration.crash.configurer.CrashConfigurer {
     public static boolean isCrashReportingEnabled;
 }
--repackageclasses 'com.cisco.android.rum.integration.crash'
+-repackageclasses 'com.splunk.rum.integration.crash'
