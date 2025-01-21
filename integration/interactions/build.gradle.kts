@@ -19,7 +19,7 @@ ext {
 }
 
 android {
-    namespace = "com.cisco.android.rum.integration.interactions"
+    namespace = "com.splunk.rum.integration.interactions"
 }
 
 dependencies {

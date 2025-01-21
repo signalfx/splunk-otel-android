@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cisco.android.rum.integration.interactions
+package com.splunk.rum.integration.interactions
 
 import android.app.Application
 import android.content.Context

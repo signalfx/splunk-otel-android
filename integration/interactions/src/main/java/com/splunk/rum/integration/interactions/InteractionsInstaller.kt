@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.cisco.android.rum.integration.interactions
+package com.splunk.rum.integration.interactions
 
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
+import com.splunk.rum.integration.interactions.InteractionsConfigurator
 
 internal class InteractionsInstaller : ContentProvider() {
 
