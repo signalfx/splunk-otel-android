@@ -26,7 +26,7 @@ dependencies {
     implementation(project(":common:utils"))
     implementation(project(":integration:agent:internal"))
 
-    implementation(Dependencies.Android.SessionReplay.logger)
-    implementation(Dependencies.Android.SessionReplay.frameCapturer)
-    implementation(Dependencies.Android.SessionReplay.interactions)
+    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.instrumentationSessionRecordingFrameCapturer)
+    implementation(Dependencies.SessionReplay.instrumentationSessionRecordingInteractions)
 }
