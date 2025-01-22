@@ -19,7 +19,11 @@ include ':integration:agent:api',
         ':integration:startup',
         ':integration:networkrequest',
         ':integration:anr',
-        ':integration:crash'
+        ':integration:crash',
+        ':integration:interactions'
+
+// Integration tests
+// TODO disable it for now because of different artifactory include ':integration-run'
 
 // Test App
 include ':app'
