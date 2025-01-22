@@ -19,10 +19,10 @@ package com.splunk.rum.integration.agent.api.configuration
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.AgentConfiguration
-import com.cisco.mrum.common.otel.internal.storage.OtelStorage
+import com.splunk.sdk.common.storage.IAgentStorage
 
 internal class ConfigurationManager private constructor(
-    private val otelStorage: OtelStorage
+    private val agentStorage: IAgentStorage
 ) {
     fun preProcessConfiguration(context: Context, proposalConfig: AgentConfiguration): AgentConfiguration {
         val config = proposalConfig.copy()
@@ -33,7 +33,7 @@ internal class ConfigurationManager private constructor(
         if (config.appVersion == null)
             config.appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName
 
-        otelStorage.writeBaseUrl(config.url.toExternalForm())
+        agentStorage.writeBaseUrl(config.url.toExternalForm())
 
         Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
 
@@ -43,9 +43,9 @@ internal class ConfigurationManager private constructor(
     companion object {
         private const val TAG = "ConfigurationManager"
         private var instanceInternal: ConfigurationManager? = null
-        fun obtainInstance(urlStorage: OtelStorage): ConfigurationManager {
+        fun obtainInstance(agentStorage: IAgentStorage): ConfigurationManager {
             if (instanceInternal == null)
-                instanceInternal = ConfigurationManager(urlStorage)
+                instanceInternal = ConfigurationManager(agentStorage)
 
             return requireNotNull(instanceInternal)
         }

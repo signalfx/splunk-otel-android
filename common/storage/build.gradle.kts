@@ -20,11 +20,11 @@ ext {
 }
 
 android {
-    namespace = "com.smartlook.sdk.common.storage"
+    namespace = "com.splunk.sdk.common.storage"
 }
 
 dependencies {
-    implementation(project(":common:utils"))
-
-    implementation(Dependencies.Android.SessionReplay.logger)
+    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.commonStorage)
+    implementation(Dependencies.SessionReplay.commonUtils)
 }

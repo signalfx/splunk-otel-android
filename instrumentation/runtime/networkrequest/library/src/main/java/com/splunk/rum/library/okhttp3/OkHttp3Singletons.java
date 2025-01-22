@@ -25,7 +25,7 @@ import com.splunk.rum.library.okhttp3.tracing.OkHttpCallbackAdviceHelper;
 import com.splunk.rum.library.okhttp3.tracing.OkHttpCustomConfigArgument;
 import com.splunk.rum.library.okhttp3.tracing.ResendCountContextInterceptor;
 import com.splunk.rum.library.okhttp3.tracing.TracingInterceptor;
-import com.cisco.mrum.common.otel.api.OpenTelemetry;
+import com.splunk.sdk.common.otel.OpenTelemetry;
 
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;

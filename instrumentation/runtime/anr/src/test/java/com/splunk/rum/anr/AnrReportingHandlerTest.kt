@@ -31,7 +31,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
-import com.cisco.mrum.common.otel.api.OpenTelemetry
+import com.splunk.sdk.common.otel.OpenTelemetry
 import io.mockk.Runs
 import io.mockk.mockkObject
 import io.mockk.just

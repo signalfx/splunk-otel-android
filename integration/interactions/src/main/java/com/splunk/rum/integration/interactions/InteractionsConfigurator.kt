@@ -28,7 +28,6 @@ import com.cisco.android.instrumentation.recording.wireframe.model.Wireframe
 import com.cisco.android.instrumentation.recording.wireframe.stats.WireframeStats
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
-import com.splunk.rum.integration.agent.internal.config.RemoteModuleConfiguration
 
 internal object InteractionsConfigurator {
 
@@ -65,15 +64,8 @@ internal object InteractionsConfigurator {
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
-        override fun onRemoteModuleConfigurationsChanged(manager: ModuleConfigurationManager, remoteConfigurations: List<RemoteModuleConfiguration>) {
-            Logger.d(TAG, "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)")
-            setModuleConfiguration(remoteConfigurations)
-        }
     }
 
-    private fun setModuleConfiguration(remoteConfigurations: List<RemoteModuleConfiguration>) {
-        Logger.d(TAG, "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)")
-    }
 
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(context: Context) {
@@ -81,8 +73,6 @@ internal object InteractionsConfigurator {
 
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
-
-            setModuleConfiguration(integration.moduleConfigurationManager.remoteConfigurations)
         }
     }
 }

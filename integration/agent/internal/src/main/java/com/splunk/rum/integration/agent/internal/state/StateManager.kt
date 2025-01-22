@@ -18,7 +18,7 @@ package com.splunk.rum.integration.agent.internal.state
 
 import android.app.Application
 import android.content.Context
-import com.splunk.sdk.common.utils.AppStateObserver
+import com.cisco.android.common.utils.AppStateObserver
 
 class StateManager(context: Context) {
 

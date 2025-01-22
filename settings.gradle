@@ -1,22 +1,25 @@
 // Common modules
-include ':common:otel:api',
-        ':common:otel:internal',
+include ':common:otel',
         ':common:storage',
-        ':common:utils',
-        ':common:http',
-        ':common:job',
-        ':common:id'
+        ':common:utils'
 
 // Instrumentation modules
 include ':instrumentation:runtime:crash',
         ':instrumentation:runtime:anr',
-        ':instrumentation:runtime:startup'
+        ':instrumentation:runtime:startup',
+        ':instrumentation:runtime:networkrequest:library',
+        ':instrumentation:buildtime:networkrequest:bci',
+        ':instrumentation:buildtime:plugin',
+        ':instrumentation:buildtime:build-info-injector'
 
 // Integration
 include ':integration:agent:api',
         ':integration:agent:module',
         ':integration:agent:internal',
         ':integration:startup',
+        ':integration:networkrequest',
+        ':integration:anr',
+        ':integration:crash',
         ':integration:interactions'
 
 // Integration tests
@@ -27,16 +30,3 @@ include ':app'
 
 // Main entry point
 include ':agent'
-
-// Automatic network request instrumentation modules
-include ':instrumentation:buildtime:networkrequest:bci'
-include ':instrumentation:runtime:networkrequest:library'
-include ':instrumentation:buildtime:plugin'
-include ':integration:networkrequest'
-
-// Build Info Injection portion of buildtime gradle plugin
-include ':instrumentation:buildtime:build-info-injector'
-
-// Crash and ANR config modules
-include ':integration:crash'
-include ':integration:anr'

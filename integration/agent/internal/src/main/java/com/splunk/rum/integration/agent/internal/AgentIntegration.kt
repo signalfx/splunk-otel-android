@@ -18,25 +18,15 @@ package com.splunk.rum.integration.agent.internal
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
-import com.splunk.rum.integration.agent.internal.config.RemoteModuleConfiguration
 import com.splunk.rum.integration.agent.internal.session.SessionManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
-import com.cisco.mrum.common.otel.internal.storage.OtelStorage
-import com.splunk.sdk.common.storage.Storage
-import com.splunk.sdk.common.storage.preferences.FilePermanentCache
-import com.splunk.sdk.common.storage.preferences.Preferences
-import com.splunk.sdk.common.utils.extensions.forEachFast
-import com.splunk.sdk.common.utils.extensions.noBackupFilesDirCompat
-import com.splunk.sdk.common.utils.extensions.optLongNull
-import java.io.File
+import com.splunk.sdk.common.storage.AgentStorage
 
 class AgentIntegration private constructor(
     context: Context
 ) {
-
-    private val preferences: Preferences
-
     private var appName: String? = null
     private var agentVersion: String? = null
 
@@ -47,22 +37,12 @@ class AgentIntegration private constructor(
     init {
         registerModule(MODULE_NAME)
 
-        val storage = Storage.attach(context)
-        val otelStorage = OtelStorage.obtainInstance(storage.preferences)
+        val storage = AgentStorage.attach(context)
 
-        val preferencesFile = File(context.noBackupFilesDirCompat, PREFERENCES_FILE_NAME)
-        preferences = Preferences(FilePermanentCache(preferencesFile))
-
-        sessionManager = SessionManager(preferences)
-        moduleConfigurationManager = ModuleConfigurationManager(preferences, otelStorage)
-
-        // Load initial configuration to session manager.
-        setModuleConfiguration(
-            moduleConfigurationManager.agentRemoteConfiguration
-        )
+        sessionManager = SessionManager(storage)
+        moduleConfigurationManager = ModuleConfigurationManager(storage)
 
         sessionManager.sessionListeners += SessionManagerListener()
-        moduleConfigurationManager.listeners += ModuleConfigurationManagerListener()
     }
 
     fun setup(appName: String, agentVersion: String, moduleConfigurations: List<ModuleConfiguration>): AgentIntegration {
@@ -81,26 +61,10 @@ class AgentIntegration private constructor(
         listeners.forEachFast { it.onInstall(context) }
     }
 
-    private fun setModuleConfiguration(moduleConfiguration: RemoteModuleConfiguration?) {
-        val config = moduleConfiguration?.config
-
-        sessionManager.maxSessionLength = config?.optLongNull("maxSessionLength")?.times(1000L) ?: DEFAULT_SESSION_LENGTH
-        sessionManager.sessionTimeout = config?.optLongNull("sessionTimeout")?.times(1000L) ?: DEFAULT_SESSION_TIMEOUT
-    }
-
-    private inner class ModuleConfigurationManagerListener : ModuleConfigurationManager.Listener {
-        override fun onAgentModuleConfigurationChanged(manager: ModuleConfigurationManager, remoteConfiguration: RemoteModuleConfiguration) {
-            setModuleConfiguration(remoteConfiguration)
-        }
-    }
-
     private inner class SessionManagerListener : SessionManager.SessionListener {
         override fun onSessionChanged(sessionId: String) {
             val appName = appName ?: throw IllegalStateException("Call setup() first")
             val agentVersion = agentVersion ?: throw IllegalStateException("Call setup() first")
-
-            moduleConfigurationManager.publishCurrentConfigurations()
-            moduleConfigurationManager.check(appName, agentVersion, moduleNames.toList())
         }
     }
 
@@ -112,12 +76,7 @@ class AgentIntegration private constructor(
 
         private const val TAG = "AgentIntegration"
 
-        private const val MODULE_NAME = "mrum"
-
-        private const val PREFERENCES_FILE_NAME = "mrum_preferences.dat"
-
-        private const val DEFAULT_SESSION_TIMEOUT = 900_000L
-        private const val DEFAULT_SESSION_LENGTH = 60L * 60L * 1000L
+        private const val MODULE_NAME = "agent"
 
         private var instanceInternal: AgentIntegration? = null
         private val moduleNames = HashSet<String>()
