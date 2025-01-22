@@ -36,6 +36,7 @@ class NoOpSplunkRum extends SplunkRum {
     }
 
     @Override
+    @Deprecated
     public Call.Factory createRumOkHttpCallFactory(OkHttpClient client) {
         return client;
     }
@@ -81,11 +82,13 @@ class NoOpSplunkRum extends SplunkRum {
     }
 
     @Override
+    @Deprecated
     public void experimentalSetScreenName(String screenName) {
         // no-op
     }
 
     @Override
+    @Deprecated
     public void experimentalSetScreenName(String screenName, String spanType) {
         // no-op
     }

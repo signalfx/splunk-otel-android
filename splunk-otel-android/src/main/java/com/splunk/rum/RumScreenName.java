@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Deprecated
 public @interface RumScreenName {
     /** Return the customized screen name. */
     String value();

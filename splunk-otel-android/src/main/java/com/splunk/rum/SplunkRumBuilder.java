@@ -81,6 +81,7 @@ public final class SplunkRumBuilder {
     }
 
     /**
+     * @deprecated This method is deprecated and will be removed in a future release
      * This method can be used to provide a customizer that will have access to the
      * OkHttpSender.Builder before the sender is created. Typical use cases for this are to provide
      * custom headers or to modify compression settings. This is a pretty large hammer and should be
@@ -92,6 +93,7 @@ public final class SplunkRumBuilder {
      * @return {@code this}
      * @since 1.4.0
      */
+    @Deprecated
     public SplunkRumBuilder setHttpSenderCustomizer(HttpSenderCustomizer customizer) {
         this.httpSenderCustomizer = customizer;
         return this;
@@ -168,12 +170,14 @@ public final class SplunkRumBuilder {
     }
 
     /**
+     * @deprecated This method is deprecated and will be removed in a future release.
      * Enables support for the React Native instrumentation.
      *
      * <p>This feature is disabled by default. You can enable it by calling this method.
      *
      * @return {@code this}
      */
+    @Deprecated
     public SplunkRumBuilder enableReactNativeSupport() {
         configFlags.enableReactNativeSupport();
         return this;
@@ -327,6 +331,7 @@ public final class SplunkRumBuilder {
     }
 
     /**
+     * @deprecated This method is deprecated and will be removed in a future release.
      * Creates a new instance of {@link SplunkRum} with the settings of this {@link
      * SplunkRumBuilder}.
      *
@@ -340,6 +345,7 @@ public final class SplunkRumBuilder {
      * SplunkRum#getInstance()}. If there was a global {@link SplunkRum} instance configured before,
      * this method does not initialize a new one and simply returns the existing instance.
      */
+    @Deprecated
     public SplunkRum build(Application application) {
         if (rumAccessToken == null || beaconEndpoint == null || applicationName == null) {
             throw new IllegalStateException(
@@ -376,10 +382,12 @@ public final class SplunkRumBuilder {
     }
 
     /**
+     * @deprecated This method is deprecated and will be removed in a future release.
      * Enables experimental support for exporting via OTLP instead of Zipkin.
      *
      * @return {@code this}
      */
+    @Deprecated
     public SplunkRumBuilder enableExperimentalOtlpExporter() {
         if (isDiskBufferingEnabled()) {
             Log.w(SplunkRum.LOG_TAG, "OTLP export is not yet compatible with disk buffering!");
@@ -402,7 +410,8 @@ public final class SplunkRumBuilder {
     SpanExporter decorateWithSpanFilter(SpanExporter exporter) {
         SpanFilterBuilder spanFilterBuilder = new SpanFilterBuilder(exporter);
         this.spanFilterConfigurer.accept(spanFilterBuilder);
-        return spanFilterBuilder.build();
+        SpanExporter build = spanFilterBuilder.build();
+        return build;
     }
 
     boolean isDebugEnabled() {

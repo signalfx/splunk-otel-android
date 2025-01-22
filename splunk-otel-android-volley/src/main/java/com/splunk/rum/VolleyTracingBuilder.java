@@ -42,14 +42,17 @@ public final class VolleyTracingBuilder {
                     HttpClientAttributesExtractor.builder(
                             VolleyHttpClientAttributesGetter.INSTANCE);
 
+    @Deprecated
     VolleyTracingBuilder(OpenTelemetry openTelemetry) {
         this.openTelemetry = openTelemetry;
     }
 
     /**
+     * @deprecated This method is deprecated and will be removed in a future release
      * Adds an additional {@link AttributesExtractor} to invoke to set attributes to instrumented
      * items.
      */
+    @Deprecated
     public VolleyTracingBuilder addAttributesExtractor(
             AttributesExtractor<RequestWrapper, HttpResponse> attributesExtractor) {
         additionalExtractors.add(attributesExtractor);
@@ -57,28 +60,34 @@ public final class VolleyTracingBuilder {
     }
 
     /**
+     * @deprecated This method is deprecated and will be removed in a future release
      * Configures the HTTP request headers that will be captured as span attributes.
      *
      * @param requestHeaders A list of HTTP header names.
      */
+    @Deprecated
     public VolleyTracingBuilder setCapturedRequestHeaders(List<String> requestHeaders) {
         this.httpClientAttributesExtractorBuilder.setCapturedRequestHeaders(requestHeaders);
         return this;
     }
 
     /**
+     * @deprecated This method is deprecated and will be removed in a future release
      * Configures the HTTP response headers that will be captured as span attributes.
      *
      * @param responseHeaders A list of HTTP header names.
      */
+    @Deprecated
     public VolleyTracingBuilder setCapturedResponseHeaders(List<String> responseHeaders) {
         this.httpClientAttributesExtractorBuilder.setCapturedResponseHeaders(responseHeaders);
         return this;
     }
 
     /**
+     * @deprecated This method is deprecated and will be removed in a future release
      * Returns a new {@link VolleyTracing} with the settings of this {@link VolleyTracingBuilder}.
      */
+    @Deprecated
     public VolleyTracing build() {
         VolleyHttpClientAttributesGetter httpAttributesGetter =
                 VolleyHttpClientAttributesGetter.INSTANCE;
