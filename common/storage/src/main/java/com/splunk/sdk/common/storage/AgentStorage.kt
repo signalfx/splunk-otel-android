@@ -40,15 +40,8 @@ import java.io.File
  * SDK storage structure:
  *  agent/
  *    └─<STORAGE_VERSION>/
- *           └─dataChunks/
- *              └─<data_chunk_id>/
- *                ├──metrics.dat
- *                ├──dataChunk.dat
- *                ├──wireframe.dat
- *                └──video/
- *                  ├──<frame_number>.jpg
- *                  ├──video.mp4
- *                  └──metadata.dat
+ *           ├─logs/
+ *           └─spans/
  */
 class AgentStorage(context: Context) : IAgentStorage {
 
@@ -61,7 +54,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     private val agentVersionDir = File(rootDir, "$VERSION${if (preferencesFileManager is EncryptedFileManager) "e" else ""}")
     private val preferencesFile = File(agentVersionDir, "preferences/preferences.dat")
     private val logDir = File(agentVersionDir, "logs")
-    private val spanDir = File(agentVersionDir, "spanDir")
+    private val spanDir = File(agentVersionDir, "spans")
 
     init {
         preferences = Preferences(FileSimplePermanentCache(preferencesFile, preferencesFileManager))
@@ -109,68 +102,82 @@ class AgentStorage(context: Context) : IAgentStorage {
     override fun readDeviceId(): String? = preferences.getString(DEVICE_ID)
 
     override fun writeAnonId(value: String) {
-        TODO("Not yet implemented")
+        preferences.putString(ANON_ID, value).commit()
     }
 
-    override fun readAnonId(): String? {
-        TODO("Not yet implemented")
-    }
+    override fun readAnonId(): String? = preferences.getString(ANON_ID)
 
     override fun deleteAnonId() {
-        TODO("Not yet implemented")
+        preferences.remove(ANON_ID)
     }
 
     override fun writeSessionId(value: String) {
-        TODO("Not yet implemented")
+        preferences.putString(SESSION_ID, value).commit()
     }
 
-    override fun readSessionId(): String? {
-        TODO("Not yet implemented")
-    }
+    override fun readSessionId(): String? = preferences.getString(SESSION_ID)
 
     override fun deleteSessionId() {
-        TODO("Not yet implemented")
+        preferences.remove(SESSION_ID)
     }
 
     override fun writeSessionValidUntil(value: Long) {
-        TODO("Not yet implemented")
+        preferences.putLong(SESSION_VALID_UNTIL, value).commit()
     }
 
-    override fun readSessionValidUntil(): Long? {
-        TODO("Not yet implemented")
-    }
+    override fun readSessionValidUntil(): Long? = preferences.getLong(SESSION_VALID_UNTIL)
 
     override fun deleteSessionValidUntil() {
-        TODO("Not yet implemented")
+        preferences.remove(SESSION_VALID_UNTIL)
     }
 
     override fun writeSessionValidUntilInBackground(value: Long) {
-        TODO("Not yet implemented")
+        preferences.putLong(SESSION_VALID_UNTIL_IN_BACKGROUND, value).commit()
     }
 
-    override fun readSessionValidUntilInBackground(): Long? {
-        TODO("Not yet implemented")
-    }
+    override fun readSessionValidUntilInBackground(): Long? = preferences.getLong(SESSION_VALID_UNTIL_IN_BACKGROUND)
 
     override fun deleteSessionValidUntilInBackground() {
-        TODO("Not yet implemented")
+        preferences.remove(SESSION_VALID_UNTIL_IN_BACKGROUND)
     }
 
-    override fun createOtelLogDataFile(id: String): File {
-        TODO("Not yet implemented")
+    override fun writeOtelLogData(id: String, data: ByteArray): Boolean {
+        val file: File = otelLogDataFile(id)
+        val success = encryptedStorage.writeBytes(file, data)
+        Logger.d(TAG, "createOtelLogDataFile(): id = $id, success = $success")
+
+        return success
     }
 
-    override fun getOtelLogDataFile(id: String): File {
-        TODO("Not yet implemented")
+    override fun readOtelLogData(id: String): ByteArray? {
+        val file: File = otelLogDataFile(id)
+        return encryptedStorage.readBytes(file)
     }
 
-    override fun createOtelSpanDataFile(id: String): File {
-        TODO("Not yet implemented")
+    override fun deleteOtelLogData(id: String) {
+        val file: File = otelLogDataFile(id)
+        file.delete()
     }
 
-    override fun getOtelSpanDataFile(id: String): File {
-        TODO("Not yet implemented")
+    override fun writeOtelSpanData(id: String, data: ByteArray): Boolean {
+        val file: File = otelSpanDataFile(id)
+        val success = encryptedStorage.writeBytes(file, data)
+        Logger.d(TAG, "writeOtelSpanData(): id = $id, success = $success")
+
+        return success
     }
+    override fun readOtelSpanData(id: String): ByteArray? {
+        val file: File = otelSpanDataFile(id)
+        return encryptedStorage.readBytes(file)
+    }
+
+    override fun deleteOtelSpanData(id: String) {
+        val file: File = otelSpanDataFile(id)
+        file.delete()
+    }
+
+    private fun otelLogDataFile(id: String) = File(logDir, "$id.dat")
+    private fun otelSpanDataFile(id: String) = File(spanDir, "$id.dat")
 
     fun cleanUpStorage(context: Context): Boolean {
         val files = ArrayList<File>()
@@ -198,6 +205,10 @@ class AgentStorage(context: Context) : IAgentStorage {
     companion object {
         private const val BASE_URL = "LOG_BASE_URL"
         private const val DEVICE_ID = "DEVICE_ID"
+        private const val ANON_ID = "ANON_ID"
+        private const val SESSION_ID = "SESSION_ID"
+        private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
+        private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
 
         private const val TAG = "AgentStorage"
 

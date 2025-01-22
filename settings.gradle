@@ -20,7 +20,8 @@ include ':integration:agent:api',
         ':integration:networkrequest',
         ':integration:anr',
         ':integration:crash',
-        ':integration:sessionreplay'
+        ':integration:sessionreplay',
+        ':integration:interactions'
 
 // Test App
 include ':app'

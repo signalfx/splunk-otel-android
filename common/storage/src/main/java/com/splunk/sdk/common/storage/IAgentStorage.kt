@@ -16,8 +16,6 @@
 
 package com.splunk.sdk.common.storage
 
-import java.io.File
-
 interface IAgentStorage {
     val freeSpace: Long
     val rootDirPath: String
@@ -46,8 +44,10 @@ interface IAgentStorage {
     fun readSessionValidUntilInBackground(): Long?
     fun deleteSessionValidUntilInBackground()
 
-    fun createOtelLogDataFile(id: String): File
-    fun getOtelLogDataFile(id: String): File
-    fun createOtelSpanDataFile(id: String): File
-    fun getOtelSpanDataFile(id: String): File
+    fun writeOtelLogData(id: String, data: ByteArray): Boolean
+    fun readOtelLogData(id: String): ByteArray?
+    fun deleteOtelLogData(id: String)
+    fun writeOtelSpanData(id: String, data: ByteArray): Boolean
+    fun readOtelSpanData(id: String): ByteArray?
+    fun deleteOtelSpanData(id: String)
 }

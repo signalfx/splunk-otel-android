@@ -23,6 +23,7 @@ import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
+import java.io.ByteArrayOutputStream
 import java.util.UUID
 
 /**
@@ -40,9 +41,9 @@ internal class AndroidSpanExporter(
         val id = UUID.randomUUID().toString()
 
         // Save data to our storage.
-        agentStorage.createOtelSpanDataFile(id).outputStream().buffered().use {
+        ByteArrayOutputStream().use {
             exportRequest.writeBinaryTo(it)
-            it.flush()
+            agentStorage.writeOtelSpanData(id, it.toByteArray())
         }
 
         // Job scheduling

@@ -61,11 +61,19 @@ internal class UploadOtelSpanDataJob : JobService() {
                 return
             }
 
+            val data = storage.readOtelSpanData(id)
+
+            if (data == null) {
+                Logger.d(TAG, "startUpload() data is not valid")
+                jobFinished(params, false)
+                return
+            }
+
             httpClient.makePostRequest(
                 url = url,
                 queries = emptyList(),
                 headers = listOf(Header("Content-Type", "application/x-protobuf")),
-                body = storage.getOtelSpanDataFile(id),
+                body = data,
                 callback = object : HttpClient.Callback {
                     override fun onSuccess(response: Response) {
                         Logger.d(TAG, "startUpload() onSuccess: response=$response, code=${response.code}, body=${response.body.toString(Charsets.UTF_8)}")
@@ -94,7 +102,7 @@ internal class UploadOtelSpanDataJob : JobService() {
 
     private fun deleteData(id: String) {
         jobIdStorage.delete(id)
-        storage.getOtelSpanDataFile(id).delete()
+        storage.deleteOtelSpanData(id)
     }
 
     companion object {
