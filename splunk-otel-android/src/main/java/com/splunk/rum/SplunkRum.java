@@ -122,9 +122,8 @@ public class SplunkRum {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release
-     * Starts a UI navigation span and remembers the last screen name.
-     *
+     * @deprecated This method is deprecated and will be removed in a future release Starts a UI
+     *     navigation span and remembers the last screen name.
      * @param screenName Name of the new screen or null when exiting explicit UI navigation mode.
      * @param spanType "Created", "Restarted", or "Resumed"
      */
@@ -139,9 +138,8 @@ public class SplunkRum {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release
-     * Starts a "Created" UI navigation span and remembers the last screen name.
-     *
+     * @deprecated This method is deprecated and will be removed in a future release Starts a
+     *     "Created" UI navigation span and remembers the last screen name.
      * @param screenName Name of the new screen or null when exiting explicit UI navigation mode.
      */
     @Deprecated
@@ -175,11 +173,10 @@ public class SplunkRum {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release.
-     * Wrap the provided {@link OkHttpClient} with OpenTelemetry and RUM instrumentation. Since
-     * {@link Call.Factory} is the primary useful interface implemented by the OkHttpClient, this
-     * should be a drop-in replacement for any usages of OkHttpClient.
-     *
+     * @deprecated This method is deprecated and will be removed in a future release. Wrap the
+     *     provided {@link OkHttpClient} with OpenTelemetry and RUM instrumentation. Since {@link
+     *     Call.Factory} is the primary useful interface implemented by the OkHttpClient, this
+     *     should be a drop-in replacement for any usages of OkHttpClient.
      * @param client The {@link OkHttpClient} to wrap with OpenTelemetry and RUM instrumentation.
      * @return A {@link okhttp3.Call.Factory} implementation.
      */
@@ -338,13 +335,10 @@ public class SplunkRum {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release
-     * Updates the current location. The latitude and longitude will be appended to every span and
-     * event.
-     *
-     * <p>Note: this operation performs an atomic update. You can safely call it from your {@code
-     * LocationListener} or {@code LocationCallback}.
-     *
+     * @deprecated This method is deprecated and will be removed in a future release Updates the
+     *     current location. The latitude and longitude will be appended to every span and event.
+     *     <p>Note: this operation performs an atomic update. You can safely call it from your
+     *     {@code LocationListener} or {@code LocationCallback}.
      * @param location the current location. Passing {@code null} removes the location data.
      */
     @Deprecated

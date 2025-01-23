@@ -19,10 +19,9 @@ package com.splunk.rum.incubating;
 import zipkin2.reporter.okhttp3.OkHttpSender;
 
 /**
- * @deprecated This method is deprecated and will be removed in a future release
- * This interface can be used to customize the exporter used to send telemetry to Splunk. It is not
- * yet stable and its APIs are subject to change at any time.
- *
+ * @deprecated This method is deprecated and will be removed in a future release This interface can
+ *     be used to customize the exporter used to send telemetry to Splunk. It is not yet stable and
+ *     its APIs are subject to change at any time.
  * @since 1.4.0
  */
 public interface HttpSenderCustomizer {
