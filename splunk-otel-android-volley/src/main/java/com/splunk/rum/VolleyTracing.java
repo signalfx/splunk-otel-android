@@ -22,12 +22,18 @@ import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import javax.net.ssl.SSLSocketFactory;
 
-/** Entrypoint for tracing Volley clients. */
+/**
+ * Entrypoint for tracing Volley clients.
+ *
+ * @deprecated This API is deprecated and will be removed in a future release.
+ */
+@Deprecated
 public final class VolleyTracing {
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Returns a new
-     *     {@link VolleyTracing} configured with the given {@link SplunkRum}.
+     * Returns a new {@link VolleyTracing} configured with the given {@link SplunkRum}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
     @Deprecated
     public static VolleyTracing create(SplunkRum splunkRum) {
@@ -35,8 +41,9 @@ public final class VolleyTracing {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Returns a new
-     *     {@link VolleyTracing} configured with the given {@link OpenTelemetry}.
+     * Returns a new {@link VolleyTracing} configured with the given {@link OpenTelemetry}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
     @Deprecated
     public static VolleyTracing create(OpenTelemetry openTelemetry) {
@@ -44,8 +51,9 @@ public final class VolleyTracing {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Returns a new
-     *     {@link VolleyTracingBuilder} configured with the given {@link SplunkRum}.
+     * Returns a new {@link VolleyTracingBuilder} configured with the given {@link SplunkRum}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
     @Deprecated
     public static VolleyTracingBuilder builder(SplunkRum splunkRum) {
@@ -53,8 +61,9 @@ public final class VolleyTracing {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Returns a new
-     *     {@link VolleyTracingBuilder} configured with the given {@link OpenTelemetry}.
+     * Returns a new {@link VolleyTracingBuilder} configured with the given {@link OpenTelemetry}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
     @Deprecated
     public static VolleyTracingBuilder builder(OpenTelemetry openTelemetry) {
@@ -72,8 +81,9 @@ public final class VolleyTracing {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Returns a new
-     *     {@link HurlStack} capable of tracing requests.
+     * Returns a new {@link HurlStack} capable of tracing requests.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
     @Deprecated
     public HurlStack newHurlStack() {
@@ -81,9 +91,10 @@ public final class VolleyTracing {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Returns a new
-     *     {@link HurlStack} capable of tracing requests configured with given {@link
-     *     HurlStack.UrlRewriter}.
+     * Returns a new {@link HurlStack} capable of tracing requests configured with given {@link
+     * HurlStack.UrlRewriter}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
     @Deprecated
     public HurlStack newHurlStack(HurlStack.UrlRewriter urlRewriter) {
@@ -91,9 +102,10 @@ public final class VolleyTracing {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Returns a new
-     *     {@link HurlStack} capable of tracing requests configured with given {@link
-     *     HurlStack.UrlRewriter} and {@link SSLSocketFactory}.
+     * Returns a new {@link HurlStack} capable of tracing requests configured with given {@link
+     * HurlStack.UrlRewriter} and {@link SSLSocketFactory}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
     @Deprecated
     public HurlStack newHurlStack(

@@ -29,7 +29,11 @@ import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanStatusExtr
 import java.util.ArrayList;
 import java.util.List;
 
-/** A builder for {@link VolleyTracing}. */
+/**
+ * @deprecated This API is deprecated and will be removed in a future release. A builder for {@link
+ *     VolleyTracing}.
+ */
+@Deprecated
 public final class VolleyTracingBuilder {
 
     private static final String INSTRUMENTATION_NAME = "com.splunk.android.volley";
@@ -48,8 +52,10 @@ public final class VolleyTracingBuilder {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release Adds an
-     *     additional {@link AttributesExtractor} to invoke to set attributes to instrumented items.
+     * Adds an additional {@link AttributesExtractor} to invoke to set attributes to instrumented
+     * items.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release
      */
     @Deprecated
     public VolleyTracingBuilder addAttributesExtractor(
@@ -59,9 +65,10 @@ public final class VolleyTracingBuilder {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release Configures the
-     *     HTTP request headers that will be captured as span attributes.
+     * Configures the HTTP request headers that will be captured as span attributes.
+     *
      * @param requestHeaders A list of HTTP header names.
+     * @deprecated This method is deprecated and will be removed in a future release
      */
     @Deprecated
     public VolleyTracingBuilder setCapturedRequestHeaders(List<String> requestHeaders) {
@@ -70,9 +77,10 @@ public final class VolleyTracingBuilder {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release Configures the
-     *     HTTP response headers that will be captured as span attributes.
+     * Configures the HTTP response headers that will be captured as span attributes.
+     *
      * @param responseHeaders A list of HTTP header names.
+     * @deprecated This method is deprecated and will be removed in a future release
      */
     @Deprecated
     public VolleyTracingBuilder setCapturedResponseHeaders(List<String> responseHeaders) {
@@ -81,8 +89,9 @@ public final class VolleyTracingBuilder {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release Returns a new
-     *     {@link VolleyTracing} with the settings of this {@link VolleyTracingBuilder}.
+     * Returns a new {@link VolleyTracing} with the settings of this {@link VolleyTracingBuilder}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release
      */
     @Deprecated
     public VolleyTracing build() {

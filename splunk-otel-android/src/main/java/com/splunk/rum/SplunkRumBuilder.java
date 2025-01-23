@@ -81,15 +81,17 @@ public final class SplunkRumBuilder {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release This method can
-     *     be used to provide a customizer that will have access to the OkHttpSender.Builder before
-     *     the sender is created. Typical use cases for this are to provide custom headers or to
-     *     modify compression settings. This is a pretty large hammer and should be used with
-     *     caution.
-     *     <p>This API is considered incubating and is subject to change.
+     * This method can be used to provide a customizer that will have access to the
+     * OkHttpSender.Builder before the sender is created. Typical use cases for this are to provide
+     * custom headers or to modify compression settings. This is a pretty large hammer and should be
+     * used with caution.
+     *
+     * <p>This API is considered incubating and is subject to change.
+     *
      * @param customizer that can make changes to the OkHttpSender.Builder
      * @return {@code this}
      * @since 1.4.0
+     * @deprecated This method is deprecated and will be removed in a future release
      */
     @Deprecated
     public SplunkRumBuilder setHttpSenderCustomizer(HttpSenderCustomizer customizer) {
@@ -168,10 +170,12 @@ public final class SplunkRumBuilder {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Enables
-     *     support for the React Native instrumentation.
-     *     <p>This feature is disabled by default. You can enable it by calling this method.
+     * Enables support for the React Native instrumentation.
+     *
+     * <p>This feature is disabled by default. You can enable it by calling this method.
+     *
      * @return {@code this}
+     * @deprecated This method is deprecated and will be removed in a future release
      */
     @Deprecated
     public SplunkRumBuilder enableReactNativeSupport() {
@@ -327,17 +331,20 @@ public final class SplunkRumBuilder {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Creates a new
-     *     instance of {@link SplunkRum} with the settings of this {@link SplunkRumBuilder}.
-     *     <p>You must configure at least the {@linkplain #setApplicationName(String) application
-     *     name}, the {@linkplain #setRealm(String) realm} or the {@linkplain
-     *     #setBeaconEndpoint(String) beacon endpoint}, and the {@linkplain
-     *     #setRumAccessToken(String) access token} before calling this method. Trying to build a
-     *     {@link SplunkRum} instance without any of these will result in an exception being thrown.
-     *     <p>The returned {@link SplunkRum} is set as the global instance {@link
-     *     SplunkRum#getInstance()}. If there was a global {@link SplunkRum} instance configured
-     *     before, this method does not initialize a new one and simply returns the existing
-     *     instance.
+     * Creates a new instance of {@link SplunkRum} with the settings of this {@link
+     * SplunkRumBuilder}.
+     *
+     * <p>You must configure at least the {@linkplain #setApplicationName(String) application name},
+     * the {@linkplain #setRealm(String) realm} or the {@linkplain #setBeaconEndpoint(String) beacon
+     * endpoint}, and the {@linkplain #setRumAccessToken(String) access token} before calling this
+     * method. Trying to build a {@link SplunkRum} instance without any of these will result in an
+     * exception being thrown.
+     *
+     * <p>The returned {@link SplunkRum} is set as the global instance {@link
+     * SplunkRum#getInstance()}. If there was a global {@link SplunkRum} instance configured before,
+     * this method does not initialize a new one and simply returns the existing instance.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release
      */
     @Deprecated
     public SplunkRum build(Application application) {
@@ -376,9 +383,10 @@ public final class SplunkRumBuilder {
     }
 
     /**
-     * @deprecated This method is deprecated and will be removed in a future release. Enables
-     *     experimental support for exporting via OTLP instead of Zipkin.
+     * Enables experimental support for exporting via OTLP instead of Zipkin.
+     *
      * @return {@code this}
+     * @deprecated This method is deprecated and will be removed in a future release
      */
     @Deprecated
     public SplunkRumBuilder enableExperimentalOtlpExporter() {
