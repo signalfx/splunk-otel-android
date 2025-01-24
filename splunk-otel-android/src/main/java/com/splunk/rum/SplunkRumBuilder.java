@@ -343,10 +343,7 @@ public final class SplunkRumBuilder {
      * <p>The returned {@link SplunkRum} is set as the global instance {@link
      * SplunkRum#getInstance()}. If there was a global {@link SplunkRum} instance configured before,
      * this method does not initialize a new one and simply returns the existing instance.
-     *
-     * @deprecated This method is deprecated and will be removed in a future release
      */
-    @Deprecated
     public SplunkRum build(Application application) {
         if (rumAccessToken == null || beaconEndpoint == null || applicationName == null) {
             throw new IllegalStateException(
