@@ -30,8 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @deprecated This API is deprecated and will be removed in a future release. A builder for {@link
- *     VolleyTracing}.
+ * A builder for {@link VolleyTracing}.
+ *
+ * @deprecated This API is deprecated and will be removed in a future release.
  */
 @Deprecated
 public final class VolleyTracingBuilder {

@@ -411,8 +411,7 @@ public final class SplunkRumBuilder {
     SpanExporter decorateWithSpanFilter(SpanExporter exporter) {
         SpanFilterBuilder spanFilterBuilder = new SpanFilterBuilder(exporter);
         this.spanFilterConfigurer.accept(spanFilterBuilder);
-        SpanExporter build = spanFilterBuilder.build();
-        return build;
+        return spanFilterBuilder.build();
     }
 
     boolean isDebugEnabled() {

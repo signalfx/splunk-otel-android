@@ -38,10 +38,6 @@ class ConfigFlags {
         diskBufferingEnabled = true;
     }
 
-    /**
-     * @deprecated This method is deprecated and will be removed in a future release.
-     */
-    @Deprecated
     void enableReactNativeSupport() {
         reactNativeSupportEnabled = true;
     }
