@@ -101,6 +101,8 @@ object Dependencies {
         const val instrumentationSessionRecordingInteractions = "com.cisco.android:sr-instrumentation-session-recording-interactions:$version"
         const val instrumentationSessionRecordingScreenshot = "com.cisco.android:sr-instrumentation-session-recording-screenshot:$version"
         const val instrumentationSessionRecordingWireframe = "com.cisco.android:sr-instrumentation-session-recording-wireframe:$version"
+
+        const val debugger = "com.cisco.android:sr-debugger:$version"
     }
 
     object Otel {

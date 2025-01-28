@@ -23,6 +23,7 @@ import io.opentelemetry.exporter.internal.otlp.logs.LogsRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
+import java.io.ByteArrayOutputStream
 import java.util.UUID
 
 /**
@@ -40,9 +41,9 @@ internal class AndroidLogRecordExporter(
         val id = UUID.randomUUID().toString()
 
         // Save data to our storage.
-        agentStorage.createOtelLogDataFile(id).outputStream().buffered().use {
+        ByteArrayOutputStream().use {
             exportRequest.writeBinaryTo(it)
-            it.flush()
+            agentStorage.writeOtelLogData(id, it.toByteArray())
         }
 
         // Job scheduling
