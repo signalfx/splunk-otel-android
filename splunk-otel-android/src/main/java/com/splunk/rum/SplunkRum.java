@@ -126,7 +126,9 @@ public class SplunkRum {
      *
      * @param screenName Name of the new screen or null when exiting explicit UI navigation mode.
      * @param spanType "Created", "Restarted", or "Resumed"
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public void experimentalSetScreenName(String screenName, String spanType) {
         screenAttributesAppender.setScreenName(screenName);
 
@@ -140,7 +142,9 @@ public class SplunkRum {
      * Starts a "Created" UI navigation span and remembers the last screen name.
      *
      * @param screenName Name of the new screen or null when exiting explicit UI navigation mode.
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public void experimentalSetScreenName(String screenName) {
         experimentalSetScreenName(screenName, "Created");
     }
@@ -177,7 +181,9 @@ public class SplunkRum {
      *
      * @param client The {@link OkHttpClient} to wrap with OpenTelemetry and RUM instrumentation.
      * @return A {@link okhttp3.Call.Factory} implementation.
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public Call.Factory createRumOkHttpCallFactory(OkHttpClient client) {
         return createOkHttpTracing().newCallFactory(client);
     }
@@ -339,7 +345,9 @@ public class SplunkRum {
      * LocationListener} or {@code LocationCallback}.
      *
      * @param location the current location. Passing {@code null} removes the location data.
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public void updateLocation(@Nullable Location location) {
         if (location == null) {
             updateGlobalAttributes(

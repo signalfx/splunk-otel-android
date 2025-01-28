@@ -22,38 +22,70 @@ import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import javax.net.ssl.SSLSocketFactory;
 
-/** Entrypoint for tracing Volley clients. */
+/**
+ * Entrypoint for tracing Volley clients.
+ *
+ * @deprecated This API is deprecated and will be removed in a future release.
+ */
+@Deprecated
 public final class VolleyTracing {
 
-    /** Returns a new {@link VolleyTracing} configured with the given {@link SplunkRum}. */
+    /**
+     * Returns a new {@link VolleyTracing} configured with the given {@link SplunkRum}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
+     */
+    @Deprecated
     public static VolleyTracing create(SplunkRum splunkRum) {
         return create(splunkRum.getOpenTelemetry());
     }
 
-    /** Returns a new {@link VolleyTracing} configured with the given {@link OpenTelemetry}. */
+    /**
+     * Returns a new {@link VolleyTracing} configured with the given {@link OpenTelemetry}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
+     */
+    @Deprecated
     public static VolleyTracing create(OpenTelemetry openTelemetry) {
         return builder(openTelemetry).build();
     }
 
-    /** Returns a new {@link VolleyTracingBuilder} configured with the given {@link SplunkRum}. */
+    /**
+     * Returns a new {@link VolleyTracingBuilder} configured with the given {@link SplunkRum}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
+     */
+    @Deprecated
     public static VolleyTracingBuilder builder(SplunkRum splunkRum) {
         return new VolleyTracingBuilder(splunkRum.getOpenTelemetry());
     }
 
     /**
      * Returns a new {@link VolleyTracingBuilder} configured with the given {@link OpenTelemetry}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
+    @Deprecated
     public static VolleyTracingBuilder builder(OpenTelemetry openTelemetry) {
         return new VolleyTracingBuilder(openTelemetry);
     }
 
     private final Instrumenter<RequestWrapper, HttpResponse> instrumenter;
 
+    /**
+     * @deprecated This method is deprecated and will be removed in a future release.
+     */
+    @Deprecated
     VolleyTracing(Instrumenter<RequestWrapper, HttpResponse> instrumenter) {
         this.instrumenter = instrumenter;
     }
 
-    /** Returns a new {@link HurlStack} capable of tracing requests. */
+    /**
+     * Returns a new {@link HurlStack} capable of tracing requests.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
+     */
+    @Deprecated
     public HurlStack newHurlStack() {
         return new TracingHurlStack(instrumenter);
     }
@@ -61,7 +93,10 @@ public final class VolleyTracing {
     /**
      * Returns a new {@link HurlStack} capable of tracing requests configured with given {@link
      * HurlStack.UrlRewriter}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
+    @Deprecated
     public HurlStack newHurlStack(HurlStack.UrlRewriter urlRewriter) {
         return new TracingHurlStack(instrumenter, urlRewriter);
     }
@@ -69,7 +104,10 @@ public final class VolleyTracing {
     /**
      * Returns a new {@link HurlStack} capable of tracing requests configured with given {@link
      * HurlStack.UrlRewriter} and {@link SSLSocketFactory}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release.
      */
+    @Deprecated
     public HurlStack newHurlStack(
             HurlStack.UrlRewriter urlRewriter, SSLSocketFactory sslSocketFactory) {
         return new TracingHurlStack(instrumenter, urlRewriter, sslSocketFactory);

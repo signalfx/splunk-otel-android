@@ -23,10 +23,12 @@ import zipkin2.reporter.okhttp3.OkHttpSender;
  * yet stable and its APIs are subject to change at any time.
  *
  * @since 1.4.0
+ * @deprecated This API is deprecated and will be removed in a future release.
  */
 public interface HttpSenderCustomizer {
 
     HttpSenderCustomizer DEFAULT = x -> {};
 
+    @Deprecated
     void customize(OkHttpSender.Builder builder);
 }

@@ -91,7 +91,9 @@ public final class SplunkRumBuilder {
      * @param customizer that can make changes to the OkHttpSender.Builder
      * @return {@code this}
      * @since 1.4.0
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public SplunkRumBuilder setHttpSenderCustomizer(HttpSenderCustomizer customizer) {
         this.httpSenderCustomizer = customizer;
         return this;
@@ -173,7 +175,9 @@ public final class SplunkRumBuilder {
      * <p>This feature is disabled by default. You can enable it by calling this method.
      *
      * @return {@code this}
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public SplunkRumBuilder enableReactNativeSupport() {
         configFlags.enableReactNativeSupport();
         return this;
@@ -379,7 +383,9 @@ public final class SplunkRumBuilder {
      * Enables experimental support for exporting via OTLP instead of Zipkin.
      *
      * @return {@code this}
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public SplunkRumBuilder enableExperimentalOtlpExporter() {
         if (isDiskBufferingEnabled()) {
             Log.w(SplunkRum.LOG_TAG, "OTLP export is not yet compatible with disk buffering!");

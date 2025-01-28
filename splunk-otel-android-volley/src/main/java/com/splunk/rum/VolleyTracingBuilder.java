@@ -29,7 +29,12 @@ import io.opentelemetry.instrumentation.api.instrumenter.http.HttpSpanStatusExtr
 import java.util.ArrayList;
 import java.util.List;
 
-/** A builder for {@link VolleyTracing}. */
+/**
+ * A builder for {@link VolleyTracing}.
+ *
+ * @deprecated This API is deprecated and will be removed in a future release.
+ */
+@Deprecated
 public final class VolleyTracingBuilder {
 
     private static final String INSTRUMENTATION_NAME = "com.splunk.android.volley";
@@ -42,6 +47,7 @@ public final class VolleyTracingBuilder {
                     HttpClientAttributesExtractor.builder(
                             VolleyHttpClientAttributesGetter.INSTANCE);
 
+    @Deprecated
     VolleyTracingBuilder(OpenTelemetry openTelemetry) {
         this.openTelemetry = openTelemetry;
     }
@@ -49,7 +55,10 @@ public final class VolleyTracingBuilder {
     /**
      * Adds an additional {@link AttributesExtractor} to invoke to set attributes to instrumented
      * items.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public VolleyTracingBuilder addAttributesExtractor(
             AttributesExtractor<RequestWrapper, HttpResponse> attributesExtractor) {
         additionalExtractors.add(attributesExtractor);
@@ -60,7 +69,9 @@ public final class VolleyTracingBuilder {
      * Configures the HTTP request headers that will be captured as span attributes.
      *
      * @param requestHeaders A list of HTTP header names.
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public VolleyTracingBuilder setCapturedRequestHeaders(List<String> requestHeaders) {
         this.httpClientAttributesExtractorBuilder.setCapturedRequestHeaders(requestHeaders);
         return this;
@@ -70,7 +81,9 @@ public final class VolleyTracingBuilder {
      * Configures the HTTP response headers that will be captured as span attributes.
      *
      * @param responseHeaders A list of HTTP header names.
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public VolleyTracingBuilder setCapturedResponseHeaders(List<String> responseHeaders) {
         this.httpClientAttributesExtractorBuilder.setCapturedResponseHeaders(responseHeaders);
         return this;
@@ -78,7 +91,10 @@ public final class VolleyTracingBuilder {
 
     /**
      * Returns a new {@link VolleyTracing} with the settings of this {@link VolleyTracingBuilder}.
+     *
+     * @deprecated This method is deprecated and will be removed in a future release
      */
+    @Deprecated
     public VolleyTracing build() {
         VolleyHttpClientAttributesGetter httpAttributesGetter =
                 VolleyHttpClientAttributesGetter.INSTANCE;
