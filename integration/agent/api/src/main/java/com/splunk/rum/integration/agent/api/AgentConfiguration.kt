@@ -31,4 +31,5 @@ data class AgentConfiguration(
     val url: URL,
     var appName: String? = null,
     var appVersion: String? = null,
+    var debugLogsEnabled: Boolean = false,
 )

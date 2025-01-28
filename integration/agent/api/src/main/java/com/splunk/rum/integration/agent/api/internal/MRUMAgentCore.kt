@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
 import com.cisco.android.common.logger.Logger
+import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
@@ -46,6 +47,10 @@ internal object MRUMAgentCore {
     private const val SERVICE_HASH_RESOURCE_KEY = "service.hash"
 
     fun install(application: Application, agentConfiguration: AgentConfiguration, moduleConfigurations: List<ModuleConfiguration>) {
+        if (agentConfiguration.debugLogsEnabled) {
+            Logger.consumers += AndroidLogConsumer()
+        }
+
         Logger.d(com.splunk.rum.integration.agent.api.internal.MRUMAgentCore.TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
         val storage = Storage.attach(application)
