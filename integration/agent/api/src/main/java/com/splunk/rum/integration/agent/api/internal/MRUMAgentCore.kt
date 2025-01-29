@@ -33,7 +33,6 @@ import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.storage.AgentStorage
-import com.splunk.sdk.common.utils.HashCalculationUtils
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.resources.ResourceBuilder
@@ -72,26 +71,11 @@ internal object MRUMAgentCore {
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
-
-        val hash = obtainServiceHashResource(application)
-        if (hash != null) {
-            openTelemetryInitializer.joinResources(hash)
-        }
-
+        
         openTelemetryInitializer.build()
 
         agentIntegration.install(application)
     }
 
-    private fun obtainServiceHashResource(application: Application): Resource? {
-        val sourceDir = application.applicationInfo.sourceDir
-        if (sourceDir == null) {
-            Logger.d(TAG, "Unable to calculate service hash, application source directory null")
-            return null
-        }
 
-        return ResourceBuilder().put(AttributeKey.stringKey(SERVICE_HASH_RESOURCE_KEY),
-            HashCalculationUtils.calculateSha256(File(sourceDir)))
-            .build()
-    }
 }
