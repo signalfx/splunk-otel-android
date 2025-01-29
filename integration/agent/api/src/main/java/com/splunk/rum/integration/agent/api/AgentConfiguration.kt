@@ -31,5 +31,5 @@ data class AgentConfiguration(
     val url: URL,
     var appName: String? = null,
     var appVersion: String? = null,
-    var debugLogsEnabled: Boolean = false,
+    var isDebugLogsEnabled: Boolean = false, // temporary name till product decides on more suitable one
 )

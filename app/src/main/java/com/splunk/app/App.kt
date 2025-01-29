@@ -32,7 +32,7 @@ class App : Application() {
             url = URL("https://alameda-eum-qe.saas.appd-test.com"),
             appName = "smartlook-android",
             appVersion = "0.1",
-            debugLogsEnabled = true,
+            isDebugLogsEnabled = true,
         )
 
         val agent = CiscoRUMAgent.install(
