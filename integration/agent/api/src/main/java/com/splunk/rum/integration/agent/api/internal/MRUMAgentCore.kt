@@ -18,7 +18,7 @@ package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
 import com.cisco.android.common.logger.Logger
-import com.splunk.sdk.common.otel.OpenTelemetryInitializer
+import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
@@ -32,6 +32,7 @@ import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
 import com.splunk.sdk.common.utils.HashCalculationUtils
 import io.opentelemetry.api.common.AttributeKey
