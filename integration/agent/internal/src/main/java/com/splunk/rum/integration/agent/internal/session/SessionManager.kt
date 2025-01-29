@@ -20,16 +20,16 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
-import com.splunk.sdk.common.id.NanoId
-import com.splunk.sdk.common.storage.preferences.IPreferences
-import com.splunk.sdk.common.utils.AppStateObserver
-import com.splunk.sdk.common.utils.extensions.forEachFast
-import com.splunk.sdk.common.utils.extensions.safeSchedule
+import com.cisco.android.common.id.NanoId
+import com.cisco.android.common.utils.AppStateObserver
+import com.cisco.android.common.utils.extensions.forEachFast
+import com.cisco.android.common.utils.extensions.safeSchedule
+import com.splunk.sdk.common.storage.IAgentStorage
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 
 class SessionManager internal constructor(
-    private val preferences: IPreferences
+    private val agentStorage: IAgentStorage
 ) {
 
     private val executor = Executors.newSingleThreadScheduledExecutor()
@@ -39,7 +39,7 @@ class SessionManager internal constructor(
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
 
     val anonId: String
-        get() = preferences.getString(ANON_ID_KEY) ?: throw IllegalStateException("Should never be null")
+        get() = agentStorage.readAnonId() ?: throw IllegalStateException("Should never be null")
 
     /**
      * The value is valid after the [install] function is called.
@@ -48,10 +48,8 @@ class SessionManager internal constructor(
     var sessionId: String
         get() = createNewSessionIfNeeded()
         private set(value) {
-            preferences
-                .putString(SESSION_ID_KEY, value)
-                .putLong(SESSION_VALID_UNTIL_KEY, System.currentTimeMillis() + maxSessionLength)
-                .apply()
+            agentStorage.writeSessionId(value)
+            agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
         }
 
     var sessionTimeout: Long = DEFAULT_SESSION_TIMEOUT
@@ -79,25 +77,24 @@ class SessionManager internal constructor(
     }
 
     private fun createAnonIdIfNeeded() {
-        if (ANON_ID_KEY !in preferences)
-            preferences
-                .putString(ANON_ID_KEY, NanoId.generate())
-                .apply()
+        if (agentStorage.readAnonId() == null) {
+            agentStorage.writeAnonId(NanoId.generate())
+        }
     }
 
     @Synchronized
     private fun createNewSessionIfNeeded(): String {
-        val savedSessionId = preferences.getString(SESSION_ID_KEY)
-        val sessionValidInBackgroundUntil = preferences.getLong(SESSION_VALID_IN_BACKGROUND_UNTIL_KEY)
-        val sessionValidUntil = preferences.getLong(SESSION_VALID_UNTIL_KEY)
+        val savedSessionId = agentStorage.readSessionId()
+        val sessionValidInBackgroundUntil = agentStorage.readSessionValidUntilInBackground()
+        val sessionValidUntil = agentStorage.readSessionValidUntil()
         val now = System.currentTimeMillis()
 
         val backgroundValidity = if (sessionValidInBackgroundUntil != null) sessionValidInBackgroundUntil > now else true
 
         val isCurrentSessionIdValid = savedSessionId != null &&
-            backgroundValidity &&
-            sessionValidUntil != null &&
-            sessionValidUntil > now
+                backgroundValidity &&
+                sessionValidUntil != null &&
+                sessionValidUntil > now
 
         if (isCurrentSessionIdValid) {
             return requireNotNull(savedSessionId)
@@ -136,21 +133,15 @@ class SessionManager internal constructor(
     }
 
     private fun saveSessionInBackgroundValidationTime() {
-        preferences
-            .putLong(SESSION_VALID_IN_BACKGROUND_UNTIL_KEY, System.currentTimeMillis() + sessionTimeout)
-            .apply()
+        agentStorage.writeSessionValidUntilInBackground(System.currentTimeMillis() + sessionTimeout)
     }
 
     private fun deleteSessionInBackgroundValidationTime() {
-        preferences
-            .remove(SESSION_VALID_IN_BACKGROUND_UNTIL_KEY)
-            .apply()
+        agentStorage.deleteSessionValidUntilInBackground()
     }
 
     private fun deleteSessionValidationTime() {
-        preferences
-            .remove(SESSION_VALID_UNTIL_KEY)
-            .apply()
+        agentStorage.deleteSessionValidUntil()
     }
 
     private fun schedulePulseEvent() {
@@ -207,10 +198,5 @@ class SessionManager internal constructor(
         const val DEFAULT_SESSION_TIMEOUT = 900_000L
         const val DEFAULT_SESSION_LENGTH = 60L * 60L * 1000L
         const val DEFAULT_PULSE_EVENT_LENGTH = 5L * 60L * 1000L // 5 minutes
-
-        const val ANON_ID_KEY = "anonId"
-        const val SESSION_ID_KEY = "sessionId"
-        const val SESSION_VALID_UNTIL_KEY = "sessionValidUntil"
-        const val SESSION_VALID_IN_BACKGROUND_UNTIL_KEY = "sessionValidInBackgroundUntil"
     }
 }

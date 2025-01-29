@@ -25,11 +25,11 @@ android {
 dependencies {
     api(project(":integration:agent:module"))
 
-    implementation(project(":common:http"))
-    implementation(project(":common:id"))
-    implementation(project(":common:utils"))
     implementation(project(":common:storage"))
-    implementation(project(":common:otel:internal"))
 
-    implementation(Dependencies.Android.SessionReplay.logger)
+    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.commonId)
+    implementation(Dependencies.SessionReplay.commonHttp)
+    implementation(Dependencies.SessionReplay.commonStorage)
+    implementation(Dependencies.SessionReplay.commonUtils)
 }

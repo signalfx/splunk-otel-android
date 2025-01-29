@@ -20,9 +20,6 @@ import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
-import com.splunk.rum.integration.agent.internal.config.RemoteModuleConfiguration
-import com.splunk.rum.integration.agent.internal.extension.find
-import com.splunk.sdk.common.utils.extensions.optBooleanNull
 
 object NetworkRequestConfigurer {
 
@@ -44,18 +41,6 @@ object NetworkRequestConfigurer {
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
-        override fun onRemoteModuleConfigurationsChanged(manager: ModuleConfigurationManager, remoteConfigurations: List<RemoteModuleConfiguration>) {
-            Logger.d(TAG, "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)")
-            setModuleConfiguration(remoteConfigurations)
-        }
-    }
-
-    private fun setModuleConfiguration(remoteConfigurations: List<RemoteModuleConfiguration>) {
-        Logger.d(TAG, "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)")
-
-        val remoteConfig = remoteConfigurations.find(MODULE_NAME)?.config
-
-        isNetworkTracingEnabled = remoteConfig?.optBooleanNull("enabled") ?: DEFAULT_IS_ENABLED
     }
 
     private val installationListener = object : AgentIntegration.Listener {
@@ -64,8 +49,6 @@ object NetworkRequestConfigurer {
 
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
-
-            setModuleConfiguration(integration.moduleConfigurationManager.remoteConfigurations)
         }
     }
 }

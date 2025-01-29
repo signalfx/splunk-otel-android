@@ -18,12 +18,12 @@ package com.splunk.app.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.cisco.android.common.utils.extensions.contentView
 import com.splunk.app.databinding.ActivityMainBinding
 import com.splunk.app.extension.setCustomAnimations
 import com.splunk.app.extension.setSubtitle
 import com.splunk.app.ui.menu.MenuFragment
 import com.splunk.app.util.FragmentAnimation
-import com.splunk.sdk.common.utils.extensions.contentView
 
 class MainActivity : AppCompatActivity() {
 

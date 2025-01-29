@@ -24,5 +24,5 @@ android {
 }
 
 dependencies {
-    api(project(":common:utils"))
+    api(Dependencies.SessionReplay.commonUtils)
 }

@@ -22,10 +22,6 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.anr.AnrReportingHandler
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
-import com.splunk.rum.integration.agent.internal.config.RemoteModuleConfiguration
-import com.splunk.rum.integration.agent.internal.extension.find
-import com.splunk.sdk.common.utils.extensions.optBooleanNull
-import com.splunk.sdk.common.utils.extensions.optLongNull
 
 @SuppressLint("LongLogTag")
 object ANRConfigurer {
@@ -53,26 +49,6 @@ object ANRConfigurer {
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
-        override fun onRemoteModuleConfigurationsChanged(manager: ModuleConfigurationManager, remoteConfigurations: List<RemoteModuleConfiguration>) {
-            Logger.d(TAG, "onRemoteModuleConfigurationsChanged(remoteConfigurations: $remoteConfigurations)")
-            setModuleConfiguration(remoteConfigurations)
-
-            if (ANRConfigurer::anrHandler.isInitialized) {
-                // We always unregister the ANR Handler. If ANR reporting is still enabled, we re-register
-                // the ANR Handler so that it will have the most recently updated threshold value
-                anrHandler.unregister()
-                if (isANRReportingEnabled) {
-                    anrHandler.register(thresholdSeconds)
-                }
-            }
-        }
-    }
-
-    private fun setModuleConfiguration(remoteConfigurations: List<RemoteModuleConfiguration>) {
-        Logger.d(TAG, "setModuleConfiguration(remoteConfigurations: $remoteConfigurations)")
-        val remoteConfig = remoteConfigurations.find(MODULE_NAME)?.config
-        isANRReportingEnabled = remoteConfig?.optBooleanNull("enabled") ?: DEFAULT_IS_ENABLED
-        thresholdSeconds = remoteConfig?.optLongNull("thresholdAndroid") ?: DEFAULT_TIMEOUT
     }
 
     private val installationListener = object : AgentIntegration.Listener {
@@ -80,8 +56,6 @@ object ANRConfigurer {
             Logger.d(TAG, "onInstall()")
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
-
-            setModuleConfiguration(integration.moduleConfigurationManager.remoteConfigurations)
 
             // Registers anr handler if anr reporting enabled
             if (!ANRConfigurer::anrHandler.isInitialized) {

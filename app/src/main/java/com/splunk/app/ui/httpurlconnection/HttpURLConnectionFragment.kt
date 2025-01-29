@@ -17,20 +17,20 @@
 package com.splunk.app.ui.httpurlconnection
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.cisco.android.common.utils.runOnBackgroundThread
+import com.cisco.android.common.utils.runOnUiThread
+import com.splunk.app.R
 import com.splunk.app.databinding.FragmentHttpUrlConnectionBinding
 import com.splunk.app.ui.BaseFragment
-import com.splunk.sdk.common.utils.runOnBackgroundThread
+import com.splunk.rum.library.httpurlconnection.HttpUrlInstrumentationConfig
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import android.util.Log
-import android.widget.Toast
-import com.splunk.rum.library.httpurlconnection.HttpUrlInstrumentationConfig
-import com.splunk.app.R
-import com.splunk.sdk.common.utils.runOnUiThread
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 

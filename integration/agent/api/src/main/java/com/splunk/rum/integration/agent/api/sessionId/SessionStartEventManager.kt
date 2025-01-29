@@ -19,7 +19,7 @@ package com.splunk.rum.integration.agent.api.sessionId
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.attributes.AttributeConstants
 import com.splunk.rum.integration.agent.internal.session.SessionManager
-import com.cisco.mrum.common.otel.api.OpenTelemetry
+import com.splunk.sdk.common.otel.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import java.util.concurrent.TimeUnit
