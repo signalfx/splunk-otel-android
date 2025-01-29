@@ -1,6 +1,6 @@
 // Common modules
 include ':common:otel',
-        ':common:storage',
+        ':common:storage'
 
 // Instrumentation modules
 include ':instrumentation:runtime:crash',
