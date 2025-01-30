@@ -3,10 +3,7 @@ include ':common:otel',
         ':common:storage'
 
 // Instrumentation modules
-include ':instrumentation:runtime:crash',
-        ':instrumentation:runtime:anr',
-        ':instrumentation:runtime:startup',
-        ':instrumentation:runtime:networkrequest:library',
+include ':instrumentation:runtime:startup',
         ':instrumentation:buildtime:plugin'
 
 // Integration
