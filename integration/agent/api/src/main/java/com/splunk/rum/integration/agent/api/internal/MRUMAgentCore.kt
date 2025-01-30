@@ -64,15 +64,13 @@ internal object MRUMAgentCore {
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
         SessionPulseEventManager.obtainInstance(agentIntegration.sessionManager)
 
-        val openTelemetryInitializer = OpenTelemetryInitializer(application)
-        openTelemetryInitializer
+        OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
-        
-        openTelemetryInitializer.build()
+            .build()
 
         agentIntegration.install(application)
     }
