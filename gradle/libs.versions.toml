@@ -10,7 +10,7 @@ spotless = "6.25.0"
 kotlin = "2.1.0"
 lifecycle-runtime-ktx = "2.8.7"
 activity-compose = "1.9.3"
-compose-bom = "2024.11.00"
+compose-bom = "2024.12.01"
 navigationCompose = "2.7.7"
 
 [libraries]
