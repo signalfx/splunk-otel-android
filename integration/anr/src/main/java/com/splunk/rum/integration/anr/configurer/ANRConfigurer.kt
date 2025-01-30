@@ -19,7 +19,6 @@ package com.splunk.rum.integration.anr.configurer
 import android.annotation.SuppressLint
 import android.content.Context
 import com.cisco.android.common.logger.Logger
-import com.splunk.rum.anr.AnrReportingHandler
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 
@@ -30,7 +29,6 @@ object ANRConfigurer {
     private const val MODULE_NAME = "anrReporting"
     private const val DEFAULT_IS_ENABLED = true
     private const val DEFAULT_TIMEOUT = 5L
-    private lateinit var anrHandler: AnrReportingHandler
 
     @JvmField
     var isANRReportingEnabled: Boolean = DEFAULT_IS_ENABLED
@@ -56,15 +54,6 @@ object ANRConfigurer {
             Logger.d(TAG, "onInstall()")
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
-
-            // Registers anr handler if anr reporting enabled
-            if (!ANRConfigurer::anrHandler.isInitialized) {
-                anrHandler = AnrReportingHandler(context)
-            }
-
-            if (isANRReportingEnabled) {
-                anrHandler.register(thresholdSeconds)
-            }
         }
     }
 }
