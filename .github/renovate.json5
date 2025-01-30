@@ -1,19 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "baseBranches": ["main"],
   // Run monthly once before 5am UTC for the main branch
   "schedule": [
     "* 0-4 1 * *"
-  ]
+  ],
   "packageRules": [
     {
       // Don't bump upstream otel versions
-      "matchPackagePatterns": [
-        "^io.opentelemetry",
-        "^io.opentelemetry.instrumentation"
+      "matchPackageNames": [
+        "/^io.opentelemetry/",
+        "/^io.opentelemetry.instrumentation/"
       ],
       "enabled": false
     },
@@ -33,7 +33,7 @@
     {
       // navigation-fragment 2.7.0 and above require android api 34+, which we are not ready for
       // yet due to android gradle plugin only supporting min 33.
-      "matchPackagePrefixes": ["androidx.navigation"],
+      "matchPackageNames": ["androidx.navigation{/,}**"],
       "matchUpdateTypes": ["major", "minor"],
       "groupName": "androidx.navigation",
       "enabled": false
@@ -54,11 +54,11 @@
       "enabled": false
     },
     {
-      "matchPackagePrefixes": ["com.diffplug.spotless"],
+      "matchPackageNames": ["com.diffplug.spotless{/,}**"],
       "groupName": "spotless packages"
     },
     {
-      "matchPackagePrefixes": ["io.opentelemetry.instrumentation"],
+      "matchPackageNames": ["io.opentelemetry.instrumentation{/,}**"],
       "groupName": "upstream otel instrumentation"
     },
     {
