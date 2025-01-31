@@ -27,7 +27,6 @@ import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentHttpUrlConnectionBinding
 import com.splunk.app.ui.BaseFragment
-import com.splunk.rum.library.httpurlconnection.HttpUrlInstrumentationConfig
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -45,12 +44,6 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
 
         // Schedule thread that closes un-ended spans for edge cases
         val executor = Executors.newSingleThreadScheduledExecutor()
-        executor.scheduleWithFixedDelay(
-            HttpUrlInstrumentationConfig.getReportIdleConnectionRunnable(),
-            0,
-            HttpUrlInstrumentationConfig.getReportIdleConnectionInterval(),
-            TimeUnit.MILLISECONDS
-        )
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

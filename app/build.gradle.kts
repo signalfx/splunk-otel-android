@@ -69,8 +69,6 @@ dependencies {
 
     implementation(project(":agent"))
     implementation(project(":integration:sessionreplay"))
-    //TODO: Below dependency can be removed once we uncomment the plugin id.
-    implementation(project(":instrumentation:runtime:networkrequest:library"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)

@@ -24,7 +24,6 @@ android {
 
 dependencies {
     implementation(project(":integration:agent:internal"))
-    implementation(project(":instrumentation:runtime:crash"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)

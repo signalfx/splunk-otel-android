@@ -56,7 +56,6 @@ dependencies {
     implementation(Dependencies.bytebuddyGradlePlugin)
     implementation(Dependencies.bytebuddy)
     implementation(gradleApi())
-    api(project(":instrumentation:buildtime:build-info-injector"))
 }
 
 signing {
