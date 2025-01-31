@@ -16,7 +16,6 @@
 
 package com.splunk.rum.plugin;
 
-import com.splunk.rum.buildInfoInjector.BuildInfoInjectorPlugin;
 import net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -29,13 +28,8 @@ public class AndroidInstrumentationPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         this.project = project;
-        applyBuildInfoInjectorPlugin(project);
         addBytebuddyPluginForNRTracing();
         addAutoInstrumentationDependenciesForNRTracing();
-    }
-
-    private void applyBuildInfoInjectorPlugin(Project project) {
-        project.getPluginManager().apply(BuildInfoInjectorPlugin.class);
     }
 
     private void addBytebuddyPluginForNRTracing() {

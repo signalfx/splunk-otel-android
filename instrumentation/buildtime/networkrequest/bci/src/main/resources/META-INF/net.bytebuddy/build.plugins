@@ -1,3 +1,0 @@
-com.splunk.rum.bci.httpurlconnection.HttpUrlConnectionPlugin
-com.splunk.rum.bci.okhttp3.OkHttpClientPlugin
-com.splunk.rum.bci.okhttp3.OkHttpCallbackPlugin

@@ -1,16 +1,10 @@
 // Common modules
 include ':common:otel',
-        ':common:storage',
-        ':common:utils'
+        ':common:storage'
 
 // Instrumentation modules
-include ':instrumentation:runtime:crash',
-        ':instrumentation:runtime:anr',
-        ':instrumentation:runtime:startup',
-        ':instrumentation:runtime:networkrequest:library',
-        ':instrumentation:buildtime:networkrequest:bci',
-        ':instrumentation:buildtime:plugin',
-        ':instrumentation:buildtime:build-info-injector'
+include ':instrumentation:runtime:startup',
+        ':instrumentation:buildtime:plugin'
 
 // Integration
 include ':integration:agent:api',

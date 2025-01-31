@@ -68,8 +68,6 @@ dependencies {
     //implementation("com.cisco.android:rum-common-utils:24.4.10-2246")
 
     implementation(project(":agent"))
-    //TODO: Below dependency can be removed once we uncomment the plugin id.
-    implementation(project(":instrumentation:runtime:networkrequest:library"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)

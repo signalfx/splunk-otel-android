@@ -19,7 +19,6 @@ package com.splunk.rum.integration.crash.configurer
 import android.annotation.SuppressLint
 import android.content.Context
 import com.cisco.android.common.logger.Logger
-import com.splunk.rum.crash.CrashReportingHandler
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 
@@ -29,7 +28,6 @@ object CrashConfigurer {
     private const val TAG = "CrashReportingConfigurer"
     private const val MODULE_NAME = "crashReporting"
     private const val DEFAULT_IS_ENABLED = true
-    private lateinit var crashHandler: CrashReportingHandler
 
     @JvmField
     var isCrashReportingEnabled: Boolean = DEFAULT_IS_ENABLED
@@ -52,15 +50,6 @@ object CrashConfigurer {
             Logger.d(TAG, "onInstall()")
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
-
-            // Registers crash handler if crash reporting enabled
-            if (!CrashConfigurer::crashHandler.isInitialized) {
-                crashHandler = CrashReportingHandler(context)
-            }
-
-            if (isCrashReportingEnabled) {
-                crashHandler.register()
-            }
         }
     }
 }
