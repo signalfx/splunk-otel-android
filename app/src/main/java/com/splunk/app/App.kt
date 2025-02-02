@@ -17,8 +17,6 @@
 package com.splunk.app
 
 import android.app.Application
-import com.cisco.android.common.logger.Logger
-import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.CiscoRUMAgent
 import java.net.URL
@@ -27,16 +25,14 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        if (BuildConfig.DEBUG)
-            Logger.consumers += AndroidLogConsumer()
-
         // TODO: Reenable with the bridge support
         // BridgeManager.bridgeInterfaces += TomasBridgeInterface()
 
         val agentConfig = AgentConfiguration(
             url = URL("https://alameda-eum-qe.saas.appd-test.com"),
             appName = "smartlook-android",
-            appVersion = "0.1"
+            appVersion = "0.1",
+            isDebugLogsEnabled = true,
         )
 
         val agent = CiscoRUMAgent.install(
