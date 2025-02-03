@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 1.9.0 - 2025-02-03
+
+This is a regular maintenance release
+
+* Marked APIs, classes, and methods that will be deprecated down the line with the deprecation annotation
+
 ### Version 1.8.1 - 2024-12-06
 
 Reducing the version of androidx libraries that enforce API level 35.
