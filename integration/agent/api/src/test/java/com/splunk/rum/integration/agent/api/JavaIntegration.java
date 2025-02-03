@@ -35,7 +35,7 @@ public class JavaIntegration extends Application {
             throw new RuntimeException(e);
         }
 
-        AgentConfiguration agentConfig = new AgentConfiguration(url, "smartlook-android", "0.1");
+        AgentConfiguration agentConfig = new AgentConfiguration(url, "smartlook-android", "0.1", true);
 
         ModuleConfiguration[] moduleConfigs = new ModuleConfiguration[2];
         moduleConfigs[0] = new CustomModuleConfiguration();

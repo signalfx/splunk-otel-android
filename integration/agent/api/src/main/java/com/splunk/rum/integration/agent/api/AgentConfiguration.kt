@@ -26,9 +26,12 @@ import java.net.URL
  *                  The default value corresponds to `Context.getPackageName()`.
  * @property appVersion Optional string that contains the current application version.
  *                      The default value corresponds to `PackageInfo.versionName`.
+ * @property isDebugLogsEnabled Optional boolean that decides if debug logs are visible or not.
+ *                              The default value is `false`.
  */
 data class AgentConfiguration(
     val url: URL,
     var appName: String? = null,
     var appVersion: String? = null,
+    var isDebugLogsEnabled: Boolean = false, // temporary name till product decides on more suitable one
 )
