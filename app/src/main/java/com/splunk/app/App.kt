@@ -17,6 +17,7 @@
 package com.splunk.app
 
 import android.app.Application
+import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRUMAgent
 import com.splunk.rum.integration.sessionreplay.api.sessionReplay
