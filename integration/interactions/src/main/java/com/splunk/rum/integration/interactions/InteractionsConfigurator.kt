@@ -22,12 +22,17 @@ import com.cisco.android.common.logger.Logger
 import com.cisco.android.instrumentation.recording.capturer.FrameCapturer
 import com.cisco.android.instrumentation.recording.interactions.Interactions
 import com.cisco.android.instrumentation.recording.interactions.OnInteractionListener
+import com.cisco.android.instrumentation.recording.interactions.compose.PointerInputObserverInjectorModifier
 import com.cisco.android.instrumentation.recording.interactions.model.Interaction
 import com.cisco.android.instrumentation.recording.interactions.model.LegacyData
+import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.cisco.android.instrumentation.recording.wireframe.model.Wireframe
 import com.cisco.android.instrumentation.recording.wireframe.stats.WireframeStats
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
+import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
+import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
+import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 
 internal object InteractionsConfigurator {
 
@@ -53,6 +58,20 @@ internal object InteractionsConfigurator {
         }
 
         Interactions.listeners += interactionsListener
+
+        setupComposeIdentification()
+    }
+
+    private fun setupComposeIdentification() {
+        runIfComposeUiExists {
+            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) { id, isSensitive, _ ->
+                SessionReplayDrawModifier(id, isSensitive)
+            }
+
+            ComposeElementIdentification.insertModifierIfNeeded(PointerInputObserverInjectorModifier::class, OrderPriority.LOW) { id, _, positionInList ->
+                id?.let { PointerInputObserverInjectorModifier(id, positionInList) }
+            }
+        }
     }
 
     private val interactionsListener = object : OnInteractionListener {
@@ -65,7 +84,6 @@ internal object InteractionsConfigurator {
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
     }
-
 
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(context: Context) {

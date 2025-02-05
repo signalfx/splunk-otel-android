@@ -28,4 +28,6 @@ dependencies {
 
     api(Dependencies.SessionReplay.instrumentationSessionRecordingCore)
     implementation(Dependencies.SessionReplay.commonLogger)
+
+    compileOnly(Dependencies.Android.Compose.ui)
 }

@@ -83,6 +83,12 @@ object Dependencies {
         const val constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
         const val activityKtx = "androidx.activity:activity-ktx:$activityKtxVersion"
         const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+
+        object Compose {
+            private const val version = "1.2.1" // No need to update
+
+            const val ui = "androidx.compose.ui:ui:$version"
+        }
     }
 
     object SessionReplay {

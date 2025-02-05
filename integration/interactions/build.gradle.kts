@@ -28,4 +28,6 @@ dependencies {
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingFrameCapturer)
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingInteractions)
+
+    compileOnly(Dependencies.Android.Compose.ui)
 }
