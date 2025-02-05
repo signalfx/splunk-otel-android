@@ -44,8 +44,9 @@ object ApplicationStartupTimekeeper {
             isColdStartCompleted = true
 
             if (isEnabled) {
-                val duration = System.currentTimeMillis() - firstTimestamp
-                listeners.forEachFast { it.onColdStarted(duration) }
+                val endTimestamp = System.currentTimeMillis()
+                val duration = endTimestamp - firstTimestamp
+                listeners.forEachFast { it.onColdStarted(firstTimestamp, endTimestamp, duration) }
             }
         }
 
@@ -87,10 +88,12 @@ object ApplicationStartupTimekeeper {
 
             if (resumedActivityCount == 1 && (isHotStartPending || isWarmStartPending))
                 handler.twoConsecutivePosts {
+                    val endTimestamp = System.currentTimeMillis()
+
                     if (isHotStartPending) {
                         if (isEnabled) {
-                            val duration = System.currentTimeMillis() - firstActivityStartTimestamp
-                            listeners.forEachFast { it.onHotStarted(duration) }
+                            val duration = endTimestamp - firstActivityStartTimestamp
+                            listeners.forEachFast { it.onHotStarted(firstActivityStartTimestamp, endTimestamp, duration) }
                         }
 
                         isHotStartPending = false
@@ -98,8 +101,8 @@ object ApplicationStartupTimekeeper {
 
                     if (isWarmStartPending) {
                         if (isEnabled) {
-                            val duration = System.currentTimeMillis() - firstActivityCreateTimestamp
-                            listeners.forEachFast { it.onWarmStarted(duration) }
+                            val duration = endTimestamp - firstActivityCreateTimestamp
+                            listeners.forEachFast { it.onWarmStarted(firstActivityCreateTimestamp, endTimestamp, duration) }
                         }
 
                         isWarmStartPending = false
@@ -132,18 +135,18 @@ object ApplicationStartupTimekeeper {
          * The application is launched from a completely inactive state.
          * Kill the app > press the application icon.
          */
-        fun onColdStarted(duration: Long)
+        fun onColdStarted(startTimestamp: Long, endTimestamp: Long, duration: Long)
 
         /**
          * The application is launched after being recently closed or moved to the background, but still resides in memory.
          * Open the app > press back button > press the app icon.
          */
-        fun onWarmStarted(duration: Long)
+        fun onWarmStarted(startTimestamp: Long, endTimestamp: Long, duration: Long)
 
         /**
          * The application is already running in the background and is brought to the foreground.
          * Open the app > press home button > press the app icon.
          */
-        fun onHotStarted(duration: Long)
+        fun onHotStarted(startTimestamp: Long, endTimestamp: Long, duration: Long)
     }
 }

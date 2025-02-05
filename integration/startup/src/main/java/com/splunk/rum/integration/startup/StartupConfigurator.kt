@@ -18,9 +18,11 @@ package com.splunk.rum.integration.startup
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.splunk.sdk.common.otel.extensions.toInstant
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
+import com.splunk.sdk.common.otel.OpenTelemetry
 
 internal object StartupConfigurator {
 
@@ -38,19 +40,31 @@ internal object StartupConfigurator {
     }
 
     private val applicationStartupTimekeeperListener = object : ApplicationStartupTimekeeper.Listener {
-        override fun onColdStarted(duration: Long) {
-            Logger.d(TAG, "onColdStarted(duration: $duration ms)")
-            // TODO send data
+        override fun onColdStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
+            Logger.d(TAG, "onColdStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)")
+            reportEvent(startTimestamp, endTimestamp, "cold")
         }
 
-        override fun onWarmStarted(duration: Long) {
-            Logger.d(TAG, "onWarmStarted(duration: $duration ms)")
-            // TODO send data
+        override fun onWarmStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
+            Logger.d(TAG, "onWarmStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)")
+            reportEvent(startTimestamp, endTimestamp, "warm")
         }
 
-        override fun onHotStarted(duration: Long) {
-            Logger.d(TAG, "onHotStarted(duration: $duration ms)")
-            // TODO send data
+        override fun onHotStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
+            Logger.d(TAG, "onHotStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)")
+            reportEvent(startTimestamp, endTimestamp, "hot")
+        }
+
+        private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
+            val provider = OpenTelemetry.instance?.sdkTracerProvider ?: return
+
+            provider.get("SplunkRum")
+                .spanBuilder("AppStart")
+                .setStartTimestamp(startTimestamp.toInstant())
+                .setAttribute("component", "appstart")
+                .setAttribute("start.type", name)
+                .startSpan()
+                .end(endTimestamp.toInstant())
         }
     }
 
