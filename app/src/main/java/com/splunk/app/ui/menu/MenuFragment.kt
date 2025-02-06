@@ -26,6 +26,7 @@ import com.splunk.app.ui.BaseFragment
 import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.util.FragmentAnimation
+import com.splunk.rum.integration.agent.api.extension.splunkRumId
 
 class MenuFragment : BaseFragment<FragmentMenuBinding>() {
 
@@ -48,6 +49,8 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.anrEvent.setOnClickListener(onClickListener)
         viewBinding.okhttpSampleCalls.setOnClickListener(onClickListener)
         viewBinding.httpurlconnection.setOnClickListener(onClickListener)
+
+        viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"
     }
 
     private val onClickListener = View.OnClickListener {
