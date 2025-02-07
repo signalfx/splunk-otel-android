@@ -40,6 +40,10 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
 
     override val titleRes: Int = R.string.menu_title
 
+    private val agent: SplunkRUMAgent? by lazy {
+        (requireActivity().application as? App)?.agent
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -117,34 +121,33 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
 
             viewBinding.trackCustomEvent.id -> {
-                val testAttributes = Attributes.builder()
-                    .put("attribute.one", "value1")
-                    .put("attribute.two", "12345")
-                    .build()
-                getAgent()?.customTracking?.trackCustomEvent("TestEvent", testAttributes)
-                showDoneToast("Track Custom Event")
+                agent?.let {
+                    val testAttributes = Attributes.builder()
+                        .put("attribute.one", "value1")
+                        .put("attribute.two", "12345")
+                        .build()
+                    it.customTracking.trackCustomEvent("TestEvent", testAttributes)
+                    showDoneToast("Track Custom Event, Done!")
+                } ?: showDoneToast("Agent is null, cannot track")
             }
 
             viewBinding.trackWorkflow.id -> {
-                val workflowSpan = getAgent()?.customTracking?.trackWorkflow("Test Workflow")
-                workflowSpan?.setAttribute("workflow.start.time", System.currentTimeMillis())
-                // Simulate some processing time
-                Thread.sleep(125)
-                workflowSpan?.setAttribute("workflow.end.time", System.currentTimeMillis())
-                workflowSpan?.end()
-                showDoneToast("Track Workflow")
+                agent?.let {
+                    val workflowSpan = it.customTracking.trackWorkflow("Test Workflow")
+                    workflowSpan?.setAttribute("workflow.start.time", System.currentTimeMillis())
+                    // Simulate some processing time
+                    Thread.sleep(125)
+                    workflowSpan?.setAttribute("workflow.end.time", System.currentTimeMillis())
+                    workflowSpan?.end()
+                    showDoneToast("Track Workflow, Done!")
+                } ?: showDoneToast("Agent is null, cannot track")
             }
         }
     }
 
-    private fun getAgent(): SplunkRUMAgent? {
-        val app = requireActivity().application as? App
-        return app?.agent
-    }
-
-    private fun showDoneToast(name: String) {
+    private fun showDoneToast(message: String) {
         runOnUiThread {
-            Toast.makeText(context, "$name, Done!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 }
