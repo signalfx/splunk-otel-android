@@ -21,8 +21,12 @@ import com.cisco.android.common.logger.Logger
 import com.cisco.android.instrumentation.recording.core.api.DataListener
 import com.cisco.android.instrumentation.recording.core.api.Metadata
 import com.cisco.android.instrumentation.recording.core.api.SessionReplay
+import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
+import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
+import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
+import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.sdk.common.otel.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -45,6 +49,16 @@ internal object SessionReplayCore {
         Logger.d(TAG, "attach()")
 
         AgentIntegration.obtainInstance(context).listeners += installationListener
+
+        setupComposeIdentification()
+    }
+
+    private fun setupComposeIdentification() {
+        runIfComposeUiExists {
+            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) { id, isSensitive, _ ->
+                SessionReplayDrawModifier(id, isSensitive)
+            }
+        }
     }
 
     private val moduleConfigurationManagerListener = object : ModuleConfigurationManager.Listener {
