@@ -24,6 +24,9 @@ import com.splunk.rum.integration.sessionreplay.api.sessionReplay
 import java.net.URL
 
 class App : Application() {
+    lateinit var agent: SplunkRUMAgent
+        private set
+
     override fun onCreate() {
         super.onCreate()
 
@@ -37,7 +40,7 @@ class App : Application() {
             isDebugLogsEnabled = true,
         )
 
-        val agent = SplunkRUMAgent.install(
+        agent = SplunkRUMAgent.install(
             application = this,
             agentConfiguration = agentConfig,
             moduleConfigurations = arrayOf(

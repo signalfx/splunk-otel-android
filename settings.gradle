@@ -22,3 +22,4 @@ include ':app'
 
 // Main entry point
 include ':agent'
+include ':instrumentation:runtime:customtracking'
