@@ -137,7 +137,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         }
     }
 
-    fun getAgent(): SplunkRUMAgent? {
+    private fun getAgent(): SplunkRUMAgent? {
         val app = requireActivity().application as? App
         return app?.agent
     }
