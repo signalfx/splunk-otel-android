@@ -32,6 +32,7 @@ import com.splunk.app.util.FragmentAnimation
 import com.splunk.rum.customtracking.extension.customTracking
 import com.splunk.rum.integration.agent.api.SplunkRUMAgent
 import io.opentelemetry.api.common.Attributes
+import com.splunk.rum.integration.agent.api.extension.splunkRumId
 
 class MenuFragment : BaseFragment<FragmentMenuBinding>() {
 
@@ -56,6 +57,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.httpurlconnection.setOnClickListener(onClickListener)
         viewBinding.trackCustomEvent.setOnClickListener(onClickListener)
         viewBinding.trackWorkflow.setOnClickListener(onClickListener)
+        viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"
     }
 
     private val onClickListener = View.OnClickListener {
