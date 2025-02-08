@@ -63,11 +63,7 @@ class OpenTelemetryInitializer(application: Application) {
         ).build()
 
         logRecordProcessors += BatchLogRecordProcessor.builder(
-            AndroidLogRecordExporter(
-                agentStorage = agentStorage,
-                jobManager = jobManager,
-                jobIdStorage = jobIdStorage
-            )
+            AndroidLogRecordExporter()
         ).build()
     }
 

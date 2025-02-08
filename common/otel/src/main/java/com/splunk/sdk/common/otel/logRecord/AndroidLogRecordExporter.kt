@@ -16,42 +16,59 @@
 
 package com.splunk.sdk.common.otel.logRecord
 
-import com.cisco.android.common.job.IJobManager
-import com.cisco.android.common.job.JobIdStorage
-import com.splunk.sdk.common.storage.IAgentStorage
-import io.opentelemetry.exporter.internal.otlp.logs.LogsRequestMarshaler
+import com.splunk.sdk.common.otel.OpenTelemetry
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.SpanKind
+import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
-import java.io.ByteArrayOutputStream
-import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 /**
  * This Exporter is added to Otel by default, it handles the offline/persistance.
  */
-internal class AndroidLogRecordExporter(
-    private val agentStorage: IAgentStorage,
-    private val jobManager: IJobManager,
-    private val jobIdStorage: JobIdStorage
-) : LogRecordExporter {
+internal class AndroidLogRecordExporter : LogRecordExporter {
 
     override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
-        val exportRequest = LogsRequestMarshaler.create(logs)
+        logs.forEach { log ->
+             val parentContext = Context.current()
+             val activeSpan = Span.fromContextOrNull(parentContext)
 
-        val id = UUID.randomUUID().toString()
+            // traceId and spanId should be inside the context already from global OTel instance
+            val spanBuilder = OpenTelemetry.instance!!.sdkTracerProvider.get("splunkrum")
+                .spanBuilder(log.attributes[AttributeKey.stringKey("event.name")] ?: "")
+                .setSpanKind(SpanKind.INTERNAL)
+                .setParent(parentContext)
+                .setStartTimestamp(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
 
-        // Save data to our storage.
-        ByteArrayOutputStream().use {
-            exportRequest.writeBinaryTo(it)
-            agentStorage.writeOtelLogData(id, it.toByteArray())
+
+            if(activeSpan !=null && activeSpan.spanContext.isValid){
+                spanBuilder.setParent(parentContext)
+            }
+
+            val span = spanBuilder.startSpan()
+
+            try {
+                span.setAttribute("log.body", log.body.asString())
+                log.attributes.asMap().forEach { (key, value) ->
+                    when (value) {
+                        is String -> span.setAttribute(key.key, value)
+                        is Long -> span.setAttribute(key.key, value)
+                        is Double -> span.setAttribute(key.key, value)
+                        is Boolean -> span.setAttribute(key.key, value)
+                        is List<*> -> {
+                            val listValue = value.joinToString(",") { it.toString() }
+                            span.setAttribute(key.key, listValue)
+                        }
+                        else -> span.setAttribute(key.key, value.toString())
+                    }
+                }
+            } finally {
+                span.end(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+            }
         }
-
-        // Job scheduling
-        jobManager.scheduleJob(UploadOtelLogRecordData(id, jobIdStorage))
-
-        // TODO move this to proper standalone exporter
-        // flush to std out too (temporary for demo purposes, uncomment to enable)
-        // flushToConsole(logs)
 
         return CompletableResultCode.ofSuccess()
     }
@@ -62,39 +79,5 @@ internal class AndroidLogRecordExporter(
 
     override fun shutdown(): CompletableResultCode {
         return CompletableResultCode.ofSuccess()
-    }
-
-    private fun flushToConsole(logs: MutableCollection<LogRecordData>) {
-        val stringBuilder = StringBuilder(60)
-
-        for (log in logs) {
-            stringBuilder.setLength(0)
-            formatLog(stringBuilder, log)
-            println(stringBuilder)
-        }
-    }
-
-    // temporary for demo purposes
-    private fun formatLog(stringBuilder: java.lang.StringBuilder, log: LogRecordData) {
-        val instrumentationScopeInfo = log.instrumentationScopeInfo
-        stringBuilder.append("DEMO log to std out:")
-        stringBuilder.appendLine()
-        stringBuilder
-            .append("SEVERITY: " + log.severity)
-            .appendLine()
-            .append("BODY: " + log.body.asString())
-            .appendLine()
-            .append("SPAN CONTEXT TRACE ID: " + log.spanContext.traceId)
-            .appendLine()
-            .append("SPAN CONTEXT SPAN ID: " + log.spanContext.spanId)
-            .appendLine()
-            .append("ATTRIBUTES: " + log.attributes.toString())
-            .appendLine()
-            .append("SCOPE INFO: ")
-            .append(instrumentationScopeInfo.name)
-            .append(" : ")
-            .append(
-                if (instrumentationScopeInfo.version == null) "" else instrumentationScopeInfo.version
-            )
     }
 }
