@@ -37,7 +37,7 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
              val activeSpan = Span.fromContextOrNull(parentContext)
 
             // traceId and spanId should be inside the context already from global OTel instance
-            val spanBuilder = OpenTelemetry.instance!!.sdkTracerProvider.get("splunkrum")
+            val spanBuilder = OpenTelemetry.instance!!.sdkTracerProvider.get("SplunkRum")
                 .spanBuilder(log.attributes[AttributeKey.stringKey("event.name")] ?: "")
                 .setSpanKind(SpanKind.INTERNAL)
                 .setParent(parentContext)
