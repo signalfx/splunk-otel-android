@@ -20,12 +20,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.cisco.android.common.utils.runOnUiThread
+import com.splunk.app.App
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentMenuBinding
 import com.splunk.app.ui.BaseFragment
 import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.util.FragmentAnimation
+import com.splunk.rum.customtracking.extension.customTracking
+import com.splunk.rum.integration.agent.api.SplunkRUMAgent
+import io.opentelemetry.api.common.Attributes
 import com.splunk.rum.integration.agent.api.extension.splunkRumId
 
 class MenuFragment : BaseFragment<FragmentMenuBinding>() {
@@ -34,6 +40,10 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         get() = FragmentMenuBinding::inflate
 
     override val titleRes: Int = R.string.menu_title
+
+    private val agent: SplunkRUMAgent? by lazy {
+        (requireActivity().application as? App)?.agent
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,7 +59,8 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.anrEvent.setOnClickListener(onClickListener)
         viewBinding.okhttpSampleCalls.setOnClickListener(onClickListener)
         viewBinding.httpurlconnection.setOnClickListener(onClickListener)
-
+        viewBinding.trackCustomEvent.setOnClickListener(onClickListener)
+        viewBinding.trackWorkflow.setOnClickListener(onClickListener)
         viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"
     }
 
@@ -57,10 +68,13 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         when (it.id) {
             viewBinding.crashReportsIllegal.id ->
                 throw IllegalArgumentException("Illegal Argument Exception Thrown!")
+
             viewBinding.crashReportsMainThread.id ->
                 throw RuntimeException("Crashing on main thread")
+
             viewBinding.crashReportsInBackground.id ->
                 Thread { throw RuntimeException("Attempt to crash background thread") }.start()
+
             viewBinding.crashReportsNoAppCode.id -> {
                 val e = java.lang.RuntimeException("No Application Code")
                 e.stackTrace = arrayOf(
@@ -70,16 +84,19 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 )
                 throw e
             }
+
             viewBinding.crashReportsNoStacktrace.id -> {
                 val e = java.lang.RuntimeException("No Stack Trace")
                 e.stackTrace = arrayOfNulls(0)
                 throw e
             }
+
             viewBinding.crashReportsOutOfMemoryError.id -> {
                 val e = OutOfMemoryError("out of memory")
                 e.stackTrace = arrayOfNulls(0)
                 throw e
             }
+
             viewBinding.crashReportsWithChainedExceptions.id -> {
                 try {
                     throw NullPointerException("Simulated error in exception 1")
@@ -87,8 +104,10 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     throw IllegalArgumentException("Simulated error in exception 2", e)
                 }
             }
+
             viewBinding.crashReportsNull.id ->
                 throw NullPointerException("I am null!")
+
             viewBinding.anrEvent.id -> {
                 try {
                     Thread.sleep(6000)
@@ -96,10 +115,41 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     throw RuntimeException(e)
                 }
             }
+
             viewBinding.okhttpSampleCalls.id ->
                 navigateTo(OkHttpFragment(), FragmentAnimation.FADE)
+
             viewBinding.httpurlconnection.id ->
                 navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
+
+            viewBinding.trackCustomEvent.id -> {
+                agent?.let {
+                    val testAttributes = Attributes.builder()
+                        .put("attribute.one", "value1")
+                        .put("attribute.two", "12345")
+                        .build()
+                    it.customTracking.trackCustomEvent("TestEvent", testAttributes)
+                    showDoneToast("Track Custom Event, Done!")
+                } ?: showDoneToast("Agent is null, cannot track")
+            }
+
+            viewBinding.trackWorkflow.id -> {
+                agent?.let {
+                    val workflowSpan = it.customTracking.trackWorkflow("Test Workflow")
+                    workflowSpan?.setAttribute("workflow.start.time", System.currentTimeMillis())
+                    // Simulate some processing time
+                    Thread.sleep(125)
+                    workflowSpan?.setAttribute("workflow.end.time", System.currentTimeMillis())
+                    workflowSpan?.end()
+                    showDoneToast("Track Workflow, Done!")
+                } ?: showDoneToast("Agent is null, cannot track")
+            }
+        }
+    }
+
+    private fun showDoneToast(message: String) {
+        runOnUiThread {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 }

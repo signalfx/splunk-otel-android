@@ -15,6 +15,9 @@
     <string name="menu_okhttp_sample_calls">Okhttp sample calls</string>
     <string name="menu_network_request_title">Network Requests</string>
     <string name="menu_httpurlconnection_title">HttpURLConnection</string>
+    <string name="menu_custom_tracking_title">Custom Tracking</string>
+    <string name="menu_custom_event">Track Custom Event</string>
+    <string name="menu_workflow">Track Workflow</string>
 
     <string name="okhttp_title">OkHttp</string>
     <string name="httpurlconnection_title">HttpURLConnection</string>

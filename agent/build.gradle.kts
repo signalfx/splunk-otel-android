@@ -27,5 +27,6 @@ dependencies {
     api(project(":integration:networkrequest"))
     api(project(":integration:startup"))
     api(project(":integration:interactions"))
+    api(project(":instrumentation:runtime:customtracking"))
 }
 

@@ -149,8 +149,41 @@
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
 			android:text="@string/menu_httpurlconnection_title"
-			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintTop_toBottomOf="@id/okhttp_sample_calls" />
+
+		<TextView
+			android:id="@+id/custom_tracking_title"
+			style="@style/Header"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="30dp"
+			android:text="@string/menu_custom_tracking_title"
+			android:textSize="18sp"
+			android:textStyle="bold"
+			app:layout_constraintTop_toBottomOf="@+id/httpurlconnection" />
+
+		<TextView
+			android:id="@+id/track_custom_event"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_custom_event"
+			app:layout_constraintTop_toBottomOf="@id/custom_tracking_title" />
+
+		<TextView
+			android:id="@+id/track_workflow"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_workflow"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/track_custom_event" />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -15,7 +15,7 @@ apply<ConfigAndroidLibrary>()
 apply<ConfigPublish>()
 
 ext {
-    set(artifactIdProperty, "$artifactPrefix${commonPrefix}otel-${project.name}")
+    set(artifactIdProperty, "$artifactPrefix${commonPrefix}${project.name}")
     set(versionProperty, Configurations.sdkVersionName)
 }
 
