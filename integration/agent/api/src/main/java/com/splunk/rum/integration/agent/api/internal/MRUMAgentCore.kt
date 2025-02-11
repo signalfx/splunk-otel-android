@@ -31,13 +31,10 @@ import com.splunk.rum.integration.agent.api.sessionPulse.SessionPulseEventManage
 import com.splunk.rum.integration.agent.api.state.StateLogRecordProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.BuildConfig
+import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.storage.AgentStorage
-import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.sdk.resources.Resource
-import io.opentelemetry.sdk.resources.ResourceBuilder
-import java.io.File
 
 internal object MRUMAgentCore {
 
@@ -72,6 +69,7 @@ internal object MRUMAgentCore {
         OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
+            .addSpanProcessor(GlobalAttributeSpanProcessor())
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
