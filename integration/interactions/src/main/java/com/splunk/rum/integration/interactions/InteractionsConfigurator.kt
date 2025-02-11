@@ -33,11 +33,18 @@ import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManag
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
+import com.splunk.sdk.common.otel.OpenTelemetry
+import io.opentelemetry.api.common.AttributeKey
+import java.util.concurrent.TimeUnit
 
 internal object InteractionsConfigurator {
 
     private const val TAG = "InteractionsConfigurator"
     private const val MODULE_NAME = "interactions"
+
+    private val attributeKeyComponent = AttributeKey.stringKey("component")
+    private val attributeKeyActionName = AttributeKey.stringKey("action.name")
+    private val attributeKeyTargetType = AttributeKey.stringKey("target.type")
 
     init {
         AgentIntegration.registerModule(MODULE_NAME)
@@ -77,8 +84,51 @@ internal object InteractionsConfigurator {
     private val interactionsListener = object : OnInteractionListener {
         override fun onInteraction(interaction: Interaction, legacyData: LegacyData?) {
             Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
+            reportEvent(interaction)
+        }
 
-            // TODO process interaction
+        private fun reportEvent(interaction: Interaction) {
+            val logger = OpenTelemetry.instance?.sdkLoggerProvider ?: return
+
+            val actionName = when (interaction) {
+                is Interaction.Focus ->
+                    "focus"
+                is Interaction.Keyboard ->
+                    "soft_keyboard"
+                is Interaction.Orientation ->
+                    return
+                is Interaction.PhoneButton ->
+                    "phone_button"
+                is Interaction.Touch.Gesture.DoubleTap ->
+                    "double_tap"
+                is Interaction.Touch.Gesture.LongPress ->
+                    "long_press"
+                is Interaction.Touch.Gesture.Pinch ->
+                    "pinch"
+                is Interaction.Touch.Gesture.RageTap ->
+                    "rage_tap"
+                is Interaction.Touch.Gesture.Rotation ->
+                    "rotation"
+                is Interaction.Touch.Gesture.Swipe ->
+                    return
+                is Interaction.Touch.Gesture.Tap ->
+                    "tap"
+                is Interaction.Touch.Pointer ->
+                    return
+            }
+
+            val targetType = if (interaction is Interaction.Targetable)
+                interaction.targetElementPath?.lastOrNull()?.view?.id
+            else
+                null
+
+            logger.get("SplunkRum")
+                .logRecordBuilder()
+                .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
+                .setAttribute(attributeKeyComponent, "ui")
+                .setAttribute(attributeKeyActionName, actionName)
+                .setAttribute(attributeKeyTargetType, targetType)
+                .emit()
         }
     }
 

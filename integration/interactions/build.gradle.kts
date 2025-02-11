@@ -23,6 +23,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":common:otel"))
     implementation(project(":integration:agent:internal"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
