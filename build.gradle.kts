@@ -8,6 +8,7 @@ buildscript {
         classpath(Dependencies.gradle)
         classpath(Dependencies.buildInfoExtractorGradle)
         classpath(Dependencies.kotlin)
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
     }
 }
 

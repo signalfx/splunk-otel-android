@@ -20,5 +20,11 @@ import io.opentelemetry.api.common.AttributeKey
 
 object RumConstants {
     const val RUM_TRACER_NAME: String = "SplunkRum"
+    const val COMPONENT_ERROR: String = "error"
     val WORKFLOW_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("workflow.name")
+    val COMPONENT_KEY: AttributeKey<String> = AttributeKey.stringKey("component")
+
+    val APPLICATION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("service.application_id")
+    val APP_VERSION_CODE_KEY: AttributeKey<String> = AttributeKey.stringKey("service.version_code")
+    val SPLUNK_OLLY_UUID_KEY: AttributeKey<String> = AttributeKey.stringKey("service.o11y.key")
 }

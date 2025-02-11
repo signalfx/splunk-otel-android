@@ -2,7 +2,7 @@ import plugins.ConfigAndroidLibrary
 import plugins.ConfigPublish
 import utils.artifactIdProperty
 import utils.artifactPrefix
-import utils.instrumentationPrefix
+import utils.commonPrefix
 import utils.versionProperty
 
 plugins {
@@ -15,18 +15,16 @@ apply<ConfigAndroidLibrary>()
 apply<ConfigPublish>()
 
 ext {
-    set(artifactIdProperty, "$artifactPrefix$instrumentationPrefix${project.name}")
+    set(artifactIdProperty, "$artifactPrefix$commonPrefix${project.name}")
     set(versionProperty, Configurations.sdkVersionName)
 }
 
 android {
-    namespace = "com.splunk.rum.customtracking"
+    namespace = "com.splunk.sdk.common.utils"
 }
 
 dependencies {
-    api(Dependencies.Otel.api)
-    implementation(project(":integration:agent:api"))
-    implementation(project(":common:otel"))
     implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(project(":common:utils"))
+    implementation(Dependencies.SessionReplay.commonStorage)
+    implementation(Dependencies.SessionReplay.commonUtils)
 }

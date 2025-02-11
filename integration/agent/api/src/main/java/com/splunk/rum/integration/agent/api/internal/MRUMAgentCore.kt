@@ -42,7 +42,6 @@ import java.io.File
 internal object MRUMAgentCore {
 
     private const val TAG = "MRUMAgentCore"
-    private const val SERVICE_HASH_RESOURCE_KEY = "service.hash"
 
     fun install(application: Application, agentConfiguration: AgentConfiguration, moduleConfigurations: List<ModuleConfiguration>) {
         if (agentConfiguration.isDebugLogsEnabled) {

@@ -16,13 +16,15 @@
 
 package com.splunk.rum.customtracking
 
+import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.sdk.common.otel.OpenTelemetry
 import com.splunk.sdk.common.otel.internal.RumConstants
+import com.splunk.sdk.utils.ErrorIdentifierExtractor
+import com.splunk.sdk.utils.ErrorIdentifierInfo
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
-
 
 class CustomTracking internal constructor() {
 
@@ -53,6 +55,47 @@ class CustomTracking internal constructor() {
             .startSpan()
     }
 
+    /**
+     * Add a custom exception to RUM monitoring. This can be useful for tracking custom error
+     * handling in your application.
+     *
+     *
+     * This event will be turned into a Span and sent to the RUM ingest along with other,
+     * auto-generated spans.
+     *
+     * @param throwable A [Throwable] associated with this event.
+     */
+    fun trackException(throwable: Throwable) {
+        trackException(throwable, Attributes.empty())
+    }
+
+    /**
+     * Add a custom exception to RUM monitoring. This can be useful for tracking custom error
+     * handling in your application.
+     *
+     *
+     * This event will be turned into a Span and sent to the RUM ingest along with other,
+     * auto-generated spans.
+     *
+     * @param throwable A [Throwable] associated with this event.
+     * @param attributes Any [Attributes] to associate with the event.
+     */
+    fun trackException(throwable: Throwable, attributes: Attributes?) {
+//        val extractor: ErrorIdentifierExtractor = ErrorIdentifierExtractor(application)
+//        val errorIdentifierInfo: ErrorIdentifierInfo = extractor.extractInfo()
+
+        val tracer = getTracer() ?: return
+        tracer.spanBuilder(throwable.javaClass.simpleName)
+            .setAllAttributes(attributes!!)
+            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
+//            .setAttribute(RumConstants.APPLICATION_ID_KEY, )
+//            .setAttribute(RumConstants.APP_VERSION_CODE_KEY, )
+//            .setAttribute(RumConstants.SPLUNK_OLLY_UUID_KEY, )
+            .startSpan()
+            .recordException(throwable)
+            .end()
+        // then set error identifiers
+    }
 
     /**
      * Retrieves the Tracer instance for the application.
