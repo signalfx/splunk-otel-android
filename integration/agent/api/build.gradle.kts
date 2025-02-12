@@ -33,6 +33,7 @@ dependencies {
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonStorage)
     implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(project(":common:utils"))
 
     compileOnly(Dependencies.Android.Compose.ui)
 }

@@ -21,6 +21,7 @@ import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
+import com.splunk.rum.integration.agent.api.attributes.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.extension.toResource
@@ -70,6 +71,7 @@ internal object MRUMAgentCore {
 
         OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
+            .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
