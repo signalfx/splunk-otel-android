@@ -79,9 +79,11 @@ class CustomTracking internal constructor() {
      */
     fun trackException(throwable: Throwable, attributes: Attributes?) {
         val tracer = getTracer() ?: return
-        tracer.spanBuilder(throwable.javaClass.simpleName)
-            .setAllAttributes(attributes!!)
-            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
+        val spanBuilder = tracer.spanBuilder(throwable.javaClass.simpleName)
+        attributes?.let {
+            spanBuilder.setAllAttributes(it)
+        }
+        spanBuilder.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
             .startSpan()
             .recordException(throwable)
             .end()

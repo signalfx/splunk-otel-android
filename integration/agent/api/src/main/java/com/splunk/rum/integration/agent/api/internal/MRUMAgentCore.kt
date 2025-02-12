@@ -35,10 +35,6 @@ import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.storage.AgentStorage
-import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.sdk.resources.Resource
-import io.opentelemetry.sdk.resources.ResourceBuilder
-import java.io.File
 
 internal object MRUMAgentCore {
 

@@ -45,8 +45,11 @@ class ErrorIdentifierExtractor(private val application: Application) {
         try {
             val packageInfo =
                 packageManager.getPackageInfo(application.packageName, 0)
-            return packageInfo.versionCode.toString()
-//            return packageInfo.longVersionCode.toString()
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                packageInfo.longVersionCode.toString()
+            } else {
+                packageInfo.versionCode.toString()
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to get application version code", e)
             return null
