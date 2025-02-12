@@ -69,6 +69,7 @@ dependencies {
 
     implementation(project(":agent"))
     implementation(project(":integration:sessionreplay"))
+    implementation(project(":integration:navigation"))
     implementation(project(":instrumentation:runtime:customtracking"))
 
     implementation(Dependencies.SessionReplay.commonLogger)

@@ -19,16 +19,13 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.rum.integration.interactions"
+    namespace = "com.splunk.rum.integration.navigation"
 }
 
 dependencies {
-    implementation(project(":common:otel"))
     implementation(project(":integration:agent:internal"))
+    implementation(project(":integration:agent:api"))
+    implementation(project(":common:otel"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.instrumentationSessionRecordingFrameCapturer)
-    implementation(Dependencies.SessionReplay.instrumentationSessionRecordingInteractions)
-
-    compileOnly(Dependencies.Android.Compose.ui)
 }

@@ -5,7 +5,8 @@ include ':common:otel',
 
 // Instrumentation modules
 include ':instrumentation:runtime:startup',
-        ':instrumentation:buildtime:plugin'
+        ':instrumentation:buildtime:plugin',
+        ':instrumentation:runtime:customtracking' // TODO Move the code to the integration module
 
 // Integration
 include ':integration:agent:api',
@@ -16,7 +17,8 @@ include ':integration:agent:api',
         ':integration:anr',
         ':integration:crash',
         ':integration:sessionreplay',
-        ':integration:interactions'
+        ':integration:interactions',
+        ':integration:navigation'
 
 // Test App
 include ':app'

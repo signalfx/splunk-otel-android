@@ -25,6 +25,7 @@ android {
 dependencies {
     api(project(":integration:agent:module"))
 
+    implementation(project(":common:otel"))
     implementation(project(":common:storage"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
