@@ -30,9 +30,11 @@ import com.cisco.android.instrumentation.recording.wireframe.model.Wireframe
 import com.cisco.android.instrumentation.recording.wireframe.stats.WireframeStats
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
+import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
+import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
@@ -45,6 +47,12 @@ internal object InteractionsConfigurator {
     private val attributeKeyComponent = AttributeKey.stringKey("component")
     private val attributeKeyActionName = AttributeKey.stringKey("action.name")
     private val attributeKeyTargetType = AttributeKey.stringKey("target.type")
+
+    private val defaultModuleConfiguration = InteractionsModuleConfiguration(
+        isEnabled = true
+    )
+
+    private var moduleConfiguration = defaultModuleConfiguration
 
     init {
         AgentIntegration.registerModule(MODULE_NAME)
@@ -88,6 +96,9 @@ internal object InteractionsConfigurator {
         }
 
         private fun reportEvent(interaction: Interaction) {
+            if (!moduleConfiguration.isEnabled)
+                return
+
             val logger = OpenTelemetry.instance?.sdkLoggerProvider ?: return
 
             val actionName = when (interaction) {
@@ -133,6 +144,9 @@ internal object InteractionsConfigurator {
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
+        override fun onSetup(configurations: List<ModuleConfiguration>) {
+            moduleConfiguration = configurations.find<InteractionsModuleConfiguration>() ?: defaultModuleConfiguration
+        }
     }
 
     private val installationListener = object : AgentIntegration.Listener {

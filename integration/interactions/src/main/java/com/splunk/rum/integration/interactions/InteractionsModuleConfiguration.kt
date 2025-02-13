@@ -18,4 +18,6 @@ package com.splunk.rum.integration.interactions
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class InteractionsModuleConfiguration : ModuleConfiguration
+data class InteractionsModuleConfiguration(
+    val isEnabled: Boolean
+) : ModuleConfiguration
