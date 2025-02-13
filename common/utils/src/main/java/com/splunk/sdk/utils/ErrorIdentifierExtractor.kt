@@ -19,21 +19,16 @@ class ErrorIdentifierExtractor(private val application: Application) {
         }
     }
 
-    fun extractInfo(): ErrorIdentifierInfo {
-        var applicationId: String? = null
-        val versionCode = retrieveVersionCode()
-        val customUUID = retrieveCustomUUID()
-
+    fun retrieveApplicationId(): String? {
         if (applicationInfo != null) {
-            applicationId = applicationInfo.packageName
+            return applicationInfo.packageName
         } else {
             Logger.e(TAG, "ApplicationInfo is null, cannot extract applicationId")
         }
-
-        return ErrorIdentifierInfo(applicationId, versionCode, customUUID)
+        return null
     }
 
-    private fun retrieveVersionCode(): String? {
+    fun retrieveVersionCode(): String? {
         try {
             val packageInfo =
                 packageManager.getPackageInfo(application.packageName, 0)
@@ -48,7 +43,7 @@ class ErrorIdentifierExtractor(private val application: Application) {
         }
     }
 
-    private fun retrieveCustomUUID(): String? {
+    fun retrieveCustomUUID(): String? {
         if (applicationInfo == null) {
             Logger.e(TAG, "ApplicationInfo is null; cannot retrieve Custom UUID.")
             return null
@@ -62,7 +57,7 @@ class ErrorIdentifierExtractor(private val application: Application) {
         }
     }
 
-    companion object {
+    private companion object {
         private const val TAG = "ErrorIdentifier"
 
         private const val SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_O11Y_CUSTOM_UUID"

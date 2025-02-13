@@ -1,1 +1,1 @@
--repackageclasses 'com.smartlook.sdk.common.utils'
+-repackageclasses 'com.splunk.sdk.common.utils'

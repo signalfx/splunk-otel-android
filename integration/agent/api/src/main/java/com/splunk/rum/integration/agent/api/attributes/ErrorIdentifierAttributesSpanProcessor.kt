@@ -1,37 +1,25 @@
 package com.splunk.rum.integration.agent.api.attributes
 
 import android.app.Application
-import android.util.Log
 import com.splunk.sdk.common.otel.internal.RumConstants
 import com.splunk.sdk.utils.ErrorIdentifierExtractor
-import com.splunk.sdk.utils.ErrorIdentifierInfo
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-internal class ErrorIdentifierAttributesSpanProcessor(private val application: Application) : SpanProcessor {
+internal class ErrorIdentifierAttributesSpanProcessor(application: Application) : SpanProcessor {
 
     private var applicationId: String? = null
     private var versionCode: String? = null
     private var customUUID: String? = null
-    private var isInitialized = false
-
-    private fun initializeAttributes() {
-        if (!isInitialized) {
-            val extractor = ErrorIdentifierExtractor(application)
-            val errorIdentifierInfo: ErrorIdentifierInfo = extractor.extractInfo()
-
-            applicationId = errorIdentifierInfo.applicationId
-            versionCode = errorIdentifierInfo.versionCode
-            customUUID = errorIdentifierInfo.customUUID
-
-            isInitialized = true
-        }
-    }
 
     init {
-        initializeAttributes()
+        val extractor = ErrorIdentifierExtractor(application)
+
+        applicationId = extractor.retrieveApplicationId()
+        versionCode = extractor.retrieveVersionCode()
+        customUUID = extractor.retrieveCustomUUID()
     }
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
