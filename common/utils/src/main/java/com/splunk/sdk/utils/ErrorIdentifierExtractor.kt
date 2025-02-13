@@ -4,27 +4,19 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
+import com.cisco.android.common.logger.Logger
 
 class ErrorIdentifierExtractor(private val application: Application) {
     private val packageManager: PackageManager = application.packageManager
     private val applicationInfo: ApplicationInfo?
 
     init {
-        var appInfo: ApplicationInfo?
-        try {
-            appInfo =
-                packageManager.getApplicationInfo(
-                    application.packageName, PackageManager.GET_META_DATA
-                )
+        applicationInfo = try {
+            packageManager.getApplicationInfo(application.packageName, PackageManager.GET_META_DATA)
         } catch (e: Exception) {
-            Log.e(
-                TAG,
-                "Failed to initialize ErrorIdentifierExtractor: " + e.message
-            )
-            appInfo = null
+            Logger.e(TAG, "Failed to initialize ErrorIdentifierExtractor: ${e.message}")
+            null
         }
-        this.applicationInfo = appInfo
     }
 
     fun extractInfo(): ErrorIdentifierInfo {
@@ -35,7 +27,7 @@ class ErrorIdentifierExtractor(private val application: Application) {
         if (applicationInfo != null) {
             applicationId = applicationInfo.packageName
         } else {
-            Log.e(TAG, "ApplicationInfo is null, cannot extract applicationId")
+            Logger.e(TAG, "ApplicationInfo is null, cannot extract applicationId")
         }
 
         return ErrorIdentifierInfo(applicationId, versionCode, customUUID)
@@ -51,21 +43,21 @@ class ErrorIdentifierExtractor(private val application: Application) {
                 packageInfo.versionCode.toString()
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to get application version code", e)
+            Logger.e(TAG, "Failed to get application version code", e)
             return null
         }
     }
 
     private fun retrieveCustomUUID(): String? {
         if (applicationInfo == null) {
-            Log.e(TAG, "ApplicationInfo is null; cannot retrieve Custom UUID.")
+            Logger.e(TAG, "ApplicationInfo is null; cannot retrieve Custom UUID.")
             return null
         }
         val bundle = applicationInfo.metaData
         if (bundle != null) {
             return bundle.getString(SPLUNK_UUID_MANIFEST_KEY)
         } else {
-            Log.e(TAG, "Application MetaData bundle is null")
+            Logger.e(TAG, "Application MetaData bundle is null")
             return null
         }
     }

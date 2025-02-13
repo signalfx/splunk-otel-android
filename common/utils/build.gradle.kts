@@ -22,3 +22,7 @@ ext {
 android {
     namespace = "com.splunk.sdk.common.utils"
 }
+
+dependencies {
+    implementation(Dependencies.SessionReplay.commonLogger)
+}
