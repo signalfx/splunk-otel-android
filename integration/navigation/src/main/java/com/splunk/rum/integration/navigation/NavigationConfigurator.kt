@@ -20,6 +20,7 @@ import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
+import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetry
@@ -28,6 +29,10 @@ internal object NavigationConfigurator {
 
     private const val TAG = "NavigationConfigurator"
     private const val MODULE_NAME = "navigation"
+
+    private val defaultModuleConfiguration = NavigationModuleConfiguration()
+
+    private var moduleConfiguration = defaultModuleConfiguration
 
     init {
         AgentIntegration.registerModule(MODULE_NAME)
@@ -41,6 +46,9 @@ internal object NavigationConfigurator {
 
     private val navigationListener = object : Navigation.Listener {
         override fun onScreenNameChanged(screenName: String) {
+            if (!moduleConfiguration.isEnabled)
+                return
+
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
 
             val provider = OpenTelemetry.instance?.sdkTracerProvider ?: return
@@ -58,6 +66,9 @@ internal object NavigationConfigurator {
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
         override fun onSetup(configurations: List<ModuleConfiguration>) {
+            moduleConfiguration = configurations.find<NavigationModuleConfiguration>() ?: defaultModuleConfiguration
+
+            Logger.d(TAG, "onSetup(moduleConfiguration: $moduleConfiguration)")
         }
     }
 
