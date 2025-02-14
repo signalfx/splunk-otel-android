@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.config
 
+import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.storage.IAgentStorage
 
@@ -36,7 +37,11 @@ class ModuleConfigurationManager internal constructor(
 
     internal fun setup(moduleConfigurations: List<ModuleConfiguration>) {
         this.configurations = moduleConfigurations
+
+        listeners.forEachFast { it.onSetup(configurations) }
     }
 
-    interface Listener
+    interface Listener {
+        fun onSetup(configurations: List<ModuleConfiguration>)
+    }
 }

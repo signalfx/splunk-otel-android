@@ -21,6 +21,7 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.sdk.common.otel.extensions.toInstant
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
+import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import com.splunk.sdk.common.otel.OpenTelemetry
 
@@ -69,6 +70,8 @@ internal object StartupConfigurator {
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
+        override fun onSetup(configurations: List<ModuleConfiguration>) {
+        }
     }
 
     private val installationListener = object : AgentIntegration.Listener {

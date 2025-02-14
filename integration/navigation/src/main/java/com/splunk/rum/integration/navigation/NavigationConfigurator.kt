@@ -21,6 +21,7 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
+import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetry
 
 internal object NavigationConfigurator {
@@ -56,6 +57,8 @@ internal object NavigationConfigurator {
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
+        override fun onSetup(configurations: List<ModuleConfiguration>) {
+        }
     }
 
     private val installationListener = object : AgentIntegration.Listener {

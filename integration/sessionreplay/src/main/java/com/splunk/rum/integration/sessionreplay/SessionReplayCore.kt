@@ -27,6 +27,7 @@ import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManag
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
+import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -62,6 +63,8 @@ internal object SessionReplayCore {
     }
 
     private val moduleConfigurationManagerListener = object : ModuleConfigurationManager.Listener {
+        override fun onSetup(configurations: List<ModuleConfiguration>) {
+        }
     }
 
     private val sessionReplayDataListener = object : DataListener {
