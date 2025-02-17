@@ -21,12 +21,11 @@ import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRUMAgent
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
+import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.api.sessionReplay
 import java.net.URL
 
 class App : Application() {
-    lateinit var agent: SplunkRUMAgent
-        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -34,24 +33,26 @@ class App : Application() {
         // TODO: Reenable with the bridge support
         // BridgeManager.bridgeInterfaces += TomasBridgeInterface()
 
-        val agentConfig = AgentConfiguration(
-            url = URL("https://alameda-eum-qe.saas.appd-test.com"),
-            appName = "smartlook-android",
-            appVersion = "0.1",
-            isDebugLogsEnabled = true,
-        )
-
-        agent = SplunkRUMAgent.install(
+        val agent = SplunkRUMAgent.install(
             application = this,
-            agentConfiguration = agentConfig,
+            agentConfiguration = AgentConfiguration(
+                url = URL("https://alameda-eum-qe.saas.appd-test.com"),
+                appName = "smartlook-android",
+                appVersion = "0.1",
+                isDebugLogsEnabled = true,
+            ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
                     isEnabled = true
+                ),
+                NavigationModuleConfiguration(
+                    isEnabled = true,
+                    isFragmentTrackingEnabled = false,
+                    isActivityTrackingEnabled = false
                 )
             )
         )
 
-        // MARK temp comment
         agent.sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
         agent.sessionReplay.start()
     }

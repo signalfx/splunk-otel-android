@@ -48,9 +48,7 @@ internal object InteractionsConfigurator {
     private val attributeKeyActionName = AttributeKey.stringKey("action.name")
     private val attributeKeyTargetType = AttributeKey.stringKey("target.type")
 
-    private val defaultModuleConfiguration = InteractionsModuleConfiguration(
-        isEnabled = true
-    )
+    private val defaultModuleConfiguration = InteractionsModuleConfiguration()
 
     private var moduleConfiguration = defaultModuleConfiguration
 
@@ -91,13 +89,10 @@ internal object InteractionsConfigurator {
 
     private val interactionsListener = object : OnInteractionListener {
         override fun onInteraction(interaction: Interaction, legacyData: LegacyData?) {
-            Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
-            reportEvent(interaction)
-        }
-
-        private fun reportEvent(interaction: Interaction) {
             if (!moduleConfiguration.isEnabled)
                 return
+
+            Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
 
             val logger = OpenTelemetry.instance?.sdkLoggerProvider ?: return
 
@@ -146,6 +141,8 @@ internal object InteractionsConfigurator {
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
         override fun onSetup(configurations: List<ModuleConfiguration>) {
             moduleConfiguration = configurations.find<InteractionsModuleConfiguration>() ?: defaultModuleConfiguration
+
+            Logger.d(TAG, "onSetup(moduleConfiguration: $moduleConfiguration)")
         }
     }
 
