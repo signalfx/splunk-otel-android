@@ -2,7 +2,7 @@ package com.splunk.rum.integration.agent.api.attributes
 
 import android.app.Application
 import com.splunk.sdk.common.otel.internal.RumConstants
-import com.splunk.sdk.utils.ErrorIdentifierExtractor
+import com.splunk.sdk.utils.ApplicationInfoUtils
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
@@ -15,11 +15,9 @@ internal class ErrorIdentifierAttributesSpanProcessor(application: Application) 
     private var customUUID: String? = null
 
     init {
-        val extractor = ErrorIdentifierExtractor(application)
-
-        applicationId = extractor.retrieveApplicationId()
-        versionCode = extractor.retrieveVersionCode()
-        customUUID = extractor.retrieveCustomUUID()
+        applicationId = ApplicationInfoUtils.retrieveApplicationId(application)
+        versionCode = ApplicationInfoUtils.retrieveVersionCode(application)
+        customUUID = ApplicationInfoUtils.retrieveCustomUUID(application)
     }
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {

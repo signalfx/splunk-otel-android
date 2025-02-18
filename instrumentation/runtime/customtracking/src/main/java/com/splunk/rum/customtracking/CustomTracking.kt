@@ -63,7 +63,7 @@ class CustomTracking internal constructor() {
      * @param throwable A [Throwable] associated with this event.
      */
     fun trackException(throwable: Throwable) {
-        trackException(throwable, Attributes.empty())
+        trackException(throwable, null)
     }
 
     /**
