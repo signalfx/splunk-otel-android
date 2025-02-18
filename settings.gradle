@@ -1,6 +1,7 @@
 // Common modules
 include ':common:otel',
-        ':common:storage'
+        ':common:storage',
+        ':common:utils'
 
 // Instrumentation modules
 include ':instrumentation:runtime:startup',
@@ -24,3 +25,4 @@ include ':app'
 
 // Main entry point
 include ':agent'
+include ':instrumentation:runtime:customtracking'

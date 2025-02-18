@@ -57,6 +57,8 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.httpurlconnection.setOnClickListener(onClickListener)
         viewBinding.trackCustomEvent.setOnClickListener(onClickListener)
         viewBinding.trackWorkflow.setOnClickListener(onClickListener)
+        viewBinding.trackException.setOnClickListener(onClickListener)
+        viewBinding.trackExceptionWithAttributes.setOnClickListener(onClickListener)
         viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"
 
         SplunkRUMAgent.instance.navigation.track("Menu")
@@ -125,6 +127,30 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 workflowSpan?.setAttribute("workflow.end.time", System.currentTimeMillis())
                 workflowSpan?.end()
                 showDoneToast("Track Workflow, Done!")
+            }
+            viewBinding.trackException.id -> {
+                val e = Exception("Custom Exception To Be Tracked");
+                e.stackTrace = arrayOf(
+                    StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
+                    StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
+                    StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
+                )
+                SplunkRUMAgent.instance.customTracking.trackException(e)
+                showDoneToast("Track Exception, Done!")
+            }
+            viewBinding.trackExceptionWithAttributes.id -> {
+                val e = Exception("Custom Exception (with attributes) To Be Tracked");
+                e.stackTrace = arrayOf(
+                    StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
+                    StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
+                    StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
+                )
+                val testAttributes = Attributes.builder()
+                    .put("attribute.one", "value1")
+                    .put("attribute.two", "12345")
+                    .build()
+                SplunkRUMAgent.instance.customTracking.trackException(e, testAttributes)
+                showDoneToast("Track Exception with Attributes, Done!")
             }
         }
     }
