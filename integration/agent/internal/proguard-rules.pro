@@ -5,3 +5,4 @@
 -keep class com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 -keep class com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification$OrderPriority
 -keep class com.splunk.rum.integration.agent.internal.utils.ModifierKt
+-repackageclasses 'com.splunk.rum.integration.agent.internal'

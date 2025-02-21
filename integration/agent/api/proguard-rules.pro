@@ -2,3 +2,4 @@
 -keep class com.splunk.rum.integration.agent.api.SplunkRUMAgent$Companion
 -keep class com.splunk.rum.integration.agent.api.AgentConfiguration
 -keep class com.splunk.rum.integration.agent.api.extension.ViewExtKt
+-repackageclasses 'com.splunk.rum.integration.agent.api'
