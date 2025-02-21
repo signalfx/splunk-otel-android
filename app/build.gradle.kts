@@ -16,6 +16,10 @@ apply<ConfigAndroidApp>()
 android {
     namespace = "com.splunk.app"
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.splunk.app"
         versionCode = Configurations.sdkVersionCode

@@ -1,1 +1,2 @@
+-keep class com.splunk.sdk.common.otel.OpenTelemetry
 -repackageclasses 'com.cisco.mrum.common.otel.api'

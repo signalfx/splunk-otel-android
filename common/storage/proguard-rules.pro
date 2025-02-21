@@ -1,1 +1,4 @@
--repackageclasses 'com.smartlook.sdk.common.storage'
+-keep interface com.splunk.sdk.common.storage.IAgentStorage
+-keep class com.splunk.sdk.common.storage.AgentStorage
+-keep class com.splunk.sdk.common.storage.AgentStorage$Companion
+-repackageclasses 'com.splunk.sdk.common.storage'

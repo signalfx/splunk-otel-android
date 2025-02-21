@@ -8,8 +8,8 @@ object Configurations {
     object Android {
         const val appCompileVersion = 34
         const val compileVersion = 34
-        const val minVersion = 21
-        const val targetVersion = 31
+        const val minVersion = 24
+        const val targetVersion = 34
     }
 
     object Compilation {

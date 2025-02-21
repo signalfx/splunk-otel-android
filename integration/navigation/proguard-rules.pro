@@ -1,0 +1,4 @@
+-keep class com.splunk.rum.integration.navigation.Navigation
+-keep class com.splunk.rum.integration.navigation.NavigationModuleConfiguration
+-keep class com.splunk.rum.integration.navigation.extension.SplunkRUMAgentExtKt
+-repackageclasses 'com.splunk.rum.integration.navigation'

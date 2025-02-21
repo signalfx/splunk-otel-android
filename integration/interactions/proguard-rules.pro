@@ -1,0 +1,2 @@
+-keep class com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
+-repackageclasses 'com.splunk.rum.integration.interactions'

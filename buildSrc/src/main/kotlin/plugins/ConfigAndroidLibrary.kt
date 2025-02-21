@@ -10,6 +10,11 @@ class ConfigAndroidLibrary : Plugin<Project> by local plugin {
     apply<ConfigLint>()
 
     android {
+
+        buildFeatures {
+            buildConfig = true
+        }
+
         compileSdk = Configurations.Android.compileVersion
 
         defaultConfig {
