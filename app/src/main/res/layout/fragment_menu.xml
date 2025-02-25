@@ -182,8 +182,30 @@
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
 			android:text="@string/menu_workflow"
-			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintTop_toBottomOf="@id/track_custom_event" />
+
+		<TextView
+			android:id="@+id/track_exception"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_track_exception"
+			app:layout_constraintTop_toBottomOf="@id/track_workflow" />
+
+		<TextView
+			android:id="@+id/track_exception_with_attributes"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_track_exception_with_attributes"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/track_exception" />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

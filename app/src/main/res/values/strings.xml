@@ -18,6 +18,8 @@
     <string name="menu_custom_tracking_title">Custom Tracking</string>
     <string name="menu_custom_event">Track Custom Event</string>
     <string name="menu_workflow">Track Workflow</string>
+    <string name="menu_track_exception">Track Exception</string>
+    <string name="menu_track_exception_with_attributes">Track Exception With Attributes</string>
 
     <string name="okhttp_title">OkHttp</string>
     <string name="httpurlconnection_title">HttpURLConnection</string>
