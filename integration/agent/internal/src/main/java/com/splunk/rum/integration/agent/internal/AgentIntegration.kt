@@ -23,6 +23,7 @@ import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.session.SessionManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.module.extension.toSplunkString
 import com.splunk.sdk.common.otel.OpenTelemetry
 import com.splunk.sdk.common.otel.internal.RumConstants
 import com.splunk.sdk.common.storage.AgentStorage

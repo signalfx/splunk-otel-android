@@ -65,11 +65,5 @@ public class JavaIntegration extends Application {
             attributes.add(new Pair<>("enabled", "true"));
             return attributes;
         }
-
-        @NotNull
-        @Override
-        public String toSplunkString() {
-            return ModuleConfiguration.super.toSplunkString();
-        }
     }
 }

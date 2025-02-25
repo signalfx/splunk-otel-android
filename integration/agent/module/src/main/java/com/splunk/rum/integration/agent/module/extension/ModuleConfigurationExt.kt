@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.module
+package com.splunk.rum.integration.agent.module.extension
 
-interface ModuleConfiguration {
+import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-    val name: String
-    val attributes: List<Pair<String, String>>
+fun ModuleConfiguration.toSplunkString(): String {
+    return attributes.joinToString(",") { "$name.${it.first}:${it.second}" }
 }
