@@ -20,4 +20,11 @@ import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
 data class InteractionsModuleConfiguration(
     val isEnabled: Boolean = true
-) : ModuleConfiguration
+) : ModuleConfiguration {
+
+    override val name: String = "interactions"
+
+    override val attributes: List<Pair<String, String>> = listOf(
+        "enabled" to isEnabled.toString()
+    )
+}

@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.anr.api
+package com.splunk.rum.integration.crash
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class ANRModuleConfiguration : ModuleConfiguration
+class CrashModuleConfiguration : ModuleConfiguration {
+
+    override val name: String = "crash"
+
+    override val attributes: List<Pair<String, String>> = listOf(
+        "enabled" to true.toString()
+    )
+}

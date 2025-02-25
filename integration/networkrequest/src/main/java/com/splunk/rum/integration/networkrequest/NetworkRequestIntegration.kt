@@ -14,32 +14,25 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.anr.configurer
+package com.splunk.rum.integration.networkrequest
 
-import android.annotation.SuppressLint
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-@SuppressLint("LongLogTag")
-object ANRConfigurer {
+internal object NetworkRequestIntegration {
 
-    private const val TAG = "ANRReportingConfigurer"
-    private const val MODULE_NAME = "anrReporting"
+    private const val TAG = "NetworkRequestIntegration"
+    private const val MODULE_NAME = "networkTracing"
     private const val DEFAULT_IS_ENABLED = true
-    private const val DEFAULT_TIMEOUT = 5L
 
-    @JvmField
-    var isANRReportingEnabled: Boolean = DEFAULT_IS_ENABLED
-
-    @JvmField
-    var thresholdSeconds: Long = DEFAULT_TIMEOUT
+    private var isNetworkTracingEnabled: Boolean = DEFAULT_IS_ENABLED
 
     init {
         Logger.d(TAG, "init()")
-        AgentIntegration.registerModule(MODULE_NAME)
+        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
     }
 
     fun attach(context: Context) {
@@ -55,8 +48,11 @@ object ANRConfigurer {
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(context: Context) {
             Logger.d(TAG, "onInstall()")
+
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
+
+            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }

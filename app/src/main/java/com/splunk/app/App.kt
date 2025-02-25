@@ -22,7 +22,7 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRUMAgent
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
-import com.splunk.rum.integration.sessionreplay.api.sessionReplay
+import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import java.net.URL
 
 class App : Application() {

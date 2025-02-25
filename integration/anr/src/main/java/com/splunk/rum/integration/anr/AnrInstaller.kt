@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.crash.installer
+package com.splunk.rum.integration.anr
 
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import com.splunk.rum.integration.crash.configurer.CrashConfigurer
 
-class CrashInstaller : ContentProvider() {
+internal class AnrInstaller : ContentProvider() {
     override fun onCreate(): Boolean {
         val context = context ?: throw IllegalStateException("Cannot find context from the provider")
-        CrashConfigurer.attach(context)
+        AnrIntegration.attach(context)
         return true
     }
 

@@ -24,7 +24,7 @@ import android.net.Uri
 internal class NavigationInstaller : ContentProvider() {
 
     override fun onCreate(): Boolean {
-        NavigationConfigurator.attach(context!!)
+        NavigationIntegration.attach(context!!)
         return true
     }
 

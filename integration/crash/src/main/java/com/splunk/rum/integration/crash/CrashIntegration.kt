@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.networkrequest.configurer
+package com.splunk.rum.integration.crash
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-object NetworkRequestConfigurer {
+@SuppressLint("LongLogTag")
+internal object CrashIntegration {
 
-    private const val TAG = "NetworkRequestConfigurer"
-    private const val MODULE_NAME = "networkTracing"
+    private const val TAG = "CrashIntegration"
+    private const val MODULE_NAME = "crashReporting"
     private const val DEFAULT_IS_ENABLED = true
 
-    @JvmField
-    var isNetworkTracingEnabled: Boolean = DEFAULT_IS_ENABLED
+    private var isCrashReportingEnabled: Boolean = DEFAULT_IS_ENABLED
 
     init {
         Logger.d(TAG, "init()")
-        AgentIntegration.registerModule(MODULE_NAME)
+        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
     }
 
     fun attach(context: Context) {
@@ -49,9 +50,10 @@ object NetworkRequestConfigurer {
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(context: Context) {
             Logger.d(TAG, "onInstall()")
-
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
+
+            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }

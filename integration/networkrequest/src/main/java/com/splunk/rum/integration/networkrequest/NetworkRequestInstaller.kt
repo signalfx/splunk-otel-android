@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.anr.installer
+package com.splunk.rum.integration.networkrequest
 
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import com.splunk.rum.integration.anr.configurer.ANRConfigurer
 
-class ANRInstaller : ContentProvider() {
+internal class NetworkRequestInstaller : ContentProvider() {
+
     override fun onCreate(): Boolean {
         val context = context ?: throw IllegalStateException("Cannot find context from the provider")
-        ANRConfigurer.attach(context)
+        NetworkRequestIntegration.attach(context)
         return true
     }
 

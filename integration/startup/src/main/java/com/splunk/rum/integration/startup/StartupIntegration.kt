@@ -24,14 +24,15 @@ import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManag
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.internal.RumConstants
 
-internal object StartupConfigurator {
+internal object StartupIntegration {
 
-    private const val TAG = "StartupConfigurator"
+    private const val TAG = "StartupIntegration"
     private const val MODULE_NAME = "startup"
 
     init {
-        AgentIntegration.registerModule(MODULE_NAME)
+        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
     }
 
     fun attach(context: Context) {
@@ -59,7 +60,7 @@ internal object StartupConfigurator {
         private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
             val provider = OpenTelemetry.instance?.sdkTracerProvider ?: return
 
-            provider.get("SplunkRum")
+            provider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder("AppStart")
                 .setStartTimestamp(startTimestamp.toInstant())
                 .setAttribute("component", "appstart")
@@ -80,6 +81,8 @@ internal object StartupConfigurator {
 
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
+
+            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }

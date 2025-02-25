@@ -22,4 +22,13 @@ data class NavigationModuleConfiguration(
     val isEnabled: Boolean = true,
     val isFragmentTrackingEnabled: Boolean = false,
     val isActivityTrackingEnabled: Boolean = false
-) : ModuleConfiguration
+) : ModuleConfiguration {
+
+    override val name: String = "navigation"
+
+    override val attributes: List<Pair<String, String>> = listOf(
+        "enabled" to isEnabled.toString(),
+        "isActivityTrackingEnabled" to isActivityTrackingEnabled.toString(),
+        "isFragmentTrackingEnabled" to isFragmentTrackingEnabled.toString()
+    )
+}

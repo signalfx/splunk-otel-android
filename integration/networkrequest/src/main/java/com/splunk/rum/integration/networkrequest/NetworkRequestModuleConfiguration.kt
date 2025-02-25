@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.crash.api
+package com.splunk.rum.integration.networkrequest
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class CrashModuleConfiguration : ModuleConfiguration
+class NetworkRequestModuleConfiguration : ModuleConfiguration {
+    override val name: String = "network"
+
+    override val attributes: List<Pair<String, String>> = listOf(
+        "enabled" to true.toString()
+    )
+}

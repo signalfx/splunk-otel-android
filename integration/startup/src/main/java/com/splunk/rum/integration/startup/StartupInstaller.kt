@@ -24,7 +24,7 @@ import android.net.Uri
 internal class StartupInstaller : ContentProvider() {
 
     override fun onCreate(): Boolean {
-        StartupConfigurator.attach(context!!)
+        StartupIntegration.attach(context!!)
         return true
     }
 

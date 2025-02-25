@@ -24,10 +24,11 @@ import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.internal.RumConstants
 
-internal object NavigationConfigurator {
+internal object NavigationIntegration {
 
-    private const val TAG = "NavigationConfigurator"
+    private const val TAG = "NavigationIntegration"
     private const val MODULE_NAME = "navigation"
 
     private val defaultModuleConfiguration = NavigationModuleConfiguration()
@@ -35,7 +36,7 @@ internal object NavigationConfigurator {
     private var moduleConfiguration = defaultModuleConfiguration
 
     init {
-        AgentIntegration.registerModule(MODULE_NAME)
+        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
     }
 
     fun attach(context: Context) {
@@ -56,7 +57,7 @@ internal object NavigationConfigurator {
             GlobalAttributeSpanProcessor.attributes.removeIf { it.name == "screen.name" }
             GlobalAttributeSpanProcessor.attributes += GlobalAttributeSpanProcessor.Attribute.String("screen.name", screenName)
 
-            provider.get("SplunkRum")
+            provider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder("Created")
                 .setAttribute("component", "ui")
                 .startSpan()
@@ -78,6 +79,8 @@ internal object NavigationConfigurator {
 
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
+
+            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }

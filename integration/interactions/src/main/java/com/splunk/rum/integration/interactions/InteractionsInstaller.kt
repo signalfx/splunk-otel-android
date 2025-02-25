@@ -24,7 +24,7 @@ import android.net.Uri
 internal class InteractionsInstaller : ContentProvider() {
 
     override fun onCreate(): Boolean {
-        InteractionsConfigurator.attach(context!!)
+        InteractionsIntegration.attach(context!!)
         return true
     }
 

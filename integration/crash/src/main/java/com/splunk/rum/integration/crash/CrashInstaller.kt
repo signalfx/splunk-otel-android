@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.networkrequest.installer
+package com.splunk.rum.integration.crash
 
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import com.splunk.rum.integration.networkrequest.configurer.NetworkRequestConfigurer
 
-internal class NetworkRequestInstaller : ContentProvider() {
-
+internal class CrashInstaller : ContentProvider() {
     override fun onCreate(): Boolean {
         val context = context ?: throw IllegalStateException("Cannot find context from the provider")
-        NetworkRequestConfigurer.attach(context)
+        CrashIntegration.attach(context)
         return true
     }
 

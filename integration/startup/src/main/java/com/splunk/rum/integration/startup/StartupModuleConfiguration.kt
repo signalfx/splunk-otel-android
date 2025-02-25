@@ -18,4 +18,11 @@ package com.splunk.rum.integration.startup
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class StartupModuleConfiguration : ModuleConfiguration
+class StartupModuleConfiguration : ModuleConfiguration {
+
+    override val name: String = "startup"
+
+    override val attributes: List<Pair<String, String>> = listOf(
+        "enabled" to true.toString()
+    )
+}

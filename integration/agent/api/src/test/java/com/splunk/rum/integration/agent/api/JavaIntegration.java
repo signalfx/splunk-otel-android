@@ -20,8 +20,14 @@ import android.app.Application;
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import kotlin.Pair;
 
 public class JavaIntegration extends Application {
 
@@ -45,5 +51,25 @@ public class JavaIntegration extends Application {
     }
 
     private static class CustomModuleConfiguration implements ModuleConfiguration {
+
+        @NotNull
+        @Override
+        public String getName() {
+            return "test";
+        }
+
+        @NotNull
+        @Override
+        public List<Pair<String, String>> getAttributes() {
+            ArrayList<Pair<String, String>> attributes = new ArrayList<>();
+            attributes.add(new Pair<>("enabled", "true"));
+            return attributes;
+        }
+
+        @NotNull
+        @Override
+        public String toSplunkString() {
+            return ModuleConfiguration.super.toSplunkString();
+        }
     }
 }
