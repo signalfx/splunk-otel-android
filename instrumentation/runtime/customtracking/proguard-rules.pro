@@ -1,3 +1,0 @@
--keep class com.splunk.rum.customtracking.CustomTracking
--keep class com.splunk.rum.customtracking.extension.SplunkRUMCustomTrackingExtKt
--repackageclasses 'com.splunk.rum.customtracking'

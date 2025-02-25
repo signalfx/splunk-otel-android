@@ -1,8 +1,1 @@
--keep class com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager$Listener
--keep class com.splunk.rum.integration.agent.internal.AgentIntegration
--keep class com.splunk.rum.integration.agent.internal.AgentIntegration$Listener
--keep class com.splunk.rum.integration.agent.internal.AgentIntegration$Companion
--keep class com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
--keep class com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification$OrderPriority
--keep class com.splunk.rum.integration.agent.internal.utils.ModifierKt
 -repackageclasses 'com.splunk.rum.integration.agent.internal'

@@ -1,3 +1,0 @@
--keep class com.splunk.rum.startup.ApplicationStartupTimekeeper
--keep class com.splunk.rum.startup.ApplicationStartupTimekeeper$Listener
--repackageclasses 'com.splunk.rum.startup'

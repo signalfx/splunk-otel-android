@@ -1,1 +1,0 @@
--repackageclasses 'com.splunk.rum.integration.startup'

@@ -27,13 +27,6 @@ class ConfigAndroidLibrary : Plugin<Project> by local plugin {
             buildConfigField("String", "VERSION_CODE", "\"${Configurations.sdkVersionCode}\"")
         }
 
-        buildTypes {
-            release {
-                isMinifyEnabled = true
-                proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            }
-        }
-
         compileOptions {
             isCoreLibraryDesugaringEnabled = true
 

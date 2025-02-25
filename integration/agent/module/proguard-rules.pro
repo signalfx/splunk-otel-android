@@ -1,2 +1,1 @@
--keep class com.splunk.rum.integration.agent.module.ModuleConfiguration
 -repackageclasses 'com.splunk.rum.integration.agent.module'
