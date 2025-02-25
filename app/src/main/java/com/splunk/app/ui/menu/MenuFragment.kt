@@ -30,6 +30,8 @@ import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.util.FragmentAnimation
 import com.splunk.rum.customtracking.extension.customTracking
 import com.splunk.rum.integration.agent.api.SplunkRUMAgent
+import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
+import com.splunk.rum.integration.agent.api.attributes.extension.globalAttributes
 import com.splunk.rum.integration.agent.api.extension.splunkRumId
 import com.splunk.rum.integration.navigation.extension.navigation
 import io.opentelemetry.api.common.Attributes
@@ -129,6 +131,8 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 showDoneToast("Track Workflow, Done!")
             }
             viewBinding.trackException.id -> {
+                SplunkRUMAgent.instance.globalAttributes.set("globkey12", "val12") // temporarily hijacking use of this button to also add global attribute on the fly
+
                 val e = Exception("Custom Exception To Be Tracked");
                 e.stackTrace = arrayOf(
                     StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
@@ -139,6 +143,9 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 showDoneToast("Track Exception, Done!")
             }
             viewBinding.trackExceptionWithAttributes.id -> {
+                SplunkRUMAgent.instance.globalAttributes.remove("globkey12") // temporarily hijacking use of this button to also remove global attribute on the fly
+                SplunkRUMAgent.instance.globalAttributes.remove("globkey")
+
                 val e = Exception("Custom Exception (with attributes) To Be Tracked");
                 e.stackTrace = arrayOf(
                     StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),

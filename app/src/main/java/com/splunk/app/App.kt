@@ -23,6 +23,8 @@ import com.splunk.rum.integration.agent.api.SplunkRUMAgent
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.api.sessionReplay
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
 import java.net.URL
 
 class App : Application() {
@@ -33,6 +35,14 @@ class App : Application() {
         // TODO: Reenable with the bridge support
         // BridgeManager.bridgeInterfaces += TomasBridgeInterface()
 
+        val globalAttributes = Attributes.of(
+            AttributeKey.stringKey("globKeyConfig1"), "12345",
+            AttributeKey.booleanKey("globKeyConfig2"), true,
+            AttributeKey.doubleKey("globKeyConfig3"), 1200.50,
+            AttributeKey.longKey("globKeyConfig4"), 30L,
+            AttributeKey.stringKey("globKeyConfig5"), "US"
+        )
+
         val agent = SplunkRUMAgent.install(
             application = this,
             agentConfiguration = AgentConfiguration(
@@ -40,6 +50,7 @@ class App : Application() {
                 appName = "smartlook-android",
                 appVersion = "0.1",
                 isDebugLogsEnabled = true,
+                globalAttributes = globalAttributes
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(

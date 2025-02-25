@@ -23,6 +23,8 @@ import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.attributes.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
+import com.splunk.rum.integration.agent.api.attributes.GlobalAttributeSpanProcessor2
+import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.extension.toResource
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdLogProcessor
@@ -66,9 +68,15 @@ internal object MRUMAgentCore {
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
         SessionPulseEventManager.obtainInstance(agentIntegration.sessionManager)
 
+        // adding agent config global attributes to global attributes
+        agentConfiguration.globalAttributes.forEach { attributeKey, value ->
+            GlobalAttributes.instance[attributeKey] = value
+        }
+
         OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
+            .addSpanProcessor(GlobalAttributeSpanProcessor2())
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(GlobalAttributeSpanProcessor())
             .addLogRecordProcessor(GenericAttributesLogProcessor())

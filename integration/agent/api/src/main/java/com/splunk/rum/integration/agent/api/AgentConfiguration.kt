@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.agent.api
 
+import io.opentelemetry.api.common.Attributes
 import java.net.URL
 
 /**
@@ -34,4 +35,5 @@ data class AgentConfiguration(
     var appName: String? = null,
     var appVersion: String? = null,
     var isDebugLogsEnabled: Boolean = false, // temporary name till product decides on more suitable one
+    var globalAttributes: Attributes = Attributes.empty() // Default to empty attributes if not provided
 )
