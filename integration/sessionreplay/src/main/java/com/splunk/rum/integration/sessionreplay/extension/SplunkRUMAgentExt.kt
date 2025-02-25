@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.networkrequest.api
+package com.splunk.rum.integration.sessionreplay.extension
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.cisco.android.instrumentation.recording.core.api.SessionReplay
+import com.splunk.rum.integration.agent.api.SplunkRUMAgent
 
-class NetworkRequestModuleConfiguration : ModuleConfiguration
+/**
+ * Extension property to access the [SessionReplay] instance via [SplunkRUMAgent].
+ */
+@Suppress("UnusedReceiverParameter")
+val SplunkRUMAgent.sessionReplay: SessionReplay
+    get() = SessionReplay.instance

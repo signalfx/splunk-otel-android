@@ -25,7 +25,7 @@ internal class SessionReplayInstaller : ContentProvider() {
 
     override fun onCreate(): Boolean {
         val context = context ?: throw IllegalStateException("Cannot find context from the provider")
-        SessionReplayCore.attach(context)
+        SessionReplayIntegration.attach(context)
         return true
     }
 

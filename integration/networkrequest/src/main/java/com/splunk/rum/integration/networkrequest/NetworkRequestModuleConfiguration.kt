@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.interactions
+package com.splunk.rum.integration.networkrequest
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-data class InteractionsModuleConfiguration(
-    val isEnabled: Boolean = true
-) : ModuleConfiguration {
-
-    override val name: String = "interactions"
+class NetworkRequestModuleConfiguration : ModuleConfiguration {
+    override val name: String = "network"
 
     override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to isEnabled.toString()
+        "enabled" to true.toString()
     )
 }

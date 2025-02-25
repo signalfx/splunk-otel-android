@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.crash.api
+package com.splunk.rum.integration.agent.module.extension
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class CrashModuleConfiguration : ModuleConfiguration
+fun ModuleConfiguration.toSplunkString(): String {
+    return attributes.joinToString(",") { "$name.${it.first}:${it.second}" }
+}

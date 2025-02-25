@@ -17,6 +17,7 @@
 package com.splunk.sdk.common.otel.logRecord
 
 import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
@@ -37,7 +38,7 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
              val activeSpan = Span.fromContextOrNull(parentContext)
 
             // traceId and spanId should be inside the context already from global OTel instance
-            val spanBuilder = OpenTelemetry.instance!!.sdkTracerProvider.get("SplunkRum")
+            val spanBuilder = OpenTelemetry.instance!!.sdkTracerProvider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder(log.attributes[AttributeKey.stringKey("event.name")] ?: "")
                 .setSpanKind(SpanKind.INTERNAL)
                 .setParent(parentContext)

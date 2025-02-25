@@ -21,6 +21,7 @@ import android.app.Application
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import com.cisco.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.cisco.android.common.utils.extensions.forEachFast
 
@@ -29,6 +30,8 @@ object ApplicationStartupTimekeeper {
     private val handler = Handler(Looper.getMainLooper())
 
     private var firstTimestamp = 0L
+    private var firstElapsed = 0L
+
     private var isColdStartCompleted = false
 
     var isEnabled = true
@@ -37,6 +40,7 @@ object ApplicationStartupTimekeeper {
 
     internal fun onInit() {
         firstTimestamp = System.currentTimeMillis()
+        firstElapsed = SystemClock.elapsedRealtime()
     }
 
     internal fun onCreate(application: Application) {
@@ -44,9 +48,9 @@ object ApplicationStartupTimekeeper {
             isColdStartCompleted = true
 
             if (isEnabled) {
-                val endTimestamp = System.currentTimeMillis()
-                val duration = endTimestamp - firstTimestamp
-                listeners.forEachFast { it.onColdStarted(firstTimestamp, endTimestamp, duration) }
+                val endElapsed = SystemClock.elapsedRealtime()
+                val duration = endElapsed - firstElapsed
+                listeners.forEachFast { it.onColdStarted(firstTimestamp, firstTimestamp + duration, duration) }
             }
         }
 
@@ -60,9 +64,11 @@ object ApplicationStartupTimekeeper {
         private var resumedActivityCount = 0
 
         private var firstActivityCreateTimestamp = 0L
+        private var firstActivityCreateElapsed = 0L
         private var isWarmStartPending = false
 
         private var firstActivityStartTimestamp = 0L
+        private var firstActivityStartElapsed = 0L
         private var isHotStartPending = false
 
         override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -70,6 +76,7 @@ object ApplicationStartupTimekeeper {
 
             if (isColdStartCompleted && createdActivityCount == 1) {
                 firstActivityCreateTimestamp = System.currentTimeMillis()
+                firstActivityCreateElapsed = SystemClock.elapsedRealtime()
                 isWarmStartPending = true
             }
         }
@@ -79,6 +86,7 @@ object ApplicationStartupTimekeeper {
 
             if (isColdStartCompleted && !isWarmStartPending && !isHotStartPending) {
                 firstActivityStartTimestamp = System.currentTimeMillis()
+                firstActivityStartElapsed = SystemClock.elapsedRealtime()
                 isHotStartPending = true
             }
         }
@@ -88,12 +96,12 @@ object ApplicationStartupTimekeeper {
 
             if (resumedActivityCount == 1 && (isHotStartPending || isWarmStartPending))
                 handler.twoConsecutivePosts {
-                    val endTimestamp = System.currentTimeMillis()
+                    val endTimestamp = SystemClock.elapsedRealtime()
 
                     if (isHotStartPending) {
                         if (isEnabled) {
-                            val duration = endTimestamp - firstActivityStartTimestamp
-                            listeners.forEachFast { it.onHotStarted(firstActivityStartTimestamp, endTimestamp, duration) }
+                            val duration = endTimestamp - firstActivityStartElapsed
+                            listeners.forEachFast { it.onHotStarted(firstActivityStartTimestamp, firstActivityStartTimestamp + duration, duration) }
                         }
 
                         isHotStartPending = false
@@ -101,8 +109,8 @@ object ApplicationStartupTimekeeper {
 
                     if (isWarmStartPending) {
                         if (isEnabled) {
-                            val duration = endTimestamp - firstActivityCreateTimestamp
-                            listeners.forEachFast { it.onWarmStarted(firstActivityCreateTimestamp, endTimestamp, duration) }
+                            val duration = endTimestamp - firstActivityCreateElapsed
+                            listeners.forEachFast { it.onWarmStarted(firstActivityCreateTimestamp, firstActivityCreateTimestamp + duration, duration) }
                         }
 
                         isWarmStartPending = false

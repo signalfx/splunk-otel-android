@@ -3,7 +3,7 @@
 
     <application>
         <provider
-            android:name="com.splunk.rum.integration.crash.installer.CrashInstaller"
+            android:name="com.splunk.rum.integration.crash.CrashInstaller"
             android:authorities="${applicationId}.CrashReportingInstaller"
             android:enabled="true"
             android:exported="false" />

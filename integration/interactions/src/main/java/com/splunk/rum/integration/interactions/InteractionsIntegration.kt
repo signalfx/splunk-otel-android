@@ -36,12 +36,13 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
 
-internal object InteractionsConfigurator {
+internal object InteractionsIntegration {
 
-    private const val TAG = "InteractionsConfigurator"
+    private const val TAG = "InteractionsIntegration"
     private const val MODULE_NAME = "interactions"
 
     private val attributeKeyComponent = AttributeKey.stringKey("component")
@@ -53,7 +54,7 @@ internal object InteractionsConfigurator {
     private var moduleConfiguration = defaultModuleConfiguration
 
     init {
-        AgentIntegration.registerModule(MODULE_NAME)
+        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
     }
 
     fun attach(context: Context) {
@@ -128,7 +129,7 @@ internal object InteractionsConfigurator {
             else
                 null
 
-            logger.get("SplunkRum")
+            logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
                 .setAttribute(attributeKeyComponent, "ui")
@@ -152,6 +153,8 @@ internal object InteractionsConfigurator {
 
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
+
+            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }

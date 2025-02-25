@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.crash.configurer
+package com.splunk.rum.integration.anr
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -24,18 +24,20 @@ import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManag
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
 @SuppressLint("LongLogTag")
-object CrashConfigurer {
+internal object AnrIntegration {
 
-    private const val TAG = "CrashReportingConfigurer"
-    private const val MODULE_NAME = "crashReporting"
+    private const val TAG = "AnrIntegration"
+    private const val MODULE_NAME = "anrReporting"
     private const val DEFAULT_IS_ENABLED = true
+    private const val DEFAULT_TIMEOUT = 5L
 
-    @JvmField
-    var isCrashReportingEnabled: Boolean = DEFAULT_IS_ENABLED
+    private var isANRReportingEnabled: Boolean = DEFAULT_IS_ENABLED
+
+    private var thresholdSeconds: Long = DEFAULT_TIMEOUT
 
     init {
         Logger.d(TAG, "init()")
-        AgentIntegration.registerModule(MODULE_NAME)
+        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
     }
 
     fun attach(context: Context) {
@@ -53,6 +55,8 @@ object CrashConfigurer {
             Logger.d(TAG, "onInstall()")
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
+
+            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }

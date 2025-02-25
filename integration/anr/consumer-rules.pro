@@ -1,5 +1,5 @@
--keep public class com.splunk.rum.integration.anr.installer.ANRInstaller
--keep public class com.splunk.rum.integration.anr.configurer.ANRConfigurer
--keepclassmembers class com.splunk.rum.integration.anr.configurer.ANRConfigurer {
+-keep public class com.splunk.rum.integration.anr.ANRInstaller
+-keep public class com.splunk.rum.integration.anr.ANRConfigurer
+-keepclassmembers class com.splunk.rum.integration.anr.ANRConfigurer {
      public static boolean isANRReportingEnabled;
 }

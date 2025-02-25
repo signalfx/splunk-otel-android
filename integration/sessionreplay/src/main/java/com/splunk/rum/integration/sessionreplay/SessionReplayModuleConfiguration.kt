@@ -18,4 +18,11 @@ package com.splunk.rum.integration.sessionreplay
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class SessionReplayModuleConfiguration : ModuleConfiguration
+class SessionReplayModuleConfiguration : ModuleConfiguration {
+
+    override val name: String = "sessionReplay"
+
+    override val attributes: List<Pair<String, String>> = listOf(
+        "enabled" to true.toString()
+    )
+}

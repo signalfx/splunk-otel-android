@@ -35,15 +35,15 @@ import io.opentelemetry.extension.incubator.logs.AnyValue
 import io.opentelemetry.extension.incubator.logs.ExtendedLogRecordBuilder
 import java.util.concurrent.TimeUnit
 
-internal object SessionReplayCore {
+internal object SessionReplayIntegration {
 
-    private const val TAG = "SessionReplayCore"
+    private const val TAG = "SessionReplayIntegration"
     private const val MODULE_NAME = "sessionReplay"
 
     init {
         Logger.d(TAG, "init()")
 
-        AgentIntegration.registerModule(MODULE_NAME)
+        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
     }
 
     fun attach(context: Context) {
@@ -101,6 +101,8 @@ internal object SessionReplayCore {
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += moduleConfigurationManagerListener
             SessionReplay.instance.dataListeners += sessionReplayDataListener
+
+            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }
