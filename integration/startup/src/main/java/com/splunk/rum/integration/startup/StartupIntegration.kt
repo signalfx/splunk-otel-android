@@ -18,6 +18,7 @@ package com.splunk.rum.integration.startup
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.sdk.common.otel.extensions.toInstant
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
@@ -30,6 +31,8 @@ internal object StartupIntegration {
 
     private const val TAG = "StartupIntegration"
     private const val MODULE_NAME = "startup"
+
+    private val cache: MutableList<StartUpData> = mutableListOf()
 
     init {
         AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
@@ -56,18 +59,21 @@ internal object StartupIntegration {
             Logger.d(TAG, "onHotStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)")
             reportEvent(startTimestamp, endTimestamp, "hot")
         }
+    }
 
-        private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
-            val provider = OpenTelemetry.instance?.sdkTracerProvider ?: return
-
-            provider.get(RumConstants.RUM_TRACER_NAME)
-                .spanBuilder("AppStart")
-                .setStartTimestamp(startTimestamp.toInstant())
-                .setAttribute("component", "appstart")
-                .setAttribute("start.type", name)
-                .startSpan()
-                .end(endTimestamp.toInstant())
+    private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
+        val provider = OpenTelemetry.instance?.sdkTracerProvider ?: run {
+            cache.add(StartUpData(startTimestamp, endTimestamp, name))
+            return
         }
+
+        provider.get(RumConstants.RUM_TRACER_NAME)
+            .spanBuilder("AppStart")
+            .setStartTimestamp(startTimestamp.toInstant())
+            .setAttribute("component", "appstart")
+            .setAttribute("start.type", name)
+            .startSpan()
+            .end(endTimestamp.toInstant())
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
@@ -83,6 +89,9 @@ internal object StartupIntegration {
             integration.moduleConfigurationManager.listeners += configManagerListener
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
+
+            cache.forEachFast { reportEvent(it.startTimestamp, it.endTimestamp, it.name) }
+            cache.clear()
         }
     }
 }
