@@ -23,6 +23,7 @@ import com.splunk.sdk.common.otel.extensions.toInstant
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import com.splunk.sdk.common.otel.OpenTelemetry
 import com.splunk.sdk.common.otel.internal.RumConstants
@@ -32,7 +33,7 @@ internal object StartupIntegration {
     private const val TAG = "StartupIntegration"
     private const val MODULE_NAME = "startup"
 
-    private val cache: MutableList<StartUpData> = mutableListOf()
+    private val cache: MutableList<StartupData> = mutableListOf()
 
     init {
         AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
@@ -63,7 +64,7 @@ internal object StartupIntegration {
 
     private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
         val provider = OpenTelemetry.instance?.sdkTracerProvider ?: run {
-            cache.add(StartUpData(startTimestamp, endTimestamp, name))
+            cache += StartupData(startTimestamp, endTimestamp, name)
             return
         }
 
