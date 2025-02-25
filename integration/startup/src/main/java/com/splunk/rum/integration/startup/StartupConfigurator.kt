@@ -88,6 +88,7 @@ internal object StartupConfigurator {
             integration.moduleConfigurationManager.listeners += configManagerListener
 
             cache.forEachFast { reportEvent(it.startTimestamp, it.endTimestamp, it.name) }
+            cache.clear()
         }
     }
 }
