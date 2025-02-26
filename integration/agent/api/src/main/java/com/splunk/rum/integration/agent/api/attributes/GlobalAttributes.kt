@@ -8,20 +8,17 @@ class GlobalAttributes private constructor() {
         val instance: GlobalAttributes by lazy { GlobalAttributes() }
     }
 
-    // The list of global attributes. You can modify this list directly.
     private val _attributes: MutableList<Attribute> = ArrayList()
     val attributes: List<Attribute> get() = _attributes // Expose as immutable list
 
-    // Set a global attribute
+    // this method definitely can be streamlined
     operator fun set(key: Any, value: Any) {
         if (key is String) {
-            // Handle String key
             val existingAttribute = _attributes.find { it.name == key }
             if (existingAttribute != null) {
                 _attributes.remove(existingAttribute)
             }
 
-            // Add the new attribute
             _attributes += when (value) {
                 is String -> Attribute.String(key, value)
                 is Boolean -> Attribute.Boolean(key, value)
@@ -30,13 +27,11 @@ class GlobalAttributes private constructor() {
                 else -> throw IllegalArgumentException("Unsupported attribute type")
             }
         } else if (key is AttributeKey<*>) {
-            // Handle AttributeKey key
             val existingAttribute = _attributes.find { it.name == key.key }
             if (existingAttribute != null) {
                 _attributes.remove(existingAttribute)
             }
 
-            // Add the new attribute using the name of the AttributeKey
             _attributes += when (value) {
                 is String -> Attribute.String(key.key, value)
                 is Boolean -> Attribute.Boolean(key.key, value)
@@ -49,14 +44,10 @@ class GlobalAttributes private constructor() {
         }
     }
 
-
-
-    // Remove a global attribute by key
     fun remove(key: String) {
         _attributes.removeAll { it.name == key }
     }
 
-    // Sealed class for the attribute types (String, Boolean, Long, Double)
     sealed interface Attribute {
 
         val name: kotlin.String
