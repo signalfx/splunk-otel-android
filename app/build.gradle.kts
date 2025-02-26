@@ -16,6 +16,10 @@ apply<ConfigAndroidApp>()
 android {
     namespace = "com.splunk.app"
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.splunk.app"
         versionCode = Configurations.sdkVersionCode
@@ -70,7 +74,6 @@ dependencies {
     implementation(project(":agent"))
     implementation(project(":integration:sessionreplay"))
     implementation(project(":integration:navigation"))
-    implementation(project(":instrumentation:runtime:customtracking"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)

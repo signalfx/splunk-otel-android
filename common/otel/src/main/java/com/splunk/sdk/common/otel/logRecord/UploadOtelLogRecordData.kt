@@ -27,7 +27,6 @@ internal data class UploadOtelLogRecordData(val id: String, val jobIdStorage: Jo
 
     override val jobNumberLimit: Long = 80L
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun createJobInfo(context: Context): JobInfo {
         return UploadOtelLogRecordDataJob.createJobInfoBuilder(context, jobIdStorage.getOrCreateId(id), id).build()
     }
