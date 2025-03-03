@@ -52,7 +52,7 @@ class SplunkRUMAgent private constructor() {
          * @return The initialized [SplunkRUMAgent] instance.
          */
         @JvmStatic
-        fun install(application: Application, agentConfiguration: com.splunk.rum.integration.agent.api.AgentConfiguration, vararg moduleConfigurations: ModuleConfiguration): SplunkRUMAgent {
+        fun install(application: Application, agentConfiguration: AgentConfiguration, vararg moduleConfigurations: ModuleConfiguration): SplunkRUMAgent {
             if (instanceInternal != null)
                 return instance
 
