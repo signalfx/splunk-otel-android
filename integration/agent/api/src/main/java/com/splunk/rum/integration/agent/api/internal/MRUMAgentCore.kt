@@ -32,6 +32,7 @@ import com.splunk.rum.integration.agent.api.sessionPulse.SessionPulseEventManage
 import com.splunk.rum.integration.agent.api.state.StateLogRecordProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.BuildConfig
+import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
 import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
@@ -72,6 +73,7 @@ internal object MRUMAgentCore {
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(GlobalAttributeSpanProcessor())
+            .addSpanProcessor(AppStartSpanProcessor())
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))

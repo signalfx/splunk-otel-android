@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.agent.api.exporter
 
 import com.cisco.android.common.logger.Logger
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
@@ -32,7 +33,7 @@ internal class LoggerSpanExporter : SpanExporter {
 
         for (span in spans) {
             val instrumentationScopeInfo = span.instrumentationScopeInfo
-            Logger.i(TAG, "name=${span.name}, traceId=${span.traceId}, spanId=${span.spanId}, kind=${span.kind}, attributes=${span.attributes}, instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, instrumentationScopeInfo.version=${instrumentationScopeInfo.version}")
+            Logger.i(TAG, "name=${span.name}, traceId=${span.traceId}, spanId=${span.spanId}, parentSpanId=${span.parentSpanId}, kind=${span.kind}, attributes=${span.attributes.toSplunkString()}, instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, instrumentationScopeInfo.version=${instrumentationScopeInfo.version}")
         }
 
         return CompletableResultCode.ofSuccess()
@@ -47,6 +48,12 @@ internal class LoggerSpanExporter : SpanExporter {
             CompletableResultCode.ofSuccess()
         else
             flush()
+    }
+
+    private fun Attributes.toSplunkString(): String {
+        return asMap()
+            .toList()
+            .joinToString(", ", "[", "]") { "${it.first}=${it.second}" }
     }
 
     private companion object {
