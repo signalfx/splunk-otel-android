@@ -21,13 +21,10 @@ import android.os.SystemClock
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
+import com.splunk.rum.integration.agent.internal.model.Module
 import com.splunk.rum.integration.agent.internal.session.SessionManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
-import com.splunk.rum.integration.agent.module.extension.toSplunkString
-import com.splunk.sdk.common.otel.OpenTelemetry
-import com.splunk.sdk.common.otel.internal.RumConstants
 import com.splunk.sdk.common.storage.AgentStorage
-import java.util.concurrent.TimeUnit
 
 class AgentIntegration private constructor(
     context: Context
@@ -77,34 +74,8 @@ class AgentIntegration private constructor(
         listeners.forEachFast { it.onInstall(context) }
 
         registerModuleInitializationEnd(MODULE_NAME)
-        reportInitialization()
     }
 
-    private fun reportInitialization() {
-        val provider = OpenTelemetry.instance?.sdkTracerProvider ?: throw IllegalStateException("unable to report initialization")
-        val modules = modules.values
-
-        val span = provider.get(RumConstants.RUM_TRACER_NAME)
-            .spanBuilder("SplunkRum.initialize")
-            .setStartTimestamp(startTimestamp + SystemClock.elapsedRealtime() - startElapsed, TimeUnit.MILLISECONDS)
-            .startSpan()
-
-        val resources = modules.joinToString(",", "[", "]") { it.configuration?.toSplunkString() ?: "${it.name}.enabled:true" }
-
-        span.setAttribute("config_settings", resources)
-
-        for (module in modules) {
-            if (module.initialization == null)
-                throw IllegalStateException("Module '${module.name}' initialization has not been started")
-
-            if (module.initialization.endElapsed == null)
-                throw IllegalStateException("Module '${module.name}' is not initialized")
-
-            span.addEvent("${module.name}_initialized", module.initialization.run { endElapsed!! - startElapsed }, TimeUnit.MILLISECONDS)
-        }
-
-        span.end()
-    }
 
     private inner class SessionManagerListener : SessionManager.SessionListener {
         override fun onSessionChanged(sessionId: String) {
@@ -117,18 +88,6 @@ class AgentIntegration private constructor(
         fun onInstall(context: Context)
     }
 
-    private data class Module(
-        val name: String,
-        val configuration: ModuleConfiguration? = null,
-        val initialization: Initialization? = null
-    ) {
-        data class Initialization(
-            val startTimestamp: Long,
-            val startElapsed: Long,
-            val endElapsed: Long?
-        )
-    }
-
     companion object {
 
         private const val TAG = "AgentIntegration"
@@ -136,7 +95,8 @@ class AgentIntegration private constructor(
         private const val MODULE_NAME = "agent"
 
         private var instanceInternal: AgentIntegration? = null
-        private val modules = HashMap<String, Module>()
+
+        internal val modules = HashMap<String, Module>()
 
         val instance: AgentIntegration
             get() = instanceInternal ?: throw IllegalStateException("Instance is not created, call createInstance() first")
