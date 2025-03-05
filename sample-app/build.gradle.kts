@@ -42,7 +42,7 @@ android {
             val accessToken = localProperties["rum.access.token"] as String?
             resValue("string", "rum_realm", realm ?: "us0")
             resValue("string", "rum_access_token", accessToken ?: "dummyAuth")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
 
