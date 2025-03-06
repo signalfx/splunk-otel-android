@@ -19,12 +19,12 @@ package com.splunk.rum.integration.agent.api.internal
 import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.logger.consumers.AndroidLogConsumer
-import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.attributes.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.extension.toResource
+import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdLogProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
@@ -32,11 +32,15 @@ import com.splunk.rum.integration.agent.api.sessionPulse.SessionPulseEventManage
 import com.splunk.rum.integration.agent.api.state.StateLogRecordProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.BuildConfig
+import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
 import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 
 internal object SplunkRumAgentCore {
 
@@ -44,12 +48,8 @@ internal object SplunkRumAgentCore {
     private var agentConfiguration: AgentConfiguration? = null
 
     fun install(application: Application, agentConfiguration: AgentConfiguration, moduleConfigurations: List<ModuleConfiguration>): OpenTelemetry {
-        this.agentConfiguration = agentConfiguration
-
-        // TODO is this correct?
-        if (agentConfiguration.enableDebugLogging == true) {
+        if (agentConfiguration.isDebugLogsEnabled)
             Logger.consumers += AndroidLogConsumer()
-        }
 
         Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
@@ -71,20 +71,23 @@ internal object SplunkRumAgentCore {
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
         SessionPulseEventManager.obtainInstance(agentIntegration.sessionManager)
 
-        val openTelemetry = OpenTelemetryInitializer(application)
+        val initializer = OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(GlobalAttributeSpanProcessor())
+            .addSpanProcessor(AppStartSpanProcessor())
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
-            .build()
+
+        if (agentConfiguration.isDebugLogsEnabled)
+            initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
+
+        val openTelemetry = initializer.build()
 
         agentIntegration.install(application)
 
         return openTelemetry
     }
-
-
 }
