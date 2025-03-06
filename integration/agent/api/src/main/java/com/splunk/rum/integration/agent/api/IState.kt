@@ -1,5 +1,7 @@
 package com.splunk.rum.integration.agent.api
 
+import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
+
 interface IState {
     val appName: String
     val state: Status
@@ -9,9 +11,9 @@ interface IState {
     val sessionSamplingRate: Double
 }
 
-class State internal constructor(agentConfiguration: AgentConfiguration, isRunning: Boolean) : IState {
+class State internal constructor(agentConfiguration: AgentConfiguration) : IState {
     override val appName: String = agentConfiguration.appName
-    override val state: Status = if (isRunning) Status.Running else Status.NotRunning(cause = Status.NotRunning.Cause.SampledOut)
+    override val state: Status = if (SplunkRumAgentCore.isRunning) Status.Running else Status.NotRunning(cause = Status.NotRunning.Cause.SampledOut)
     override val endpointConfiguration: EndpointConfiguration = agentConfiguration.endpointConfiguration
     override val deploymentEnvironment: String? = agentConfiguration.deploymentEnvironment
     override val isDebugLoggingEnabled: Boolean = agentConfiguration.enableDebugLogging

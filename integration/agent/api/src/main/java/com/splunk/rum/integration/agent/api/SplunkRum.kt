@@ -27,15 +27,14 @@ import io.opentelemetry.api.OpenTelemetry
  */
 class SplunkRum private constructor(
     agentConfiguration: AgentConfiguration,
-    isRunning: Boolean,
     val openTelemetry: OpenTelemetry,
-    val state: IState = State(agentConfiguration, isRunning)
+    val state: IState = State(agentConfiguration)
 ) {
     // TODO separate task
     var globalAttributes: Any = agentConfiguration.globalAttributes
 
     companion object {
-        private val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop, isRunning = false)
+        private val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop)
         private var instanceInternal: SplunkRum? = null
 
         /**
@@ -64,17 +63,9 @@ class SplunkRum private constructor(
             if (instanceInternal != null)
                 return instance
 
-            val isRunning = when (val samplingRate = agentConfiguration.sessionSamplingRate.coerceIn(0.0, 1.0)) {
-                0.0 -> false
-                1.0 -> true
-                else -> Math.random() < samplingRate
-            }
-
-            if (!isRunning) return SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, isRunning = false)
-
             val openTelemetry = SplunkRumAgentCore.install(application, agentConfiguration, moduleConfigurations.toList())
 
-            instanceInternal = SplunkRum(agentConfiguration = agentConfiguration, openTelemetry = openTelemetry, isRunning = true)
+            instanceInternal = SplunkRum(agentConfiguration = agentConfiguration, openTelemetry = openTelemetry)
 
             return instance
         }
