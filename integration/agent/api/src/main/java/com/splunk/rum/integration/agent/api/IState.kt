@@ -9,14 +9,13 @@ interface IState {
     val sessionSamplingRate: Double
 }
 
-class State internal constructor(agentConfiguration: AgentConfiguration) : IState {
+class State internal constructor(agentConfiguration: AgentConfiguration, isRunning: Boolean) : IState {
     override val appName: String = agentConfiguration.appName
-    override val state: Status
-        get() = TODO("Not yet implemented")
+    override val state: Status = if (isRunning) Status.Running else Status.NotRunning(cause = Status.NotRunning.Cause.SampledOut)
     override val endpointConfiguration: EndpointConfiguration = agentConfiguration.endpointConfiguration
     override val deploymentEnvironment: String? = agentConfiguration.deploymentEnvironment
     override val isDebugLoggingEnabled: Boolean = agentConfiguration.enableDebugLogging
-    override val sessionSamplingRate: Double = agentConfiguration.sessionSamplingRate
+    override val sessionSamplingRate: Double = agentConfiguration.sessionSamplingRate.coerceIn(0.0, 1.0)
 }
 
 object Noop : IState {

@@ -22,7 +22,7 @@ data class AgentConfiguration(
     val appName: String,
     var deploymentEnvironment: String? = null,
     var enableDebugLogging: Boolean = false,
-    var sessionSamplingRate: Double = 1.0, // TODO separate task
+    var sessionSamplingRate: Double = 1.0,
     var globalAttributes: Any = Unit, // TODO Tony implementation
     var spanFilter: Any? = null // TODO separate task
 ) {
