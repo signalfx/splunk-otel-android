@@ -17,11 +17,11 @@
 package com.splunk.rum.integration.sessionreplay.extension
 
 import com.cisco.android.instrumentation.recording.core.api.SessionReplay
-import com.splunk.rum.integration.agent.api.SplunkRUMAgent
+import com.splunk.rum.integration.agent.api.SplunkRum
 
 /**
- * Extension property to access the [SessionReplay] instance via [SplunkRUMAgent].
+ * Extension property to access the [SessionReplay] instance via [SplunkRum].
  */
 @Suppress("UnusedReceiverParameter")
-val SplunkRUMAgent.sessionReplay: SessionReplay
+val SplunkRum.sessionReplay: SessionReplay
     get() = SessionReplay.instance

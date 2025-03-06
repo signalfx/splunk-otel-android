@@ -47,7 +47,7 @@ public class JavaIntegration extends Application {
         moduleConfigs[0] = new CustomModuleConfiguration();
         moduleConfigs[1] = new CustomModuleConfiguration();
 
-        SplunkRUMAgent agent = SplunkRUMAgent.install(this, agentConfig, moduleConfigs);
+        SplunkRum agent = SplunkRum.install(this, agentConfig, moduleConfigs);
     }
 
     private static class CustomModuleConfiguration implements ModuleConfiguration {

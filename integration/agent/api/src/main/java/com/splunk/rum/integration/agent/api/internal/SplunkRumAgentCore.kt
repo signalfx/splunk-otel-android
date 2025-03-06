@@ -36,13 +36,18 @@ import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcess
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.storage.AgentStorage
+import io.opentelemetry.api.OpenTelemetry
 
-internal object MRUMAgentCore {
+internal object SplunkRumAgentCore {
 
-    private const val TAG = "MRUMAgentCore"
+    private const val TAG = "SplunkRumAgentCore"
+    private var agentConfiguration: AgentConfiguration? = null
 
-    fun install(application: Application, agentConfiguration: AgentConfiguration, moduleConfigurations: List<ModuleConfiguration>) {
-        if (agentConfiguration.isDebugLogsEnabled) {
+    fun install(application: Application, agentConfiguration: AgentConfiguration, moduleConfigurations: List<ModuleConfiguration>): OpenTelemetry {
+        this.agentConfiguration = agentConfiguration
+
+        // TODO is this correct?
+        if (agentConfiguration.enableDebugLogging == true) {
             Logger.consumers += AndroidLogConsumer()
         }
 
@@ -66,7 +71,7 @@ internal object MRUMAgentCore {
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
         SessionPulseEventManager.obtainInstance(agentIntegration.sessionManager)
 
-        OpenTelemetryInitializer(application)
+        val openTelemetry = OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
@@ -77,6 +82,8 @@ internal object MRUMAgentCore {
             .build()
 
         agentIntegration.install(application)
+
+        return openTelemetry
     }
 
 

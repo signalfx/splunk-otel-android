@@ -27,13 +27,8 @@ internal class ConfigurationManager private constructor(
     fun preProcessConfiguration(context: Context, proposalConfig: AgentConfiguration): AgentConfiguration {
         val config = proposalConfig.copy()
 
-        if (config.appName == null)
-            config.appName = context.packageName
-
-        if (config.appVersion == null)
-            config.appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName
-
-        agentStorage.writeBaseUrl(config.url.toExternalForm())
+        // TODO separate task
+        // agentStorage.writeBaseUrl(config.url.toExternalForm())
 
         Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
 
