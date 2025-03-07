@@ -17,18 +17,18 @@
 package com.splunk.rum.integration.agent.api.sessionPulse
 
 import com.cisco.android.common.logger.Logger
-import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.SplunkRumOpenTelemetrySdk
 import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.NAME
-import com.splunk.rum.integration.agent.internal.session.SessionManager
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.api.common.Attributes
 import java.util.concurrent.TimeUnit
 
-internal class SessionPulseEventManager(sessionManager: SessionManager) {
+internal class SessionPulseEventManager(sessionManager: SplunkSessionManager) {
 
     init {
         Logger.d(TAG, "init()")
 
-        sessionManager.pulseListeners += object : SessionManager.PulseListener {
+        sessionManager.pulseListeners += object : SplunkSessionManager.PulseListener {
             override fun onPulseEvent() {
                 createSessionPulseEvent(sessionManager.sessionId)
             }
@@ -38,7 +38,7 @@ internal class SessionPulseEventManager(sessionManager: SessionManager) {
     private fun createSessionPulseEvent(sessionId: String) {
         Logger.d(TAG, "createSessionPulseEvent() sessionId: $sessionId")
 
-        val instance = OpenTelemetry.instance ?: return
+        val instance = SplunkRumOpenTelemetrySdk.instance ?: return
 
         val now = System.currentTimeMillis()
         val attributes = Attributes.of(
@@ -58,7 +58,7 @@ internal class SessionPulseEventManager(sessionManager: SessionManager) {
     companion object {
         private const val TAG = "SessionPulseEventManager"
         private var instanceInternal: SessionPulseEventManager? = null
-        fun obtainInstance(sessionManager: SessionManager): SessionPulseEventManager {
+        fun obtainInstance(sessionManager: SplunkSessionManager): SessionPulseEventManager {
             if (instanceInternal == null)
                 instanceInternal = SessionPulseEventManager(sessionManager)
 

@@ -16,18 +16,23 @@
 
 package com.splunk.rum.integration.agent.internal
 
+import android.app.Application
 import android.content.Context
 import android.os.SystemClock
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
-import com.splunk.rum.integration.agent.internal.session.SessionManager
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.module.extension.toSplunkString
-import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.SplunkRumOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
 import com.splunk.sdk.common.storage.AgentStorage
+import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 import java.util.concurrent.TimeUnit
+import io.opentelemetry.android.session.SessionManager
+import io.opentelemetry.android.session.SessionObserver
 
 class AgentIntegration private constructor(
     context: Context
@@ -38,9 +43,20 @@ class AgentIntegration private constructor(
     private var startTimestamp = 0L
     private var startElapsed = 0L
 
-    val sessionManager: SessionManager
+    val sessionManager: SplunkSessionManager
     val moduleConfigurationManager: ModuleConfigurationManager
     val listeners: MutableSet<Listener> = HashSet()
+
+    //TODO: Replace with actual SessionManager when session module from upstream is integrated
+    val oTelSessionManager = object : SessionManager {
+        override fun getSessionId(): String {
+            return "dummy-session-id"
+        }
+
+        override fun addObserver(observer: SessionObserver){
+            //no-op
+        }
+    }
 
     init {
         startTimestamp = System.currentTimeMillis()
@@ -50,7 +66,7 @@ class AgentIntegration private constructor(
 
         val storage = AgentStorage.attach(context)
 
-        sessionManager = SessionManager(storage)
+        sessionManager = SplunkSessionManager(storage)
         moduleConfigurationManager = ModuleConfigurationManager(storage)
 
         sessionManager.sessionListeners += SessionManagerListener()
@@ -72,16 +88,17 @@ class AgentIntegration private constructor(
         return this
     }
 
-    fun install(context: Context) {
+    fun install(context: Context, openTelemetry: OpenTelemetry) {
         sessionManager.install(context)
-        listeners.forEachFast { it.onInstall(context) }
+        val oTelInstallationContext = InstallationContext(context.applicationContext as Application, openTelemetry, oTelSessionManager)
+        listeners.forEachFast { it.onInstall(context, oTelInstallationContext) }
 
         registerModuleInitializationEnd(MODULE_NAME)
         reportInitialization()
     }
 
     private fun reportInitialization() {
-        val provider = OpenTelemetry.instance?.sdkTracerProvider ?: throw IllegalStateException("unable to report initialization")
+        val provider = SplunkRumOpenTelemetrySdk.instance?.sdkTracerProvider ?: throw IllegalStateException("unable to report initialization")
         val modules = modules.values
 
         val span = provider.get(RumConstants.RUM_TRACER_NAME)
@@ -106,7 +123,7 @@ class AgentIntegration private constructor(
         span.end()
     }
 
-    private inner class SessionManagerListener : SessionManager.SessionListener {
+    private inner class SessionManagerListener : SplunkSessionManager.SessionListener {
         override fun onSessionChanged(sessionId: String) {
             val appName = appName ?: throw IllegalStateException("Call setup() first")
             val agentVersion = agentVersion ?: throw IllegalStateException("Call setup() first")
@@ -114,7 +131,7 @@ class AgentIntegration private constructor(
     }
 
     interface Listener {
-        fun onInstall(context: Context)
+        fun onInstall(context: Context, oTelInstallationContext: InstallationContext)
     }
 
     private data class Module(

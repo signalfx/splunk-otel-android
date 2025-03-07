@@ -18,12 +18,12 @@ package com.splunk.rum.integration.agent.api.sessionId
 
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.SESSION_ID_KEY
-import com.splunk.rum.integration.agent.internal.session.SessionManager
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord
 
-internal class SessionIdLogProcessor(private val sessionManager: SessionManager) : LogRecordProcessor {
+internal class SessionIdLogProcessor(private val sessionManager: SplunkSessionManager) : LogRecordProcessor {
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
         val sessionId = sessionManager.sessionId
         Logger.d("SessionIdLogProcessor", "onEmit sessionId: $sessionId, ${logRecord.toLogRecordData().attributes}")

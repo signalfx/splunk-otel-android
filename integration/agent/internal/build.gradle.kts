@@ -28,6 +28,9 @@ dependencies {
     implementation(project(":common:otel"))
     implementation(project(":common:storage"))
 
+    implementation(Dependencies.Otel.androidSession)
+    implementation(Dependencies.Otel.androidInstrumentation)
+
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonId)
     implementation(Dependencies.SessionReplay.commonHttp)

@@ -37,7 +37,6 @@ public class AndroidInstrumentationPlugin implements Plugin<Project> {
     }
 
     private void addAutoInstrumentationDependenciesForNRTracing() {
-        project.getDependencies().add("byteBuddy", "com.cisco.android:rum-network-request-bci:" + dependenciesVersion);
-        project.getDependencies().add("implementation", "com.cisco.android:rum-network-request-library:" + dependenciesVersion);
+        project.getDependencies().add("byteBuddy", "io.opentelemetry.android:instrumentation-httpurlconnection-agent:" + dependenciesVersion);
     }
 }

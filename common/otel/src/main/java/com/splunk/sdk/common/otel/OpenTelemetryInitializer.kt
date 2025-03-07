@@ -75,7 +75,7 @@ class OpenTelemetryInitializer(application: Application) {
 
         val sdk = if (global) instance.buildAndRegisterGlobal() else instance.build()
 
-        OpenTelemetry.instance = sdk
+        SplunkRumOpenTelemetrySdk.instance = sdk
 
         return sdk
     }

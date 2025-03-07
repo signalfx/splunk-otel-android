@@ -25,8 +25,9 @@ import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManag
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
-import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.SplunkRumOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
+import io.opentelemetry.android.instrumentation.InstallationContext
 
 internal object StartupIntegration {
 
@@ -63,7 +64,7 @@ internal object StartupIntegration {
     }
 
     private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
-        val provider = OpenTelemetry.instance?.sdkTracerProvider ?: run {
+        val provider = SplunkRumOpenTelemetrySdk.instance?.sdkTracerProvider ?: run {
             cache += StartupData(startTimestamp, endTimestamp, name)
             return
         }
@@ -83,7 +84,7 @@ internal object StartupIntegration {
     }
 
     private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(context: Context) {
+        override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
             Logger.d(TAG, "onInstall()")
 
             val integration = AgentIntegration.obtainInstance(context)

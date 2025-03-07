@@ -22,6 +22,7 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import io.opentelemetry.android.instrumentation.InstallationContext
 
 @SuppressLint("LongLogTag")
 internal object AnrIntegration {
@@ -51,8 +52,9 @@ internal object AnrIntegration {
     }
 
     private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(context: Context) {
+        override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
             Logger.d(TAG, "onInstall()")
+
             val integration = AgentIntegration.obtainInstance(context)
             integration.moduleConfigurationManager.listeners += configManagerListener
 

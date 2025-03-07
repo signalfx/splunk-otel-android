@@ -18,10 +18,10 @@ package com.splunk.rum.integration.networkrequest
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class NetworkRequestModuleConfiguration : ModuleConfiguration {
+class NetworkRequestModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
     override val name: String = "network"
 
     override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to true.toString()
+        "enabled" to isEnabled.toString()
     )
 }

@@ -36,6 +36,7 @@ import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcess
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.storage.AgentStorage
+import io.opentelemetry.api.OpenTelemetry
 
 internal object MRUMAgentCore {
 
@@ -66,7 +67,7 @@ internal object MRUMAgentCore {
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
         SessionPulseEventManager.obtainInstance(agentIntegration.sessionManager)
 
-        OpenTelemetryInitializer(application)
+        val openTelemetry : OpenTelemetry = OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
@@ -76,7 +77,7 @@ internal object MRUMAgentCore {
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
             .build()
 
-        agentIntegration.install(application)
+        agentIntegration.install(application, openTelemetry)
     }
 
 

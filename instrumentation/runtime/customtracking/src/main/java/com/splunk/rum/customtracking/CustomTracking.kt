@@ -17,7 +17,7 @@
 package com.splunk.rum.customtracking
 
 import com.cisco.android.common.logger.Logger
-import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.SplunkRumOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
@@ -95,7 +95,7 @@ class CustomTracking internal constructor() {
      * @return A Tracer instance if available, or null if the OpenTelemetry instance is null.
      */
     private fun getTracer(): Tracer? {
-        return OpenTelemetry.instance?.sdkTracerProvider?.get(RumConstants.RUM_TRACER_NAME).also {
+        return SplunkRumOpenTelemetrySdk.instance?.sdkTracerProvider?.get(RumConstants.RUM_TRACER_NAME).also {
             if (it == null) {
                 Logger.e(
                     TAG,

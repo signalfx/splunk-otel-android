@@ -18,8 +18,8 @@ package com.splunk.rum.integration.agent.api.extension
 
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import io.opentelemetry.sdk.resources.Resource
-import io.opentelemetry.semconv.ResourceAttributes.SERVICE_NAME
-import io.opentelemetry.semconv.ResourceAttributes.SERVICE_VERSION
+import io.opentelemetry.semconv.ServiceAttributes.SERVICE_NAME
+import io.opentelemetry.semconv.ServiceAttributes.SERVICE_VERSION
 
 fun AgentConfiguration.toResource(): Resource {
     return Resource.getDefault().toBuilder()

@@ -18,18 +18,18 @@ package com.splunk.rum.integration.agent.api.sessionId
 
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.attributes.AttributeConstants
-import com.splunk.rum.integration.agent.internal.session.SessionManager
-import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
+import com.splunk.sdk.common.otel.SplunkRumOpenTelemetrySdk
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import java.util.concurrent.TimeUnit
 
-internal class SessionStartEventManager(sessionManager: SessionManager) {
+internal class SessionStartEventManager(sessionManager: SplunkSessionManager) {
 
     init {
         Logger.d(TAG, "init()")
 
-        sessionManager.sessionListeners += object : SessionManager.SessionListener {
+        sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String) {
                 createSessionStartEvent(sessionId, sessionManager.anonId)
             }
@@ -39,7 +39,7 @@ internal class SessionStartEventManager(sessionManager: SessionManager) {
     private fun createSessionStartEvent(sessionId: String, userId: String) {
         Logger.d(TAG, "createSessionStartEvent() sessionId: $sessionId, userId: $userId")
 
-        val instance = OpenTelemetry.instance ?: return
+        val instance = SplunkRumOpenTelemetrySdk.instance ?: return
 
         val now = System.currentTimeMillis()
         val attributes = Attributes.of(
@@ -59,7 +59,7 @@ internal class SessionStartEventManager(sessionManager: SessionManager) {
     companion object {
         private const val TAG = "SessionStartEventManager"
         private var instanceInternal: SessionStartEventManager? = null
-        fun obtainInstance(sessionManager: SessionManager): SessionStartEventManager {
+        fun obtainInstance(sessionManager: SplunkSessionManager): SessionStartEventManager {
             if (instanceInternal == null)
                 instanceInternal =
                     SessionStartEventManager(sessionManager)
