@@ -79,7 +79,7 @@ internal object SplunkRumAgentCore {
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
         val initializer = OpenTelemetryInitializer(application)
-            .joinResources(finalConfiguration.toResource())
+          .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(GlobalAttributeSpanProcessor())
@@ -98,5 +98,5 @@ internal object SplunkRumAgentCore {
         agentIntegration.install(application, openTelemetry)
 
         return openTelemetry
-    }
+   }
 }
