@@ -24,13 +24,9 @@ import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
-import com.splunk.rum.integration.agent.module.extension.toSplunkString
-import com.splunk.sdk.common.otel.SplunkRumOpenTelemetrySdk
-import com.splunk.sdk.common.otel.internal.RumConstants
 import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.OpenTelemetry
-import java.util.concurrent.TimeUnit
 import io.opentelemetry.android.session.SessionManager
 import io.opentelemetry.android.session.SessionObserver
 import com.splunk.rum.integration.agent.internal.model.Module
