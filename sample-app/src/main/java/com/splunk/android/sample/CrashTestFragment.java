@@ -1,18 +1,30 @@
+/*
+ * Copyright Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.splunk.android.sample;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +35,10 @@ public class CrashTestFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_crash_test, container, false);
     }
 
@@ -44,10 +59,11 @@ public class CrashTestFragment extends Fragment {
         anrButton.setOnClickListener(v -> triggerANR());
 
         Button navigateButton = view.findViewById(R.id.button_to_fragment_b);
-        navigateButton.setOnClickListener(v -> {
-            NavHostFragment.findNavController(CrashTestFragment.this)
-                    .navigate(R.id.action_CrashTestFragment_to_CrashTestFragmentB);
-        });
+        navigateButton.setOnClickListener(
+                v -> {
+                    NavHostFragment.findNavController(CrashTestFragment.this)
+                            .navigate(R.id.action_CrashTestFragment_to_CrashTestFragmentB);
+                });
     }
 
     private void triggerChainedException() {
@@ -74,18 +90,20 @@ public class CrashTestFragment extends Fragment {
     // 2. Uses Java 8 lambdas which generate synthetic methods in bytecode
     private void triggerSyntheticCodeException() {
         // Define multiple lambdas to generate several synthetic methods
-        Callable<String> callable1 = () -> {
-            Callable<Integer> callable2 = () -> {
-                String nullStr = null;
-                return nullStr.length(); // cause NPE
-            };
+        Callable<String> callable1 =
+                () -> {
+                    Callable<Integer> callable2 =
+                            () -> {
+                                String nullStr = null;
+                                return nullStr.length(); // cause NPE
+                            };
 
-            try {
-                return "Result: " + callable2.call();
-            } catch (Exception e) {
-                throw new RuntimeException("Nested lambda failure", e);
-            }
-        };
+                    try {
+                        return "Result: " + callable2.call();
+                    } catch (Exception e) {
+                        throw new RuntimeException("Nested lambda failure", e);
+                    }
+                };
 
         try {
             callable1.call();
@@ -102,25 +120,29 @@ public class CrashTestFragment extends Fragment {
         // Multiple threads accessing the same list without synchronization
         for (int i = 0; i < threadCount; i++) {
             final int threadNum = i;
-            new Thread(() -> {
-                try {
-                    // Wait for all threads to be ready
-                    startSignal.await();
+            new Thread(
+                            () -> {
+                                try {
+                                    // Wait for all threads to be ready
+                                    startSignal.await();
 
-                    // Perform competing operations on the shared list
-                    for (int j = 0; j < 1000; j++) {
-                        sharedList.add("Thread " + threadNum + " value " + j);
-                        if (!sharedList.isEmpty()) {
-                            // Should cause ConcurrentModificationException
-                            // when another thread modifies the list at same time
-                            sharedList.remove(0);
-                        }
-                    }
-                } catch (Exception e) {
-                    // Wrap the exception
-                    throw new RuntimeException("Thread " + threadNum + " crashed", e);
-                }
-            }, "CrashTest-Thread-" + i).start();
+                                    // Perform competing operations on the shared list
+                                    for (int j = 0; j < 1000; j++) {
+                                        sharedList.add("Thread " + threadNum + " value " + j);
+                                        if (!sharedList.isEmpty()) {
+                                            // Should cause ConcurrentModificationException
+                                            // when another thread modifies the list at same time
+                                            sharedList.remove(0);
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    // Wrap the exception
+                                    throw new RuntimeException(
+                                            "Thread " + threadNum + " crashed", e);
+                                }
+                            },
+                            "CrashTest-Thread-" + i)
+                    .start();
         }
 
         // Start all threads at once

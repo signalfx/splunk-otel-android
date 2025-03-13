@@ -1,3 +1,19 @@
+/*
+ * Copyright Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.splunk.android.sample;
 
 import android.os.Bundle;
@@ -5,21 +21,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class CrashTestFragmentB extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_crash_test_b, container, false);
     }
 
@@ -47,7 +64,7 @@ public class CrashTestFragmentB extends Fragment {
     private void triggerInliningException() {
         int a = inlinableMethod1(5);
         int b = inlinableMethod2(0);
-        int result = a / b;  // Division by zero
+        int result = a / b; // Division by zero
     }
 
     private int inlinableMethod1(int value) {
@@ -55,7 +72,7 @@ public class CrashTestFragmentB extends Fragment {
     }
 
     private int inlinableMethod2(int value) {
-        return value;  // cause division by zero when called with 0
+        return value; // cause division by zero when called with 0
     }
 
     private void triggerReflectionException() {
@@ -101,14 +118,14 @@ public class CrashTestFragmentB extends Fragment {
     // Second level of inheritance
     private static class SecondChild extends FirstChild {
         protected void midMethod() {
-            baseMethod();  // Call parent method
+            baseMethod(); // Call parent method
         }
     }
 
     // Third and deepest level
     private static class DeepestChild extends SecondChild {
         public void methodThatThrows() {
-            midMethod();  // Will eventually throw exception from base class
+            midMethod(); // Will eventually throw exception from base class
         }
     }
 
@@ -118,7 +135,7 @@ public class CrashTestFragmentB extends Fragment {
 
             // Allocating memory in chunks until out of memory
             for (int i = 0; i < 100; i++) {
-                memoryHog.add(new byte[10 * 1024 * 1024]);  // 10MB chunks
+                memoryHog.add(new byte[10 * 1024 * 1024]); // 10MB chunks
             }
         } catch (OutOfMemoryError e) {
             throw e;
@@ -146,7 +163,8 @@ public class CrashTestFragmentB extends Fragment {
 
     private void crashingMethod(String param, int value, boolean flag, Map<String, Object> extra) {
         if (param != null && value > 0 && flag) {
-            throw new IllegalArgumentException("Crasher called with: " + param + ", " + value + ", " + flag);
+            throw new IllegalArgumentException(
+                    "Crasher called with: " + param + ", " + value + ", " + flag);
         }
     }
 }
