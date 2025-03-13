@@ -17,8 +17,13 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
+import com.splunk.rum.integration.agent.api.SplunkRUMAgent.Companion.install
+import com.splunk.rum.integration.agent.api.internal.MRUMAgentCore
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.sdk.common.otel.OpenTelemetry
+import io.opentelemetry.api.common.Attributes
+import java.net.URL
 import io.opentelemetry.api.OpenTelemetry
 
 /**
@@ -68,6 +73,116 @@ class SplunkRum private constructor(
             instanceInternal = SplunkRum(agentConfiguration = agentConfiguration, openTelemetry = openTelemetry)
 
             return instance
+        }
+
+        @JvmStatic
+        @Deprecated("Use install()")
+        fun builder(): Builder {
+            return Builder()
+        }
+    }
+
+    @Deprecated("Use install()")
+    class Builder internal constructor() {
+
+        private var accessToken: String? = null
+        private var applicationName: String? = null
+        private var deploymentEnvironment: String? = null
+        private var realm: String? = null
+        private var beaconEndpoint: String? = null
+        private var enableDebug: Boolean = false
+        private var attributes: Attributes? = null
+        private var enableSessionBasedSampling: Boolean = false
+
+        fun setRumAccessToken(token: String): Builder {
+            accessToken = token
+            return this
+        }
+
+        fun setApplicationName(name: String): Builder {
+            applicationName = name
+            return this
+        }
+
+        fun setDeploymentEnvironment(environment: String): Builder {
+            deploymentEnvironment = environment
+            return this
+        }
+
+        fun setRealm(realm: String): Builder {
+            if (beaconEndpoint != null)
+                throw IllegalStateException("setRealm can not be set when setBeaconEndpoint was called")
+
+            this.realm = realm
+            return this
+        }
+
+        fun setBeaconEndpoint(endpoint: String): Builder {
+            if (beaconEndpoint != null)
+                throw IllegalStateException("setBeaconEndpoint can not be set when setRealm was called")
+
+            beaconEndpoint = endpoint
+            return this
+        }
+
+        fun enableDebug(debug: Boolean): Builder {
+            enableDebug = debug
+            return this
+        }
+
+        fun setGlobalAttributes(attributes: Attributes): Builder {
+            this.attributes = attributes
+            return this
+        }
+
+        fun filterSpans(): Builder { // TODO
+            return this
+        }
+
+        fun limitDiskUsageMegabytes(): Builder { // TODO
+            return this
+        }
+
+        fun enableSessionBasedSampling(enable: Boolean): Builder { // TODO
+            enableSessionBasedSampling = enable
+            return this
+        }
+
+        fun disableSubprocessInstrumentation(): Builder { // TODO
+            return this
+        }
+
+        fun enableBackgroundInstrumentationDeferredUntilForeground(): Builder { //TODO
+            return this
+        }
+
+        @Deprecated("This is no longer supported")
+        fun enableDiskBuffering(enable: Boolean): Builder {
+            return this
+        }
+
+        fun build(application: Application): SplunkRUMAgent {
+            val agent = install(
+                application,
+                agentConfiguration = AgentConfiguration(
+                    url = URL(""), // TODO
+                    appName = applicationName,
+                    isDebugLogsEnabled = enableDebug
+                )
+            )
+
+            // TODO setRumAccessToken
+            // TODO setDeploymentEnvironment
+            // TODO setRealm
+            // TODO setBeaconEndpoint
+            // TODO setGlobalAttributes
+            // TODO filterSpans
+            // TODO limitDiskUsageMegabytes
+            // TODO enableSessionBasedSampling
+            // TODO disableSubprocessInstrumentation
+            // TODO enableBackgroundInstrumentationDeferredUntilForeground
+
+            return agent
         }
     }
 }
