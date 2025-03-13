@@ -38,4 +38,17 @@
     <string name="draw_speed_slowly">Draw Slowly</string>
     <string name="send_email">send email</string>
     <string name="title_activity_jetpack_compose">JetpackComposeActivity</string>
+    <string name="reflection_based_exception">Reflection-based Exception</string>
+    <string name="deep_inheritance_exception">Deep Inheritance Exception</string>
+    <string name="method_inlining_exception">Method Inlining Exception</string>
+    <string name="crash_test_fragment_b">Crash Test Fragment B</string>
+    <string name="out_of_memory_error">Out Of Memory Error</string>
+    <string name="method_overloading_exception">Method Overloading Exception</string>
+    <string name="open_crash_test">Open Crash Test</string>
+    <string name="chained_exception">Chained Exception</string>
+    <string name="synthetic_code_lambda_exception">Synthetic Code (Lambda) Exception</string>
+    <string name="crash_test_fragment_a">Crash Test Fragment A</string>
+    <string name="race_condition_exception">Race Condition Exception</string>
+    <string name="anr">Trigger ANR</string>
+    <string name="go_to_crash_test_fragment_b">Go to Crash Test Fragment B</string>
 </resources>

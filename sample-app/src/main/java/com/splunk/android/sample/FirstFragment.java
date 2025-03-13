@@ -89,7 +89,7 @@ public class FirstFragment extends Fragment {
                             new Intent(this.getView().getContext(), JetpackComposeActivity.class));
                 });
 
-        binding.crash.setOnClickListener(v -> multiThreadCrashing());
+        binding.crash.setOnClickListener(v -> simpleCrash());
 
         binding.httpMe.setOnClickListener(
                 v -> {
@@ -135,6 +135,14 @@ public class FirstFragment extends Fragment {
                             "kustom",
                             Attributes.of(longKey("counted"), customCount.incrementAndGet()));
                 });
+        binding.crashTestFragment.setOnClickListener(v -> {
+            NavHostFragment.findNavController(FirstFragment.this)
+                    .navigate(R.id.action_FirstFragment_to_CrashTestFragment);
+        });
+    }
+
+    private void simpleCrash() {
+        throw new RuntimeException("Simple RuntimeException Crash");
     }
 
     private void multiThreadCrashing() {

@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
             app:destination="@id/SecondFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_CrashTestFragment"
+            app:destination="@id/CrashTestFragment" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
@@ -44,4 +47,19 @@
         android:id="@+id/shopWebViewFragment"
         android:name="com.splunk.android.sample.ShopWebViewFragment"
         android:label="Online Boutique" />
+    <fragment
+        android:id="@+id/CrashTestFragment"
+        android:name="com.splunk.android.sample.CrashTestFragment"
+        android:label="Crash Test"
+        tools:layout="@layout/fragment_crash_test">
+        <action
+            android:id="@+id/action_CrashTestFragment_to_CrashTestFragmentB"
+            app:destination="@id/CrashTestFragmentB" />
+    </fragment>
+    <fragment
+        android:id="@+id/CrashTestFragmentB"
+        android:name="com.splunk.android.sample.CrashTestFragmentB"
+        android:label="Crash Test B"
+        tools:layout="@layout/fragment_crash_test_b">
+    </fragment>
 </navigation>
