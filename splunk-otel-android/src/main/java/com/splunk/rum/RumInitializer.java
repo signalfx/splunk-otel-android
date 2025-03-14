@@ -33,7 +33,6 @@ import static java.util.Objects.requireNonNull;
 import android.app.Application;
 import android.os.Looper;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
@@ -507,8 +506,11 @@ class RumInitializer {
         @Override
         public CompletableResultCode export(Collection<SpanData> spans) {
             for (SpanData span : spans) {
-                if (span.getAttributes().get(AttributeKey.stringKey("exception.stacktrace")) != null) {
-                    String exceptionAttributeValue = span.getAttributes().get(AttributeKey.stringKey("exception.stacktrace"));
+                if (span.getAttributes().get(AttributeKey.stringKey("exception.stacktrace"))
+                        != null) {
+                    String exceptionAttributeValue =
+                            span.getAttributes()
+                                    .get(AttributeKey.stringKey("exception.stacktrace"));
                     Log.d("CRASHDEBUG", "Stacktrace: " + exceptionAttributeValue);
                 }
             }
