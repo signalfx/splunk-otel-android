@@ -16,22 +16,21 @@
 
 package com.splunk.rum.integration.agent.api
 
-import java.net.URL
-
-/**
- * Configuration parameters for the RUM agent.
- *
- * @property url The base URL of the server to which RUM data will be sent.
- * @property appName Optional string that contains the name of the application.
- *                  The default value corresponds to `Context.getPackageName()`.
- * @property appVersion Optional string that contains the current application version.
- *                      The default value corresponds to `PackageInfo.versionName`.
- * @property isDebugLogsEnabled Optional boolean that decides if debug logs are visible or not.
- *                              The default value is `false`.
- */
 data class AgentConfiguration(
-    val url: URL,
-    var appName: String? = null,
-    var appVersion: String? = null,
-    var isDebugLogsEnabled: Boolean = false, // temporary name till product decides on more suitable one
-)
+    val rumAccessToken: String,
+    val endpointConfiguration: EndpointConfiguration,
+    val appName: String,
+    var deploymentEnvironment: String? = null,
+    var enableDebugLogging: Boolean = false,
+    var sessionSamplingRate: Double = 1.0,
+    var globalAttributes: Any = Unit, // TODO Tony implementation
+    var spanFilter: Any? = null // TODO separate task
+) {
+    internal companion object {
+        val noop = AgentConfiguration(
+            rumAccessToken = "",
+            endpointConfiguration = EndpointConfiguration(),
+            appName = "",
+        )
+    }
+}

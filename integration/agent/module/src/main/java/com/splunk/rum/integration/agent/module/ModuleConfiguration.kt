@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.module
 
 interface ModuleConfiguration {
-
     val name: String
     val attributes: List<Pair<String, String>>
 }

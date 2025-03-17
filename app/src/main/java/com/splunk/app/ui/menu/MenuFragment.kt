@@ -29,7 +29,7 @@ import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.util.FragmentAnimation
 import com.splunk.rum.customtracking.extension.customTracking
-import com.splunk.rum.integration.agent.api.SplunkRUMAgent
+import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.api.extension.splunkRumId
 import com.splunk.rum.integration.navigation.extension.navigation
 import io.opentelemetry.api.common.Attributes
@@ -61,7 +61,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.trackExceptionWithAttributes.setOnClickListener(onClickListener)
         viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"
 
-        SplunkRUMAgent.instance.navigation.track("Menu")
+        SplunkRum.instance.navigation.track("Menu")
     }
 
     private val onClickListener = View.OnClickListener {
@@ -116,11 +116,11 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     .put("attribute.one", "value1")
                     .put("attribute.two", "12345")
                     .build()
-                SplunkRUMAgent.instance.customTracking.trackCustomEvent("TestEvent", testAttributes)
+                SplunkRum.instance.customTracking.trackCustomEvent("TestEvent", testAttributes)
                 showDoneToast("Track Custom Event, Done!")
             }
             viewBinding.trackWorkflow.id -> {
-                val workflowSpan = SplunkRUMAgent.instance.customTracking.trackWorkflow("Test Workflow")
+                val workflowSpan = SplunkRum.instance.customTracking.trackWorkflow("Test Workflow")
                 workflowSpan?.setAttribute("workflow.start.time", System.currentTimeMillis())
                 // Simulate some processing time
                 Thread.sleep(125)
@@ -135,7 +135,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
                     StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
                 )
-                SplunkRUMAgent.instance.customTracking.trackException(e)
+                SplunkRum.instance.customTracking.trackException(e)
                 showDoneToast("Track Exception, Done!")
             }
             viewBinding.trackExceptionWithAttributes.id -> {
@@ -149,7 +149,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     .put("attribute.one", "value1")
                     .put("attribute.two", "12345")
                     .build()
-                SplunkRUMAgent.instance.customTracking.trackException(e, testAttributes)
+                SplunkRum.instance.customTracking.trackException(e, testAttributes)
                 showDoneToast("Track Exception with Attributes, Done!")
             }
         }

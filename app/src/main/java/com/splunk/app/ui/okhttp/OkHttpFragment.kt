@@ -29,7 +29,7 @@ import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentOkhttpBinding
 import com.splunk.app.ui.BaseFragment
-import com.splunk.rum.integration.agent.api.SplunkRUMAgent
+import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.OpenTelemetrySdk
@@ -114,7 +114,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         viewBinding.responseCaching.setOnClickListener { responseCaching() }
         viewBinding.canceledCall.setOnClickListener { canceledCall() }
 
-        SplunkRUMAgent.instance.navigation.track("OkHttp")
+        SplunkRum.instance.navigation.track("OkHttp")
     }
 
     /**
