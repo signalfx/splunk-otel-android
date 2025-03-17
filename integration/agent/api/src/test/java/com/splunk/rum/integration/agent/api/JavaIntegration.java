@@ -28,42 +28,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kotlin.Pair;
-
-public class JavaIntegration extends Application {
-
-    @Override
-    public void onCreate() {
-        URL url;
-
-        try {
-            url = new URL("https://alameda-eum-qe.saas.appd-test.com");
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-
-        AgentConfiguration agentConfig = new AgentConfiguration(url, "smartlook-android", "0.1", true);
-
-        ModuleConfiguration[] moduleConfigs = new ModuleConfiguration[2];
-        moduleConfigs[0] = new CustomModuleConfiguration();
-        moduleConfigs[1] = new CustomModuleConfiguration();
-
-        SplunkRum agent = SplunkRum.install(this, agentConfig, moduleConfigs);
-    }
-
-    private static class CustomModuleConfiguration implements ModuleConfiguration {
-
-        @NotNull
-        @Override
-        public String getName() {
-            return "test";
-        }
-
-        @NotNull
-        @Override
-        public List<Pair<String, String>> getAttributes() {
-            ArrayList<Pair<String, String>> attributes = new ArrayList<>();
-            attributes.add(new Pair<>("enabled", "true"));
-            return attributes;
-        }
-    }
-}
+// TODO will be fixed with JAVA api ticket
+//public class JavaIntegration extends Application {
+//
+//    @Override
+//    public void onCreate() {
+//        URL url;
+//
+//        try {
+//            url = new URL("https://alameda-eum-qe.saas.appd-test.com");
+//        } catch (MalformedURLException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        AgentConfiguration agentConfig = new AgentConfiguration(url, "smartlook-android", "0.1", true);
+//
+//        ModuleConfiguration[] moduleConfigs = new ModuleConfiguration[2];
+//        moduleConfigs[0] = new CustomModuleConfiguration();
+//        moduleConfigs[1] = new CustomModuleConfiguration();
+//
+//        SplunkRum agent = SplunkRum.install(this, agentConfig, moduleConfigs);
+//    }
+//
+//    private static class CustomModuleConfiguration implements ModuleConfiguration {
+//
+//        @NotNull
+//        @Override
+//        public String getName() {
+//            return "test";
+//        }
+//
+//        @NotNull
+//        @Override
+//        public List<Pair<String, String>> getAttributes() {
+//            ArrayList<Pair<String, String>> attributes = new ArrayList<>();
+//            attributes.add(new Pair<>("enabled", "true"));
+//            return attributes;
+//        }
+//    }
+//}
