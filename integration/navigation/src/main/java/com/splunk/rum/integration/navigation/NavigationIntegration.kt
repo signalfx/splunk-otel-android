@@ -21,7 +21,7 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.extension.find
-import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
+import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetry
 import com.splunk.sdk.common.otel.internal.RumConstants
@@ -54,8 +54,8 @@ internal object NavigationIntegration {
 
             val provider = OpenTelemetry.instance?.sdkTracerProvider ?: return
 
-            GlobalAttributeSpanProcessor.attributes.removeIf { it.name == "screen.name" }
-            GlobalAttributeSpanProcessor.attributes += GlobalAttributeSpanProcessor.Attribute.String("screen.name", screenName)
+            SplunkInternalGlobalAttributeSpanProcessor.attributes.removeIf { it.name == "screen.name" }
+            SplunkInternalGlobalAttributeSpanProcessor.attributes += SplunkInternalGlobalAttributeSpanProcessor.Attribute.String("screen.name", screenName)
 
             provider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder("Created")
