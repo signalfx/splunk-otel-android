@@ -7,8 +7,6 @@ class EndpointConfiguration internal constructor() {
         private set
     var sessionReplayEndpoint: URL? = null
         private set
-    var realm: String? = null
-        private set
 
     constructor(realm: String) : this() {
         tracesEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/rumotlp")
