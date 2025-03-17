@@ -17,9 +17,11 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
+import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.common.Attributes
 
 /**
  * The [SplunkRum] class is responsible for initializing and providing access to the RUM agent.
@@ -31,7 +33,7 @@ class SplunkRum private constructor(
     val state: IState = State(agentConfiguration)
 ) {
     // TODO separate task
-    var globalAttributes: Any = agentConfiguration.globalAttributes
+    var globalAttributes: Attributes = agentConfiguration.globalAttributes ?: Attributes.empty()
 
     companion object {
         private val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop)
