@@ -37,6 +37,7 @@ import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
+import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 
 internal object SplunkRumAgentCore {
@@ -97,5 +98,6 @@ internal object SplunkRumAgentCore {
         agentIntegration.install(application, openTelemetry)
 
         return openTelemetry
+
    }
 }
