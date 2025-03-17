@@ -46,6 +46,9 @@ public class CrashTestFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Button simpleCrashButton = view.findViewById(R.id.button_simple_crash);
+        simpleCrashButton.setOnClickListener(v -> simpleCrash());
+
         Button chainedExceptionButton = view.findViewById(R.id.button_chained_exception);
         chainedExceptionButton.setOnClickListener(v -> triggerChainedException());
 
@@ -66,30 +69,28 @@ public class CrashTestFragment extends Fragment {
                 });
     }
 
+    private void simpleCrash() {
+        throw new RuntimeException("Simple RuntimeException Crash");
+    }
+
     private void triggerChainedException() {
         try {
             try {
                 try {
-                    // Deepest level: cause IndexOutOfBoundsException
                     List<String> list = new ArrayList<>();
-                    String item = list.get(10);
+                    String item = list.get(10); // cause IndexOutOfBoundsException
                 } catch (IndexOutOfBoundsException e) {
-                    // Intermediate level: wrap in IOException
                     throw new IOException("Error accessing data", e);
                 }
             } catch (IOException e) {
-                // Top level: wrap in RuntimeException
                 throw new RuntimeException("Operation failed", e);
             }
         } catch (RuntimeException e) {
-            // Re-throw with another layer for deeper chaining
             throw new IllegalStateException("Application error occurred", e);
         }
     }
 
-    // 2. Uses Java 8 lambdas which generate synthetic methods in bytecode
     private void triggerSyntheticCodeException() {
-        // Define multiple lambdas to generate several synthetic methods
         Callable<String> callable1 =
                 () -> {
                     Callable<Integer> callable2 =
@@ -117,26 +118,20 @@ public class CrashTestFragment extends Fragment {
         final CountDownLatch startSignal = new CountDownLatch(1);
         final int threadCount = 5;
 
-        // Multiple threads accessing the same list without synchronization
         for (int i = 0; i < threadCount; i++) {
             final int threadNum = i;
             new Thread(
                             () -> {
                                 try {
-                                    // Wait for all threads to be ready
                                     startSignal.await();
 
-                                    // Perform competing operations on the shared list
                                     for (int j = 0; j < 1000; j++) {
                                         sharedList.add("Thread " + threadNum + " value " + j);
                                         if (!sharedList.isEmpty()) {
-                                            // Should cause ConcurrentModificationException
-                                            // when another thread modifies the list at same time
                                             sharedList.remove(0);
                                         }
                                     }
                                 } catch (Exception e) {
-                                    // Wrap the exception
                                     throw new RuntimeException(
                                             "Thread " + threadNum + " crashed", e);
                                 }
@@ -144,8 +139,6 @@ public class CrashTestFragment extends Fragment {
                             "CrashTest-Thread-" + i)
                     .start();
         }
-
-        // Start all threads at once
         startSignal.countDown();
     }
 

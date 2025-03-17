@@ -89,7 +89,7 @@ public class FirstFragment extends Fragment {
                             new Intent(this.getView().getContext(), JetpackComposeActivity.class));
                 });
 
-        binding.crash.setOnClickListener(v -> simpleCrash());
+        binding.crash.setOnClickListener(v -> multiThreadCrashing());
 
         binding.httpMe.setOnClickListener(
                 v -> {
@@ -140,10 +140,6 @@ public class FirstFragment extends Fragment {
                     NavHostFragment.findNavController(FirstFragment.this)
                             .navigate(R.id.action_FirstFragment_to_CrashTestFragment);
                 });
-    }
-
-    private void simpleCrash() {
-        throw new RuntimeException("Simple RuntimeException Crash");
     }
 
     private void multiThreadCrashing() {

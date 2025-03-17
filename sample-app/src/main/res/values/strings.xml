@@ -46,6 +46,7 @@
     <string name="method_overloading_exception">Method Overloading Exception</string>
     <string name="open_crash_test">Open Crash Test</string>
     <string name="chained_exception">Chained Exception</string>
+    <string name="simple_crash">Simple Crash</string>
     <string name="synthetic_code_lambda_exception">Synthetic Code (Lambda) Exception</string>
     <string name="crash_test_fragment_a">Crash Test Fragment A</string>
     <string name="race_condition_exception">Race Condition Exception</string>

@@ -60,7 +60,6 @@ public class CrashTestFragmentB extends Fragment {
         overloadButton.setOnClickListener(v -> triggerOverloadedMethodCrash());
     }
 
-    // Small methods that are likely to be candidates for inlining
     private void triggerInliningException() {
         int a = inlinableMethod1(5);
         int b = inlinableMethod2(0);
@@ -72,41 +71,35 @@ public class CrashTestFragmentB extends Fragment {
     }
 
     private int inlinableMethod2(int value) {
-        return value; // cause division by zero when called with 0
+        return value;
     }
 
     private void triggerReflectionException() {
         try {
             Method method = String.class.getMethod("nonExistentMethod");
 
-            // Won't reach here, exception will be thrown above
+            // won't reach here
             method.invoke("test");
         } catch (Exception e) {
-            // Wrap the reflection exception
             throw new RuntimeException("Reflection failed", e);
         }
     }
 
     private void triggerInheritanceException() {
-        // Create instance of deepest class
         DeepestChild deepChild = new DeepestChild();
 
-        // Call a method that will throw an exception
         deepChild.methodThatThrows();
     }
 
-    // Base class for inheritance testing
     private static class BaseClass {
         protected void baseMethod() {
             throw new RuntimeException("Exception in base class");
         }
     }
 
-    // First level of inheritance
     private static class FirstChild extends BaseClass {
         @Override
         protected void baseMethod() {
-            // Add a try-catch to alter the stack trace
             try {
                 super.baseMethod();
             } catch (RuntimeException e) {
@@ -115,17 +108,15 @@ public class CrashTestFragmentB extends Fragment {
         }
     }
 
-    // Second level of inheritance
     private static class SecondChild extends FirstChild {
         protected void midMethod() {
-            baseMethod(); // Call parent method
+            baseMethod();
         }
     }
 
-    // Third and deepest level
     private static class DeepestChild extends SecondChild {
         public void methodThatThrows() {
-            midMethod(); // Will eventually throw exception from base class
+            midMethod();
         }
     }
 
@@ -142,13 +133,10 @@ public class CrashTestFragmentB extends Fragment {
         }
     }
 
-    // 5. Method overloading for testing symbolication with similar signatures
     private void triggerOverloadedMethodCrash() {
-        // Call the first overloaded method
         crashingMethod("test");
     }
 
-    // Overloaded methods with different signatures
     private void crashingMethod(String param) {
         crashingMethod(param, 10);
     }

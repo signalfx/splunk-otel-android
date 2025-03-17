@@ -32,7 +32,6 @@ import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.os.Looper;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
@@ -51,7 +50,6 @@ import io.opentelemetry.android.instrumentation.lifecycle.AndroidLifecycleInstru
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingDetector;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
-import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
@@ -505,15 +503,6 @@ class RumInitializer {
 
         @Override
         public CompletableResultCode export(Collection<SpanData> spans) {
-            for (SpanData span : spans) {
-                if (span.getAttributes().get(AttributeKey.stringKey("exception.stacktrace"))
-                        != null) {
-                    String exceptionAttributeValue =
-                            span.getAttributes()
-                                    .get(AttributeKey.stringKey("exception.stacktrace"));
-                    Log.d("CRASHDEBUG", "Stacktrace: " + exceptionAttributeValue);
-                }
-            }
             return getDelegate().export(spans);
         }
 
