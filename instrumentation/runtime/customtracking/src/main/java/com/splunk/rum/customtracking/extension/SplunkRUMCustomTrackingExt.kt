@@ -17,11 +17,11 @@
 package com.splunk.rum.customtracking.extension
 
 import com.splunk.rum.customtracking.CustomTracking
-import com.splunk.rum.integration.agent.api.SplunkRUMAgent
+import com.splunk.rum.integration.agent.api.SplunkRum
 
 /**
- * Extension property to access the [CustomTracking] instance via [SplunkRUMAgent].
+ * Extension property to access the [CustomTracking] instance via [SplunkRum].
  */
 @Suppress("UnusedReceiverParameter")
-val SplunkRUMAgent.customTracking: CustomTracking
+val SplunkRum.customTracking: CustomTracking
     get() = CustomTracking.instance

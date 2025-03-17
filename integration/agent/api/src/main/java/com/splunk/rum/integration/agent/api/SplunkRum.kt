@@ -17,28 +17,35 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
-import com.splunk.rum.integration.agent.api.internal.MRUMAgentCore
+import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import io.opentelemetry.api.OpenTelemetry
 
 /**
- * The [SplunkRUMAgent] class is responsible for initializing and providing access to the RUM agent.
+ * The [SplunkRum] class is responsible for initializing and providing access to the RUM agent.
  * Agent is initialized through the [install] method.
  */
-class SplunkRUMAgent private constructor() {
+class SplunkRum private constructor(
+    agentConfiguration: AgentConfiguration,
+    val openTelemetry: OpenTelemetry,
+    val state: IState = State(agentConfiguration)
+) {
+    // TODO separate task
+    var globalAttributes: Any = agentConfiguration.globalAttributes
 
     companion object {
-
-        private var instanceInternal: SplunkRUMAgent? = null
+        private val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop)
+        private var instanceInternal: SplunkRum? = null
 
         /**
-         * Provides access to the initialized instance of [SplunkRUMAgent].
+         * Provides access to the initialized instance of [SplunkRum].
          *
-         * @return The single instance of [SplunkRUMAgent] that has been initialized.
+         * @return The single instance of [SplunkRum] that has been initialized.
          * @throws RuntimeException if the [install] method has not been called prior to accessing the instance.
          */
         @get:JvmStatic
-        val instance: SplunkRUMAgent
-            get() = instanceInternal ?: throw RuntimeException("Must call install() before fetching instance")
+        val instance: SplunkRum
+            get() = instanceInternal ?: noop
 
         /**
          * Initializes the RUM agent with the provided application context and configurations.
@@ -49,16 +56,16 @@ class SplunkRUMAgent private constructor() {
          * @param application The application context used to initialize the RUM agent.
          * @param agentConfiguration Configuration parameters for the RUM agent.
          * @param moduleConfigurations An array of module configurations.
-         * @return The initialized [SplunkRUMAgent] instance.
+         * @return The initialized [SplunkRum] instance.
          */
         @JvmStatic
-        fun install(application: Application, agentConfiguration: AgentConfiguration, vararg moduleConfigurations: ModuleConfiguration): SplunkRUMAgent {
+        fun install(application: Application, agentConfiguration: AgentConfiguration, vararg moduleConfigurations: ModuleConfiguration): SplunkRum {
             if (instanceInternal != null)
                 return instance
 
-            MRUMAgentCore.install(application, agentConfiguration, moduleConfigurations.toList())
+            val openTelemetry = SplunkRumAgentCore.install(application, agentConfiguration, moduleConfigurations.toList())
 
-            instanceInternal = SplunkRUMAgent()
+            instanceInternal = SplunkRum(agentConfiguration = agentConfiguration, openTelemetry = openTelemetry)
 
             return instance
         }

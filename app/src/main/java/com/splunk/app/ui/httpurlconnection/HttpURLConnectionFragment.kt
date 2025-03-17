@@ -27,7 +27,7 @@ import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentHttpUrlConnectionBinding
 import com.splunk.app.ui.BaseFragment
-import com.splunk.rum.integration.agent.api.SplunkRUMAgent
+import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -57,7 +57,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         viewBinding.stalledRequest.setOnClickListener { stalledRequest() }
         viewBinding.post.setOnClickListener { post() }
 
-        SplunkRUMAgent.instance.navigation.track("HttpUrlConnection")
+        SplunkRum.instance.navigation.track("HttpUrlConnection")
     }
 
     /**

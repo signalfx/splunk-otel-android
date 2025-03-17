@@ -53,7 +53,7 @@ internal class UploadOtelSpanDataJob : JobService() {
         params?.extras?.getString(DATA_SERIALIZE_KEY)?.let { id ->
             Logger.d(TAG, "startUpload() id: $id")
 
-            val url = storage.readBaseUrl()?.let { "$it/eum/v1/traces" }
+            val url = storage.readBaseUrl()
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")

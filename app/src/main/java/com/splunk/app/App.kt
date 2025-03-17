@@ -19,7 +19,8 @@ package com.splunk.app
 import android.app.Application
 import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
-import com.splunk.rum.integration.agent.api.SplunkRUMAgent
+import com.splunk.rum.integration.agent.api.EndpointConfiguration
+import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
@@ -33,13 +34,15 @@ class App : Application() {
         // TODO: Reenable with the bridge support
         // BridgeManager.bridgeInterfaces += TomasBridgeInterface()
 
-        val agent = SplunkRUMAgent.install(
+        val agent = SplunkRum.install(
             application = this,
             agentConfiguration = AgentConfiguration(
-                url = URL("https://alameda-eum-qe.saas.appd-test.com"),
-                appName = "smartlook-android",
-                appVersion = "0.1",
-                isDebugLogsEnabled = true,
+                rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw",
+                endpointConfiguration = EndpointConfiguration(
+                    realm = "lab0"
+                ),
+                appName = "Android demo app",
+                enableDebugLogging = true
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
