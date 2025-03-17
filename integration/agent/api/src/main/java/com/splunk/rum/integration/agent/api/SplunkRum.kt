@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
-import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.api.OpenTelemetry

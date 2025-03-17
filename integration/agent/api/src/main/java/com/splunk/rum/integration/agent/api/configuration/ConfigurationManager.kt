@@ -30,6 +30,8 @@ internal class ConfigurationManager private constructor(
         // TODO separate task
         // agentStorage.writeBaseUrl(config.url.toExternalForm())
 
+        agentStorage.writeBaseUrl(config.endpointConfiguration.tracesEndpoint!!.toExternalForm() + "?auth=" + proposalConfig.rumAccessToken)
+
         Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
 
         return config

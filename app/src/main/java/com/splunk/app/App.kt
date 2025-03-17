@@ -36,10 +36,12 @@ class App : Application() {
         val agent = SplunkRum.install(
             application = this,
             agentConfiguration = AgentConfiguration(
-                url = URL("https://alameda-eum-qe.saas.appd-test.com"),
-                appName = "smartlook-android",
-                appVersion = "0.1",
-                isDebugLogsEnabled = true,
+                rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw",
+                endpointConfiguration = EndpointConfiguration(
+                    realm = "lab0"
+                ),
+                appName = "Android demo app",
+                enableDebugLogging = true
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
