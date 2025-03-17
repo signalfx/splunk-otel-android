@@ -20,6 +20,10 @@ import net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+/**
+ * This plugin adds the <a href="https://github.com/raphw/byte-buddy/tree/master/byte-buddy-gradle-plugin">Byte-Buddy Gradle plugin</a>
+ *  * and needed dependencies for automatic instrumentation of HTTP request made via HttpURLConnection APIs.
+ */
 public class AndroidInstrumentationPlugin implements Plugin<Project> {
 
     private Project project;
