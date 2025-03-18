@@ -26,8 +26,7 @@ data class AgentConfiguration(
     var enableDebugLogging: Boolean = false,
     var sessionSamplingRate: Double = 1.0,
     var globalAttributes: Attributes = Attributes.empty(),
-    var spanFilter: Any? = null // TODO separate task
-
+    var spanFilter: Any? = null // TODO
 ) {
     internal companion object {
         val noop = AgentConfiguration(
