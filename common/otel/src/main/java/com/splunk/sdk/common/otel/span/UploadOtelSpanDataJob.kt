@@ -23,7 +23,6 @@ import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
 import android.os.PersistableBundle
-import android.util.Log
 import com.cisco.android.common.http.HttpClient
 import com.cisco.android.common.http.model.Header
 import com.cisco.android.common.http.model.Response
