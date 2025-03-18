@@ -81,7 +81,7 @@ internal object SplunkRumAgentCore {
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
         // adding agent config global attributes to global attributes
-        agentConfiguration.globalAttributes.forEach { attributeKey, value ->
+        agentConfiguration.globalAttributes?.forEach { attributeKey, value ->
             GlobalAttributes.instance[attributeKey] = value
         }
 

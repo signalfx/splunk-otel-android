@@ -25,7 +25,7 @@ data class AgentConfiguration(
     var deploymentEnvironment: String? = null,
     var enableDebugLogging: Boolean = false,
     var sessionSamplingRate: Double = 1.0,
-    var globalAttributes: Attributes = Attributes.empty(),
+    var globalAttributes: Attributes? = Attributes.empty(),
     var spanFilter: Any? = null // TODO
 ) {
     internal companion object {
