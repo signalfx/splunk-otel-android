@@ -1,0 +1,72 @@
+/*
+ * Copyright 2025 Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.splunk.rum.integration.agent.api.network
+
+import java.net.URL
+
+data class SplunkNetworkRequest(
+    var start: Long,
+    var duration: Long,
+    var url: URL,
+    var method: String,
+    var protocol: String?,
+    var initiator: String?,
+    var status: Status,
+    var statusCode: Int,
+    var cached: Boolean,
+    var requestBody: String?,
+    var responseBody: String?,
+    var requestHeaders: MutableMap<String, MutableList<String>>?,
+    var responseHeaders: MutableMap<String, MutableList<String>>?
+) {
+
+    constructor(
+        duration: Long,
+        url: URL,
+        method: String,
+        protocol: String?,
+        initiator: String,
+        status: Status,
+        statusCode: Int,
+        cached: Boolean,
+        requestBody: String?,
+        responseBody: String?,
+        requestHeaders: MutableMap<String, MutableList<String>>? = null,
+        responseHeaders: MutableMap<String, MutableList<String>>? = null
+    ) : this (
+        start = System.currentTimeMillis(),
+        duration = duration,
+        url = url,
+        method = method,
+        protocol = protocol,
+        initiator = initiator,
+        status = status,
+        statusCode = statusCode,
+        cached = cached,
+        requestBody = requestBody,
+        responseBody = responseBody,
+        requestHeaders = requestHeaders,
+        responseHeaders = responseHeaders
+    )
+
+    enum class Status(internal val code: String) {
+        OK("ok"),
+        ERROR("error"),
+        ABORT("abort"),
+        TIMEOUT("timeout")
+    }
+}

@@ -18,7 +18,8 @@ include ':integration:agent:api',
         ':integration:crash',
         ':integration:sessionreplay',
         ':integration:interactions',
-        ':integration:navigation'
+        ':integration:navigation',
+        ':integration:okhttp'
 
 // Test App
 include ':app'
