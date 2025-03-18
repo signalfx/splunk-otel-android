@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.api
 
 import io.opentelemetry.api.common.Attributes
-import java.util.function.Consumer
 
 data class AgentConfiguration(
     val rumAccessToken: String,
@@ -27,7 +26,7 @@ data class AgentConfiguration(
     var enableDebugLogging: Boolean = false,
     var sessionSamplingRate: Double = 1.0,
     var globalAttributes: Attributes? = null,
-    var spanFilter: Consumer<SpanFilterBuilder>? = null
+    var spanFilter: Any? = null // TODO
 ) {
     internal companion object {
         val noop = AgentConfiguration(
