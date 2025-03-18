@@ -42,11 +42,8 @@ android {
             val accessToken = localProperties["rum.access.token"] as String?
             resValue("string", "rum_realm", realm ?: "us0")
             resValue("string", "rum_access_token", accessToken ?: "dummyAuth")
-            isMinifyEnabled = false
+            isMinifyEnabled = false // set to true to enable obfuscation
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-
-        release {
         }
     }
 

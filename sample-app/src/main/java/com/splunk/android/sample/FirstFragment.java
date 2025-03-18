@@ -135,6 +135,11 @@ public class FirstFragment extends Fragment {
                             "kustom",
                             Attributes.of(longKey("counted"), customCount.incrementAndGet()));
                 });
+        binding.crashTestFragment.setOnClickListener(
+                v -> {
+                    NavHostFragment.findNavController(FirstFragment.this)
+                            .navigate(R.id.action_FirstFragment_to_CrashTestFragment);
+                });
     }
 
     private void multiThreadCrashing() {
