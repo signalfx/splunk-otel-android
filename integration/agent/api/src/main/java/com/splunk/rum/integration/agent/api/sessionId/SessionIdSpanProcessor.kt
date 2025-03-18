@@ -17,13 +17,13 @@
 package com.splunk.rum.integration.agent.api.sessionId
 
 import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.SESSION_ID_KEY
-import com.splunk.rum.integration.agent.internal.session.SessionManager
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-internal class SessionIdSpanProcessor(private val sessionManager: SessionManager) : SpanProcessor {
+internal class SessionIdSpanProcessor(private val sessionManager: SplunkSessionManager) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
     }

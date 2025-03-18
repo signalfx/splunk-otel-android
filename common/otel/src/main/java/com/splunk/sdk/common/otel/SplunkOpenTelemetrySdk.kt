@@ -18,7 +18,7 @@ package com.splunk.sdk.common.otel
 
 import io.opentelemetry.sdk.OpenTelemetrySdk
 
-object OpenTelemetry {
+object SplunkOpenTelemetrySdk {
     var instance: OpenTelemetrySdk? = null
     val listeners: MutableCollection<Listener> = HashSet()
 

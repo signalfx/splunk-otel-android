@@ -20,6 +20,10 @@ import net.bytebuddy.build.gradle.android.ByteBuddyAndroidPlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+/**
+ * This plugin adds the <a href="https://github.com/raphw/byte-buddy/tree/master/byte-buddy-gradle-plugin">Byte-Buddy Gradle plugin</a>
+ * and needed dependencies for automatic instrumentation of HTTP request made via HttpURLConnection APIs.
+ */
 public class AndroidInstrumentationPlugin implements Plugin<Project> {
 
     private Project project;
@@ -37,7 +41,6 @@ public class AndroidInstrumentationPlugin implements Plugin<Project> {
     }
 
     private void addAutoInstrumentationDependenciesForNRTracing() {
-        project.getDependencies().add("byteBuddy", "com.cisco.android:rum-network-request-bci:" + dependenciesVersion);
-        project.getDependencies().add("implementation", "com.cisco.android:rum-network-request-library:" + dependenciesVersion);
+        project.getDependencies().add("byteBuddy", "io.opentelemetry.android:instrumentation-httpurlconnection-agent:" + dependenciesVersion);
     }
 }

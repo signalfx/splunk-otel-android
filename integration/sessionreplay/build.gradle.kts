@@ -26,6 +26,8 @@ dependencies {
     implementation(project(":integration:agent:api"))
     implementation(project(":integration:agent:internal"))
 
+    implementation(Dependencies.Otel.androidInstrumentation)
+
     api(Dependencies.SessionReplay.instrumentationSessionRecordingCore)
     implementation(Dependencies.SessionReplay.commonLogger)
 

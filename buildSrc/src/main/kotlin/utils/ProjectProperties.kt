@@ -1,6 +1,6 @@
 package utils
 
-const val defaultGroupId = "com.cisco.android"
+const val defaultGroupId = "com.splunk.android"
 const val artifactPrefix = "rum-"
 const val snapshotProperty = "maven.deploy.artifactory.snapshot"
 const val artifactIdProperty = "mavenArtifactId"
