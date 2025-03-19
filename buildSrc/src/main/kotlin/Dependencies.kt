@@ -113,8 +113,7 @@ object Dependencies {
     }
 
     object Otel {
-        private const val otelVersion = "1.36.0"
-        private const val otelAlphaVersion = "$otelVersion-alpha"
+        private const val otelVersion = "1.47.0"
         private const val otelSemConvVersion = "1.30.0"
         private const val otelSemConvAlphaVersion = "$otelSemConvVersion-alpha"
         private const val otelInstrumentationVersion = "1.32.0"
@@ -124,7 +123,6 @@ object Dependencies {
         const val api = "io.opentelemetry:opentelemetry-api:$otelVersion"
         const val context = "io.opentelemetry:opentelemetry-context:$otelVersion"
         const val sdk = "io.opentelemetry:opentelemetry-sdk:$otelVersion"
-        const val extensionIncubator = "io.opentelemetry:opentelemetry-extension-incubator:$otelAlphaVersion"
         const val exporterOtlpCommon = "io.opentelemetry:opentelemetry-exporter-otlp-common:$otelVersion"
         const val exporterOtlp = "io.opentelemetry:opentelemetry-exporter-otlp:$otelVersion"
         const val semConv = "io.opentelemetry.semconv:opentelemetry-semconv:$otelSemConvVersion"

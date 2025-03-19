@@ -30,7 +30,6 @@ dependencies {
 
     api(Dependencies.Otel.sdk)
     api(Dependencies.Otel.api)
-    api(Dependencies.Otel.extensionIncubator)
     api(Dependencies.Otel.exporterOtlpCommon)
     api(Dependencies.Otel.exporterOtlp) {
         exclude(group = "com.squareup.okhttp3", module = "okhttp")
