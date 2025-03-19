@@ -26,7 +26,7 @@ import com.splunk.sdk.common.storage.IAgentStorage
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 
-class SessionManager internal constructor(
+class SplunkSessionManager internal constructor(
     private val agentStorage: IAgentStorage
 ) {
 

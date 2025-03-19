@@ -34,7 +34,7 @@ java {
 tasks.jar {
     manifest {
         attributes(
-            "Implementation-Version" to Configurations.sdkVersionName
+            "Implementation-Version" to Dependencies.Otel.otelAndroidVersion
         )
     }
     metaInf {
@@ -47,7 +47,7 @@ gradlePlugin {
         create("androidInstrumentationPlugin") {
             id = "$defaultGroupId.${artifactPrefix}plugin"
             implementationClass = "com.splunk.rum.plugin.AndroidInstrumentationPlugin"
-            displayName = "Cisco Android Auto-Instrumentation Plugin"
+            displayName = "Splunk Android Auto-Instrumentation Plugin"
         }
     }
 }

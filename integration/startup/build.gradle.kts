@@ -27,5 +27,7 @@ dependencies {
     implementation(project(":instrumentation:runtime:startup"))
     implementation(project(":common:otel"))
 
+    implementation(Dependencies.Otel.androidInstrumentation)
+
     implementation(Dependencies.SessionReplay.commonLogger)
 }

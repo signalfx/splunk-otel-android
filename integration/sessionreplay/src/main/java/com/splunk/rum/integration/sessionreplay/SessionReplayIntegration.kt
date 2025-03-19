@@ -28,7 +28,8 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
-import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
+import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.extension.incubator.logs.AnyValue
@@ -71,7 +72,7 @@ internal object SessionReplayIntegration {
         override fun onData(data: ByteArray, metadata: Metadata): Boolean {
             Logger.d(TAG, "onData()")
 
-            val instance = OpenTelemetry.instance ?: return false
+            val instance = SplunkOpenTelemetrySdk.instance ?: return false
 
             val attributes = Attributes.of(
                 AttributeKey.stringKey("event.name"), "session_replay_data",
@@ -95,7 +96,7 @@ internal object SessionReplayIntegration {
     }
 
     private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(context: Context) {
+        override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
             Logger.d(TAG, "onInstall()")
 
             val integration = AgentIntegration.obtainInstance(context)

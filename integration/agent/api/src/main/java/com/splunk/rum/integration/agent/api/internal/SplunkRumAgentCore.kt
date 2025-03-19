@@ -95,7 +95,7 @@ internal object SplunkRumAgentCore {
 
         isRunning = true
 
-        agentIntegration.install(application)
+        agentIntegration.install(application, openTelemetry)
 
         return openTelemetry
     }

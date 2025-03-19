@@ -36,6 +36,7 @@ dependencies {
         exclude(group = "com.squareup.okhttp3", module = "okhttp")
     }
     api(Dependencies.Otel.semConv)
+    api(Dependencies.Otel.semConvIncubating)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonJob)

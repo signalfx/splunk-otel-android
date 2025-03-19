@@ -20,14 +20,14 @@ import android.os.Build
 import com.splunk.sdk.otel.BuildConfig
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.sdk.resources.Resource
-import io.opentelemetry.semconv.ResourceAttributes.DEVICE_ID
-import io.opentelemetry.semconv.ResourceAttributes.DEVICE_MANUFACTURER
-import io.opentelemetry.semconv.ResourceAttributes.DEVICE_MODEL_IDENTIFIER
-import io.opentelemetry.semconv.ResourceAttributes.DEVICE_MODEL_NAME
-import io.opentelemetry.semconv.ResourceAttributes.OS_DESCRIPTION
-import io.opentelemetry.semconv.ResourceAttributes.OS_NAME
-import io.opentelemetry.semconv.ResourceAttributes.OS_TYPE
-import io.opentelemetry.semconv.ResourceAttributes.OS_VERSION
+import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_ID
+import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MANUFACTURER
+import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER
+import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_NAME
+import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_DESCRIPTION
+import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_NAME
+import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_TYPE
+import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_VERSION
 
 internal object Resources {
 
