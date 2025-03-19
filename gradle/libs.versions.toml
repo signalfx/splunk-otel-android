@@ -54,7 +54,7 @@ robolectric = "org.robolectric:robolectric:4.14.1"
 assertj-core = "org.assertj:assertj-core:3.27.0"
 
 #Compilation tools
-desugarJdkLibs = "com.android.tools:desugar_jdk_libs:2.1.4"
+desugarJdkLibs = "com.android.tools:desugar_jdk_libs:2.1.5"
 android-plugin = "com.android.tools.build:gradle:8.7.3"
 errorprone-plugin = "net.ltgt.gradle:gradle-errorprone-plugin:4.1.0"
 nullaway-plugin = "net.ltgt.gradle:gradle-nullaway-plugin:2.1.0"
