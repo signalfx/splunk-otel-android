@@ -32,8 +32,7 @@ import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
-import io.opentelemetry.extension.incubator.logs.AnyValue
-import io.opentelemetry.extension.incubator.logs.ExtendedLogRecordBuilder
+import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
 
 internal object SessionReplayIntegration {
@@ -84,9 +83,9 @@ internal object SessionReplayIntegration {
             val logRecordBuilder = instance.sdkLoggerProvider
                 .loggerBuilder("SessionReplayDataScopeName")
                 .build()
-                .logRecordBuilder() as ExtendedLogRecordBuilder
+                .logRecordBuilder()
 
-            logRecordBuilder.setBody(AnyValue.of(data))
+            logRecordBuilder.setBody(Value.of(data))
                 .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
                 .setAllAttributes(attributes)
                 .emit()
