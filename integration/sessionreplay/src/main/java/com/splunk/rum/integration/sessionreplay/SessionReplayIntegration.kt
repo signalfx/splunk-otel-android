@@ -84,7 +84,7 @@ internal object SessionReplayIntegration {
             val logRecordBuilder = instance.sdkLoggerProvider
                 .loggerBuilder("SessionReplayDataScopeName")
                 .build()
-                .logRecordBuilder() as ExtendedLogRecordBuilder
+                .logRecordBuilder() as ExtendedSdkLogRecordBuilder
 
             logRecordBuilder.setBody(AnyValue.of(data))
                 .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)

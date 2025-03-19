@@ -25,6 +25,7 @@ android {
 dependencies {
     implementation(project(":integration:agent:api"))
     implementation(project(":integration:agent:internal"))
+    implementation(project(":common:otel"))
 
     implementation(Dependencies.Otel.androidInstrumentation)
 

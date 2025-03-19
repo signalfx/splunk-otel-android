@@ -31,29 +31,8 @@ internal class SessionStartEventManager(sessionManager: SplunkSessionManager) {
 
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String) {
-                createSessionStartEvent(sessionId, sessionManager.anonId)
             }
         }
-    }
-
-    private fun createSessionStartEvent(sessionId: String, userId: String) {
-        Logger.d(TAG, "createSessionStartEvent() sessionId: $sessionId, userId: $userId")
-
-        val instance = SplunkOpenTelemetrySdk.instance ?: return
-
-        val now = System.currentTimeMillis()
-        val attributes = Attributes.of(
-            AttributeConstants.NAME, "session_start",
-            AttributeKey.stringKey("enduser.anon_id"), userId,
-        )
-        // TODO Scope
-        instance.sdkLoggerProvider
-            .loggerBuilder("SessionStartEventScopeName")
-            .build()
-            .logRecordBuilder()
-            .setAllAttributes(attributes)
-            .setTimestamp(now, TimeUnit.MILLISECONDS)
-            .emit()
     }
 
     companion object {

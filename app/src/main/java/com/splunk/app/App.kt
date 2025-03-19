@@ -24,7 +24,6 @@ import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
-import java.net.URL
 
 class App : Application() {
 
@@ -38,7 +37,7 @@ class App : Application() {
             application = this,
             agentConfiguration = AgentConfiguration(
                 rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw",
-                endpointConfiguration = EndpointConfiguration(
+                endpoint = EndpointConfiguration(
                     realm = "lab0"
                 ),
                 appName = "Android demo app",
