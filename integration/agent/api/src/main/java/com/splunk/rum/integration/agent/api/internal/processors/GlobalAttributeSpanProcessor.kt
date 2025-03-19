@@ -1,5 +1,6 @@
 package com.splunk.rum.integration.agent.api.internal.processors
 
+import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
@@ -10,7 +11,7 @@ class GlobalAttributeSpanProcessor : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         // Fetch the current attributes from GlobalAttributes and apply them to the span
-        GlobalAttributes.instance.attributes.forEach { attribute ->
+        GlobalAttributes.instance.attributes.forEachFast { attribute ->
             when (attribute) {
                 is GlobalAttributes.Attribute.Boolean -> span.setAttribute(attribute.name, attribute.value)
                 is GlobalAttributes.Attribute.Double -> span.setAttribute(attribute.name, attribute.value)
