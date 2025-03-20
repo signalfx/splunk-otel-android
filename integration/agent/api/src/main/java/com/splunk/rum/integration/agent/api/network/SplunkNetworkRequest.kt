@@ -19,54 +19,25 @@ package com.splunk.rum.integration.agent.api.network
 import java.net.URL
 
 data class SplunkNetworkRequest(
-    var start: Long,
-    var duration: Long,
+    //var start: Long,
+    //var duration: Long,
     var url: URL,
     var method: String,
-    var protocol: String?,
-    var initiator: String?,
-    var status: Status,
+    //var protocol: String?,
+    //var initiator: String?,
+    //var status: Status,
     var statusCode: Int,
-    var cached: Boolean,
-    var requestBody: String?,
-    var responseBody: String?,
+    //var cached: Boolean,
+    //var requestBody: String?,
+    //var responseBody: String?,
     var requestHeaders: MutableMap<String, MutableList<String>>?,
     var responseHeaders: MutableMap<String, MutableList<String>>?
 ) {
 
-    constructor(
-        duration: Long,
-        url: URL,
-        method: String,
-        protocol: String?,
-        initiator: String,
-        status: Status,
-        statusCode: Int,
-        cached: Boolean,
-        requestBody: String?,
-        responseBody: String?,
-        requestHeaders: MutableMap<String, MutableList<String>>? = null,
-        responseHeaders: MutableMap<String, MutableList<String>>? = null
-    ) : this (
-        start = System.currentTimeMillis(),
-        duration = duration,
-        url = url,
-        method = method,
-        protocol = protocol,
-        initiator = initiator,
-        status = status,
-        statusCode = statusCode,
-        cached = cached,
-        requestBody = requestBody,
-        responseBody = responseBody,
-        requestHeaders = requestHeaders,
-        responseHeaders = responseHeaders
-    )
-
-    enum class Status(internal val code: String) {
+    /*enum class Status(internal val code: String) {
         OK("ok"),
         ERROR("error"),
         ABORT("abort"),
         TIMEOUT("timeout")
-    }
+    }*/
 }

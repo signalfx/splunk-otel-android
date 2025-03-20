@@ -21,7 +21,8 @@ import com.splunk.rum.integration.agent.api.network.SplunkNetworkRequest
 import com.splunk.rum.integration.okhttp.model.Mask
 import com.splunk.rum.integration.okhttp.model.SplunkChain
 
-class SplunkMaskBodyInterceptor(
+// Not supported by a BE at the moment
+/*class SplunkMaskBodyInterceptor(
     val masks: List<Mask>
 ) : SplunkOkHttpInterceptor {
 
@@ -36,4 +37,4 @@ class SplunkMaskBodyInterceptor(
 
         return intercepted
     }
-}
+}*/

@@ -25,7 +25,8 @@ import okio.Buffer
 import java.io.IOException
 import java.nio.charset.Charset
 
-class SplunkNonBinaryBodyInterceptor : SplunkOkHttpInterceptor {
+// Not supported by a BE at the moment
+/*class SplunkNonBinaryBodyInterceptor : SplunkOkHttpInterceptor {
 
     override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest {
         intercepted.requestBody = original.request.parseBody()
@@ -94,4 +95,4 @@ class SplunkNonBinaryBodyInterceptor : SplunkOkHttpInterceptor {
             "text/x-markdown"
         )
     }
-}
+}*/
