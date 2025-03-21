@@ -81,9 +81,7 @@ internal object SplunkRumAgentCore {
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
         // adding agent config global attributes to global attributes
-        agentConfiguration.globalAttributes?.forEach { attributeKey, value ->
-            GlobalAttributes.instance[attributeKey] = value
-        }
+        agentConfiguration.globalAttributes?.let { GlobalAttributes.instance.setAll(it) }
 
         val initializer = OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
