@@ -10,8 +10,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 class GlobalAttributeSpanProcessor : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        // Fetch the current attributes from GlobalAttributes and apply them to the span
-        GlobalAttributes.instance.attributes.forEachFast { attribute ->
+        GlobalAttributes.instance.attributes.values.forEachFast { attribute ->
             when (attribute) {
                 is GlobalAttributes.Attribute.Boolean -> span.setAttribute(attribute.name, attribute.value)
                 is GlobalAttributes.Attribute.Double -> span.setAttribute(attribute.name, attribute.value)
