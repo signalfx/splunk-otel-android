@@ -22,9 +22,11 @@ import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.attributes.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
+import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.extension.toResource
+import com.splunk.rum.integration.agent.api.internal.processors.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdLogProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
@@ -32,7 +34,7 @@ import com.splunk.rum.integration.agent.api.state.StateLogRecordProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
-import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
+import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetryInitializer
@@ -78,11 +80,15 @@ internal object SplunkRumAgentCore {
         val stateManager = StateManager.obtainInstance(application)
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
+        // adding agent config global attributes to global attributes
+        agentConfiguration.globalAttributes?.let { GlobalAttributes.instance.setAll(it) }
+
         val initializer = OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
-            .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(GlobalAttributeSpanProcessor())
+            .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
+            .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
