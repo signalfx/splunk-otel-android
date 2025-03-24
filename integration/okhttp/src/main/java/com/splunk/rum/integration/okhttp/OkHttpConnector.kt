@@ -80,7 +80,7 @@ internal class OkHttpConnector(
                 prefilteredInterceptedRequest = parseRequestAndResponse(
                     start = start,
                     duration = System.currentTimeMillis() - start,
-                    status = SplunkNetworkRequest.Status.ERROR,
+                    //status = SplunkNetworkRequest.Status.ERROR,
                     request = request,
                     response = null,
                     connection = connection
@@ -95,7 +95,7 @@ internal class OkHttpConnector(
             prefilteredInterceptedRequest = parseRequestAndResponse(
                 start = start,
                 duration = System.currentTimeMillis() - start,
-                status = SplunkNetworkRequest.Status.OK,
+                //status = SplunkNetworkRequest.Status.OK,
                 request = request,
                 response = response,
                 connection = connection
@@ -105,19 +105,19 @@ internal class OkHttpConnector(
         return response
     }
 
-    private fun parseRequestAndResponse(start: Long, duration: Long, status: SplunkNetworkRequest.Status, request: Request, response: Response?, connection: Connection?): SplunkNetworkRequest {
+    private fun parseRequestAndResponse(start: Long, duration: Long, /*status: SplunkNetworkRequest.Status,*/ request: Request, response: Response?, connection: Connection?): SplunkNetworkRequest {
         return SplunkNetworkRequest(
-            start = start,
-            duration = duration,
+            //start = start,
+            //duration = duration,
             url = request.parseURL(),
             method = request.parseMethod(),
-            protocol = connection?.parseProtocol(),
-            initiator = initiator,
-            status = status,
+            //protocol = connection?.parseProtocol(),
+            //initiator = initiator,
+            //status = status,
             statusCode = response?.parseStatusCode() ?: UNKNOWN_STATUS_CODE,
-            cached = response?.isCached() == true,
-            requestBody = null,
-            responseBody = null,
+            //cached = response?.isCached() == true,
+            //requestBody = null,
+            //responseBody = null,
             requestHeaders = request.parseHeaders(),
             responseHeaders = response?.parseHeaders() ?: mutableMapOf()
         )

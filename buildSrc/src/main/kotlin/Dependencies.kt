@@ -113,30 +113,22 @@ object Dependencies {
     }
 
     object Otel {
-        private const val otelVersion = "1.36.0"
-        private const val otelAlphaVersion = "$otelVersion-alpha"
-        private const val otelSemConvVersion = "1.30.0"
-        private const val otelSemConvAlphaVersion = "$otelSemConvVersion-alpha"
-        private const val otelInstrumentationVersion = "1.32.0"
-        private const val otelInstrumentationAlphaVersion = "$otelInstrumentationVersion-alpha"
-        public const val otelAndroidVersion = "0.10.0-alpha"
+        private const val oTelInstrumentationBomAlpha = "2.13.3-alpha"
+        const val otelAndroidBomVersion = "0.10.0-alpha"
 
-        const val api = "io.opentelemetry:opentelemetry-api:$otelVersion"
-        const val context = "io.opentelemetry:opentelemetry-context:$otelVersion"
-        const val sdk = "io.opentelemetry:opentelemetry-sdk:$otelVersion"
-        const val extensionIncubator = "io.opentelemetry:opentelemetry-extension-incubator:$otelAlphaVersion"
-        const val exporterOtlpCommon = "io.opentelemetry:opentelemetry-exporter-otlp-common:$otelVersion"
-        const val exporterOtlp = "io.opentelemetry:opentelemetry-exporter-otlp:$otelVersion"
-        const val semConv = "io.opentelemetry.semconv:opentelemetry-semconv:$otelSemConvVersion"
-        const val semConvIncubating = "io.opentelemetry.semconv:opentelemetry-semconv-incubating:$otelSemConvAlphaVersion"
+        const val instrumentationBomAlpha = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$oTelInstrumentationBomAlpha"
+        const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
 
-        const val instrumentationSemConv = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv:$otelInstrumentationAlphaVersion"
-        const val instrumentationApi = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:$otelInstrumentationVersion"
-        const val instrumentationOkhttp3 = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:$otelInstrumentationAlphaVersion"
+        const val api = "io.opentelemetry:opentelemetry-api"
+        const val sdk = "io.opentelemetry:opentelemetry-sdk"
+        const val exporterOtlpCommon = "io.opentelemetry:opentelemetry-exporter-otlp-common"
+        const val exporterOtlp = "io.opentelemetry:opentelemetry-exporter-otlp"
+        const val semConv = "io.opentelemetry.semconv:opentelemetry-semconv"
+        const val semConvIncubating = "io.opentelemetry.semconv:opentelemetry-semconv-incubating"
 
-        const val androidSession = "io.opentelemetry.android:session:$otelAndroidVersion"
-        const val androidInstrumentation = "io.opentelemetry.android:instrumentation-android-instrumentation:$otelAndroidVersion"
-        const val androidHttpUrlLibrary = "io.opentelemetry.android:instrumentation-httpurlconnection-library:$otelAndroidVersion"
+        const val androidSession = "io.opentelemetry.android:session"
+        const val androidInstrumentation = "io.opentelemetry.android:instrumentation-android-instrumentation"
+        const val androidHttpUrlLibrary = "io.opentelemetry.android:instrumentation-httpurlconnection-library"
     }
 
     object AndroidTest {

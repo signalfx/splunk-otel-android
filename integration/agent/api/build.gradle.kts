@@ -24,6 +24,8 @@ android {
 }
 
 dependencies {
+    api(platform(Dependencies.Otel.instrumentationBomAlpha))
+
     api(project(":common:otel"))
     api(project(":integration:agent:module"))
 
