@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <provider
+            android:name="com.splunk.rum.integration.okhttp3.OkHttp3Installer"
+            android:authorities="${applicationId}.OkHttp3Installer"
+            android:enabled="true"
+            android:exported="false" />
+
+    </application>
+
+</manifest>
