@@ -19,13 +19,15 @@ package com.splunk.rum.httpurlconnection.plugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-private const val BYTE_BUDDY_GRADLE_PLUGIN_ID = "net.bytebuddy.byte-buddy-gradle-plugin"
-
 /**
  * This plugin adds the [Byte-Buddy Gradle plugin](https://github.com/raphw/byte-buddy/tree/master/byte-buddy-gradle-plugin)
  * and needed dependencies for automatic instrumentation of HTTP request made via HttpURLConnection APIs.
  */
 class HttpURLInstrumentationPlugin : Plugin<Project> {
+
+    companion object {
+        private const val BYTE_BUDDY_GRADLE_PLUGIN_ID = "net.bytebuddy.byte-buddy-gradle-plugin"
+    }
 
     private lateinit var project: Project
     private val dependenciesVersion: String? = this::class.java.`package`.implementationVersion
