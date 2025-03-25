@@ -61,6 +61,26 @@ class GlobalAttributes private constructor() {
         _attributes[prefixedKey] = Attribute.Boolean(prefixedKey, value)
     }
 
+    operator fun <T> set(key: AttributeKey<T>, value: String) {
+        val prefixedKey = CUSTOM_PREFIX + key.key
+        _attributes[prefixedKey] = Attribute.String(prefixedKey, value)
+    }
+
+    operator fun <T> set(key: AttributeKey<T>, value: Long) {
+        val prefixedKey = CUSTOM_PREFIX + key.key
+        _attributes[prefixedKey] = Attribute.Long(prefixedKey, value)
+    }
+
+    operator fun <T> set(key: AttributeKey<T>, value: Double) {
+        val prefixedKey = CUSTOM_PREFIX + key.key
+        _attributes[prefixedKey] = Attribute.Double(prefixedKey, value)
+    }
+
+    operator fun <T> set(key: AttributeKey<T>, value: Boolean) {
+        val prefixedKey = CUSTOM_PREFIX + key.key
+        _attributes[prefixedKey] = Attribute.Boolean(prefixedKey, value)
+    }
+
     fun <T> remove(key: AttributeKey<T>) {
         val prefixedKey = CUSTOM_PREFIX + key.key
         _attributes.remove(prefixedKey)
