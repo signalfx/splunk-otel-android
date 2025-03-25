@@ -28,6 +28,7 @@ data class AgentConfiguration(
     var sessionSamplingRate: Double = 1.0,
     var globalAttributes: Attributes? = null,
     var spanFilter: Any? = null, // TODO
+    var instrumentedProcessName: String? = null,
     var user: UserConfiguration = UserConfiguration()
 ) {
     internal companion object {

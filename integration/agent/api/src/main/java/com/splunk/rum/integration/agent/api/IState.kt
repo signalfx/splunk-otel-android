@@ -9,6 +9,7 @@ interface IState {
     val deploymentEnvironment: String?
     val isDebugLoggingEnabled: Boolean
     val sessionSamplingRate: Double
+    val instrumentedProcessName: String?
 }
 
 class State internal constructor(agentConfiguration: AgentConfiguration) : IState {
@@ -18,13 +19,17 @@ class State internal constructor(agentConfiguration: AgentConfiguration) : IStat
     override val deploymentEnvironment: String? = agentConfiguration.deploymentEnvironment
     override val isDebugLoggingEnabled: Boolean = agentConfiguration.enableDebugLogging
     override val sessionSamplingRate: Double = agentConfiguration.sessionSamplingRate.coerceIn(0.0, 1.0)
+    override val instrumentedProcessName: String? = agentConfiguration.instrumentedProcessName
 }
 
-object Noop : IState {
+
+class Noop(notRunningCause: Status.NotRunning.Cause = Status.NotRunning.Cause.NotInstalled) : IState {
     override val appName: String = ""
-    override val state: Status = Status.NotRunning(cause = Status.NotRunning.Cause.NotInstalled)
+    override val state: Status = Status.NotRunning(notRunningCause)
     override val endpointConfiguration: EndpointConfiguration = EndpointConfiguration("")
     override val deploymentEnvironment: String = ""
     override val isDebugLoggingEnabled: Boolean = false
     override val sessionSamplingRate: Double = 1.0
+    override val instrumentedProcessName: String?
+        get() = null
 }
