@@ -16,22 +16,24 @@
 
 package com.splunk.rum.integration.agent.api
 
+import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import io.opentelemetry.api.common.Attributes
 
 data class AgentConfiguration(
     val rumAccessToken: String,
-    val endpointConfiguration: EndpointConfiguration,
+    val endpoint: EndpointConfiguration,
     val appName: String,
     var deploymentEnvironment: String? = null,
     var enableDebugLogging: Boolean = false,
     var sessionSamplingRate: Double = 1.0,
     var globalAttributes: Attributes? = Attributes.empty(),
-    var spanFilter: Any? = null // TODO
+    var spanFilter: Any? = null, // TODO
+    var user: UserConfiguration = UserConfiguration()
 ) {
     internal companion object {
         val noop = AgentConfiguration(
             rumAccessToken = "",
-            endpointConfiguration = EndpointConfiguration(),
+            endpoint = EndpointConfiguration(),
             appName = "",
         )
     }

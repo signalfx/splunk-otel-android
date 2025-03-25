@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api.attributes
 import io.opentelemetry.api.common.AttributeKey
 
 internal object AttributeConstants {
+    val USER_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("user.anonymous_id")
     val SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.id")
     val STATE: AttributeKey<String> = AttributeKey.stringKey("android.state")
     val DOMAIN: AttributeKey<String> = AttributeKey.stringKey("event.domain")

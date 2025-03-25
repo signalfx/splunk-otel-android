@@ -35,8 +35,9 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
-import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
+import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
 
@@ -95,7 +96,7 @@ internal object InteractionsIntegration {
 
             Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
 
-            val logger = OpenTelemetry.instance?.sdkLoggerProvider ?: return
+            val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider ?: return
 
             val actionName = when (interaction) {
                 is Interaction.Focus ->
@@ -148,7 +149,7 @@ internal object InteractionsIntegration {
     }
 
     private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(context: Context) {
+        override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
             Logger.d(TAG, "onInstall()")
 
             val integration = AgentIntegration.obtainInstance(context)

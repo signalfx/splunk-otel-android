@@ -131,7 +131,7 @@ class SplunkRumBuilder {
             application,
             agentConfiguration = AgentConfiguration(
                 rumAccessToken = accessToken ?: throw IllegalStateException("rumAccessToken was not set"),
-                endpointConfiguration = endpointConfiguration,
+                endpoint = endpointConfiguration,
                 appName = appName ?: throw IllegalStateException("applicationName was not set"),
                 deploymentEnvironment = deploymentEnvironment,
                 enableDebugLogging = enableDebug,

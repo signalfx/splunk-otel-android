@@ -5,10 +5,9 @@ import java.net.InetAddress
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    //TODO: Causes issues while building with common:otel module in minifyR8 task.
-    // Need to figure out a way to depend on plugin project instead of published jar
-    // Uncomment this to test HttpURLConnection and build just the app to test
-    //id("com.cisco.android.rum-plugin") version "24.4.10-2246"
+    // Uncomment this to test HttpURLConnection instrumentation
+    //id("com.splunk.android.rum-okhttp3-plugin") version "24.4.1"
+    //id("com.splunk.android.rum-httpurlconnection-plugin") version "24.4.1"
 }
 
 apply<ConfigAndroidApp>()
@@ -65,6 +64,8 @@ android {
 }
 
 dependencies {
+    api(platform(Dependencies.Otel.instrumentationBomAlpha))
+
     implementation(kotlinStdlibJdk8)
 
     //implementation("com.cisco.android:rum-agent:24.4.10-2246")

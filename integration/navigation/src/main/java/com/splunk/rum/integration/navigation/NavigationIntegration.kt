@@ -23,8 +23,9 @@ import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManag
 import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
-import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
+import io.opentelemetry.android.instrumentation.InstallationContext
 
 internal object NavigationIntegration {
 
@@ -52,7 +53,7 @@ internal object NavigationIntegration {
 
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
 
-            val provider = OpenTelemetry.instance?.sdkTracerProvider ?: return
+            val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: return
 
             SplunkInternalGlobalAttributeSpanProcessor.attributes.removeIf { it.name == "screen.name" }
             SplunkInternalGlobalAttributeSpanProcessor.attributes += SplunkInternalGlobalAttributeSpanProcessor.Attribute.String("screen.name", screenName)
@@ -74,7 +75,7 @@ internal object NavigationIntegration {
     }
 
     private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(context: Context) {
+        override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
             Logger.d(TAG, "onInstall()")
 
             val integration = AgentIntegration.obtainInstance(context)
