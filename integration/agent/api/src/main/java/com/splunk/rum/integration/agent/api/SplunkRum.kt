@@ -19,6 +19,10 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
+import com.splunk.rum.integration.agent.api.user.User
+import com.splunk.rum.integration.agent.internal.user.IUserManager
+import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
+import com.splunk.rum.integration.agent.internal.user.UserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
@@ -29,14 +33,17 @@ import io.opentelemetry.api.common.Attributes
  */
 class SplunkRum private constructor(
     agentConfiguration: AgentConfiguration,
+    userManager: IUserManager,
     val openTelemetry: OpenTelemetry,
-    val state: IState = State(agentConfiguration)
+    val state: IState = State(agentConfiguration),
 ) {
     // TODO separate task
     var globalAttributes: Attributes = agentConfiguration.globalAttributes ?: Attributes.empty()
 
+    val user: User = User(userManager)
+
     companion object {
-        private val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop)
+        private val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop, userManager = NoOpUserManager)
         private var instanceInternal: SplunkRum? = null
 
         /**
@@ -65,9 +72,11 @@ class SplunkRum private constructor(
             if (instanceInternal != null)
                 return instance
 
-            val openTelemetry = SplunkRumAgentCore.install(application, agentConfiguration, moduleConfigurations.toList())
+            val userManager = UserManager()
 
-            instanceInternal = SplunkRum(agentConfiguration = agentConfiguration, openTelemetry = openTelemetry)
+            val openTelemetry = SplunkRumAgentCore.install(application, agentConfiguration, userManager, moduleConfigurations.toList())
+
+            instanceInternal = SplunkRum(agentConfiguration = agentConfiguration, openTelemetry = openTelemetry, userManager = UserManager())
 
             return instance
         }
