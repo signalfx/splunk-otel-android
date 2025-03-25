@@ -98,10 +98,10 @@ class GlobalAttributes private constructor() {
     fun setAll(attributes: Attributes) {
         attributes.forEach { key, value ->
             when (value) {
-                is Boolean -> set(key.toString(), value)
-                is String -> set(key.toString(), value)
-                is Long -> set(key.toString(), value)
-                is Double -> set(key.toString(), value)
+                is Boolean -> set(key, value)
+                is String -> set(key, value)
+                is Long -> set(key, value)
+                is Double -> set(key, value)
                 else -> throw IllegalArgumentException("Unsupported attribute type")
             }
         }
