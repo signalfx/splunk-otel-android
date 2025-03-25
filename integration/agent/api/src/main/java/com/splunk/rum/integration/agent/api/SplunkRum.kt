@@ -32,9 +32,6 @@ class SplunkRum private constructor(
     val openTelemetry: OpenTelemetry,
     val state: IState = State(agentConfiguration)
 ) {
-    // TODO separate task
-    var globalAttributes: Attributes = agentConfiguration.globalAttributes ?: Attributes.empty()
-
     companion object {
         private val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop)
         private var instanceInternal: SplunkRum? = null

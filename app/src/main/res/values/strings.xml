@@ -20,6 +20,12 @@
     <string name="menu_workflow">Track Workflow</string>
     <string name="menu_track_exception">Track Exception</string>
     <string name="menu_track_exception_with_attributes">Track Exception With Attributes</string>
+    <string name="menu_add_global_attribute">Add Global Attribute</string>
+    <string name="menu_remove_global_attribute">Remove Global Attribute</string>
+    <string name="menu_get_global_attribute">Get Global Attribute</string>
+    <string name="menu_set_all_global_attributes">Set All Global Attributes</string>
+    <string name="menu_remove_all_global_attributes">Remove All Global Attributes</string>
+    <string name="menu_get_all_global_attributes">Get All Global Attributes</string>
 
     <string name="okhttp_title">OkHttp</string>
     <string name="httpurlconnection_title">HttpURLConnection</string>

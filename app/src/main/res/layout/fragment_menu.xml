@@ -204,8 +204,74 @@
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
 			android:text="@string/menu_track_exception_with_attributes"
+  			app:layout_constraintTop_toBottomOf="@id/track_exception" />
+
+		<TextView
+			android:id="@+id/add_global_attribute"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_add_global_attribute"
+			app:layout_constraintTop_toBottomOf="@id/track_exception_with_attributes" />
+
+		<TextView
+			android:id="@+id/remove_global_attribute"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_remove_global_attribute"
+			app:layout_constraintTop_toBottomOf="@id/add_global_attribute" />
+
+		<TextView
+			android:id="@+id/get_global_attribute"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_get_global_attribute"
+			app:layout_constraintTop_toBottomOf="@id/remove_global_attribute" />
+
+		<TextView
+			android:id="@+id/set_all_global_attributes"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_set_all_global_attributes"
+			app:layout_constraintTop_toBottomOf="@id/get_global_attribute" />
+
+		<TextView
+			android:id="@+id/remove_all_global_attributes"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_remove_all_global_attributes"
+			app:layout_constraintTop_toBottomOf="@id/set_all_global_attributes" />
+
+		<TextView
+			android:id="@+id/get_all_global_attributes"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/menu_get_all_global_attributes"
 			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintTop_toBottomOf="@id/track_exception" />
+			app:layout_constraintTop_toBottomOf="@id/remove_all_global_attributes" />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

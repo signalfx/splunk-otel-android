@@ -29,6 +29,18 @@ class GlobalAttributes private constructor() {
         }
     }
 
+    operator fun get(key: String): Any? {
+        val prefixedKey = CUSTOM_PREFIX + key
+        val attribute = _attributes[prefixedKey] ?: return null
+
+        return when (attribute) {
+            is Attribute.Boolean -> attribute.value
+            is Attribute.Double -> attribute.value
+            is Attribute.String -> attribute.value
+            is Attribute.Long -> attribute.value
+        }
+    }
+
     operator fun set(key: String, value: String) {
         val prefixedKey = CUSTOM_PREFIX + key
         _attributes[prefixedKey] = Attribute.String(prefixedKey, value)
@@ -86,13 +98,11 @@ class GlobalAttributes private constructor() {
                 is Attribute.Long -> builder.put(attribute.name, attribute.value)
             }
         }
-
         return builder.build()
     }
 
 
     sealed interface Attribute {
-
         val name: kotlin.String
 
         data class Boolean(override val name: kotlin.String, val value: kotlin.Boolean) : Attribute
