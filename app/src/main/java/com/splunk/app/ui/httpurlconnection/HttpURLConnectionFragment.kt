@@ -72,7 +72,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * Demonstrates a successful HttpURLConnection GET request
      */
     fun successfulGet() {
-        executeGet("http://httpbin.org/get")
+        executeGet("https://httpbin.org/get")
         showDoneToast("successfulGet")
     }
 
@@ -82,7 +82,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * to end the span. This test covers OPTIONS and TRACE requests too.
      */
     fun getWithoutInputStream() {
-        executeGet("http://httpbin.org/get", false)
+        executeGet("https://httpbin.org/get", false)
         showDoneToast("getWithoutInputStream")
     }
 
@@ -91,10 +91,10 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * Helps test proper synchronization is achieved in our callback APIs code.
      */
     fun fourConcurrentGetRequests() {
-        executeGet("http://httpbin.org/get")
-        executeGet("http://google.com")
-        executeGet("http://android.com")
-        executeGet("http://httpbin.org/headers")
+        executeGet("https://httpbin.org/get")
+        executeGet("https://google.com")
+        executeGet("https://android.com")
+        executeGet("https://httpbin.org/headers")
         showDoneToast("fourConcurrentGetRequests")
     }
 
@@ -103,7 +103,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * and thereby requiring the harvester thread to end the span.
      */
     fun sustainedConnection() {
-        executeGet("http://httpbin.org/get", false, false)
+        executeGet("https://httpbin.org/get", false, false)
         showDoneToast("sustainedConnection")
     }
 
@@ -112,7 +112,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * and thereby requiring the harvester thread to end the span.
      */
     fun stalledRequest() {
-        executeGet("http://httpbin.org/get", false, true, true)
+        executeGet("https://httpbin.org/get", false, true, true)
         showDoneToast("stalledRequest")
     }
 
@@ -144,7 +144,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     fun unSuccessfulGet() {
         runOnBackgroundThread {
-            val connection = URL("http://httpbin.org/status/404").openConnection() as HttpURLConnection
+            val connection = URL("https://httpbin.org/status/404").openConnection() as HttpURLConnection
             try {
                 val responseCode = connection.responseCode
                 val responseMessage = connection.responseMessage
@@ -166,7 +166,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     fun post() {
         runOnBackgroundThread {
-            val connection = URL("http://httpbin.org/post").openConnection() as HttpURLConnection
+            val connection = URL("https://httpbin.org/post").openConnection() as HttpURLConnection
             connection.doOutput = true
             connection.requestMethod = "POST"
             try {

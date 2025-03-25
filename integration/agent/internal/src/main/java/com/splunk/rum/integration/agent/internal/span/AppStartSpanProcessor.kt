@@ -19,7 +19,7 @@ package com.splunk.rum.integration.agent.internal.span
 import android.os.SystemClock
 import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modules
 import com.splunk.rum.integration.agent.module.extension.toSplunkString
-import com.splunk.sdk.common.otel.OpenTelemetry
+import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.context.Context
@@ -50,7 +50,7 @@ class AppStartSpanProcessor : SpanProcessor {
     }
 
     private fun reportInitialization(appStartSpan: Span) {
-        val provider = OpenTelemetry.instance?.sdkTracerProvider ?: throw IllegalStateException("unable to report initialization")
+        val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: throw IllegalStateException("unable to report initialization")
         val modules = modules.values
 
         val firstInitialization = modules.minByOrNull { it.initialization?.startTimestamp ?: Long.MAX_VALUE }?.initialization ?: throw IllegalStateException("Module initialization did not started")

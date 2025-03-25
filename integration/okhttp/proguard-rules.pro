@@ -1,0 +1,1 @@
+-repackageclasses 'com.splunk.rum.integration.okhttp'

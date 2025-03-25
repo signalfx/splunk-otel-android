@@ -24,11 +24,15 @@ android {
 }
 
 dependencies {
+    api(platform(Dependencies.Otel.instrumentationBomAlpha))
+
     api(project(":common:otel"))
     api(project(":integration:agent:module"))
 
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:storage"))
+
+    implementation(Dependencies.Otel.semConv)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonStorage)

@@ -31,11 +31,15 @@ import com.splunk.rum.integration.agent.api.sessionId.SessionIdLogProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
 import com.splunk.rum.integration.agent.api.state.StateLogRecordProcessor
+import com.splunk.rum.integration.agent.api.user.UserIdLogProcessor
+import com.splunk.rum.integration.agent.api.user.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
 import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.state.StateManager
+import com.splunk.rum.integration.agent.internal.user.IUserManager
+import com.splunk.rum.integration.agent.internal.user.UserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
@@ -45,10 +49,14 @@ import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 internal object SplunkRumAgentCore {
 
     private const val TAG = "SplunkRumAgentCore"
-    private var agentConfiguration: AgentConfiguration? = null
     var isRunning: Boolean = false
 
-    fun install(application: Application, agentConfiguration: AgentConfiguration, moduleConfigurations: List<ModuleConfiguration>): OpenTelemetry {
+    fun install(
+        application: Application,
+        agentConfiguration: AgentConfiguration,
+        userManager: IUserManager,
+        moduleConfigurations: List<ModuleConfiguration>
+    ): OpenTelemetry {
         // Sampling.
         val shouldBeRunning = when (val samplingRate = agentConfiguration.sessionSamplingRate.coerceIn(0.0, 1.0)) {
             0.0 -> false
@@ -85,12 +93,14 @@ internal object SplunkRumAgentCore {
 
         val initializer = OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
+            .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(GlobalAttributeSpanProcessor())
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
             .addLogRecordProcessor(GenericAttributesLogProcessor())
+            .addLogRecordProcessor(UserIdLogProcessor(UserManager()))
             .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
 
@@ -101,7 +111,7 @@ internal object SplunkRumAgentCore {
 
         isRunning = true
 
-        agentIntegration.install(application)
+        agentIntegration.install(application, openTelemetry)
 
         return openTelemetry
     }
