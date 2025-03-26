@@ -17,9 +17,10 @@
 
 package com.splunk.rum.integration.agent.api.subprocess
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
+import com.cisco.android.common.utils.extensions.invoke
+import com.cisco.android.common.utils.extensions.toKClass
 
 
 internal object SubprocessDetector {
@@ -34,10 +35,10 @@ internal object SubprocessDetector {
         get() = if (Build.VERSION.SDK_INT >= 28) {
             Application.getProcessName()
         } else try {
-            @SuppressLint("PrivateApi") val activityThread = Class.forName("android.app.ActivityThread")
-            val methodName = "currentProcessName"
-            @SuppressLint("PrivateApi") val getProcessName = activityThread.getDeclaredMethod(methodName)
-            getProcessName.invoke(null) as String
+            val processName: String? = "android.app.ActivityThread".toKClass()
+                ?.invoke<String>("currentProcessName")
+
+            processName as String
         } catch (e: Exception) {
             ""
         }
