@@ -10,14 +10,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 class GlobalAttributeSpanProcessor : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        GlobalAttributes.instance.attributes.values.forEachFast { attribute ->
-            when (attribute) {
-                is GlobalAttributes.Attribute.Boolean -> span.setAttribute(attribute.name, attribute.value)
-                is GlobalAttributes.Attribute.Double -> span.setAttribute(attribute.name, attribute.value)
-                is GlobalAttributes.Attribute.Long -> span.setAttribute(attribute.name, attribute.value)
-                is GlobalAttributes.Attribute.String -> span.setAttribute(attribute.name, attribute.value)
-            }
-        }
+        span.setAllAttributes(GlobalAttributes.instance.getAll())
     }
 
     override fun isStartRequired(): Boolean {
@@ -28,6 +21,6 @@ class GlobalAttributeSpanProcessor : SpanProcessor {
     }
 
     override fun isEndRequired(): Boolean {
-        return true
+        return false
     }
 }
