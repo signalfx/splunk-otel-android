@@ -16,8 +16,8 @@
 
 package com.splunk.rum.integration.agent.api
 
+import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
-import io.opentelemetry.api.common.Attributes
 
 data class AgentConfiguration(
     val rumAccessToken: String,
@@ -26,7 +26,7 @@ data class AgentConfiguration(
     var deploymentEnvironment: String? = null,
     var enableDebugLogging: Boolean = false,
     var sessionSamplingRate: Double = 1.0,
-    var globalAttributes: Attributes? = Attributes.empty(),
+    var globalAttributes: GlobalAttributes = GlobalAttributes(),
     var spanFilter: Any? = null, // TODO
     var user: UserConfiguration = UserConfiguration()
 ) {

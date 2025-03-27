@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
+import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
 import io.opentelemetry.api.common.Attributes
 import java.net.URL
 import java.util.function.Consumer
@@ -32,7 +33,7 @@ class SplunkRumBuilder {
     private var realm: String? = null
     private var beaconEndpoint: String? = null
     private var enableDebug: Boolean = false
-    private var globalAttributes: Attributes? = null
+    private var globalAttributes: GlobalAttributes = GlobalAttributes()
     private var sessionBasedSampling = 1.0
     private var spanFilter: Consumer<SpanFilterBuilder>? = null
     private var maxUsageMegabytes: Int = 25
@@ -73,7 +74,7 @@ class SplunkRumBuilder {
         return this
     }
 
-    fun setGlobalAttributes(attributes: Attributes): SplunkRumBuilder {
+    fun setGlobalAttributes(attributes: GlobalAttributes): SplunkRumBuilder {
         globalAttributes = attributes
         return this
     }

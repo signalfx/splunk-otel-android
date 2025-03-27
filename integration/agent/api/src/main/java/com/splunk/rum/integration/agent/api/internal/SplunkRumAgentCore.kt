@@ -44,6 +44,7 @@ import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 
 internal object SplunkRumAgentCore {
@@ -88,8 +89,10 @@ internal object SplunkRumAgentCore {
         val stateManager = StateManager.obtainInstance(application)
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
-        // adding agent config global attributes to global attributes
-        agentConfiguration.globalAttributes?.let { GlobalAttributes.instance.setAll(it) }
+        agentConfiguration.globalAttributes.getAll().forEach { key, value ->
+            @Suppress("UNCHECKED_CAST")
+            GlobalAttributes.instance[key as AttributeKey<Any>] = value
+        }
 
         val initializer = OpenTelemetryInitializer(application)
             .joinResources(finalConfiguration.toResource())
