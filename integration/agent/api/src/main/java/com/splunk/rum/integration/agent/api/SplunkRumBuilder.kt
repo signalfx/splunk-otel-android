@@ -120,9 +120,11 @@ class SplunkRumBuilder {
             realm != null -> EndpointConfiguration(
                 realm = realm
             )
+
             beaconEndpoint != null -> EndpointConfiguration(
                 traces = URL(beaconEndpoint)
             )
+
             else ->
                 throw IllegalStateException("setRealm() or setBeaconEndpoint() was not called")
         }
@@ -137,7 +139,11 @@ class SplunkRumBuilder {
                 enableDebugLogging = enableDebug,
                 sessionSamplingRate = sessionBasedSampling,
                 globalAttributes = globalAttributes,
-                spanFilter = spanFilter
+                spanFilter = if (spanFilter != null) {
+                    { spanFilterBuilder ->
+                        spanFilter?.accept(spanFilterBuilder)
+                    }
+                } else null
             )
         )
 

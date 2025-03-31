@@ -41,7 +41,7 @@ class App : Application() {
                     realm = "lab0"
                 ),
                 appName = "Android demo app",
-                enableDebugLogging = true
+                enableDebugLogging = true,
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
