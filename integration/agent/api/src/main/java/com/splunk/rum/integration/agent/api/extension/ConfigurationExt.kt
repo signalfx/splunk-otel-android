@@ -21,5 +21,14 @@ import io.opentelemetry.sdk.resources.Resource
 
 fun AgentConfiguration.toResource(): Resource {
     return Resource.getDefault().toBuilder()
+        // app - appName
+        // app.version - appVersion
+        // deployment.environment -
+        // rum.sdk.version
+        // device.model.identifier
+        // device.model.name
+        // os.name
+        // os.type
+        // os.version
         .build()
 }

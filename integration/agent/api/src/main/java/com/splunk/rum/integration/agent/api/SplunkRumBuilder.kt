@@ -118,7 +118,7 @@ class SplunkRumBuilder {
 
         val endpointConfiguration = when {
             realm != null -> EndpointConfiguration(
-                realm = realm
+                realm = realm, accessToken ?: throw IllegalStateException("rumAccessToken was not set")
             )
             beaconEndpoint != null -> EndpointConfiguration(
                 traces = URL(beaconEndpoint)
@@ -130,10 +130,9 @@ class SplunkRumBuilder {
         val agent = install(
             application,
             agentConfiguration = AgentConfiguration(
-                rumAccessToken = accessToken ?: throw IllegalStateException("rumAccessToken was not set"),
                 endpoint = endpointConfiguration,
                 appName = appName ?: throw IllegalStateException("applicationName was not set"),
-                deploymentEnvironment = deploymentEnvironment,
+                deploymentEnvironment = deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
                 enableDebugLogging = enableDebug,
                 sessionSamplingRate = sessionBasedSampling,
                 globalAttributes = globalAttributes,
