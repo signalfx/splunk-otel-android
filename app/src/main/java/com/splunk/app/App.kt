@@ -41,7 +41,10 @@ class App : Application() {
                     realm = "lab0"
                 ),
                 appName = "Android demo app",
-                enableDebugLogging = true
+                enableDebugLogging = true,
+                spanFilter = { spanFilterBuilder ->
+                    spanFilterBuilder.rejectSpansByName { spanName -> spanName!!.contains("ignored") }
+                }
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(

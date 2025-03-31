@@ -25,6 +25,8 @@ android {
 
 dependencies {
     api(platform(Dependencies.Otel.instrumentationBomAlpha))
+    implementation(platform(Dependencies.Otel.androidBom))
+    implementation(Dependencies.Otel.androidCore)
 
     api(project(":common:otel"))
     api(project(":integration:agent:module"))

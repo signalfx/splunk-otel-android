@@ -36,9 +36,13 @@ import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.SpanProcessor
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
+import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.util.UUID
 
-class OpenTelemetryInitializer(application: Application) {
+class OpenTelemetryInitializer(
+    application: Application,
+    spanFilter: ((SpanExporter) -> SpanExporter)
+) {
 
     private var resource: Resource
 
@@ -54,13 +58,15 @@ class OpenTelemetryInitializer(application: Application) {
 
         resource = Resources.createDefault(deviceId)
 
-        spanProcessors += BatchSpanProcessor.builder(
+        val spanExporter = spanFilter(
             AndroidSpanExporter(
                 agentStorage = agentStorage,
                 jobManager = jobManager,
                 jobIdStorage = jobIdStorage
             )
-        ).build()
+        )
+
+        spanProcessors += BatchSpanProcessor.builder(spanExporter).build()
 
         logRecordProcessors += BatchLogRecordProcessor.builder(
             AndroidLogRecordExporter()
