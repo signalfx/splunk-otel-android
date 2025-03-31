@@ -28,6 +28,7 @@ import com.splunk.rum.integration.agent.api.extension.toResource
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdLogProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
+import com.splunk.rum.integration.agent.api.SpanFilterBuilder
 import com.splunk.rum.integration.agent.api.state.StateLogRecordProcessor
 import com.splunk.rum.integration.agent.api.user.UserIdLogProcessor
 import com.splunk.rum.integration.agent.api.user.UserIdSpanProcessor
@@ -43,6 +44,7 @@ import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
+import io.opentelemetry.sdk.trace.export.SpanExporter
 
 internal object SplunkRumAgentCore {
 
@@ -86,7 +88,15 @@ internal object SplunkRumAgentCore {
         val stateManager = StateManager.obtainInstance(application)
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
-        val initializer = OpenTelemetryInitializer(application)
+        val spanFilter: (SpanExporter) -> SpanExporter = { spanExporter ->
+            if (agentConfiguration.spanFilter != null) {
+                val spanFilterBuilder = SpanFilterBuilder(spanExporter)
+                agentConfiguration.spanFilter?.invoke(spanFilterBuilder)
+                spanFilterBuilder.build()
+            } else spanExporter
+        }
+
+        val initializer = OpenTelemetryInitializer(application, spanFilter)
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))

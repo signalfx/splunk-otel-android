@@ -126,6 +126,7 @@ object Dependencies {
         const val semConv = "io.opentelemetry.semconv:opentelemetry-semconv"
         const val semConvIncubating = "io.opentelemetry.semconv:opentelemetry-semconv-incubating"
 
+        const val androidCore = "io.opentelemetry.android:core"
         const val androidSession = "io.opentelemetry.android:session"
         const val androidInstrumentation = "io.opentelemetry.android:instrumentation-android-instrumentation"
         const val androidHttpUrlLibrary = "io.opentelemetry.android:instrumentation-httpurlconnection-library"
