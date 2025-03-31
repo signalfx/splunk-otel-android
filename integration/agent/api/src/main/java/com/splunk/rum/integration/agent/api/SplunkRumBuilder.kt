@@ -74,7 +74,6 @@ class SplunkRumBuilder {
         return this
     }
 
-    @Deprecated("Use SplunkRum.instance.globalAttributes.setAll(attributes)")
     fun setGlobalAttributes(attributes: Attributes): SplunkRumBuilder {
         globalAttributes.setAll(attributes)
         return this
