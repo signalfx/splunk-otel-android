@@ -27,7 +27,7 @@ data class AgentConfiguration(
     val enableDebugLogging: Boolean = false,
     val sessionSamplingRate: Double = 1.0,
     val globalAttributes: Attributes? = null,
-    val spanFilter: Any? = null, // TODO
+    val spanFilter: ((SpanFilterBuilder) -> Unit)? = null,
     val user: UserConfiguration = UserConfiguration(),
     val session: Any? = null, // TODO,
 ) {

@@ -41,7 +41,7 @@ class App : Application() {
                     rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw"
                 ),
                 appName = "Android demo app",
-                enableDebugLogging = true
+                enableDebugLogging = true,
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
