@@ -14,7 +14,8 @@ include ':common:otel',
 
 // Instrumentation modules
 include ':instrumentation:runtime:startup',
-        ':instrumentation:buildtime:plugin',
+        ':instrumentation:buildtime:httpurlconnection:plugin',
+        ':instrumentation:buildtime:okhttp3:plugin',
         ':instrumentation:runtime:customtracking' // TODO Move the code to the integration module
 
 // Integration
@@ -22,7 +23,8 @@ include ':integration:agent:api',
         ':integration:agent:module',
         ':integration:agent:internal',
         ':integration:startup',
-        ':integration:networkrequest',
+        ':integration:httpurlconnection',
+        ':integration:okhttp3',
         ':integration:anr',
         ':integration:crash',
         ':integration:sessionreplay',
@@ -35,4 +37,3 @@ include ':app'
 
 // Main entry point
 include ':agent'
-include ':instrumentation:runtime:customtracking'
