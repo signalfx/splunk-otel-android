@@ -42,6 +42,7 @@ class App : Application() {
                 ),
                 appName = "Android demo app",
                 enableDebugLogging = true,
+                deploymentEnvironment = "test"
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
