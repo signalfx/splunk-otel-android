@@ -42,9 +42,6 @@ class App : Application() {
                 ),
                 appName = "Android demo app",
                 enableDebugLogging = true,
-                spanFilter = { spanFilterBuilder ->
-                    spanFilterBuilder.rejectSpansByName { spanName -> spanName!!.contains("ignored") }
-                }
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
