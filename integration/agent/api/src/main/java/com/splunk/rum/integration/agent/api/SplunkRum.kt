@@ -43,7 +43,7 @@ class SplunkRum private constructor(
     val user: User = User(userManager)
 
     companion object {
-        private val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop, userManager = NoOpUserManager)
+        val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop, userManager = NoOpUserManager)
         private var instanceInternal: SplunkRum? = null
 
         /**

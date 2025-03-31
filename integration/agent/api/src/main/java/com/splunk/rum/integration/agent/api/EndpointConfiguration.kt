@@ -24,12 +24,18 @@ class EndpointConfiguration {
         private set
     var sessionReplayEndpoint: URL? = null
         private set
+    var realm: String? = null
+        private set
+    var rumAccessToken: String? = null
+        private set
 
     internal constructor()
 
-    constructor(realm: String) {
-        tracesEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/rumotlp")
-        this.sessionReplayEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/rumreplay")
+    constructor(realm: String, rumAccessToken: String) {
+        this.realm = realm
+        this.rumAccessToken = rumAccessToken
+        tracesEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/rumotlp?auth=$rumAccessToken")
+        this.sessionReplayEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/rumreplay?auth=$rumAccessToken")
     }
 
     constructor(traces: URL) {
