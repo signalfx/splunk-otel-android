@@ -17,8 +17,11 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
+import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
+import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
+import com.splunk.rum.integration.agent.api.subprocess.SubprocessDetector
 import com.splunk.rum.integration.agent.api.user.User
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
@@ -43,8 +46,14 @@ class SplunkRum private constructor(
     val user: User = User(userManager)
 
     companion object {
-        private val noop = SplunkRum(openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop, state = Noop, userManager = NoOpUserManager)
+        private val noop = SplunkRum(
+            openTelemetry = OpenTelemetry.noop(),
+            agentConfiguration = AgentConfiguration.noop,
+            state = Noop(),
+            userManager = NoOpUserManager
+        )
         private var instanceInternal: SplunkRum? = null
+        private const val TAG = "SplunkRum"
 
         /**
          * Provides access to the initialized instance of [SplunkRum].
@@ -68,9 +77,28 @@ class SplunkRum private constructor(
          * @return The initialized [SplunkRum] instance.
          */
         @JvmStatic
-        fun install(application: Application, agentConfiguration: AgentConfiguration, vararg moduleConfigurations: ModuleConfiguration): SplunkRum {
+        fun install(
+            application: Application,
+            agentConfiguration: AgentConfiguration,
+            vararg moduleConfigurations: ModuleConfiguration
+        ): SplunkRum {
             if (instanceInternal != null)
                 return instance
+
+
+            val isSubprocess = SubprocessDetector.isSubprocess(applicationId = agentConfiguration.instrumentedProcessName)
+
+            if (isSubprocess && agentConfiguration.instrumentedProcessName != null) {
+                Logger.d(TAG, "install() - Subprocess detected exiting")
+
+                return SplunkRum(
+                    openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop,
+                    state = Noop(
+                        Status.NotRunning.Cause.Subprocess
+                    ),
+                    userManager = NoOpUserManager,
+                )
+            }
 
             val userManager = UserManager()
 
