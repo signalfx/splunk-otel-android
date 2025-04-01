@@ -69,7 +69,7 @@ public class SplunkRum {
     static final AttributeKey<String> RUM_VERSION_KEY = stringKey("splunk.rum.version");
     static final AttributeKey<String> APPLICATION_ID_KEY = stringKey("service.application_id");
     static final AttributeKey<String> APP_VERSION_CODE_KEY = stringKey("service.version_code");
-    static final AttributeKey<String> SPLUNK_OLLY_UUID_KEY = stringKey("service.o11y.key");
+    static final AttributeKey<String> SPLUNK_OLLY_UUID_KEY = stringKey("splunk.build_id");
 
     @Nullable private static SplunkRum INSTANCE;
 

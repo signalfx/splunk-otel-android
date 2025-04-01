@@ -27,7 +27,7 @@ import androidx.annotation.Nullable;
 
 public class ErrorIdentifierExtractor {
 
-    private static final String SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_O11Y_CUSTOM_UUID";
+    private static final String SPLUNK_UUID_MANIFEST_KEY = "splunk.build_id";
     private final Application application;
     private final PackageManager packageManager;
     @Nullable private final ApplicationInfo applicationInfo;

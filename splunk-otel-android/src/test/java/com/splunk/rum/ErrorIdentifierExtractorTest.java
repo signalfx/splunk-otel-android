@@ -30,7 +30,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class ErrorIdentifierExtractorTest {
-    private static final String SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_O11Y_CUSTOM_UUID";
+    private static final String SPLUNK_UUID_MANIFEST_KEY = "splunk.build_id";
     private static final String TEST_PACKAGE_NAME = "splunk.test.package.name";
     private static final String TEST_VERSION_CODE = "123";
     private static final String TEST_UUID = "test-uuid";
