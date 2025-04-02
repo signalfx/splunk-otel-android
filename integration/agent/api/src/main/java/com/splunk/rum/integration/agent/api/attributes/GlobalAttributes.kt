@@ -16,66 +16,66 @@ class GlobalAttributes constructor(
     }
 
     operator fun <T> get(key: AttributeKey<T>): T? {
-        val prefixedKey = createPrefixedKey(key)
-        return prefixedKey?.let { attributes.get(it) }
+        val prefixedAttributeKey = createPrefixedAttributeKey(key)
+        return prefixedAttributeKey?.let { attributes.get(it) }
     }
 
     @Suppress("UNCHECKED_CAST")
     operator fun <T> get(key: String): T? {
-        val prefixedKey = prefixKey(key)
-        return attributes.asMap().entries.firstOrNull { it.key.key == prefixedKey }?.value as? T
+        val prefixedAttributeKey = prefixKey(key)
+        return attributes.asMap().entries.firstOrNull { it.key.key == prefixedAttributeKey }?.value as? T
     }
 
     operator fun set(key: String, value: String) {
-        val prefixedKey = prefixKey(key)
+        val prefixedAttributeKey = prefixKey(key)
         val builder = attributes.toBuilder()
-        builder.put(AttributeKey.stringKey(prefixedKey), value)
+        builder.put(AttributeKey.stringKey(prefixedAttributeKey), value)
         attributes = builder.build()
     }
 
     operator fun set(key: String, value: Long) {
-        val prefixedKey = prefixKey(key)
+        val prefixedAttributeKey = prefixKey(key)
         val builder = attributes.toBuilder()
-        builder.put(AttributeKey.longKey(prefixedKey), value)
+        builder.put(AttributeKey.longKey(prefixedAttributeKey), value)
         attributes = builder.build()
     }
 
     operator fun set(key: String, value: Double) {
-        val prefixedKey = prefixKey(key)
+        val prefixedAttributeKey = prefixKey(key)
         val builder = attributes.toBuilder()
-        builder.put(AttributeKey.doubleKey(prefixedKey), value)
+        builder.put(AttributeKey.doubleKey(prefixedAttributeKey), value)
         attributes = builder.build()
     }
 
     operator fun set(key: String, value: Boolean) {
-        val prefixedKey = prefixKey(key)
+        val prefixedAttributeKey = prefixKey(key)
         val builder = attributes.toBuilder()
-        builder.put(AttributeKey.booleanKey(prefixedKey), value)
+        builder.put(AttributeKey.booleanKey(prefixedAttributeKey), value)
         attributes = builder.build()
     }
 
     operator fun <T> set(key: AttributeKey<T>, value: T & Any) {
-        val prefixedKey = createPrefixedKey(key)
+        val prefixedAttributeKey = createPrefixedAttributeKey(key)
         val builder = attributes.toBuilder()
-        if (prefixedKey != null) {
-            builder.put(prefixedKey, value)
+        if (prefixedAttributeKey != null) {
+            builder.put(prefixedAttributeKey, value)
         }
         attributes = builder.build()
     }
 
     fun <T> remove(key: AttributeKey<T>) {
-        val prefixedKey = createPrefixedKey(key)
+        val prefixedAttributeKey = createPrefixedAttributeKey(key)
         val builder = attributes.toBuilder()
-        if (prefixedKey != null) {
-            builder.remove(prefixedKey)
+        if (prefixedAttributeKey != null) {
+            builder.remove(prefixedAttributeKey)
         }
         attributes = builder.build()
     }
 
     fun remove(key: String) {
-        val prefixedKey = prefixKey(key)
+        val prefixedAttributeKey = prefixKey(key)
         val builder = attributes.toBuilder()
-        builder.removeIf { it.key == prefixedKey }
+        builder.removeIf { it.key == prefixedAttributeKey }
         attributes = builder.build()
     }
 
@@ -95,18 +95,18 @@ class GlobalAttributes constructor(
     private fun prefixKey(key: String): String = CUSTOM_PREFIX + key
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> createPrefixedKey(key: AttributeKey<T>): AttributeKey<T>? {
-        val prefixedKeyName = prefixKey(key.key)
+    private fun <T> createPrefixedAttributeKey(key: AttributeKey<T>): AttributeKey<T>? {
+        val prefixedAttributeKeyName = prefixKey(key.key)
 
         return when (key.type) {
-            AttributeType.STRING -> AttributeKey.stringKey(prefixedKeyName) as AttributeKey<T>
-            AttributeType.BOOLEAN -> AttributeKey.booleanKey(prefixedKeyName) as AttributeKey<T>
-            AttributeType.LONG -> AttributeKey.longKey(prefixedKeyName) as AttributeKey<T>
-            AttributeType.DOUBLE -> AttributeKey.doubleKey(prefixedKeyName) as AttributeKey<T>
-            AttributeType.STRING_ARRAY -> AttributeKey.stringArrayKey(prefixedKeyName) as AttributeKey<T>
-            AttributeType.BOOLEAN_ARRAY -> AttributeKey.booleanArrayKey(prefixedKeyName) as AttributeKey<T>
-            AttributeType.LONG_ARRAY -> AttributeKey.longArrayKey(prefixedKeyName) as AttributeKey<T>
-            AttributeType.DOUBLE_ARRAY -> AttributeKey.doubleArrayKey(prefixedKeyName) as AttributeKey<T>
+            AttributeType.STRING -> AttributeKey.stringKey(prefixedAttributeKeyName) as AttributeKey<T>
+            AttributeType.BOOLEAN -> AttributeKey.booleanKey(prefixedAttributeKeyName) as AttributeKey<T>
+            AttributeType.LONG -> AttributeKey.longKey(prefixedAttributeKeyName) as AttributeKey<T>
+            AttributeType.DOUBLE -> AttributeKey.doubleKey(prefixedAttributeKeyName) as AttributeKey<T>
+            AttributeType.STRING_ARRAY -> AttributeKey.stringArrayKey(prefixedAttributeKeyName) as AttributeKey<T>
+            AttributeType.BOOLEAN_ARRAY -> AttributeKey.booleanArrayKey(prefixedAttributeKeyName) as AttributeKey<T>
+            AttributeType.LONG_ARRAY -> AttributeKey.longArrayKey(prefixedAttributeKeyName) as AttributeKey<T>
+            AttributeType.DOUBLE_ARRAY -> AttributeKey.doubleArrayKey(prefixedAttributeKeyName) as AttributeKey<T>
             null -> {
                 Logger.d(TAG, "Null attribute type encountered")
                 null
