@@ -54,13 +54,11 @@ class GlobalAttributes constructor(
         attributes = builder.build()
     }
 
-    operator fun <T> set(key: AttributeKey<T>, value: T & Any) {
+    operator fun <T : Any> set(key: AttributeKey<T>, value: T) {
         val prefixedAttributeKey = createPrefixedAttributeKey(key)
-        val builder = attributes.toBuilder()
-        if (prefixedAttributeKey != null) {
-            builder.put(prefixedAttributeKey, value)
+        prefixedAttributeKey?.let {
+            attributes = attributes.toBuilder().apply { put(it, value) }.build()
         }
-        attributes = builder.build()
     }
 
     fun <T> remove(key: AttributeKey<T>) {
