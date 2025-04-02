@@ -30,7 +30,8 @@ include ':integration:agent:api',
         ':integration:sessionreplay',
         ':integration:interactions',
         ':integration:navigation',
-        ':integration:okhttp'
+        ':integration:okhttp',
+        ':integration:lifecycle'
 
 // Test App
 include ':app'

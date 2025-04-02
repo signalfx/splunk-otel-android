@@ -28,6 +28,7 @@ dependencies {
     api(project(":integration:okhttp3"))
     api(project(":integration:startup"))
     api(project(":integration:interactions"))
+    api(project(":integration:lifecycle"))
     api(project(":instrumentation:runtime:customtracking"))
 }
 
