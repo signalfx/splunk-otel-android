@@ -40,9 +40,6 @@ class SplunkRum private constructor(
     val openTelemetry: OpenTelemetry,
     val state: IState = State(agentConfiguration),
 ) {
-    // TODO separate task
-    var globalAttributes: Attributes = agentConfiguration.globalAttributes ?: Attributes.empty()
-
     val user: User = User(userManager)
 
     companion object {

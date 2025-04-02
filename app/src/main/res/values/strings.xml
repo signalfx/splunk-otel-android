@@ -21,6 +21,21 @@
     <string name="menu_track_exception">Track Exception</string>
     <string name="menu_track_exception_with_attributes">Track Exception With Attributes</string>
 
+    <!-- Global Attributes -->
+    <string name="menu_global_attributes_title">Global Attributes</string>
+    <string name="menu_set_string_attribute">Set String Attribute</string>
+    <string name="menu_set_long_attribute">Set Long Attribute</string>
+    <string name="menu_set_double_attribute">Set Double Attribute</string>
+    <string name="menu_set_boolean_attribute">Set Boolean Attribute</string>
+    <string name="menu_set_generic_attribute">Set Generic Attribute (AttributeKey)</string>
+    <string name="menu_remove_string_attribute">Remove String Attribute</string>
+    <string name="menu_remove_generic_attribute">Remove Generic Attribute (AttributeKey)</string>
+    <string name="menu_get_string_attribute">Get String Attribute</string>
+    <string name="menu_get_generic_attribute">Get Generic Attribute (AttributeKey)</string>
+    <string name="menu_set_all_global_attributes">Set All Global Attributes</string>
+    <string name="menu_remove_all_global_attributes">Remove All Global Attributes</string>
+    <string name="menu_get_all_global_attributes">Get All Global Attributes</string>
+
     <string name="okhttp_title">OkHttp</string>
     <string name="httpurlconnection_title">HttpURLConnection</string>
 
@@ -55,5 +70,4 @@
     <string name="post">Post</string>
     <string name="sustained_connection">Sustained Connection</string>
     <string name="stalled_request">Stalled Request</string>
-
 </resources>
