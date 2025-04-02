@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.cisco.android.common.utils.extensions.get
 import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentMenuBinding
@@ -62,12 +63,20 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.trackWorkflow.setOnClickListener(onClickListener)
         viewBinding.trackException.setOnClickListener(onClickListener)
         viewBinding.trackExceptionWithAttributes.setOnClickListener(onClickListener)
-        viewBinding.addGlobalAttribute.setOnClickListener(onClickListener)
-        viewBinding.removeGlobalAttribute.setOnClickListener(onClickListener)
-        viewBinding.getGlobalAttribute.setOnClickListener(onClickListener)
+
+        viewBinding.setStringAttribute.setOnClickListener(onClickListener)
+        viewBinding.setLongAttribute.setOnClickListener(onClickListener)
+        viewBinding.setDoubleAttribute.setOnClickListener(onClickListener)
+        viewBinding.setBooleanAttribute.setOnClickListener(onClickListener)
+        viewBinding.setGenericAttribute.setOnClickListener(onClickListener)
+        viewBinding.removeStringAttribute.setOnClickListener(onClickListener)
+        viewBinding.removeGenericAttribute.setOnClickListener(onClickListener)
+        viewBinding.getStringAttribute.setOnClickListener(onClickListener)
+        viewBinding.getGenericAttribute.setOnClickListener(onClickListener)
         viewBinding.setAllGlobalAttributes.setOnClickListener(onClickListener)
         viewBinding.removeAllGlobalAttributes.setOnClickListener(onClickListener)
         viewBinding.getAllGlobalAttributes.setOnClickListener(onClickListener)
+
         viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"
 
         SplunkRum.instance.navigation.track("Menu")
@@ -159,38 +168,74 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     .put("attribute.two", "12345")
                     .build()
                 SplunkRum.instance.customTracking.trackException(e, testAttributes)
-                showDoneToast("Track Exception with Attributes, Done!")
+                showDoneToast("Track Exception with Attributes")
             }
-            viewBinding.addGlobalAttribute.id -> {
-                SplunkRum.instance.globalAttributes["globalAttributeKey"] = "globalAttributeVal"
+            viewBinding.setStringAttribute.id -> {
+                SplunkRum.instance.globalAttributes["stringKey"] = "String Value"
+                showDoneToast("Set String Global Attribute")
             }
-            viewBinding.removeGlobalAttribute.id -> {
-                SplunkRum.instance.globalAttributes.remove("globalAttributeKey")
+            viewBinding.setLongAttribute.id -> {
+                SplunkRum.instance.globalAttributes["longKey"] = 12345L
+                showDoneToast("Set Long Global Attribute")
             }
-            viewBinding.getGlobalAttribute.id -> {
+            viewBinding.setDoubleAttribute.id -> {
+                SplunkRum.instance.globalAttributes["doubleKey"] = 123.45
+                showDoneToast("Set Double Global Attribute")
+            }
+            viewBinding.setBooleanAttribute.id -> {
+                SplunkRum.instance.globalAttributes["booleanKey"] = true
+                showDoneToast("Set Boolean Global Attribute")
+            }
+            viewBinding.setGenericAttribute.id -> {
+                val key = AttributeKey.stringKey("genericKey")
+                SplunkRum.instance.globalAttributes[key] = "Generic Value"
+                showDoneToast("Set Generic Global Attribute")
+            }
+            viewBinding.removeStringAttribute.id -> {
+                SplunkRum.instance.globalAttributes.remove("stringKey")
+                showDoneToast("Remove String Global Attribute")
+            }
+            viewBinding.removeGenericAttribute.id -> {
+                val key = AttributeKey.stringKey("genericKey")
+                SplunkRum.instance.globalAttributes.remove(key)
+                showDoneToast("Remove Generic Global Attribute")
+            }
+            viewBinding.getStringAttribute.id -> {
+                val value: String? = SplunkRum.instance.globalAttributes["stringKey"]
                 AlertDialog.Builder(context)
-                    .setTitle("Key: globalAttributeKey")
-                    .setMessage("Val: " + SplunkRum.instance.globalAttributes["globalAttributeKey"])
+                    .setTitle("Key: stringKey")
+                    .setMessage("Value: $value")
+                    .setPositiveButton("OK", null)
+                    .show()
+            }
+            viewBinding.getGenericAttribute.id -> {
+                val key = AttributeKey.stringKey("genericKey")
+                val value = SplunkRum.instance.globalAttributes[key]
+                AlertDialog.Builder(context)
+                    .setTitle("Key: genericKey")
+                    .setMessage("Value: $value")
                     .setPositiveButton("OK", null)
                     .show()
             }
             viewBinding.setAllGlobalAttributes.id -> {
                 val globalAttributes = Attributes.of(
-                    AttributeKey.stringKey("globAttrKey1"), "12345",
-                    AttributeKey.booleanKey("globAttrKey2"), true,
-                    AttributeKey.doubleKey("globAttrKey3"), 1200.50,
-                    AttributeKey.longKey("globAttrKey4"), 30L,
-                    AttributeKey.stringKey("globAttrKey5"), "US"
+                    AttributeKey.stringKey("setAllString"), "String Value",
+                    AttributeKey.booleanKey("setAllBoolean"), true,
+                    AttributeKey.doubleKey("setAllDouble"), 456.78,
+                    AttributeKey.longKey("setAllLong"), 9876L
                 )
                 SplunkRum.instance.globalAttributes.setAll(globalAttributes)
+                showDoneToast("Set All Global Attributes")
             }
             viewBinding.removeAllGlobalAttributes.id -> {
                 SplunkRum.instance.globalAttributes.removeAll()
+                showDoneToast("Remove All Global Attributes")
             }
             viewBinding.getAllGlobalAttributes.id -> {
+                val allAttributes = SplunkRum.instance.globalAttributes.getAll()
                 AlertDialog.Builder(context)
                     .setTitle("All Global Attributes")
-                    .setMessage("All global attributes: " + SplunkRum.instance.globalAttributes.getAll().toString())
+                    .setMessage(allAttributes.toString())
                     .setPositiveButton("OK", null)
                     .show()
             }
