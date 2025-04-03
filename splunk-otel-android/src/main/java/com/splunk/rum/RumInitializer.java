@@ -24,7 +24,7 @@ import static com.splunk.rum.SplunkRum.COMPONENT_ERROR;
 import static com.splunk.rum.SplunkRum.COMPONENT_KEY;
 import static com.splunk.rum.SplunkRum.COMPONENT_UI;
 import static com.splunk.rum.SplunkRum.RUM_TRACER_NAME;
-import static com.splunk.rum.SplunkRum.SPLUNK_OLLY_UUID_KEY;
+import static com.splunk.rum.SplunkRum.SPLUNK_BUILD_ID;
 import static io.opentelemetry.android.RumConstants.APP_START_SPAN_NAME;
 import static io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor.constant;
 import static io.opentelemetry.semconv.ResourceAttributes.DEPLOYMENT_ENVIRONMENT;
@@ -295,7 +295,7 @@ class RumInitializer {
                     ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
                     String applicationId = errorIdentifierInfo.getApplicationId();
                     String versionCode = errorIdentifierInfo.getVersionCode();
-                    String uuid = errorIdentifierInfo.getCustomUUID();
+                    String splunkBuildID = errorIdentifierInfo.getSplunkBuildID();
 
                     AnrDetectorBuilder builder = AnrDetector.builder();
                     builder.addAttributesExtractor(constant(COMPONENT_KEY, COMPONENT_ERROR));
@@ -304,8 +304,8 @@ class RumInitializer {
                         builder.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
                     if (versionCode != null)
                         builder.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
-                    if (uuid != null)
-                        builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
+                    if (splunkBuildID != null)
+                        builder.addAttributesExtractor(constant(SPLUNK_BUILD_ID, splunkBuildID));
 
                     builder.setMainLooper(mainLooper).build().installOn(instrumentedApplication);
 
@@ -320,7 +320,7 @@ class RumInitializer {
                     ErrorIdentifierInfo errorIdentifierInfo = extractor.extractInfo();
                     String applicationId = errorIdentifierInfo.getApplicationId();
                     String versionCode = errorIdentifierInfo.getVersionCode();
-                    String uuid = errorIdentifierInfo.getCustomUUID();
+                    String splunkBuildId = errorIdentifierInfo.getSplunkBuildID();
 
                     CrashReporterBuilder builder = CrashReporter.builder();
                     builder.addAttributesExtractor(
@@ -334,8 +334,8 @@ class RumInitializer {
                         builder.addAttributesExtractor(constant(APPLICATION_ID_KEY, applicationId));
                     if (versionCode != null)
                         builder.addAttributesExtractor(constant(APP_VERSION_CODE_KEY, versionCode));
-                    if (uuid != null)
-                        builder.addAttributesExtractor(constant(SPLUNK_OLLY_UUID_KEY, uuid));
+                    if (splunkBuildId != null)
+                        builder.addAttributesExtractor(constant(SPLUNK_BUILD_ID, splunkBuildId));
 
                     builder.build().installOn(instrumentedApplication);
 

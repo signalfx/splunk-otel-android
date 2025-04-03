@@ -30,10 +30,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class ErrorIdentifierExtractorTest {
-    private static final String SPLUNK_UUID_MANIFEST_KEY = "splunk.build_id";
+    private static final String SPLUNK_BUILD_ID = "splunk.build_id";
     private static final String TEST_PACKAGE_NAME = "splunk.test.package.name";
     private static final String TEST_VERSION_CODE = "123";
-    private static final String TEST_UUID = "test-uuid";
+    private static final String TEST_SPLUNK_BUILDID = "test-splunk-build-id";
 
     @Mock private Application mockApplication;
     @Mock private PackageManager mockPackageManager;
@@ -54,7 +54,7 @@ public class ErrorIdentifierExtractorTest {
 
         when(mockPackageManager.getApplicationInfo(TEST_PACKAGE_NAME, PackageManager.GET_META_DATA))
                 .thenReturn(mockApplicationInfo);
-        when(mockMetadata.getString(SPLUNK_UUID_MANIFEST_KEY)).thenReturn(TEST_UUID);
+        when(mockMetadata.getString(SPLUNK_BUILD_ID)).thenReturn(TEST_SPLUNK_BUILDID);
 
         mockPackageInfo.versionCode = 123;
         when(mockPackageManager.getPackageInfo(TEST_PACKAGE_NAME, 0)).thenReturn(mockPackageInfo);
@@ -73,16 +73,16 @@ public class ErrorIdentifierExtractorTest {
     }
 
     @Test
-    public void testGetCustomUUID() {
+    public void testGetSplunkBuildID() {
         ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
-        assertEquals(TEST_UUID, extractor.extractInfo().getCustomUUID());
+        assertEquals(TEST_SPLUNK_BUILDID, extractor.extractInfo().getSplunkBuildID());
     }
 
     @Test
-    public void testCustomUUIDButDoesNotExist() {
-        when(mockMetadata.getString(SPLUNK_UUID_MANIFEST_KEY)).thenReturn(null);
+    public void testSplunkBuildIDButDoesNotExist() {
+        when(mockMetadata.getString(SPLUNK_BUILD_ID)).thenReturn(null);
         ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
-        assertNull(extractor.extractInfo().getCustomUUID());
+        assertNull(extractor.extractInfo().getSplunkBuildID());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class ErrorIdentifierExtractorTest {
                 .thenReturn(applicationInfoWithNullMetaData);
 
         ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
-        assertNull(extractor.extractInfo().getCustomUUID());
+        assertNull(extractor.extractInfo().getSplunkBuildID());
     }
 
     @Test
@@ -117,6 +117,6 @@ public class ErrorIdentifierExtractorTest {
         ErrorIdentifierInfo info = extractor.extractInfo();
         assertNull(info.getApplicationId());
         assertEquals(TEST_VERSION_CODE, info.getVersionCode());
-        assertNull(info.getCustomUUID());
+        assertNull(info.getSplunkBuildID());
     }
 }
