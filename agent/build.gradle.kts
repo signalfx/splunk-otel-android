@@ -29,6 +29,6 @@ dependencies {
     api(project(":integration:startup"))
     api(project(":integration:interactions"))
     api(project(":integration:lifecycle"))
-    api(project(":instrumentation:runtime:customtracking"))
+    api(project(":integration:customtracking"))
 }
 
