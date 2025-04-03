@@ -50,11 +50,6 @@ class SplunkRum private constructor(
 
     val user: User = User(userManager)
 
-    @Deprecated("Use property SplunkRum.instance.openTelemetry", ReplaceWith("instance.openTelemetry", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance"))
-    fun getOpenTelemetry(): OpenTelemetry {
-        return instance.openTelemetry
-    }
-
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
     fun getRumSessionId(): String {
         return session.state.sessionId
@@ -149,12 +144,6 @@ class SplunkRum private constructor(
         @Deprecated("Use SplunkRum.instance.state.status == Status.Running", ReplaceWith("instance.state.status == Status.Running", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance"))
         fun isInitialized(): Boolean {
             return instance.state.status == Status.Running
-        }
-
-        @JvmStatic
-        @Deprecated("Use instance property", ReplaceWith("instance", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance"))
-        fun getInstance(): SplunkRum {
-            return instance
         }
 
         @JvmStatic
