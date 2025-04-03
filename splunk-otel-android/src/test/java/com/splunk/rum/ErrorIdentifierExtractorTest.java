@@ -54,7 +54,8 @@ public class ErrorIdentifierExtractorTest {
 
         when(mockPackageManager.getApplicationInfo(TEST_PACKAGE_NAME, PackageManager.GET_META_DATA))
                 .thenReturn(mockApplicationInfo);
-        when(mockMetadata.getString(SPLUNK_BUILD_ID)).thenReturn(TEST_SPLUNK_BUILDID);
+        when(mockMetadata.containsKey(SPLUNK_BUILD_ID)).thenReturn(true);
+        when(mockMetadata.get(SPLUNK_BUILD_ID)).thenReturn(TEST_SPLUNK_BUILDID);
 
         mockPackageInfo.versionCode = 123;
         when(mockPackageManager.getPackageInfo(TEST_PACKAGE_NAME, 0)).thenReturn(mockPackageInfo);
@@ -80,7 +81,7 @@ public class ErrorIdentifierExtractorTest {
 
     @Test
     public void testSplunkBuildIDButDoesNotExist() {
-        when(mockMetadata.getString(SPLUNK_BUILD_ID)).thenReturn(null);
+        when(mockMetadata.containsKey(SPLUNK_BUILD_ID)).thenReturn(false);
         ErrorIdentifierExtractor extractor = new ErrorIdentifierExtractor(mockApplication);
         assertNull(extractor.extractInfo().getSplunkBuildID());
     }
