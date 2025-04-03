@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
+import android.webkit.WebView
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
@@ -28,7 +29,10 @@ import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.common.AttributesBuilder
+import java.util.function.Consumer
 
 /**
  * The [SplunkRum] class is responsible for initializing and providing access to the RUM agent.
@@ -39,11 +43,32 @@ class SplunkRum private constructor(
     userManager: IUserManager,
     val openTelemetry: OpenTelemetry,
     val state: IState = State(agentConfiguration),
+    val session: ISession = Session(ISession.State())
 ) {
     // TODO separate task
     var globalAttributes: Attributes = agentConfiguration.globalAttributes ?: Attributes.empty()
 
     val user: User = User(userManager)
+
+    @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
+    fun getRumSessionId(): String {
+        return session.state.sessionId
+    }
+
+    @Deprecated("Use globalAttributes property")
+    fun <T> setGlobalAttribute(key: AttributeKey<T>, value: T) {
+        // TODO separate task
+    }
+
+    @Deprecated("Use globalAttributes property")
+    fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
+        // TODO separate task
+    }
+
+    @Deprecated("Use webView.integrateWithBrowserRum(webView)")
+    fun integrateWithBrowserRum(webView: WebView) {
+        // TODO separate task
+    }
 
     companion object {
         private val noop = SplunkRum(
@@ -107,6 +132,24 @@ class SplunkRum private constructor(
             instanceInternal = SplunkRum(agentConfiguration = agentConfiguration, openTelemetry = openTelemetry, userManager = UserManager())
 
             return instance
+        }
+
+        @JvmStatic
+        @Deprecated("Use SplunkRum.install()", ReplaceWith("install", "com.splunk.rum.integration.agent.api.SplunkRumBuilder"))
+        fun builder(): SplunkRumBuilder {
+            return SplunkRumBuilder()
+        }
+
+        @JvmStatic
+        @Deprecated("Use SplunkRum.instance.state.status == Status.Running", ReplaceWith("instance.state.status == Status.Running", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance"))
+        fun isInitialized(): Boolean {
+            return instance.state.status == Status.Running
+        }
+
+        @JvmStatic
+        @Deprecated("Use property noop")
+        fun noop(): SplunkRum {
+            return noop
         }
     }
 }

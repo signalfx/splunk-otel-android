@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2024 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.customtracking.extension
+package com.splunk.rum.integration.navigation.extension
 
-import com.splunk.rum.customtracking.CustomTracking
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.navigation.Navigation
 
-/**
- * Extension property to access the [CustomTracking] instance via [SplunkRum].
- */
-@Suppress("UnusedReceiverParameter")
-val SplunkRum.customTracking: CustomTracking
-    get() = CustomTracking.instance
+val SplunkRum.navigation: Navigation
+    get() = Navigation
+
+@JvmOverloads
+@Deprecated("Use navigation.track(). Argument spanType is ignored.")
+fun SplunkRum.experimentalSetScreenName(screenName: String?, spanType: String = "Created") {
+    if (screenName == null)
+        return
+
+    navigation.track(screenName)
+}
