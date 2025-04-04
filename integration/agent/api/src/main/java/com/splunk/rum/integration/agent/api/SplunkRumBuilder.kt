@@ -33,7 +33,7 @@ class SplunkRumBuilder {
     private var realm: String? = null
     private var beaconEndpoint: String? = null
     private var enableDebug: Boolean = false
-    private var globalAttributes: GlobalAttributes = GlobalAttributes()
+    private var globalAttributes: Attributes = Attributes.empty()
     private var sessionBasedSampling = 1.0
     private var spanFilter: Consumer<SpanFilterBuilder>? = null
     private var maxUsageMegabytes: Int = 25
@@ -75,7 +75,7 @@ class SplunkRumBuilder {
     }
 
     fun setGlobalAttributes(attributes: Attributes): SplunkRumBuilder {
-        globalAttributes.setAll(attributes)
+        globalAttributes = attributes
         return this
     }
 

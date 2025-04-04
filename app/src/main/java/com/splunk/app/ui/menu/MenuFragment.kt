@@ -32,6 +32,7 @@ import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.util.FragmentAnimation
 import com.splunk.rum.customtracking.extension.customTracking
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
 import com.splunk.rum.integration.agent.api.attributes.extension.globalAttributes
 import com.splunk.rum.integration.agent.api.extension.splunkRumId
 import com.splunk.rum.integration.navigation.extension.navigation
@@ -171,37 +172,46 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 showDoneToast("Track Exception with Attributes")
             }
             viewBinding.setStringAttribute.id -> {
-                SplunkRum.instance.globalAttributes["stringKey"] = "String Value"
+                val ga = SplunkRum.instance.globalAttributes
+                if(ga != null) {
+                    ga["longKey"] = 12345L
+                }
+                //SplunkRum.instance.globalAttributes?.set("stringKey", "String Value")
                 showDoneToast("Set String Global Attribute")
             }
             viewBinding.setLongAttribute.id -> {
-                SplunkRum.instance.globalAttributes["longKey"] = 12345L
+                //SplunkRum.instance.globalAttributes["longKey"] = 12345L
                 showDoneToast("Set Long Global Attribute")
             }
             viewBinding.setDoubleAttribute.id -> {
-                SplunkRum.instance.globalAttributes["doubleKey"] = 123.45
+                //SplunkRum.instance.globalAttributes["doubleKey"] = 123.45
                 showDoneToast("Set Double Global Attribute")
             }
             viewBinding.setBooleanAttribute.id -> {
-                SplunkRum.instance.globalAttributes["booleanKey"] = true
+                //SplunkRum.instance.globalAttributes["booleanKey"] = true
                 showDoneToast("Set Boolean Global Attribute")
             }
             viewBinding.setGenericAttribute.id -> {
                 val key = AttributeKey.stringKey("genericKey")
-                SplunkRum.instance.globalAttributes[key] = "Generic Value"
+                //SplunkRum.instance.globalAttributes[key] = "Generic Value"
                 showDoneToast("Set Generic Global Attribute")
             }
             viewBinding.removeStringAttribute.id -> {
-                SplunkRum.instance.globalAttributes.remove("stringKey")
+                SplunkRum.instance.globalAttributes?.remove("stringKey")
                 showDoneToast("Remove String Global Attribute")
             }
             viewBinding.removeGenericAttribute.id -> {
                 val key = AttributeKey.stringKey("genericKey")
-                SplunkRum.instance.globalAttributes.remove(key)
+                SplunkRum.instance.globalAttributes?.remove(key)
                 showDoneToast("Remove Generic Global Attribute")
             }
             viewBinding.getStringAttribute.id -> {
-                val value: String? = SplunkRum.instance.globalAttributes["stringKey"]
+                val ga = SplunkRum.instance.globalAttributes
+                var value: String? = null
+                if(ga != null){
+                    value = ga["stringKey"]
+                }
+
                 AlertDialog.Builder(context)
                     .setTitle("Key: stringKey")
                     .setMessage("Value: $value")
@@ -210,7 +220,11 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
             }
             viewBinding.getGenericAttribute.id -> {
                 val key = AttributeKey.stringKey("genericKey")
-                val value = SplunkRum.instance.globalAttributes[key]
+                val ga = SplunkRum.instance.globalAttributes
+                var value: String? = null
+                if(ga != null){
+                    value = ga[key]
+                }
                 AlertDialog.Builder(context)
                     .setTitle("Key: genericKey")
                     .setMessage("Value: $value")
@@ -224,15 +238,15 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     AttributeKey.doubleKey("setAllDouble"), 456.78,
                     AttributeKey.longKey("setAllLong"), 9876L
                 )
-                SplunkRum.instance.globalAttributes.setAll(globalAttributes)
+                SplunkRum.instance.globalAttributes?.setAll(globalAttributes)
                 showDoneToast("Set All Global Attributes")
             }
             viewBinding.removeAllGlobalAttributes.id -> {
-                SplunkRum.instance.globalAttributes.removeAll()
+                SplunkRum.instance.globalAttributes?.removeAll()
                 showDoneToast("Remove All Global Attributes")
             }
             viewBinding.getAllGlobalAttributes.id -> {
-                val allAttributes = SplunkRum.instance.globalAttributes.getAll()
+                val allAttributes = SplunkRum.instance.globalAttributes?.getAll()
                 AlertDialog.Builder(context)
                     .setTitle("All Global Attributes")
                     .setMessage(allAttributes.toString())

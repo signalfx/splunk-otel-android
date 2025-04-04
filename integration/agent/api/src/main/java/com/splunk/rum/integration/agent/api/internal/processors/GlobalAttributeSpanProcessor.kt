@@ -10,7 +10,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 class GlobalAttributeSpanProcessor : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        span.setAllAttributes(GlobalAttributes.instance.getAll())
+        span.setAllAttributes(GlobalAttributes.getInitializedInstance()?.getAll())
     }
 
     override fun isStartRequired(): Boolean {
