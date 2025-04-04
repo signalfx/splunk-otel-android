@@ -10,7 +10,7 @@ class ApplicationInfoUtils {
     companion object {
 
         private const val TAG = "ErrorIdentifier"
-        private const val SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_O11Y_CUSTOM_UUID"
+        private const val SPLUNK_BUILD_ID = "splunk.build_id"
 
         fun retrieveApplicationId(application: Application): String? {
             val packageManager: PackageManager = application.packageManager
@@ -45,7 +45,7 @@ class ApplicationInfoUtils {
             }
         }
 
-        fun retrieveCustomUUID(application: Application): String? {
+        fun retrieveSplunkBuildID(application: Application): String? {
             val packageManager: PackageManager = application.packageManager
             val applicationInfo: ApplicationInfo?
 
@@ -56,11 +56,24 @@ class ApplicationInfoUtils {
                 return null
             }
 
-            return applicationInfo.metaData?.getString(SPLUNK_UUID_MANIFEST_KEY)?.takeIf {
-                it.isNotEmpty()
-            } ?: run {
-                Logger.e(TAG, "Application MetaData bundle is null or does not contain the UUID")
-                null
+            val metaData = applicationInfo.metaData
+            if (metaData == null) {
+                Logger.d(TAG, "Application metadata bundle is null - no metadata present")
+                return null
+            }
+
+            if (metaData.containsKey(SPLUNK_BUILD_ID)) {
+                val value = metaData.get(SPLUNK_BUILD_ID)
+                if (value == null) {
+                    Logger.d(TAG, "Splunk Build ID exists but has null value")
+                    return null
+                }
+                val buildId = value.toString()
+                Logger.d(TAG, "Found Splunk Build ID: $buildId")
+                return buildId
+            } else {
+                Logger.d(TAG, "Optional Splunk Build ID not found in metadata")
+                return null
             }
         }
     }
