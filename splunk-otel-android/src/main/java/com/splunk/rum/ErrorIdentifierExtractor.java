@@ -85,7 +85,7 @@ public class ErrorIdentifierExtractor {
 
         Bundle bundle = applicationInfo.metaData;
         if (bundle == null) {
-            Log.d(SplunkRum.LOG_TAG, "Application MetaData bundle is null - no metadata present");
+            Log.d(SplunkRum.LOG_TAG, "Application metadata bundle is null - no metadata present");
             return null;
         }
 
