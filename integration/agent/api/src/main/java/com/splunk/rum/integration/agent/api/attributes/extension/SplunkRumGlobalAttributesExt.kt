@@ -7,5 +7,5 @@ import com.splunk.rum.integration.agent.api.SplunkRum
  * Extension property to access the [GlobalAttributes] instance via [SplunkRum].
  */
 @Suppress("UnusedReceiverParameter")
-val SplunkRum.globalAttributes: GlobalAttributes
-    get() = GlobalAttributes.instance
+val SplunkRum.globalAttributes: GlobalAttributes?
+    get() = GlobalAttributes.getInitializedInstance()

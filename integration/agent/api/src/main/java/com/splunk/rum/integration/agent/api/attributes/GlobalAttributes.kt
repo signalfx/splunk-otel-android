@@ -10,7 +10,17 @@ class GlobalAttributes constructor(
     private var attributes: Attributes = Attributes.empty()
 ) {
     companion object {
-        val instance: GlobalAttributes by lazy { GlobalAttributes() }
+        private var instance: GlobalAttributes? = null
+
+        internal fun initialize(attributes: Attributes){
+            instance = GlobalAttributes()
+            instance?.setAll(attributes)
+        }
+
+        fun getInitializedInstance() : GlobalAttributes? {
+            return instance
+        }
+
         private const val TAG = "GlobalAttributes"
         private const val CUSTOM_PREFIX = "custom."
     }

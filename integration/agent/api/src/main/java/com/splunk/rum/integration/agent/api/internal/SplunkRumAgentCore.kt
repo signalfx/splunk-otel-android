@@ -46,6 +46,7 @@ import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import io.opentelemetry.sdk.trace.export.SpanExporter
 
@@ -91,10 +92,13 @@ internal object SplunkRumAgentCore {
         val stateManager = StateManager.obtainInstance(application)
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
-        agentConfiguration.globalAttributes.getAll().forEach { key, value ->
+        /*agentConfiguration.globalAttributes.getAll().forEach { key, value ->
             @Suppress("UNCHECKED_CAST")
             GlobalAttributes.instance[key as AttributeKey<Any>] = value
-        }
+        }*/
+
+
+        GlobalAttributes.initialize(agentConfiguration.globalAttributes)
 
         val spanFilter: (SpanExporter) -> SpanExporter = { spanExporter ->
             if (agentConfiguration.spanFilter != null) {

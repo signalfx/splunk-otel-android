@@ -17,14 +17,18 @@
 package com.splunk.app
 
 import android.app.Application
+import android.util.Log
 import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
+import com.splunk.rum.integration.agent.api.attributes.extension.globalAttributes
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
 
 class App : Application() {
 
@@ -43,6 +47,13 @@ class App : Application() {
 //        globalAttributes["email"] = "john.doe@example.com"
 //        globalAttributes["isValid"] = true
 
+        val ga = SplunkRum.instance.globalAttributes //or GlobalAttributes.getInitializedInstance()
+        if(ga == null){
+            Log.d("Surbhi","ga is null") //it will be null here
+        } else {
+            Log.d("Surbhi","ga is not null")
+        }
+
         val agent = SplunkRum.install(
             application = this,
             agentConfiguration = AgentConfiguration(
@@ -52,7 +63,7 @@ class App : Application() {
                 ),
                 appName = "Android demo app",
                 enableDebugLogging = true,
-//                globalAttributes = globalAttributes
+                globalAttributes = Attributes.of(AttributeKey.stringKey("xyz"), "xyz")
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
@@ -65,6 +76,13 @@ class App : Application() {
                 )
             )
         )
+
+        val ga2 = GlobalAttributes.getInitializedInstance()
+        if(ga2 == null){
+            Log.d("Surbhi","ga2 is null")
+        } else {
+            Log.d("Surbhi","ga2 is not null") //it will be not null here
+        }
 
         agent.sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
         agent.sessionReplay.start()
