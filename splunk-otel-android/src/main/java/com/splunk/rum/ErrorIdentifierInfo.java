@@ -21,15 +21,15 @@ import androidx.annotation.Nullable;
 public class ErrorIdentifierInfo {
     @Nullable private final String applicationId;
     @Nullable private final String versionCode;
-    @Nullable private final String customUUID;
+    @Nullable private final String splunkBuildID;
 
     public ErrorIdentifierInfo(
             @Nullable String applicationId,
             @Nullable String versionCode,
-            @Nullable String customUUID) {
+            @Nullable String splunkBuildID) {
         this.applicationId = applicationId;
         this.versionCode = versionCode;
-        this.customUUID = customUUID;
+        this.splunkBuildID = splunkBuildID;
     }
 
     @Nullable
@@ -43,7 +43,7 @@ public class ErrorIdentifierInfo {
     }
 
     @Nullable
-    public String getCustomUUID() {
-        return customUUID;
+    public String getSplunkBuildID() {
+        return splunkBuildID;
     }
 }

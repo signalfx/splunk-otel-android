@@ -27,7 +27,8 @@ import androidx.annotation.Nullable;
 
 public class ErrorIdentifierExtractor {
 
-    private static final String SPLUNK_UUID_MANIFEST_KEY = "SPLUNK_O11Y_CUSTOM_UUID";
+    private static final String SPLUNK_BUILD_ID = "splunk.build_id";
+
     private final Application application;
     private final PackageManager packageManager;
     @Nullable private final ApplicationInfo applicationInfo;
@@ -52,7 +53,7 @@ public class ErrorIdentifierExtractor {
     public ErrorIdentifierInfo extractInfo() {
         String applicationId = null;
         String versionCode = retrieveVersionCode();
-        String customUUID = retrieveCustomUUID();
+        String customUUID = retrieveSplunkBuildID();
 
         if (applicationInfo != null) {
             applicationId = applicationInfo.packageName;
@@ -76,16 +77,29 @@ public class ErrorIdentifierExtractor {
     }
 
     @Nullable
-    private String retrieveCustomUUID() {
+    private String retrieveSplunkBuildID() {
         if (applicationInfo == null) {
-            Log.e(SplunkRum.LOG_TAG, "ApplicationInfo is null; cannot retrieve Custom UUID.");
+            Log.e(SplunkRum.LOG_TAG, "ApplicationInfo is null; cannot retrieve Splunk Build ID.");
             return null;
         }
+
         Bundle bundle = applicationInfo.metaData;
-        if (bundle != null) {
-            return bundle.getString(SPLUNK_UUID_MANIFEST_KEY);
+        if (bundle == null) {
+            Log.d(SplunkRum.LOG_TAG, "Application metadata bundle is null - no metadata present");
+            return null;
+        }
+
+        if (bundle.containsKey(SPLUNK_BUILD_ID)) {
+            Object value = bundle.get(SPLUNK_BUILD_ID);
+            if (value == null) {
+                Log.d(SplunkRum.LOG_TAG, "Splunk Build ID exists but has null value");
+                return null;
+            }
+            String buildId = String.valueOf(value);
+            Log.d(SplunkRum.LOG_TAG, "Found Splunk Build ID: " + buildId);
+            return buildId;
         } else {
-            Log.e(SplunkRum.LOG_TAG, "Application MetaData bundle is null");
+            Log.d(SplunkRum.LOG_TAG, "Optional Splunk Build ID not found in metadata");
             return null;
         }
     }
