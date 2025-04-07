@@ -56,14 +56,14 @@ class ApplicationInfoUtils {
                 return null
             }
 
-            val metaData = applicationInfo.metaData
-            if (metaData == null) {
+            val metadata = applicationInfo.metaData
+            if (metadata == null) {
                 Logger.d(TAG, "Application metadata bundle is null - no metadata present")
                 return null
             }
 
-            if (metaData.containsKey(SPLUNK_BUILD_ID)) {
-                val value = metaData.get(SPLUNK_BUILD_ID)
+            if (metadata.containsKey(SPLUNK_BUILD_ID)) {
+                val value = metadata.get(SPLUNK_BUILD_ID)
                 if (value == null) {
                     Logger.d(TAG, "Splunk Build ID exists but has null value")
                     return null
