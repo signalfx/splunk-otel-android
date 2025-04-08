@@ -114,15 +114,17 @@ android {
                         val appId = android.defaultConfig.applicationId ?: "unknown"
                         val versionCode = android.defaultConfig.versionCode ?: 0
 
-                        buildIdFile.writeText("""
+                        buildIdFile.writeText(
+                            """
                             # App ID: $appId
                             # Version Code: $versionCode
-                    
-                            """.trimIndent())
+                            
+                            """.trimIndent(),
+                        )
                         logger.lifecycle("Created build ID file with app information")
                     }
 
-                    val mergedManifestPath = "${buildDirectory}/intermediates/merged_manifests/${variantName}/AndroidManifest.xml"
+                    val mergedManifestPath = "$buildDirectory/intermediates/merged_manifests/$variantName/AndroidManifest.xml"
                     // Appending build ID of this variant to file
                     buildIdFile.appendText("Variant: $variantName, Build ID: $uniqueBuildId, Manifest: $mergedManifestPath\n")
                     logger.lifecycle("Recorded build ID for $variantName in ${buildIdFile.absolutePath}")
