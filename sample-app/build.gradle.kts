@@ -88,55 +88,35 @@ android {
 
         logger.lifecycle("Splunk: Variant $name assigned build ID: $uniqueBuildId")
 
-        // Create task to save build ID to a reference file and processed manifest
-        val variantName = name
-        val capitalizedVariantName = variantName.replaceFirstChar { it.uppercase() }
+        val capitalizedVariantName = name.replaceFirstChar { it.uppercase() }
 
-        // Forces the manifest processing task to always run, even during incremental builds
         tasks.named("process${capitalizedVariantName}Manifest").configure {
             outputs.upToDateWhen { false }
-        }
 
-        tasks.register("recordSplunkBuildId$capitalizedVariantName") {
-            description = "Records the Splunk build ID for the $variantName variant"
-            group = "Splunk"
-            outputs.upToDateWhen { false } // Ensures that this task always runs, even on incremental builds
-
+            // Write the build ID to a file for bookkeeping
             doLast {
                 try {
                     val buildDirectory = layout.buildDirectory.get().asFile
                     val buildIdFile = buildDirectory.resolve("splunk/build_ids.txt")
-
                     buildIdFile.parentFile.mkdirs()
 
-                    // Add app id and version code to the top of the file if it doesn't exist yet
                     if (!buildIdFile.exists()) {
                         val appId = android.defaultConfig.applicationId ?: "unknown"
                         val versionCode = android.defaultConfig.versionCode ?: 0
 
-                        buildIdFile.writeText(
-                            """
-                            # App ID: $appId
-                            # Version Code: $versionCode
-                            
-                            """.trimIndent(),
-                        )
+                        buildIdFile.writeText("""
+                        # App ID: $appId
+                        # Version Code: $versionCode
+                        
+                    """.trimIndent())
                         logger.lifecycle("Created build ID file with app information")
                     }
-
-                    val mergedManifestPath = "$buildDirectory/intermediates/merged_manifests/$variantName/AndroidManifest.xml"
-                    // Appending build ID of this variant to file
-                    buildIdFile.appendText("Variant: $variantName, Build ID: $uniqueBuildId, Manifest: $mergedManifestPath\n")
-                    logger.lifecycle("Recorded build ID for $variantName in ${buildIdFile.absolutePath}")
+                    buildIdFile.appendText("Variant: $name, Build ID: $uniqueBuildId\n")
+                    logger.lifecycle("Recorded build ID for $name in ${buildIdFile.absolutePath}")
                 } catch (e: Exception) {
-                    logger.error("Failed to record build ID for $variantName: ${e.message}")
+                    logger.error("Failed to record build ID for $name: ${e.message}")
                 }
             }
-        }
-
-        // Only run after assembly of this variant is done
-        tasks.named("assemble$capitalizedVariantName").configure {
-            finalizedBy("recordSplunkBuildId$capitalizedVariantName")
         }
     }
 }
