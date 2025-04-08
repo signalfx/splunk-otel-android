@@ -36,6 +36,9 @@ interface IAgentStorage {
     fun readSessionId(): String?
     fun deleteSessionId()
 
+    fun writePreviousSessionId(value: String?)
+    fun readPreviousSessionId(): String?
+
     fun writeSessionValidUntil(value: Long)
     fun readSessionValidUntil(): Long?
     fun deleteSessionValidUntil()

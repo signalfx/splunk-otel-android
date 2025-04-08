@@ -121,6 +121,17 @@ class AgentStorage(context: Context) : IAgentStorage {
         preferences.remove(SESSION_ID)
     }
 
+    override fun writePreviousSessionId(value: String?) {
+        if (value == null)
+            preferences.remove(PREVIOUS_SESSION_ID)
+        else
+            preferences.putString(PREVIOUS_SESSION_ID, value).commit()
+    }
+
+    override fun readPreviousSessionId(): String? {
+        return preferences.getString(PREVIOUS_SESSION_ID)
+    }
+
     override fun writeSessionValidUntil(value: Long) {
         preferences.putLong(SESSION_VALID_UNTIL, value).commit()
     }
@@ -166,6 +177,7 @@ class AgentStorage(context: Context) : IAgentStorage {
 
         return success
     }
+
     override fun readOtelSpanData(id: String): ByteArray? {
         val file: File = otelSpanDataFile(id)
         return encryptedStorage.readBytes(file)
@@ -207,6 +219,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val DEVICE_ID = "DEVICE_ID"
         private const val ANON_ID = "ANON_ID"
         private const val SESSION_ID = "SESSION_ID"
+        private const val PREVIOUS_SESSION_ID = "PREVIOUS_SESSION_ID"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
 

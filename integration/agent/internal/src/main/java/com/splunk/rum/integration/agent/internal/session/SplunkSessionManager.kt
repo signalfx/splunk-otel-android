@@ -18,10 +18,10 @@ package com.splunk.rum.integration.agent.internal.session
 
 import android.app.Application
 import android.content.Context
-import com.cisco.android.common.id.NanoId
 import com.cisco.android.common.utils.AppStateObserver
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.cisco.android.common.utils.extensions.safeSchedule
+import com.splunk.rum.integration.agent.internal.utils.TraceId
 import com.splunk.sdk.common.storage.IAgentStorage
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -45,9 +45,15 @@ class SplunkSessionManager internal constructor(
     var sessionId: String
         get() = createNewSessionIfNeeded()
         private set(value) {
+            previousSessionId = agentStorage.readSessionId()
+
             agentStorage.writeSessionId(value)
             agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
         }
+
+    var previousSessionId: String?
+        get() = agentStorage.readPreviousSessionId()
+        private set(value) = agentStorage.writePreviousSessionId(value)
 
     var sessionTimeout: Long = DEFAULT_SESSION_TIMEOUT
 
@@ -69,7 +75,7 @@ class SplunkSessionManager internal constructor(
 
     private fun createAnonIdIfNeeded() {
         if (agentStorage.readAnonId() == null) {
-            agentStorage.writeAnonId(NanoId.generate())
+            agentStorage.writeAnonId(TraceId.random())
         }
     }
 
@@ -94,7 +100,7 @@ class SplunkSessionManager internal constructor(
         deleteSessionInBackgroundValidationTime()
         deleteSessionValidationTime()
 
-        val newSessionId = NanoId.generate()
+        val newSessionId = TraceId.random()
         sessionId = newSessionId
         sessionListeners.forEachFast { it.onSessionChanged(newSessionId) }
         return newSessionId
@@ -160,7 +166,7 @@ class SplunkSessionManager internal constructor(
     }
 
     private companion object {
-        const val DEFAULT_SESSION_TIMEOUT = 15L * 60L * 1000L
-        const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L
+        const val DEFAULT_SESSION_TIMEOUT = 15L * 60L * 1000L // 15m
+        const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L // 4h
     }
 }
