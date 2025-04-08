@@ -104,11 +104,13 @@ android {
                         val appId = android.defaultConfig.applicationId ?: "unknown"
                         val versionCode = android.defaultConfig.versionCode ?: 0
 
-                        buildIdFile.writeText("""
-                        # App ID: $appId
-                        # Version Code: $versionCode
-                        
-                    """.trimIndent())
+                        buildIdFile.writeText(
+                            """
+                            # App ID: $appId
+                            # Version Code: $versionCode
+                            
+                            """.trimIndent(),
+                        )
                         logger.lifecycle("Created build ID file with app information")
                     }
                     buildIdFile.appendText("Variant: $name, Build ID: $uniqueBuildId\n")
