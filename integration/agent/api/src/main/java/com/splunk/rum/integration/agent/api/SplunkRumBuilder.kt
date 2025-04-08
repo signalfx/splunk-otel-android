@@ -129,6 +129,7 @@ class SplunkRumBuilder {
                 throw IllegalStateException("setRealm() or setBeaconEndpoint() was not called")
         }
 
+
         val agent = install(
             application,
             agentConfiguration = AgentConfiguration(
@@ -138,11 +139,11 @@ class SplunkRumBuilder {
                 enableDebugLogging = enableDebug,
                 sessionSamplingRate = sessionBasedSampling,
                 globalAttributes = globalAttributes,
-                spanFilter = if (spanFilter != null) {
-                    { spanFilterBuilder ->
-                        spanFilter?.accept(spanFilterBuilder)
-                    }
-                } else null
+                spanFilter = this.spanFilter?.let {
+                    val spanFilterBuilder = SpanFilterBuilder()
+                    it.accept(spanFilterBuilder)
+                    spanFilterBuilder.toSpanInterceptor()
+                },
             )
         )
 

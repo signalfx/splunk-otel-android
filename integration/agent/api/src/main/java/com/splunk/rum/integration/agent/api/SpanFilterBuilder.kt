@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
+@file:Suppress("UNCHECKED_CAST")
+
 package com.splunk.rum.integration.agent.api
 
 
-import io.opentelemetry.android.export.SpanDataModifier
 import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.sdk.trace.export.SpanExporter
-import java.util.function.Function
-import java.util.function.Predicate
+import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.sdk.trace.data.SpanData
 
+@Deprecated("TODO")
 /** Delegating wrapper around otel SpanDataModifier.  */
-class SpanFilterBuilder internal constructor(exporter: SpanExporter) {
-    private val spanDataModifier: SpanDataModifier = SpanDataModifier.builder(exporter)
+class SpanFilterBuilder internal constructor() {
+    internal val rejectSpanNames: MutableList<(String) -> Boolean> = mutableListOf()
+    internal val rejectSpanAttributes: MutableMap<AttributeKey<*>, (Any) -> Boolean> = mutableMapOf()
+    internal val spanAttributeReplacements: MutableMap<AttributeKey<*>, (Any) -> Any?> = mutableMapOf()
 
     /**
      * Remove matching spans from the exporter pipeline.
@@ -38,8 +41,7 @@ class SpanFilterBuilder internal constructor(exporter: SpanExporter) {
      * @return `this`.
      */
     fun rejectSpansByName(spanNamePredicate: (String) -> Boolean): SpanFilterBuilder {
-        // TODO: Use pure upstream mechanism for this
-        spanDataModifier.rejectSpansByName(spanNamePredicate)
+        rejectSpanNames.add(spanNamePredicate)
         return this
     }
 
@@ -55,11 +57,11 @@ class SpanFilterBuilder internal constructor(exporter: SpanExporter) {
      * with matching value should be rejected.
      * @return `this`.
      */
-    fun <T> rejectSpansByAttributeValue(
+    fun <T : Any> rejectSpansByAttributeValue(
         attributeKey: AttributeKey<T>,
         attributeValuePredicate: (T) -> Boolean,
     ): SpanFilterBuilder {
-        spanDataModifier.rejectSpansByAttributeValue(attributeKey, attributeValuePredicate)
+        rejectSpanAttributes[attributeKey] = attributeValuePredicate as (Any) -> Boolean
         return this
     }
 
@@ -73,7 +75,7 @@ class SpanFilterBuilder internal constructor(exporter: SpanExporter) {
      * @param attributeKey An attribute key to match.
      * @return `this`.
      */
-    fun <T> removeSpanAttribute(attributeKey: AttributeKey<T>): SpanFilterBuilder {
+    fun <T : Any> removeSpanAttribute(attributeKey: AttributeKey<T>): SpanFilterBuilder {
         return removeSpanAttribute(attributeKey, { true })
     }
 
@@ -94,7 +96,7 @@ class SpanFilterBuilder internal constructor(exporter: SpanExporter) {
     ): SpanFilterBuilder {
         return replaceSpanAttribute(
             attributeKey,
-            { old: T -> if (attributeValuePredicate.invoke(old)) null else old }
+            { old -> if (attributeValuePredicate(old)) null else old }
         )
     }
 
@@ -115,11 +117,49 @@ class SpanFilterBuilder internal constructor(exporter: SpanExporter) {
         attributeKey: AttributeKey<T>,
         attributeValueModifier: (T) -> T?
     ): SpanFilterBuilder {
-        spanDataModifier.replaceSpanAttribute(attributeKey, attributeValueModifier)
+        spanAttributeReplacements[attributeKey] = attributeValueModifier as (Any) -> Any?
         return this
     }
+}
 
-    internal fun build(): SpanExporter {
-        return spanDataModifier.build()
+internal fun SpanFilterBuilder.toSpanInterceptor(): ((SpanData) -> SpanData?) {
+    val filter: (SpanData) -> SpanData? = filter@{ spanData: SpanData ->
+        // Step 1: reject spans by name
+        val rejectName = rejectSpanNames.any { predicate ->
+            predicate(spanData.name)
+        }
+        if (rejectName) {
+            return@filter null
+        }
+
+        // Step 2: reject spans by attribute value
+        val rejectAttribute = rejectSpanAttributes.any { predicate ->
+            val attribute = spanData.attributes.get(predicate.key)
+            if (attribute != null) {
+                predicate.value(attribute)
+            } else false
+        }
+        if (rejectAttribute) {
+            return@filter null
+        }
+
+        if (spanAttributeReplacements.isEmpty()) {
+            return@filter spanData
+        }
+
+        // Step 3: replace attributes
+        val newAttributes = Attributes.builder()
+        spanData.attributes.forEach { key, attrValue ->
+            val reMapper = spanAttributeReplacements[key]
+            if (reMapper != null) {
+                val newValue = reMapper.invoke(attrValue)
+                newValue?.let {
+                    newAttributes.put(key as AttributeKey<Any>, newValue)
+                }
+            }
+        }
+
+        return@filter ModifiedSpanData(original = spanData, modifiedAttributes = newAttributes.build())
     }
+    return filter
 }

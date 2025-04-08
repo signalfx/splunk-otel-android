@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.api
 
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.sdk.trace.data.SpanData
 
 data class AgentConfiguration(
     val endpoint: EndpointConfiguration,
@@ -27,7 +28,7 @@ data class AgentConfiguration(
     val enableDebugLogging: Boolean = false,
     val sessionSamplingRate: Double = 1.0,
     val globalAttributes: Attributes? = null,
-    val spanFilter: ((SpanFilterBuilder) -> Unit)? = null,
+    val spanFilter: ((SpanData) -> SpanData?)? = null,
     val user: UserConfiguration = UserConfiguration(),
     val session: Any? = null, // TODO,
 ) {
