@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.customtracking
+package com.splunk.rum.integration.customtracking
 
 import com.cisco.android.common.logger.Logger
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
