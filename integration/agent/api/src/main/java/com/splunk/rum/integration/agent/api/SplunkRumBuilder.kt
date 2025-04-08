@@ -35,6 +35,7 @@ class SplunkRumBuilder {
     private var globalAttributes: Attributes? = null
     private var sessionBasedSampling = 1.0
     private var spanFilter: Consumer<SpanFilterBuilder>? = null
+    private var instrumentedProcessName: String? = null
     private var maxUsageMegabytes: Int = 25
 
     fun setRumAccessToken(token: String): SplunkRumBuilder {
@@ -99,7 +100,8 @@ class SplunkRumBuilder {
         return this
     }
 
-    fun disableSubprocessInstrumentation(): SplunkRumBuilder { // TODO
+    fun disableSubprocessInstrumentation(applicationId: String): SplunkRumBuilder {
+        instrumentedProcessName = applicationId
         return this
     }
 
@@ -139,6 +141,7 @@ class SplunkRumBuilder {
                 enableDebugLogging = enableDebug,
                 sessionSamplingRate = sessionBasedSampling,
                 globalAttributes = globalAttributes,
+                instrumentedProcessName = instrumentedProcessName,
                 spanFilter = this.spanFilter?.let {
                     val spanFilterBuilder = SpanFilterBuilder()
                     it.accept(spanFilterBuilder)
@@ -148,7 +151,6 @@ class SplunkRumBuilder {
         )
 
         // TODO limitDiskUsageMegabytes
-        // TODO disableSubprocessInstrumentation
         // TODO enableBackgroundInstrumentationDeferredUntilForeground
 
         return agent

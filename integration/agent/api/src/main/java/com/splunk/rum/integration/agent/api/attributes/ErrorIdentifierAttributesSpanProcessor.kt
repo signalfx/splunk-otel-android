@@ -12,12 +12,12 @@ internal class ErrorIdentifierAttributesSpanProcessor(application: Application) 
 
     private var applicationId: String? = null
     private var versionCode: String? = null
-    private var customUUID: String? = null
+    private var splunkBuildId: String? = null
 
     init {
         applicationId = ApplicationInfoUtils.retrieveApplicationId(application)
         versionCode = ApplicationInfoUtils.retrieveVersionCode(application)
-        customUUID = ApplicationInfoUtils.retrieveCustomUUID(application)
+        splunkBuildId = ApplicationInfoUtils.retrieveSplunkBuildID(application)
     }
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
@@ -29,8 +29,8 @@ internal class ErrorIdentifierAttributesSpanProcessor(application: Application) 
             versionCode?.let {
                 span.setAttribute(RumConstants.APP_VERSION_CODE_KEY, it)
             }
-            customUUID?.let {
-                span.setAttribute(RumConstants.SPLUNK_OLLY_UUID_KEY, it)
+            splunkBuildId?.let {
+                span.setAttribute(RumConstants.SPLUNK_BUILD_ID, it)
             }
         }
     }

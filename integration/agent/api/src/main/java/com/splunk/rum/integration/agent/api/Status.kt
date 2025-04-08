@@ -6,6 +6,7 @@ sealed interface Status {
         enum class Cause {
             SampledOut,
             NotInstalled,
+            Subprocess
         }
     }
 }

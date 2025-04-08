@@ -26,11 +26,12 @@ data class AgentConfiguration(
     var deploymentEnvironment: String,
     var appVersion: String? = null,
     val enableDebugLogging: Boolean = false,
-    val sessionSamplingRate: Double = 1.0,
+    val sessionSamplingRate: Double = 1.0, // TODO move to session
     val globalAttributes: Attributes? = null,
     val spanFilter: ((SpanData) -> SpanData?)? = null,
     val user: UserConfiguration = UserConfiguration(),
     val session: Any? = null, // TODO,
+    val instrumentedProcessName: String? = null,
 ) {
     internal companion object {
         val noop = AgentConfiguration(
