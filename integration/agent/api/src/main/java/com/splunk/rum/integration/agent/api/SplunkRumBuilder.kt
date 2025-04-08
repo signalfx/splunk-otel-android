@@ -120,7 +120,7 @@ class SplunkRumBuilder {
 
         val endpointConfiguration = when {
             realm != null -> EndpointConfiguration(
-                realm = realm
+                realm = realm, accessToken ?: throw IllegalStateException("rumAccessToken was not set")
             )
 
             beaconEndpoint != null -> EndpointConfiguration(
@@ -131,22 +131,22 @@ class SplunkRumBuilder {
                 throw IllegalStateException("setRealm() or setBeaconEndpoint() was not called")
         }
 
+
         val agent = install(
             application,
             agentConfiguration = AgentConfiguration(
-                rumAccessToken = accessToken ?: throw IllegalStateException("rumAccessToken was not set"),
                 endpoint = endpointConfiguration,
                 appName = appName ?: throw IllegalStateException("applicationName was not set"),
-                deploymentEnvironment = deploymentEnvironment,
+                deploymentEnvironment = deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
                 enableDebugLogging = enableDebug,
                 sessionSamplingRate = sessionBasedSampling,
                 globalAttributes = globalAttributes,
                 instrumentedProcessName = instrumentedProcessName,
-                spanFilter = if (spanFilter != null) {
-                    { spanFilterBuilder ->
-                        spanFilter?.accept(spanFilterBuilder)
-                    }
-                } else null
+                spanFilter = this.spanFilter?.let {
+                    val spanFilterBuilder = SpanFilterBuilder()
+                    it.accept(spanFilterBuilder)
+                    spanFilterBuilder.toSpanInterceptor()
+                },
             )
         )
 

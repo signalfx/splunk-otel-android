@@ -36,12 +36,13 @@ class App : Application() {
         val agent = SplunkRum.install(
             application = this,
             agentConfiguration = AgentConfiguration(
-                rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw",
                 endpoint = EndpointConfiguration(
-                    realm = "lab0"
+                    realm = "lab0",
+                    rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw"
                 ),
                 appName = "Android demo app",
                 enableDebugLogging = true,
+                deploymentEnvironment = "test"
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
