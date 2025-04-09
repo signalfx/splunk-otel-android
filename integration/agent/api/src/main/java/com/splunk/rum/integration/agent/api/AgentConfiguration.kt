@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.api
 
-import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
+import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
 
 data class AgentConfiguration(
@@ -26,7 +26,7 @@ data class AgentConfiguration(
     var deploymentEnvironment: String? = null,
     var enableDebugLogging: Boolean = false,
     var sessionSamplingRate: Double = 1.0,
-    var globalAttributes: GlobalAttributes = GlobalAttributes(),
+    var globalAttributes: MutableAttributes = MutableAttributes(),
     var spanFilter: ((SpanFilterBuilder) -> Unit)? = null,
     var instrumentedProcessName: String? = null,
     var user: UserConfiguration = UserConfiguration()

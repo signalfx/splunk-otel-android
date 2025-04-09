@@ -21,7 +21,7 @@ import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
+import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
@@ -34,14 +34,13 @@ class App : Application() {
         // TODO: Reenable with the bridge support
         // BridgeManager.bridgeInterfaces += TomasBridgeInterface()
 
-        // uncomment the below and also the field passed into agentConfiguration to test global
-        // attribute setting at agent initialization
-//        val globalAttributes = GlobalAttributes()
-//        globalAttributes["name"] = "John"
-//        globalAttributes["surname"] = "Doe"
-//        globalAttributes["age"] = 32
-//        globalAttributes["email"] = "john.doe@example.com"
-//        globalAttributes["isValid"] = true
+        val globalAttributes = MutableAttributes()
+        // Uncomment the following to test global attributes
+        // globalAttributes["session.id"] = "wrong"
+        // globalAttributes["name"] = "John Doe"
+        // globalAttributes["age"] = 32
+        // globalAttributes["email"] = "john.doe@example.com"
+        // globalAttributes["isValid"] = true
 
         val agent = SplunkRum.install(
             application = this,
@@ -52,7 +51,7 @@ class App : Application() {
                 ),
                 appName = "Android demo app",
                 enableDebugLogging = true,
-//                globalAttributes = globalAttributes
+                globalAttributes = globalAttributes
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(

@@ -32,7 +32,7 @@ import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.util.FragmentAnimation
 import com.splunk.rum.customtracking.extension.customTracking
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.api.attributes.extension.globalAttributes
+import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.extension.splunkRumId
 import com.splunk.rum.integration.navigation.extension.navigation
 import io.opentelemetry.api.common.AttributeKey
@@ -130,10 +130,11 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
             viewBinding.httpurlconnection.id ->
                 navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
             viewBinding.trackCustomEvent.id -> {
-                val testAttributes = Attributes.builder()
-                    .put("attribute.one", "value1")
-                    .put("attribute.two", "12345")
-                    .build()
+                val testAttributes = MutableAttributes().also { attributes ->
+                    attributes["attribute.one"] = "value1"
+                    attributes["attribute.two"] = "12345"
+                }
+
                 SplunkRum.instance.customTracking.trackCustomEvent("TestEvent", testAttributes)
                 showDoneToast("Track Custom Event, Done!")
             }
@@ -163,10 +164,11 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
                     StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
                 )
-                val testAttributes = Attributes.builder()
-                    .put("attribute.one", "value1")
-                    .put("attribute.two", "12345")
-                    .build()
+                val testAttributes = MutableAttributes().also { attributes ->
+                    attributes["attribute.one"] = "value1"
+                    attributes["attribute.two"] = "12345"
+                }
+
                 SplunkRum.instance.customTracking.trackException(e, testAttributes)
                 showDoneToast("Track Exception with Attributes")
             }

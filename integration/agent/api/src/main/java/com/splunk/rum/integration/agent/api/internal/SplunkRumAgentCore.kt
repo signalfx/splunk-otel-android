@@ -22,7 +22,6 @@ import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.attributes.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
-import com.splunk.rum.integration.agent.api.attributes.GlobalAttributes
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.extension.toResource
@@ -45,7 +44,6 @@ import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.api.OpenTelemetry
-import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import io.opentelemetry.sdk.trace.export.SpanExporter
 
@@ -91,11 +89,6 @@ internal object SplunkRumAgentCore {
         val stateManager = StateManager.obtainInstance(application)
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
-        agentConfiguration.globalAttributes.getAll().forEach { key, value ->
-            @Suppress("UNCHECKED_CAST")
-            GlobalAttributes.instance[key as AttributeKey<Any>] = value
-        }
-
         val spanFilter: (SpanExporter) -> SpanExporter = { spanExporter ->
             if (agentConfiguration.spanFilter != null) {
                 val spanFilterBuilder = SpanFilterBuilder(spanExporter)
@@ -105,10 +98,12 @@ internal object SplunkRumAgentCore {
         }
 
         val initializer = OpenTelemetryInitializer(application, spanFilter)
+            // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
+            // do not override internal agent attributes required by the backend.
+            .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
-            .addSpanProcessor(GlobalAttributeSpanProcessor())
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
