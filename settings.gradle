@@ -15,8 +15,7 @@ include ':common:otel',
 // Instrumentation modules
 include ':instrumentation:runtime:startup',
         ':instrumentation:buildtime:httpurlconnection:plugin',
-        ':instrumentation:buildtime:okhttp3:plugin',
-        ':instrumentation:runtime:customtracking' // TODO Move the code to the integration module
+        ':instrumentation:buildtime:okhttp3:plugin'
 
 // Integration
 include ':integration:agent:api',
@@ -30,7 +29,9 @@ include ':integration:agent:api',
         ':integration:sessionreplay',
         ':integration:interactions',
         ':integration:navigation',
-        ':integration:okhttp'
+        ':integration:okhttp',
+        ':integration:lifecycle',
+        ':integration:customtracking'
 
 // Test App
 include ':app'

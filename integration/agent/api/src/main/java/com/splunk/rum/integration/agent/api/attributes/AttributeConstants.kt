@@ -21,6 +21,7 @@ import io.opentelemetry.api.common.AttributeKey
 internal object AttributeConstants {
     val USER_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("user.anonymous_id")
     val SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.id")
+    val PREVIOUS_SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.previous_id")
     val STATE: AttributeKey<String> = AttributeKey.stringKey("android.state")
     val DOMAIN: AttributeKey<String> = AttributeKey.stringKey("event.domain")
     val NAME: AttributeKey<String> = AttributeKey.stringKey("event.name")

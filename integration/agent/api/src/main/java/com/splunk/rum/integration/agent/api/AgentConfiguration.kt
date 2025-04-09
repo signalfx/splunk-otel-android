@@ -18,24 +18,26 @@ package com.splunk.rum.integration.agent.api
 
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
+import io.opentelemetry.sdk.trace.data.SpanData
 
 data class AgentConfiguration(
-    val rumAccessToken: String,
     val endpoint: EndpointConfiguration,
-    val appName: String,
-    var deploymentEnvironment: String? = null,
-    var enableDebugLogging: Boolean = false,
-    var sessionSamplingRate: Double = 1.0,
-    var globalAttributes: MutableAttributes = MutableAttributes(),
-    var spanFilter: ((SpanFilterBuilder) -> Unit)? = null,
-    var instrumentedProcessName: String? = null,
-    var user: UserConfiguration = UserConfiguration()
+    var appName: String,
+    var deploymentEnvironment: String,
+    var appVersion: String? = null,
+    val enableDebugLogging: Boolean = false,
+    val sessionSamplingRate: Double = 1.0, // TODO move to session
+    val globalAttributes: MutableAttributes = MutableAttributes(),
+    val spanFilter: ((SpanData) -> SpanData?)? = null,
+    val user: UserConfiguration = UserConfiguration(),
+    val session: Any? = null, // TODO,
+    val instrumentedProcessName: String? = null,
 ) {
     internal companion object {
         val noop = AgentConfiguration(
-            rumAccessToken = "",
             endpoint = EndpointConfiguration(),
             appName = "",
+            deploymentEnvironment = ""
         )
     }
 }

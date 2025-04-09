@@ -30,7 +30,7 @@ import com.splunk.app.ui.BaseFragment
 import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.util.FragmentAnimation
-import com.splunk.rum.customtracking.extension.customTracking
+import com.splunk.rum.integration.customtracking.extension.customTracking
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.extension.splunkRumId

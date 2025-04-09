@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.customtracking.extension
+package com.splunk.rum.integration.lifecycle.screen.activity
 
-import com.splunk.rum.customtracking.CustomTracking
-import com.splunk.rum.integration.agent.api.SplunkRum
+import com.cisco.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.rum.integration.lifecycle.screen.VisibleScreenTracker
 
-/**
- * Extension property to access the [CustomTracking] instance via [SplunkRum].
- */
-@Suppress("UnusedReceiverParameter")
-val SplunkRum.customTracking: CustomTracking
-    get() = CustomTracking.instance
+internal interface ActivityCallback : ActivityLifecycleCallbacksAdapter {
+    val tracker: VisibleScreenTracker
+}
