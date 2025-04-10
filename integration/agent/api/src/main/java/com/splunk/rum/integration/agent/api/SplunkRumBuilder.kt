@@ -84,11 +84,6 @@ class SplunkRumBuilder {
         return this
     }
 
-    fun limitDiskUsageMegabytes(maxUsageMegabytes: Int): SplunkRumBuilder {
-        this.maxUsageMegabytes = maxUsageMegabytes
-        return this
-    }
-
     fun enableSessionBasedSampling(ratio: Double): SplunkRumBuilder {
         if (ratio < 0)
             Logger.w(TAG, "enableSessionBasedSampling(ratio: $ratio) - ratio can not be lower then 0")
@@ -111,6 +106,11 @@ class SplunkRumBuilder {
 
     @Deprecated("This is no longer supported")
     fun enableDiskBuffering(enable: Boolean): SplunkRumBuilder {
+        return this
+    }
+
+    @Deprecated("This is no longer supported")
+    fun limitDiskUsageMegabytes(maxUsageMegabytes: Int): SplunkRumBuilder {
         return this
     }
 
