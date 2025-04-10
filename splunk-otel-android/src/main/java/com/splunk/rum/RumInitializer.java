@@ -32,6 +32,8 @@ import static java.util.Objects.requireNonNull;
 
 import android.app.Application;
 import android.os.Looper;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.splunk.rum.internal.GlobalAttributesSupplier;
@@ -50,6 +52,7 @@ import io.opentelemetry.android.instrumentation.lifecycle.AndroidLifecycleInstru
 import io.opentelemetry.android.instrumentation.network.CurrentNetworkProvider;
 import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingDetector;
 import io.opentelemetry.android.instrumentation.startup.AppStartupTimer;
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
@@ -503,6 +506,17 @@ class RumInitializer {
 
         @Override
         public CompletableResultCode export(Collection<SpanData> spans) {
+            for (SpanData span : spans) {
+                if (span.getAttributes().get(AttributeKey.stringKey("exception.stacktrace")) != null) {
+                    Log.e("Splunkrum", "span: " + span);
+                    Log.e("Splunkrum", "~~~~~~");
+                    Log.e("Splunkrum", "stacktrace: " + span.getAttributes().get(AttributeKey.stringKey("exception.stacktrace")));
+                }
+//                else {
+//                    Log.e("Splunkrum", "removing span");
+//                    spans.remove(span);
+//                }
+            }
             return getDelegate().export(spans);
         }
 

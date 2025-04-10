@@ -20,7 +20,7 @@ android {
         applicationId = "com.splunk.android.sample"
         minSdk = 21
         targetSdk = 35
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -42,7 +42,7 @@ android {
             val accessToken = localProperties["rum.access.token"] as String?
             resValue("string", "rum_realm", realm ?: "us0")
             resValue("string", "rum_access_token", accessToken ?: "dummyAuth")
-            isMinifyEnabled = false // set to true to enable obfuscation
+            isMinifyEnabled = true // set to true to enable obfuscation
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
