@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.cisco.android.common.utils.extensions.get
 import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentMenuBinding
@@ -30,10 +29,10 @@ import com.splunk.app.ui.BaseFragment
 import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.util.FragmentAnimation
-import com.splunk.rum.integration.customtracking.extension.customTracking
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.extension.splunkRumId
+import com.splunk.rum.integration.customtracking.extension.customTracking
 import com.splunk.rum.integration.navigation.extension.navigation
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -234,7 +233,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 showDoneToast("Remove All Global Attributes")
             }
             viewBinding.getAllGlobalAttributes.id -> {
-                val allAttributes = SplunkRum.instance.globalAttributes.getAll()
+                val allAttributes = SplunkRum.instance.globalAttributes
                 AlertDialog.Builder(context)
                     .setTitle("All Global Attributes")
                     .setMessage(allAttributes.toString())
