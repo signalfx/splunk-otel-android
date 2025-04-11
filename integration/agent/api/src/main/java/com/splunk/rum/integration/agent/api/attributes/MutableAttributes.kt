@@ -3,6 +3,7 @@ package com.splunk.rum.integration.agent.api.attributes
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
+import java.util.function.BiConsumer
 
 /**
  * A utility class for managing custom RUM attributes.
@@ -10,7 +11,7 @@ import io.opentelemetry.api.common.AttributesBuilder
 class MutableAttributes(
     @Volatile
     private var attributes: Attributes = Attributes.empty()
-) {
+): Attributes {
 
     /**
      * Retrieves the value associated with the given [AttributeKey].
@@ -18,7 +19,7 @@ class MutableAttributes(
      * @param key the attribute key to retrieve
      * @return the value if present, or null
      */
-    operator fun <T> get(key: AttributeKey<T>): T? = key.let { attributes.get(it) }
+    override operator fun <T> get(key: AttributeKey<T>): T? = key.let { attributes.get(it) }
 
     /**
      * Retrieves the value associated with the given key string.
@@ -131,6 +132,17 @@ class MutableAttributes(
     fun update(updateAttributes: AttributesBuilder.() -> Unit) {
         attributes = attributes.edit(updateAttributes)
     }
+
+    override fun forEach(consumer: BiConsumer<in AttributeKey<*>, in Any>) =
+        attributes.forEach(consumer)
+
+    override fun size(): Int = attributes.size()
+
+    override fun isEmpty(): Boolean = attributes.isEmpty
+
+    override fun asMap(): MutableMap<AttributeKey<*>, Any> = attributes.asMap()
+
+    override fun toBuilder(): AttributesBuilder = attributes.toBuilder()
 
     private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes {
         return toBuilder().apply(block).build()

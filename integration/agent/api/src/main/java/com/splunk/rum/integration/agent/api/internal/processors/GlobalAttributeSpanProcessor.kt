@@ -1,15 +1,15 @@
 package com.splunk.rum.integration.agent.api.internal.processors
 
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-class GlobalAttributeSpanProcessor(private val globalAttributes: MutableAttributes) : SpanProcessor {
+class GlobalAttributeSpanProcessor(private val globalAttributes: Attributes) : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        span.setAllAttributes(globalAttributes.getAll())
+        span.setAllAttributes(globalAttributes)
     }
 
     override fun isStartRequired(): Boolean {

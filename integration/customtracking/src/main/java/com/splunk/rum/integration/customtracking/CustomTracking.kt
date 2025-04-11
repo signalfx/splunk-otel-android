@@ -37,7 +37,7 @@ class CustomTracking internal constructor() {
      */
     fun trackCustomEvent(name: String, attributes: MutableAttributes) {
         val tracer = getTracer() ?: return
-        tracer.spanBuilder(name).setAllAttributes(attributes.getAll()).startSpan().end()
+        tracer.spanBuilder(name).setAllAttributes(attributes).startSpan().end()
     }
 
     /**
@@ -82,7 +82,7 @@ class CustomTracking internal constructor() {
         val tracer = getTracer() ?: return
         val spanBuilder = tracer.spanBuilder(throwable.javaClass.simpleName)
         attributes?.let {
-            spanBuilder.setAllAttributes(it.getAll())
+            spanBuilder.setAllAttributes(it)
         }
         spanBuilder.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
             .startSpan()
