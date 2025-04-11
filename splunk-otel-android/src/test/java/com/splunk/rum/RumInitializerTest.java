@@ -61,7 +61,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-
 import zipkin2.reporter.okhttp3.OkHttpSender;
 
 @ExtendWith(MockitoExtension.class)
