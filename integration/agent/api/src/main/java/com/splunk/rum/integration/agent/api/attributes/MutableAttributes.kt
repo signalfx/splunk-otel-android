@@ -1,0 +1,138 @@
+package com.splunk.rum.integration.agent.api.attributes
+
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.common.AttributesBuilder
+
+/**
+ * A utility class for managing custom RUM attributes.
+ */
+class MutableAttributes(
+    @Volatile
+    private var attributes: Attributes = Attributes.empty()
+) {
+
+    /**
+     * Retrieves the value associated with the given [AttributeKey].
+     *
+     * @param key the attribute key to retrieve
+     * @return the value if present, or null
+     */
+    operator fun <T> get(key: AttributeKey<T>): T? = key.let { attributes.get(it) }
+
+    /**
+     * Retrieves the value associated with the given key string.
+     *
+     * @param key the string key to retrieve
+     * @return the value if present, or null
+     * @throws ClassCastException if the stored value is not of the expected type
+     */
+    @Suppress("UNCHECKED_CAST")
+    operator fun <T> get(key: String): T? =
+        attributes.get(AttributeKey.stringKey(key)) as (T)
+
+    /**
+     * Sets a String value for the given key.
+     *
+     * @param key the key to set
+     * @param value the value to associate
+     */
+    operator fun set(key: String, value: String) {
+        attributes = attributes.edit { put(AttributeKey.stringKey(key), value) }
+    }
+
+    /**
+     * Sets a Long value for the given key.
+     *
+     * @param key the key to set
+     * @param value the value to associate
+     */
+    operator fun set(key: String, value: Long) {
+        attributes = attributes.edit { put(AttributeKey.longKey(key), value) }
+    }
+
+    /**
+     * Sets a Double value for the given key.
+     *
+     * @param key the key to set
+     * @param value the value to associate
+     */
+    operator fun set(key: String, value: Double) {
+        attributes = attributes.edit { put(AttributeKey.doubleKey(key), value) }
+    }
+
+    /**
+     * Sets a Boolean value for the given key.
+     *
+     * @param key the key to set
+     * @param value the value to associate
+     */
+    operator fun set(key: String, value: Boolean) {
+        attributes = attributes.edit { put(AttributeKey.booleanKey(key), value) }
+    }
+
+    /**
+     * Sets a value for a given [AttributeKey].
+     *
+     * @param key the attribute key
+     * @param value the value to associate
+     */
+    operator fun <T : Any> set(key: AttributeKey<T>, value: T) {
+        attributes = attributes.edit { put(key, value) }
+    }
+
+    /**
+     * Removes the attribute associated with the given [AttributeKey].
+     *
+     * @param key the attribute key
+     */
+    fun <T> remove(key: AttributeKey<T>) {
+        attributes = attributes.edit { remove(key) }
+    }
+
+    /**
+     * Removes the attribute associated with the given key string.
+     *
+     * @param key the string key to remove
+     */
+    fun remove(key: String) {
+        attributes = attributes.edit { removeIf { it.key == key } }
+    }
+
+    /**
+     * Removes all attributes.
+     */
+    fun removeAll() {
+        attributes = Attributes.empty()
+    }
+
+    /**
+     * Sets multiple attributes at once from an existing [Attributes] instance.
+     *
+     * @param attributesToAdd the attributes to merge
+     */
+    fun setAll(attributesToAdd: Attributes) {
+        attributes = attributes.edit { putAll(attributesToAdd) }
+    }
+
+    /**
+     * Returns all stored attributes.
+     *
+     * @return the current attributes
+     */
+    fun getAll(): Attributes = attributes
+
+    /**
+     * Updates the attributes by applying the provided lambda to the current attributes.
+     * This allows clients to modify the attributes in a flexible way.
+     *
+     * @param updateAttributes a lambda to modify the current attributes. The lambda receives an [AttributesBuilder].
+     */
+    fun update(updateAttributes: AttributesBuilder.() -> Unit) {
+        attributes = attributes.edit(updateAttributes)
+    }
+
+    private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes {
+        return toBuilder().apply(block).build()
+    }
+}

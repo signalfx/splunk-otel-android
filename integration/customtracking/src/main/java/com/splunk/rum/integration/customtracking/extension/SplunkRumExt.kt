@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.customtracking.extension
 
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.customtracking.CustomTracking
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
@@ -30,7 +31,7 @@ val SplunkRum.customTracking: CustomTracking
 
 @Deprecated("Use customTracking.trackCustomEvent(name, attributes)", ReplaceWith("customTracking.trackCustomEvent(name, attributes)"))
 fun SplunkRum.addRumEvent(name: String, attributes: Attributes) {
-    customTracking.trackCustomEvent(name, attributes)
+    customTracking.trackCustomEvent(name, MutableAttributes(attributes))
 }
 
 @Deprecated("Use customTracking.trackWorkflow(workflowName)", ReplaceWith("customTracking.trackWorkflow(workflowName)"))
@@ -41,5 +42,5 @@ fun SplunkRum.startWorkflow(workflowName: String): Span? {
 @JvmOverloads
 @Deprecated("Use customTracking.trackException(throwable, attributes)", ReplaceWith("customTracking.trackException(throwable, attributes)"))
 fun SplunkRum.addRumException(throwable: Throwable, attributes: Attributes = Attributes.empty()) {
-    customTracking.trackException(throwable, attributes)
+    customTracking.trackException(throwable, MutableAttributes(attributes))
 }

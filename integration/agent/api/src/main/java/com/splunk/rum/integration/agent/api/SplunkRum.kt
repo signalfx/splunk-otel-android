@@ -21,6 +21,7 @@ import android.webkit.WebView
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
+import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.api.subprocess.SubprocessDetector
 import com.splunk.rum.integration.agent.api.user.User
@@ -45,10 +46,12 @@ class SplunkRum private constructor(
     val state: IState = State(agentConfiguration),
     val session: ISession = Session(ISession.State())
 ) {
-    // TODO separate task
-    var globalAttributes: Attributes = agentConfiguration.globalAttributes ?: Attributes.empty()
-
     val user: User = User(userManager)
+
+    /**
+     * Represents the global attributes configured for the agent.
+     */
+    val globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
     fun getRumSessionId(): String {

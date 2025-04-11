@@ -25,6 +25,7 @@ import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProce
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.extension.toResource
+import com.splunk.rum.integration.agent.api.internal.processors.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdLogProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
@@ -34,7 +35,7 @@ import com.splunk.rum.integration.agent.api.user.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
-import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
+import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.state.StateManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
@@ -87,11 +88,14 @@ internal object SplunkRumAgentCore {
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
         val initializer = OpenTelemetryInitializer(application, agentConfiguration.spanFilter)
+            // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
+            // do not override internal agent attributes required by the backend.
+            .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
-            .addSpanProcessor(GlobalAttributeSpanProcessor())
+            .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(UserIdLogProcessor(UserManager()))

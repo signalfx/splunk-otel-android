@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.customtracking
 
 import com.cisco.android.common.logger.Logger
+import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.Attributes
@@ -34,9 +35,9 @@ class CustomTracking internal constructor() {
      * @param name The name of the event.
      * @param attributes Any {@link Attributes} to associate with the event.
      */
-    fun trackCustomEvent(name: String, attributes: Attributes) {
+    fun trackCustomEvent(name: String, attributes: MutableAttributes) {
         val tracer = getTracer() ?: return
-        tracer.spanBuilder(name).setAllAttributes(attributes).startSpan().end()
+        tracer.spanBuilder(name).setAllAttributes(attributes.getAll()).startSpan().end()
     }
 
     /**
@@ -77,11 +78,11 @@ class CustomTracking internal constructor() {
      * @param throwable A [Throwable] associated with this event.
      * @param attributes Any [Attributes] to associate with the event.
      */
-    fun trackException(throwable: Throwable, attributes: Attributes?) {
+    fun trackException(throwable: Throwable, attributes: MutableAttributes?) {
         val tracer = getTracer() ?: return
         val spanBuilder = tracer.spanBuilder(throwable.javaClass.simpleName)
         attributes?.let {
-            spanBuilder.setAllAttributes(it)
+            spanBuilder.setAllAttributes(it.getAll())
         }
         spanBuilder.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
             .startSpan()
