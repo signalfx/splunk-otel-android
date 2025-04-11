@@ -108,6 +108,8 @@ class RumInitializer {
         // We are installing the crash reporter ourselves in installCrashReporter.
         // Disabling this one to prevent duplicate spans
         config.disableCrashReporting();
+        config.disableAnrDetection();  // Same with ANR
+
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
 
         otelRumBuilder.mergeResource(createSplunkResource());
