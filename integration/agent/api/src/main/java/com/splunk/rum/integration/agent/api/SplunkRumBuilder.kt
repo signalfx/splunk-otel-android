@@ -143,7 +143,7 @@ class SplunkRumBuilder {
                 sessionSamplingRate = sessionBasedSampling,
                 globalAttributes = globalAttributes,
                 instrumentedProcessName = instrumentedProcessName,
-                spanFilter = this.spanFilter?.let {
+                spanInterceptor = this.spanFilter?.let {
                     val spanFilterBuilder = SpanFilterBuilder()
                     it.accept(spanFilterBuilder)
                     spanFilterBuilder.toSpanInterceptor()
