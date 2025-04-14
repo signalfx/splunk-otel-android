@@ -38,12 +38,12 @@ import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.SpanProcessor
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
-import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.util.UUID
 
 class OpenTelemetryInitializer(
     application: Application,
-    spanInterceptor: ((SpanData) -> SpanData?)? = null
+    deferredUntilForeground: Boolean,
+    spanInterceptor: ((SpanData) -> SpanData?)? = null,
 ) {
 
     private var resource: Resource
@@ -64,7 +64,8 @@ class OpenTelemetryInitializer(
             AndroidSpanExporter(
                 agentStorage = agentStorage,
                 jobManager = jobManager,
-                jobIdStorage = jobIdStorage
+                jobIdStorage = jobIdStorage,
+                deferredUntilForeground = deferredUntilForeground,
             ),
             spanInterceptor
         )

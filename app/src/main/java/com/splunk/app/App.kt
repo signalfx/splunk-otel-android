@@ -52,7 +52,8 @@ class App : Application() {
                 appName = "Android demo app",
                 enableDebugLogging = true,
                 globalAttributes = globalAttributes,
-                deploymentEnvironment = "test"
+                deploymentEnvironment = "test",
+                deferredUntilForeground = true,
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(

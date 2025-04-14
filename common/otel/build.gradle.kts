@@ -25,6 +25,8 @@ android {
 
 dependencies {
     api(platform(Dependencies.Otel.instrumentationBomAlpha))
+    implementation("androidx.lifecycle:lifecycle-common-jvm:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
 
     compileOnly(Dependencies.Android.annotation)
 
