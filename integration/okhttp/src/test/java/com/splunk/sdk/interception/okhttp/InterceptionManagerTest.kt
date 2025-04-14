@@ -19,9 +19,7 @@ package com.splunk.sdk.interception.okhttp
 import com.splunk.rum.integration.agent.api.network.SplunkNetworkRequest
 import com.splunk.rum.integration.okhttp.InterceptionManager
 import com.splunk.rum.integration.okhttp.interceptor.SplunkHeadersInterceptor
-//import com.splunk.rum.integration.okhttp.interceptor.SplunkMaskBodyInterceptor
 import com.splunk.rum.integration.okhttp.interceptor.SplunkMaskUrlInterceptor
-//import com.splunk.rum.integration.okhttp.interceptor.SplunkNonBinaryBodyInterceptor
 import com.splunk.rum.integration.okhttp.interceptor.SplunkOkHttpInterceptor
 import com.splunk.rum.integration.okhttp.listener.OkHttpConnectorListenerDummy
 import com.splunk.rum.integration.okhttp.model.Mask
@@ -98,7 +96,6 @@ class InterceptionManagerTest {
         whenSuccessfulCallExecuted(request, response)
 
         thenStatusCodeIs(OK_STATUS_CODE)
-        //thenStatusIs(SplunkNetworkRequest.Status.OK)
         thenInterceptedUrlIs(mockURL)
         thenInterceptedMethodIs(GET_METHOD)
     }
@@ -352,8 +349,6 @@ class InterceptionManagerTest {
         whenFailedCallExecuted(request)
 
         thenStatusCodeIs(UNKNOWN_STATUS_CODE)
-        //thenStatusIs(SplunkNetworkRequest.Status.ERROR)
-        //thenResponseBodyIs(null)
     }
 
     @Test
@@ -504,10 +499,6 @@ class InterceptionManagerTest {
         Assert.assertEquals(statusCode, sdkConnector.request?.statusCode)
     }
 
-    /*private fun thenStatusIs(status: SplunkNetworkRequest.Status) {
-        Assert.assertEquals(status, sdkConnector.request?.status)
-    }*/
-
     private fun thenInterceptedMethodIs(method: String) {
         Assert.assertEquals(method, sdkConnector.request?.method)
     }
@@ -640,22 +631,12 @@ class InterceptionManagerTest {
         }
     }
 
-    /*class AllowAllContentTypesInterceptor : SplunkOkHttpInterceptor {
-        override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest {
-            intercepted.requestBody = Buffer().also { buffer -> original.request.body?.writeTo(buffer) }.readUtf8()
-            intercepted.responseBody = original.response?.peekBody(1_000_000_000)?.string()
-            return intercepted
-        }
-    }*/
-
     private companion object {
         const val UNKNOWN_STATUS_CODE = -1
         const val OK_STATUS_CODE = 200
         const val GET_METHOD = "GET"
         const val POST_METHOD = "POST"
 
-        val plainTextMediaType = "text/plain; charset=utf-8".toMediaType()
         val jsonMediaType = "application/json; charset=utf-8".toMediaType()
-        val binaryMediaType = "application/octet-stream".toMediaType()
     }
 }

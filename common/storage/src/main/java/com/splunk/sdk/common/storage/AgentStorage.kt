@@ -101,16 +101,6 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun readDeviceId(): String? = preferences.getString(DEVICE_ID)
 
-    override fun writeAnonId(value: String) {
-        preferences.putString(ANON_ID, value).commit()
-    }
-
-    override fun readAnonId(): String? = preferences.getString(ANON_ID)
-
-    override fun deleteAnonId() {
-        preferences.remove(ANON_ID)
-    }
-
     override fun writeSessionId(value: String) {
         preferences.putString(SESSION_ID, value).commit()
     }

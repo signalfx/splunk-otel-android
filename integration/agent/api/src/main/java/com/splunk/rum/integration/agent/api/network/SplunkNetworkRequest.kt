@@ -19,25 +19,9 @@ package com.splunk.rum.integration.agent.api.network
 import java.net.URL
 
 data class SplunkNetworkRequest(
-    //var start: Long,
-    //var duration: Long,
     var url: URL,
     var method: String,
-    //var protocol: String?,
-    //var initiator: String?,
-    //var status: Status,
     var statusCode: Int,
-    //var cached: Boolean,
-    //var requestBody: String?,
-    //var responseBody: String?,
     var requestHeaders: MutableMap<String, MutableList<String>>?,
     var responseHeaders: MutableMap<String, MutableList<String>>?
-) {
-
-    /*enum class Status(internal val code: String) {
-        OK("ok"),
-        ERROR("error"),
-        ABORT("abort"),
-        TIMEOUT("timeout")
-    }*/
-}
+)

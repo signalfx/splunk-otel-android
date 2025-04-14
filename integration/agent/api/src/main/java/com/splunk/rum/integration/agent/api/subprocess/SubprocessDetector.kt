@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-
 package com.splunk.rum.integration.agent.api.subprocess
 
 import android.app.Application
 import android.os.Build
 import com.cisco.android.common.utils.extensions.invoke
 import com.cisco.android.common.utils.extensions.toKClass
-
 
 internal object SubprocessDetector {
     fun isSubprocess(applicationId: String?): Boolean {
