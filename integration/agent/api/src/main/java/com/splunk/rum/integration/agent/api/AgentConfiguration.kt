@@ -20,6 +20,19 @@ import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import io.opentelemetry.sdk.trace.data.SpanData
 
+/**
+ * TODO: Fill in the documentation.
+ *
+ * @property spanInterceptor A function to intercept and optionally modify spans before they are exported.
+ * Can return `null` to drop a span. Default is `null` (no interception).
+ *
+ * If span interception and modification are required, consider using the [toMutableSpanData] extension method:
+ * ```kotlin
+ * val mutableSpanData: MutableSpanData = spanData.toMutableSpanData()
+ * ```
+ * This method allows you to convert a `SpanData` instance into a `MutableSpanData`, enabling you to modify span attributes,
+ * status, and other properties as needed during the interception process.
+ */
 data class AgentConfiguration(
     val endpoint: EndpointConfiguration,
     var appName: String,
@@ -28,7 +41,7 @@ data class AgentConfiguration(
     val enableDebugLogging: Boolean = false,
     val sessionSamplingRate: Double = 1.0, // TODO move to session
     val globalAttributes: MutableAttributes = MutableAttributes(),
-    val spanFilter: ((SpanData) -> SpanData?)? = null,
+    val spanInterceptor: ((SpanData) -> SpanData?)? = null,
     val user: UserConfiguration = UserConfiguration(),
     val session: Any? = null, // TODO,
     val instrumentedProcessName: String? = null,

@@ -147,7 +147,7 @@ class SplunkRumBuilder {
                 globalAttributes = globalAttributes,
                 instrumentedProcessName = instrumentedProcessName,
                 deferredUntilForeground = deferredUntilForeground,
-                spanFilter = this.spanFilter?.let {
+                spanInterceptor = this.spanFilter?.let {
                     val spanFilterBuilder = SpanFilterBuilder()
                     it.accept(spanFilterBuilder)
                     spanFilterBuilder.toSpanInterceptor()
