@@ -16,11 +16,14 @@
 
 package com.splunk.sdk.common.otel.span
 
+import android.app.Application
+import android.content.Context
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.cisco.android.common.job.IJobManager
 import com.cisco.android.common.job.JobIdStorage
+import com.cisco.android.common.utils.AppStateObserver
 import com.splunk.sdk.common.storage.IAgentStorage
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
@@ -36,24 +39,16 @@ internal class AndroidSpanExporter(
     private val agentStorage: IAgentStorage,
     private val jobManager: IJobManager,
     private val jobIdStorage: JobIdStorage,
-    private val deferredUntilForeground: Boolean
-) : SpanExporter, DefaultLifecycleObserver {
+    private val deferredUntilForeground: Boolean,
+    context: Context
+) : SpanExporter {
     private val buffer = mutableListOf<SpanData>()
+    private val appStateObserver = AppStateObserver()
     private var isForeground = false
 
     init {
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-    }
-
-    override fun onStart(owner: LifecycleOwner) {
-        isForeground = true
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        isForeground = false
-        if (deferredUntilForeground) {
-            flushBufferedSpans()
-        }
+        appStateObserver.listener = AppStateObserverListener()
+        appStateObserver.attach(context.applicationContext as Application)
     }
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {
@@ -94,4 +89,27 @@ internal class AndroidSpanExporter(
         // Job scheduling
         jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
     }
+
+    private inner class AppStateObserverListener : AppStateObserver.Listener {
+
+        override fun onAppStarted() {
+            isForeground = true
+        }
+
+        override fun onAppBackgrounded() {
+            isForeground = true
+        }
+
+        override fun onAppForegrounded() {
+            isForeground = false
+            if (deferredUntilForeground) {
+                flushBufferedSpans()
+            }
+        }
+
+        override fun onAppClosed() {
+            isForeground = false
+        }
+    }
 }
+

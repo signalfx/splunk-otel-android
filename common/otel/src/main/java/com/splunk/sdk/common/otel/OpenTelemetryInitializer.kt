@@ -19,6 +19,7 @@ package com.splunk.sdk.common.otel
 import android.app.Application
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.job.JobManager
+import com.cisco.android.common.utils.AppStateObserver
 import com.splunk.sdk.common.otel.internal.Resources
 import com.splunk.sdk.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.sdk.common.otel.span.AndroidSpanExporter
@@ -66,6 +67,7 @@ class OpenTelemetryInitializer(
                 jobManager = jobManager,
                 jobIdStorage = jobIdStorage,
                 deferredUntilForeground = deferredUntilForeground,
+                context = application.applicationContext
             ),
             spanInterceptor
         )
