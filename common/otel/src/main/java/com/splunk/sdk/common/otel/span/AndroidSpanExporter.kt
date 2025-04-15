@@ -18,9 +18,6 @@ package com.splunk.sdk.common.otel.span
 
 import android.app.Application
 import android.content.Context
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ProcessLifecycleOwner
 import com.cisco.android.common.job.IJobManager
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.utils.AppStateObserver
@@ -96,17 +93,16 @@ internal class AndroidSpanExporter(
             isForeground = true
         }
 
-        override fun onAppBackgrounded() {
+        override fun onAppForegrounded() {
             isForeground = true
         }
 
-        override fun onAppForegrounded() {
+        override fun onAppBackgrounded() {
             isForeground = false
             if (deferredUntilForeground) {
                 flushBufferedSpans()
             }
         }
-
         override fun onAppClosed() {
             isForeground = false
         }
