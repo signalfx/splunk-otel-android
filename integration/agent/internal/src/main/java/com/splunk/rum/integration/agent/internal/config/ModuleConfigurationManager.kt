@@ -24,16 +24,10 @@ class ModuleConfigurationManager internal constructor(
     private val agentStorage: IAgentStorage
 ) {
 
-    private var serverClock: ServerClock? = null
-
     var configurations: List<ModuleConfiguration> = emptyList()
         private set
 
     val listeners: MutableSet<Listener> = HashSet()
-
-    fun currentTimeMillis(): Long {
-        return serverClock?.currentTimeMillis() ?: System.currentTimeMillis()
-    }
 
     internal fun setup(moduleConfigurations: List<ModuleConfiguration>) {
         this.configurations = moduleConfigurations

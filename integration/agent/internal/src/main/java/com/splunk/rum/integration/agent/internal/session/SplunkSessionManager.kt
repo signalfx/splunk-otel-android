@@ -35,9 +35,6 @@ class SplunkSessionManager internal constructor(
 
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
 
-    val anonId: String
-        get() = agentStorage.readAnonId() ?: throw IllegalStateException("Should never be null")
-
     /**
      * The value is valid after the [install] function is called.
      */
@@ -61,22 +58,12 @@ class SplunkSessionManager internal constructor(
 
     val sessionListeners: MutableSet<SessionListener> = HashSet()
 
-    init {
-        createAnonIdIfNeeded()
-    }
-
     fun install(context: Context) {
         clearLastSession()
         createNewSessionIfNeeded()
 
         appStateObserver.listener = AppStateObserverListener()
         appStateObserver.attach(context.applicationContext as Application)
-    }
-
-    private fun createAnonIdIfNeeded() {
-        if (agentStorage.readAnonId() == null) {
-            agentStorage.writeAnonId(TraceId.random())
-        }
     }
 
     @Synchronized
