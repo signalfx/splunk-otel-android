@@ -45,6 +45,7 @@ data class AgentConfiguration(
     val user: UserConfiguration = UserConfiguration(),
     val session: Any? = null, // TODO,
     val instrumentedProcessName: String? = null,
+    val deferredUntilForeground: Boolean = false,
 ) {
     internal companion object {
         val noop = AgentConfiguration(
