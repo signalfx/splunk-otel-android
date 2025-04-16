@@ -14,14 +14,27 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.customtracking.extension
+package com.splunk.rum.integration.agent.internal.utils
 
-import com.splunk.rum.customtracking.CustomTracking
-import com.splunk.rum.integration.agent.api.SplunkRum
+import java.security.SecureRandom
 
-/**
- * Extension property to access the [CustomTracking] instance via [SplunkRum].
- */
-@Suppress("UnusedReceiverParameter")
-val SplunkRum.customTracking: CustomTracking
-    get() = CustomTracking.instance
+internal object TraceId {
+
+    private const val LENGTH = 16
+    private val INVALID = "0".repeat(LENGTH)
+    private val CHARACTERS = "0123456789abcdef"
+
+    fun random(): String {
+        val random = SecureRandom()
+        var result: String
+
+        do {
+            result = ""
+
+            for (i in 0 until LENGTH)
+                result += CHARACTERS[random.nextInt(CHARACTERS.length)]
+        } while (result == INVALID)
+
+        return result
+    }
+}

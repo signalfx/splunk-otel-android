@@ -25,18 +25,16 @@ import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProce
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.extension.toResource
+import com.splunk.rum.integration.agent.api.internal.processors.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdLogProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
-import com.splunk.rum.integration.agent.api.SpanFilterBuilder
-import com.splunk.rum.integration.agent.api.state.StateLogRecordProcessor
 import com.splunk.rum.integration.agent.api.user.UserIdLogProcessor
 import com.splunk.rum.integration.agent.api.user.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
-import com.splunk.rum.integration.agent.internal.span.GlobalAttributeSpanProcessor
-import com.splunk.rum.integration.agent.internal.state.StateManager
+import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
@@ -44,7 +42,6 @@ import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
-import io.opentelemetry.sdk.trace.export.SpanExporter
 
 internal object SplunkRumAgentCore {
 
@@ -85,27 +82,20 @@ internal object SplunkRumAgentCore {
                 moduleConfigurations = moduleConfigurations
             )
 
-        val stateManager = StateManager.obtainInstance(application)
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
-        val spanFilter: (SpanExporter) -> SpanExporter = { spanExporter ->
-            if (agentConfiguration.spanFilter != null) {
-                val spanFilterBuilder = SpanFilterBuilder(spanExporter)
-                agentConfiguration.spanFilter?.invoke(spanFilterBuilder)
-                spanFilterBuilder.build()
-            } else spanExporter
-        }
-
-        val initializer = OpenTelemetryInitializer(application, spanFilter)
+        val initializer = OpenTelemetryInitializer(application, agentConfiguration.deferredUntilForeground, agentConfiguration.spanInterceptor)
+            // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
+            // do not override internal agent attributes required by the backend.
+            .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
             .joinResources(finalConfiguration.toResource())
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
-            .addSpanProcessor(GlobalAttributeSpanProcessor())
+            .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(UserIdLogProcessor(UserManager()))
-            .addLogRecordProcessor(StateLogRecordProcessor(stateManager))
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
 
         if (agentConfiguration.enableDebugLogging)

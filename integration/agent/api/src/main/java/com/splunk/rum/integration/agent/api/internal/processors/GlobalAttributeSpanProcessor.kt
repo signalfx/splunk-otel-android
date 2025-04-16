@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.user
+package com.splunk.rum.integration.agent.api.internal.processors
 
-import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.USER_ID_KEY
-import com.splunk.rum.integration.agent.internal.user.IUserManager
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-internal class UserIdSpanProcessor(private val userManager: IUserManager) : SpanProcessor {
+class GlobalAttributeSpanProcessor(private val globalAttributes: Attributes) : SpanProcessor {
+
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        val userId = userManager.userId ?: return
-        span.setAttribute(USER_ID_KEY, userId)
+        span.setAllAttributes(globalAttributes)
     }
 
-    override fun isStartRequired(): Boolean = true
+    override fun isStartRequired(): Boolean {
+        return true
+    }
 
-    override fun onEnd(span: ReadableSpan) = Unit
+    override fun onEnd(span: ReadableSpan) {
+    }
 
-    override fun isEndRequired(): Boolean = false
+    override fun isEndRequired(): Boolean {
+        return false
+    }
 }

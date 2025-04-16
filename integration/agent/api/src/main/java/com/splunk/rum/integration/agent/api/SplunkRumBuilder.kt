@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
+import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import io.opentelemetry.api.common.Attributes
 import java.net.URL
 import java.util.function.Consumer
@@ -32,10 +33,11 @@ class SplunkRumBuilder {
     private var realm: String? = null
     private var beaconEndpoint: String? = null
     private var enableDebug: Boolean = false
-    private var globalAttributes: Attributes? = null
+    private var globalAttributes: MutableAttributes = MutableAttributes()
     private var sessionBasedSampling = 1.0
     private var spanFilter: Consumer<SpanFilterBuilder>? = null
     private var instrumentedProcessName: String? = null
+    private var deferredUntilForeground: Boolean = false
     private var maxUsageMegabytes: Int = 25
 
     fun setRumAccessToken(token: String): SplunkRumBuilder {
@@ -75,17 +77,12 @@ class SplunkRumBuilder {
     }
 
     fun setGlobalAttributes(attributes: Attributes): SplunkRumBuilder {
-        globalAttributes = attributes
+        globalAttributes.setAll(attributes)
         return this
     }
 
     fun filterSpans(spanFilter: Consumer<SpanFilterBuilder>): SplunkRumBuilder {
         this.spanFilter = spanFilter
-        return this
-    }
-
-    fun limitDiskUsageMegabytes(maxUsageMegabytes: Int): SplunkRumBuilder {
-        this.maxUsageMegabytes = maxUsageMegabytes
         return this
     }
 
@@ -105,12 +102,19 @@ class SplunkRumBuilder {
         return this
     }
 
-    fun enableBackgroundInstrumentationDeferredUntilForeground(): SplunkRumBuilder { //TODO
+    fun enableBackgroundInstrumentationDeferredUntilForeground(enable: Boolean): SplunkRumBuilder {
+        deferredUntilForeground = enable
+
         return this
     }
 
     @Deprecated("This is no longer supported")
     fun enableDiskBuffering(enable: Boolean): SplunkRumBuilder {
+        return this
+    }
+
+    @Deprecated("This is no longer supported")
+    fun limitDiskUsageMegabytes(maxUsageMegabytes: Int): SplunkRumBuilder {
         return this
     }
 
@@ -120,7 +124,7 @@ class SplunkRumBuilder {
 
         val endpointConfiguration = when {
             realm != null -> EndpointConfiguration(
-                realm = realm
+                realm = realm, accessToken ?: throw IllegalStateException("rumAccessToken was not set")
             )
 
             beaconEndpoint != null -> EndpointConfiguration(
@@ -131,27 +135,27 @@ class SplunkRumBuilder {
                 throw IllegalStateException("setRealm() or setBeaconEndpoint() was not called")
         }
 
+
         val agent = install(
             application,
             agentConfiguration = AgentConfiguration(
-                rumAccessToken = accessToken ?: throw IllegalStateException("rumAccessToken was not set"),
                 endpoint = endpointConfiguration,
                 appName = appName ?: throw IllegalStateException("applicationName was not set"),
-                deploymentEnvironment = deploymentEnvironment,
+                deploymentEnvironment = deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
                 enableDebugLogging = enableDebug,
                 sessionSamplingRate = sessionBasedSampling,
                 globalAttributes = globalAttributes,
                 instrumentedProcessName = instrumentedProcessName,
-                spanFilter = if (spanFilter != null) {
-                    { spanFilterBuilder ->
-                        spanFilter?.accept(spanFilterBuilder)
-                    }
-                } else null
+                deferredUntilForeground = deferredUntilForeground,
+                spanInterceptor = this.spanFilter?.let {
+                    val spanFilterBuilder = SpanFilterBuilder()
+                    it.accept(spanFilterBuilder)
+                    spanFilterBuilder.toSpanInterceptor()
+                },
             )
         )
 
         // TODO limitDiskUsageMegabytes
-        // TODO enableBackgroundInstrumentationDeferredUntilForeground
 
         return agent
     }

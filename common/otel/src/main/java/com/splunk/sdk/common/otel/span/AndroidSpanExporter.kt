@@ -16,8 +16,11 @@
 
 package com.splunk.sdk.common.otel.span
 
+import android.app.Application
+import android.content.Context
 import com.cisco.android.common.job.IJobManager
 import com.cisco.android.common.job.JobIdStorage
+import com.cisco.android.common.utils.AppStateObserver
 import com.splunk.sdk.common.storage.IAgentStorage
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
@@ -32,12 +35,46 @@ import java.util.UUID
 internal class AndroidSpanExporter(
     private val agentStorage: IAgentStorage,
     private val jobManager: IJobManager,
-    private val jobIdStorage: JobIdStorage
+    private val jobIdStorage: JobIdStorage,
+    private val deferredUntilForeground: Boolean,
+    context: Context
 ) : SpanExporter {
+    private val buffer = mutableListOf<SpanData>()
+    private val appStateObserver = AppStateObserver()
+    private var isForeground = false
+
+    init {
+        appStateObserver.listener = AppStateObserverListener()
+        appStateObserver.attach(context.applicationContext as Application)
+    }
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {
-        val exportRequest = TraceRequestMarshaler.create(spans)
+        return if (deferredUntilForeground && isForeground) {
+            buffer.addAll(spans)
+            CompletableResultCode.ofSuccess()
+        } else {
+            flushBufferedSpans(spans)
+            CompletableResultCode.ofSuccess()
+        }
+    }
 
+    override fun flush(): CompletableResultCode {
+        flushBufferedSpans()
+        return CompletableResultCode.ofSuccess()
+    }
+
+    override fun shutdown(): CompletableResultCode {
+        buffer.clear()
+        return CompletableResultCode.ofSuccess()
+    }
+
+    private fun flushBufferedSpans(extra: Collection<SpanData> = emptyList()) {
+        val allSpans = buffer + extra
+        buffer.clear()
+
+        if (allSpans.isEmpty()) return
+
+        val exportRequest = TraceRequestMarshaler.create(allSpans)
         val id = UUID.randomUUID().toString()
 
         // Save data to our storage.
@@ -48,15 +85,27 @@ internal class AndroidSpanExporter(
 
         // Job scheduling
         jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
-
-        return CompletableResultCode.ofSuccess()
     }
 
-    override fun flush(): CompletableResultCode {
-        return CompletableResultCode.ofSuccess()
-    }
+    private inner class AppStateObserverListener : AppStateObserver.Listener {
 
-    override fun shutdown(): CompletableResultCode {
-        return CompletableResultCode.ofSuccess()
+        override fun onAppStarted() {
+            isForeground = true
+        }
+
+        override fun onAppForegrounded() {
+            isForeground = true
+        }
+
+        override fun onAppBackgrounded() {
+            isForeground = false
+            if (deferredUntilForeground) {
+                flushBufferedSpans()
+            }
+        }
+        override fun onAppClosed() {
+            isForeground = false
+        }
     }
 }
+

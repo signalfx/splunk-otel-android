@@ -21,6 +21,7 @@ import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
@@ -33,15 +34,26 @@ class App : Application() {
         // TODO: Reenable with the bridge support
         // BridgeManager.bridgeInterfaces += TomasBridgeInterface()
 
+        val globalAttributes = MutableAttributes()
+        // Uncomment the following to test global attributes
+        // globalAttributes["session.id"] = "wrong"
+        // globalAttributes["name"] = "John Doe"
+        // globalAttributes["age"] = 32
+        // globalAttributes["email"] = "john.doe@example.com"
+        // globalAttributes["isValid"] = true
+
         val agent = SplunkRum.install(
             application = this,
             agentConfiguration = AgentConfiguration(
-                rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw",
                 endpoint = EndpointConfiguration(
-                    realm = "lab0"
+                    realm = "lab0",
+                    rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw"
                 ),
                 appName = "Android demo app",
                 enableDebugLogging = true,
+                globalAttributes = globalAttributes,
+                deploymentEnvironment = "test",
+                deferredUntilForeground = true,
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(

@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.internal.config
+package com.splunk.rum.integration.agent.api
 
-internal class ServerClock(
-    val serverTimestamp: Long,
-    val localTimeStamp: Long
-) {
+import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.sdk.trace.data.DelegatingSpanData
+import io.opentelemetry.sdk.trace.data.SpanData
 
-    fun currentTimeMillis(): Long {
-        return serverTimestamp + System.currentTimeMillis() - localTimeStamp
+internal class ModifiedSpanData(
+    original: SpanData,
+    private val modifiedAttributes: Attributes
+) : DelegatingSpanData(original) {
+    override fun getAttributes(): Attributes {
+        return modifiedAttributes
+    }
+
+    override fun getTotalAttributeCount(): Int {
+        return modifiedAttributes.size()
     }
 }

@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.agent.api.sessionId
 
 import com.cisco.android.common.logger.Logger
+import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.context.Context
@@ -28,5 +29,6 @@ internal class SessionIdLogProcessor(private val sessionManager: SplunkSessionMa
         val sessionId = sessionManager.sessionId
         Logger.d("SessionIdLogProcessor", "onEmit sessionId: $sessionId, ${logRecord.toLogRecordData().attributes}")
         logRecord.setAttribute(SESSION_ID_KEY, sessionId)
+        logRecord.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
     }
 }

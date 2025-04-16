@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.internal.config
+package com.splunk.rum.integration.agent.api
 
-import org.json.JSONObject
+interface ISession {
+    val state: State
 
-data class RemoteModuleConfiguration internal constructor(
-    val name: String,
-    val config: JSONObject
-)
+    class State {
+        var sessionId: String = "dummy-session-id" // TODO implementation
+            internal set
+    }
+}
+
+class Session internal constructor(
+    override val state: ISession.State
+) : ISession

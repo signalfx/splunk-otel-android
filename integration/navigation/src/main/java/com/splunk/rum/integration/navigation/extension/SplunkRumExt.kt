@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.state
+package com.splunk.rum.integration.navigation.extension
 
-import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.STATE
-import com.splunk.rum.integration.agent.internal.state.StateManager
-import io.opentelemetry.context.Context
-import io.opentelemetry.sdk.logs.LogRecordProcessor
-import io.opentelemetry.sdk.logs.ReadWriteLogRecord
+import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.navigation.Navigation
 
-internal class StateLogRecordProcessor(private val stateManager: StateManager) : LogRecordProcessor {
-    override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
-        logRecord.setAttribute(STATE, stateManager.state.value)
-    }
+val SplunkRum.navigation: Navigation
+    get() = Navigation
+
+@JvmOverloads
+@Deprecated("Use navigation.track(). Argument spanType is ignored.")
+fun SplunkRum.experimentalSetScreenName(screenName: String?, spanType: String = "Created") {
+    if (screenName == null)
+        return
+
+    navigation.track(screenName)
 }

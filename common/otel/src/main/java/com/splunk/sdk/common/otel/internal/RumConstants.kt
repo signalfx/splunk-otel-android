@@ -29,8 +29,9 @@ object RumConstants {
 
     val APPLICATION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("service.application_id")
     val APP_VERSION_CODE_KEY: AttributeKey<String> = AttributeKey.stringKey("service.version_code")
-    val SPLUNK_OLLY_UUID_KEY: AttributeKey<String> = AttributeKey.stringKey("service.o11y.key")
 
     val LINK_SPAN_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("link.spanId")
     val LINK_TRACE_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("link.traceId")
+
+    val SPLUNK_BUILD_ID: AttributeKey<String> = AttributeKey.stringKey("splunk.build_id")
 }

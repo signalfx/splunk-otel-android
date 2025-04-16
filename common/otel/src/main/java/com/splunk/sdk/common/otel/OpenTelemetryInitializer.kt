@@ -19,9 +19,11 @@ package com.splunk.sdk.common.otel
 import android.app.Application
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.job.JobManager
+import com.cisco.android.common.utils.AppStateObserver
 import com.splunk.sdk.common.otel.internal.Resources
 import com.splunk.sdk.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.sdk.common.otel.span.AndroidSpanExporter
+import com.splunk.sdk.common.otel.span.SpanInterceptorExporter
 import com.splunk.sdk.common.storage.AgentStorage
 import com.splunk.sdk.common.storage.IAgentStorage
 import io.opentelemetry.api.baggage.propagation.W3CBaggagePropagator
@@ -35,13 +37,14 @@ import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.SpanProcessor
+import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
-import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.util.UUID
 
 class OpenTelemetryInitializer(
     application: Application,
-    spanFilter: ((SpanExporter) -> SpanExporter)
+    deferredUntilForeground: Boolean,
+    spanInterceptor: ((SpanData) -> SpanData?)? = null,
 ) {
 
     private var resource: Resource
@@ -58,12 +61,15 @@ class OpenTelemetryInitializer(
 
         resource = Resources.createDefault(deviceId)
 
-        val spanExporter = spanFilter(
+        val spanExporter = SpanInterceptorExporter(
             AndroidSpanExporter(
                 agentStorage = agentStorage,
                 jobManager = jobManager,
-                jobIdStorage = jobIdStorage
-            )
+                jobIdStorage = jobIdStorage,
+                deferredUntilForeground = deferredUntilForeground,
+                context = application.applicationContext
+            ),
+            spanInterceptor
         )
 
         spanProcessors += BatchSpanProcessor.builder(spanExporter).build()
