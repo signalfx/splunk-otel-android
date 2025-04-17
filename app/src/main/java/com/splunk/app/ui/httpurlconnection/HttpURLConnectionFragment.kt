@@ -56,6 +56,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         viewBinding.sustainedConnection.setOnClickListener { sustainedConnection() }
         viewBinding.stalledRequest.setOnClickListener { stalledRequest() }
         viewBinding.post.setOnClickListener { post() }
+        viewBinding.serverTimingHeaderInResponse.setOnClickListener { serverTimingHeaderInResponse() }
 
         SplunkRum.instance.navigation.track("HttpUrlConnection")
     }
@@ -114,6 +115,26 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
     fun stalledRequest() {
         executeGet("https://httpbin.org/get", false, true, true)
         showDoneToast("stalledRequest")
+    }
+
+    /**
+     * Demonstrates addition of link.traceId and link.spanId attributes in span when
+     * server-timing header is present in the response.
+     */
+    fun serverTimingHeaderInResponse() {
+        //one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
+        executeGet("https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'")
+
+        //invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
+        executeGet("https://httpbin.org/response-headers?Server-Timing=incorrectSyntax")
+
+        //two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
+        // with the values from last valid header found
+        executeGet("https://httpbin.org/response-headers" +
+                "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
+                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\"")
+
+        showDoneToast("serverTimingHeaderInResponse")
     }
 
     private fun executeGet(inputUrl: String, getInputStream: Boolean = true, disconnect: Boolean = true, stallRequest: Boolean = false) {

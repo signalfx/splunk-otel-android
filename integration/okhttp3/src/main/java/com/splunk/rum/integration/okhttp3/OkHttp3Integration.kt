@@ -64,6 +64,7 @@ internal object OkHttp3Integration {
             //install OkHttp3 auto-instrumentation if isEnabled is true
             if(moduleConfiguration.isEnabled){
                 val okHttpInstrumentation = AndroidInstrumentationLoader.getInstrumentation(OkHttpInstrumentation::class.java)
+                okHttpInstrumentation?.addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
                 okHttpInstrumentation?.install(oTelInstallationContext)
             }
         }

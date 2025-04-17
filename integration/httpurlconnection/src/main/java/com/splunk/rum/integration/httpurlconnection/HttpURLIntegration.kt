@@ -64,6 +64,7 @@ internal object HttpURLIntegration {
             //install HttpURLConnection auto-instrumentation if isEnabled is true
             if(moduleConfiguration.isEnabled){
                 val httpUrlInstrumentation = AndroidInstrumentationLoader.getInstrumentation(HttpUrlInstrumentation::class.java)
+                httpUrlInstrumentation?.addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
                 httpUrlInstrumentation?.install(oTelInstallationContext)
             }
         }

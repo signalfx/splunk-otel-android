@@ -70,4 +70,6 @@
     <string name="post">Post</string>
     <string name="sustained_connection">Sustained Connection</string>
     <string name="stalled_request">Stalled Request</string>
+    <string name="server_timing_header_in_response">Server-Timing Header In Response</string>
+
 </resources>

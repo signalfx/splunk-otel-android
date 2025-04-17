@@ -113,8 +113,8 @@ object Dependencies {
     }
 
     object Otel {
-        private const val oTelInstrumentationBomAlpha = "2.13.3-alpha"
-        const val otelAndroidBomVersion = "0.10.0-alpha"
+        private const val oTelInstrumentationBomAlpha = "2.15.0-alpha"
+        const val otelAndroidBomVersion = "0.11.0-alpha"
 
         const val instrumentationBomAlpha = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$oTelInstrumentationBomAlpha"
         const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
@@ -126,11 +126,13 @@ object Dependencies {
         const val semConv = "io.opentelemetry.semconv:opentelemetry-semconv"
         const val semConvIncubating = "io.opentelemetry.semconv:opentelemetry-semconv-incubating"
 
+        const val instrumentationApi = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api"
+
         const val androidCore = "io.opentelemetry.android:core"
         const val androidSession = "io.opentelemetry.android:session"
-        const val androidInstrumentation = "io.opentelemetry.android:instrumentation-android-instrumentation"
-        const val androidHttpUrlLibrary = "io.opentelemetry.android:instrumentation-httpurlconnection-library"
-        const val androidOkHttp3Library = "io.opentelemetry.android:instrumentation-okhttp-3.0-library"
+        const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation"
+        const val androidHttpUrlLibrary = "io.opentelemetry.android.instrumentation:httpurlconnection-library"
+        const val androidOkHttp3Library = "io.opentelemetry.android.instrumentation:okhttp3-library"
     }
 
     object AndroidTest {

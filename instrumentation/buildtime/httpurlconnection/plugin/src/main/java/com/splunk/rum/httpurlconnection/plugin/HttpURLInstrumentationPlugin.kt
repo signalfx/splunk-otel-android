@@ -45,6 +45,6 @@ class HttpURLInstrumentationPlugin : Plugin<Project> {
     }
 
     private fun addDependenciesForHttpURLNRTracing() {
-        project.dependencies.add("byteBuddy", "io.opentelemetry.android:instrumentation-httpurlconnection-agent:$dependenciesVersion")
+        project.dependencies.add("byteBuddy", "io.opentelemetry.android.instrumentation:httpurlconnection-agent:$dependenciesVersion")
     }
 }
