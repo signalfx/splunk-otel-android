@@ -1,5 +1,6 @@
 import java.io.FileInputStream
 import java.util.Properties
+import java.util.UUID
 
 plugins {
     id("com.android.application")
@@ -59,6 +60,17 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    applicationVariants.configureEach {
+        val uniqueBuildId = UUID.randomUUID().toString()
+        this.mergedFlavor.manifestPlaceholders["splunkBuildId"] = uniqueBuildId
+
+        logger.lifecycle("Splunk: Variant $name assigned build ID: $uniqueBuildId")
+
+        val capitalizedVariantName = name.replaceFirstChar { it.uppercase() }
+        tasks.named("process${capitalizedVariantName}Manifest").configure {
+            outputs.upToDateWhen { false }
         }
     }
 }

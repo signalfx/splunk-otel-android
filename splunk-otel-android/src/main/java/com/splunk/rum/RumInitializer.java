@@ -108,6 +108,8 @@ class RumInitializer {
         }
 
         config.disableScreenAttributes();
+        config.disableAnrDetection();
+        config.disableCrashReporting();
         OpenTelemetryRumBuilder otelRumBuilder = OpenTelemetryRum.builder(application, config);
 
         otelRumBuilder.mergeResource(createSplunkResource());

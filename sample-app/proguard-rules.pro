@@ -22,19 +22,19 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
 # Preserve details needed for reflection, annotations and lambdas
-#-keepattributes Signature,InnerClasses,EnclosingMethod
-#-keepattributes MethodParameters,Exceptions
-#-keepattributes *Annotation*
+-keepattributes Signature,InnerClasses,EnclosingMethod
+-keepattributes MethodParameters,Exceptions
+-keepattributes *Annotation*
 
 # Force R8/ProGuard to keep package structure
-#-keeppackagenames
+-keeppackagenames
 
 # Allows changing access modifiers to enable more optimizations
 #-allowaccessmodification

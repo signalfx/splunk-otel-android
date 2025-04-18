@@ -15,7 +15,7 @@
         android:theme="@style/Theme.SplunkRUMSampleApp">
         <meta-data
             android:name="splunk.build_id"
-            android:value="abc123" />
+            android:value="${splunkBuildId}" />
         <activity
             android:name=".JetpackComposeActivity"
             android:exported="false"

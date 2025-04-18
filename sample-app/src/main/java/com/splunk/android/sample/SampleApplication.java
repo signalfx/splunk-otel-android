@@ -84,9 +84,9 @@ public class SampleApplication extends Application {
                 // file as rum.beacon.url and rum.access.token
 //                .setRealm(getResources().getString(R.string.rum_realm))
                 .setRealm("lab0")
-                .setApplicationName("bugBash2")
-//                .setRumAccessToken("nollRTbzroTXX9kjiufv6A") // sf monitoring
-                .setRumAccessToken("cXxDmRIr5e-UyJfz3t27pg") //  app d org
+                .setApplicationName("fridayBugBash!123")
+                .setRumAccessToken("nollRTbzroTXX9kjiufv6A") // sf monitoring
+//                .setRumAccessToken("cXxDmRIr5e-UyJfz3t27pg") //  app d org
 //                .setRumAccessToken("a5OVE71NXiRkCYxH34_Fbw") //us0
                 .enableDebug()
                 .enableDiskBuffering()
