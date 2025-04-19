@@ -21,17 +21,19 @@ import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
+import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.android.instrumentation.crash.CrashReporterInstrumentation
 
 @SuppressLint("LongLogTag")
 internal object CrashIntegration {
 
     private const val TAG = "CrashIntegration"
-    private const val MODULE_NAME = "crashReporting"
-    private const val DEFAULT_IS_ENABLED = true
+    private const val MODULE_NAME = "crash"
 
-    private var isCrashReportingEnabled: Boolean = DEFAULT_IS_ENABLED
+    private val defaultModuleConfiguration = CrashModuleConfiguration()
+    private var moduleConfiguration = defaultModuleConfiguration
 
     init {
         Logger.d(TAG, "init()")
@@ -45,6 +47,8 @@ internal object CrashIntegration {
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
         override fun onSetup(configurations: List<ModuleConfiguration>) {
+            moduleConfiguration = configurations.find< CrashModuleConfiguration>() ?: defaultModuleConfiguration
+            Logger.d(TAG, "onSetup(moduleConfiguration: ${moduleConfiguration})")
         }
     }
 
@@ -55,6 +59,14 @@ internal object CrashIntegration {
             integration.moduleConfigurationManager.listeners += configManagerListener
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
+
+            if (moduleConfiguration.isEnabled){
+                Logger.d(TAG, "Installing crash reporter")
+                val crashReporterInstrumentation = CrashReporterInstrumentation()
+                crashReporterInstrumentation.install(oTelInstallationContext)
+            } else {
+                Logger.d(TAG, "Crash reporting is disabled")
+            }
         }
     }
 }

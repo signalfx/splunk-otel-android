@@ -22,6 +22,8 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import com.splunk.rum.integration.anr.AnrModuleConfiguration
+import com.splunk.rum.integration.crash.CrashModuleConfiguration
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
@@ -63,6 +65,12 @@ class App : Application() {
                     isEnabled = true,
                     isFragmentTrackingEnabled = false,
                     isActivityTrackingEnabled = false
+                ),
+                CrashModuleConfiguration(
+                    isEnabled = true
+                ),
+                AnrModuleConfiguration(
+                    isEnabled = true
                 )
             )
         )
