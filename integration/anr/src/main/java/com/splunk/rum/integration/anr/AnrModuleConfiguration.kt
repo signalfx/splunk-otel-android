@@ -23,6 +23,6 @@ class AnrModuleConfiguration(val isEnabled: Boolean = true)  : ModuleConfigurati
     override val name: String = "anr"
 
     override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to true.toString()
+        "enabled" to isEnabled.toString()
     )
 }

@@ -42,12 +42,14 @@ internal object CrashIntegration {
 
     fun attach(context: Context) {
         Logger.d(TAG, "attach()")
-        AgentIntegration.obtainInstance(context).listeners += installationListener
+        val integration = AgentIntegration.obtainInstance(context)
+        integration.moduleConfigurationManager.listeners += configManagerListener
+        integration.listeners += installationListener
     }
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
         override fun onSetup(configurations: List<ModuleConfiguration>) {
-            moduleConfiguration = configurations.find< CrashModuleConfiguration>() ?: defaultModuleConfiguration
+            moduleConfiguration = configurations.find<CrashModuleConfiguration>() ?: defaultModuleConfiguration
             Logger.d(TAG, "onSetup(moduleConfiguration: ${moduleConfiguration})")
         }
     }
@@ -55,9 +57,6 @@ internal object CrashIntegration {
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
             Logger.d(TAG, "onInstall()")
-            val integration = AgentIntegration.obtainInstance(context)
-            integration.moduleConfigurationManager.listeners += configManagerListener
-
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
 
             if (moduleConfiguration.isEnabled){

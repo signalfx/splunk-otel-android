@@ -23,6 +23,6 @@ class CrashModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfigurat
     override val name: String = "crash"
 
     override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to true.toString()
+        "enabled" to isEnabled.toString()
     )
 }
