@@ -60,12 +60,18 @@ class SplunkRum private constructor(
 
     @Deprecated("Use globalAttributes property")
     fun <T> setGlobalAttribute(key: AttributeKey<T>, value: T) {
-        // TODO separate task
+        if (value != null) {
+            @Suppress("UNCHECKED_CAST")
+            globalAttributes.set(key as AttributeKey<Any>, value as Any)
+        }
     }
 
     @Deprecated("Use globalAttributes property")
     fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
-        // TODO separate task
+        val builder = Attributes.builder()
+        attributesUpdater.accept(builder)
+        globalAttributes.removeAll()
+        globalAttributes.setAll(builder.build())
     }
 
     @Deprecated("Use webView.integrateWithBrowserRum(webView)")
