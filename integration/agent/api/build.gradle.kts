@@ -40,6 +40,8 @@ dependencies {
     implementation(Dependencies.SessionReplay.commonStorage)
     implementation(Dependencies.SessionReplay.commonUtils)
     implementation(project(":common:utils"))
+    implementation(project(":integration:crash"))
+    implementation(project(":integration:anr"))
 
     compileOnly(Dependencies.Android.Compose.ui)
 }
