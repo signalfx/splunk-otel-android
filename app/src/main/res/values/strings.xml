@@ -35,6 +35,8 @@
     <string name="menu_set_all_global_attributes">Set All Global Attributes</string>
     <string name="menu_remove_all_global_attributes">Remove All Global Attributes</string>
     <string name="menu_get_all_global_attributes">Get All Global Attributes</string>
+    <string name="menu_legacy_set_global_attribute">Set Global Attribute (Legacy API) </string>
+    <string name="menu_legacy_update_global_attributes">Update Global Attributes (Legacy API)</string>
 
     <string name="okhttp_title">OkHttp</string>
     <string name="httpurlconnection_title">HttpURLConnection</string>
