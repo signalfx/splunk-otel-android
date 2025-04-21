@@ -48,6 +48,9 @@ internal class ErrorIdentifierAttributesSpanProcessor(application: Application) 
                 span.setAttribute(RumConstants.SPLUNK_BUILD_ID, it)
             }
         }
+        if (span.instrumentationScopeInfo.name == "io.opentelemetry.anr") {
+            span.setAttribute(RumConstants.COMPONENT_KEY, "error")
+        }
     }
 
     override fun isStartRequired(): Boolean = true

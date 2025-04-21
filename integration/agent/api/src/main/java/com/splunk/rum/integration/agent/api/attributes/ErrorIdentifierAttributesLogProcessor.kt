@@ -6,6 +6,7 @@ import com.splunk.sdk.utils.ApplicationInfoUtils
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord
+import kotlin.math.log
 
 class ErrorIdentifierAttributesLogProcessor(application: Application) : LogRecordProcessor {
 
@@ -30,6 +31,9 @@ class ErrorIdentifierAttributesLogProcessor(application: Application) : LogRecor
             splunkBuildId?.let {
                 logRecord.setAttribute(RumConstants.SPLUNK_BUILD_ID, it)
             }
+        }
+        if (logRecord.instrumentationScopeInfo.name == "io.opentelemetry.crash") {
+            logRecord.setAttribute(RumConstants.COMPONENT_KEY, "crash")
         }
     }
 }
