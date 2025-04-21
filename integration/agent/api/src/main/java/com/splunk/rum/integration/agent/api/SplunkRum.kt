@@ -58,14 +58,19 @@ class SplunkRum private constructor(
         return session.state.sessionId
     }
 
-    @Deprecated("Use globalAttributes property")
+    @Deprecated(
+        message = "Use globalAttributes property directly",
+        replaceWith = ReplaceWith("globalAttributes[key] = value")
+    )
     fun <T> setGlobalAttribute(key: AttributeKey<T>, value: T) {
         @Suppress("UNCHECKED_CAST")
         value?.let { globalAttributes[key as AttributeKey<Any>] = it as Any }
     }
 
-    @Deprecated("Use globalAttributes property")
-    fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
+    @Deprecated(
+        message = "Use globalAttributes.update() method",
+        replaceWith = ReplaceWith("globalAttributes.update { attributesUpdater.accept(this) }")
+    )    fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
         globalAttributes.update { attributesUpdater.accept(this) }
     }
 
