@@ -60,10 +60,8 @@ class SplunkRum private constructor(
 
     @Deprecated("Use globalAttributes property")
     fun <T> setGlobalAttribute(key: AttributeKey<T>, value: T) {
-        if (value != null) {
-            @Suppress("UNCHECKED_CAST")
-            globalAttributes.set(key as AttributeKey<Any>, value as Any)
-        }
+        @Suppress("UNCHECKED_CAST")
+        value?.let { globalAttributes[key as AttributeKey<Any>] = it as Any }
     }
 
     @Deprecated("Use globalAttributes property")
