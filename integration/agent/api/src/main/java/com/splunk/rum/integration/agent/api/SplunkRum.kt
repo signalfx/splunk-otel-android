@@ -66,10 +66,7 @@ class SplunkRum private constructor(
 
     @Deprecated("Use globalAttributes property")
     fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
-        val builder = Attributes.builder()
-        attributesUpdater.accept(builder)
-        globalAttributes.removeAll()
-        globalAttributes.setAll(builder.build())
+        globalAttributes.update { attributesUpdater.accept(this) }
     }
 
     @Deprecated("Use webView.integrateWithBrowserRum(webView)")
