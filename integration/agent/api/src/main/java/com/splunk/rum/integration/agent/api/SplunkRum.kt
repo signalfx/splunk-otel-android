@@ -58,6 +58,21 @@ class SplunkRum private constructor(
         return session.state.sessionId
     }
 
+    /**
+     * Set an attribute in the global attributes that will be appended to every span and event.
+     *
+     * <p>Note: If this key is the same as an existing key in the global attributes, it will replace
+     * the existing value.
+     *
+     * <p>If you attempt to set a value to null or use a null key, this call will be ignored.
+     *
+     * <p>Note: this operation performs an atomic update. The passed function should be free from
+     * side effects, since it may be called multiple times in case of thread contention.
+     *
+     * @param key The {@link AttributeKey} for the attribute.
+     * @param value The value of the attribute, which must match the generic type of the key.
+     * @param <T> The generic type of the value.
+     */
     @Deprecated(
         message = "Use globalAttributes property directly",
         replaceWith = ReplaceWith("globalAttributes[key] = value")
@@ -67,6 +82,15 @@ class SplunkRum private constructor(
         value?.let { globalAttributes[key as AttributeKey<Any>] = it as Any }
     }
 
+    /**
+     * Update the global set of attributes that will be appended to every span and event.
+     *
+     * <p>Note: this operation performs an atomic update. The passed function should be free from
+     * side effects, since it may be called multiple times in case of thread contention.
+     *
+     * @param attributesUpdater A function which will update the current set of attributes, by
+     *     operating on a {@link AttributesBuilder} from the current set.
+     */
     @Deprecated(
         message = "Use globalAttributes.update() method",
         replaceWith = ReplaceWith("globalAttributes.update { attributesUpdater.accept(this) }")
