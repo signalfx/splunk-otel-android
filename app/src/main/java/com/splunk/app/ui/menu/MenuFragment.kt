@@ -75,6 +75,8 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.setAllGlobalAttributes.setOnClickListener(onClickListener)
         viewBinding.removeAllGlobalAttributes.setOnClickListener(onClickListener)
         viewBinding.getAllGlobalAttributes.setOnClickListener(onClickListener)
+        viewBinding.legacySetGlobalAttribute.setOnClickListener(onClickListener)
+        viewBinding.legacyUpdateGlobalAttributes.setOnClickListener(onClickListener)
 
         viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"
 
@@ -234,11 +236,31 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
             }
             viewBinding.getAllGlobalAttributes.id -> {
                 val allAttributes = SplunkRum.instance.globalAttributes
+                val attributesText = StringBuilder()
+                allAttributes.forEach { key, value ->
+                    attributesText.append("${key.key}: $value\n")
+                }
+
                 AlertDialog.Builder(context)
                     .setTitle("All Global Attributes")
-                    .setMessage(allAttributes.toString())
+                    .setMessage(attributesText.toString())
                     .setPositiveButton("OK", null)
                     .show()
+            }
+
+            viewBinding.legacySetGlobalAttribute.id -> {
+                val key = AttributeKey.stringKey("legacyKey")
+                SplunkRum.instance.setGlobalAttribute(key, "LegacyVal")
+                showDoneToast("Set Global Attribute using legacy API")
+            }
+
+            viewBinding.legacyUpdateGlobalAttributes.id -> {
+                SplunkRum.instance.updateGlobalAttributes { builder ->
+                    builder.put(AttributeKey.stringKey("legacyUpdate1"), "Value1")
+                        .put(AttributeKey.longKey("legacyUpdate2"), 54321L)
+                        .put(AttributeKey.booleanKey("legacyUpdate3"), false)
+                }
+                showDoneToast("Updated Global Attributes using legacy API")
             }
         }
     }
