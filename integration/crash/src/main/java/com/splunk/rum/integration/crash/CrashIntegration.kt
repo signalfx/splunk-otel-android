@@ -50,7 +50,7 @@ internal object CrashIntegration {
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
         override fun onSetup(configurations: List<ModuleConfiguration>) {
             moduleConfiguration = configurations.find<CrashModuleConfiguration>() ?: defaultModuleConfiguration
-            Logger.d(TAG, "onSetup(moduleConfiguration: ${moduleConfiguration})")
+            Logger.d(TAG, "onSetup(moduleConfiguration: $moduleConfiguration)")
         }
     }
 

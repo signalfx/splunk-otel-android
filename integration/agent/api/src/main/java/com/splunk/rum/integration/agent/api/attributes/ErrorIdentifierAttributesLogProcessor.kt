@@ -6,19 +6,12 @@ import com.splunk.sdk.utils.ApplicationInfoUtils
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord
-import kotlin.math.log
 
 class ErrorIdentifierAttributesLogProcessor(application: Application) : LogRecordProcessor {
 
-    private var applicationId: String? = null
-    private var versionCode: String? = null
-    private var splunkBuildId: String? = null
-
-    init {
-        applicationId = ApplicationInfoUtils.retrieveApplicationId(application)
-        versionCode = ApplicationInfoUtils.retrieveVersionCode(application)
-        splunkBuildId = ApplicationInfoUtils.retrieveSplunkBuildID(application)
-    }
+    private var applicationId: String? = ApplicationInfoUtils.retrieveApplicationId(application)
+    private var versionCode: String? = ApplicationInfoUtils.retrieveVersionCode(application)
+    private var splunkBuildId: String? = ApplicationInfoUtils.retrieveSplunkBuildID(application)
 
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
         if (logRecord.getAttribute(RumConstants.EXCEPTION_STACKTRACE_KEY) != null) {
@@ -32,8 +25,8 @@ class ErrorIdentifierAttributesLogProcessor(application: Application) : LogRecor
                 logRecord.setAttribute(RumConstants.SPLUNK_BUILD_ID, it)
             }
         }
-        if (logRecord.instrumentationScopeInfo.name == "io.opentelemetry.crash") {
-            logRecord.setAttribute(RumConstants.COMPONENT_KEY, "crash")
+        if (logRecord.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
+            logRecord.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CRASH)
         }
     }
 }

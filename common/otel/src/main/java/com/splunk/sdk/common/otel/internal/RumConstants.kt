@@ -23,6 +23,8 @@ object RumConstants {
     const val COMPONENT_ERROR: String = "error"
     const val COMPONENT_CRASH: String = "crash"
     const val SERVER_TIMING_HEADER = "server-timing"
+    const val CRASH_INSTRUMENTATION_SCOPE_NAME = "io.opentelemetry.crash"
+    const val ANR_INSTRUMENTATION_SCOPE_NAME = "io.opentelemetry.anr"
 
     val WORKFLOW_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("workflow.name")
     val COMPONENT_KEY: AttributeKey<String> = AttributeKey.stringKey("component")
