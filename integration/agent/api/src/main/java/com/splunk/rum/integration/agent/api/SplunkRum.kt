@@ -85,9 +85,6 @@ class SplunkRum private constructor(
     /**
      * Update the global set of attributes that will be appended to every span and event.
      *
-     * <p>Note: this operation performs an atomic update. The passed function should be free from
-     * side effects, since it may be called multiple times in case of thread contention.
-     *
      * @param attributesUpdater A function which will update the current set of attributes, by
      *     operating on a {@link AttributesBuilder} from the current set.
      */
