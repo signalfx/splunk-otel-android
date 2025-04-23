@@ -14,7 +14,8 @@ class ErrorIdentifierAttributesLogProcessor(application: Application) : LogRecor
     private var splunkBuildId: String? = ApplicationInfoUtils.retrieveSplunkBuildID(application)
 
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
-        if (logRecord.getAttribute(RumConstants.EXCEPTION_STACKTRACE_KEY) != null) {
+        if (logRecord.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_ERROR ||
+            logRecord.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_CRASH) {
             applicationId?.let {
                 logRecord.setAttribute(RumConstants.APPLICATION_ID_KEY, it)
             }

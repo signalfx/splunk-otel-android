@@ -31,7 +31,8 @@ internal class ErrorIdentifierAttributesSpanProcessor(application: Application) 
     private var splunkBuildId: String? = ApplicationInfoUtils.retrieveSplunkBuildID(application)
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        if (span.getAttribute(RumConstants.EXCEPTION_STACKTRACE_KEY) != null) {
+        if (span.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_ERROR ||
+            span.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_CRASH) {
             applicationId?.let {
                 span.setAttribute(RumConstants.APPLICATION_ID_KEY, it)
             }
