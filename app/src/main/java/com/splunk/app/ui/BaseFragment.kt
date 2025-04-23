@@ -50,7 +50,10 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         super.onDestroyView()
     }
 
-    fun navigateTo(fragment: BaseFragment<*>, animation: FragmentAnimation? = null) {
+    fun navigateTo(fragment: BaseFragment<*>, animation: FragmentAnimation? = null, args: Bundle? = null) {
+        args?.let {
+            fragment.arguments = it
+        }
         activity.navigateTo(fragment, animation)
     }
 }

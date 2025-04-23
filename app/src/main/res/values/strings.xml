@@ -15,6 +15,9 @@
     <string name="menu_okhttp_sample_calls">Okhttp sample calls</string>
     <string name="menu_network_request_title">Network Requests</string>
     <string name="menu_httpurlconnection_title">HttpURLConnection</string>
+    <string name="menu_web_view_native_bridge_title">Web View Native Bridge</string>
+    <string name="menu_web_view_nextgen">Get Session ID (Nextgen)</string>
+    <string name="menu_web_view_legacy">Get Session ID (Legacy)</string>
     <string name="menu_custom_tracking_title">Custom Tracking</string>
     <string name="menu_custom_event">Track Custom Event</string>
     <string name="menu_workflow">Track Workflow</string>
@@ -38,6 +41,7 @@
 
     <string name="okhttp_title">OkHttp</string>
     <string name="httpurlconnection_title">HttpURLConnection</string>
+    <string name="webview_title">WebView</string>
 
     <!-- Fragment Okhttp -->
     <string name="synchronous_get">Synchronous GET</string>

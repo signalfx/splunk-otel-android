@@ -30,5 +30,6 @@ dependencies {
     api(project(":integration:interactions"))
     api(project(":integration:lifecycle"))
     api(project(":integration:customtracking"))
+    api(project(":integration:webview"))
 }
 

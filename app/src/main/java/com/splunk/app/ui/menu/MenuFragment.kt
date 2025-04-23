@@ -28,6 +28,7 @@ import com.splunk.app.databinding.FragmentMenuBinding
 import com.splunk.app.ui.BaseFragment
 import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
+import com.splunk.app.ui.webview.WebViewFragment
 import com.splunk.app.util.FragmentAnimation
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
@@ -58,6 +59,8 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.anrEvent.setOnClickListener(onClickListener)
         viewBinding.okhttpSampleCalls.setOnClickListener(onClickListener)
         viewBinding.httpurlconnection.setOnClickListener(onClickListener)
+        viewBinding.webViewNextgen.setOnClickListener(onClickListener)
+        viewBinding.webViewLegacy.setOnClickListener(onClickListener)
         viewBinding.trackCustomEvent.setOnClickListener(onClickListener)
         viewBinding.trackWorkflow.setOnClickListener(onClickListener)
         viewBinding.trackException.setOnClickListener(onClickListener)
@@ -128,6 +131,18 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 navigateTo(OkHttpFragment(), FragmentAnimation.FADE)
             viewBinding.httpurlconnection.id ->
                 navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
+            viewBinding.webViewNextgen.id -> {
+                val args = Bundle().apply {
+                    putString("IMPLEMENTATION_TYPE", "nextgen")
+                }
+                navigateTo(WebViewFragment(), FragmentAnimation.FADE, args)
+            }
+            viewBinding.webViewLegacy.id -> {
+                val args = Bundle().apply {
+                    putString("IMPLEMENTATION_TYPE", "legacy")
+                }
+                navigateTo(WebViewFragment(), FragmentAnimation.FADE, args)
+            }
             viewBinding.trackCustomEvent.id -> {
                 val testAttributes = MutableAttributes().also { attributes ->
                     attributes["attribute.one"] = "value1"
