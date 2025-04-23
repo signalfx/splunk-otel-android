@@ -42,9 +42,6 @@ internal class ErrorIdentifierAttributesSpanProcessor(application: Application) 
                 span.setAttribute(RumConstants.SPLUNK_BUILD_ID, it)
             }
         }
-        if (span.instrumentationScopeInfo.name == RumConstants.ANR_INSTRUMENTATION_SCOPE_NAME) {
-            span.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
-        }
     }
 
     override fun isStartRequired(): Boolean = true

@@ -25,8 +25,5 @@ class ErrorIdentifierAttributesLogProcessor(application: Application) : LogRecor
                 logRecord.setAttribute(RumConstants.SPLUNK_BUILD_ID, it)
             }
         }
-        if (logRecord.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
-            logRecord.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CRASH)
-        }
     }
 }

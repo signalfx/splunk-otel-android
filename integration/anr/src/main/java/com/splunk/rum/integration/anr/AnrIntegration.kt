@@ -62,6 +62,7 @@ internal object AnrIntegration {
             if (moduleConfiguration.isEnabled) {
                 Logger.d(TAG, "Installing ANR reporter")
                 val anrDetectorInstrumentation = AnrInstrumentation()
+                anrDetectorInstrumentation.addAttributesExtractor(AnrAttributesExtractor())
                 anrDetectorInstrumentation.install(oTelInstallationContext)
             } else {
                 Logger.d(TAG, "ANR reporting is disabled")

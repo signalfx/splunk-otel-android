@@ -28,8 +28,10 @@ dependencies {
     implementation(project(":integration:agent:internal"))
 
     implementation(Dependencies.Otel.androidANRInstrumentation)
+    implementation(Dependencies.Otel.instrumentationApi)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(project(":common:otel"))
 }
 
