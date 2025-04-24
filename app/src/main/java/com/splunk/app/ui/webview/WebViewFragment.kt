@@ -26,7 +26,6 @@ import com.splunk.app.databinding.FragmentWebViewBinding
 import com.splunk.app.ui.BaseFragment
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
-import com.splunk.rum.integration.webview.extension.integrateWithBrowserRum
 import com.splunk.rum.integration.webview.extension.webViewNativeBridge
 
 class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {

@@ -33,6 +33,7 @@ import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
+import java.lang.reflect.Method
 import java.util.function.Consumer
 
 /**
@@ -66,6 +67,26 @@ class SplunkRum private constructor(
     @Deprecated("Use globalAttributes property")
     fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
         // TODO separate task
+    }
+
+    /**
+     * This method will enable Splunk Browser-based RUM to integrate with the current Android RUM
+     * Session. It injects a javascript object named "SplunkRumNative" into your WebView which
+     * exposes the Android Session ID to the browser-based RUM javascript implementation.
+     *
+     * @param webView The WebView to inject the javascript object into.
+     */
+    @Deprecated(
+        message = "Use SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)",
+        replaceWith = ReplaceWith("SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)")
+    )
+    fun integrateWithBrowserRum(webView: WebView) {
+        try {
+            val navigationClass = Class.forName("com.splunk.rum.integration.webview.WebViewNativeBridge")
+            val trackMethod = navigationClass.getDeclaredMethod("integrateWithBrowserRum", WebView::class.java)
+            val navigationInstance = navigationClass.getField("INSTANCE").get(null)
+            trackMethod.invoke(navigationInstance, webView)
+        } catch (_: Exception) { }
     }
 
     companion object {
