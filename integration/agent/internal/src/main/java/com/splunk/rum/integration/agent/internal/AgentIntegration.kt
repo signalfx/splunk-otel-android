@@ -32,9 +32,6 @@ import io.opentelemetry.api.OpenTelemetry
 class AgentIntegration private constructor(
     context: Context
 ) {
-    private var startTimestamp = 0L
-    private var startElapsed = 0L
-
     val sessionManager: SplunkSessionManager
     val listeners: MutableSet<Listener> = HashSet()
 
@@ -50,9 +47,6 @@ class AgentIntegration private constructor(
     }
 
     init {
-        startTimestamp = System.currentTimeMillis()
-        startElapsed = SystemClock.elapsedRealtime()
-
         registerModuleInitializationStart(MODULE_NAME)
 
         val storage = AgentStorage.attach(context)
