@@ -24,5 +24,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":integration:agent:api"))
+    implementation(project(":integration:agent:internal"))
 }

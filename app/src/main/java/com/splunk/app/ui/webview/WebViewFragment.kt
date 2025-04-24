@@ -26,8 +26,6 @@ import com.splunk.app.databinding.FragmentWebViewBinding
 import com.splunk.app.ui.BaseFragment
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
-import com.splunk.rum.integration.webview.extension.integrateWithBrowserRum
-import com.splunk.rum.integration.webview.extension.webViewNativeBridge
 
 class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
 
@@ -44,12 +42,15 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
 
         when (implementationType) {
             "nextgen" -> {
-                SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(viewBinding.webView)
-                Log.d(TAG, "Nextgen integrateWithBrowserRum API called")
+               /* SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(viewBinding.webView)
+                Log.d(TAG, "Nextgen integrateWithBrowserRum API called")*/
+
+                JavaTestUtil.nextGen(viewBinding.webView)
             }
             "legacy" -> {
-                SplunkRum.instance.integrateWithBrowserRum(viewBinding.webView)
-                Log.d(TAG, "Legacy integrateWithBrowserRum API called")
+               /* SplunkRum.instance.integrateWithBrowserRum(viewBinding.webView)
+                Log.d(TAG, "Legacy integrateWithBrowserRum API called")*/
+                JavaTestUtil.legacy(viewBinding.webView)
             }
         }
 

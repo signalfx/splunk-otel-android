@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.api
 
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import io.opentelemetry.sdk.trace.data.SpanData
 

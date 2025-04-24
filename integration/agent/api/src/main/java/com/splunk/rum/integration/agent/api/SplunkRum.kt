@@ -21,7 +21,7 @@ import android.webkit.WebView
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.api.subprocess.SubprocessDetector
 import com.splunk.rum.integration.agent.api.user.User
@@ -29,9 +29,9 @@ import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.webview.WebViewNativeBridge
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import java.util.function.Consumer
 
@@ -52,6 +52,13 @@ class SplunkRum private constructor(
      * Represents the global attributes configured for the agent.
      */
     val globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
+
+    val webViewNativeBridge: WebViewNativeBridge
+        get() = WebViewNativeBridge
+
+    fun integrateWithBrowserRum(webView: WebView) {
+        WebViewNativeBridge.integrateWithBrowserRum(webView)
+    }
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
     fun getRumSessionId(): String {

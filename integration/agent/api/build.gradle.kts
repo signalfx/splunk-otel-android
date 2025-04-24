@@ -32,7 +32,9 @@ dependencies {
     api(project(":integration:agent:module"))
 
     implementation(project(":integration:agent:internal"))
+    implementation(project(":integration:agent:attributes"))
     implementation(project(":common:storage"))
+    implementation(project(":integration:webview"))
 
     implementation(Dependencies.Otel.semConv)
 

@@ -17,13 +17,13 @@
 package com.splunk.rum.integration.webview
 
 import android.webkit.JavascriptInterface
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 
 /**
  * Object to inject into WebViews as a javascript object, in order to integrate with browser RUM.
  */
-class NativeRumSessionId() {
+internal class NativeRumSessionId {
     @get:JavascriptInterface
     val nativeSessionId: String
-        //TODO: Obtain real session-id here
-        get() = "dummy-session-id"
+        get() = SplunkSessionManager.instance?.sessionId.toString()
 }

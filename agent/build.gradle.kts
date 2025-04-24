@@ -21,6 +21,7 @@ android {
 
 dependencies {
     api(project(":integration:agent:api"))
+    api(project(":integration:agent:attributes"))
     // TODO api(project(":integration:session-recording"))
     api(project(":integration:crash"))
     api(project(":integration:anr"))

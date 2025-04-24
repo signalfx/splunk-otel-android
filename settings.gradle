@@ -39,3 +39,5 @@ include ':app'
 // Main entry point
 include ':agent'
 include ':integration:webview'
+include ':integration:attributes'
+include ':integration:agent:attributes'

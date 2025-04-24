@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.attributes
+package com.splunk.rum.integration.agent.attributes
 
+import java.util.function.BiConsumer
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
-import java.util.function.BiConsumer
 
 /**
  * A utility class for managing custom RUM attributes.
@@ -30,7 +30,7 @@ class MutableAttributes(
 ): Attributes {
 
     /**
-     * Retrieves the value associated with the given [AttributeKey].
+     * Retrieves the value associated with the given [io.opentelemetry.api.common.AttributeKey].
      *
      * @param key the attribute key to retrieve
      * @return the value if present, or null
@@ -89,7 +89,7 @@ class MutableAttributes(
     }
 
     /**
-     * Sets a value for a given [AttributeKey].
+     * Sets a value for a given [io.opentelemetry.api.common.AttributeKey].
      *
      * @param key the attribute key
      * @param value the value to associate
@@ -99,7 +99,7 @@ class MutableAttributes(
     }
 
     /**
-     * Removes the attribute associated with the given [AttributeKey].
+     * Removes the attribute associated with the given [io.opentelemetry.api.common.AttributeKey].
      *
      * @param key the attribute key
      */
@@ -124,7 +124,7 @@ class MutableAttributes(
     }
 
     /**
-     * Sets multiple attributes at once from an existing [Attributes] instance.
+     * Sets multiple attributes at once from an existing [io.opentelemetry.api.common.Attributes] instance.
      *
      * @param attributesToAdd the attributes to merge
      */
@@ -143,7 +143,7 @@ class MutableAttributes(
      * Updates the attributes by applying the provided lambda to the current attributes.
      * This allows clients to modify the attributes in a flexible way.
      *
-     * @param updateAttributes a lambda to modify the current attributes. The lambda receives an [AttributesBuilder].
+     * @param updateAttributes a lambda to modify the current attributes. The lambda receives an [io.opentelemetry.api.common.AttributesBuilder].
      */
     fun update(updateAttributes: AttributesBuilder.() -> Unit) {
         attributes = attributes.edit(updateAttributes)

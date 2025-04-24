@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.customtracking.extension
 
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.attributes.MutableAttributes
 import com.splunk.rum.integration.customtracking.CustomTracking
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span

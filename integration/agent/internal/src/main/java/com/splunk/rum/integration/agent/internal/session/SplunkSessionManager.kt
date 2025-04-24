@@ -152,8 +152,15 @@ class SplunkSessionManager internal constructor(
         }
     }
 
-    private companion object {
+    companion object {
         const val DEFAULT_SESSION_TIMEOUT = 15L * 60L * 1000L // 15m
         const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L // 4h
+
+        var instance: SplunkSessionManager? = null
+
+        fun initialize(agentStorage: IAgentStorage): SplunkSessionManager {
+            instance = SplunkSessionManager(agentStorage)
+            return instance!!
+        }
     }
 }

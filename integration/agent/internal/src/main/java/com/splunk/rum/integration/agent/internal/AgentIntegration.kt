@@ -63,7 +63,7 @@ class AgentIntegration private constructor(
 
         val storage = AgentStorage.attach(context)
 
-        sessionManager = SplunkSessionManager(storage)
+        sessionManager = SplunkSessionManager.initialize(storage)
         moduleConfigurationManager = ModuleConfigurationManager(storage)
 
         sessionManager.sessionListeners += SessionManagerListener()
