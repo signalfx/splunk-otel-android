@@ -19,9 +19,7 @@ package com.splunk.rum.integration.agent.internal
 import android.app.Application
 import android.content.Context
 import android.os.SystemClock
-import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.utils.extensions.forEachFast
-import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.model.Module
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
@@ -34,14 +32,10 @@ import io.opentelemetry.api.OpenTelemetry
 class AgentIntegration private constructor(
     context: Context
 ) {
-    private var appName: String? = null
-    private var agentVersion: String? = null
-
     private var startTimestamp = 0L
     private var startElapsed = 0L
 
     val sessionManager: SplunkSessionManager
-    val moduleConfigurationManager: ModuleConfigurationManager
     val listeners: MutableSet<Listener> = HashSet()
 
     //TODO: Replace with actual SessionManager when session module from upstream is integrated
@@ -64,46 +58,24 @@ class AgentIntegration private constructor(
         val storage = AgentStorage.attach(context)
 
         sessionManager = SplunkSessionManager(storage)
-        moduleConfigurationManager = ModuleConfigurationManager(storage)
-
-        sessionManager.sessionListeners += SessionManagerListener()
     }
 
-    fun setup(appName: String, agentVersion: String, moduleConfigurations: List<ModuleConfiguration>): AgentIntegration {
-        Logger.d(TAG, "setup(appName: $appName, agentVersion: $agentVersion, moduleConfigurations: $moduleConfigurations)")
-
-        this.appName = appName
-        this.agentVersion = agentVersion
+    fun install(context: Context, openTelemetry: OpenTelemetry, moduleConfigurations: List<ModuleConfiguration>) {
+        sessionManager.install(context)
 
         for (config in moduleConfigurations) {
             val module = modules[config.name] ?: Module(config.name)
             modules[config.name] = module.copy(configuration = config)
         }
 
-        moduleConfigurationManager.setup(moduleConfigurations)
-
-        return this
-    }
-
-    fun install(context: Context, openTelemetry: OpenTelemetry) {
-        sessionManager.install(context)
-
         val oTelInstallationContext = InstallationContext(context.applicationContext as Application, openTelemetry, oTelSessionManager)
-        listeners.forEachFast { it.onInstall(context, oTelInstallationContext) }
+        listeners.forEachFast { it.onInstall(context, oTelInstallationContext, moduleConfigurations) }
 
         registerModuleInitializationEnd(MODULE_NAME)
     }
 
-
-    private inner class SessionManagerListener : SplunkSessionManager.SessionListener {
-        override fun onSessionChanged(sessionId: String) {
-            val appName = appName ?: throw IllegalStateException("Call setup() first")
-            val agentVersion = agentVersion ?: throw IllegalStateException("Call setup() first")
-        }
-    }
-
     interface Listener {
-        fun onInstall(context: Context, oTelInstallationContext: InstallationContext)
+        fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>)
     }
 
     companion object {
