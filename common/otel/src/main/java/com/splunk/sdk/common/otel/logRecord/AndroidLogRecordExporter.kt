@@ -52,7 +52,7 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
             val span = spanBuilder.startSpan()
 
             try {
-                span.setAttribute("log.body", log.body.asString())
+                span.setAttribute("body", log.body.asString())
                 log.attributes.asMap().forEach { (key, value) ->
                     when (value) {
                         is String -> span.setAttribute(key.key, value)
