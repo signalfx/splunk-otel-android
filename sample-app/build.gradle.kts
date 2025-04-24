@@ -1,5 +1,6 @@
 import java.io.FileInputStream
 import java.util.Properties
+import java.util.UUID
 
 plugins {
     id("com.android.application")
@@ -20,7 +21,7 @@ android {
         applicationId = "com.splunk.android.sample"
         minSdk = 21
         targetSdk = 35
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -42,7 +43,7 @@ android {
             val accessToken = localProperties["rum.access.token"] as String?
             resValue("string", "rum_realm", realm ?: "us0")
             resValue("string", "rum_access_token", accessToken ?: "dummyAuth")
-            isMinifyEnabled = false // set to true to enable obfuscation
+            isMinifyEnabled = true // set to true to enable obfuscation
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -59,6 +60,17 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    applicationVariants.configureEach {
+        val uniqueBuildId = UUID.randomUUID().toString()
+        this.mergedFlavor.manifestPlaceholders["splunkBuildId"] = uniqueBuildId
+
+        logger.lifecycle("Splunk: Variant $name assigned build ID: $uniqueBuildId")
+
+        val capitalizedVariantName = name.replaceFirstChar { it.uppercase() }
+        tasks.named("process${capitalizedVariantName}Manifest").configure {
+            outputs.upToDateWhen { false }
         }
     }
 }

@@ -80,8 +80,8 @@ class FileSender {
             sender.send(encodedSpans);
             Log.d(LOG_TAG, "File content " + file + " successfully uploaded");
             return true;
-        } catch (IOException e) {
-            Log.w(LOG_TAG, "Error sending file content", e);
+        } catch (Exception e) {
+            Log.w(LOG_TAG, "Error sending file content!" + e + " :/");
             return false;
         }
     }
