@@ -25,16 +25,4 @@ import com.splunk.rum.integration.webview.WebViewNativeBridge
  */
 @Suppress("UnusedReceiverParameter")
 val SplunkRum.webViewNativeBridge: WebViewNativeBridge
-    get() = WebViewNativeBridge.instance
-
-/**
- * This method will enable Splunk Browser-based RUM to integrate with the current Android RUM
- * Session. It injects a javascript object named "SplunkRumNative" into your WebView which
- * exposes the Android Session ID to the browser-based RUM javascript implementation.
- *
- * @param webView The WebView to inject the javascript object into.
- */
-@Deprecated("Use SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)", ReplaceWith("SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)"))
-fun SplunkRum.integrateWithBrowserRum(webView: WebView) {
-    webViewNativeBridge.integrateWithBrowserRum(webView)
-}
+    get() = WebViewNativeBridge
