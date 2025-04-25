@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.InstallationContext
@@ -42,21 +41,18 @@ internal object AnrIntegration {
 
     fun attach(context: Context) {
         Logger.d(TAG, "attach()")
-        val integration = AgentIntegration.obtainInstance(context)
-        integration.moduleConfigurationManager.listeners += configManagerListener
-        integration.listeners += installationListener
-    }
-
-    private val configManagerListener = object : ModuleConfigurationManager.Listener {
-        override fun onSetup(configurations: List<ModuleConfiguration>) {
-            moduleConfiguration = configurations.find<AnrModuleConfiguration>() ?: defaultModuleConfiguration
-            Logger.d(TAG, "onSetup(moduleConfiguration: $moduleConfiguration)")
-        }
+        AgentIntegration.obtainInstance(context).listeners += installationListener
     }
 
     private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
+        override fun onInstall(
+            context: Context,
+            oTelInstallationContext: InstallationContext,
+            moduleConfigurations: List<ModuleConfiguration>
+        ) {
             Logger.d(TAG, "onInstall()")
+            moduleConfiguration = moduleConfigurations.find<AnrModuleConfiguration>() ?: defaultModuleConfiguration
+
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
 
             if (moduleConfiguration.isEnabled) {

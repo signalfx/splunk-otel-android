@@ -20,7 +20,6 @@ import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
-import com.splunk.rum.integration.agent.api.attributes.ErrorIdentifierAttributesLogProcessor
 import com.splunk.rum.integration.agent.api.attributes.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
@@ -33,7 +32,6 @@ import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
 import com.splunk.rum.integration.agent.api.user.UserIdLogProcessor
 import com.splunk.rum.integration.agent.api.user.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
 import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.user.IUserManager
@@ -77,11 +75,6 @@ internal object SplunkRumAgentCore {
 
         val agentIntegration = AgentIntegration
             .obtainInstance(application)
-            .setup(
-                appName = requireNotNull(finalConfiguration.appName),
-                agentVersion = requireNotNull(BuildConfig.VERSION_NAME),
-                moduleConfigurations = moduleConfigurations
-            )
 
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
@@ -95,7 +88,6 @@ internal object SplunkRumAgentCore {
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
-            .addLogRecordProcessor(ErrorIdentifierAttributesLogProcessor(application))
             .addLogRecordProcessor(GenericAttributesLogProcessor())
             .addLogRecordProcessor(UserIdLogProcessor(UserManager()))
             .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
@@ -107,7 +99,7 @@ internal object SplunkRumAgentCore {
 
         isRunning = true
 
-        agentIntegration.install(application, openTelemetry)
+        agentIntegration.install(application, openTelemetry, moduleConfigurations)
 
         return openTelemetry
     }
