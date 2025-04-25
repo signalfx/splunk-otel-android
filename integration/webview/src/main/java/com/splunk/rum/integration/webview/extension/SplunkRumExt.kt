@@ -25,7 +25,7 @@ import com.splunk.rum.integration.webview.WebViewNativeBridge
  */
 @Suppress("UnusedReceiverParameter")
 val SplunkRum.webViewNativeBridge: WebViewNativeBridge
-    get() = WebViewNativeBridge.instance
+    get() = WebViewNativeBridge
 
 /**
  * This method will enable Splunk Browser-based RUM to integrate with the current Android RUM
