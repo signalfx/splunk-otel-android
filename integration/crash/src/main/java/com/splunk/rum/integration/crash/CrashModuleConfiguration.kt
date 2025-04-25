@@ -18,11 +18,11 @@ package com.splunk.rum.integration.crash
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class CrashModuleConfiguration : ModuleConfiguration {
+class CrashModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
 
     override val name: String = "crash"
 
     override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to true.toString()
+        "enabled" to isEnabled.toString()
     )
 }

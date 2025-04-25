@@ -69,6 +69,10 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
                     .setStartTimestamp(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
                     .startSpan()
                     .end(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+                if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
+                    SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.forceFlush()
+                        ?.join(5, TimeUnit.SECONDS)
+                }
             }
         }
 

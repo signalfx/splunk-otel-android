@@ -20,17 +20,19 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.android.instrumentation.crash.CrashReporterInstrumentation
 
 @SuppressLint("LongLogTag")
 internal object CrashIntegration {
 
     private const val TAG = "CrashIntegration"
-    private const val MODULE_NAME = "crashReporting"
-    private const val DEFAULT_IS_ENABLED = true
+    private const val MODULE_NAME = "crash"
 
-    private var isCrashReportingEnabled: Boolean = DEFAULT_IS_ENABLED
+    private val defaultModuleConfiguration = CrashModuleConfiguration()
+    private var moduleConfiguration = defaultModuleConfiguration
 
     init {
         Logger.d(TAG, "init()")
@@ -49,8 +51,18 @@ internal object CrashIntegration {
             moduleConfigurations: List<ModuleConfiguration>
         ) {
             Logger.d(TAG, "onInstall()")
+            moduleConfiguration = moduleConfigurations.find<CrashModuleConfiguration>() ?: defaultModuleConfiguration
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
+
+            if (moduleConfiguration.isEnabled){
+                Logger.d(TAG, "Installing crash reporter")
+                val crashReporterInstrumentation = CrashReporterInstrumentation()
+                crashReporterInstrumentation.addAttributesExtractor(CrashAttributesExtractor())
+                crashReporterInstrumentation.install(oTelInstallationContext)
+            } else {
+                Logger.d(TAG, "Crash reporting is disabled")
+            }
         }
     }
 }

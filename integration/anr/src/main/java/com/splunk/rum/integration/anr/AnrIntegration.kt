@@ -20,20 +20,19 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.android.instrumentation.anr.AnrInstrumentation
 
 @SuppressLint("LongLogTag")
 internal object AnrIntegration {
 
     private const val TAG = "AnrIntegration"
-    private const val MODULE_NAME = "anrReporting"
-    private const val DEFAULT_IS_ENABLED = true
-    private const val DEFAULT_TIMEOUT = 5L
+    private const val MODULE_NAME = "anr"
 
-    private var isANRReportingEnabled: Boolean = DEFAULT_IS_ENABLED
-
-    private var thresholdSeconds: Long = DEFAULT_TIMEOUT
+    private val defaultModuleConfiguration = AnrModuleConfiguration()
+    private var moduleConfiguration = defaultModuleConfiguration
 
     init {
         Logger.d(TAG, "init()")
@@ -52,8 +51,18 @@ internal object AnrIntegration {
             moduleConfigurations: List<ModuleConfiguration>
         ) {
             Logger.d(TAG, "onInstall()")
+            moduleConfiguration = moduleConfigurations.find<AnrModuleConfiguration>() ?: defaultModuleConfiguration
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
+
+            if (moduleConfiguration.isEnabled) {
+                Logger.d(TAG, "Installing ANR reporter")
+                val anrDetectorInstrumentation = AnrInstrumentation()
+                anrDetectorInstrumentation.addAttributesExtractor(AnrAttributesExtractor())
+                anrDetectorInstrumentation.install(oTelInstallationContext)
+            } else {
+                Logger.d(TAG, "ANR reporting is disabled")
+            }
         }
     }
 }
