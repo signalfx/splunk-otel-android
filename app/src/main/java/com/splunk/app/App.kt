@@ -27,6 +27,9 @@ import com.splunk.rum.integration.crash.CrashModuleConfiguration
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
+import com.splunk.rum.integration.agent.api.SplunkRumBuilder
 
 class App : Application() {
 
@@ -43,6 +46,18 @@ class App : Application() {
         // globalAttributes["age"] = 32
         // globalAttributes["email"] = "john.doe@example.com"
         // globalAttributes["isValid"] = true
+
+        // Uncomment the following to test install with legacy SplunkRum builder
+//        val agent = SplunkRum.builder()
+//            .setRealm("lab0")
+//            .setRumAccessToken("1CucSUVwF5f2hNyuHwKNfw")
+//            .setApplicationName("Android demo app")
+//            .setDeploymentEnvironment("test")
+//            .setGlobalAttributes(Attributes.of(AttributeKey.stringKey("legacyGlobalAttributesKey"), "legacyGlobalAttributesVal"))
+//            .disableANRReporting()
+//            .disableCrashReporting()
+//            .build(this)
+
 
         val agent = SplunkRum.install(
             application = this,

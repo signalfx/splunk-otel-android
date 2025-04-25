@@ -24,11 +24,9 @@ object RumConstants {
     const val COMPONENT_CRASH: String = "crash"
     const val SERVER_TIMING_HEADER = "server-timing"
     const val CRASH_INSTRUMENTATION_SCOPE_NAME = "io.opentelemetry.crash"
-    const val ANR_INSTRUMENTATION_SCOPE_NAME = "io.opentelemetry.anr"
 
     val WORKFLOW_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("workflow.name")
     val COMPONENT_KEY: AttributeKey<String> = AttributeKey.stringKey("component")
-    val EXCEPTION_STACKTRACE_KEY: AttributeKey<String> = AttributeKey.stringKey("exception.stacktrace")
 
     val APPLICATION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("service.application_id")
     val APP_VERSION_CODE_KEY: AttributeKey<String> = AttributeKey.stringKey("service.version_code")

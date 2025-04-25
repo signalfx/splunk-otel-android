@@ -20,6 +20,8 @@ import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import com.splunk.rum.integration.anr.AnrModuleConfiguration
+import com.splunk.rum.integration.crash.CrashModuleConfiguration
 import io.opentelemetry.api.common.Attributes
 import java.net.URL
 import java.util.function.Consumer
@@ -39,6 +41,8 @@ class SplunkRumBuilder {
     private var instrumentedProcessName: String? = null
     private var deferredUntilForeground: Boolean = false
     private var maxUsageMegabytes: Int = 25
+    private var crashReportingEnabled: Boolean = true
+    private var anrReportingEnabled: Boolean = true
 
     fun setRumAccessToken(token: String): SplunkRumBuilder {
         accessToken = token
@@ -118,6 +122,18 @@ class SplunkRumBuilder {
         return this
     }
 
+    @Deprecated("CrashReporting is now controlled by the CrashModuleConfiguration")
+    fun disableCrashReporting(): SplunkRumBuilder {
+        crashReportingEnabled = false
+        return this
+    }
+
+    @Deprecated("ANRReporting is now controlled by the ANRModuleConfiguration")
+    fun disableANRReporting(): SplunkRumBuilder {
+        anrReportingEnabled = false
+        return this
+    }
+
     fun build(application: Application): SplunkRum {
         val realm = realm
         val beaconEndpoint = beaconEndpoint
@@ -152,6 +168,14 @@ class SplunkRumBuilder {
                     it.accept(spanFilterBuilder)
                     spanFilterBuilder.toSpanInterceptor()
                 },
+            ),
+            moduleConfigurations = arrayOf(
+                CrashModuleConfiguration(
+                    isEnabled = crashReportingEnabled
+                ),
+                AnrModuleConfiguration(
+                    isEnabled = anrReportingEnabled
+                )
             )
         )
 

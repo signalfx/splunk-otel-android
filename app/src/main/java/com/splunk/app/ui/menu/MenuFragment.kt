@@ -234,9 +234,14 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
             }
             viewBinding.getAllGlobalAttributes.id -> {
                 val allAttributes = SplunkRum.instance.globalAttributes
+                val attributesText = StringBuilder()
+                allAttributes.forEach { key, value ->
+                    attributesText.append("${key.key}: $value\n")
+                }
+
                 AlertDialog.Builder(context)
                     .setTitle("All Global Attributes")
-                    .setMessage(allAttributes.toString())
+                    .setMessage(attributesText.toString())
                     .setPositiveButton("OK", null)
                     .show()
             }

@@ -68,6 +68,10 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
                 }
             } finally {
                 span.end(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+                if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
+                   SplunkOpenTelemetrySdk.instance!!.sdkTracerProvider.forceFlush()
+                       .join(5, TimeUnit.SECONDS)
+                }
             }
         }
 

@@ -7,7 +7,7 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord
 
-class ErrorIdentifierAttributesLogProcessor(application: Application) : LogRecordProcessor {
+internal class ErrorIdentifierAttributesLogProcessor(application: Application) : LogRecordProcessor {
 
     private var applicationId: String? = ApplicationInfoUtils.retrieveApplicationId(application)
     private var versionCode: String? = ApplicationInfoUtils.retrieveVersionCode(application)
