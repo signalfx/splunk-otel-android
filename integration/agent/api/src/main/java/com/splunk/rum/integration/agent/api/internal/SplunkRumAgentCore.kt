@@ -32,7 +32,6 @@ import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
 import com.splunk.rum.integration.agent.api.user.UserIdLogProcessor
 import com.splunk.rum.integration.agent.api.user.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.agent.internal.BuildConfig
 import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
 import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.user.IUserManager
@@ -76,11 +75,6 @@ internal object SplunkRumAgentCore {
 
         val agentIntegration = AgentIntegration
             .obtainInstance(application)
-            .setup(
-                appName = requireNotNull(finalConfiguration.appName),
-                agentVersion = requireNotNull(BuildConfig.VERSION_NAME),
-                moduleConfigurations = moduleConfigurations
-            )
 
         SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
@@ -105,7 +99,7 @@ internal object SplunkRumAgentCore {
 
         isRunning = true
 
-        agentIntegration.install(application, openTelemetry)
+        agentIntegration.install(application, openTelemetry, moduleConfigurations)
 
         return openTelemetry
     }
