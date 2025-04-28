@@ -105,8 +105,7 @@ class SplunkRum private constructor(
     }
 
     companion object {
-        @Deprecated("Instance is available if install is not called prior to fetching instance.")
-        val noop = SplunkRum(
+        private val noop = SplunkRum(
             openTelemetry = OpenTelemetry.noop(),
             agentConfiguration = AgentConfiguration.noop,
             state = Noop(),
