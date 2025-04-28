@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Session ID</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+        }
+        button {
+            width: calc(100% - 40px);
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-top: 5px;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 20px;
+            text-align: center;
+        }
+        #sessionId {
+            margin-top: 40px;
+        }
+    </style>
+    <script type="text/javascript">
+        function getSessionId() {
+            var sessionId = SplunkRumNative.getNativeSessionId();
+            document.getElementById('sessionId').innerText = "Session ID: " + sessionId;
+        }
+    </script>
+</head>
+<body>
+<button onclick="getSessionId()">Get Session ID</button>
+<p id="sessionId"></p>
+</body>
+</html>

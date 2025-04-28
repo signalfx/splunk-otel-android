@@ -95,11 +95,6 @@ class SplunkRum private constructor(
         globalAttributes.update { attributesUpdater.accept(this) }
     }
 
-    @Deprecated("Use webView.integrateWithBrowserRum(webView)")
-    fun integrateWithBrowserRum(webView: WebView) {
-        // TODO separate task
-    }
-
     companion object {
         private val noop = SplunkRum(
             openTelemetry = OpenTelemetry.noop(),
