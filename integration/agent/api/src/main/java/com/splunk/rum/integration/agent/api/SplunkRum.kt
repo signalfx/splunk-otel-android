@@ -28,14 +28,12 @@ import com.splunk.rum.integration.agent.api.user.User
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManager
-import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import java.util.function.Consumer
 
