@@ -8,6 +8,7 @@ import utils.versionProperty
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    id("kotlin-parcelize")
 }
 
 apply<ConfigAndroidLibrary>()
@@ -19,19 +20,9 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.rum.integration.anr"
+    namespace = "com.splunk.rum.integration.webview"
 }
 
 dependencies {
-    api(platform(Dependencies.Otel.androidBom))
-
-    implementation(project(":integration:agent:internal"))
-
-    implementation(Dependencies.Otel.androidANRInstrumentation)
-    implementation(Dependencies.Otel.instrumentationApi)
-
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
-    implementation(project(":common:otel"))
+    implementation(project(":integration:agent:api"))
 }
-

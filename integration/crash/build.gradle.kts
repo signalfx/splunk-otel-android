@@ -27,8 +27,10 @@ dependencies {
 
     implementation(project(":integration:agent:internal"))
 
-    implementation(Dependencies.Otel.androidInstrumentation)
+    implementation(Dependencies.Otel.androidCrashInstrumentation)
+    implementation(Dependencies.Otel.instrumentationApi)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(project(":common:otel"))
 }

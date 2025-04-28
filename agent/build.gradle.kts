@@ -31,5 +31,6 @@ dependencies {
     api(project(":integration:lifecycle"))
     api(project(":integration:customtracking"))
     api(project(":integration:networkmonitor"))
+    api(project(":integration:webview"))
 }
 

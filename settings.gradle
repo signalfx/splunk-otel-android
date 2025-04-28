@@ -39,3 +39,4 @@ include ':app'
 // Main entry point
 include ':agent'
 include ':integration:networkmonitor'
+include ':integration:webview'

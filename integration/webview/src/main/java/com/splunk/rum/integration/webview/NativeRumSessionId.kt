@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation
+package com.splunk.rum.integration.webview
 
-object Navigation {
+import android.webkit.JavascriptInterface
+import com.splunk.rum.integration.agent.api.SplunkRum
 
-    internal var listener: Listener? = null
-
-    val preferences = Preferences()
-
-    fun track(screenName: String) {
-        listener?.onScreenNameChanged(screenName)
-    }
-
-    class Preferences {
-        var isFragmentTrackingEnabled = false // TODO implementation
-        var isActivityTrackingEnabled = false // TODO implementation
-    }
-
-    internal interface Listener {
-        fun onScreenNameChanged(screenName: String)
-    }
+/**
+ * Object to inject into WebViews as a javascript object, in order to integrate with browser RUM.
+ */
+internal class NativeRumSessionId {
+    @get:JavascriptInterface
+    val nativeSessionId: String
+        get() = SplunkRum.instance.session.state.sessionId
 }

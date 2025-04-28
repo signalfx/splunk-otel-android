@@ -134,6 +134,8 @@ object Dependencies {
         const val androidHttpUrlLibrary = "io.opentelemetry.android.instrumentation:httpurlconnection-library"
         const val androidOkHttp3Library = "io.opentelemetry.android.instrumentation:okhttp3-library"
         const val androidNetworkMonitorInstrumentation = "io.opentelemetry.android.instrumentation:network"
+        const val androidCrashInstrumentation = "io.opentelemetry.android.instrumentation:crash"
+        const val androidANRInstrumentation = "io.opentelemetry.android.instrumentation:anr"
     }
 
     object AndroidTest {
