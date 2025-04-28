@@ -55,7 +55,7 @@ internal object SplunkRumAgentCore {
         moduleConfigurations: List<ModuleConfiguration>
     ): OpenTelemetry {
         // Sampling.
-        val shouldBeRunning = when (val samplingRate = agentConfiguration.sessionSamplingRate.coerceIn(0.0, 1.0)) {
+        val shouldBeRunning = when (val samplingRate = agentConfiguration.session.samplingRate.coerceIn(0.0, 1.0)) {
             0.0 -> false
             1.0 -> true
             else -> Math.random() < samplingRate

@@ -16,15 +16,19 @@
 
 package com.splunk.rum.integration.agent.api
 
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
+
 interface ISession {
     val state: State
 
-    class State {
-        var sessionId: String = "dummy-session-id" // TODO implementation
-            internal set
+    class State internal constructor(private val sessionConfiguration: SessionConfiguration, private val sessionManager: SplunkSessionManager) {
+        val sessionId: String
+            get() = sessionManager.sessionId
+        val samplingRate: Double
+            get() = sessionConfiguration.samplingRate
     }
 }
 
 class Session internal constructor(
-    override val state: ISession.State
+    override val state: ISession.State,
 ) : ISession

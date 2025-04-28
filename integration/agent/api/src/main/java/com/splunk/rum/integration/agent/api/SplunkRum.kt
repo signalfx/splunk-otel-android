@@ -25,6 +25,8 @@ import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.api.subprocess.SubprocessDetector
 import com.splunk.rum.integration.agent.api.user.User
+import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
@@ -42,9 +44,10 @@ import java.util.function.Consumer
 class SplunkRum private constructor(
     agentConfiguration: AgentConfiguration,
     userManager: IUserManager,
+    sessionManager: SplunkSessionManager,
     val openTelemetry: OpenTelemetry,
     val state: IState = State(agentConfiguration),
-    val session: ISession = Session(ISession.State())
+    val session: ISession = Session(ISession.State(agentConfiguration.session, sessionManager))
 ) {
     val user: User = User(userManager)
 
@@ -125,6 +128,7 @@ class SplunkRum private constructor(
                         Status.NotRunning.Cause.Subprocess
                     ),
                     userManager = NoOpUserManager,
+                    sessionManager = SplunkSessionManager
                 )
             }
 
@@ -132,7 +136,12 @@ class SplunkRum private constructor(
 
             val openTelemetry = SplunkRumAgentCore.install(application, agentConfiguration, userManager, moduleConfigurations.toList())
 
-            instanceInternal = SplunkRum(agentConfiguration = agentConfiguration, openTelemetry = openTelemetry, userManager = UserManager())
+            instanceInternal = SplunkRum(
+                agentConfiguration = agentConfiguration,
+                openTelemetry = openTelemetry,
+                userManager = userManager,
+                sessionManager = AgentIntegration.obtainInstance(application).sessionManager
+            )
 
             return instance
         }
@@ -144,13 +153,16 @@ class SplunkRum private constructor(
         }
 
         @JvmStatic
-        @Deprecated("Use SplunkRum.instance.state.status == Status.Running", ReplaceWith("instance.state.status == Status.Running", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance"))
+        @Deprecated(
+            "Use SplunkRum.instance.state.status == Status.Running",
+            ReplaceWith("instance.state.status == Status.Running", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance")
+        )
         fun isInitialized(): Boolean {
             return instance.state.status == Status.Running
         }
 
         @JvmStatic
-        @Deprecated("Use property noop")
+        @Deprecated("Use SplunkRum.instance without calling SplunkRum.install() to get noop instance")
         fun noop(): SplunkRum {
             return noop
         }
