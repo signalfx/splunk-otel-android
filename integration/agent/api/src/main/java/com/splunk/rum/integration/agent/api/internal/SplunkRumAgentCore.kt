@@ -28,7 +28,6 @@ import com.splunk.rum.integration.agent.api.extension.toResource
 import com.splunk.rum.integration.agent.api.internal.processors.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdLogProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdSpanProcessor
-import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
 import com.splunk.rum.integration.agent.api.user.UserIdLogProcessor
 import com.splunk.rum.integration.agent.api.user.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
@@ -75,8 +74,6 @@ internal object SplunkRumAgentCore {
 
         val agentIntegration = AgentIntegration
             .obtainInstance(application)
-
-        SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
         val initializer = OpenTelemetryInitializer(application, agentConfiguration.deferredUntilForeground, agentConfiguration.spanInterceptor)
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
