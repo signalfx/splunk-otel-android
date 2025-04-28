@@ -73,13 +73,22 @@
             app:layout_constraintTop_toBottomOf="@+id/retryRequest" />
 
         <Button
+            android:id="@+id/serverTimingHeaderInResponse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_timing_header_in_response"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/multipleHeaders" />
+
+        <Button
             android:id="@+id/postMarkdown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/post_markdown"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/multipleHeaders" />
+            app:layout_constraintTop_toBottomOf="@+id/serverTimingHeaderInResponse" />
 
         <Button
             android:id="@+id/postStreaming"

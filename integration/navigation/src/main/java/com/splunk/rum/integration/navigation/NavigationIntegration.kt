@@ -19,7 +19,6 @@ package com.splunk.rum.integration.navigation
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
@@ -66,20 +65,15 @@ internal object NavigationIntegration {
         }
     }
 
-    private val configManagerListener = object : ModuleConfigurationManager.Listener {
-        override fun onSetup(configurations: List<ModuleConfiguration>) {
-            moduleConfiguration = configurations.find<NavigationModuleConfiguration>() ?: defaultModuleConfiguration
-
-            Logger.d(TAG, "onSetup(moduleConfiguration: $moduleConfiguration)")
-        }
-    }
-
     private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
+        override fun onInstall(
+            context: Context,
+            oTelInstallationContext: InstallationContext,
+            moduleConfigurations: List<ModuleConfiguration>
+        ) {
             Logger.d(TAG, "onInstall()")
 
-            val integration = AgentIntegration.obtainInstance(context)
-            integration.moduleConfigurationManager.listeners += configManagerListener
+            moduleConfiguration = moduleConfigurations.find<NavigationModuleConfiguration>() ?: defaultModuleConfiguration
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }

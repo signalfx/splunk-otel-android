@@ -29,7 +29,6 @@ import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.Sess
 import com.cisco.android.instrumentation.recording.wireframe.model.Wireframe
 import com.cisco.android.instrumentation.recording.wireframe.stats.WireframeStats
 import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
@@ -140,20 +139,15 @@ internal object InteractionsIntegration {
         }
     }
 
-    private val configManagerListener = object : ModuleConfigurationManager.Listener {
-        override fun onSetup(configurations: List<ModuleConfiguration>) {
-            moduleConfiguration = configurations.find<InteractionsModuleConfiguration>() ?: defaultModuleConfiguration
-
-            Logger.d(TAG, "onSetup(moduleConfiguration: $moduleConfiguration)")
-        }
-    }
-
     private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
+        override fun onInstall(
+            context: Context,
+            oTelInstallationContext: InstallationContext,
+            moduleConfigurations: List<ModuleConfiguration>
+        ) {
             Logger.d(TAG, "onInstall()")
 
-            val integration = AgentIntegration.obtainInstance(context)
-            integration.moduleConfigurationManager.listeners += configManagerListener
+            moduleConfiguration = moduleConfigurations.find<InteractionsModuleConfiguration>() ?: defaultModuleConfiguration
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }

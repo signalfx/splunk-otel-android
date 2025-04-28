@@ -105,6 +105,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         viewBinding.unSuccessfulGet.setOnClickListener { unsuccessfulGet() }
         viewBinding.retryRequest.setOnClickListener { retryRequest() }
         viewBinding.multipleHeaders.setOnClickListener { multipleHeaders() }
+        viewBinding.serverTimingHeaderInResponse.setOnClickListener { serverTimingHeaderInResponse() }
         viewBinding.postMarkdown.setOnClickListener { postMarkdown() }
         viewBinding.postStreaming.setOnClickListener { postStreaming() }
         viewBinding.postFile.setOnClickListener { postFile() }
@@ -121,24 +122,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * Demonstrates a synchronous successful okhttp GET - Download a file, print its headers, and print its response body as a string.
      */
     fun synchronousGet() {
-
-        val request = Request.Builder()
-            .url("https://publicobject.com/helloworld.txt")
-            .build()
-
-        runOnBackgroundThread {
-
-            client.newCall(request).execute().use { response ->
-               if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                for ((name, value) in response.headers) {
-                    Log.v(TAG, "$name: $value")
-                }
-
-                Log.v(TAG, response.body?.string() ?: "null")
-                showDoneToast("synchronousGet")
-            }
-        }
+        executeGetRequest("https://publicobject.com/helloworld.txt")
+        showDoneToast("synchronousGet")
     }
 
     /**
@@ -147,8 +132,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * The callback is made after the response headers are ready.
      */
     fun asynchronousGet() {
-        val url = "https://httpbin.org/robots.txt"
-        performAsynchronousGet(url)
+        executeAsynchronousGet("https://httpbin.org/robots.txt")
         showDoneToast("asynchronousGet")
     }
 
@@ -157,36 +141,9 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun concurrentAsynchronousGet() {
         val url = "https://httpbin.org/headers"
-        performAsynchronousGet(url)
-        performAsynchronousGet(url)
+        executeAsynchronousGet(url)
+        executeAsynchronousGet(url)
         showDoneToast("concurrentAsynchronousGet")
-    }
-
-    /**
-     * Called from other functions to perform asynchronous GET to a given url.
-     */
-    fun performAsynchronousGet(url: String) {
-        val request = Request.Builder()
-            .url(url)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                    for ((name, value) in response.headers) {
-                        println("$name: $value")
-                    }
-
-                    Log.v(TAG, response.body?.string() ?: "null")
-                }
-            }
-        })
     }
 
     /**
@@ -250,26 +207,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * Demonstrates an unsuccessful okhttp GET.
      */
     fun unsuccessfulGet() {
-        val request = Request.Builder()
-            .url("http://httpbin.org/status/404")
-            .build()
-
-        runOnBackgroundThread {
-            try {
-                client.newCall(request).execute().use { response ->
-
-                    for ((name, value) in response.headers) {
-                        Log.v(TAG, "$name: $value")
-                    }
-
-                    Log.v(TAG, response.body?.string() ?: "null")
-
-                    showDoneToast("unsuccessfulGet")
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
+        executeGetRequest("https://httpbin.org/status/404")
+        showDoneToast("unsuccessfulGet")
     }
 
     /**
@@ -277,26 +216,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * http.request.resend_count is being set on each retried request.
      */
     fun retryRequest() {
-        val request = Request.Builder()
-            .url("https://httpbin.org/status/503")
-            .build()
-
-        runOnBackgroundThread {
-            try {
-                retryClient.newCall(request).execute().use { response ->
-
-                    for ((name, value) in response.headers) {
-                        Log.v(TAG, "$name: $value")
-                    }
-
-                    Log.v(TAG, response.body?.string() ?: "null")
-
-                    showDoneToast("retryRequest")
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
+        executeGetRequest("https://httpbin.org/status/503", true)
+        showDoneToast("retryRequest")
     }
 
     /**
@@ -319,9 +240,37 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                 Log.v(TAG, "Server: ${response.header("Server")}")
                 Log.v(TAG, "Date: ${response.header("Date")}")
                 Log.v(TAG, "Vary: ${response.headers("Vary")}")
-                showDoneToast("multipleHeaders")
             }
         }
+
+        showDoneToast("multipleHeaders")
+    }
+
+    /**
+     * Demonstrates addition of link.traceId and link.spanId attributes in span when
+     * server-timing header is present in the response.
+     */
+    fun serverTimingHeaderInResponse() {
+
+        //one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
+        executeGetRequest(
+            "https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'"
+        )
+
+        //invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
+        executeGetRequest(
+            "https://httpbin.org/response-headers?Server-Timing=incorrectSyntax"
+        )
+
+        //two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
+        // with the values from last valid header found
+        executeGetRequest(
+            "https://httpbin.org/response-headers" +
+                    "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
+                    "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
+        )
+
+        showDoneToast("serverTimingHeaderInResponse")
     }
 
     /**
@@ -338,19 +287,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         | * _1.2_ August 11, 2013
         |""".trimMargin()
 
-        val request = Request.Builder()
-            .url("https://api.github.com/markdown/raw")
-            .post(postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
-            .build()
-
-        runOnBackgroundThread {
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                Log.v(TAG, (response.body?.string() ?: "null"))
-                showDoneToast("postMarkdown")
-            }
-        }
+        executePostRequest("https://api.github.com/markdown/raw", postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
+        showDoneToast("postMarkdown")
     }
 
     /**
@@ -378,19 +316,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             }
         }
 
-        val request = Request.Builder()
-            .url("https://api.github.com/markdown/raw")
-            .post(requestBody)
-            .build()
-
-        runOnBackgroundThread {
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                Log.v(TAG, response.body?.string() ?: "null")
-                showDoneToast("postStreaming")
-            }
-        }
+        executePostRequest("https://api.github.com/markdown/raw", requestBody)
+        showDoneToast("postStreaming")
     }
 
     /**
@@ -410,19 +337,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             |""".trimMargin()
         )
 
-        val request = Request.Builder()
-            .url("https://api.github.com/markdown/raw")
-            .post(file.asRequestBody(MEDIA_TYPE_MARKDOWN))
-            .build()
-
-        runOnBackgroundThread {
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                Log.v(TAG, response.body?.string() ?: "null")
-                showDoneToast("postFile")
-            }
-        }
+        executePostRequest("https://api.github.com/markdown/raw", file.asRequestBody(MEDIA_TYPE_MARKDOWN))
+        showDoneToast("postFile")
     }
 
     /**
@@ -433,19 +349,9 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         val formBody = FormBody.Builder()
             .add("search", "Jurassic Park")
             .build()
-        val request = Request.Builder()
-            .url("https://en.wikipedia.org/w/index.php")
-            .post(formBody)
-            .build()
 
-        runOnBackgroundThread {
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                Log.v(TAG, response.body?.string() ?: "null")
-                showDoneToast("postFormParameters")
-            }
-        }
+        executePostRequest("https://en.wikipedia.org/w/index.php", formBody)
+        showDoneToast("postFormParameters")
     }
 
     /**
@@ -465,20 +371,9 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             )
             .build()
 
-        val request = Request.Builder()
-            .header("Authorization", "Client-ID $IMGUR_CLIENT_ID")
-            .url("https://api.imgur.com/3/image")
-            .post(requestBody)
-            .build()
-
-        runOnBackgroundThread {
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                Log.v(TAG, response.body?.string() ?: "null")
-                showDoneToast("postMutlipartRequest")
-            }
-        }
+        val headers = mapOf("Authorization" to "Client-ID $IMGUR_CLIENT_ID")
+        executePostRequest("https://api.imgur.com/3/image", requestBody, headers)
+        showDoneToast("postMutlipartRequest")
     }
 
     /**
@@ -551,7 +446,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun canceledCall() {
         val request = Request.Builder()
-            .url("http://httpbin.org/delay/2") // This URL is served with a 2 second delay.
+            .url("https://httpbin.org/delay/2") // This URL is served with a 2 second delay.
             .build()
 
         val startNanos = System.nanoTime()
@@ -585,6 +480,87 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                     )
                 )
                 showDoneToast("canceledCall")
+            }
+        }
+    }
+
+    /**
+     * Called from other functions to perform synchronous GET to a given url.
+     */
+    private fun executeGetRequest(url: String, useRetryClient: Boolean = false) {
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        val okHttpClient = if (useRetryClient) {
+            retryClient
+        } else {
+            client
+        }
+
+        runOnBackgroundThread {
+            try {
+                okHttpClient.newCall(request).execute().use { response ->
+
+                    for ((name, value) in response.headers) {
+                        Log.v(TAG, "$name: $value")
+                    }
+
+                    Log.v(TAG, response.body?.string() ?: "null")
+
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /**
+     * Called from other functions to perform asynchronous GET to a given url.
+     */
+    private fun executeAsynchronousGet(url: String) {
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+
+                    for ((name, value) in response.headers) {
+                        println("$name: $value")
+                    }
+
+                    Log.v(TAG, response.body?.string() ?: "null")
+                }
+            }
+        })
+    }
+
+    /**
+     * Called from other functions to perform POST to a given url with given request body and headers.
+     */
+    private fun executePostRequest(url: String, requestBody: RequestBody, headers: Map<String, String>? = null) {
+        val requestBuilder = Request.Builder()
+            .url(url)
+            .post(requestBody)
+
+        headers?.forEach { (key, value) ->
+            requestBuilder.addHeader(key, value)
+        }
+
+        val request = requestBuilder.build()
+
+        runOnBackgroundThread {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+
+                Log.v(TAG, (response.body?.string() ?: "null"))
             }
         }
     }
