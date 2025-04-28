@@ -21,15 +21,12 @@ import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.attributes.ErrorIdentifierAttributesSpanProcessor
-import com.splunk.rum.integration.agent.api.attributes.GenericAttributesLogProcessor
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.extension.toResource
 import com.splunk.rum.integration.agent.api.internal.processors.GlobalAttributeSpanProcessor
-import com.splunk.rum.integration.agent.api.sessionId.SessionIdLogProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionIdSpanProcessor
 import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
-import com.splunk.rum.integration.agent.api.user.UserIdLogProcessor
 import com.splunk.rum.integration.agent.api.user.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
@@ -88,9 +85,6 @@ internal object SplunkRumAgentCore {
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
-            .addLogRecordProcessor(GenericAttributesLogProcessor())
-            .addLogRecordProcessor(UserIdLogProcessor(UserManager()))
-            .addLogRecordProcessor(SessionIdLogProcessor(agentIntegration.sessionManager))
 
         if (agentConfiguration.enableDebugLogging)
             initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
