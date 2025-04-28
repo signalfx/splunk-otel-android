@@ -26,6 +26,8 @@ import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.api.subprocess.SubprocessDetector
 import com.splunk.rum.integration.agent.api.user.User
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
@@ -44,7 +46,7 @@ import java.util.function.Consumer
 class SplunkRum private constructor(
     agentConfiguration: AgentConfiguration,
     userManager: IUserManager,
-    sessionManager: SplunkSessionManager,
+    sessionManager: ISplunkSessionManager,
     val openTelemetry: OpenTelemetry,
     val state: IState = State(agentConfiguration),
     val session: ISession = Session(ISession.State(agentConfiguration.session, sessionManager))
@@ -94,7 +96,8 @@ class SplunkRum private constructor(
     @Deprecated(
         message = "Use globalAttributes.update() method",
         replaceWith = ReplaceWith("globalAttributes.update { attributesUpdater.accept(this) }")
-    )    fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
+    )
+    fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
         globalAttributes.update { attributesUpdater.accept(this) }
     }
 
@@ -104,11 +107,13 @@ class SplunkRum private constructor(
     }
 
     companion object {
-        private val noop = SplunkRum(
+        @Deprecated("Instance is available if install is not called prior to fetching instance.")
+        val noop = SplunkRum(
             openTelemetry = OpenTelemetry.noop(),
             agentConfiguration = AgentConfiguration.noop,
             state = Noop(),
-            userManager = NoOpUserManager
+            userManager = NoOpUserManager,
+            sessionManager = NoOpSplunkSessionManager
         )
         private var instanceInternal: SplunkRum? = null
         private const val TAG = "SplunkRum"
@@ -143,7 +148,6 @@ class SplunkRum private constructor(
             if (instanceInternal != null)
                 return instance
 
-
             val isSubprocess = SubprocessDetector.isSubprocess(applicationId = agentConfiguration.instrumentedProcessName)
 
             if (isSubprocess && agentConfiguration.instrumentedProcessName != null) {
@@ -155,7 +159,7 @@ class SplunkRum private constructor(
                         Status.NotRunning.Cause.Subprocess
                     ),
                     userManager = NoOpUserManager,
-                    sessionManager = SplunkSessionManager
+                    sessionManager = NoOpSplunkSessionManager,
                 )
             }
 

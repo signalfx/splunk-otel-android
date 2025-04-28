@@ -21,6 +21,7 @@ import android.content.Context
 import android.os.SystemClock
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.internal.model.Module
+import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.storage.AgentStorage
@@ -32,7 +33,7 @@ import io.opentelemetry.api.OpenTelemetry
 class AgentIntegration private constructor(
     context: Context
 ) {
-    val sessionManager: SplunkSessionManager
+    val sessionManager: ISplunkSessionManager
     val listeners: MutableSet<Listener> = HashSet()
 
     //TODO: Replace with actual SessionManager when session module from upstream is integrated
