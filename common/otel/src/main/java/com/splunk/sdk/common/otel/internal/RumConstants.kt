@@ -22,6 +22,7 @@ object RumConstants {
     const val RUM_TRACER_NAME: String = "SplunkRum"
     const val COMPONENT_ERROR: String = "error"
     const val COMPONENT_CRASH: String = "crash"
+    const val COMPONENT_HTTP: String = "http"
     const val SERVER_TIMING_HEADER = "server-timing"
 
     val WORKFLOW_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("workflow.name")

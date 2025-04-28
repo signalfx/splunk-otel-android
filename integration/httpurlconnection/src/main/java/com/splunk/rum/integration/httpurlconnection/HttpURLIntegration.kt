@@ -21,7 +21,6 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
-import io.opentelemetry.android.instrumentation.AndroidInstrumentationLoader
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
 import com.splunk.rum.integration.agent.internal.extension.find
@@ -29,7 +28,7 @@ import com.splunk.rum.integration.agent.internal.extension.find
 internal object HttpURLIntegration {
 
     private const val TAG = "HttpURLIntegration"
-    private const val MODULE_NAME = "httpURLConnectionTracing"
+    private const val MODULE_NAME = "httpURLConnection"
 
     private val defaultModuleConfiguration = HttpURLModuleConfiguration()
     private var moduleConfiguration = defaultModuleConfiguration
@@ -63,9 +62,9 @@ internal object HttpURLIntegration {
 
             //install HttpURLConnection auto-instrumentation if isEnabled is true
             if(moduleConfiguration.isEnabled){
-                val httpUrlInstrumentation = AndroidInstrumentationLoader.getInstrumentation(HttpUrlInstrumentation::class.java)
-                httpUrlInstrumentation?.addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
-                httpUrlInstrumentation?.install(oTelInstallationContext)
+                val httpUrlInstrumentation = HttpUrlInstrumentation()
+                httpUrlInstrumentation.addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
+                httpUrlInstrumentation.install(oTelInstallationContext)
             }
         }
     }

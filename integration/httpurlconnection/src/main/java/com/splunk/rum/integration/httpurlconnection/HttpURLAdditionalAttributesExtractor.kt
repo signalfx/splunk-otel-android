@@ -10,7 +10,7 @@ import java.net.URLConnection
 class HttpURLAdditionalAttributesExtractor: AttributesExtractor<URLConnection, Int> {
 
     override fun onStart(attributes: AttributesBuilder, parentContext: Context, connection: URLConnection) {
-        attributes.put(RumConstants.COMPONENT_KEY, "http")
+        attributes.put(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_HTTP)
     }
 
     override fun onEnd(
@@ -32,10 +32,10 @@ class HttpURLAdditionalAttributesExtractor: AttributesExtractor<URLConnection, I
             // HttpURLConnection consolidates multiple headers with the same name into a single header entry,
             // combining their values into a list. We want to capture the last valid server-timing header.
             header.value.forEach { headerValue ->
-                val ids = ServerTimingHeaderParser.parse(headerValue)
-                if (ids.size == 2) {
-                    attributes.put(RumConstants.LINK_TRACE_ID_KEY, ids[0])
-                    attributes.put(RumConstants.LINK_SPAN_ID_KEY, ids[1])
+                val serverTraceContext = ServerTimingHeaderParser.parse(headerValue)
+                serverTraceContext?.let {
+                    attributes.put(RumConstants.LINK_TRACE_ID_KEY, it.traceId)
+                    attributes.put(RumConstants.LINK_SPAN_ID_KEY, it.spanId)
                 }
             }
         }

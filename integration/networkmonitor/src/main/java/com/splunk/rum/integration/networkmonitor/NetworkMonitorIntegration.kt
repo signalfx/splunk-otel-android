@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.okhttp3
+package com.splunk.rum.integration.networkmonitor
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
@@ -23,15 +23,14 @@ import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManag
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.InstallationContext
 import com.splunk.rum.integration.agent.internal.extension.find
-import io.opentelemetry.android.instrumentation.AndroidInstrumentationLoader
-import io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation
+import io.opentelemetry.android.instrumentation.network.NetworkChangeInstrumentation
 
-internal object OkHttp3Integration {
+internal object NetworkMonitorIntegration {
 
-    private const val TAG = "OkHttp3Integration"
-    private const val MODULE_NAME = "okHttp3"
+    private const val TAG = "NetworkMonitorIntegration"
+    private const val MODULE_NAME = "networkMonitor"
 
-    private val defaultModuleConfiguration = OkHttp3ModuleConfiguration()
+    private val defaultModuleConfiguration = NetworkMonitorModuleConfiguration()
     private var moduleConfiguration = defaultModuleConfiguration
 
     init {
@@ -46,7 +45,7 @@ internal object OkHttp3Integration {
 
     private val configManagerListener = object : ModuleConfigurationManager.Listener {
         override fun onSetup(configurations: List<ModuleConfiguration>) {
-            moduleConfiguration = configurations.find< OkHttp3ModuleConfiguration>() ?: defaultModuleConfiguration
+            moduleConfiguration = configurations.find< NetworkMonitorModuleConfiguration>() ?: defaultModuleConfiguration
 
             Logger.d(TAG, "onSetup(moduleConfiguration: ${moduleConfiguration})")
         }
@@ -61,11 +60,9 @@ internal object OkHttp3Integration {
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
 
-            //install OkHttp3 auto-instrumentation if isEnabled is true
+            //install Network Monitor instrumentation if isEnabled is true
             if(moduleConfiguration.isEnabled){
-                val okHttpInstrumentation = AndroidInstrumentationLoader.getInstrumentation(OkHttpInstrumentation::class.java)
-                okHttpInstrumentation?.addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
-                okHttpInstrumentation?.install(oTelInstallationContext)
+                NetworkChangeInstrumentation().install(oTelInstallationContext)
             }
         }
     }
