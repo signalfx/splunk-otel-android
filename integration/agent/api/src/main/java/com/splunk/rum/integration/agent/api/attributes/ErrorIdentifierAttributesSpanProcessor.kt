@@ -26,15 +26,9 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 
 internal class ErrorIdentifierAttributesSpanProcessor(application: Application) : SpanProcessor {
 
-    private var applicationId: String? = null
-    private var versionCode: String? = null
-    private var splunkBuildId: String? = null
-
-    init {
-        applicationId = ApplicationInfoUtils.retrieveApplicationId(application)
-        versionCode = ApplicationInfoUtils.retrieveVersionCode(application)
-        splunkBuildId = ApplicationInfoUtils.retrieveSplunkBuildID(application)
-    }
+    private var applicationId: String? = ApplicationInfoUtils.retrieveApplicationId(application)
+    private var versionCode: String? = ApplicationInfoUtils.retrieveVersionCode(application)
+    private var splunkBuildId: String? = ApplicationInfoUtils.retrieveSplunkBuildID(application)
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         if (span.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_ERROR ||

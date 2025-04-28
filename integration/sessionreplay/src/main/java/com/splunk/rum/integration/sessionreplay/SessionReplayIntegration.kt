@@ -23,7 +23,6 @@ import com.cisco.android.instrumentation.recording.core.api.Metadata
 import com.cisco.android.instrumentation.recording.core.api.SessionReplay
 import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.agent.internal.config.ModuleConfigurationManager
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
@@ -62,10 +61,6 @@ internal object SessionReplayIntegration {
         }
     }
 
-    private val moduleConfigurationManagerListener = object : ModuleConfigurationManager.Listener {
-        override fun onSetup(configurations: List<ModuleConfiguration>) {
-        }
-    }
 
     private val sessionReplayDataListener = object : DataListener {
         override fun onData(data: ByteArray, metadata: Metadata): Boolean {
@@ -95,11 +90,12 @@ internal object SessionReplayIntegration {
     }
 
     private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(context: Context, oTelInstallationContext: InstallationContext) {
+        override fun onInstall(
+            context: Context,
+            oTelInstallationContext: InstallationContext,
+            moduleConfigurations: List<ModuleConfiguration>
+        ) {
             Logger.d(TAG, "onInstall()")
-
-            val integration = AgentIntegration.obtainInstance(context)
-            integration.moduleConfigurationManager.listeners += moduleConfigurationManagerListener
             SessionReplay.instance.dataListeners += sessionReplayDataListener
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)

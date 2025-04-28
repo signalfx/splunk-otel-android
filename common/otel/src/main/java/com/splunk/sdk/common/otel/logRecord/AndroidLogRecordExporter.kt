@@ -45,29 +45,34 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
                 .setStartTimestamp(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
 
 
-            if(activeSpan !=null && activeSpan.spanContext.isValid){
+            if(activeSpan != null && activeSpan.spanContext.isValid){
                 spanBuilder.setParent(parentContext)
             }
 
-            val span = spanBuilder.startSpan()
-
             try {
-                span.setAttribute("body", log.body.asString())
+                spanBuilder.setAttribute("body", log.body.asString())
                 log.attributes.asMap().forEach { (key, value) ->
                     when (value) {
-                        is String -> span.setAttribute(key.key, value)
-                        is Long -> span.setAttribute(key.key, value)
-                        is Double -> span.setAttribute(key.key, value)
-                        is Boolean -> span.setAttribute(key.key, value)
+                        is String -> spanBuilder.setAttribute(key.key, value)
+                        is Long -> spanBuilder.setAttribute(key.key, value)
+                        is Double -> spanBuilder.setAttribute(key.key, value)
+                        is Boolean -> spanBuilder.setAttribute(key.key, value)
                         is List<*> -> {
                             val listValue = value.joinToString(",") { it.toString() }
-                            span.setAttribute(key.key, listValue)
+                            spanBuilder.setAttribute(key.key, listValue)
                         }
-                        else -> span.setAttribute(key.key, value.toString())
+                        else -> spanBuilder.setAttribute(key.key, value.toString())
                     }
                 }
             } finally {
-                span.end(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+                spanBuilder
+                    .setStartTimestamp(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+                    .startSpan()
+                    .end(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+                if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
+                    SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.forceFlush()
+                        ?.join(5, TimeUnit.SECONDS)
+                }
             }
         }
 
