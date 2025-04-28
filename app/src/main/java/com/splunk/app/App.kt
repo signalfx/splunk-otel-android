@@ -30,6 +30,9 @@ import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import com.splunk.rum.integration.agent.api.SplunkRumBuilder
+import com.splunk.rum.integration.httpurlconnection.HttpURLModuleConfiguration
+import com.splunk.rum.integration.okhttp3.OkHttp3ModuleConfiguration
+import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration
 
 class App : Application() {
 
@@ -85,6 +88,15 @@ class App : Application() {
                     isEnabled = true
                 ),
                 AnrModuleConfiguration(
+                    isEnabled = true
+                ),
+                HttpURLModuleConfiguration(
+                    isEnabled = true
+                ),
+                OkHttp3ModuleConfiguration(
+                    isEnabled = true
+                ),
+                NetworkMonitorModuleConfiguration(
                     isEnabled = true
                 )
             )

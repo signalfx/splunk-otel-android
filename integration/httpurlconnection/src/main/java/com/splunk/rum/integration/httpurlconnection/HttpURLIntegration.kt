@@ -52,14 +52,14 @@ internal object HttpURLIntegration {
 
             moduleConfiguration = moduleConfigurations.find< HttpURLModuleConfiguration>() ?: defaultModuleConfiguration
 
-            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
-
             //install HttpURLConnection auto-instrumentation if isEnabled is true
             if(moduleConfiguration.isEnabled){
                 val httpUrlInstrumentation = HttpUrlInstrumentation()
                 httpUrlInstrumentation.addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
                 httpUrlInstrumentation.install(oTelInstallationContext)
             }
+
+            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }
