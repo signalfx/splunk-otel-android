@@ -21,6 +21,7 @@ import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.extension.find
+import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.android.instrumentation.crash.CrashReporterInstrumentation
@@ -32,7 +33,6 @@ internal object CrashIntegration {
     private const val MODULE_NAME = "crash"
 
     private val defaultModuleConfiguration = CrashModuleConfiguration()
-    private var moduleConfiguration = defaultModuleConfiguration
 
     init {
         Logger.d(TAG, "init()")
@@ -51,11 +51,14 @@ internal object CrashIntegration {
             moduleConfigurations: List<ModuleConfiguration>
         ) {
             Logger.d(TAG, "onInstall()")
-            moduleConfiguration = moduleConfigurations.find<CrashModuleConfiguration>() ?: defaultModuleConfiguration
+
+            val isEnabled = moduleConfigurations.find<LegacyCrashModuleConfiguration>()?.isEnabled
+                ?: moduleConfigurations.find<CrashModuleConfiguration>()?.isEnabled
+                ?: defaultModuleConfiguration.isEnabled
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
 
-            if (moduleConfiguration.isEnabled){
+            if (isEnabled) {
                 Logger.d(TAG, "Installing crash reporter")
                 val crashReporterInstrumentation = CrashReporterInstrumentation()
                 crashReporterInstrumentation.addAttributesExtractor(CrashAttributesExtractor())
