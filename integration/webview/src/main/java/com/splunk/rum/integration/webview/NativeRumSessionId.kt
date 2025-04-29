@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.attributes
+package com.splunk.rum.integration.webview
 
-import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.DOMAIN
-import io.opentelemetry.context.Context
-import io.opentelemetry.sdk.logs.LogRecordProcessor
-import io.opentelemetry.sdk.logs.ReadWriteLogRecord
+import android.webkit.JavascriptInterface
+import com.splunk.rum.integration.agent.api.SplunkRum
 
-internal class GenericAttributesLogProcessor : LogRecordProcessor {
-    override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
-        logRecord.setAttribute(DOMAIN, "mrum")
-    }
+/**
+ * Object to inject into WebViews as a javascript object, in order to integrate with browser RUM.
+ */
+internal class NativeRumSessionId {
+    @get:JavascriptInterface
+    val nativeSessionId: String
+        get() = SplunkRum.instance.session.state.sessionId
 }
