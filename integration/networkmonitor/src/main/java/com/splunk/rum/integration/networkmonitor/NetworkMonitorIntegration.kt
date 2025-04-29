@@ -19,9 +19,9 @@ package com.splunk.rum.integration.networkmonitor
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.InstallationContext
-import com.splunk.rum.integration.agent.internal.extension.find
 import io.opentelemetry.android.instrumentation.network.NetworkChangeInstrumentation
 
 internal object NetworkMonitorIntegration {
@@ -46,13 +46,15 @@ internal object NetworkMonitorIntegration {
         override fun onInstall(
             context: Context,
             oTelInstallationContext: InstallationContext,
-            moduleConfigurations: List<ModuleConfiguration>) {
+            moduleConfigurations: List<ModuleConfiguration>
+        ) {
             Logger.d(TAG, "onInstall()")
 
-            moduleConfiguration = moduleConfigurations.find< NetworkMonitorModuleConfiguration>() ?: defaultModuleConfiguration
+            moduleConfiguration = moduleConfigurations.find<NetworkMonitorModuleConfiguration>()
+                ?: defaultModuleConfiguration
 
             //install Network Monitor instrumentation if isEnabled is true
-            if(moduleConfiguration.isEnabled){
+            if (moduleConfiguration.isEnabled) {
                 NetworkChangeInstrumentation().install(oTelInstallationContext)
             }
 
