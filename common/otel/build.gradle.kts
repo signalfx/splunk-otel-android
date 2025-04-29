@@ -31,7 +31,6 @@ dependencies {
     implementation(project(":common:storage"))
 
     api(Dependencies.Otel.sdk)
-    api(Dependencies.Otel.api)
     api(Dependencies.Otel.exporterOtlpCommon)
     api(Dependencies.Otel.exporterOtlp) {
         exclude(group = "com.squareup.okhttp3", module = "okhttp")
