@@ -21,12 +21,3 @@ import com.splunk.rum.integration.navigation.Navigation
 
 val SplunkRum.navigation: Navigation
     get() = Navigation
-
-@JvmOverloads
-@Deprecated("Use navigation.track(). Argument spanType is ignored.")
-fun SplunkRum.experimentalSetScreenName(screenName: String?, spanType: String = "Created") {
-    if (screenName == null)
-        return
-
-    navigation.track(screenName)
-}
