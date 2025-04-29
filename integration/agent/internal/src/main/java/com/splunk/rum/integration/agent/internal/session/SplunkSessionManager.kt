@@ -70,7 +70,7 @@ class SplunkSessionManager internal constructor(
 
     override val sessionListeners: MutableSet<SessionListener> = HashSet()
 
-    private var sessionTimeout: Long = DEFAULT_SESSION_TIMEOUT
+    private var sessionBackgroundTimeout: Long = DEFAULT_SESSION_BACKGROUND_TIMEOUT
 
     private var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
 
@@ -117,7 +117,7 @@ class SplunkSessionManager internal constructor(
     private fun watchSessionInBackgroundValidity() {
         saveSessionInBackgroundValidationTime()
 
-        sessionValidityWatcher = executor.safeSchedule(sessionTimeout) {
+        sessionValidityWatcher = executor.safeSchedule(sessionBackgroundTimeout) {
             sessionValidityWatcher = null
 
             deleteSessionInBackgroundValidationTime()
@@ -133,7 +133,7 @@ class SplunkSessionManager internal constructor(
     }
 
     private fun saveSessionInBackgroundValidationTime() {
-        agentStorage.writeSessionValidUntilInBackground(System.currentTimeMillis() + sessionTimeout)
+        agentStorage.writeSessionValidUntilInBackground(System.currentTimeMillis() + sessionBackgroundTimeout)
     }
 
     private fun deleteSessionInBackgroundValidationTime() {
@@ -169,7 +169,7 @@ class SplunkSessionManager internal constructor(
     }
 
     private companion object {
-        const val DEFAULT_SESSION_TIMEOUT = 15L * 60L * 1000L // 15m
+        const val DEFAULT_SESSION_BACKGROUND_TIMEOUT = 15L * 60L * 1000L // 15m
         const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L // 4h
     }
 }

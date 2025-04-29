@@ -47,14 +47,13 @@ class SplunkRum private constructor(
     sessionManager: ISplunkSessionManager,
     val openTelemetry: OpenTelemetry,
     val state: IState = State(agentConfiguration),
-    val session: ISession = Session(ISession.State(agentConfiguration.session, sessionManager))
-) {
-    val user: User = User(userManager)
-
+    val session: ISession = Session(ISession.State(agentConfiguration.session, sessionManager)),
+    val user: User = User(userManager),
     /**
      * Represents the global attributes configured for the agent.
      */
     val globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
+) {
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
     fun getRumSessionId(): String {
@@ -174,12 +173,18 @@ class SplunkRum private constructor(
             return instance
         }
 
+        /**
+         * Creates a new {@link SplunkRumBuilder}, used to set up a {@link SplunkRum} instance.
+         */
         @JvmStatic
         @Deprecated("Use SplunkRum.install()", ReplaceWith("install", "com.splunk.rum.integration.agent.api.SplunkRumBuilder"))
         fun builder(): SplunkRumBuilder {
             return SplunkRumBuilder()
         }
 
+        /**
+         * Returns {@code true} if the Splunk RUM library has been successfully initialized.
+         */
         @JvmStatic
         @Deprecated(
             "Use SplunkRum.instance.state.status == Status.Running",
@@ -189,8 +194,18 @@ class SplunkRum private constructor(
             return instance.state.status == Status.Running
         }
 
+        /**
+         * Initialize a no-op version of the SplunkRum API, including the instance of OpenTelemetry that
+         * is available. This can be useful for testing, or configuring your app without RUM enabled,
+         * but still using the APIs.
+         *
+         * @return A no-op instance of {@link SplunkRum}
+         */
         @JvmStatic
-        @Deprecated("Use SplunkRum.instance without calling SplunkRum.install() to get noop instance")
+        @Deprecated(
+            "Use SplunkRum.instance without calling SplunkRum.install() to get noop instance",
+            ReplaceWith("SplunkRum.install()", "com.splunk.rum.integration.agent.api.SplunkRum.install")
+        )
         fun noop(): SplunkRum {
             return noop
         }
