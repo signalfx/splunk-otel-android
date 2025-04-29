@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.httpurlconnection
+package com.splunk.rum.integration.networkmonitor
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
-import com.splunk.rum.integration.agent.internal.extension.find
+import io.opentelemetry.android.instrumentation.network.NetworkChangeInstrumentation
 
-internal object HttpURLIntegration {
+internal object NetworkMonitorIntegration {
 
-    private const val TAG = "HttpURLIntegration"
-    private const val MODULE_NAME = "httpURLConnection"
+    private const val TAG = "NetworkMonitorIntegration"
+    private const val MODULE_NAME = "networkMonitor"
 
-    private val defaultModuleConfiguration = HttpURLModuleConfiguration()
+    private val defaultModuleConfiguration = NetworkMonitorModuleConfiguration()
     private var moduleConfiguration = defaultModuleConfiguration
 
     init {
@@ -50,13 +50,12 @@ internal object HttpURLIntegration {
         ) {
             Logger.d(TAG, "onInstall()")
 
-            moduleConfiguration = moduleConfigurations.find< HttpURLModuleConfiguration>() ?: defaultModuleConfiguration
+            moduleConfiguration = moduleConfigurations.find<NetworkMonitorModuleConfiguration>()
+                ?: defaultModuleConfiguration
 
-            //install HttpURLConnection auto-instrumentation if isEnabled is true
-            if(moduleConfiguration.isEnabled){
-                val httpUrlInstrumentation = HttpUrlInstrumentation()
-                httpUrlInstrumentation.addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
-                httpUrlInstrumentation.install(oTelInstallationContext)
+            //install Network Monitor instrumentation if isEnabled is true
+            if (moduleConfiguration.isEnabled) {
+                NetworkChangeInstrumentation().install(oTelInstallationContext)
             }
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)

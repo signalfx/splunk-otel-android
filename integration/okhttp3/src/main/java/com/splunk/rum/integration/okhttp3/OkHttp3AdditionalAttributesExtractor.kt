@@ -27,7 +27,7 @@ import okhttp3.Response
 class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Chain, Response> {
 
     override fun onStart(attributes: AttributesBuilder, parentContext: Context, chain: Interceptor.Chain) {
-        attributes.put(RumConstants.COMPONENT_KEY, "http")
+        attributes.put(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_HTTP)
     }
 
     override fun onEnd(
@@ -47,10 +47,10 @@ class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Cha
                 return@forEach
             }
 
-            val ids = ServerTimingHeaderParser.parse(header.second)
-            if (ids.size == 2) {
-                attributes.put(RumConstants.LINK_TRACE_ID_KEY, ids[0])
-                attributes.put(RumConstants.LINK_SPAN_ID_KEY, ids[1])
+            val serverTraceContext = ServerTimingHeaderParser.parse(header.second)
+            serverTraceContext?.let {
+                attributes.put(RumConstants.LINK_TRACE_ID_KEY, it.traceId)
+                attributes.put(RumConstants.LINK_SPAN_ID_KEY, it.spanId)
             }
 
         }

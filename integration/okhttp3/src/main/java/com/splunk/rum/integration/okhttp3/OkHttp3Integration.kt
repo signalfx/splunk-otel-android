@@ -28,7 +28,7 @@ import io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentatio
 internal object OkHttp3Integration {
 
     private const val TAG = "OkHttp3Integration"
-    private const val MODULE_NAME = "okHttp3Tracing"
+    private const val MODULE_NAME = "okHttp3"
 
     private val defaultModuleConfiguration = OkHttp3ModuleConfiguration()
     private var moduleConfiguration = defaultModuleConfiguration
@@ -54,14 +54,14 @@ internal object OkHttp3Integration {
 
             moduleConfiguration = moduleConfigurations.find<OkHttp3ModuleConfiguration>() ?: defaultModuleConfiguration
 
-            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
-
             //install OkHttp3 auto-instrumentation if isEnabled is true
             if(moduleConfiguration.isEnabled){
                 val okHttpInstrumentation = AndroidInstrumentationLoader.getInstrumentation(OkHttpInstrumentation::class.java)
                 okHttpInstrumentation?.addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
                 okHttpInstrumentation?.install(oTelInstallationContext)
             }
+
+            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }
