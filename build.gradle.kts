@@ -6,7 +6,6 @@ buildscript {
 
     dependencies {
         classpath(Dependencies.gradle)
-        classpath(Dependencies.buildInfoExtractorGradle)
         classpath(Dependencies.kotlin)
     }
 }

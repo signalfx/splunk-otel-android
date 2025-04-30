@@ -106,8 +106,6 @@ dependencies {
     androidTestImplementation(Dependencies.AndroidTest.testRunner)
     androidTestImplementation(Dependencies.AndroidTest.uiAutomator)
 
-    androidTestImplementation(Dependencies.AndroidTest.Compose.junit)
-
     /**
      * Jsoup must be explicitly included since a newer version is being enforced than what is transitively used by espresso contrib.
      */

@@ -3,7 +3,6 @@ object Dependencies {
     // Project level dependencies
 
     private const val gradleVersion = "8.6.0"
-    private const val buildInfoExtractorGradleVersion = "4.25.5"
     private const val kotlinVersion = "1.8.0"
     private const val ktlintVersion = "1.2.0"
     private const val desugarVersion = "2.1.3"
@@ -11,7 +10,6 @@ object Dependencies {
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
     const val gradleApi = "com.android.tools.build:gradle-api:$gradleVersion"
-    const val buildInfoExtractorGradle = "org.jfrog.buildinfo:build-info-extractor-gradle:$buildInfoExtractorGradleVersion"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
     const val desugar = "com.android.tools:desugar_jdk_libs:$desugarVersion"
@@ -43,22 +41,17 @@ object Dependencies {
      * - com.google.android.exoplayer:exoplayer:2.19.1
      */
     private const val guavaJreVersion = "32.0.1"
-    const val guavaJre = "com.google.guava:guava:$guavaJreVersion-jre"
     const val guavaAndroid = "com.google.guava:guava:$guavaJreVersion-android"
 
     object Test {
         private const val junitVersion = "4.13.2"
         private const val jsonassertVersion = "1.5.0"
         private const val mockkVersion = "1.12.4"
-        private const val fragmentVersion = "1.5.7"
-        private const val robolectricVersion = "4.12.1"
         private const val mockWebServerVersion = "4.10.0"
 
         const val junit = "junit:junit:$junitVersion"
         const val jsonassert = "org.skyscreamer:jsonassert:$jsonassertVersion"
         const val mockk = "io.mockk:mockk:$mockkVersion"
-        const val fragmentTest = "androidx.fragment:fragment-testing:$fragmentVersion"
-        const val robolectric = "org.robolectric:robolectric:$robolectricVersion"
         const val mockWebServer = "com.squareup.okhttp3:mockwebserver:$mockWebServerVersion"
     }
 
@@ -66,12 +59,10 @@ object Dependencies {
 
         private const val annotationVersion = "1.6.0"
         private const val appcompatVersion = "1.6.1"
-        private const val recyclerVersion = "1.2.1"
         private const val materialVersion = "1.9.0"
 
         const val annotation = "androidx.annotation:annotation:$annotationVersion"
         const val appcompat = "androidx.appcompat:appcompat:$appcompatVersion"
-        const val recycler = "androidx.recyclerview:recyclerview:$recyclerVersion"
         const val material = "com.google.android.material:material:$materialVersion"
 
         // Test application
@@ -119,7 +110,6 @@ object Dependencies {
         const val instrumentationBomAlpha = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$oTelInstrumentationBomAlpha"
         const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
 
-        const val api = "io.opentelemetry:opentelemetry-api"
         const val sdk = "io.opentelemetry:opentelemetry-sdk"
         const val exporterOtlpCommon = "io.opentelemetry:opentelemetry-exporter-otlp-common"
         const val exporterOtlp = "io.opentelemetry:opentelemetry-exporter-otlp"
@@ -181,12 +171,6 @@ object Dependencies {
             const val idlingResource = "androidx.test.espresso:espresso-idling-resource:$idlingResourceVersion"
             const val intents = "androidx.test.espresso:espresso-intents:$intentsVersion"
             const val web = "androidx.test.espresso:espresso-web:$webVersion"
-        }
-
-        object Compose {
-            private const val junitVersion = "1.6.1"
-
-            const val junit = "androidx.compose.ui:ui-test-junit4:$junitVersion"
         }
     }
 
