@@ -20,7 +20,7 @@ import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.extension.find
-import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
+import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
