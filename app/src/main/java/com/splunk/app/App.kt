@@ -27,11 +27,8 @@ import com.splunk.rum.integration.crash.CrashModuleConfiguration
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
-import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.Attributes
-import com.splunk.rum.integration.agent.api.SplunkRumBuilder
-import com.splunk.rum.integration.httpurlconnection.HttpURLModuleConfiguration
-import com.splunk.rum.integration.okhttp3.OkHttp3ModuleConfiguration
+import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
+import com.splunk.rum.integration.okhttp3.auto.OkHttp3ModuleConfiguration
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration
 
 class App : Application() {

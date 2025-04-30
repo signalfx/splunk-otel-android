@@ -35,7 +35,8 @@ class AgentIntegration private constructor(
     val sessionManager: SplunkSessionManager
     val listeners: MutableSet<Listener> = HashSet()
 
-    //TODO: Replace with actual SessionManager when session module from upstream is integrated
+    // The opentelemetry-android InstallationContext API needs an argument of type
+    // io.opentelemetry.android.session.SessionManager. val oTelSessionManager is a no-op definition of same.
     val oTelSessionManager = object : SessionManager {
         override fun getSessionId(): String {
             return "dummy-session-id"
