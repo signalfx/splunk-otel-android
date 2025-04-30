@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.spaninterceptor
+package com.splunk.rum.integration.agent.api.attributes
 
-import io.opentelemetry.sdk.trace.data.SpanData
+import io.opentelemetry.api.common.Attributes
 
 /**
- * Converts this [SpanData] instance into a [MutableSpanData].
+ * Converts this [Attributes] instance into a [MutableAttributes].
  *
- * This is a convenience method for clients working with the Agent's
- * span interception feature, where mutating spans may be necessary for filtering,
- * enrichment, or transformation.
+ * This is a convenience method for clients who need to modify attributes.
  *
- * @receiver The original [SpanData] to be wrapped in a mutable representation.
- * @return A [MutableSpanData] instance that reflects the original [SpanData]'s values.
+ * @receiver The original [Attributes] to be wrapped in a mutable representation.
+ * @return A [MutableAttributes] instance that reflects the original [Attributes]' values.
  */
-fun SpanData.toMutableSpanData(): MutableSpanData = MutableSpanData(this)
+fun Attributes.toMutableAttributes() = MutableAttributes(this)
