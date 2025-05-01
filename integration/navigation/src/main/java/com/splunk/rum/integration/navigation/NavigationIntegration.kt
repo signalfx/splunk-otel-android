@@ -23,6 +23,7 @@ import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.sdk.common.otel.extensions.createZeroLengthSpan
 import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.android.instrumentation.InstallationContext
 
@@ -60,8 +61,7 @@ internal object NavigationIntegration {
             provider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder("Created")
                 .setAttribute("component", "ui")
-                .startSpan()
-                .end()
+                .createZeroLengthSpan()
         }
     }
 
