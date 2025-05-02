@@ -18,7 +18,6 @@ package com.splunk.rum.integration.slowrendering
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.extension.find
@@ -61,13 +60,9 @@ internal object SlowRenderingIntegration {
 
             if (isEnabled) {
                 Logger.d(TAG, "Installing Slow Rendering Detector")
-                Log.e("TONY", "HERE")
                 val slowRenderingInstrumentation = SlowRenderingInstrumentation()
                 slowRenderingInstrumentation.install(oTelInstallationContext)
-                Log.e("TONY", "After installing slow rendering")
             } else {
-                Log.e("TONY", "HERE!!!!")
-
                 Logger.d(TAG, "Slow Rendering reporting is disabled")
             }
         }
