@@ -22,6 +22,7 @@ import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.legacy.LegacyAnrModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
+import com.splunk.rum.integration.agent.internal.legacy.LegacySlowRenderingModuleConfiguration
 import io.opentelemetry.api.common.Attributes
 import java.net.URL
 import java.util.function.Consumer
@@ -43,6 +44,7 @@ class SplunkRumBuilder {
     private var maxUsageMegabytes: Int = 25
     private var crashReportingEnabled: Boolean = true
     private var anrReportingEnabled: Boolean = true
+    private var slowRenderingDetectionEnabled: Boolean = true
 
     fun setRumAccessToken(token: String): SplunkRumBuilder {
         accessToken = token
@@ -134,6 +136,12 @@ class SplunkRumBuilder {
         return this
     }
 
+    @Deprecated("Slow Rendering Detection is now controlled by the SlowRenderingModuleConfiguration")
+    fun disableSlowRenderingDetection(): SplunkRumBuilder {
+        slowRenderingDetectionEnabled = false
+        return this
+    }
+
     fun build(application: Application): SplunkRum {
         val realm = realm
         val beaconEndpoint = beaconEndpoint
@@ -175,6 +183,9 @@ class SplunkRumBuilder {
                 ),
                 LegacyAnrModuleConfiguration(
                     isEnabled = anrReportingEnabled
+                ),
+                LegacySlowRenderingModuleConfiguration(
+                    isEnabled = slowRenderingDetectionEnabled
                 )
             )
         )

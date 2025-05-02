@@ -30,6 +30,7 @@ import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3ModuleConfiguration
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration
+import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration
 
 class App : Application() {
 
@@ -56,6 +57,7 @@ class App : Application() {
         //    .setGlobalAttributes(Attributes.of(AttributeKey.stringKey("legacyGlobalAttributesKey"), "legacyGlobalAttributesVal"))
         //    .disableANRReporting()
         //    .disableCrashReporting()
+        //    .disableSlowRenderingDetection()
         //    .build(this)
 
 
@@ -94,6 +96,9 @@ class App : Application() {
                     isEnabled = true
                 ),
                 NetworkMonitorModuleConfiguration(
+                    isEnabled = true
+                ),
+                SlowRenderingModuleConfiguration(
                     isEnabled = true
                 )
             )
