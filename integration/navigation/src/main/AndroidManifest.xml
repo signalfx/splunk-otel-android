@@ -2,8 +2,8 @@
 
     <application>
         <provider
-            android:name=".NavigationInstaller"
-            android:authorities="${applicationId}.navigation-integration-installer"
+            android:name=".NavigationModuleInstaller"
+            android:authorities="${applicationId}.NavigationModuleInstaller"
             android:enabled="true"
             android:exported="false" />
     </application>

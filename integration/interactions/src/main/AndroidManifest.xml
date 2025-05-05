@@ -2,8 +2,8 @@
 
     <application>
         <provider
-            android:name=".InteractionsInstaller"
-            android:authorities="${applicationId}.interactions-integration-installer"
+            android:name=".InteractionsModuleInstaller"
+            android:authorities="${applicationId}.InteractionsModuleInstaller"
             android:enabled="true"
             android:exported="false" />
     </application>
