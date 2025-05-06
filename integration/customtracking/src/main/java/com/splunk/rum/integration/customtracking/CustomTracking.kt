@@ -19,10 +19,12 @@ package com.splunk.rum.integration.customtracking
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.sdk.common.otel.extensions.createZeroLengthSpan
 import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
+import java.time.Instant
 
 class CustomTracking internal constructor() {
 
@@ -37,7 +39,7 @@ class CustomTracking internal constructor() {
      */
     fun trackCustomEvent(name: String, attributes: MutableAttributes) {
         val tracer = getTracer() ?: return
-        tracer.spanBuilder(name).setAllAttributes(attributes).startSpan().end()
+        tracer.spanBuilder(name).setAllAttributes(attributes).createZeroLengthSpan()
     }
 
     /**
@@ -84,10 +86,12 @@ class CustomTracking internal constructor() {
         attributes?.let {
             spanBuilder.setAllAttributes(it)
         }
+        val timestamp = Instant.now()
         spanBuilder.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
+            .setStartTimestamp(timestamp)
             .startSpan()
             .recordException(throwable)
-            .end()
+            .end(timestamp)
     }
 
     /**

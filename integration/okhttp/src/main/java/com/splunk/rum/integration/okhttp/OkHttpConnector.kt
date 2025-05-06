@@ -42,7 +42,6 @@ internal class OkHttpConnector(
     )
 
     private var networkInterceptor: Interceptor? = null
-    private val initiator: String = "OkHttp"
 
     fun register() {
         if (networkInterceptor != null)

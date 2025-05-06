@@ -17,6 +17,7 @@
 package com.splunk.sdk.common.otel.logRecord
 
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.sdk.common.otel.extensions.createZeroLengthSpan
 import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
@@ -64,10 +65,8 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
                     }
                 }
             } finally {
-                spanBuilder
-                    .setStartTimestamp(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
-                    .startSpan()
-                    .end(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+                spanBuilder.createZeroLengthSpan(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+
                 if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
                     SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.forceFlush()
                         ?.join(5, TimeUnit.SECONDS)
