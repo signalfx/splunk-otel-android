@@ -22,9 +22,9 @@ import com.cisco.android.instrumentation.recording.core.api.DataListener
 import com.cisco.android.instrumentation.recording.core.api.Metadata
 import com.cisco.android.instrumentation.recording.core.api.SessionReplay
 import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
-import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
+import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
@@ -34,23 +34,21 @@ import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
 
-internal object SessionReplayIntegration {
+internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
+    defaultModuleConfiguration = SessionReplayModuleConfiguration()
+) {
 
     private const val TAG = "SessionReplayIntegration"
-    private const val MODULE_NAME = "sessionReplay"
 
-    init {
-        Logger.d(TAG, "init()")
-
-        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
-    }
-
-    fun attach(context: Context) {
-        Logger.d(TAG, "attach()")
-
-        AgentIntegration.obtainInstance(context).listeners += installationListener
+    override fun onAttach(context: Context) {
+        Logger.d(TAG, "onAttach()")
 
         setupComposeIdentification()
+    }
+
+    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+        Logger.d(TAG, "onInstall()")
+        SessionReplay.instance.dataListeners += sessionReplayDataListener
     }
 
     private fun setupComposeIdentification() {
@@ -60,7 +58,6 @@ internal object SessionReplayIntegration {
             }
         }
     }
-
 
     private val sessionReplayDataListener = object : DataListener {
         override fun onData(data: ByteArray, metadata: Metadata): Boolean {
@@ -86,19 +83,6 @@ internal object SessionReplayIntegration {
                 .emit()
 
             return true
-        }
-    }
-
-    private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(
-            context: Context,
-            oTelInstallationContext: InstallationContext,
-            moduleConfigurations: List<ModuleConfiguration>
-        ) {
-            Logger.d(TAG, "onInstall()")
-            SessionReplay.instance.dataListeners += sessionReplayDataListener
-
-            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }

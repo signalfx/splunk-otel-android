@@ -28,38 +28,26 @@ import com.cisco.android.instrumentation.recording.interactions.model.LegacyData
 import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.cisco.android.instrumentation.recording.wireframe.model.Wireframe
 import com.cisco.android.instrumentation.recording.wireframe.stats.WireframeStats
-import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.agent.internal.extension.find
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
+import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
-import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
 
-internal object InteractionsIntegration {
+internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsModuleConfiguration>(
+    defaultModuleConfiguration = InteractionsModuleConfiguration()
+) {
 
     private const val TAG = "InteractionsIntegration"
-    private const val MODULE_NAME = "interactions"
 
     private val attributeKeyComponent = AttributeKey.stringKey("component")
     private val attributeKeyActionName = AttributeKey.stringKey("action.name")
     private val attributeKeyTargetType = AttributeKey.stringKey("target.type")
 
-    private val defaultModuleConfiguration = InteractionsModuleConfiguration()
-
-    private var moduleConfiguration = defaultModuleConfiguration
-
-    init {
-        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
-    }
-
-    fun attach(context: Context) {
-        AgentIntegration.obtainInstance(context).listeners += installationListener
-
+    override fun onAttach(context: Context) {
         val application = context.applicationContext as Application
 
         Interactions.attach(application)
@@ -136,20 +124,6 @@ internal object InteractionsIntegration {
                 .setAttribute(attributeKeyActionName, actionName)
                 .setAttribute(attributeKeyTargetType, targetType)
                 .emit()
-        }
-    }
-
-    private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(
-            context: Context,
-            oTelInstallationContext: InstallationContext,
-            moduleConfigurations: List<ModuleConfiguration>
-        ) {
-            Logger.d(TAG, "onInstall()")
-
-            moduleConfiguration = moduleConfigurations.find<InteractionsModuleConfiguration>() ?: defaultModuleConfiguration
-
-            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
         }
     }
 }

@@ -19,30 +19,32 @@ package com.splunk.rum.integration.startup
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.utils.extensions.forEachFast
-import com.splunk.sdk.common.otel.extensions.toInstant
-import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.sdk.common.otel.extensions.toInstant
 import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.android.instrumentation.InstallationContext
 
-internal object StartupIntegration {
+internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfiguration>(
+    defaultModuleConfiguration = StartupModuleConfiguration()
+) {
 
     private const val TAG = "StartupIntegration"
-    private const val MODULE_NAME = "startup"
 
     private val cache: MutableList<StartupData> = mutableListOf()
 
-    init {
-        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
+    override fun onAttach(context: Context) {
+        ApplicationStartupTimekeeper.listeners += applicationStartupTimekeeperListener
     }
 
-    fun attach(context: Context) {
-        AgentIntegration.obtainInstance(context).listeners += installationListener
+    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+        Logger.d(TAG, "onInstall()")
 
-        ApplicationStartupTimekeeper.listeners += applicationStartupTimekeeperListener
+        cache.forEachFast { reportEvent(it.startTimestamp, it.endTimestamp, it.name) }
+        cache.clear()
     }
 
     private val applicationStartupTimekeeperListener = object : ApplicationStartupTimekeeper.Listener {
@@ -75,20 +77,5 @@ internal object StartupIntegration {
             .setAttribute("start.type", name)
             .startSpan()
             .end(endTimestamp.toInstant())
-    }
-
-    private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(
-            context: Context,
-            oTelInstallationContext: InstallationContext,
-            moduleConfigurations: List<ModuleConfiguration>
-        ) {
-            Logger.d(TAG, "onInstall()")
-
-            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
-
-            cache.forEachFast { reportEvent(it.startTimestamp, it.endTimestamp, it.name) }
-            cache.clear()
-        }
     }
 }

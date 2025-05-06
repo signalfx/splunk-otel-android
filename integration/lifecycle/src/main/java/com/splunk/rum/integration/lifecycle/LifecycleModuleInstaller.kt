@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.internal.legacy
+package com.splunk.rum.integration.lifecycle
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import android.content.Context
+import com.splunk.rum.integration.agent.internal.module.ModuleInstaller
 
-@Deprecated("Only to support legacy API, can be removed with legacy API.")
-class LegacyAnrModuleConfiguration(val isEnabled: Boolean = true)  : ModuleConfiguration {
+internal class LifecycleModuleInstaller : ModuleInstaller() {
 
-    override val name: String = "anr"
-
-    override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to isEnabled.toString()
-    )
+    override fun onInstall(context: Context) {
+        LifecycleModuleIntegration.attach(context)
+    }
 }

@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
-import android.webkit.WebView
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
@@ -31,7 +30,6 @@ import com.splunk.rum.integration.agent.internal.user.UserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import java.util.function.Consumer
 
@@ -91,7 +89,8 @@ class SplunkRum private constructor(
     @Deprecated(
         message = "Use globalAttributes.update() method",
         replaceWith = ReplaceWith("globalAttributes.update { attributesUpdater.accept(this) }")
-    )    fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
+    )
+    fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
         globalAttributes.update { attributesUpdater.accept(this) }
     }
 

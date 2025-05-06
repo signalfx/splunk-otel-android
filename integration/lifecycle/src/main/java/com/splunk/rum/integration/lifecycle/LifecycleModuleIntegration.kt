@@ -19,33 +19,23 @@ package com.splunk.rum.integration.lifecycle
 import android.app.Application
 import android.content.Context
 import android.os.Build
-import com.cisco.android.common.logger.Logger
-import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.lifecycle.screen.VisibleScreenTracker
 import com.splunk.rum.integration.lifecycle.tracer.activity.ActivityTracerManager
 import com.splunk.rum.integration.lifecycle.tracer.activity.callback.ActivityCallback21
 import com.splunk.rum.integration.lifecycle.tracer.activity.callback.ActivityCallback29
-import com.splunk.rum.integration.lifecycle.tracer.fragment.callback.FragmentCallback
 import com.splunk.rum.integration.lifecycle.tracer.fragment.FragmentTracerManager
 import com.splunk.rum.integration.lifecycle.tracer.fragment.activity.FragmentActivityCallback21
 import com.splunk.rum.integration.lifecycle.tracer.fragment.activity.FragmentActivityCallback29
+import com.splunk.rum.integration.lifecycle.tracer.fragment.callback.FragmentCallback
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
-import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.trace.Tracer
 
-internal object LifecycleIntegration {
+internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleConfiguration>(
+    defaultModuleConfiguration = LifecycleModuleConfiguration()
+) {
 
-    private const val TAG = "lifecycleIntegration"
-    private const val MODULE_NAME = "lifecycle"
-
-    init {
-        AgentIntegration.registerModuleInitializationStart(MODULE_NAME)
-    }
-
-    fun attach(context: Context) {
-        AgentIntegration.obtainInstance(context).listeners += installationListener
-
+    override fun onAttach(context: Context) {
         val tracer = SplunkOpenTelemetrySdk.instance?.getTracer("io.opentelemetry.lifecycle") ?: return
         val application = context.applicationContext as Application
 
@@ -76,17 +66,5 @@ internal object LifecycleIntegration {
             FragmentActivityCallback21(callback)
 
         application.registerActivityLifecycleCallbacks(fragmentObserver)
-    }
-
-    private val installationListener = object : AgentIntegration.Listener {
-        override fun onInstall(
-            context: Context,
-            oTelInstallationContext: InstallationContext,
-            moduleConfigurations: List<ModuleConfiguration>
-        ) {
-            Logger.d(TAG, "onInstall()")
-
-            AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
-        }
     }
 }

@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.internal.extension
+package com.splunk.rum.integration.networkmonitor
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import android.content.Context
+import com.splunk.rum.integration.agent.internal.module.ModuleInstaller
 
-inline fun <reified T : ModuleConfiguration> List<ModuleConfiguration>.find(): T? {
-    for (i in indices) {
-        val item = get(i)
+internal class NetworkMonitorModuleInstaller : ModuleInstaller() {
 
-        if (item is T)
-            return item
+    override fun onInstall(context: Context) {
+        NetworkMonitorModuleIntegration.attach(context)
     }
-
-    return null
 }
