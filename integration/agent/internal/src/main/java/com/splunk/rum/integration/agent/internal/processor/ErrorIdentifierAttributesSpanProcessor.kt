@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.attributes
+package com.splunk.rum.integration.agent.internal.processor
 
 import android.app.Application
 import com.splunk.sdk.common.otel.internal.RumConstants
@@ -24,7 +24,7 @@ import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-internal class ErrorIdentifierAttributesSpanProcessor(application: Application) : SpanProcessor {
+class ErrorIdentifierAttributesSpanProcessor(application: Application) : SpanProcessor {
 
     private var applicationId: String? = ApplicationInfoUtils.retrieveApplicationId(application)
     private var versionCode: String? = ApplicationInfoUtils.retrieveVersionCode(application)

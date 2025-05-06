@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2024 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.internal.processors
+package com.splunk.rum.integration.agent.internal.processor
 
-import io.opentelemetry.api.common.Attributes
+import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
+import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-class GlobalAttributeSpanProcessor(private val globalAttributes: Attributes) : SpanProcessor {
-
+class SessionIdSpanProcessor(private val sessionManager: SplunkSessionManager) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        span.setAllAttributes(globalAttributes)
+        span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
+        span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
     }
 
-    override fun isStartRequired(): Boolean {
-        return true
-    }
+    override fun isStartRequired(): Boolean = true
 
-    override fun onEnd(span: ReadableSpan) {
-    }
+    override fun onEnd(span: ReadableSpan) = Unit
 
-    override fun isEndRequired(): Boolean {
-        return false
-    }
+    override fun isEndRequired(): Boolean = false
 }
