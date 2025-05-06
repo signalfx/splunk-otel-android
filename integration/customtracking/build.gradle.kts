@@ -25,7 +25,6 @@ android {
 
 dependencies {
     api(platform(Dependencies.Otel.instrumentationBomAlpha))
-    api(Dependencies.Otel.api)
     implementation(project(":integration:agent:api"))
     implementation(project(":common:otel"))
     implementation(Dependencies.SessionReplay.commonLogger)

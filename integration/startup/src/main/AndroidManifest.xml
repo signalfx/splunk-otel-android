@@ -2,8 +2,8 @@
 
     <application>
         <provider
-            android:name="com.splunk.rum.integration.startup.StartupInstaller"
-            android:authorities="${applicationId}.startup-integration-installer"
+            android:name=".StartupModuleInstaller"
+            android:authorities="${applicationId}.StartupModuleInstaller"
             android:enabled="true"
             android:exported="false" />
     </application>

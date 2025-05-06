@@ -1,13 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
         <provider
-            android:name="com.splunk.rum.integration.crash.CrashInstaller"
-            android:authorities="${applicationId}.CrashReportingInstaller"
+            android:name=".CrashModuleInstaller"
+            android:authorities="${applicationId}.CrashModuleInstaller"
             android:enabled="true"
             android:exported="false" />
-
     </application>
-
 </manifest>

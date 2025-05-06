@@ -14,16 +14,16 @@ include ':common:otel',
 
 // Instrumentation modules
 include ':instrumentation:runtime:startup',
-        ':instrumentation:buildtime:httpurlconnection:plugin',
-        ':instrumentation:buildtime:okhttp3:plugin'
+        ':instrumentation:buildtime:httpurlconnection-auto:plugin',
+        ':instrumentation:buildtime:okhttp3-auto:plugin'
 
 // Integration
 include ':integration:agent:api',
         ':integration:agent:module',
         ':integration:agent:internal',
         ':integration:startup',
-        ':integration:httpurlconnection',
-        ':integration:okhttp3',
+        ':integration:httpurlconnection-auto',
+        ':integration:okhttp3-auto',
         ':integration:anr',
         ':integration:crash',
         ':integration:sessionreplay',
@@ -31,11 +31,12 @@ include ':integration:agent:api',
         ':integration:navigation',
         ':integration:okhttp',
         ':integration:lifecycle',
-        ':integration:customtracking'
+        ':integration:customtracking',
+        ':integration:networkmonitor',
+        ':integration:webview'
 
 // Test App
 include ':app'
 
 // Main entry point
 include ':agent'
-include ':integration:webview'

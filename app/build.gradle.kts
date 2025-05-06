@@ -6,8 +6,8 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     // Uncomment this to test HttpURLConnection instrumentation
-    //id("com.splunk.android.rum-okhttp3-plugin") version "24.4.1"
-    //id("com.splunk.android.rum-httpurlconnection-plugin") version "24.4.1"
+    //id("com.splunk.android.rum-okhttp3-auto-plugin") version "24.4.1"
+    //id("com.splunk.android.rum-httpurlconnection-auto-plugin") version "24.4.1"
 }
 
 apply<ConfigAndroidApp>()
@@ -105,8 +105,6 @@ dependencies {
     androidTestImplementation(Dependencies.AndroidTest.testRules)
     androidTestImplementation(Dependencies.AndroidTest.testRunner)
     androidTestImplementation(Dependencies.AndroidTest.uiAutomator)
-
-    androidTestImplementation(Dependencies.AndroidTest.Compose.junit)
 
     /**
      * Jsoup must be explicitly included since a newer version is being enforced than what is transitively used by espresso contrib.

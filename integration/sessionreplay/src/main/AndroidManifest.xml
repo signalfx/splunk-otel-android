@@ -2,8 +2,8 @@
 
     <application>
         <provider
-            android:name="com.splunk.rum.integration.sessionreplay.SessionReplayInstaller"
-            android:authorities="${applicationId}.sessionreplay-integration-installer"
+            android:name=".SessionReplayModuleInstaller"
+            android:authorities="${applicationId}.SessionReplayModuleInstaller"
             android:enabled="true"
             android:exported="false" />
     </application>
