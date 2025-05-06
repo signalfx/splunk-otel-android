@@ -31,8 +31,9 @@ internal object TraceId {
         do {
             result = ""
 
-            for (i in 0 until LENGTH)
+            for (i in 0 until LENGTH) {
                 result += CHARACTERS[random.nextInt(CHARACTERS.length)]
+            }
         } while (result == INVALID)
 
         return result

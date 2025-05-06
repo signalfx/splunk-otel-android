@@ -50,10 +50,10 @@ internal object HttpURLIntegration {
         ) {
             Logger.d(TAG, "onInstall()")
 
-            moduleConfiguration = moduleConfigurations.find< HttpURLModuleConfiguration>() ?: defaultModuleConfiguration
+            moduleConfiguration = moduleConfigurations.find<HttpURLModuleConfiguration>() ?: defaultModuleConfiguration
 
             //install HttpURLConnection auto-instrumentation if isEnabled is true
-            if(moduleConfiguration.isEnabled){
+            if (moduleConfiguration.isEnabled) {
                 val httpUrlInstrumentation = HttpUrlInstrumentation()
                 httpUrlInstrumentation.addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
                 httpUrlInstrumentation.install(oTelInstallationContext)

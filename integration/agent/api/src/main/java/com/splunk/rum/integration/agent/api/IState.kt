@@ -40,7 +40,6 @@ class State internal constructor(agentConfiguration: AgentConfiguration) : IStat
     override val instrumentedProcessName: String? = agentConfiguration.instrumentedProcessName
 }
 
-
 class Noop(notRunningCause: Status.NotRunning.Cause = Status.NotRunning.Cause.NotInstalled) : IState {
     override val appName: String = ""
     override val status: Status = Status.NotRunning(notRunningCause)

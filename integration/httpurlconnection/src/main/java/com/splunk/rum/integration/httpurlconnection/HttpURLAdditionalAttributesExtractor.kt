@@ -23,7 +23,7 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import java.net.URLConnection
 
-class HttpURLAdditionalAttributesExtractor: AttributesExtractor<URLConnection, Int> {
+class HttpURLAdditionalAttributesExtractor : AttributesExtractor<URLConnection, Int> {
 
     override fun onStart(attributes: AttributesBuilder, parentContext: Context, connection: URLConnection) {
         attributes.put(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_HTTP)

@@ -55,7 +55,7 @@ internal object CrashIntegration {
 
             AgentIntegration.registerModuleInitializationEnd(MODULE_NAME)
 
-            if (moduleConfiguration.isEnabled){
+            if (moduleConfiguration.isEnabled) {
                 Logger.d(TAG, "Installing crash reporter")
                 val crashReporterInstrumentation = CrashReporterInstrumentation()
                 crashReporterInstrumentation.addAttributesExtractor(CrashAttributesExtractor())

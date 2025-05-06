@@ -43,7 +43,6 @@ internal object OkHttp3Integration {
         AgentIntegration.obtainInstance(context).listeners += installationListener
     }
 
-
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(
             context: Context,
@@ -55,7 +54,7 @@ internal object OkHttp3Integration {
             moduleConfiguration = moduleConfigurations.find<OkHttp3ModuleConfiguration>() ?: defaultModuleConfiguration
 
             //install OkHttp3 auto-instrumentation if isEnabled is true
-            if(moduleConfiguration.isEnabled){
+            if (moduleConfiguration.isEnabled) {
                 val okHttpInstrumentation = AndroidInstrumentationLoader.getInstrumentation(OkHttpInstrumentation::class.java)
                 okHttpInstrumentation?.addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
                 okHttpInstrumentation?.install(oTelInstallationContext)

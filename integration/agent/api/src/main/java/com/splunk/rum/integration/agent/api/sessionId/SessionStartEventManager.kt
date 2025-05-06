@@ -17,12 +17,7 @@
 package com.splunk.rum.integration.agent.api.sessionId
 
 import com.cisco.android.common.logger.Logger
-import com.splunk.rum.integration.agent.api.attributes.AttributeConstants
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
-import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
-import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.Attributes
-import java.util.concurrent.TimeUnit
 
 internal class SessionStartEventManager(sessionManager: SplunkSessionManager) {
 

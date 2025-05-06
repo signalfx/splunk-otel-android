@@ -61,7 +61,6 @@ internal object SessionReplayIntegration {
         }
     }
 
-
     private val sessionReplayDataListener = object : DataListener {
         override fun onData(data: ByteArray, metadata: Metadata): Boolean {
             Logger.d(TAG, "onData()")

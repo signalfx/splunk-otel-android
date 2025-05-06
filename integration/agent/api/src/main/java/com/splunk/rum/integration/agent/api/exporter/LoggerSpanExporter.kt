@@ -39,22 +39,16 @@ internal class LoggerSpanExporter : SpanExporter {
         return CompletableResultCode.ofSuccess()
     }
 
-    override fun flush(): CompletableResultCode {
-        return CompletableResultCode.ofSuccess()
-    }
+    override fun flush(): CompletableResultCode = CompletableResultCode.ofSuccess()
 
-    override fun shutdown(): CompletableResultCode {
-        return if (!isShutdown.compareAndSet(false, true))
+    override fun shutdown(): CompletableResultCode = if (!isShutdown.compareAndSet(false, true))
             CompletableResultCode.ofSuccess()
         else
             flush()
-    }
 
-    private fun Attributes.toSplunkString(): String {
-        return asMap()
+    private fun Attributes.toSplunkString(): String = asMap()
             .toList()
             .joinToString(", ", "[", "]") { "${it.first}=${it.second}" }
-    }
 
     private companion object {
         const val TAG = "LoggerSpanExporter"

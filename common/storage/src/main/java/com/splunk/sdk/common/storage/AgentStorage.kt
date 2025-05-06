@@ -118,9 +118,7 @@ class AgentStorage(context: Context) : IAgentStorage {
             preferences.putString(PREVIOUS_SESSION_ID, value).commit()
     }
 
-    override fun readPreviousSessionId(): String? {
-        return preferences.getString(PREVIOUS_SESSION_ID)
-    }
+    override fun readPreviousSessionId(): String? = preferences.getString(PREVIOUS_SESSION_ID)
 
     override fun writeSessionValidUntil(value: Long) {
         preferences.putLong(SESSION_VALID_UNTIL, value).commit()
@@ -187,9 +185,10 @@ class AgentStorage(context: Context) : IAgentStorage {
 
         val filesToDelete = ArrayList<File>()
 
-        for (file in files)
+        for (file in files) {
             if (file.exists() && file != agentVersionDir)
                 filesToDelete += file
+        }
 
         return if (filesToDelete.isNotEmpty()) {
             runOnBackgroundThread {

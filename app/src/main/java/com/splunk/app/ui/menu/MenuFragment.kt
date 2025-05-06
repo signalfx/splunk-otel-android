@@ -164,7 +164,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 showDoneToast("Track Workflow, Done!")
             }
             viewBinding.trackException.id -> {
-                val e = Exception("Custom Exception To Be Tracked");
+                val e = Exception("Custom Exception To Be Tracked")
                 e.stackTrace = arrayOf(
                     StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
                     StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
@@ -174,7 +174,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 showDoneToast("Track Exception, Done!")
             }
             viewBinding.trackExceptionWithAttributes.id -> {
-                val e = Exception("Custom Exception (with attributes) To Be Tracked");
+                val e = Exception("Custom Exception (with attributes) To Be Tracked")
                 e.stackTrace = arrayOf(
                     StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
                     StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),

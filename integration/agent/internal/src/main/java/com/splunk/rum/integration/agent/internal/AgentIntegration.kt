@@ -37,11 +37,9 @@ class AgentIntegration private constructor(
 
     //TODO: Replace with actual SessionManager when session module from upstream is integrated
     val oTelSessionManager = object : SessionManager {
-        override fun getSessionId(): String {
-            return "dummy-session-id"
-        }
+        override fun getSessionId(): String = "dummy-session-id"
 
-        override fun addObserver(observer: SessionObserver){
+        override fun addObserver(observer: SessionObserver) {
             //no-op
         }
     }

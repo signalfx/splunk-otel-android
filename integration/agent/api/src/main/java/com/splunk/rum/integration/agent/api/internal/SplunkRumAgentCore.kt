@@ -32,7 +32,6 @@ import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.span.AppStartSpanProcessor
 import com.splunk.rum.integration.agent.internal.span.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.user.IUserManager
-import com.splunk.rum.integration.agent.internal.user.UserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage

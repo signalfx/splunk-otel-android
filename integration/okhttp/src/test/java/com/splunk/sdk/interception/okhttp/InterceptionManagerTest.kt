@@ -557,8 +557,7 @@ class InterceptionManagerTest {
         Assert.assertTrue(sdkConnector.request?.responseHeaders?.contains(key) == false)
     }
 
-    private fun buildRequest(testRequest: TestRequest): Request {
-        return Request.Builder()
+    private fun buildRequest(testRequest: TestRequest): Request = Request.Builder()
             .url(testRequest.url)
             .method(testRequest.method, testRequest.body?.toRequestBody(testRequest.mediaType))
             .also { builder ->
@@ -567,10 +566,8 @@ class InterceptionManagerTest {
                 }
             }
             .build()
-    }
 
-    private fun buildResponse(testResponse: TestResponse): MockResponse {
-        return MockResponse()
+    private fun buildResponse(testResponse: TestResponse): MockResponse = MockResponse()
             .setResponseCode(testResponse.statusCode)
             .also { response ->
                 if (testResponse.mediaType != null) {
@@ -583,7 +580,6 @@ class InterceptionManagerTest {
                     response.addHeader(it.key, it.value)
                 }
             }
-    }
 
     data class TestRequest(
         val url: URL,

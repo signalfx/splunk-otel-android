@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
-import android.webkit.WebView
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
@@ -31,7 +30,6 @@ import com.splunk.rum.integration.agent.internal.user.UserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import java.util.function.Consumer
 
@@ -54,9 +52,7 @@ class SplunkRum private constructor(
     val globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
-    fun getRumSessionId(): String {
-        return session.state.sessionId
-    }
+    fun getRumSessionId(): String = session.state.sessionId
 
     /**
      * Set an attribute in the global attributes that will be appended to every span and event.
@@ -91,7 +87,8 @@ class SplunkRum private constructor(
     @Deprecated(
         message = "Use globalAttributes.update() method",
         replaceWith = ReplaceWith("globalAttributes.update { attributesUpdater.accept(this) }")
-    )    fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
+    )
+    fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
         globalAttributes.update { attributesUpdater.accept(this) }
     }
 
@@ -135,7 +132,6 @@ class SplunkRum private constructor(
             if (instanceInternal != null)
                 return instance
 
-
             val isSubprocess = SubprocessDetector.isSubprocess(applicationId = agentConfiguration.instrumentedProcessName)
 
             if (isSubprocess && agentConfiguration.instrumentedProcessName != null) {
@@ -161,20 +157,14 @@ class SplunkRum private constructor(
 
         @JvmStatic
         @Deprecated("Use SplunkRum.install()", ReplaceWith("install", "com.splunk.rum.integration.agent.api.SplunkRumBuilder"))
-        fun builder(): SplunkRumBuilder {
-            return SplunkRumBuilder()
-        }
+        fun builder(): SplunkRumBuilder = SplunkRumBuilder()
 
         @JvmStatic
         @Deprecated("Use SplunkRum.instance.state.status == Status.Running", ReplaceWith("instance.state.status == Status.Running", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance"))
-        fun isInitialized(): Boolean {
-            return instance.state.status == Status.Running
-        }
+        fun isInitialized(): Boolean = instance.state.status == Status.Running
 
         @JvmStatic
         @Deprecated("Use property noop")
-        fun noop(): SplunkRum {
-            return noop
-        }
+        fun noop(): SplunkRum = noop
     }
 }

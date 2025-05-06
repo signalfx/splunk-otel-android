@@ -113,14 +113,10 @@ class SplunkRumBuilder {
     }
 
     @Deprecated("This is no longer supported")
-    fun enableDiskBuffering(enable: Boolean): SplunkRumBuilder {
-        return this
-    }
+    fun enableDiskBuffering(enable: Boolean): SplunkRumBuilder = this
 
     @Deprecated("This is no longer supported")
-    fun limitDiskUsageMegabytes(maxUsageMegabytes: Int): SplunkRumBuilder {
-        return this
-    }
+    fun limitDiskUsageMegabytes(maxUsageMegabytes: Int): SplunkRumBuilder = this
 
     @Deprecated("CrashReporting is now controlled by the CrashModuleConfiguration")
     fun disableCrashReporting(): SplunkRumBuilder {
@@ -150,7 +146,6 @@ class SplunkRumBuilder {
             else ->
                 throw IllegalStateException("setRealm() or setBeaconEndpoint() was not called")
         }
-
 
         val agent = install(
             application,

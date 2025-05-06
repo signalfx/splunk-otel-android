@@ -26,8 +26,7 @@ import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_NAME
 import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_TYPE
 import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_VERSION
 
-fun AgentConfiguration.toResource(): Resource {
-    return Resource.getDefault().toBuilder()
+fun AgentConfiguration.toResource(): Resource = Resource.getDefault().toBuilder()
         .put("app", appName)
         .put("app.version", requireNotNull(appVersion))
         .put("deployment.environment", deploymentEnvironment)
@@ -38,4 +37,3 @@ fun AgentConfiguration.toResource(): Resource {
         .put(OS_TYPE, "linux")
         .put(OS_VERSION, Build.VERSION.SDK_INT.toString())
         .build()
-}
