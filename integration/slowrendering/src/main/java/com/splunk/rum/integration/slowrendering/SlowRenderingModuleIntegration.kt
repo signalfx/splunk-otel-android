@@ -35,12 +35,12 @@ internal object SlowRenderingModuleIntegration : ModuleIntegration<SlowRendering
         Logger.d(TAG, "onInstall()")
 
         val isEnabled = moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
-        val pollInterval = moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.interval ?: moduleConfiguration.interval
+        val interval = moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.interval ?: moduleConfiguration.interval
 
         if (isEnabled) {
             Logger.d(TAG, "Installing Slow Rendering Detector")
             val slowRenderingInstrumentation = SlowRenderingInstrumentation()
-            slowRenderingInstrumentation.setSlowRenderingDetectionPollInterval(pollInterval)
+            slowRenderingInstrumentation.setSlowRenderingDetectionPollInterval(interval)
             slowRenderingInstrumentation.install(oTelInstallationContext)
         } else {
             Logger.d(TAG, "Slow Rendering detection is disabled")

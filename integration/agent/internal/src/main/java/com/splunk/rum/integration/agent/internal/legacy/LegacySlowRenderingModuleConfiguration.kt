@@ -28,6 +28,6 @@ class LegacySlowRenderingModuleConfiguration(
 
     override val attributes: List<Pair<String, String>> = listOf(
         "enabled" to isEnabled.toString(),
-        "pollInterval" to interval.toString()
+        "interval" to interval.toString()
     )
 }
