@@ -24,6 +24,7 @@ dependencies {
     // TODO api(project(":integration:session-recording"))
     api(project(":integration:crash"))
     api(project(":integration:anr"))
+    api(project(":integration:slowrendering"))
     api(project(":integration:httpurlconnection-auto"))
     api(project(":integration:okhttp3-auto"))
     api(project(":integration:startup"))
