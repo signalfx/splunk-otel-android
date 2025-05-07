@@ -16,18 +16,15 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
-import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.SESSION_ID_KEY
-import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
-import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
+import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-internal class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) : SpanProcessor {
+class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
         span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
