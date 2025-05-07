@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.sessionId
+package com.splunk.rum.integration.agent.internal.processor
 
 import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.integration.agent.api.attributes.AttributeConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
+import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan

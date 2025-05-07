@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.internal.processors
+package com.splunk.rum.integration.agent.internal.processor
 
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.context.Context
