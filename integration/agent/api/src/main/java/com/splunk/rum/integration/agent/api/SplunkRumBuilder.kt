@@ -154,7 +154,7 @@ class SplunkRumBuilder {
                 appName = appName ?: throw IllegalStateException("applicationName was not set"),
                 deploymentEnvironment = deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
                 enableDebugLogging = enableDebug,
-                sessionSamplingRate = sessionBasedSampling,
+                session = SessionConfiguration(sessionBasedSampling),
                 globalAttributes = globalAttributes,
                 instrumentedProcessName = instrumentedProcessName,
                 deferredUntilForeground = deferredUntilForeground,
