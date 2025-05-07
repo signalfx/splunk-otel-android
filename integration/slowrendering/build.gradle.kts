@@ -26,11 +26,11 @@ dependencies {
     api(platform(Dependencies.Otel.androidBom))
 
     implementation(project(":integration:agent:internal"))
+    implementation(project(":common:otel"))
 
     implementation(Dependencies.Otel.instrumentationApi)
     implementation(Dependencies.Otel.androidSlowRenderingInstrumentation)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
-    implementation(project(":common:otel"))
 }
