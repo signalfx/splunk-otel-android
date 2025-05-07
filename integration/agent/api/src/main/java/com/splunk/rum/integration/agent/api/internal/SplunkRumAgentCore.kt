@@ -20,17 +20,16 @@ import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
-import com.splunk.rum.integration.agent.internal.processor.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.extension.toResource
-import com.splunk.rum.integration.agent.internal.processor.GlobalAttributeSpanProcessor
-import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcessor
-import com.splunk.rum.integration.agent.api.sessionId.SessionStartEventManager
-import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.processor.AppStartSpanProcessor
+import com.splunk.rum.integration.agent.internal.processor.ErrorIdentifierAttributesSpanProcessor
+import com.splunk.rum.integration.agent.internal.processor.GlobalAttributeSpanProcessor
+import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
+import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetryInitializer
@@ -50,7 +49,7 @@ internal object SplunkRumAgentCore {
         moduleConfigurations: List<ModuleConfiguration>
     ): OpenTelemetry {
         // Sampling.
-        val shouldBeRunning = when (val samplingRate = agentConfiguration.sessionSamplingRate.coerceIn(0.0, 1.0)) {
+        val shouldBeRunning = when (val samplingRate = agentConfiguration.session.samplingRate.coerceIn(0.0, 1.0)) {
             0.0 -> false
             1.0 -> true
             else -> Math.random() < samplingRate
@@ -71,8 +70,6 @@ internal object SplunkRumAgentCore {
 
         val agentIntegration = AgentIntegration
             .obtainInstance(application)
-
-        SessionStartEventManager.obtainInstance(agentIntegration.sessionManager)
 
         val initializer = OpenTelemetryInitializer(application, agentConfiguration.deferredUntilForeground, agentConfiguration.spanInterceptor)
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes

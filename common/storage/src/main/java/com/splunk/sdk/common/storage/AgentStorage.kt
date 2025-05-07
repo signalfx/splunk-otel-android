@@ -207,7 +207,6 @@ class AgentStorage(context: Context) : IAgentStorage {
     companion object {
         private const val BASE_URL = "LOG_BASE_URL"
         private const val DEVICE_ID = "DEVICE_ID"
-        private const val ANON_ID = "ANON_ID"
         private const val SESSION_ID = "SESSION_ID"
         private const val PREVIOUS_SESSION_ID = "PREVIOUS_SESSION_ID"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"

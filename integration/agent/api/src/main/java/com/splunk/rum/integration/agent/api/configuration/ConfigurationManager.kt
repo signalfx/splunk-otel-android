@@ -25,10 +25,11 @@ internal class ConfigurationManager private constructor(
     private val agentStorage: IAgentStorage
 ) {
     fun preProcessConfiguration(context: Context, proposalConfig: AgentConfiguration): AgentConfiguration {
-        val config = proposalConfig.copy()
+        var config = proposalConfig.copy()
 
-        if (config.appVersion == null)
-            config.appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        if (config.appVersion == null) {
+            config = config.copy(appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName)
+        }
 
         // TODO separate task
         agentStorage.writeBaseUrl(config.endpoint.tracesEndpoint!!.toExternalForm())

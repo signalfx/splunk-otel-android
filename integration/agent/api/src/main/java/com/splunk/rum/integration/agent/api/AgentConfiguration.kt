@@ -35,15 +35,14 @@ import io.opentelemetry.sdk.trace.data.SpanData
  */
 data class AgentConfiguration(
     val endpoint: EndpointConfiguration,
-    var appName: String,
-    var deploymentEnvironment: String,
-    var appVersion: String? = null,
+    val appName: String,
+    val deploymentEnvironment: String,
+    val appVersion: String? = null,
     val enableDebugLogging: Boolean = false,
-    val sessionSamplingRate: Double = 1.0, // TODO move to session
     val globalAttributes: MutableAttributes = MutableAttributes(),
     val spanInterceptor: ((SpanData) -> SpanData?)? = null,
     val user: UserConfiguration = UserConfiguration(),
-    val session: Any? = null, // TODO,
+    val session: SessionConfiguration = SessionConfiguration(),
     val instrumentedProcessName: String? = null,
     val deferredUntilForeground: Boolean = false,
 ) {

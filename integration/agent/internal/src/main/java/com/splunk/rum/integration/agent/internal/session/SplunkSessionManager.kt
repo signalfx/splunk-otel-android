@@ -21,14 +21,30 @@ import android.content.Context
 import com.cisco.android.common.utils.AppStateObserver
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.cisco.android.common.utils.extensions.safeSchedule
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
 import com.splunk.rum.integration.agent.internal.utils.TraceId
 import com.splunk.sdk.common.storage.IAgentStorage
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 
+interface ISplunkSessionManager {
+    val sessionId: String
+    val previousSessionId: String?
+    val sessionListeners: MutableSet<SessionListener>
+
+    fun install(context: Context)
+}
+
+object NoOpSplunkSessionManager : ISplunkSessionManager {
+    override val sessionId: String = ""
+    override val previousSessionId: String? = null
+    override val sessionListeners: MutableSet<SessionListener> = mutableSetOf()
+    override fun install(context: Context) = Unit
+}
+
 class SplunkSessionManager internal constructor(
     private val agentStorage: IAgentStorage
-) {
+) : ISplunkSessionManager {
 
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val appStateObserver = AppStateObserver()
@@ -39,7 +55,7 @@ class SplunkSessionManager internal constructor(
      * The value is valid after the [install] function is called.
      */
     @set:Synchronized
-    var sessionId: String
+    override var sessionId: String
         get() = createNewSessionIfNeeded()
         private set(value) {
             previousSessionId = agentStorage.readSessionId()
@@ -48,17 +64,17 @@ class SplunkSessionManager internal constructor(
             agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
         }
 
-    var previousSessionId: String?
+    override var previousSessionId: String?
         get() = agentStorage.readPreviousSessionId()
         private set(value) = agentStorage.writePreviousSessionId(value)
 
-    var sessionTimeout: Long = DEFAULT_SESSION_TIMEOUT
+    override val sessionListeners: MutableSet<SessionListener> = HashSet()
 
-    var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
+    private var sessionBackgroundTimeout: Long = DEFAULT_SESSION_BACKGROUND_TIMEOUT
 
-    val sessionListeners: MutableSet<SessionListener> = HashSet()
+    private var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
 
-    fun install(context: Context) {
+    override fun install(context: Context) {
         clearLastSession()
         createNewSessionIfNeeded()
 
@@ -101,7 +117,7 @@ class SplunkSessionManager internal constructor(
     private fun watchSessionInBackgroundValidity() {
         saveSessionInBackgroundValidationTime()
 
-        sessionValidityWatcher = executor.safeSchedule(sessionTimeout) {
+        sessionValidityWatcher = executor.safeSchedule(sessionBackgroundTimeout) {
             sessionValidityWatcher = null
 
             deleteSessionInBackgroundValidationTime()
@@ -117,7 +133,7 @@ class SplunkSessionManager internal constructor(
     }
 
     private fun saveSessionInBackgroundValidationTime() {
-        agentStorage.writeSessionValidUntilInBackground(System.currentTimeMillis() + sessionTimeout)
+        agentStorage.writeSessionValidUntilInBackground(System.currentTimeMillis() + sessionBackgroundTimeout)
     }
 
     private fun deleteSessionInBackgroundValidationTime() {
@@ -153,7 +169,7 @@ class SplunkSessionManager internal constructor(
     }
 
     private companion object {
-        const val DEFAULT_SESSION_TIMEOUT = 15L * 60L * 1000L // 15m
+        const val DEFAULT_SESSION_BACKGROUND_TIMEOUT = 15L * 60L * 1000L // 15m
         const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L // 4h
     }
 }
