@@ -19,6 +19,18 @@ package com.splunk.rum.integration.slowrendering
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import java.time.Duration
 
+/**
+ * Configuration for the slow rendering detection module.
+ *
+ * This module enables detection of slow or frozen application user interface
+ * The instrumentation operates by periodically polling for frame metrics, by default every second.
+ *
+ * @property isEnabled Whether the slow rendering detection is enabled.
+ * @property interval The time period between polling for slow or frozen frames.
+ *                    A shorter interval provides more frequent checks but uses more resources.
+ *                    Default is 1 second.
+ */
+
 class SlowRenderingModuleConfiguration(
     val isEnabled: Boolean = true,
     val interval: Duration = Duration.ofSeconds(1)) : ModuleConfiguration {
