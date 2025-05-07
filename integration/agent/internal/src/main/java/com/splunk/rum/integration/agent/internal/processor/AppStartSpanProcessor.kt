@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.internal.span
+package com.splunk.rum.integration.agent.internal.processor
 
 import android.os.SystemClock
 import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modules

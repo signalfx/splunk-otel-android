@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.internal.span
+package com.splunk.rum.integration.agent.internal.processor
 
 import com.cisco.android.common.utils.extensions.forEachFast
 import io.opentelemetry.context.Context

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.attributes
+package com.splunk.rum.integration.agent.internal.attributes
 
 import io.opentelemetry.api.common.AttributeKey
 
