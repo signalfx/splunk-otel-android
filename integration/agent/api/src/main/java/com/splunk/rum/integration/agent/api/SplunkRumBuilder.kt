@@ -146,7 +146,7 @@ class SplunkRumBuilder {
             Logger.w(TAG, "invalid slowRenderPollingDuration: $interval is not positive")
             return this
         }
-        slowRenderingDetectionPollInterval = interval;
+        slowRenderingDetectionPollInterval = interval
         return this
     }
 

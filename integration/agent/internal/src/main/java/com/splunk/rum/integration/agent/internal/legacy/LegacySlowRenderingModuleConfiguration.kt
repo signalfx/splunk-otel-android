@@ -22,7 +22,8 @@ import java.time.Duration
 @Deprecated("Only to support legacy API, can be removed with legacy API.")
 class LegacySlowRenderingModuleConfiguration(
     val isEnabled: Boolean = true,
-    val interval: Duration = Duration.ofSeconds(1)) : ModuleConfiguration {
+    val interval: Duration = Duration.ofSeconds(1)
+) : ModuleConfiguration {
 
     override val name: String = "slowrendering"
 

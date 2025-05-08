@@ -33,7 +33,8 @@ import java.time.Duration
 
 class SlowRenderingModuleConfiguration(
     val isEnabled: Boolean = true,
-    val interval: Duration = Duration.ofSeconds(1)) : ModuleConfiguration {
+    val interval: Duration = Duration.ofSeconds(1)
+) : ModuleConfiguration {
 
     override val name: String = "slowrendering"
 
