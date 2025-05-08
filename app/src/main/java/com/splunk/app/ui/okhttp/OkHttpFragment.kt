@@ -507,7 +507,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                     }
 
                     Log.v(TAG, response.body?.string() ?: "null")
-
                 }
             } catch (e: IOException) {
                 e.printStackTrace()

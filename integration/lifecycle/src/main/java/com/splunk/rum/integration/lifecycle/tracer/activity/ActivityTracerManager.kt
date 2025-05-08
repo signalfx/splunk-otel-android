@@ -30,21 +30,13 @@ internal class ActivityTracerManager(
 
     private val tracers = HashMap<String, ActivityTracer>()
 
-    fun addEvent(activity: Activity, eventName: String): ActivityTracer {
-        return getTracer(activity).addEvent(eventName)
-    }
+    fun addEvent(activity: Activity, eventName: String): ActivityTracer = getTracer(activity).addEvent(eventName)
 
-    fun startSpanIfNoneInProgress(activity: Activity, spanName: String): ActivityTracer {
-        return getTracer(activity).startSpanIfNoneInProgress(spanName)
-    }
+    fun startSpanIfNoneInProgress(activity: Activity, spanName: String): ActivityTracer = getTracer(activity).startSpanIfNoneInProgress(spanName)
 
-    fun initiateRestartSpanIfNecessary(activity: Activity): ActivityTracer {
-        return getTracer(activity).initiateRestartSpanIfNecessary()
-    }
+    fun initiateRestartSpanIfNecessary(activity: Activity): ActivityTracer = getTracer(activity).initiateRestartSpanIfNecessary()
 
-    fun startActivityCreation(activity: Activity): ActivityTracer {
-        return getTracer(activity).startActivityCreation()
-    }
+    fun startActivityCreation(activity: Activity): ActivityTracer = getTracer(activity).startActivityCreation()
 
     private fun getTracer(activity: Activity): ActivityTracer {
         val className = activity::class.java.name

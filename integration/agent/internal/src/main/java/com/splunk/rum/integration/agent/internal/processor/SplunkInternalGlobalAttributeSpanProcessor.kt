@@ -35,16 +35,12 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
         }
     }
 
-    override fun isStartRequired(): Boolean {
-        return true
-    }
+    override fun isStartRequired(): Boolean = true
 
     override fun onEnd(span: ReadableSpan) {
     }
 
-    override fun isEndRequired(): Boolean {
-        return true
-    }
+    override fun isEndRequired(): Boolean = true
 
     sealed interface Attribute {
 

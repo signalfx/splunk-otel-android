@@ -58,7 +58,6 @@ class App : Application() {
         //    .disableCrashReporting()
         //    .build(this)
 
-
         val agent = SplunkRum.install(
             application = this,
             agentConfiguration = AgentConfiguration(

@@ -60,7 +60,5 @@ internal object InterceptionFilter {
         "warning"
     )
 
-    fun isHeaderAllowed(name: String): Boolean {
-        return name.lowercase() in allowedHeaders
-    }
+    fun isHeaderAllowed(name: String): Boolean = name.lowercase() in allowedHeaders
 }

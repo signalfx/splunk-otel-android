@@ -27,12 +27,10 @@ class SplunkHeadersInterceptor(
 
     constructor(allowedHeaders: Set<String>) : this(allowedHeaders.map { it.toRegex() })
 
-    override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest {
-        return intercepted.apply {
+    override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest = intercepted.apply {
             requestHeaders = original.request.headers.parseAndFilter()
             responseHeaders = original.response?.headers?.parseAndFilter()
         }
-    }
 
     private fun Headers.parseAndFilter(): MutableMap<String, MutableList<String>> {
         val parsedHeaders = mutableMapOf<String, MutableList<String>>()

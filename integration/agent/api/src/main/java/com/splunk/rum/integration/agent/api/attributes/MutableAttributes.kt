@@ -27,7 +27,7 @@ import java.util.function.BiConsumer
 class MutableAttributes(
     @Volatile
     private var attributes: Attributes = Attributes.empty()
-): Attributes {
+) : Attributes {
 
     /**
      * Retrieves the value associated with the given [AttributeKey].
@@ -160,7 +160,5 @@ class MutableAttributes(
 
     override fun toBuilder(): AttributesBuilder = attributes.toBuilder()
 
-    private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes {
-        return toBuilder().apply(block).build()
-    }
+    private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes = toBuilder().apply(block).build()
 }

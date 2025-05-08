@@ -31,8 +31,7 @@ import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_VERSION
 
 internal object Resources {
 
-    fun createDefault(deviceId: String): Resource {
-        return Resource.getDefault().toBuilder()
+    fun createDefault(deviceId: String): Resource = Resource.getDefault().toBuilder()
             .put(DEVICE_ID, deviceId)
             .put(AttributeKey.stringKey("com.appdynamics.agent.version"), BuildConfig.VERSION_NAME)
             .put(DEVICE_MODEL_NAME, Build.MODEL)
@@ -43,10 +42,8 @@ internal object Resources {
             .put(OS_DESCRIPTION, getOSDescription())
             .put(OS_TYPE, "linux")
             .build()
-    }
 
-    private fun getOSDescription(): String {
-        return StringBuilder().apply {
+    private fun getOSDescription(): String = StringBuilder().apply {
             append("Android Version ")
             append(Build.VERSION.RELEASE)
             append(" (Build ")
@@ -55,5 +52,4 @@ internal object Resources {
             append(Build.VERSION.SDK_INT)
             append(")")
         }.toString()
-    }
 }

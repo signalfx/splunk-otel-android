@@ -45,8 +45,7 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
                 .setParent(parentContext)
                 .setStartTimestamp(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
 
-
-            if(activeSpan != null && activeSpan.spanContext.isValid){
+            if (activeSpan != null && activeSpan.spanContext.isValid) {
                 spanBuilder.setParent(parentContext)
             }
 
@@ -78,11 +77,7 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
         return CompletableResultCode.ofSuccess()
     }
 
-    override fun flush(): CompletableResultCode {
-        return CompletableResultCode.ofSuccess()
-    }
+    override fun flush(): CompletableResultCode = CompletableResultCode.ofSuccess()
 
-    override fun shutdown(): CompletableResultCode {
-        return CompletableResultCode.ofSuccess()
-    }
+    override fun shutdown(): CompletableResultCode = CompletableResultCode.ofSuccess()
 }

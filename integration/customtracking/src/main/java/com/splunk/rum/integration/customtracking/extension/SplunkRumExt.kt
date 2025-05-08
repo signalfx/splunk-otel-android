@@ -35,9 +35,7 @@ fun SplunkRum.addRumEvent(name: String, attributes: Attributes) {
 }
 
 @Deprecated("Use customTracking.trackWorkflow(workflowName)", ReplaceWith("customTracking.trackWorkflow(workflowName)"))
-fun SplunkRum.startWorkflow(workflowName: String): Span? {
-    return customTracking.trackWorkflow(workflowName)
-}
+fun SplunkRum.startWorkflow(workflowName: String): Span? = customTracking.trackWorkflow(workflowName)
 
 @JvmOverloads
 @Deprecated("Use customTracking.trackException(throwable, attributes)", ReplaceWith("customTracking.trackException(throwable, attributes)"))

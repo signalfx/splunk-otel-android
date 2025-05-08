@@ -18,8 +18,6 @@ package com.splunk.sdk.common.otel.logRecord
 
 import android.app.job.JobInfo
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.job.JobType
 
@@ -27,7 +25,5 @@ internal data class UploadOtelLogRecordData(val id: String, val jobIdStorage: Jo
 
     override val jobNumberLimit: Long = 80L
 
-    override fun createJobInfo(context: Context): JobInfo {
-        return UploadOtelLogRecordDataJob.createJobInfoBuilder(context, jobIdStorage.getOrCreateId(id), id).build()
-    }
+    override fun createJobInfo(context: Context): JobInfo = UploadOtelLogRecordDataJob.createJobInfoBuilder(context, jobIdStorage.getOrCreateId(id), id).build()
 }
