@@ -132,11 +132,9 @@ class OpenTelemetryInitializer(
         return ContextPropagators.create(propagator)
     }
 
-    private fun getDeviceId(agentStorage: IAgentStorage): String {
-        return agentStorage.readDeviceId() ?: run {
+    private fun getDeviceId(agentStorage: IAgentStorage): String = agentStorage.readDeviceId() ?: run {
             val deviceId = UUID.randomUUID().toString()
             agentStorage.writeDeviceId(deviceId)
             deviceId
         }
-    }
 }

@@ -24,7 +24,7 @@ class ConfigKtLint : Plugin<Project> by local plugin {
     val outputDir = Ktlint.outputDir(project.buildDir)
     val inputFiles = project.fileTree(mapOf("dir" to Ktlint.INPUT_DIR, "include" to Ktlint.INCLUDED_FILES))
 
-    tasks.register<JavaExec>("ktlint") {
+    tasks.register<JavaExec>("ktlintCheck") {
         inputs.files(inputFiles)
         outputs.dir(outputDir)
 

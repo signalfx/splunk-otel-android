@@ -50,17 +50,17 @@ class App : Application() {
         // globalAttributes["isValid"] = true
 
         // Uncomment the following to test install with legacy SplunkRum builder
-//         val agent = SplunkRum.builder()
-//            .setRealm("lab0")
-//            .setRumAccessToken("1CucSUVwF5f2hNyuHwKNfw")
-//            .setApplicationName("Android demo app")
-//            .setDeploymentEnvironment("test")
-//            .setGlobalAttributes(Attributes.of(AttributeKey.stringKey("legacyGlobalAttributesKey"), "legacyGlobalAttributesVal"))
-//            .disableANRReporting()
-//            .disableCrashReporting()
-//            .disableSlowRenderingDetection()
-//            .setSlowRenderingDetectionPollInterval(Duration.ofMillis(500))
-//            .build(this)
+        // val agent = SplunkRum.builder()
+        //   .setRealm("lab0")
+        //   .setRumAccessToken("1CucSUVwF5f2hNyuHwKNfw")
+        //   .setApplicationName("Android demo app")
+        //   .setDeploymentEnvironment("test")
+        //   .setGlobalAttributes(Attributes.of(AttributeKey.stringKey("legacyGlobalAttributesKey"), "legacyGlobalAttributesVal"))
+        //   .disableANRReporting()
+        //   .disableCrashReporting()
+        //   .disableSlowRenderingDetection()
+        //   .setSlowRenderingDetectionPollInterval(Duration.ofMillis(500))
+        //   .build(this)
 
         val agent = SplunkRum.install(
             application = this,

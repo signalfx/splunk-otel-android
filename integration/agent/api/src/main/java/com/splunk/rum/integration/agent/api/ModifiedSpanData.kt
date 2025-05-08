@@ -24,11 +24,7 @@ internal class ModifiedSpanData(
     original: SpanData,
     private val modifiedAttributes: Attributes
 ) : DelegatingSpanData(original) {
-    override fun getAttributes(): Attributes {
-        return modifiedAttributes
-    }
+    override fun getAttributes(): Attributes = modifiedAttributes
 
-    override fun getTotalAttributeCount(): Int {
-        return modifiedAttributes.size()
-    }
+    override fun getTotalAttributeCount(): Int = modifiedAttributes.size()
 }

@@ -22,6 +22,8 @@ jobs:
         run: touch ./local.properties; ./gradlew check javadoc assemble
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5.0.7
+      - name: Run KtLint
+        run: ./gradlew ktlintCheck
   check_links:
     runs-on: ubuntu-latest
     steps:

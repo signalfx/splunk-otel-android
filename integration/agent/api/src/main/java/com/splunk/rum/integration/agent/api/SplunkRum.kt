@@ -55,9 +55,7 @@ class SplunkRum private constructor(
 ) {
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
-    fun getRumSessionId(): String {
-        return session.state.sessionId
-    }
+    fun getRumSessionId(): String = session.state.sessionId
 
     /**
      * Set an attribute in the global attributes that will be appended to every span and event.
@@ -172,9 +170,7 @@ class SplunkRum private constructor(
          */
         @JvmStatic
         @Deprecated("Use SplunkRum.install()", ReplaceWith("install", "com.splunk.rum.integration.agent.api.SplunkRumBuilder"))
-        fun builder(): SplunkRumBuilder {
-            return SplunkRumBuilder()
-        }
+        fun builder(): SplunkRumBuilder = SplunkRumBuilder()
 
         /**
          * Returns {@code true} if the Splunk RUM library has been successfully initialized.
@@ -184,9 +180,7 @@ class SplunkRum private constructor(
             "Use SplunkRum.instance.state.status == Status.Running",
             ReplaceWith("instance.state.status == Status.Running", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance")
         )
-        fun isInitialized(): Boolean {
-            return instance.state.status == Status.Running
-        }
+        fun isInitialized(): Boolean = instance.state.status == Status.Running
 
         /**
          * Initialize a no-op version of the SplunkRum API, including the instance of OpenTelemetry that
@@ -200,8 +194,6 @@ class SplunkRum private constructor(
             "Use SplunkRum.instance without calling SplunkRum.install() to get noop instance",
             ReplaceWith("SplunkRum.install()", "com.splunk.rum.integration.agent.api.SplunkRum.install")
         )
-        fun noop(): SplunkRum {
-            return noop
-        }
+        fun noop(): SplunkRum = noop
     }
 }

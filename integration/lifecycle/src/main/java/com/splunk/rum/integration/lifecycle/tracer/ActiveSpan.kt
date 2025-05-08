@@ -27,9 +27,7 @@ internal class ActiveSpan(
     private var span: Span? = null
     private var scope: Scope? = null
 
-    fun isSpanInProgress(): Boolean {
-        return span != null
-    }
+    fun isSpanInProgress(): Boolean = span != null
 
     fun startSpan(spanCreator: () -> Span?) {
         if (span != null)

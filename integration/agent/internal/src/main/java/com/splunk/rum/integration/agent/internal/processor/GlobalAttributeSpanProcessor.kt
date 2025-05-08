@@ -28,14 +28,10 @@ class GlobalAttributeSpanProcessor(private val globalAttributes: Attributes) : S
         span.setAllAttributes(globalAttributes)
     }
 
-    override fun isStartRequired(): Boolean {
-        return true
-    }
+    override fun isStartRequired(): Boolean = true
 
     override fun onEnd(span: ReadableSpan) {
     }
 
-    override fun isEndRequired(): Boolean {
-        return false
-    }
+    override fun isEndRequired(): Boolean = false
 }

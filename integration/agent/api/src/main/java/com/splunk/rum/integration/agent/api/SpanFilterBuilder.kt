@@ -18,13 +18,12 @@
 
 package com.splunk.rum.integration.agent.api
 
-
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.trace.data.SpanData
 
-@Deprecated("TODO")
 /** Delegating wrapper around otel SpanDataModifier.  */
+@Deprecated("TODO")
 class SpanFilterBuilder internal constructor() {
     internal val rejectSpanNames: MutableList<(String) -> Boolean> = mutableListOf()
     internal val rejectSpanAttributes: MutableMap<AttributeKey<*>, (Any) -> Boolean> = mutableMapOf()
@@ -75,9 +74,7 @@ class SpanFilterBuilder internal constructor() {
      * @param attributeKey An attribute key to match.
      * @return `this`.
      */
-    fun <T : Any> removeSpanAttribute(attributeKey: AttributeKey<T>): SpanFilterBuilder {
-        return removeSpanAttribute(attributeKey, { true })
-    }
+    fun <T : Any> removeSpanAttribute(attributeKey: AttributeKey<T>): SpanFilterBuilder = removeSpanAttribute(attributeKey, { true })
 
     /**
      * Modify span data before it enters the exporter pipeline.
@@ -93,12 +90,10 @@ class SpanFilterBuilder internal constructor() {
     fun <T> removeSpanAttribute(
         attributeKey: AttributeKey<T>,
         attributeValuePredicate: (T) -> Boolean
-    ): SpanFilterBuilder {
-        return replaceSpanAttribute(
+    ): SpanFilterBuilder = replaceSpanAttribute(
             attributeKey,
             { old -> if (attributeValuePredicate(old)) null else old }
         )
-    }
 
     /**
      * Modify span data before it enters the exporter pipeline.

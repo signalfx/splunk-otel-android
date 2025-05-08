@@ -22,29 +22,17 @@ import com.splunk.rum.integration.lifecycle.screen.RumScreenName
 
 internal object ScreenNameDescriptor {
 
-    fun getName(activity: Activity): String {
-        return getName(activity as Any)
-    }
+    fun getName(activity: Activity): String = getName(activity as Any)
 
-    fun isIgnored(activity: Activity): Boolean {
-        return isIgnored(activity as Any)
-    }
+    fun isIgnored(activity: Activity): Boolean = isIgnored(activity as Any)
 
-    fun getName(fragment: Fragment): String {
-        return getName(fragment as Any)
-    }
+    fun getName(fragment: Fragment): String = getName(fragment as Any)
 
-    fun isIgnored(fragment: Fragment): Boolean {
-        return isIgnored(fragment as Any)
-    }
+    fun isIgnored(fragment: Fragment): Boolean = isIgnored(fragment as Any)
 
-    private fun getName(element: Any): String {
-        return getAnnotation(element)?.name ?: javaClass.simpleName
-    }
+    private fun getName(element: Any): String = getAnnotation(element)?.name ?: javaClass.simpleName
 
-    private fun isIgnored(element: Any): Boolean {
-        return getAnnotation(element)?.isIgnored ?: false
-    }
+    private fun isIgnored(element: Any): Boolean = getAnnotation(element)?.isIgnored ?: false
 
     private fun getAnnotation(element: Any): RumScreenName? {
         val javaClass = element::class.java

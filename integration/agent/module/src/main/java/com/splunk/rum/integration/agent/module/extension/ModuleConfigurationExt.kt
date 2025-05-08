@@ -18,9 +18,7 @@ package com.splunk.rum.integration.agent.module.extension
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-fun ModuleConfiguration.toSplunkString(): String {
-    return attributes.joinToString(",") { "$name.${it.first}:${it.second}" }
-}
+fun ModuleConfiguration.toSplunkString(): String = attributes.joinToString(",") { "$name.${it.first}:${it.second}" }
 
 inline fun <reified T : ModuleConfiguration> List<ModuleConfiguration>.find(): T? {
     for (i in indices) {

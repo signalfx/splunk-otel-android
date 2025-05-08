@@ -52,7 +52,6 @@ class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Cha
                 attributes.put(RumConstants.LINK_TRACE_ID_KEY, it.traceId)
                 attributes.put(RumConstants.LINK_SPAN_ID_KEY, it.spanId)
             }
-
         }
     }
 }

@@ -36,11 +36,7 @@ internal class SpanInterceptorExporter(
         return delegate.export(modifiedSpans)
     }
 
-    override fun flush(): CompletableResultCode {
-        return CompletableResultCode.ofSuccess()
-    }
+    override fun flush(): CompletableResultCode = CompletableResultCode.ofSuccess()
 
-    override fun shutdown(): CompletableResultCode {
-        return CompletableResultCode.ofSuccess()
-    }
+    override fun shutdown(): CompletableResultCode = CompletableResultCode.ofSuccess()
 }
