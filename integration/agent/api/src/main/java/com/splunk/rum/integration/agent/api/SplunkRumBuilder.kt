@@ -22,8 +22,10 @@ import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.legacy.LegacyAnrModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
+import com.splunk.rum.integration.agent.internal.legacy.LegacySlowRenderingModuleConfiguration
 import io.opentelemetry.api.common.Attributes
 import java.net.URL
+import java.time.Duration
 import java.util.function.Consumer
 
 @Deprecated("Use SplunkRum.install()")
@@ -43,6 +45,8 @@ class SplunkRumBuilder {
     private var maxUsageMegabytes: Int = 25
     private var crashReportingEnabled: Boolean = true
     private var anrReportingEnabled: Boolean = true
+    private var slowRenderingDetectionEnabled: Boolean = true
+    private var slowRenderingDetectionPollInterval: Duration = Duration.ofSeconds(1)
 
     fun setRumAccessToken(token: String): SplunkRumBuilder {
         accessToken = token
@@ -130,6 +134,22 @@ class SplunkRumBuilder {
         return this
     }
 
+    @Deprecated("Slow Rendering Detection is now controlled by the SlowRenderingModuleConfiguration")
+    fun disableSlowRenderingDetection(): SplunkRumBuilder {
+        slowRenderingDetectionEnabled = false
+        return this
+    }
+
+    @Deprecated("Slow Rendering Detection is now controlled by the SlowRenderingModuleConfiguration")
+    fun setSlowRenderingDetectionPollInterval(interval: Duration): SplunkRumBuilder {
+        if (interval.toMillis() <= 0) {
+            Logger.w(TAG, "invalid slowRenderPollingDuration: $interval is not positive")
+            return this
+        }
+        slowRenderingDetectionPollInterval = interval
+        return this
+    }
+
     fun build(application: Application): SplunkRum {
         val realm = realm
         val beaconEndpoint = beaconEndpoint
@@ -170,6 +190,10 @@ class SplunkRumBuilder {
                 ),
                 LegacyAnrModuleConfiguration(
                     isEnabled = anrReportingEnabled
+                ),
+                LegacySlowRenderingModuleConfiguration(
+                    isEnabled = slowRenderingDetectionEnabled,
+                    interval = slowRenderingDetectionPollInterval
                 )
             )
         )

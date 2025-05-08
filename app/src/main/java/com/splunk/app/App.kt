@@ -30,6 +30,8 @@ import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3ModuleConfiguration
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration
+import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration
+import java.time.Duration
 
 class App : Application() {
 
@@ -49,14 +51,16 @@ class App : Application() {
 
         // Uncomment the following to test install with legacy SplunkRum builder
         // val agent = SplunkRum.builder()
-        //    .setRealm("lab0")
-        //    .setRumAccessToken("1CucSUVwF5f2hNyuHwKNfw")
-        //    .setApplicationName("Android demo app")
-        //    .setDeploymentEnvironment("test")
-        //    .setGlobalAttributes(Attributes.of(AttributeKey.stringKey("legacyGlobalAttributesKey"), "legacyGlobalAttributesVal"))
-        //    .disableANRReporting()
-        //    .disableCrashReporting()
-        //    .build(this)
+        //   .setRealm("lab0")
+        //   .setRumAccessToken("1CucSUVwF5f2hNyuHwKNfw")
+        //   .setApplicationName("Android demo app")
+        //   .setDeploymentEnvironment("test")
+        //   .setGlobalAttributes(Attributes.of(AttributeKey.stringKey("legacyGlobalAttributesKey"), "legacyGlobalAttributesVal"))
+        //   .disableANRReporting()
+        //   .disableCrashReporting()
+        //   .disableSlowRenderingDetection()
+        //   .setSlowRenderingDetectionPollInterval(Duration.ofMillis(500))
+        //   .build(this)
 
         val agent = SplunkRum.install(
             application = this,
@@ -94,7 +98,11 @@ class App : Application() {
                 ),
                 NetworkMonitorModuleConfiguration(
                     isEnabled = true
-                )
+                ),
+                SlowRenderingModuleConfiguration(
+                    isEnabled = true,
+                    interval = Duration.ofMillis(500)
+                ),
             )
         )
 
