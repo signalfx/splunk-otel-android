@@ -48,7 +48,7 @@ internal class AndroidSpanExporter(
         appStateObserver.attach(context.applicationContext as Application)
     }
 
-    override fun export(spans: MutableCollection<SpanData>): CompletableResultCode = if (deferredUntilForeground && isForeground) {
+    override fun export(spans: MutableCollection<SpanData>): CompletableResultCode = if (deferredUntilForeground && !isForeground) {
             buffer.addAll(spans)
             CompletableResultCode.ofSuccess()
         } else {
@@ -66,8 +66,7 @@ internal class AndroidSpanExporter(
         return CompletableResultCode.ofSuccess()
     }
 
-    private fun flushBufferedSpans(extra: Collection<SpanData> = emptyList()) {
-        val allSpans = buffer + extra
+    private fun flushBufferedSpans(extra: Collection<SpanData> = emptyList()) { val allSpans = buffer + extra
         buffer.clear()
 
         if (allSpans.isEmpty()) return
