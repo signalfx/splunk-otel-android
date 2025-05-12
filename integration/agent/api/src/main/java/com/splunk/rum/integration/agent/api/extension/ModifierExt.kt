@@ -19,4 +19,7 @@ package com.splunk.rum.integration.agent.api.extension
 import androidx.compose.ui.Modifier
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 
+/**
+ * Splunk [Modifier] for Jetpack Compose that adds additional info into wireframe.
+ */
 fun Modifier.splunkRum(id: String? = null, isSensitive: Boolean? = null, positionInList: Int? = null): Modifier = ComposeElementIdentification.resolveChain(this, id, isSensitive, positionInList)

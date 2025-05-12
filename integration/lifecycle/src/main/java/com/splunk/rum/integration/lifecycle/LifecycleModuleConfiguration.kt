@@ -18,6 +18,9 @@ package com.splunk.rum.integration.lifecycle
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
+/**
+ * Lifecycle module configuration.
+ */
 class LifecycleModuleConfiguration : ModuleConfiguration {
 
     override val name: String = "lifecycle"

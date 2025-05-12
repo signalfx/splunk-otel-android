@@ -17,21 +17,33 @@
 package com.splunk.rum.integration.agent.api
 
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
-import com.splunk.rum.integration.agent.api.user.UserConfiguration
+import com.splunk.rum.integration.agent.api.spaninterceptor.toMutableSpanData
+import com.splunk.rum.integration.agent.api.user.User
 import io.opentelemetry.sdk.trace.data.SpanData
 
 /**
- * TODO: Fill in the documentation.
+ * Configuration for the Splunk RUM Agent.
  *
+ * @property endpoint Configuration for the Splunk RUM Agent's endpoint.
+ * @property appName The name of the application.
+ * @property deploymentEnvironment The deployment environment of the application.
+ * @property appVersion The version of the application.
+ * @property enableDebugLogging Whether to enable debug logging.
+ * @property sessionSamplingRate The sampling rate for sessions. Default is 1.0.
+ * @property globalAttributes Global attributes to be added to all spans.
  * @property spanInterceptor A function to intercept and optionally modify spans before they are exported.
  * Can return `null` to drop a span. Default is `null` (no interception).
  *
- * If span interception and modification are required, consider using the [toMutableSpanData] extension method:
+ * If span interception and modification are required, consider using the [SpanData.toMutableSpanData] extension method:
  * ```kotlin
  * val mutableSpanData: MutableSpanData = spanData.toMutableSpanData()
  * ```
  * This method allows you to convert a `SpanData` instance into a `MutableSpanData`, enabling you to modify span attributes,
  * status, and other properties as needed during the interception process.
+ * @property user Configuration for the user.
+ * @property session Additional session information.
+ * @property instrumentedProcessName The name of the instrumented process.
+ * @property deferredUntilForeground Whether to defer tracing until the app is brought to the foreground.
  */
 data class AgentConfiguration(
     val endpoint: EndpointConfiguration,
@@ -41,7 +53,7 @@ data class AgentConfiguration(
     val enableDebugLogging: Boolean = false,
     val globalAttributes: MutableAttributes = MutableAttributes(),
     val spanInterceptor: ((SpanData) -> SpanData?)? = null,
-    val user: UserConfiguration = UserConfiguration(),
+    val user: User.Configuration = User.Configuration(),
     val session: SessionConfiguration = SessionConfiguration(),
     val instrumentedProcessName: String? = null,
     val deferredUntilForeground: Boolean = false,

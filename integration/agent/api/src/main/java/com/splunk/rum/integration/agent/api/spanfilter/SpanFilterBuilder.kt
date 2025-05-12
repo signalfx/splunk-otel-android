@@ -16,13 +16,15 @@
 
 @file:Suppress("UNCHECKED_CAST")
 
-package com.splunk.rum.integration.agent.api
+package com.splunk.rum.integration.agent.api.spanfilter
 
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.trace.data.SpanData
 
-/** Delegating wrapper around otel SpanDataModifier.  */
+/**
+ * Delegating wrapper around otel SpanDataModifier.
+ */
 @Deprecated("TODO")
 class SpanFilterBuilder internal constructor() {
     internal val rejectSpanNames: MutableList<(String) -> Boolean> = mutableListOf()
