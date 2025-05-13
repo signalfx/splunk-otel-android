@@ -18,7 +18,15 @@ package com.splunk.rum.integration.networkmonitor
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class NetworkMonitorModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
+/**
+ * Configuration for the network monitor module.
+ *
+ * @property isEnabled Whether the module is enabled.
+ */
+class NetworkMonitorModuleConfiguration(
+    val isEnabled: Boolean = true
+) : ModuleConfiguration {
+
     override val name: String = "networkMonitor"
 
     override val attributes: List<Pair<String, String>> = listOf(

@@ -18,6 +18,15 @@ package com.splunk.rum.integration.agent.api.network
 
 import java.net.URL
 
+/**
+ * Data class representing a network request.
+ *
+ * @param url The URL of the request.
+ * @param method The HTTP method of the request.
+ * @param statusCode The HTTP status code of the response.
+ * @param requestHeaders The HTTP headers of the request.
+ * @param responseHeaders The HTTP headers of the response.
+ */
 data class SplunkNetworkRequest(
     var url: URL,
     var method: String,

@@ -18,6 +18,11 @@ package com.splunk.rum.integration.interactions
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
+/**
+ * A user interactions module configuration.
+ *
+ * @property isEnabled Whether the module is enabled.
+ */
 data class InteractionsModuleConfiguration(
     val isEnabled: Boolean = true
 ) : ModuleConfiguration {

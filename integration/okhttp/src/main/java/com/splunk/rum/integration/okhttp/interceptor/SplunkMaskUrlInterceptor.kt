@@ -22,6 +22,11 @@ import com.splunk.rum.integration.okhttp.model.Mask
 import com.splunk.rum.integration.okhttp.model.SplunkChain
 import java.net.URL
 
+/**
+ * Interceptor that masks request URL.
+ *
+ * @param masks List of masks to be applied to URL.
+ */
 class SplunkMaskUrlInterceptor(
     val masks: List<Mask>
 ) : SplunkOkHttpInterceptor {

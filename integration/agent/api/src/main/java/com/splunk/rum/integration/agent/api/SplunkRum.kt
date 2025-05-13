@@ -39,6 +39,9 @@ import java.util.function.Consumer
 /**
  * The [SplunkRum] class is responsible for initializing and providing access to the RUM agent.
  * Agent is initialized through the [install] method.
+ *
+ * @param user Represents the user associated with the RUM session.
+ * @param globalAttributes Represents the global attributes configured for the agent.
  */
 class SplunkRum private constructor(
     agentConfiguration: AgentConfiguration,
@@ -48,9 +51,6 @@ class SplunkRum private constructor(
     val state: IState = State(agentConfiguration),
     val session: ISession = Session(ISession.State(agentConfiguration.session, sessionManager)),
     val user: User = User(userManager),
-    /**
-     * Represents the global attributes configured for the agent.
-     */
     val globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 ) {
 
@@ -166,14 +166,14 @@ class SplunkRum private constructor(
         }
 
         /**
-         * Creates a new {@link SplunkRumBuilder}, used to set up a {@link SplunkRum} instance.
+         * Creates a new [SplunkRumBuilder], used to set up a [SplunkRum] instance.
          */
         @JvmStatic
         @Deprecated("Use SplunkRum.install()", ReplaceWith("install", "com.splunk.rum.integration.agent.api.SplunkRumBuilder"))
         fun builder(): SplunkRumBuilder = SplunkRumBuilder()
 
         /**
-         * Returns {@code true} if the Splunk RUM library has been successfully initialized.
+         * Returns true if the Splunk RUM library has been successfully initialized.
          */
         @JvmStatic
         @Deprecated(
@@ -183,11 +183,8 @@ class SplunkRum private constructor(
         fun isInitialized(): Boolean = instance.state.status == Status.Running
 
         /**
-         * Initialize a no-op version of the SplunkRum API, including the instance of OpenTelemetry that
-         * is available. This can be useful for testing, or configuring your app without RUM enabled,
-         * but still using the APIs.
-         *
-         * @return A no-op instance of {@link SplunkRum}
+         * Initialize a no-op version of the SplunkRum API, including the instance of OpenTelemetry that is available.
+         * This can be useful for testing, or configuring your app without RUM enabled, but still using the APIs.
          */
         @JvmStatic
         @Deprecated(
