@@ -24,6 +24,9 @@ private const val TAG = "ViewExt"
 
 private val idRegex = "^[a-zA-Z][a-zA-Z0-9_\\.\\-,]{0,199}\$".toRegex() // https://regex101.com/r/r7RYao/1
 
+/**
+ * UI element identification. Useful for wireframe and interactions.
+ */
 var View.splunkRumId: String?
     get() = internalCiscoId
     set(value) {

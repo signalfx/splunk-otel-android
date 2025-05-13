@@ -18,6 +18,9 @@ package com.splunk.rum.integration.sessionreplay
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
+/**
+ * Session replay module configuration.
+ */
 class SessionReplayModuleConfiguration : ModuleConfiguration {
 
     override val name: String = "sessionReplay"

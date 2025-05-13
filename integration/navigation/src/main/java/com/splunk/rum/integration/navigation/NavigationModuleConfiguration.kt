@@ -18,6 +18,13 @@ package com.splunk.rum.integration.navigation
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
+/**
+ * Configuration for the navigation module.
+ *
+ * @property isEnabled Whether the navigation module is enabled.
+ * @property isFragmentTrackingEnabled Whether fragment tracking is enabled.
+ * @property isActivityTrackingEnabled Whether activity tracking is enabled.
+ */
 data class NavigationModuleConfiguration(
     val isEnabled: Boolean = true,
     val isFragmentTrackingEnabled: Boolean = false,

@@ -18,7 +18,15 @@ package com.splunk.rum.integration.okhttp3.auto
 
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 
-class OkHttp3ModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
+/**
+ * OkHttp module configuration.
+ *
+ * @property isEnabled Whether the module is enabled.
+ */
+class OkHttp3ModuleConfiguration(
+    val isEnabled: Boolean = true
+) : ModuleConfiguration {
+
     override val name: String = "okHttp3"
 
     override val attributes: List<Pair<String, String>> = listOf(

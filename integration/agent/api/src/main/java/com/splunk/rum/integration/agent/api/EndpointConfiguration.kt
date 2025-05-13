@@ -31,6 +31,10 @@ class EndpointConfiguration {
 
     internal constructor()
 
+    /**
+     * @param realm Sets the realm for the beacon to send RUM telemetry to, e.g. "us0", "eu0".
+     * @param rumAccessToken Sets the RUM auth token to be used by the RUM library.
+     */
     constructor(realm: String, rumAccessToken: String) {
         this.realm = realm
         this.rumAccessToken = rumAccessToken
@@ -38,10 +42,17 @@ class EndpointConfiguration {
         this.sessionReplayEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/rumreplay?auth=$rumAccessToken")
     }
 
+    /**
+     * @param traces Sets the "beacon" endpoint URL to be used by the RUM library.
+     */
     constructor(traces: URL) {
         tracesEndpoint = traces
     }
 
+    /**
+     * @param traces Sets the "beacon" endpoint URL to be used by the RUM library.
+     * @param sessionReplayEndpoint Sets the "session replay" endpoint URL to be used by the RUM library.
+     */
     constructor(traces: URL, sessionReplayEndpoint: URL) {
         tracesEndpoint = traces
         this.sessionReplayEndpoint = sessionReplayEndpoint

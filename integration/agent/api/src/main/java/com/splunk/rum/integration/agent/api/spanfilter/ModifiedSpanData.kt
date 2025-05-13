@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2024 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.user
+package com.splunk.rum.integration.agent.api.spanfilter
 
-data class UserConfiguration(
-    val trackingMode: UserTrackingMode = UserTrackingMode.NoTracking
-)
+import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.sdk.trace.data.DelegatingSpanData
+import io.opentelemetry.sdk.trace.data.SpanData
 
-enum class UserTrackingMode {
-    NoTracking, AnonymousTracking
+internal class ModifiedSpanData(
+    original: SpanData,
+    private val modifiedAttributes: Attributes
+) : DelegatingSpanData(original) {
+    override fun getAttributes(): Attributes = modifiedAttributes
+
+    override fun getTotalAttributeCount(): Int = modifiedAttributes.size()
 }

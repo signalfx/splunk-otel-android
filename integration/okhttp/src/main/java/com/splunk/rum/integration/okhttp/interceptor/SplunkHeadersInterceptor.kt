@@ -21,6 +21,11 @@ import com.splunk.rum.integration.agent.api.network.SplunkNetworkRequest
 import com.splunk.rum.integration.okhttp.model.SplunkChain
 import okhttp3.Headers
 
+/**
+ * Interceptor that filters headers by given regexes.
+ *
+ * @param allowedHeaders Set of regexes that are used to filter headers.
+ */
 class SplunkHeadersInterceptor(
     val allowedHeaders: List<Regex>
 ) : SplunkOkHttpInterceptor {
