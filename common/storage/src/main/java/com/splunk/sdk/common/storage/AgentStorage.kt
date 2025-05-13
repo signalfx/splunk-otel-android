@@ -41,7 +41,8 @@ import java.io.File
  *  agent/
  *    └─<STORAGE_VERSION>/
  *           ├─logs/
- *           └─spans/
+ *           ├─spans/
+ *           └─session_replay/
  */
 class AgentStorage(context: Context) : IAgentStorage {
 
@@ -55,6 +56,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     private val preferencesFile = File(agentVersionDir, "preferences/preferences.dat")
     private val logDir = File(agentVersionDir, "logs")
     private val spanDir = File(agentVersionDir, "spans")
+    private val sessionReplayDir = File(agentVersionDir, "session_replay")
 
     init {
         preferences = Preferences(FileSimplePermanentCache(preferencesFile, preferencesFileManager))
@@ -62,6 +64,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         agentVersionDir.mkdirs()
         logDir.mkdirs()
         spanDir.mkdirs()
+        sessionReplayDir.mkdirs()
     }
 
     override val freeSpace: Long
@@ -94,6 +97,16 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun readBaseUrl(): String? = preferences.getString(BASE_URL)
+
+    override fun writeSessionReplayBaseUrl(value: String) {
+        preferences.putString(SESSION_REPLAY_BASE_URL, value).commit()
+    }
+
+    override fun deleteSessionReplayBaseUrl() {
+        preferences.remove(SESSION_REPLAY_BASE_URL)
+    }
+
+    override fun readSessionReplayBaseUrl(): String? = preferences.getString(SESSION_REPLAY_BASE_URL)
 
     override fun writeDeviceId(value: String) {
         preferences.putString(DEVICE_ID, value).commit()
@@ -176,8 +189,27 @@ class AgentStorage(context: Context) : IAgentStorage {
         file.delete()
     }
 
+    override fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean {
+        val file: File = sessionReplayDataFile(id)
+        val success = encryptedStorage.writeBytes(file, data)
+        Logger.d(TAG, "writeOtelSessionReplayData(): id = $id, success = $success")
+
+        return success
+    }
+
+    override fun readOtelSessionReplayData(id: String): ByteArray? {
+        val file: File = sessionReplayDataFile(id)
+        return encryptedStorage.readBytes(file)
+    }
+
+    override fun deleteOtelSessionReplayData(id: String) {
+        val file: File = sessionReplayDataFile(id)
+        file.delete()
+    }
+
     private fun otelLogDataFile(id: String) = File(logDir, "$id.dat")
     private fun otelSpanDataFile(id: String) = File(spanDir, "$id.dat")
+    private fun sessionReplayDataFile(id: String) = File(sessionReplayDir, "$id.dat")
 
     fun cleanUpStorage(context: Context): Boolean {
         val files = ArrayList<File>()
@@ -204,7 +236,8 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     companion object {
-        private const val BASE_URL = "LOG_BASE_URL"
+        private const val BASE_URL = "BASE_URL"
+        private const val SESSION_REPLAY_BASE_URL = "SESSION_REPLAY_BASE_URL"
         private const val DEVICE_ID = "DEVICE_ID"
         private const val SESSION_ID = "SESSION_ID"
         private const val PREVIOUS_SESSION_ID = "PREVIOUS_SESSION_ID"

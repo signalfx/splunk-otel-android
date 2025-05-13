@@ -67,9 +67,9 @@ class App : Application() {
             agentConfiguration = AgentConfiguration(
                 endpoint = EndpointConfiguration(
                     realm = "lab0",
-                    rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw"
+                    rumAccessToken = "GHnFoSZy5Fr9u9EL_8yKkQ"
                 ),
-                appName = "Android demo app",
+                appName = "DavidK-App",
                 enableDebugLogging = true,
                 globalAttributes = globalAttributes,
                 deploymentEnvironment = "test",
@@ -85,19 +85,19 @@ class App : Application() {
                     isActivityTrackingEnabled = false
                 ),
                 CrashModuleConfiguration(
-                    isEnabled = true
+                    isEnabled = false
                 ),
                 AnrModuleConfiguration(
-                    isEnabled = true
+                    isEnabled = false
                 ),
                 HttpURLModuleConfiguration(
-                    isEnabled = true
+                    isEnabled = false
                 ),
                 OkHttp3ModuleConfiguration(
-                    isEnabled = true
+                    isEnabled = false
                 ),
                 NetworkMonitorModuleConfiguration(
-                    isEnabled = true
+                    isEnabled = false
                 ),
                 SlowRenderingModuleConfiguration(
                     isEnabled = true,

@@ -22,6 +22,7 @@ import com.cisco.android.common.job.IJobManager
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.utils.AppStateObserver
 import com.splunk.sdk.common.storage.IAgentStorage
+import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
@@ -49,12 +50,12 @@ internal class AndroidSpanExporter(
     }
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode = if (deferredUntilForeground && !isForeground) {
-            buffer.addAll(spans)
-            CompletableResultCode.ofSuccess()
-        } else {
-            flushBufferedSpans(spans)
-            CompletableResultCode.ofSuccess()
-        }
+        buffer.addAll(spans)
+        CompletableResultCode.ofSuccess()
+    } else {
+        flushBufferedSpans(spans)
+        CompletableResultCode.ofSuccess()
+    }
 
     override fun flush(): CompletableResultCode {
         flushBufferedSpans()
@@ -72,17 +73,42 @@ internal class AndroidSpanExporter(
 
         if (allSpans.isEmpty()) return
 
-        val exportRequest = TraceRequestMarshaler.create(allSpans)
-        val id = UUID.randomUUID().toString()
-
-        // Save data to our storage.
-        ByteArrayOutputStream().use {
-            exportRequest.writeBinaryTo(it)
-            agentStorage.writeOtelSpanData(id, it.toByteArray())
+        val genericSpans = allSpans.filter {
+            val eventName = it.attributes.get(AttributeKey.stringKey("event.name"))
+            eventName == null && eventName != "session_replay_data"
+        }
+        val sessionReplaySpans = allSpans.filter {
+            val eventName = it.attributes.get(AttributeKey.stringKey("event.name"))
+            eventName == "session_replay_data"
         }
 
-        // Job scheduling
-        jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+        if (genericSpans.isNotEmpty()) {
+            val exportRequest = TraceRequestMarshaler.create(genericSpans)
+            val id = UUID.randomUUID().toString()
+
+            // Save data to our storage.
+            ByteArrayOutputStream().use {
+                exportRequest.writeBinaryTo(it)
+                agentStorage.writeOtelSpanData(id, it.toByteArray())
+            }
+
+            // Job scheduling
+            jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+        }
+
+        if (sessionReplaySpans.isNotEmpty()) {
+            val exportRequest = TraceRequestMarshaler.create(sessionReplaySpans)
+            val id = UUID.randomUUID().toString()
+
+            // Save data to our storage.
+            ByteArrayOutputStream().use {
+                exportRequest.writeBinaryTo(it)
+                agentStorage.writeOtelSessionReplayData(id, it.toByteArray())
+            }
+
+            // Job scheduling
+            jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
+        }
     }
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {
@@ -101,6 +127,7 @@ internal class AndroidSpanExporter(
                 flushBufferedSpans()
             }
         }
+
         override fun onAppClosed() {
             isForeground = false
         }
