@@ -24,7 +24,7 @@ import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Chain, Response> {
+internal class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Chain, Response> {
 
     override fun onStart(attributes: AttributesBuilder, parentContext: Context, chain: Interceptor.Chain) {
         attributes.put(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_HTTP)

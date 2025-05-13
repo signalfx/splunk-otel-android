@@ -19,9 +19,15 @@ package com.splunk.rum.integration.okhttp
 import com.splunk.rum.integration.okhttp.interceptor.SplunkOkHttpInterceptor
 import okhttp3.OkHttpClient
 
+/**
+ * Splunk OkHttp interceptor list for RUM. Used for tracking network requests.
+ */
 val OkHttpClient.Builder.splunkInterceptors: MutableList<SplunkOkHttpInterceptor>
     get() = InterceptionManager.instance.getOkHttpInterceptors(this)
 
+/**
+ * Adds Splunk OkHttp interceptor that will be used for tracking network requests.
+ */
 fun OkHttpClient.Builder.addSplunkInterceptor(interceptor: SplunkOkHttpInterceptor): OkHttpClient.Builder {
     splunkInterceptors += interceptor
     return this

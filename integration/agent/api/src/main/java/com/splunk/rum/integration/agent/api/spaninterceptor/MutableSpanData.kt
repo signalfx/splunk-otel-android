@@ -26,6 +26,9 @@ import io.opentelemetry.sdk.trace.data.LinkData
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.data.StatusData
 
+/**
+ * Mutable implementation of [SpanData].
+ */
 class MutableSpanData(private val spanData: SpanData) : SpanData {
 
     private var name: String? = null
