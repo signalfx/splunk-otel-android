@@ -236,7 +236,7 @@ class SplunkRumBuilder {
         return this
     }
 
-    /** 
+    /**
      * Creates a new instance of [SplunkRum] with the settings of this [SplunkRumBuilder].
      *
      * You must configure at least the [setApplicationName], the [setRealm] or the [setBeaconEndpoint] beacon,
