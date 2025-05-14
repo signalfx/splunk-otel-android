@@ -201,8 +201,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 val readInput = inputStream.bufferedReader().use { it.readText() }
                 Log.v(
                     TAG,
-                    "response code: " + responseCode + " response message: " + responseMessage +
-                        " InputStream: " + readInput
+                    "response code: $responseCode response message: $responseMessage InputStream: $readInput"
                 )
                 showDoneToast("post")
             } catch (e: IOException) {
