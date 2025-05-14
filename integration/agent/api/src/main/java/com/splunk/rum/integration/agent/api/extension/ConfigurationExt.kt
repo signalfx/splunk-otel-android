@@ -35,5 +35,5 @@ internal fun AgentConfiguration.toResource(): Resource = Resource.getDefault().t
         .put(DEVICE_MODEL_NAME, Build.MODEL)
         .put(OS_NAME, "Android")
         .put(OS_TYPE, "linux")
-        .put(OS_VERSION, Build.VERSION.SDK_INT.toString())
+        .put(OS_VERSION, Build.VERSION.RELEASE)
         .build()
