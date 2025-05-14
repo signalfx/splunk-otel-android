@@ -173,11 +173,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 val responseMessage = connection.responseMessage
                 val errorStream = connection.errorStream
                 val readError = errorStream.bufferedReader().use { it.readText() }
-                Log.v(
-                    TAG,
-                    "response code: " + responseCode + " response message: " + responseMessage +
-                        " ErrorStream: " + readError
-                )
+                Log.v(TAG, "response code: $responseCode response message: $responseMessage ErrorStream: $readError")
                 showDoneToast("unSuccessfulGet")
             } catch (e: IOException) {
                 e.printStackTrace()
