@@ -153,7 +153,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
 
                 stallRequest.takeIf { it }?.let { Thread.sleep(20000) }
 
-                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage + readInputString)
+                Log.v(TAG, "response code: $responseCode response message: $responseMessage$readInputString")
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
