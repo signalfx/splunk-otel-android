@@ -19,7 +19,6 @@ package com.splunk.sdk.common.otel
 import android.app.Application
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.job.JobManager
-import com.splunk.sdk.common.otel.internal.Resources
 import com.splunk.sdk.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.sdk.common.otel.span.AndroidSpanExporter
 import com.splunk.sdk.common.otel.span.SpanInterceptorExporter
@@ -44,9 +43,8 @@ class OpenTelemetryInitializer(
     application: Application,
     deferredUntilForeground: Boolean,
     spanInterceptor: ((SpanData) -> SpanData?)? = null,
+    private val resource: Resource
 ) {
-
-    private var resource: Resource
 
     private val spanProcessors: MutableList<SpanProcessor> = mutableListOf()
     private val logRecordProcessors: MutableList<LogRecordProcessor> = mutableListOf()
@@ -55,10 +53,6 @@ class OpenTelemetryInitializer(
         val agentStorage = AgentStorage.attach(application)
         val jobManager = JobManager.attach(application)
         val jobIdStorage = JobIdStorage.init(application)
-
-        val deviceId = getDeviceId(agentStorage)
-
-        resource = Resources.createDefault(deviceId)
 
         val spanExporter = SpanInterceptorExporter(
             AndroidSpanExporter(
@@ -101,11 +95,6 @@ class OpenTelemetryInitializer(
         return this
     }
 
-    fun joinResources(resource: Resource): OpenTelemetryInitializer {
-        this.resource = this.resource.merge(resource)
-        return this
-    }
-
     private fun createTracerProvider(): SdkTracerProvider {
         val builder = SdkTracerProvider.builder()
             .setResource(resource)
@@ -131,10 +120,4 @@ class OpenTelemetryInitializer(
         )
         return ContextPropagators.create(propagator)
     }
-
-    private fun getDeviceId(agentStorage: IAgentStorage): String = agentStorage.readDeviceId() ?: run {
-            val deviceId = UUID.randomUUID().toString()
-            agentStorage.writeDeviceId(deviceId)
-            deviceId
-        }
 }
