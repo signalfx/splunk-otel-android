@@ -40,9 +40,9 @@ import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
 class OpenTelemetryInitializer(
     application: Application,
     deferredUntilForeground: Boolean,
-    spanInterceptor: ((SpanData) -> SpanData?)? = null,
-    private val resource: Resource
+    spanInterceptor: ((SpanData) -> SpanData?)? = null
 ) {
+    private var resource: Resource
 
     private val spanProcessors: MutableList<SpanProcessor> = mutableListOf()
     private val logRecordProcessors: MutableList<LogRecordProcessor> = mutableListOf()
@@ -51,6 +51,8 @@ class OpenTelemetryInitializer(
         val agentStorage = AgentStorage.attach(application)
         val jobManager = JobManager.attach(application)
         val jobIdStorage = JobIdStorage.init(application)
+
+        resource = Resource.getDefault()
 
         val spanExporter = SpanInterceptorExporter(
             AndroidSpanExporter(
@@ -90,6 +92,11 @@ class OpenTelemetryInitializer(
 
     fun addLogRecordProcessor(logRecordProcessor: LogRecordProcessor): OpenTelemetryInitializer {
         logRecordProcessors += logRecordProcessor
+        return this
+    }
+
+    fun joinResources(resource: Resource): OpenTelemetryInitializer {
+        this.resource = this.resource.merge(resource)
         return this
     }
 
