@@ -23,7 +23,6 @@ import com.splunk.sdk.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.sdk.common.otel.span.AndroidSpanExporter
 import com.splunk.sdk.common.otel.span.SpanInterceptorExporter
 import com.splunk.sdk.common.storage.AgentStorage
-import com.splunk.sdk.common.storage.IAgentStorage
 import io.opentelemetry.api.baggage.propagation.W3CBaggagePropagator
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator
 import io.opentelemetry.context.propagation.ContextPropagators
@@ -37,7 +36,6 @@ import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.SpanProcessor
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
-import java.util.UUID
 
 class OpenTelemetryInitializer(
     application: Application,

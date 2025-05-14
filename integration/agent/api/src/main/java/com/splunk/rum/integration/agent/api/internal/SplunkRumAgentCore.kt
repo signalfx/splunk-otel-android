@@ -71,7 +71,7 @@ internal object SplunkRumAgentCore {
         val agentIntegration = AgentIntegration
             .obtainInstance(application)
 
-        val initializer = OpenTelemetryInitializer(application, agentConfiguration.deferredUntilForeground, agentConfiguration.spanInterceptor,finalConfiguration.toResource())
+        val initializer = OpenTelemetryInitializer(application, agentConfiguration.deferredUntilForeground, agentConfiguration.spanInterceptor, finalConfiguration.toResource())
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
             .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
