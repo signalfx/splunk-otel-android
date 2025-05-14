@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentWebViewBinding
 import com.splunk.app.ui.BaseFragment
+import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
 import com.splunk.rum.integration.webview.extension.integrateWithBrowserRum
@@ -40,17 +41,20 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
 
         viewBinding.webView.settings.javaScriptEnabled = true
 
-        val implementationType = arguments?.getString("IMPLEMENTATION_TYPE")
+        val apiVariant = arguments?.getString("API_VARIANT")?.let { ApiVariant.valueOf(it) }
 
-        when (implementationType) {
-            "nextgen" -> {
+        when (apiVariant) {
+            ApiVariant.NEXTGEN -> {
                 SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(viewBinding.webView)
                 Log.d(TAG, "Nextgen integrateWithBrowserRum API called")
             }
-            "legacy" -> {
+
+             ApiVariant.LEGACY -> {
                 SplunkRum.instance.integrateWithBrowserRum(viewBinding.webView)
                 Log.d(TAG, "Legacy integrateWithBrowserRum API called")
             }
+
+            null -> Log.e(TAG, "WebView not integrated with Browser RUM due to missing API_VARIANT argument.")
         }
 
         viewBinding.webView.loadUrl("file:///android_asset/webview_content.html")
