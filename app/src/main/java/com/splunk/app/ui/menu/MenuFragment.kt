@@ -237,10 +237,14 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
             }
             viewBinding.setAllGlobalAttributes.id -> {
                 val globalAttributes = Attributes.of(
-                    AttributeKey.stringKey("setAllString"), "String Value",
-                    AttributeKey.booleanKey("setAllBoolean"), true,
-                    AttributeKey.doubleKey("setAllDouble"), 456.78,
-                    AttributeKey.longKey("setAllLong"), 9876L
+                    AttributeKey.stringKey("setAllString"),
+                    "String Value",
+                    AttributeKey.booleanKey("setAllBoolean"),
+                    true,
+                    AttributeKey.doubleKey("setAllDouble"),
+                    456.78,
+                    AttributeKey.longKey("setAllLong"),
+                    9876L
                 )
                 SplunkRum.instance.globalAttributes.setAll(globalAttributes)
                 showDoneToast("Set All Global Attributes")

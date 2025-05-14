@@ -24,12 +24,12 @@ import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.anr.AnrModuleConfiguration
 import com.splunk.rum.integration.crash.CrashModuleConfiguration
+import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
-import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
-import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
-import com.splunk.rum.integration.okhttp3.auto.OkHttp3ModuleConfiguration
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration
+import com.splunk.rum.integration.okhttp3.auto.OkHttp3ModuleConfiguration
+import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration
 import java.time.Duration
 
@@ -73,7 +73,7 @@ class App : Application() {
                 enableDebugLogging = true,
                 globalAttributes = globalAttributes,
                 deploymentEnvironment = "test",
-                deferredUntilForeground = true,
+                deferredUntilForeground = true
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
@@ -102,7 +102,7 @@ class App : Application() {
                 SlowRenderingModuleConfiguration(
                     isEnabled = true,
                     interval = Duration.ofMillis(500)
-                ),
+                )
             )
         )
 

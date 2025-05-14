@@ -50,7 +50,8 @@ class User internal constructor(
     )
 
     enum class TrackingMode {
-        NoTracking, AnonymousTracking
+        NoTracking,
+        AnonymousTracking
     }
 }
 

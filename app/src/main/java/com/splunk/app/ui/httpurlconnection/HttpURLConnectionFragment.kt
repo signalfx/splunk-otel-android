@@ -122,17 +122,19 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * server-timing header is present in the response.
      */
     fun serverTimingHeaderInResponse() {
-        //one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
+        // one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
         executeGet("https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'")
 
-        //invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
+        // invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
         executeGet("https://httpbin.org/response-headers?Server-Timing=incorrectSyntax")
 
-        //two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
+        // two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
         // with the values from last valid header found
-        executeGet("https://httpbin.org/response-headers" +
+        executeGet(
+            "https://httpbin.org/response-headers" +
                 "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
-                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\"")
+                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
+        )
 
         showDoneToast("serverTimingHeaderInResponse")
     }
@@ -171,8 +173,11 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 val responseMessage = connection.responseMessage
                 val errorStream = connection.errorStream
                 val readError = errorStream.bufferedReader().use { it.readText() }
-                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage +
-                    " ErrorStream: " + readError)
+                Log.v(
+                    TAG,
+                    "response code: " + responseCode + " response message: " + responseMessage +
+                        " ErrorStream: " + readError
+                )
                 showDoneToast("unSuccessfulGet")
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -198,8 +203,11 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 val responseMessage = connection.responseMessage
                 val inputStream = connection.inputStream
                 val readInput = inputStream.bufferedReader().use { it.readText() }
-                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage +
-                    " InputStream: " + readInput)
+                Log.v(
+                    TAG,
+                    "response code: " + responseCode + " response message: " + responseMessage +
+                        " InputStream: " + readInput
+                )
                 showDoneToast("post")
             } catch (e: IOException) {
                 e.printStackTrace()

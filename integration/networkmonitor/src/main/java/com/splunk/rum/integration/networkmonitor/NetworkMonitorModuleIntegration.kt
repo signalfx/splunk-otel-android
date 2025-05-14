@@ -32,7 +32,7 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
     override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
         Logger.d(TAG, "onInstall()")
 
-        //install Network Monitor instrumentation if isEnabled is true
+        // install Network Monitor instrumentation if isEnabled is true
         if (moduleConfiguration.isEnabled) {
             NetworkChangeInstrumentation().install(oTelInstallationContext)
         }

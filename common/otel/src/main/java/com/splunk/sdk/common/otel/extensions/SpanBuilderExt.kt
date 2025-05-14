@@ -20,8 +20,6 @@ import io.opentelemetry.api.trace.SpanBuilder
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-fun SpanBuilder.createZeroLengthSpan(timestamp: Instant = Instant.now()) =
-    this.setStartTimestamp(timestamp).startSpan().end(timestamp)
+fun SpanBuilder.createZeroLengthSpan(timestamp: Instant = Instant.now()) = this.setStartTimestamp(timestamp).startSpan().end(timestamp)
 
-fun SpanBuilder.createZeroLengthSpan(startTimestamp: Long, unit: TimeUnit) =
-    this.setStartTimestamp(startTimestamp, unit).startSpan().end(startTimestamp, unit)
+fun SpanBuilder.createZeroLengthSpan(startTimestamp: Long, unit: TimeUnit) = this.setStartTimestamp(startTimestamp, unit).startSpan().end(startTimestamp, unit)

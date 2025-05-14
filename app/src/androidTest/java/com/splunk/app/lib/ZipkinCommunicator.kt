@@ -16,10 +16,10 @@
 
 package com.splunk.app.lib
 
+import java.net.URL
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
-import java.net.URL
 
 object ZipkinCommunicator {
     private val interceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)

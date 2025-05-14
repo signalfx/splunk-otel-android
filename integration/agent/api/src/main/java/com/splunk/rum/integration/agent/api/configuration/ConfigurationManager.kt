@@ -43,8 +43,9 @@ internal class ConfigurationManager private constructor(
         private const val TAG = "ConfigurationManager"
         private var instanceInternal: ConfigurationManager? = null
         fun obtainInstance(agentStorage: IAgentStorage): ConfigurationManager {
-            if (instanceInternal == null)
+            if (instanceInternal == null) {
                 instanceInternal = ConfigurationManager(agentStorage)
+            }
 
             return requireNotNull(instanceInternal)
         }

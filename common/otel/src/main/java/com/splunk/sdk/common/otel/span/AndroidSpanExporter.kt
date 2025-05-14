@@ -49,12 +49,12 @@ internal class AndroidSpanExporter(
     }
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode = if (deferredUntilForeground && !isForeground) {
-            buffer.addAll(spans)
-            CompletableResultCode.ofSuccess()
-        } else {
-            flushBufferedSpans(spans)
-            CompletableResultCode.ofSuccess()
-        }
+        buffer.addAll(spans)
+        CompletableResultCode.ofSuccess()
+    } else {
+        flushBufferedSpans(spans)
+        CompletableResultCode.ofSuccess()
+    }
 
     override fun flush(): CompletableResultCode {
         flushBufferedSpans()

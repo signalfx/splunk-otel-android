@@ -30,5 +30,5 @@ interface ISession {
 }
 
 class Session internal constructor(
-    override val state: ISession.State,
+    override val state: ISession.State
 ) : ISession

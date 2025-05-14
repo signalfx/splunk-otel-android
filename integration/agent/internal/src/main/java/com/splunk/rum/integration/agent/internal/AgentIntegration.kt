@@ -42,7 +42,7 @@ class AgentIntegration private constructor(
         override fun getSessionId(): String = "dummy-session-id"
 
         override fun addObserver(observer: SessionObserver) {
-            //no-op
+            // no-op
         }
     }
 
@@ -86,8 +86,9 @@ class AgentIntegration private constructor(
             get() = instanceInternal ?: throw IllegalStateException("Instance is not created, call createInstance() first")
 
         fun obtainInstance(context: Context): AgentIntegration {
-            if (instanceInternal == null)
+            if (instanceInternal == null) {
                 instanceInternal = AgentIntegration(context)
+            }
 
             return instanceInternal!!
         }
@@ -95,8 +96,9 @@ class AgentIntegration private constructor(
         fun registerModuleInitializationStart(name: String) {
             val module = modules[name] ?: Module(name)
 
-            if (module.initialization != null)
+            if (module.initialization != null) {
                 throw IllegalStateException()
+            }
 
             modules[name] = module.copy(
                 initialization = Module.Initialization(
@@ -110,8 +112,9 @@ class AgentIntegration private constructor(
         fun registerModuleInitializationEnd(name: String) {
             val module = modules[name] ?: throw IllegalStateException("Initialization start for module '$name' was not called")
 
-            if (module.initialization == null)
+            if (module.initialization == null) {
                 throw IllegalStateException("Function registerModuleInitializationStart() for module '$name' was not called")
+            }
 
             modules[name] = module.copy(
                 initialization = module.initialization.copy(

@@ -64,11 +64,13 @@ class AppStartSpanProcessor : SpanProcessor {
         span.setAttribute("config_settings", resources)
 
         for (module in modules) {
-            if (module.initialization == null)
+            if (module.initialization == null) {
                 throw IllegalStateException("Module '${module.name}' initialization has not been started")
+            }
 
-            if (module.initialization.endElapsed == null)
+            if (module.initialization.endElapsed == null) {
                 throw IllegalStateException("Module '${module.name}' is not initialized")
+            }
 
             span.addEvent("${module.name}_initialized", module.initialization.run { endElapsed!! - startElapsed }, TimeUnit.MILLISECONDS)
         }

@@ -35,8 +35,8 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
 
     override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
         logs.forEach { log ->
-             val parentContext = Context.current()
-             val activeSpan = Span.fromContextOrNull(parentContext)
+            val parentContext = Context.current()
+            val activeSpan = Span.fromContextOrNull(parentContext)
 
             // traceId and spanId should be inside the context already from global OTel instance
             val spanBuilder = SplunkOpenTelemetrySdk.instance!!.sdkTracerProvider.get(RumConstants.RUM_TRACER_NAME)

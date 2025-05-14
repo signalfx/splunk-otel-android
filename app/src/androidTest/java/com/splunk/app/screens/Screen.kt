@@ -32,9 +32,9 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.splunk.app.lib.ResourceType
 import com.splunk.app.lib.TestConstants
 import com.splunk.app.lib.resType
-import org.hamcrest.Matcher
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import org.hamcrest.Matcher
 
 /**
  * Utility function to call a specific screen. Instead of instantiating page objects,
@@ -42,8 +42,7 @@ import java.util.concurrent.TimeUnit
  *
  * Example: screen<MainScreen> { myButton.click() }
  */
-inline fun <reified T : Screen> screen(init: T.() -> Unit): T? =
-    T::class.java.getDeclaredConstructor().newInstance().apply { init() }
+inline fun <reified T : Screen> screen(init: T.() -> Unit): T? = T::class.java.getDeclaredConstructor().newInstance().apply { init() }
 
 open class Screen {
 

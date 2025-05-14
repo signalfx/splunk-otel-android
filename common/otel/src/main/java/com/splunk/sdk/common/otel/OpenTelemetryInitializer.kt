@@ -43,7 +43,7 @@ import java.util.UUID
 class OpenTelemetryInitializer(
     application: Application,
     deferredUntilForeground: Boolean,
-    spanInterceptor: ((SpanData) -> SpanData?)? = null,
+    spanInterceptor: ((SpanData) -> SpanData?)? = null
 ) {
 
     private var resource: Resource
@@ -133,8 +133,8 @@ class OpenTelemetryInitializer(
     }
 
     private fun getDeviceId(agentStorage: IAgentStorage): String = agentStorage.readDeviceId() ?: run {
-            val deviceId = UUID.randomUUID().toString()
-            agentStorage.writeDeviceId(deviceId)
-            deviceId
-        }
+        val deviceId = UUID.randomUUID().toString()
+        agentStorage.writeDeviceId(deviceId)
+        deviceId
+    }
 }

@@ -34,7 +34,8 @@ val targetContext: Context = instrumentation.targetContext
  * A resource type enum to specify what kind of resource you want to interact with.
  */
 enum class ResourceType {
-    RESOURCE_ID, RESOURCE_STRING
+    RESOURCE_ID,
+    RESOURCE_STRING
 }
 
 /**
