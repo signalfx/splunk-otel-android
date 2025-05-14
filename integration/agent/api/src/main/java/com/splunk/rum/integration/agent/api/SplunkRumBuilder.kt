@@ -24,6 +24,7 @@ import com.splunk.rum.integration.agent.api.spanfilter.SpanFilterBuilder
 import com.splunk.rum.integration.agent.api.spanfilter.toSpanInterceptor
 import com.splunk.rum.integration.agent.internal.legacy.LegacyAnrModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
+import com.splunk.rum.integration.agent.internal.legacy.LegacyNetworkMonitorModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacySlowRenderingModuleConfiguration
 import io.opentelemetry.api.common.Attributes
 import java.net.URL
@@ -52,6 +53,7 @@ class SplunkRumBuilder {
     private var anrReportingEnabled: Boolean = true
     private var slowRenderingDetectionEnabled: Boolean = true
     private var slowRenderingDetectionPollInterval: Duration = Duration.ofSeconds(1)
+    private var networkMonitorEnabled: Boolean = true
 
     /**
      * Sets the RUM auth token to be used by the RUM library.
@@ -225,6 +227,19 @@ class SplunkRumBuilder {
     }
 
     /**
+     * Disables the network monitoring feature.
+     *
+     * This feature is enabled by default. You can disable it by calling this method.
+     *
+     * @return `this`
+     */
+    @Deprecated("NetworkMonitor is now controlled by the NetworkMonitorModuleConfiguration")
+    fun disableNetworkMonitor(): SplunkRumBuilder {
+        networkMonitorEnabled = false
+        return this
+    }
+
+    /**
      * Creates a new instance of [SplunkRum] with the settings of this [SplunkRumBuilder].
      *
      * You must configure at least the [setApplicationName], the [setRealm] or the [setBeaconEndpoint] beacon,
@@ -277,6 +292,9 @@ class SplunkRumBuilder {
                 LegacySlowRenderingModuleConfiguration(
                     isEnabled = slowRenderingDetectionEnabled,
                     interval = slowRenderingDetectionPollInterval
+                ),
+                LegacyNetworkMonitorModuleConfiguration(
+                    isEnabled = networkMonitorEnabled
                 )
             )
         )

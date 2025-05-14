@@ -18,8 +18,10 @@ package com.splunk.rum.integration.networkmonitor
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.splunk.rum.integration.agent.internal.legacy.LegacyNetworkMonitorModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.module.extension.find
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.android.instrumentation.network.NetworkChangeInstrumentation
 
@@ -32,8 +34,10 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
     override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
         Logger.d(TAG, "onInstall()")
 
+        val isEnabled = moduleConfigurations.find<LegacyNetworkMonitorModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
+
         // install Network Monitor instrumentation if isEnabled is true
-        if (moduleConfiguration.isEnabled) {
+        if (isEnabled) {
             NetworkChangeInstrumentation().install(oTelInstallationContext)
         }
     }
