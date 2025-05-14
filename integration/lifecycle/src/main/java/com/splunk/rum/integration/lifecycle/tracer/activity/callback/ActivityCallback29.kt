@@ -21,7 +21,7 @@ import android.os.Bundle
 import com.splunk.rum.integration.lifecycle.tracer.activity.ActivityTracerManager
 
 internal class ActivityCallback29(
-    override val tracer: ActivityTracerManager,
+    override val tracer: ActivityTracerManager
 ) : ActivityCallback {
 
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {

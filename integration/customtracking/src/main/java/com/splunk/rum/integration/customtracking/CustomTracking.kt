@@ -100,13 +100,13 @@ class CustomTracking internal constructor() {
      * @return A Tracer instance if available, or null if the OpenTelemetry instance is null.
      */
     private fun getTracer(): Tracer? = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.get(RumConstants.RUM_TRACER_NAME).also {
-            if (it == null) {
-                Logger.e(
-                    TAG,
-                    "Opentelemetry instance is null. Cannot track custom events/workflow."
-                )
-            }
+        if (it == null) {
+            Logger.e(
+                TAG,
+                "Opentelemetry instance is null. Cannot track custom events/workflow."
+            )
         }
+    }
 
     companion object {
 

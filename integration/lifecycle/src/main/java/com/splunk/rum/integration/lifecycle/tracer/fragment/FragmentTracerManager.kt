@@ -17,9 +17,9 @@
 package com.splunk.rum.integration.lifecycle.tracer.fragment
 
 import androidx.fragment.app.Fragment
+import com.splunk.rum.integration.lifecycle.descriptor.ScreenNameDescriptor
 import com.splunk.rum.integration.lifecycle.screen.VisibleScreenTracker
 import com.splunk.rum.integration.lifecycle.tracer.ActiveSpan
-import com.splunk.rum.integration.lifecycle.descriptor.ScreenNameDescriptor
 import io.opentelemetry.api.trace.Tracer
 
 internal class FragmentTracerManager(

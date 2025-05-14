@@ -36,8 +36,9 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
     private val navigationListener = object : Navigation.Listener {
         override fun onScreenNameChanged(screenName: String) {
-            if (!moduleConfiguration.isEnabled)
+            if (!moduleConfiguration.isEnabled) {
                 return
+            }
 
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
 

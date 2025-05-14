@@ -26,7 +26,8 @@ internal class FragmentActivityCallback29(
 ) : FragmentActivityCallback {
 
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-        if (activity is FragmentActivity)
+        if (activity is FragmentActivity) {
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
+        }
     }
 }

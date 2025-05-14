@@ -51,37 +51,43 @@ internal class VisibleScreenTracker(
     fun onActivityPaused(activity: Activity) {
         previouslyLastResumedActivity = activity.javaClass.simpleName
 
-        if (lastResumedActivity == activity.javaClass.simpleName)
+        if (lastResumedActivity == activity.javaClass.simpleName) {
             lastResumedActivity = null
+        }
     }
 
     fun onFragmentResumed(fragment: Fragment) {
-        if (ScreenNameDescriptor.isIgnored(fragment))
+        if (ScreenNameDescriptor.isIgnored(fragment)) {
             return
+        }
 
-        if (fragment is DialogFragment)
+        if (fragment is DialogFragment) {
             previouslyLastResumedFragment = lastResumedFragment
+        }
 
         lastResumedFragment = fragment.javaClass.simpleName
     }
 
     fun onFragmentPaused(fragment: Fragment) {
-        if (ScreenNameDescriptor.isIgnored(fragment))
+        if (ScreenNameDescriptor.isIgnored(fragment)) {
             return
+        }
 
-        if (fragment is DialogFragment)
+        if (fragment is DialogFragment) {
             lastResumedFragment = previouslyLastResumedFragment
-        else if (lastResumedFragment == fragment.javaClass.simpleName)
+        } else if (lastResumedFragment == fragment.javaClass.simpleName) {
             lastResumedFragment = null
+        }
 
         previouslyLastResumedFragment = fragment.javaClass.simpleName
     }
 
     private fun observeActivities(application: Application) {
-        val callback = if (Build.VERSION.SDK_INT >= 29)
+        val callback = if (Build.VERSION.SDK_INT >= 29) {
             ActivityCallback29(this)
-        else
+        } else {
             ActivityCallback21(this)
+        }
 
         application.registerActivityLifecycleCallbacks(callback)
     }
@@ -89,10 +95,11 @@ internal class VisibleScreenTracker(
     private fun observeFragments(application: Application) {
         val fragmentLifecycle = VisibleFragmentTracker(this)
 
-        val callback = if (Build.VERSION.SDK_INT >= 29)
+        val callback = if (Build.VERSION.SDK_INT >= 29) {
             FragmentActivityCallback29(fragmentLifecycle)
-        else
+        } else {
             FragmentActivityCallback21(fragmentLifecycle)
+        }
 
         application.registerActivityLifecycleCallbacks(callback)
     }

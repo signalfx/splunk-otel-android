@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 
 internal class VisibleFragmentTracker(
-    private val visibleScreenTracker: VisibleScreenTracker,
+    private val visibleScreenTracker: VisibleScreenTracker
 ) : FragmentManager.FragmentLifecycleCallbacks() {
 
     override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {

@@ -24,8 +24,9 @@ inline fun <reified T : ModuleConfiguration> List<ModuleConfiguration>.find(): T
     for (i in indices) {
         val item = get(i)
 
-        if (item is T)
+        if (item is T) {
             return item
+        }
     }
 
     return null

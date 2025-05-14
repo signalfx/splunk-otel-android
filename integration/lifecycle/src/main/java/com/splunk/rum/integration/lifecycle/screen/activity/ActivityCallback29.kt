@@ -20,7 +20,7 @@ import android.app.Activity
 import com.splunk.rum.integration.lifecycle.screen.VisibleScreenTracker
 
 internal class ActivityCallback29(
-    override val tracker: VisibleScreenTracker,
+    override val tracker: VisibleScreenTracker
 ) : ActivityCallback {
 
     override fun onActivityPostResumed(activity: Activity) {

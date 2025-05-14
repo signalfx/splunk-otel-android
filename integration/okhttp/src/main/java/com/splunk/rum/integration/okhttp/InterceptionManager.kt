@@ -45,8 +45,9 @@ internal class InterceptionManager(private val listener: OkHttpConnector.Listene
 
             connectors[builderHash] = connector
             connector.interceptors
-        } else
+        } else {
             interceptors
+        }
     }
 
     companion object {
