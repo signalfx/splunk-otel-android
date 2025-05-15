@@ -185,60 +185,28 @@
 			app:layout_constraintTop_toBottomOf="@id/web_view_nextgen" />
 
 		<TextView
-			android:id="@+id/custom_tracking_title"
+			android:id="@+id/menu_custom_tracking_title"
 			style="@style/Header"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="30dp"
-			android:text="@string/menu_custom_tracking_title"
+			android:text="@string/custom_tracking_title"
 			android:textSize="18sp"
 			android:textStyle="bold"
 			app:layout_constraintTop_toBottomOf="@+id/web_view_legacy" />
 
 
 		<TextView
-			android:id="@+id/track_custom_event"
+			android:id="@+id/menu_custom_tracking_button"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_custom_event"
-			app:layout_constraintTop_toBottomOf="@id/custom_tracking_title" />
+			android:text="@string/custom_tracking_title"
+			app:layout_constraintTop_toBottomOf="@id/menu_custom_tracking_title" />
 
-		<TextView
-			android:id="@+id/track_workflow"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_workflow"
-			app:layout_constraintTop_toBottomOf="@id/track_custom_event" />
-
-		<TextView
-			android:id="@+id/track_exception"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_track_exception"
-			app:layout_constraintTop_toBottomOf="@id/track_workflow" />
-
-		<TextView
-			android:id="@+id/track_exception_with_attributes"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_track_exception_with_attributes"
-			app:layout_constraintTop_toBottomOf="@id/track_exception" />
 
 		<TextView
 			android:id="@+id/global_attributes_title"
@@ -249,7 +217,7 @@
 			android:text="@string/menu_global_attributes_title"
 			android:textSize="18sp"
 			android:textStyle="bold"
-			app:layout_constraintTop_toBottomOf="@+id/track_exception_with_attributes" />
+			app:layout_constraintTop_toBottomOf="@+id/menu_custom_tracking_button" />
 
 		<TextView
 			android:id="@+id/set_string_attribute"
