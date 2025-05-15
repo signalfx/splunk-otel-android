@@ -116,9 +116,9 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
         }
 
         workflowSpan?.apply {
-            setAttribute("workflow.start.time", System.currentTimeMillis())
-            Thread.sleep(125) // Simulate processing time
-            setAttribute("workflow.end.time", System.currentTimeMillis())
+            val startTime = System.currentTimeMillis()
+            setAttribute("workflow.start.time", startTime)
+            setAttribute("workflow.end.time", startTime + 125) // Added 125ms processing time in end time.
             end()
         }
     }
