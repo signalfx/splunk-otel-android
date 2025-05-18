@@ -34,7 +34,10 @@ val SplunkRum.webViewNativeBridge: WebViewNativeBridge
  *
  * @param webView The WebView to inject the javascript object into.
  */
-@Deprecated("Use SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)", ReplaceWith("SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)"))
+@Deprecated(
+    "Use SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)",
+    ReplaceWith("SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)")
+)
 fun SplunkRum.integrateWithBrowserRum(webView: WebView) {
     webViewNativeBridge.integrateWithBrowserRum(webView)
 }

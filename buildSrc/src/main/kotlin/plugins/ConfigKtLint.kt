@@ -43,6 +43,7 @@ class ConfigKtLint : Plugin<Project> by local plugin {
         description = "Fix Kotlin code style deviations."
         classpath = ktlint
         mainClass.set("com.pinterest.ktlint.Main")
+        workingDir = rootDir
         jvmArgs("--add-opens=java.base/java.lang=ALL-UNNAMED")
         args = listOf("-F", "${Ktlint.INPUT_DIR}/${Ktlint.INCLUDED_FILES}")
     }
