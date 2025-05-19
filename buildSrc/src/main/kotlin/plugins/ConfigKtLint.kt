@@ -30,6 +30,7 @@ class ConfigKtLint : Plugin<Project> by local plugin {
 
         group = TaskGroups.VERIFICATION
         description = "Check Kotlin code style."
+        workingDir = rootDir
         classpath = ktlint
         mainClass.set("com.pinterest.ktlint.Main")
         args = listOf("${Ktlint.INPUT_DIR}/${Ktlint.INCLUDED_FILES}")
