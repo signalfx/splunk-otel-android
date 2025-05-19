@@ -21,18 +21,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.cisco.android.common.utils.runOnBackgroundThread
-import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentHttpUrlConnectionBinding
 import com.splunk.app.ui.BaseFragment
+import com.splunk.app.util.CommonUtils
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.Executors
 
 class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>() {
 
@@ -42,10 +40,8 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Schedule thread that closes un-ended spans for edge cases
-        val executor = Executors.newSingleThreadScheduledExecutor()
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewBinding.customUrlGet.setOnClickListener { customUrlGet() }
@@ -66,7 +62,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     fun customUrlGet() {
         executeGet(viewBinding.customUrl.text.toString())
-        showDoneToast("customUrlGet")
+        CommonUtils.showDoneToast(context, "Custom Url Get")
     }
 
     /**
@@ -74,7 +70,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     fun successfulGet() {
         executeGet("https://httpbin.org/get")
-        showDoneToast("successfulGet")
+        CommonUtils.showDoneToast(context, "Successful Get")
     }
 
     /**
@@ -84,7 +80,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     fun getWithoutInputStream() {
         executeGet("https://httpbin.org/get", false)
-        showDoneToast("getWithoutInputStream")
+        CommonUtils.showDoneToast(context, "Get Without InputStream")
     }
 
     /**
@@ -96,7 +92,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         executeGet("https://google.com")
         executeGet("https://android.com")
         executeGet("https://httpbin.org/headers")
-        showDoneToast("fourConcurrentGetRequests")
+        CommonUtils.showDoneToast(context, "Four Concurrent Get Requests")
     }
 
     /**
@@ -105,7 +101,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     fun sustainedConnection() {
         executeGet("https://httpbin.org/get", false, false)
-        showDoneToast("sustainedConnection")
+        CommonUtils.showDoneToast(context, "Sustained Connection")
     }
 
     /**
@@ -114,7 +110,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     fun stalledRequest() {
         executeGet("https://httpbin.org/get", false, true, true)
-        showDoneToast("stalledRequest")
+        CommonUtils.showDoneToast(context, "Stalled Request")
     }
 
     /**
@@ -122,21 +118,19 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * server-timing header is present in the response.
      */
     fun serverTimingHeaderInResponse() {
-        // one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
+        //one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
         executeGet("https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'")
 
-        // invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
+        //invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
         executeGet("https://httpbin.org/response-headers?Server-Timing=incorrectSyntax")
 
-        // two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
+        //two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
         // with the values from last valid header found
-        executeGet(
-            "https://httpbin.org/response-headers" +
+        executeGet("https://httpbin.org/response-headers" +
                 "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
-                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
-        )
+                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\"")
 
-        showDoneToast("serverTimingHeaderInResponse")
+        CommonUtils.showDoneToast(context, "Server-Timing Header In Response")
     }
 
     private fun executeGet(inputUrl: String, getInputStream: Boolean = true, disconnect: Boolean = true, stallRequest: Boolean = false) {
@@ -153,7 +147,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
 
                 stallRequest.takeIf { it }?.let { Thread.sleep(20000) }
 
-                Log.v(TAG, "response code: $responseCode response message: $responseMessage$readInputString")
+                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage + readInputString)
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -173,8 +167,9 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 val responseMessage = connection.responseMessage
                 val errorStream = connection.errorStream
                 val readError = errorStream.bufferedReader().use { it.readText() }
-                Log.v(TAG, "response code: $responseCode response message: $responseMessage ErrorStream: $readError")
-                showDoneToast("unSuccessfulGet")
+                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage +
+                    " ErrorStream: " + readError)
+                CommonUtils.showDoneToast(context, "UnSuccessful Get")
             } catch (e: IOException) {
                 e.printStackTrace()
             } finally {
@@ -199,22 +194,14 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 val responseMessage = connection.responseMessage
                 val inputStream = connection.inputStream
                 val readInput = inputStream.bufferedReader().use { it.readText() }
-                Log.v(
-                    TAG,
-                    "response code: $responseCode response message: $responseMessage InputStream: $readInput"
-                )
-                showDoneToast("post")
+                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage +
+                    " InputStream: " + readInput)
+                CommonUtils.showDoneToast(context, "Post")
             } catch (e: IOException) {
                 e.printStackTrace()
             } finally {
                 connection.disconnect()
             }
-        }
-    }
-
-    private fun showDoneToast(methodName: String) {
-        runOnUiThread {
-            Toast.makeText(context, getString(R.string.http_toast, methodName), Toast.LENGTH_SHORT).show()
         }
     }
 

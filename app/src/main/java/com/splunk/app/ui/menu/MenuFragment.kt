@@ -21,19 +21,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentMenuBinding
 import com.splunk.app.ui.BaseFragment
+import com.splunk.app.ui.customtracking.CustomTrackingFragment
 import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.ui.webview.WebViewFragment
+import com.splunk.app.util.ApiVariant
+import com.splunk.app.util.CommonUtils
 import com.splunk.app.util.FragmentAnimation
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.extension.splunkRumId
-import com.splunk.rum.integration.customtracking.extension.customTracking
 import com.splunk.rum.integration.navigation.extension.navigation
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -61,10 +60,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.httpurlconnection.setOnClickListener(onClickListener)
         viewBinding.webViewNextgen.setOnClickListener(onClickListener)
         viewBinding.webViewLegacy.setOnClickListener(onClickListener)
-        viewBinding.trackCustomEvent.setOnClickListener(onClickListener)
-        viewBinding.trackWorkflow.setOnClickListener(onClickListener)
-        viewBinding.trackException.setOnClickListener(onClickListener)
-        viewBinding.trackExceptionWithAttributes.setOnClickListener(onClickListener)
+        viewBinding.menuCustomTrackingButton.setOnClickListener(onClickListener)
 
         viewBinding.setStringAttribute.setOnClickListener(onClickListener)
         viewBinding.setLongAttribute.setOnClickListener(onClickListener)
@@ -135,88 +131,48 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
             viewBinding.webViewNextgen.id -> {
                 val args = Bundle().apply {
-                    putString("IMPLEMENTATION_TYPE", "nextgen")
+                    putString("API_VARIANT", ApiVariant.NEXTGEN.name)
                 }
                 navigateTo(WebViewFragment(), FragmentAnimation.FADE, args)
             }
             viewBinding.webViewLegacy.id -> {
                 val args = Bundle().apply {
-                    putString("IMPLEMENTATION_TYPE", "legacy")
+                    putString("API_VARIANT", ApiVariant.LEGACY.name)
                 }
                 navigateTo(WebViewFragment(), FragmentAnimation.FADE, args)
             }
-            viewBinding.trackCustomEvent.id -> {
-                val testAttributes = MutableAttributes().also { attributes ->
-                    attributes["attribute.one"] = "value1"
-                    attributes["attribute.two"] = "12345"
-                }
-
-                SplunkRum.instance.customTracking.trackCustomEvent("TestEvent", testAttributes)
-                showDoneToast("Track Custom Event, Done!")
-            }
-            viewBinding.trackWorkflow.id -> {
-                val workflowSpan = SplunkRum.instance.customTracking.trackWorkflow("Test Workflow")
-                workflowSpan?.setAttribute("workflow.start.time", System.currentTimeMillis())
-                // Simulate some processing time
-                Thread.sleep(125)
-                workflowSpan?.setAttribute("workflow.end.time", System.currentTimeMillis())
-                workflowSpan?.end()
-                showDoneToast("Track Workflow, Done!")
-            }
-            viewBinding.trackException.id -> {
-                val e = Exception("Custom Exception To Be Tracked")
-                e.stackTrace = arrayOf(
-                    StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
-                    StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
-                    StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
-                )
-                SplunkRum.instance.customTracking.trackException(e)
-                showDoneToast("Track Exception, Done!")
-            }
-            viewBinding.trackExceptionWithAttributes.id -> {
-                val e = Exception("Custom Exception (with attributes) To Be Tracked")
-                e.stackTrace = arrayOf(
-                    StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
-                    StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
-                    StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
-                )
-                val testAttributes = MutableAttributes().also { attributes ->
-                    attributes["attribute.one"] = "value1"
-                    attributes["attribute.two"] = "12345"
-                }
-
-                SplunkRum.instance.customTracking.trackException(e, testAttributes)
-                showDoneToast("Track Exception with Attributes")
+            viewBinding.menuCustomTrackingButton.id -> {
+                navigateTo(CustomTrackingFragment(), FragmentAnimation.FADE)
             }
             viewBinding.setStringAttribute.id -> {
                 SplunkRum.instance.globalAttributes["stringKey"] = "String Value"
-                showDoneToast("Set String Global Attribute")
+                CommonUtils.showDoneToast(context, "Set String Global Attribute")
             }
             viewBinding.setLongAttribute.id -> {
                 SplunkRum.instance.globalAttributes["longKey"] = 12345L
-                showDoneToast("Set Long Global Attribute")
+                CommonUtils.showDoneToast(context, "Set Long Global Attribute")
             }
             viewBinding.setDoubleAttribute.id -> {
                 SplunkRum.instance.globalAttributes["doubleKey"] = 123.45
-                showDoneToast("Set Double Global Attribute")
+                CommonUtils.showDoneToast(context, "Set Double Global Attribute")
             }
             viewBinding.setBooleanAttribute.id -> {
                 SplunkRum.instance.globalAttributes["booleanKey"] = true
-                showDoneToast("Set Boolean Global Attribute")
+                CommonUtils.showDoneToast(context, "Set Boolean Global Attribute")
             }
             viewBinding.setGenericAttribute.id -> {
                 val key = AttributeKey.stringKey("genericKey")
                 SplunkRum.instance.globalAttributes[key] = "Generic Value"
-                showDoneToast("Set Generic Global Attribute")
+                CommonUtils.showDoneToast(context, "Set Generic Global Attribute")
             }
             viewBinding.removeStringAttribute.id -> {
                 SplunkRum.instance.globalAttributes.remove("stringKey")
-                showDoneToast("Remove String Global Attribute")
+                CommonUtils.showDoneToast(context, "Remove String Global Attribute")
             }
             viewBinding.removeGenericAttribute.id -> {
                 val key = AttributeKey.stringKey("genericKey")
                 SplunkRum.instance.globalAttributes.remove(key)
-                showDoneToast("Remove Generic Global Attribute")
+                CommonUtils.showDoneToast(context, "Remove Generic Global Attribute")
             }
             viewBinding.getStringAttribute.id -> {
                 val value: String? = SplunkRum.instance.globalAttributes["stringKey"]
@@ -244,11 +200,11 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     AttributeKey.longKey("setAllLong"), 9876L
                 )
                 SplunkRum.instance.globalAttributes.setAll(globalAttributes)
-                showDoneToast("Set All Global Attributes")
+                CommonUtils.showDoneToast(context, "Set All Global Attributes")
             }
             viewBinding.removeAllGlobalAttributes.id -> {
                 SplunkRum.instance.globalAttributes.removeAll()
-                showDoneToast("Remove All Global Attributes")
+                CommonUtils.showDoneToast(context, "Remove All Global Attributes")
             }
             viewBinding.getAllGlobalAttributes.id -> {
                 val allAttributes = SplunkRum.instance.globalAttributes
@@ -267,7 +223,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
             viewBinding.legacySetGlobalAttribute.id -> {
                 val key = AttributeKey.stringKey("legacyKey")
                 SplunkRum.instance.setGlobalAttribute(key, "LegacyVal")
-                showDoneToast("Set Global Attribute using legacy API")
+                CommonUtils.showDoneToast(context, "Set Global Attribute using legacy API")
             }
 
             viewBinding.legacyUpdateGlobalAttributes.id -> {
@@ -276,14 +232,8 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                         .put(AttributeKey.longKey("legacyUpdate2"), 54321L)
                         .put(AttributeKey.booleanKey("legacyUpdate3"), false)
                 }
-                showDoneToast("Updated Global Attributes using legacy API")
+                CommonUtils.showDoneToast(context, "Updated Global Attributes using legacy API")
             }
-        }
-    }
-
-    private fun showDoneToast(message: String) {
-        runOnUiThread {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 }

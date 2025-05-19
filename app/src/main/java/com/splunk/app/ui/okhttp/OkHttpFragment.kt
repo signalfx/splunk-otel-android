@@ -22,13 +22,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.cisco.android.common.utils.extensions.safeSchedule
 import com.cisco.android.common.utils.runOnBackgroundThread
-import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentOkhttpBinding
 import com.splunk.app.ui.BaseFragment
+import com.splunk.app.util.CommonUtils
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
 import io.opentelemetry.api.trace.Span
@@ -123,7 +122,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun synchronousGet() {
         executeGetRequest("https://publicobject.com/helloworld.txt")
-        showDoneToast("synchronousGet")
+        CommonUtils.showDoneToast(context, "Synchronous Get")
     }
 
     /**
@@ -133,7 +132,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun asynchronousGet() {
         executeAsynchronousGet("https://httpbin.org/robots.txt")
-        showDoneToast("asynchronousGet")
+        CommonUtils.showDoneToast(context, "Asynchronous Get")
     }
 
     /**
@@ -143,7 +142,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         val url = "https://httpbin.org/headers"
         executeAsynchronousGet(url)
         executeAsynchronousGet(url)
-        showDoneToast("concurrentAsynchronousGet")
+        CommonUtils.showDoneToast(context, "Concurrent Asynchronous Get")
     }
 
     /**
@@ -203,7 +202,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         }
         lock.await()
         span.end()
-        showDoneToast("parentContextPropagationInAsyncGet")
+        CommonUtils.showDoneToast(context, "Parent Context Propagation In Async Get")
     }
 
     /**
@@ -211,7 +210,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun unsuccessfulGet() {
         executeGetRequest("https://httpbin.org/status/404")
-        showDoneToast("unsuccessfulGet")
+        CommonUtils.showDoneToast(context, "Unsuccessful Get")
     }
 
     /**
@@ -220,7 +219,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun retryRequest() {
         executeGetRequest("https://httpbin.org/status/503", true)
-        showDoneToast("retryRequest")
+        CommonUtils.showDoneToast(context, "Retry Request")
     }
 
     /**
@@ -246,7 +245,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             }
         }
 
-        showDoneToast("multipleHeaders")
+        CommonUtils.showDoneToast(context, "Multiple Headers")
     }
 
     /**
@@ -272,7 +271,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                 "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
         )
 
-        showDoneToast("serverTimingHeaderInResponse")
+        CommonUtils.showDoneToast(context, "Server-Timing Header In Response")
     }
 
     /**
@@ -291,7 +290,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         """.trimMargin()
 
         executePostRequest("https://api.github.com/markdown/raw", postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
-        showDoneToast("postMarkdown")
+        CommonUtils.showDoneToast(context, "Post Markdown")
     }
 
     /**
@@ -320,7 +319,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         }
 
         executePostRequest("https://api.github.com/markdown/raw", requestBody)
-        showDoneToast("postStreaming")
+        CommonUtils.showDoneToast(context, "Post Streaming")
     }
 
     /**
@@ -342,7 +341,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         )
 
         executePostRequest("https://api.github.com/markdown/raw", file.asRequestBody(MEDIA_TYPE_MARKDOWN))
-        showDoneToast("postFile")
+        CommonUtils.showDoneToast(context, "Post File")
     }
 
     /**
@@ -355,7 +354,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             .build()
 
         executePostRequest("https://en.wikipedia.org/w/index.php", formBody)
-        showDoneToast("postFormParameters")
+        CommonUtils.showDoneToast(context, "Post Form Parameters")
     }
 
     /**
@@ -378,7 +377,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
         val headers = mapOf("Authorization" to "Client-ID $IMGUR_CLIENT_ID")
         executePostRequest("https://api.imgur.com/3/image", requestBody, headers)
-        showDoneToast("postMutlipartRequest")
+        CommonUtils.showDoneToast(context, "Post Mutlipart Request")
     }
 
     /**
@@ -392,7 +391,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         runOnBackgroundThread {
             try {
                 client.newCall(request).execute()
-                showDoneToast("networkError")
+                CommonUtils.showDoneToast(context, "Network Error")
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -439,7 +438,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             }
 
             Log.v(TAG, "Response 2 equals Response 1? " + (response1Body == response2Body))
-            showDoneToast("responseCaching")
+            CommonUtils.showDoneToast(context, "Response Caching")
         }
     }
 
@@ -486,7 +485,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                         e
                     )
                 )
-                showDoneToast("canceledCall")
+                CommonUtils.showDoneToast(context, "Canceled Call")
             }
         }
     }
@@ -568,12 +567,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
                 Log.v(TAG, (response.body?.string() ?: "null"))
             }
-        }
-    }
-
-    private fun showDoneToast(methodName: String) {
-        runOnUiThread {
-            Toast.makeText(context, getString(R.string.http_toast, methodName), Toast.LENGTH_SHORT).show()
         }
     }
 

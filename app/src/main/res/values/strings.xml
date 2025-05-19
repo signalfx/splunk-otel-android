@@ -18,11 +18,13 @@
     <string name="menu_web_view_native_bridge_title">Web View Native Bridge</string>
     <string name="menu_web_view_nextgen">Get Session ID (Nextgen)</string>
     <string name="menu_web_view_legacy">Get Session ID (Legacy)</string>
-    <string name="menu_custom_tracking_title">Custom Tracking</string>
-    <string name="menu_custom_event">Track Custom Event</string>
-    <string name="menu_workflow">Track Workflow</string>
-    <string name="menu_track_exception">Track Exception</string>
-    <string name="menu_track_exception_with_attributes">Track Exception With Attributes</string>
+    <string name="custom_tracking_title">Custom Tracking</string>
+    <string name="custom_tracking_latest_api_title">Latest APIs</string>
+    <string name="custom_tracking_legacy_api_title">Legacy APIs</string>
+    <string name="track_custom_event">Track Custom Event</string>
+    <string name="track_workflow">Track Workflow</string>
+    <string name="track_exception">Track Exception</string>
+    <string name="track_exception_with_attributes">Track Exception With Attributes</string>
 
     <!-- Global Attributes -->
     <string name="menu_global_attributes_title">Global Attributes</string>
@@ -44,6 +46,7 @@
     <string name="okhttp_title">OkHttp</string>
     <string name="httpurlconnection_title">HttpURLConnection</string>
     <string name="webview_title">WebView</string>
+    <string name="customtracking_title">CustomTracking</string>
 
     <!-- Fragment Okhttp -->
     <string name="synchronous_get">Synchronous GET</string>
@@ -60,7 +63,7 @@
     <string name="network_error">Network Error</string>
     <string name="response_caching">Response caching</string>
     <string name="canceled_call">Canceled call</string>
-    <string name="http_toast">%s(): Done!</string>
+    <string name="http_toast">%s, Done!</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

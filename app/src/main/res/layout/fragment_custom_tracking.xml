@@ -1,0 +1,136 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/custom_tracking_title"
+            style="@style/Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/custom_tracking_title"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/custom_tracking_latest_api_title"
+            style="@style/Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/custom_tracking_latest_api_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/custom_tracking_title"/>
+
+
+        <TextView
+            android:id="@+id/track_custom_event"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/track_custom_event"
+            app:layout_constraintTop_toBottomOf="@id/custom_tracking_latest_api_title" />
+
+        <TextView
+            android:id="@+id/track_workflow"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/track_workflow"
+            app:layout_constraintTop_toBottomOf="@id/track_custom_event" />
+
+        <TextView
+            android:id="@+id/track_exception"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/track_exception"
+            app:layout_constraintTop_toBottomOf="@id/track_workflow" />
+
+        <TextView
+            android:id="@+id/track_exception_with_attributes"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/track_exception_with_attributes"
+            app:layout_constraintTop_toBottomOf="@id/track_exception" />
+
+        <TextView
+            android:id="@+id/custom_tracking_legacy_api_title"
+            style="@style/Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/custom_tracking_legacy_api_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/track_exception_with_attributes"/>
+
+
+        <TextView
+            android:id="@+id/track_custom_event_legacy"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/track_custom_event"
+            app:layout_constraintTop_toBottomOf="@id/custom_tracking_legacy_api_title" />
+
+        <TextView
+            android:id="@+id/track_workflow_legacy"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/track_workflow"
+            app:layout_constraintTop_toBottomOf="@id/track_custom_event_legacy" />
+
+        <TextView
+            android:id="@+id/track_exception_legacy"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/track_exception"
+            app:layout_constraintTop_toBottomOf="@id/track_workflow_legacy" />
+
+        <TextView
+            android:id="@+id/track_exception_with_attributes_legacy"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/track_exception_with_attributes"
+            app:layout_constraintTop_toBottomOf="@id/track_exception_legacy"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
