@@ -61,12 +61,16 @@ pull request, make sure that:
 To send us a pull request:
 
 1. Fork the repository.
-2. Modify the source; we recommend making a single logical change per PR. Avoid combining code changes with broad formatting changes, as this makes reviews more difficult.
-3. Format your code using [Ktlint](https://github.com/pinterest/ktlint) before submitting the PR. You can run Ktlint formatting locally with: `./gradlew ktlintFormat`
-4. Ensure all local tests pass and add tests relevant to your changes.
-5. Commit to your fork using clear and descriptive commit messages.
-6. Open a pull request and fill out any provided prompts in the PR interface.
-7. Monitor and address any automated CI failures and participate in review discussions.
+2. Modify the source; a single change per PR is recommended. If you also
+   reformat all the code, it will be hard for us to focus on your change.
+3. Format your code using [Ktlint](https://github.com/pinterest/ktlint) before submitting the PR.  
+   You can run Ktlint formatting locally with: `./gradlew ktlintFormat`
+4. Ensure local tests pass and add new tests related to the contribution.
+5. Commit to your fork using clear commit messages.
+6. Send us a pull request, answering any default questions in the pull request
+   interface.
+7. Pay attention to any automated CI failures reported in the pull request, and
+   stay involved in the conversation.
 
 GitHub provides additional documentation on [forking a
 repository](https://help.github.com/articles/fork-a-repo/) and [creating a pull
