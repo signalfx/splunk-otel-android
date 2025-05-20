@@ -92,9 +92,9 @@ class SplunkSessionManager internal constructor(
         val backgroundValidity = if (sessionValidInBackgroundUntil != null) sessionValidInBackgroundUntil > now else true
 
         val isCurrentSessionIdValid = savedSessionId != null &&
-                backgroundValidity &&
-                sessionValidUntil != null &&
-                sessionValidUntil > now
+            backgroundValidity &&
+            sessionValidUntil != null &&
+            sessionValidUntil > now
 
         if (isCurrentSessionIdValid) {
             return requireNotNull(savedSessionId)

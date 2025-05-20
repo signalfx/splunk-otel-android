@@ -133,8 +133,9 @@ class SplunkRum private constructor(
             agentConfiguration: AgentConfiguration,
             vararg moduleConfigurations: ModuleConfiguration
         ): SplunkRum {
-            if (instanceInternal != null)
+            if (instanceInternal != null) {
                 return instance
+            }
 
             val isSubprocess = SubprocessDetector.isSubprocess(applicationId = agentConfiguration.instrumentedProcessName)
 
@@ -142,12 +143,13 @@ class SplunkRum private constructor(
                 Logger.d(TAG, "install() - Subprocess detected exiting")
 
                 return SplunkRum(
-                    openTelemetry = OpenTelemetry.noop(), agentConfiguration = AgentConfiguration.noop,
+                    openTelemetry = OpenTelemetry.noop(),
+                    agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
                         Status.NotRunning.Cause.Subprocess
                     ),
                     userManager = NoOpUserManager,
-                    sessionManager = NoOpSplunkSessionManager,
+                    sessionManager = NoOpSplunkSessionManager
                 )
             }
 

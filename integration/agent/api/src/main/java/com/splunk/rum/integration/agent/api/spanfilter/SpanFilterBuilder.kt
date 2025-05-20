@@ -60,7 +60,7 @@ class SpanFilterBuilder internal constructor() {
      */
     fun <T : Any> rejectSpansByAttributeValue(
         attributeKey: AttributeKey<T>,
-        attributeValuePredicate: (T) -> Boolean,
+        attributeValuePredicate: (T) -> Boolean
     ): SpanFilterBuilder {
         rejectSpanAttributes[attributeKey] = attributeValuePredicate as (Any) -> Boolean
         return this
@@ -93,9 +93,9 @@ class SpanFilterBuilder internal constructor() {
         attributeKey: AttributeKey<T>,
         attributeValuePredicate: (T) -> Boolean
     ): SpanFilterBuilder = replaceSpanAttribute(
-            attributeKey,
-            { old -> if (attributeValuePredicate(old)) null else old }
-        )
+        attributeKey,
+        { old -> if (attributeValuePredicate(old)) null else old }
+    )
 
     /**
      * Modify span data before it enters the exporter pipeline.
@@ -134,7 +134,9 @@ internal fun SpanFilterBuilder.toSpanInterceptor(): ((SpanData) -> SpanData?) {
             val attribute = spanData.attributes.get(predicate.key)
             if (attribute != null) {
                 predicate.value(attribute)
-            } else false
+            } else {
+                false
+            }
         }
         if (rejectAttribute) {
             return@filter null

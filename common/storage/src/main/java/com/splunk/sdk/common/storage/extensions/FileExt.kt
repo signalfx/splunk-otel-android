@@ -21,8 +21,9 @@ import java.io.File
 
 internal val File.statFsFreeSpace: Long
     get() {
-        if (!exists())
+        if (!exists()) {
             mkdirs()
+        }
 
         return StatFs(path).run { availableBlocksCompat * blockSizeCompat }
     }

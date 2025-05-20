@@ -57,8 +57,9 @@ internal object SplunkRumAgentCore {
 
         if (!shouldBeRunning) return OpenTelemetry.noop()
 
-        if (agentConfiguration.enableDebugLogging)
+        if (agentConfiguration.enableDebugLogging) {
             Logger.consumers += AndroidLogConsumer()
+        }
 
         Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
@@ -82,8 +83,9 @@ internal object SplunkRumAgentCore {
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
 
-        if (agentConfiguration.enableDebugLogging)
+        if (agentConfiguration.enableDebugLogging) {
             initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
+        }
 
         val openTelemetry = initializer.build()
 

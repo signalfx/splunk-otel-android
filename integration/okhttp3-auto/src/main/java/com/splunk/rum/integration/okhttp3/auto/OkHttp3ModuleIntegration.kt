@@ -33,7 +33,7 @@ internal object OkHttp3ModuleIntegration : ModuleIntegration<OkHttp3ModuleConfig
     override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
         Logger.d(TAG, "onInstall()")
 
-        //install OkHttp3 auto-instrumentation if isEnabled is true
+        // install OkHttp3 auto-instrumentation if isEnabled is true
         if (moduleConfiguration.isEnabled) {
             val okHttpInstrumentation = AndroidInstrumentationLoader.getInstrumentation(OkHttpInstrumentation::class.java)
             okHttpInstrumentation?.addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())

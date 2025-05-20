@@ -88,8 +88,9 @@ class SplunkRumBuilder {
      * @param realm A valid Splunk "realm", e.g. "us0", "eu0".
      */
     fun setRealm(realm: String): SplunkRumBuilder {
-        if (beaconEndpoint != null)
+        if (beaconEndpoint != null) {
             throw IllegalStateException("setRealm can not be set when setBeaconEndpoint was called")
+        }
 
         this.realm = realm
         return this
@@ -102,8 +103,9 @@ class SplunkRumBuilder {
      * and let this configuration set the full endpoint URL for you.
      */
     fun setBeaconEndpoint(endpoint: String): SplunkRumBuilder {
-        if (beaconEndpoint != null)
+        if (beaconEndpoint != null) {
             throw IllegalStateException("setBeaconEndpoint can not be set when setRealm was called")
+        }
 
         beaconEndpoint = endpoint
         return this
@@ -147,12 +149,13 @@ class SplunkRumBuilder {
      * @param ratio The desired ratio of sampling. Must be within <0.0, 1.0>.
      */
     fun enableSessionBasedSampling(ratio: Double): SplunkRumBuilder {
-        if (ratio < 0)
+        if (ratio < 0) {
             Logger.w(TAG, "enableSessionBasedSampling(ratio: $ratio) - ratio can not be lower then 0")
-        else if (ratio > 1)
+        } else if (ratio > 1) {
             Logger.w(TAG, "enableSessionBasedSampling(ratio: $ratio) - ratio can not be greater then 1")
-        else
+        } else {
             sessionBasedSampling = ratio
+        }
 
         return this
     }
@@ -252,7 +255,8 @@ class SplunkRumBuilder {
 
         val endpointConfiguration = when {
             realm != null -> EndpointConfiguration(
-                realm = realm, accessToken ?: throw IllegalStateException("rumAccessToken was not set")
+                realm = realm,
+                accessToken ?: throw IllegalStateException("rumAccessToken was not set")
             )
             beaconEndpoint != null -> EndpointConfiguration(
                 traces = URL(beaconEndpoint)
@@ -276,7 +280,7 @@ class SplunkRumBuilder {
                     val spanFilterBuilder = SpanFilterBuilder()
                     it.accept(spanFilterBuilder)
                     spanFilterBuilder.toSpanInterceptor()
-                },
+                }
             ),
             moduleConfigurations = arrayOf(
                 LegacyCrashModuleConfiguration(
@@ -290,7 +294,7 @@ class SplunkRumBuilder {
                     interval = slowRenderingDetectionPollInterval
                 ),
                 LegacyNetworkMonitorModuleConfiguration(
-                    isEnabled = networkMonitorEnabled,
+                    isEnabled = networkMonitorEnabled
                 )
             )
         )

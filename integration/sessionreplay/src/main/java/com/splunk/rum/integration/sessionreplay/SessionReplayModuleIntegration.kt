@@ -66,7 +66,8 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             val instance = SplunkOpenTelemetrySdk.instance ?: return false
 
             val attributes = Attributes.of(
-                AttributeKey.stringKey("event.name"), "session_replay_data",
+                AttributeKey.stringKey("event.name"),
+                "session_replay_data"
 //                AttributeKey.stringKey("replay.record_id"), recordData.id,
 //                AttributeKey.longKey("replay.start_timestamp"), recordData.start * 1_000_000,
 //                AttributeKey.longKey("replay.end_timestamp"), recordData.end * 1_000_000

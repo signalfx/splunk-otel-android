@@ -36,7 +36,7 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
 
         val isEnabled = moduleConfigurations.find<LegacyNetworkMonitorModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
 
-        //install Network Monitor instrumentation if isEnabled is true
+        // install Network Monitor instrumentation if isEnabled is true
         if (isEnabled) {
             NetworkChangeInstrumentation().install(oTelInstallationContext)
         }

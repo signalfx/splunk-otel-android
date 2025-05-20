@@ -94,7 +94,7 @@ object ApplicationStartupTimekeeper {
         override fun onActivityResumed(activity: Activity) {
             resumedActivityCount++
 
-            if (resumedActivityCount == 1 && (isHotStartPending || isWarmStartPending))
+            if (resumedActivityCount == 1 && (isHotStartPending || isWarmStartPending)) {
                 handler.twoConsecutivePosts {
                     val endTimestamp = SystemClock.elapsedRealtime()
 
@@ -116,6 +116,7 @@ object ApplicationStartupTimekeeper {
                         isWarmStartPending = false
                     }
                 }
+            }
         }
 
         override fun onActivityPaused(activity: Activity) {

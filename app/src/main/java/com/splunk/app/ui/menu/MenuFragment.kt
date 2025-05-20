@@ -192,6 +192,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                     .show()
             }
             viewBinding.setAllGlobalAttributes.id -> {
+                @Suppress("ktlint:standard:argument-list-wrapping")
                 val globalAttributes = Attributes.of(
                     AttributeKey.stringKey("setAllString"), "String Value",
                     AttributeKey.booleanKey("setAllBoolean"), true,

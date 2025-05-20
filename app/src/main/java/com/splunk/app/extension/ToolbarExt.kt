@@ -20,8 +20,9 @@ import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 
 fun Toolbar.setSubtitle(@StringRes resId: Int?) {
-    if (resId != null)
+    if (resId != null) {
         setSubtitle(resId)
-    else
+    } else {
         subtitle = ""
+    }
 }

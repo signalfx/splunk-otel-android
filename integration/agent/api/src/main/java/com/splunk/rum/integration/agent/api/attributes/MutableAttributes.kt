@@ -45,8 +45,7 @@ class MutableAttributes(
      * @throws ClassCastException if the stored value is not of the expected type
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <T> get(key: String): T? =
-        attributes.get(AttributeKey.stringKey(key)) as (T)
+    operator fun <T> get(key: String): T? = attributes.get(AttributeKey.stringKey(key)) as (T)
 
     /**
      * Sets a String value for the given key.
@@ -149,8 +148,7 @@ class MutableAttributes(
         attributes = attributes.edit(updateAttributes)
     }
 
-    override fun forEach(consumer: BiConsumer<in AttributeKey<*>, in Any>) =
-        attributes.forEach(consumer)
+    override fun forEach(consumer: BiConsumer<in AttributeKey<*>, in Any>) = attributes.forEach(consumer)
 
     override fun size(): Int = attributes.size()
 

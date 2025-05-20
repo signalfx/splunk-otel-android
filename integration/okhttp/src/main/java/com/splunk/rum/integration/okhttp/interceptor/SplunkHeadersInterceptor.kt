@@ -33,9 +33,9 @@ class SplunkHeadersInterceptor(
     constructor(allowedHeaders: Set<String>) : this(allowedHeaders.map { it.toRegex() })
 
     override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest = intercepted.apply {
-            requestHeaders = original.request.headers.parseAndFilter()
-            responseHeaders = original.response?.headers?.parseAndFilter()
-        }
+        requestHeaders = original.request.headers.parseAndFilter()
+        responseHeaders = original.response?.headers?.parseAndFilter()
+    }
 
     private fun Headers.parseAndFilter(): MutableMap<String, MutableList<String>> {
         val parsedHeaders = mutableMapOf<String, MutableList<String>>()
@@ -45,10 +45,11 @@ class SplunkHeadersInterceptor(
                 val name = header.first.lowercase()
                 val value = header.second
 
-                if (name in parsedHeaders)
+                if (name in parsedHeaders) {
                     parsedHeaders[name]?.add(value)
-                else
+                } else {
                     parsedHeaders[name] = mutableListOf(value)
+                }
             }
         }
 

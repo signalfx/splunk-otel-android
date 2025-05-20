@@ -24,14 +24,17 @@ import kotlin.reflect.KClass
 object ComposeElementIdentification {
 
     enum class OrderPriority {
-        HIGH, MEDIUM, LOW
+        HIGH,
+        MEDIUM,
+        LOW
     }
 
     private val chain = ArrayList<Element>()
 
     fun <T : Modifier> insertModifierIfNeeded(kClass: KClass<T>, orderPriority: OrderPriority, constructor: (id: String?, isSensitive: Boolean?, positionInList: Int?) -> T?) {
-        if (chain.any { it.kClass == kClass })
+        if (chain.any { it.kClass == kClass }) {
             return
+        }
 
         chain += Element(orderPriority, constructor, kClass)
         chain.sortBy { it.orderPriority.ordinal }

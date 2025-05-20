@@ -43,5 +43,6 @@ object NoOpUserManager : IUserManager {
 }
 
 enum class InternalUserTrackingMode {
-    NoTracking, AnonymousTracking
+    NoTracking,
+    AnonymousTracking
 }

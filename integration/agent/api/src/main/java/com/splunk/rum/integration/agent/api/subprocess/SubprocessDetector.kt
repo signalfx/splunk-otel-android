@@ -32,12 +32,14 @@ internal object SubprocessDetector {
     private val applicationProcessName: String
         get() = if (Build.VERSION.SDK_INT >= 28) {
             Application.getProcessName()
-        } else try {
-            val processName: String? = "android.app.ActivityThread".toKClass()
-                ?.invoke<String>("currentProcessName")
+        } else {
+            try {
+                val processName: String? = "android.app.ActivityThread".toKClass()
+                    ?.invoke<String>("currentProcessName")
 
-            processName as String
-        } catch (e: Exception) {
-            ""
+                processName as String
+            } catch (e: Exception) {
+                ""
+            }
         }
 }

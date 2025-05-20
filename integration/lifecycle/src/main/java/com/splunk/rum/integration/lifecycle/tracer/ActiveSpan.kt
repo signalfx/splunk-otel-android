@@ -30,8 +30,9 @@ internal class ActiveSpan(
     fun isSpanInProgress(): Boolean = span != null
 
     fun startSpan(spanCreator: () -> Span?) {
-        if (span != null)
+        if (span != null) {
             return
+        }
 
         span = spanCreator()
         scope = span?.makeCurrent()
@@ -53,8 +54,9 @@ internal class ActiveSpan(
         val span = span ?: return
 
         val previouslyVisibleScreen = lastVisibleScreenProvider()
-        if (previouslyVisibleScreen != null && screenName != previouslyVisibleScreen)
+        if (previouslyVisibleScreen != null && screenName != previouslyVisibleScreen) {
             span.setAttribute(LAST_SCREEN_NAME_KEY, previouslyVisibleScreen)
+        }
     }
 
     private companion object {

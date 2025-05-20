@@ -33,6 +33,11 @@ import com.splunk.rum.integration.navigation.extension.navigation
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.trace.SdkTracerProvider
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import okhttp3.Cache
 import okhttp3.Call
 import okhttp3.Callback
@@ -47,11 +52,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.BufferedSink
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
 
 class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
@@ -84,8 +84,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
     }
 
     private val cachedClient = OkHttpClient.Builder()
-      .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
-      .build()
+        .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
+        .build()
 
     private val executor = Executors.newScheduledThreadPool(1)
 
@@ -150,7 +150,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
 
     fun parentContextPropagationInAsyncGet() {
-
         val lock = CountDownLatch(1)
 
         val openTelemetry = OpenTelemetrySdk.builder()
@@ -168,13 +167,15 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                             Span.current().spanContext
                         // Verify context propagation.
                         if (span.spanContext.traceId ==
-                            currentSpan.traceId) {
-                            Log.d( TAG, "Testing parent context propagation in async get - trace id's are same as expected.")
+                            currentSpan.traceId
+                        ) {
+                            Log.d(TAG, "Testing parent context propagation in async get - trace id's are same as expected.")
                         } else {
-                            Log.e( TAG, "Testing parent context propagation in async get - trace id's are unexpectedly not same.")
+                            Log.e(TAG, "Testing parent context propagation in async get - trace id's are unexpectedly not same.")
                         }
                         chain.proceed(chain.request())
-                    })
+                    }
+                )
                 .build()
 
             val request = Request.Builder()
@@ -185,17 +186,19 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                 object : Callback {
                     override fun onFailure(call: Call, e: IOException) {}
                     override fun onResponse(
-                        call: Call, response: Response
+                        call: Call,
+                        response: Response
                     ) {
                         // Verify that the original caller's context is the current one here.
                         if (span == Span.current()) {
-                            Log.d( TAG, "Testing parent context propagation in async get - contexts are same as expected.")
+                            Log.d(TAG, "Testing parent context propagation in async get - contexts are same as expected.")
                         } else {
-                            Log.e( TAG, "Testing parent context propagation in async get - Contexts are unexpectedly different.")
+                            Log.e(TAG, "Testing parent context propagation in async get - Contexts are unexpectedly different.")
                         }
                         lock.countDown()
                     }
-                })
+                }
+            )
         }
         lock.await()
         span.end()
@@ -250,23 +253,22 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * server-timing header is present in the response.
      */
     fun serverTimingHeaderInResponse() {
-
-        //one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
+        // one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
         executeGetRequest(
             "https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'"
         )
 
-        //invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
+        // invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
         executeGetRequest(
             "https://httpbin.org/response-headers?Server-Timing=incorrectSyntax"
         )
 
-        //two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
+        // two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
         // with the values from last valid header found
         executeGetRequest(
             "https://httpbin.org/response-headers" +
-                    "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
-                    "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
+                "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
+                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
         )
 
         CommonUtils.showDoneToast(context, "Server-Timing Header In Response")
@@ -284,7 +286,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         | * _1.0_ May 6, 2013
         | * _1.1_ June 15, 2013
         | * _1.2_ August 11, 2013
-        |""".trimMargin()
+        |
+        """.trimMargin()
 
         executePostRequest("https://api.github.com/markdown/raw", postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
         CommonUtils.showDoneToast(context, "Post Markdown")
@@ -333,7 +336,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             | * _1.0_ May 6, 2013
             | * _1.1_ June 15, 2013
             | * _1.2_ August 11, 2013
-            |""".trimMargin()
+            |
+            """.trimMargin()
         )
 
         executePostRequest("https://api.github.com/markdown/raw", file.asRequestBody(MEDIA_TYPE_MARKDOWN))
@@ -365,7 +369,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             .setType(MultipartBody.FORM)
             .addFormDataPart("title", "Square Logo")
             .addFormDataPart(
-                "image", "logo-square.png",
+                "image",
+                "logo-square.png",
                 writeOutBitmapIntoFile(File(activity?.filesDir, "logo-square.png")).asRequestBody(MEDIA_TYPE_PNG)
             )
             .build()
@@ -466,7 +471,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                         TAG,
                         String.format(
                             "%.2f Call was expected to fail, but completed: %s%n",
-                            (System.nanoTime() - startNanos) / 1e9f, response
+                            (System.nanoTime() - startNanos) / 1e9f,
+                            response
                         )
                     )
                 }
@@ -475,7 +481,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                     TAG,
                     String.format(
                         "%.2f Call failed as expected: %s%n",
-                        (System.nanoTime() - startNanos) / 1e9f, e
+                        (System.nanoTime() - startNanos) / 1e9f,
+                        e
                     )
                 )
                 CommonUtils.showDoneToast(context, "Canceled Call")

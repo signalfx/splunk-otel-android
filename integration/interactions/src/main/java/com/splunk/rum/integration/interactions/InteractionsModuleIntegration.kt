@@ -78,8 +78,9 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     private val interactionsListener = object : OnInteractionListener {
         override fun onInteraction(interaction: Interaction, legacyData: LegacyData?) {
-            if (!moduleConfiguration.isEnabled)
+            if (!moduleConfiguration.isEnabled) {
                 return
+            }
 
             Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
 
@@ -112,10 +113,11 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                     return
             }
 
-            val targetType = if (interaction is Interaction.Targetable)
+            val targetType = if (interaction is Interaction.Targetable) {
                 interaction.targetElementPath?.lastOrNull()?.view?.id
-            else
+            } else {
                 null
+            }
 
             logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()

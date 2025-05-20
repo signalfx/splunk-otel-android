@@ -27,9 +27,9 @@ internal class SpanInterceptorExporter(
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {
         val modifiedSpans = spans.mapNotNull {
-            if (interceptor != null)
+            if (interceptor != null) {
                 interceptor.invoke(it)
-            else {
+            } else {
                 it
             }
         }
