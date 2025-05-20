@@ -57,7 +57,7 @@ class App : Application() {
           .setDeploymentEnvironment("test")
           .setGlobalAttributes(Attributes.of(AttributeKey.stringKey("legacyGlobalAttributesKey"), "legacyGlobalAttributesVal"))
           .enableDebug(true)
-          .disableANRReporting()
+          .disableAnrDetection()
           .disableCrashReporting()
           .disableSlowRenderingDetection()
           .setSlowRenderingDetectionPollInterval(Duration.ofMillis(500))
