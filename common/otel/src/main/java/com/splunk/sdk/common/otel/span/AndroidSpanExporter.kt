@@ -18,14 +18,23 @@ package com.splunk.sdk.common.otel.span
 
 import android.app.Application
 import android.content.Context
+import com.cisco.android.common.http.HttpClient
+import com.cisco.android.common.http.model.Header
+import com.cisco.android.common.http.model.Query
+import com.cisco.android.common.http.model.Response
 import com.cisco.android.common.job.IJobManager
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.utils.AppStateObserver
 import com.splunk.sdk.common.storage.IAgentStorage
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
+import io.opentelemetry.exporter.zipkin.ZipkinSpanExporter
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
+import org.json.JSONArray
+import org.json.JSONObject
+import zipkin2.reporter.BytesMessageSender
+import zipkin2.reporter.Encoding
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 
@@ -49,12 +58,12 @@ internal class AndroidSpanExporter(
     }
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode = if (deferredUntilForeground && !isForeground) {
-            buffer.addAll(spans)
-            CompletableResultCode.ofSuccess()
-        } else {
-            flushBufferedSpans(spans)
-            CompletableResultCode.ofSuccess()
-        }
+        buffer.addAll(spans)
+        CompletableResultCode.ofSuccess()
+    } else {
+        flushBufferedSpans(spans)
+        CompletableResultCode.ofSuccess()
+    }
 
     override fun flush(): CompletableResultCode {
         flushBufferedSpans()
@@ -70,10 +79,17 @@ internal class AndroidSpanExporter(
         val allSpans = buffer + extra
         buffer.clear()
 
-        if (allSpans.isEmpty()) return
+        if (allSpans.isEmpty())
+            return
 
-        val exportRequest = TraceRequestMarshaler.create(allSpans)
+        if (DEBUG)
+            ZipkinSpanExporter.builder()
+                .setSender(HttpClientByteMessageSender())
+                .build()
+                .export(allSpans)
+
         val id = UUID.randomUUID().toString()
+        val exportRequest = TraceRequestMarshaler.create(allSpans)
 
         // Save data to our storage.
         ByteArrayOutputStream().use {
@@ -83,6 +99,54 @@ internal class AndroidSpanExporter(
 
         // Job scheduling
         jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+    }
+
+    private class HttpClientByteMessageSender : BytesMessageSender {
+
+        override fun encoding(): Encoding {
+            return Encoding.JSON
+        }
+
+        override fun messageMaxBytes(): Int {
+            return 2_000_000
+        }
+
+        override fun messageSizeInBytes(encodedSpans: List<ByteArray>): Int {
+            return encodedSpans.sumOf { it.size }
+        }
+
+        override fun messageSizeInBytes(encodedSizeInBytes: Int): Int {
+            return encodedSizeInBytes
+        }
+
+        override fun send(encodedSpans: List<ByteArray>) {
+            val array = JSONArray()
+
+            for (span in encodedSpans)
+                array.put(JSONObject(span.toString(Charsets.UTF_8)))
+
+            HttpClient().makePostRequest(
+                url = "https://rum-ingest.mon0.signalfx.com/v1/rum",
+                queries = listOf(
+                    Query("auth", "GHnFoSZy5Fr9u9EL_8yKkQ")
+                ),
+                headers = listOf(
+                    Header("Content-Type", "application/json")
+                ),
+                body = array.toString(3).toByteArray(Charsets.UTF_8),
+                callback = object : HttpClient.Callback {
+                    override fun onSuccess(response: Response) {
+                        println("onSuccess $response")
+                    }
+
+                    override fun onFailed(e: Exception) {
+                        println("onFailed $e")
+                    }
+                }
+            )
+        }
+
+        override fun close() {}
     }
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {
@@ -101,8 +165,13 @@ internal class AndroidSpanExporter(
                 flushBufferedSpans()
             }
         }
+
         override fun onAppClosed() {
             isForeground = false
         }
+    }
+
+    private companion object {
+        const val DEBUG = true
     }
 }

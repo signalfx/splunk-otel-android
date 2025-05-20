@@ -37,6 +37,7 @@ dependencies {
     }
     api(Dependencies.Otel.semConv)
     api(Dependencies.Otel.semConvIncubating)
+    api("io.opentelemetry:opentelemetry-exporter-zipkin")
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonJob)

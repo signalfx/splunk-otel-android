@@ -33,3 +33,13 @@ allprojects {
         }
     }
 }
+
+tasks.register("buildAARs") {
+    description = "Create AAR for all modules"
+    group = "build"
+
+    subprojects.forEach { module ->
+        if (module.plugins.hasPlugin("com.android.library"))
+            dependsOn("${module.path}:assembleRelease")
+    }
+}
