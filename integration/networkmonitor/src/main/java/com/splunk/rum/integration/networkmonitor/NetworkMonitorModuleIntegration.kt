@@ -60,15 +60,15 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
 
                     SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CONNECTION_TYPE.key, currentNetwork.getState().getHumanName())
 
-                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CONNECTION_SUBTYPE.key, currentNetwork.getSubType()?.toString())
+                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CONNECTION_SUBTYPE.key, currentNetwork.getSubType())
 
-                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CARRIER_NAME.key, currentNetwork.getCarrierName()?.toString())
+                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CARRIER_NAME.key, currentNetwork.getCarrierName())
 
-                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CARRIER_MCC.key, currentNetwork.getCarrierCountryCode()?.toString())
+                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CARRIER_MCC.key, currentNetwork.getCarrierCountryCode())
 
-                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CARRIER_MNC.key, currentNetwork.getCarrierNetworkCode()?.toString())
+                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CARRIER_MNC.key, currentNetwork.getCarrierNetworkCode())
 
-                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CARRIER_ICC.key, currentNetwork.getCarrierIsoCountryCode()?.toString())
+                    SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CARRIER_ICC.key, currentNetwork.getCarrierIsoCountryCode())
                 }
             }
 
@@ -79,10 +79,6 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
             SplunkInternalGlobalAttributeSpanProcessor.updateStringAttribute(NETWORK_CONNECTION_TYPE.key,
                 NetworkState.NO_NETWORK_AVAILABLE.humanName
             )
-
         }
     }
-
-
-
 }

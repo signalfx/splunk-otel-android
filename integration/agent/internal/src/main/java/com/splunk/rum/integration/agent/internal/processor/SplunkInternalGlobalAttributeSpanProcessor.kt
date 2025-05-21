@@ -58,12 +58,8 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
         fun updateStringAttribute(key: String, value: String?) {
             attributes.removeIf { it.name == key }
             if (value != null) {
-                attributes += Attribute.String(
-                    key, value
-                )
+                attributes += Attribute.String(key, value)
             }
         }
     }
-
-
 }
