@@ -205,7 +205,7 @@ class SplunkRumBuilder {
      * This feature is enabled by default. You can disable it by calling this method.
      */
     @Deprecated("ANRReporting is now controlled by the ANRModuleConfiguration")
-    fun disableANRReporting(): SplunkRumBuilder {
+    fun disableAnrDetection(): SplunkRumBuilder {
         anrReportingEnabled = false
         return this
     }
