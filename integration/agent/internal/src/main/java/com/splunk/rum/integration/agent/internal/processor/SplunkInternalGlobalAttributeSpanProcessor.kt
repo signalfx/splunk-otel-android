@@ -54,5 +54,16 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
 
     companion object {
         val attributes: MutableList<Attribute> = ArrayList()
+
+        fun updateStringAttribute(key: String, value: String?) {
+            attributes.removeIf { it.name == key }
+            if (value != null) {
+                attributes += Attribute.String(
+                    key, value
+                )
+            }
+        }
     }
+
+
 }
