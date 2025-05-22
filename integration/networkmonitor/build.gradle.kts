@@ -28,6 +28,9 @@ dependencies {
     implementation(project(":integration:agent:internal"))
 
     implementation(Dependencies.Otel.androidNetworkMonitorInstrumentation)
+    implementation(Dependencies.Otel.androidServices)
+    implementation(Dependencies.Otel.androidCommon)
+    implementation(Dependencies.Otel.semConvIncubating)
 
     implementation(Dependencies.SessionReplay.commonLogger)
 
