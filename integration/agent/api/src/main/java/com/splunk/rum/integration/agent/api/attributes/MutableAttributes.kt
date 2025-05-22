@@ -154,7 +154,7 @@ class MutableAttributes(
 
     override fun isEmpty(): Boolean = attributes.isEmpty
 
-    override fun asMap(): MutableMap<AttributeKey<*>, Any> = attributes.asMap()
+    override fun asMap(): Map<AttributeKey<*>, Any> = attributes.asMap()
 
     override fun toBuilder(): AttributesBuilder = attributes.toBuilder()
 
