@@ -1,6 +1,5 @@
 package com.splunk.rum.integration.agent.api.attributes
 
-import com.splunk.rum.integration.agent.api.SplunkRumBuilder
 import io.opentelemetry.android.export.SpanDataModifier
 import io.opentelemetry.api.common.AttributeKey
 
@@ -13,16 +12,12 @@ object StandardAttributes {
 
     /**
      * The version of your app. Useful for adding to global attributes.
-     *
-     * @see SplunkRumBuilder.setGlobalAttributes
      */
     @JvmStatic
     val APP_VERSION: AttributeKey<String> = AttributeKey.stringKey("app.version")
 
     /**
      * The build type of your app (typically one of debug or release). Useful for adding to global attributes.
-     *
-     * @see SplunkRumBuilder.setGlobalAttributes
      */
     @JvmStatic
     val APP_BUILD_TYPE: AttributeKey<String> = AttributeKey.stringKey("app.build.type")
