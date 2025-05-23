@@ -78,7 +78,8 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             viewBinding.trackExceptionWithAttributes.id -> {
                 SplunkRum.instance.customTracking.trackException(
                     getTestException("Custom Exception (with attributes) To Be Tracked"),
-                    getTestAttributes())
+                    getTestAttributes()
+                )
 
                 CommonUtils.showDoneToast(context, "Track Exception with Attributes")
             }
@@ -102,7 +103,8 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             viewBinding.trackExceptionWithAttributesLegacy.id -> {
                 SplunkRum.instance.addRumException(
                     getTestException("Custom Exception (with attributes) To Be Tracked"),
-                    getTestAttributes())
+                    getTestAttributes()
+                )
 
                 CommonUtils.showDoneToast(context, "Track Exception with Attributes (Legacy)")
             }

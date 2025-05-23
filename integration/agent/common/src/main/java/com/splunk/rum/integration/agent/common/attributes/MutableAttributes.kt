@@ -158,5 +158,7 @@ class MutableAttributes(
 
     override fun toBuilder(): AttributesBuilder = attributes.toBuilder()
 
-    private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes = toBuilder().apply(block).build()
+    private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes =
+        toBuilder().apply(block).build()
 }
+

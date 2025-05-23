@@ -33,7 +33,8 @@ class ApplicationInfoUtils {
             val applicationInfo: ApplicationInfo?
 
             try {
-                applicationInfo = packageManager.getApplicationInfo(application.packageName, PackageManager.GET_META_DATA)
+                applicationInfo =
+                    packageManager.getApplicationInfo(application.packageName, PackageManager.GET_META_DATA)
             } catch (e: Exception) {
                 Logger.e(TAG, "Failed to retrieve ApplicationInfo: ${e.message}")
                 return null
@@ -66,7 +67,8 @@ class ApplicationInfoUtils {
             val applicationInfo: ApplicationInfo?
 
             try {
-                applicationInfo = packageManager.getApplicationInfo(application.packageName, PackageManager.GET_META_DATA)
+                applicationInfo =
+                    packageManager.getApplicationInfo(application.packageName, PackageManager.GET_META_DATA)
             } catch (e: Exception) {
                 Logger.e(TAG, "Failed to retrieve ApplicationInfo: ${e.message}")
                 return null

@@ -22,9 +22,7 @@ import com.splunk.rum.integration.agent.internal.user.InternalUserTrackingMode
 /**
  * Class representing a user.
  */
-class User internal constructor(
-    userManager: IUserManager
-) {
+class User internal constructor(userManager: IUserManager) {
 
     val state: State = State(userManager)
 
@@ -45,9 +43,7 @@ class User internal constructor(
             }
     }
 
-    data class Configuration(
-        val trackingMode: TrackingMode = TrackingMode.NoTracking
-    )
+    data class Configuration(val trackingMode: TrackingMode = TrackingMode.NoTracking)
 
     enum class TrackingMode {
         NoTracking,

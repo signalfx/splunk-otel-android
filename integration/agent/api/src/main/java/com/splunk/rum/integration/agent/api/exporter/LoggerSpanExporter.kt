@@ -34,7 +34,10 @@ internal class LoggerSpanExporter : SpanExporter {
 
         for (span in spans) {
             val instrumentationScopeInfo = span.instrumentationScopeInfo
-            Logger.i(TAG, "name=${span.name}, traceId=${span.traceId}, spanId=${span.spanId}, parentSpanId=${span.parentSpanId}, kind=${span.kind}, attributes=${span.attributes.toSplunkString()}, instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, instrumentationScopeInfo.version=${instrumentationScopeInfo.version}")
+            Logger.i(
+                TAG,
+                "name=${span.name}, traceId=${span.traceId}, spanId=${span.spanId}, parentSpanId=${span.parentSpanId}, kind=${span.kind}, attributes=${span.attributes.toSplunkString()}, instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
+            )
         }
 
         return CompletableResultCode.ofSuccess()

@@ -31,11 +31,19 @@ internal object SlowRenderingModuleIntegration : ModuleIntegration<SlowRendering
 
     private const val TAG = "SlowRendering"
 
-    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
         Logger.d(TAG, "onInstall()")
 
-        val isEnabled = moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
-        val interval = moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.interval ?: moduleConfiguration.interval
+        val isEnabled =
+            moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.isEnabled
+                ?: moduleConfiguration.isEnabled
+        val interval =
+            moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.interval
+                ?: moduleConfiguration.interval
 
         if (isEnabled) {
             Logger.d(TAG, "Installing Slow Rendering Detector")

@@ -101,7 +101,13 @@ object ApplicationStartupTimekeeper {
                     if (isHotStartPending) {
                         if (isEnabled) {
                             val duration = endTimestamp - firstActivityStartElapsed
-                            listeners.forEachFast { it.onHotStarted(firstActivityStartTimestamp, firstActivityStartTimestamp + duration, duration) }
+                            listeners.forEachFast {
+                                it.onHotStarted(
+                                    firstActivityStartTimestamp,
+                                    firstActivityStartTimestamp + duration,
+                                    duration
+                                )
+                            }
                         }
 
                         isHotStartPending = false
@@ -110,7 +116,13 @@ object ApplicationStartupTimekeeper {
                     if (isWarmStartPending) {
                         if (isEnabled) {
                             val duration = endTimestamp - firstActivityCreateElapsed
-                            listeners.forEachFast { it.onWarmStarted(firstActivityCreateTimestamp, firstActivityCreateTimestamp + duration, duration) }
+                            listeners.forEachFast {
+                                it.onWarmStarted(
+                                    firstActivityCreateTimestamp,
+                                    firstActivityCreateTimestamp + duration,
+                                    duration
+                                )
+                            }
                         }
 
                         isWarmStartPending = false

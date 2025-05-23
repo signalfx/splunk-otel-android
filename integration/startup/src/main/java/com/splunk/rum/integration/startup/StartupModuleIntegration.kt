@@ -40,7 +40,11 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         ApplicationStartupTimekeeper.listeners += applicationStartupTimekeeperListener
     }
 
-    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
         Logger.d(TAG, "onInstall()")
 
         cache.forEachFast { reportEvent(it.startTimestamp, it.endTimestamp, it.name) }
@@ -49,17 +53,26 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
     private val applicationStartupTimekeeperListener = object : ApplicationStartupTimekeeper.Listener {
         override fun onColdStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
-            Logger.d(TAG, "onColdStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)")
+            Logger.d(
+                TAG,
+                "onColdStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
+            )
             reportEvent(startTimestamp, endTimestamp, "cold")
         }
 
         override fun onWarmStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
-            Logger.d(TAG, "onWarmStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)")
+            Logger.d(
+                TAG,
+                "onWarmStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
+            )
             reportEvent(startTimestamp, endTimestamp, "warm")
         }
 
         override fun onHotStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
-            Logger.d(TAG, "onHotStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)")
+            Logger.d(
+                TAG,
+                "onHotStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
+            )
             reportEvent(startTimestamp, endTimestamp, "hot")
         }
     }

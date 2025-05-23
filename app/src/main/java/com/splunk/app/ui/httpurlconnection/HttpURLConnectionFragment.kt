@@ -118,22 +118,31 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * server-timing header is present in the response.
      */
     fun serverTimingHeaderInResponse() {
-        //one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
-        executeGet("https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'")
+        // one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
+        executeGet(
+            "https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'"
+        )
 
-        //invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
+        // invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
         executeGet("https://httpbin.org/response-headers?Server-Timing=incorrectSyntax")
 
-        //two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
+        // two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
         // with the values from last valid header found
-        executeGet("https://httpbin.org/response-headers" +
+        executeGet(
+            "https://httpbin.org/response-headers" +
                 "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
-                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\"")
+                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
+        )
 
         CommonUtils.showDoneToast(context, "Server-Timing Header In Response")
     }
 
-    private fun executeGet(inputUrl: String, getInputStream: Boolean = true, disconnect: Boolean = true, stallRequest: Boolean = false) {
+    private fun executeGet(
+        inputUrl: String,
+        getInputStream: Boolean = true,
+        disconnect: Boolean = true,
+        stallRequest: Boolean = false
+    ) {
         runOnBackgroundThread {
             var connection: HttpURLConnection? = null
             try {
@@ -142,7 +151,13 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
 
                 val responseCode = connection.responseCode
                 val responseMessage = connection.responseMessage
-                val readInput = if (getInputStream) connection.inputStream.bufferedReader().use { it.readText() } else ""
+                val readInput = if (getInputStream) {
+                    connection.inputStream.bufferedReader().use {
+                        it.readText()
+                    }
+                } else {
+                    ""
+                }
                 val readInputString = if (getInputStream) ("input Stream: " + readInput) else ""
 
                 stallRequest.takeIf { it }?.let { Thread.sleep(20000) }
@@ -167,8 +182,11 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 val responseMessage = connection.responseMessage
                 val errorStream = connection.errorStream
                 val readError = errorStream.bufferedReader().use { it.readText() }
-                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage +
-                    " ErrorStream: " + readError)
+                Log.v(
+                    TAG,
+                    "response code: " + responseCode + " response message: " + responseMessage +
+                        " ErrorStream: " + readError
+                )
                 CommonUtils.showDoneToast(context, "UnSuccessful Get")
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -194,8 +212,11 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 val responseMessage = connection.responseMessage
                 val inputStream = connection.inputStream
                 val readInput = inputStream.bufferedReader().use { it.readText() }
-                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage +
-                    " InputStream: " + readInput)
+                Log.v(
+                    TAG,
+                    "response code: " + responseCode + " response message: " + responseMessage +
+                        " InputStream: " + readInput
+                )
                 CommonUtils.showDoneToast(context, "Post")
             } catch (e: IOException) {
                 e.printStackTrace()

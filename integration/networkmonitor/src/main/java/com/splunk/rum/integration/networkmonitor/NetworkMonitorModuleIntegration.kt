@@ -31,10 +31,16 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
 
     private const val TAG = "NetworkMonitorIntegration"
 
-    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
         Logger.d(TAG, "onInstall()")
 
-        val isEnabled = moduleConfigurations.find<LegacyNetworkMonitorModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
+        val isEnabled =
+            moduleConfigurations.find<LegacyNetworkMonitorModuleConfiguration>()?.isEnabled
+                ?: moduleConfiguration.isEnabled
 
         // install Network Monitor instrumentation if isEnabled is true
         if (isEnabled) {

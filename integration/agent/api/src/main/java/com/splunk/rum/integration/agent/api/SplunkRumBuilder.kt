@@ -270,7 +270,8 @@ class SplunkRumBuilder {
             agentConfiguration = AgentConfiguration(
                 endpoint = endpointConfiguration,
                 appName = appName ?: throw IllegalStateException("applicationName was not set"),
-                deploymentEnvironment = deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
+                deploymentEnvironment =
+                deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
                 enableDebugLogging = enableDebug,
                 session = SessionConfiguration(sessionBasedSampling),
                 globalAttributes = globalAttributes,

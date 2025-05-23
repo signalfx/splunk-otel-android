@@ -21,7 +21,10 @@ import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 interface ISession {
     val state: State
 
-    class State internal constructor(private val sessionConfiguration: SessionConfiguration, private val sessionManager: ISplunkSessionManager) {
+    class State internal constructor(
+        private val sessionConfiguration: SessionConfiguration,
+        private val sessionManager: ISplunkSessionManager
+    ) {
         val sessionId: String
             get() = sessionManager.sessionId
         val samplingRate: Double
@@ -29,6 +32,4 @@ interface ISession {
     }
 }
 
-class Session internal constructor(
-    override val state: ISession.State
-) : ISession
+class Session internal constructor(override val state: ISession.State) : ISession
