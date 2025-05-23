@@ -19,5 +19,10 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.rum.integration.agent.module"
+    namespace = "com.splunk.rum.integration.agent.common"
+}
+
+dependencies {
+    api(platform(Dependencies.Otel.instrumentationBomAlpha))
+    api(Dependencies.Otel.api)
 }

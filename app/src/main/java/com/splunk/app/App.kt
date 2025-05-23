@@ -21,7 +21,8 @@ import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.common.attributes.toMutableAttributes
 import com.splunk.rum.integration.anr.AnrModuleConfiguration
 import com.splunk.rum.integration.crash.CrashModuleConfiguration
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
@@ -31,6 +32,7 @@ import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfigurati
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3ModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration
+import io.opentelemetry.api.common.Attributes
 import java.time.Duration
 
 class App : Application() {

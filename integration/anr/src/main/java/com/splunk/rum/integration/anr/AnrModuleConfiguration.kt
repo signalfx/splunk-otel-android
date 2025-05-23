@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.anr
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
 /**
  * ANR module configuration.

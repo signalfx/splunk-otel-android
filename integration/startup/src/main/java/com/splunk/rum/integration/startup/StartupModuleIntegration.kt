@@ -20,7 +20,7 @@ import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk

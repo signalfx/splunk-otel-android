@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.okhttp3.auto
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
 /**
  * OkHttp module configuration.

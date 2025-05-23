@@ -26,7 +26,7 @@ import com.splunk.app.ui.BaseFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.app.util.CommonUtils
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.customtracking.extension.addRumEvent
 import com.splunk.rum.integration.customtracking.extension.addRumException
 import com.splunk.rum.integration.customtracking.extension.customTracking
