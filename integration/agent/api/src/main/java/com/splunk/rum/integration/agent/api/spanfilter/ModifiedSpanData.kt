@@ -20,10 +20,8 @@ import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.trace.data.DelegatingSpanData
 import io.opentelemetry.sdk.trace.data.SpanData
 
-internal class ModifiedSpanData(
-    original: SpanData,
-    private val modifiedAttributes: Attributes
-) : DelegatingSpanData(original) {
+internal class ModifiedSpanData(original: SpanData, private val modifiedAttributes: Attributes) :
+    DelegatingSpanData(original) {
     override fun getAttributes(): Attributes = modifiedAttributes
 
     override fun getTotalAttributeCount(): Int = modifiedAttributes.size()

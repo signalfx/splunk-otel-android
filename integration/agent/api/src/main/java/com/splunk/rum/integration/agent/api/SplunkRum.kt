@@ -137,7 +137,9 @@ class SplunkRum private constructor(
                 return instance
             }
 
-            val isSubprocess = SubprocessDetector.isSubprocess(applicationId = agentConfiguration.instrumentedProcessName)
+            val isSubprocess = SubprocessDetector.isSubprocess(
+                applicationId = agentConfiguration.instrumentedProcessName
+            )
 
             if (isSubprocess && agentConfiguration.instrumentedProcessName != null) {
                 Logger.d(TAG, "install() - Subprocess detected exiting")
@@ -155,7 +157,12 @@ class SplunkRum private constructor(
 
             val userManager = UserManager()
 
-            val openTelemetry = SplunkRumAgentCore.install(application, agentConfiguration, userManager, moduleConfigurations.toList())
+            val openTelemetry = SplunkRumAgentCore.install(
+                application,
+                agentConfiguration,
+                userManager,
+                moduleConfigurations.toList()
+            )
 
             instanceInternal = SplunkRum(
                 agentConfiguration = agentConfiguration,
@@ -171,7 +178,10 @@ class SplunkRum private constructor(
          * Creates a new [SplunkRumBuilder], used to set up a [SplunkRum] instance.
          */
         @JvmStatic
-        @Deprecated("Use SplunkRum.install()", ReplaceWith("install", "com.splunk.rum.integration.agent.api.SplunkRumBuilder"))
+        @Deprecated(
+            "Use SplunkRum.install()",
+            ReplaceWith("install", "com.splunk.rum.integration.agent.api.SplunkRumBuilder")
+        )
         fun builder(): SplunkRumBuilder = SplunkRumBuilder()
 
         /**
@@ -180,7 +190,10 @@ class SplunkRum private constructor(
         @JvmStatic
         @Deprecated(
             "Use SplunkRum.instance.state.status == Status.Running",
-            ReplaceWith("instance.state.status == Status.Running", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance")
+            ReplaceWith(
+                "instance.state.status == Status.Running",
+                "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance"
+            )
         )
         fun isInitialized(): Boolean = instance.state.status == Status.Running
 

@@ -26,16 +26,15 @@ import okhttp3.Headers
  *
  * @param allowedHeaders Set of regexes that are used to filter headers.
  */
-class SplunkHeadersInterceptor(
-    val allowedHeaders: List<Regex>
-) : SplunkOkHttpInterceptor {
+class SplunkHeadersInterceptor(val allowedHeaders: List<Regex>) : SplunkOkHttpInterceptor {
 
     constructor(allowedHeaders: Set<String>) : this(allowedHeaders.map { it.toRegex() })
 
-    override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest = intercepted.apply {
-        requestHeaders = original.request.headers.parseAndFilter()
-        responseHeaders = original.response?.headers?.parseAndFilter()
-    }
+    override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest =
+        intercepted.apply {
+            requestHeaders = original.request.headers.parseAndFilter()
+            responseHeaders = original.response?.headers?.parseAndFilter()
+        }
 
     private fun Headers.parseAndFilter(): MutableMap<String, MutableList<String>> {
         val parsedHeaders = mutableMapOf<String, MutableList<String>>()

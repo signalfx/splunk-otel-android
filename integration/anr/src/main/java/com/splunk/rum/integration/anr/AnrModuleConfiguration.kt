@@ -23,9 +23,7 @@ import com.splunk.rum.integration.agent.module.ModuleConfiguration
  *
  * @property isEnabled Whether the module is enabled.
  */
-class AnrModuleConfiguration(
-    val isEnabled: Boolean = true
-) : ModuleConfiguration {
+class AnrModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
 
     override val name: String = "anr"
 

@@ -33,7 +33,7 @@ class ConfigKtLint : Plugin<Project> by local plugin {
         workingDir = rootDir
         classpath = ktlint
         mainClass.set("com.pinterest.ktlint.Main")
-        args = listOf("${Ktlint.INPUT_DIR}/${Ktlint.INCLUDED_FILES}")
+        args = listOf("${projectDir.path}/${Ktlint.INPUT_DIR}/${Ktlint.INCLUDED_FILES}")
     }
 
     tasks.register<JavaExec>("ktlintFormat") {
@@ -46,6 +46,6 @@ class ConfigKtLint : Plugin<Project> by local plugin {
         mainClass.set("com.pinterest.ktlint.Main")
         workingDir = rootDir
         jvmArgs("--add-opens=java.base/java.lang=ALL-UNNAMED")
-        args = listOf("-F", "${Ktlint.INPUT_DIR}/${Ktlint.INCLUDED_FILES}")
+        args = listOf("-F", "${projectDir.path}/${Ktlint.INPUT_DIR}/${Ktlint.INCLUDED_FILES}")
     }
 }

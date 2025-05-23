@@ -27,9 +27,7 @@ import java.net.URL
  *
  * @param masks List of masks to be applied to URL.
  */
-class SplunkMaskUrlInterceptor(
-    val masks: List<Mask>
-) : SplunkOkHttpInterceptor {
+class SplunkMaskUrlInterceptor(val masks: List<Mask>) : SplunkOkHttpInterceptor {
 
     override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest {
         var processedUrl = intercepted.url.toString()

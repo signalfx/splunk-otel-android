@@ -32,9 +32,11 @@ internal class ActivityTracerManager(
 
     fun addEvent(activity: Activity, eventName: String): ActivityTracer = getTracer(activity).addEvent(eventName)
 
-    fun startSpanIfNoneInProgress(activity: Activity, spanName: String): ActivityTracer = getTracer(activity).startSpanIfNoneInProgress(spanName)
+    fun startSpanIfNoneInProgress(activity: Activity, spanName: String): ActivityTracer =
+        getTracer(activity).startSpanIfNoneInProgress(spanName)
 
-    fun initiateRestartSpanIfNecessary(activity: Activity): ActivityTracer = getTracer(activity).initiateRestartSpanIfNecessary()
+    fun initiateRestartSpanIfNecessary(activity: Activity): ActivityTracer =
+        getTracer(activity).initiateRestartSpanIfNecessary()
 
     fun startActivityCreation(activity: Activity): ActivityTracer = getTracer(activity).startActivityCreation()
 

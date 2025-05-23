@@ -23,9 +23,5 @@ internal data class Module(
     val configuration: ModuleConfiguration? = null,
     val initialization: Initialization? = null
 ) {
-    data class Initialization(
-        val startTimestamp: Long,
-        val startElapsed: Long,
-        val endElapsed: Long?
-    )
+    data class Initialization(val startTimestamp: Long, val startElapsed: Long, val endElapsed: Long?)
 }

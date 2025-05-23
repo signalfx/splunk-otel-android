@@ -24,10 +24,7 @@ import java.util.regex.Pattern
  * @property traceId The Trace ID extracted from the header.
  * @property spanId The Span ID extracted from the header.
  */
-data class ServerTraceContext(
-    val traceId: String,
-    val spanId: String
-)
+data class ServerTraceContext(val traceId: String, val spanId: String)
 
 object ServerTimingHeaderParser {
 

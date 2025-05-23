@@ -49,7 +49,7 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
                 Log.d(TAG, "Nextgen integrateWithBrowserRum API called")
             }
 
-             ApiVariant.LEGACY -> {
+            ApiVariant.LEGACY -> {
                 SplunkRum.instance.integrateWithBrowserRum(viewBinding.webView)
                 Log.d(TAG, "Legacy integrateWithBrowserRum API called")
             }

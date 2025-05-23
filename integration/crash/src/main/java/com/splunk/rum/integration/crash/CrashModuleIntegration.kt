@@ -31,10 +31,15 @@ internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfigurat
 
     private const val TAG = "CrashIntegration"
 
-    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
         Logger.d(TAG, "onInstall()")
 
-        val isEnabled = moduleConfigurations.find<LegacyCrashModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
+        val isEnabled =
+            moduleConfigurations.find<LegacyCrashModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
 
         if (isEnabled) {
             Logger.d(TAG, "Installing crash reporter")

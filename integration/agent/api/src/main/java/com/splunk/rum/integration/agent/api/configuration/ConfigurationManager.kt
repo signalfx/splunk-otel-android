@@ -21,9 +21,7 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.sdk.common.storage.IAgentStorage
 
-internal class ConfigurationManager private constructor(
-    private val agentStorage: IAgentStorage
-) {
+internal class ConfigurationManager private constructor(private val agentStorage: IAgentStorage) {
     fun preProcessConfiguration(context: Context, proposalConfig: AgentConfiguration): AgentConfiguration {
         var config = proposalConfig.copy()
 

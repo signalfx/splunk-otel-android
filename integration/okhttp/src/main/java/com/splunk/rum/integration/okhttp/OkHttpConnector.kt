@@ -104,7 +104,13 @@ internal class OkHttpConnector(
         return response
     }
 
-    private fun parseRequestAndResponse(start: Long, duration: Long, request: Request, response: Response?, connection: Connection?): SplunkNetworkRequest = SplunkNetworkRequest(
+    private fun parseRequestAndResponse(
+        start: Long,
+        duration: Long,
+        request: Request,
+        response: Response?,
+        connection: Connection?
+    ): SplunkNetworkRequest = SplunkNetworkRequest(
         url = request.parseURL(),
         method = request.parseMethod(),
         statusCode = response?.parseStatusCode() ?: UNKNOWN_STATUS_CODE,

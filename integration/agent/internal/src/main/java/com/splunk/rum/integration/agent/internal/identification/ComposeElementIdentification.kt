@@ -31,7 +31,11 @@ object ComposeElementIdentification {
 
     private val chain = ArrayList<Element>()
 
-    fun <T : Modifier> insertModifierIfNeeded(kClass: KClass<T>, orderPriority: OrderPriority, constructor: (id: String?, isSensitive: Boolean?, positionInList: Int?) -> T?) {
+    fun <T : Modifier> insertModifierIfNeeded(
+        kClass: KClass<T>,
+        orderPriority: OrderPriority,
+        constructor: (id: String?, isSensitive: Boolean?, positionInList: Int?) -> T?
+    ) {
         if (chain.any { it.kClass == kClass }) {
             return
         }
