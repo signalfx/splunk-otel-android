@@ -16,6 +16,18 @@
 
 package com.splunk.rum.integration.agent.api;
 
+import android.app.Application;
+
+import com.splunk.rum.integration.agent.module.ModuleConfiguration;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import kotlin.Pair;
 // TODO will be fixed with JAVA api ticket
 //public class JavaIntegration extends Application {
 //
