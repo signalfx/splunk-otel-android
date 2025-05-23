@@ -18,7 +18,7 @@ package com.splunk.rum.integration.agent.api;
 
 import android.app.Application;
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration;
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
