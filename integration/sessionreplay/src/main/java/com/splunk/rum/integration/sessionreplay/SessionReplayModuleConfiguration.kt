@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.sessionreplay
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
 /**
  * Session replay module configuration.

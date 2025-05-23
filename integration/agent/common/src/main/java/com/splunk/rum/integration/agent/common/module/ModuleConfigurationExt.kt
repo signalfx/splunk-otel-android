@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.module.extension
-
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+package com.splunk.rum.integration.agent.common.module
 
 fun ModuleConfiguration.toSplunkString(): String = attributes.joinToString(",") { "$name.${it.first}:${it.second}" }
 

@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.crash
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
 /**
  * Crash module configuration.
