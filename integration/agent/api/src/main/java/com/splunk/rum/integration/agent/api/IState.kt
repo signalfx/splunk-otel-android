@@ -31,7 +31,13 @@ interface IState {
 class State internal constructor(agentConfiguration: AgentConfiguration) : IState {
     override val appName: String = agentConfiguration.appName
     override val appVersion: String = "0.0.0"
-    override val status: Status = if (SplunkRumAgentCore.isRunning) Status.Running else Status.NotRunning(cause = Status.NotRunning.Cause.SampledOut)
+    override val status: Status = if (SplunkRumAgentCore.isRunning) {
+        Status.Running
+    } else {
+        Status.NotRunning(
+            cause = Status.NotRunning.Cause.SampledOut
+        )
+    }
     override val endpointConfiguration: EndpointConfiguration = agentConfiguration.endpoint
     override val deploymentEnvironment: String = agentConfiguration.deploymentEnvironment
     override val isDebugLoggingEnabled: Boolean = agentConfiguration.enableDebugLogging

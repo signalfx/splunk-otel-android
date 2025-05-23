@@ -21,9 +21,8 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
 
-internal class FragmentActivityCallback21(
-    override val fragmentCallback: FragmentLifecycleCallbacks
-) : FragmentActivityCallback {
+internal class FragmentActivityCallback21(override val fragmentCallback: FragmentLifecycleCallbacks) :
+    FragmentActivityCallback {
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         if (activity is FragmentActivity) {

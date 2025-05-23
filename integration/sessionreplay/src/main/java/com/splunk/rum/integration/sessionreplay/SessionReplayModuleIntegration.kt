@@ -46,14 +46,22 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         setupComposeIdentification()
     }
 
-    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
         Logger.d(TAG, "onInstall()")
         SessionReplay.instance.dataListeners += sessionReplayDataListener
     }
 
     private fun setupComposeIdentification() {
         runIfComposeUiExists {
-            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) { id, isSensitive, _ ->
+            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) {
+                    id,
+                    isSensitive,
+                    _
+                ->
                 SessionReplayDrawModifier(id, isSensitive)
             }
         }

@@ -48,7 +48,9 @@ internal class AndroidSpanExporter(
         appStateObserver.attach(context.applicationContext as Application)
     }
 
-    override fun export(spans: MutableCollection<SpanData>): CompletableResultCode = if (deferredUntilForeground && !isForeground) {
+    override fun export(spans: MutableCollection<SpanData>): CompletableResultCode = if (deferredUntilForeground &&
+        !isForeground
+    ) {
         buffer.addAll(spans)
         CompletableResultCode.ofSuccess()
     } else {

@@ -46,6 +46,9 @@ class OkHttp3InstrumentationPlugin : Plugin<Project> {
     }
 
     private fun addDependenciesForOkhttp3NRTracing() {
-        project.dependencies.add("byteBuddy", "io.opentelemetry.android.instrumentation:okhttp3-agent:$dependenciesVersion")
+        project.dependencies.add(
+            "byteBuddy",
+            "io.opentelemetry.android.instrumentation:okhttp3-agent:$dependenciesVersion"
+        )
     }
 }

@@ -16,11 +16,11 @@
 
 package com.splunk.rum.integration.okhttp.model
 
-data class Mask(
-    val regex: Regex,
-    val replaceWith: String = DEFAULT_REPLACE_WITH
-) {
-    constructor(regexPattern: String, replaceWith: String = DEFAULT_REPLACE_WITH) : this(regexPattern.toRegex(), replaceWith)
+data class Mask(val regex: Regex, val replaceWith: String = DEFAULT_REPLACE_WITH) {
+    constructor(
+        regexPattern: String,
+        replaceWith: String = DEFAULT_REPLACE_WITH
+    ) : this(regexPattern.toRegex(), replaceWith)
 
     companion object {
         const val DEFAULT_REPLACE_WITH = "<hidden>"

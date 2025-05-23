@@ -20,9 +20,7 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.context.Scope
 
-internal class ActiveSpan(
-    private val lastVisibleScreenProvider: () -> String?
-) {
+internal class ActiveSpan(private val lastVisibleScreenProvider: () -> String?) {
 
     private var span: Span? = null
     private var scope: Scope? = null

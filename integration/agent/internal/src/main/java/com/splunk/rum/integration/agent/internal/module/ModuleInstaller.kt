@@ -32,7 +32,13 @@ abstract class ModuleInstaller : ContentProvider() {
         return true
     }
 
-    final override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor? = null
+    final override fun query(
+        uri: Uri,
+        projection: Array<out String>?,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+        sortOrder: String?
+    ): Cursor? = null
 
     final override fun getType(uri: Uri): String? = null
 
@@ -40,5 +46,10 @@ abstract class ModuleInstaller : ContentProvider() {
 
     final override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int = 0
 
-    final override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int = 0
+    final override fun update(
+        uri: Uri,
+        values: ContentValues?,
+        selection: String?,
+        selectionArgs: Array<out String>?
+    ): Int = 0
 }

@@ -31,10 +31,15 @@ internal object AnrModuleIntegration : ModuleIntegration<AnrModuleConfiguration>
 
     private const val TAG = "AnrIntegration"
 
-    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
         Logger.d(TAG, "onInstall()")
 
-        val isEnabled = moduleConfigurations.find<LegacyAnrModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
+        val isEnabled =
+            moduleConfigurations.find<LegacyAnrModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
 
         if (isEnabled) {
             Logger.d(TAG, "Installing ANR reporter")

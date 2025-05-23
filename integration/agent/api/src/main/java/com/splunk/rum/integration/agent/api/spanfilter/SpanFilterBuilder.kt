@@ -76,7 +76,8 @@ class SpanFilterBuilder internal constructor() {
      * @param attributeKey An attribute key to match.
      * @return `this`.
      */
-    fun <T : Any> removeSpanAttribute(attributeKey: AttributeKey<T>): SpanFilterBuilder = removeSpanAttribute(attributeKey, { true })
+    fun <T : Any> removeSpanAttribute(attributeKey: AttributeKey<T>): SpanFilterBuilder =
+        removeSpanAttribute(attributeKey, { true })
 
     /**
      * Modify span data before it enters the exporter pipeline.
@@ -110,10 +111,7 @@ class SpanFilterBuilder internal constructor() {
      * the new one.
      * @return `this`.
      */
-    fun <T> replaceSpanAttribute(
-        attributeKey: AttributeKey<T>,
-        attributeValueModifier: (T) -> T?
-    ): SpanFilterBuilder {
+    fun <T> replaceSpanAttribute(attributeKey: AttributeKey<T>, attributeValueModifier: (T) -> T?): SpanFilterBuilder {
         spanAttributeReplacements[attributeKey] = attributeValueModifier as (Any) -> Any?
         return this
     }

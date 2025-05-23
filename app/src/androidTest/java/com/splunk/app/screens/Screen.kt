@@ -42,7 +42,8 @@ import org.hamcrest.Matcher
  *
  * Example: screen<MainScreen> { myButton.click() }
  */
-inline fun <reified T : Screen> screen(init: T.() -> Unit): T? = T::class.java.getDeclaredConstructor().newInstance().apply { init() }
+inline fun <reified T : Screen> screen(init: T.() -> Unit): T? =
+    T::class.java.getDeclaredConstructor().newInstance().apply { init() }
 
 open class Screen {
 
@@ -141,9 +142,7 @@ open class Screen {
     }
 
     /** Wait for some time to allow any MELT data to be sent. */
-    fun waitForSendingData(
-        timeout: Long = TestConstants.DEFAULT_MELT_TIMEOUT
-    ) {
+    fun waitForSendingData(timeout: Long = TestConstants.DEFAULT_MELT_TIMEOUT) {
         Thread.sleep(timeout)
     }
 }

@@ -27,9 +27,7 @@ import com.splunk.rum.integration.lifecycle.screen.activity.ActivityCallback29
 import com.splunk.rum.integration.lifecycle.tracer.fragment.activity.FragmentActivityCallback21
 import com.splunk.rum.integration.lifecycle.tracer.fragment.activity.FragmentActivityCallback29
 
-internal class VisibleScreenTracker(
-    application: Application
-) {
+internal class VisibleScreenTracker(application: Application) {
 
     private var lastResumedActivity: String? = null
     private var previouslyLastResumedActivity: String? = null
