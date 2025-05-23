@@ -17,8 +17,8 @@
 package com.splunk.rum.integration.agent.internal.module
 
 import android.content.Context
-import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.internal.AgentIntegration
 import io.opentelemetry.android.instrumentation.InstallationContext
 
 abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultModuleConfiguration: T) {
