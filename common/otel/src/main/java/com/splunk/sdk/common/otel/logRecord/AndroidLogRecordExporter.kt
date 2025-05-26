@@ -50,7 +50,7 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
             }
 
             try {
-                if(log.bodyValue != null) {
+                if (log.bodyValue != null) {
                     spanBuilder.setAttribute("body", log.bodyValue.toString())
                 }
 
