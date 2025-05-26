@@ -11,11 +11,7 @@ internal class CrashAttributesExtractor : AttributesExtractor<CrashDetails, Void
 
     private val crashHappened = AtomicBoolean(false)
 
-    override fun onStart(
-        attributes: AttributesBuilder,
-        parentContext: Context,
-        crashDetails: CrashDetails
-    ) {
+    override fun onStart(attributes: AttributesBuilder, parentContext: Context, crashDetails: CrashDetails) {
         // Set component=crash only for the first error that arrives here
         // When multiple threads fail at roughly the same time (e.g. because of an OOM error),
         // the first error to arrive here is actually responsible for crashing the app; and all

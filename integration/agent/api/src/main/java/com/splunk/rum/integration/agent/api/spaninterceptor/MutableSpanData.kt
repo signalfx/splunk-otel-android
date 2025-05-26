@@ -118,7 +118,8 @@ class MutableSpanData(private val spanData: SpanData) : SpanData {
         totalAttributeCount = value
     }
 
-    override fun getInstrumentationLibraryInfo(): InstrumentationLibraryInfo = instrumentationLibraryInfo ?: spanData.instrumentationLibraryInfo
+    override fun getInstrumentationLibraryInfo(): InstrumentationLibraryInfo =
+        instrumentationLibraryInfo ?: spanData.instrumentationLibraryInfo
     fun setInstrumentationLibraryInfo(value: InstrumentationLibraryInfo) {
         instrumentationLibraryInfo = value
     }

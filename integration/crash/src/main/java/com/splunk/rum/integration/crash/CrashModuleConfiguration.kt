@@ -16,16 +16,14 @@
 
 package com.splunk.rum.integration.crash
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
 /**
  * Crash module configuration.
  *
  * @property isEnabled Whether the crash module is enabled.
  */
-class CrashModuleConfiguration(
-    val isEnabled: Boolean = true
-) : ModuleConfiguration {
+class CrashModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
 
     override val name: String = "crash"
 

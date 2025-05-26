@@ -26,7 +26,7 @@ import com.splunk.app.ui.BaseFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.app.util.CommonUtils
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.customtracking.extension.addRumEvent
 import com.splunk.rum.integration.customtracking.extension.addRumException
 import com.splunk.rum.integration.customtracking.extension.customTracking
@@ -78,7 +78,8 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             viewBinding.trackExceptionWithAttributes.id -> {
                 SplunkRum.instance.customTracking.trackException(
                     getTestException("Custom Exception (with attributes) To Be Tracked"),
-                    getTestAttributes())
+                    getTestAttributes()
+                )
 
                 CommonUtils.showDoneToast(context, "Track Exception with Attributes")
             }
@@ -102,7 +103,8 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             viewBinding.trackExceptionWithAttributesLegacy.id -> {
                 SplunkRum.instance.addRumException(
                     getTestException("Custom Exception (with attributes) To Be Tracked"),
-                    getTestAttributes())
+                    getTestAttributes()
+                )
 
                 CommonUtils.showDoneToast(context, "Track Exception with Attributes (Legacy)")
             }

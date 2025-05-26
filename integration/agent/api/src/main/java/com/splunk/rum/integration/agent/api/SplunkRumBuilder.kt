@@ -19,9 +19,9 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.spanfilter.SpanFilterBuilder
 import com.splunk.rum.integration.agent.api.spanfilter.toSpanInterceptor
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.legacy.LegacyAnrModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacyNetworkMonitorModuleConfiguration
@@ -116,8 +116,8 @@ class SplunkRumBuilder {
      *
      * This feature is disabled by default. You can enable it by calling this method.
      */
-    fun enableDebug(debug: Boolean): SplunkRumBuilder {
-        enableDebug = debug
+    fun enableDebug(): SplunkRumBuilder {
+        enableDebug = true
         return this
     }
 
@@ -176,14 +176,14 @@ class SplunkRumBuilder {
      *
      * Use case: Track only app session started by user opening app.
      */
-    fun enableBackgroundInstrumentationDeferredUntilForeground(enable: Boolean): SplunkRumBuilder {
-        deferredUntilForeground = enable
+    fun enableBackgroundInstrumentationDeferredUntilForeground(): SplunkRumBuilder {
+        deferredUntilForeground = true
 
         return this
     }
 
     @Deprecated("This is no longer supported")
-    fun enableDiskBuffering(enable: Boolean): SplunkRumBuilder = this
+    fun enableDiskBuffering(): SplunkRumBuilder = this
 
     @Deprecated("This is no longer supported")
     fun limitDiskUsageMegabytes(maxUsageMegabytes: Int): SplunkRumBuilder = this
@@ -270,7 +270,8 @@ class SplunkRumBuilder {
             agentConfiguration = AgentConfiguration(
                 endpoint = endpointConfiguration,
                 appName = appName ?: throw IllegalStateException("applicationName was not set"),
-                deploymentEnvironment = deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
+                deploymentEnvironment =
+                deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
                 enableDebugLogging = enableDebug,
                 session = SessionConfiguration(sessionBasedSampling),
                 globalAttributes = globalAttributes,

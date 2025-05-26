@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.attributes
+package com.splunk.rum.integration.agent.common.attributes
 
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -158,5 +158,6 @@ class MutableAttributes(
 
     override fun toBuilder(): AttributesBuilder = attributes.toBuilder()
 
-    private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes = toBuilder().apply(block).build()
+    private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes =
+        toBuilder().apply(block).build()
 }

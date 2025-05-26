@@ -18,8 +18,8 @@ package com.splunk.rum.integration.okhttp3.auto
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.AndroidInstrumentationLoader
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation
@@ -30,12 +30,18 @@ internal object OkHttp3ModuleIntegration : ModuleIntegration<OkHttp3ModuleConfig
 
     private const val TAG = "OkHttp3Integration"
 
-    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
         Logger.d(TAG, "onInstall()")
 
         // install OkHttp3 auto-instrumentation if isEnabled is true
         if (moduleConfiguration.isEnabled) {
-            val okHttpInstrumentation = AndroidInstrumentationLoader.getInstrumentation(OkHttpInstrumentation::class.java)
+            val okHttpInstrumentation = AndroidInstrumentationLoader.getInstrumentation(
+                OkHttpInstrumentation::class.java
+            )
             okHttpInstrumentation?.addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
             okHttpInstrumentation?.install(oTelInstallationContext)
         }

@@ -169,9 +169,15 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                         if (span.spanContext.traceId ==
                             currentSpan.traceId
                         ) {
-                            Log.d(TAG, "Testing parent context propagation in async get - trace id's are same as expected.")
+                            Log.d(
+                                TAG,
+                                "Testing parent context propagation in async get - trace id's are same as expected."
+                            )
                         } else {
-                            Log.e(TAG, "Testing parent context propagation in async get - trace id's are unexpectedly not same.")
+                            Log.e(
+                                TAG,
+                                "Testing parent context propagation in async get - trace id's are unexpectedly not same."
+                            )
                         }
                         chain.proceed(chain.request())
                     }
@@ -185,15 +191,18 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             client.newCall(request).enqueue(
                 object : Callback {
                     override fun onFailure(call: Call, e: IOException) {}
-                    override fun onResponse(
-                        call: Call,
-                        response: Response
-                    ) {
+                    override fun onResponse(call: Call, response: Response) {
                         // Verify that the original caller's context is the current one here.
                         if (span == Span.current()) {
-                            Log.d(TAG, "Testing parent context propagation in async get - contexts are same as expected.")
+                            Log.d(
+                                TAG,
+                                "Testing parent context propagation in async get - contexts are same as expected."
+                            )
                         } else {
-                            Log.e(TAG, "Testing parent context propagation in async get - Contexts are unexpectedly different.")
+                            Log.e(
+                                TAG,
+                                "Testing parent context propagation in async get - Contexts are unexpectedly different."
+                            )
                         }
                         lock.countDown()
                     }

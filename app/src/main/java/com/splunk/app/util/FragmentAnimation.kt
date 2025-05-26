@@ -29,10 +29,22 @@ data class FragmentAnimation(
 
     companion object {
         val FADE = FragmentAnimation(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
-        val SLOW_FADE = FragmentAnimation(R.animator.slow_fade_in, R.animator.slow_fade_out, R.animator.slow_fade_in, R.animator.slow_fade_out)
+        val SLOW_FADE =
+            FragmentAnimation(
+                R.animator.slow_fade_in,
+                R.animator.slow_fade_out,
+                R.animator.slow_fade_in,
+                R.animator.slow_fade_out
+            )
         val SLOW_FADE_1 = FragmentAnimation(0, R.animator.slow_fade_out, 0, R.animator.slow_fade_out)
         val SLOW_FADE_2 = FragmentAnimation(R.animator.slow_fade_in, 0, R.animator.slow_fade_in, 0)
-        val SLOW_TRANSLATE = FragmentAnimation(R.anim.slow_enter_from_right, R.anim.slow_exit_to_left, R.anim.slow_enter_from_left, R.anim.slow_exit_to_right)
+        val SLOW_TRANSLATE =
+            FragmentAnimation(
+                R.anim.slow_enter_from_right,
+                R.anim.slow_exit_to_left,
+                R.anim.slow_enter_from_left,
+                R.anim.slow_exit_to_right
+            )
         val SLOW_TRANSLATE_1 = FragmentAnimation(0, R.anim.slow_exit_to_left, 0, R.anim.slow_exit_to_right)
         val SLOW_TRANSLATE_2 = FragmentAnimation(R.anim.slow_enter_from_right, 0, R.anim.slow_enter_from_left, 0)
     }

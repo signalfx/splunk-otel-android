@@ -20,19 +20,17 @@ import android.app.Application
 import android.content.Context
 import android.os.SystemClock
 import com.cisco.android.common.utils.extensions.forEachFast
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.model.Module
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.android.session.SessionManager
 import io.opentelemetry.android.session.SessionObserver
 import io.opentelemetry.api.OpenTelemetry
 
-class AgentIntegration private constructor(
-    context: Context
-) {
+class AgentIntegration private constructor(context: Context) {
     val sessionManager: ISplunkSessionManager
     val listeners: MutableSet<Listener> = HashSet()
 
@@ -62,14 +60,19 @@ class AgentIntegration private constructor(
             modules[config.name] = module.copy(configuration = config)
         }
 
-        val oTelInstallationContext = InstallationContext(context.applicationContext as Application, openTelemetry, oTelSessionManager)
+        val oTelInstallationContext =
+            InstallationContext(context.applicationContext as Application, openTelemetry, oTelSessionManager)
         listeners.forEachFast { it.onInstall(context, oTelInstallationContext, moduleConfigurations) }
 
         registerModuleInitializationEnd(MODULE_NAME)
     }
 
     interface Listener {
-        fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>)
+        fun onInstall(
+            context: Context,
+            oTelInstallationContext: InstallationContext,
+            moduleConfigurations: List<ModuleConfiguration>
+        )
     }
 
     companion object {
@@ -83,7 +86,8 @@ class AgentIntegration private constructor(
         internal val modules = HashMap<String, Module>()
 
         val instance: AgentIntegration
-            get() = instanceInternal ?: throw IllegalStateException("Instance is not created, call createInstance() first")
+            get() = instanceInternal
+                ?: throw IllegalStateException("Instance is not created, call createInstance() first")
 
         fun obtainInstance(context: Context): AgentIntegration {
             if (instanceInternal == null) {
@@ -110,10 +114,13 @@ class AgentIntegration private constructor(
         }
 
         fun registerModuleInitializationEnd(name: String) {
-            val module = modules[name] ?: throw IllegalStateException("Initialization start for module '$name' was not called")
+            val module =
+                modules[name] ?: throw IllegalStateException("Initialization start for module '$name' was not called")
 
             if (module.initialization == null) {
-                throw IllegalStateException("Function registerModuleInitializationStart() for module '$name' was not called")
+                throw IllegalStateException(
+                    "Function registerModuleInitializationStart() for module '$name' was not called"
+                )
             }
 
             modules[name] = module.copy(

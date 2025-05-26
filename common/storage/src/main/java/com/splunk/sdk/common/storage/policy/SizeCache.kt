@@ -69,8 +69,5 @@ internal object SizeCache {
     private val Long.age: Long
         get() = System.currentTimeMillis() - this
 
-    private data class SizeCacheEntry(
-        val size: Long,
-        val timestamp: Long = System.currentTimeMillis()
-    )
+    private data class SizeCacheEntry(val size: Long, val timestamp: Long = System.currentTimeMillis())
 }

@@ -471,10 +471,7 @@ class InterceptionManagerTest {
     /**
      * WARNING: Must be called after whenOkHttpBuilt().
      */
-    private fun whenSuccessfulCallExecuted(
-        testRequest: TestRequest,
-        testResponse: TestResponse
-    ) {
+    private fun whenSuccessfulCallExecuted(testRequest: TestRequest, testResponse: TestResponse) {
         val request = buildRequest(testRequest)
         val response = buildResponse(testResponse)
 
@@ -595,11 +592,17 @@ class InterceptionManagerTest {
         val body: Buffer?,
         val headers: Map<String, String>
     ) {
-        constructor(statusCode: Int, mediaType: MediaType?, body: String, headers: Map<String, String>) : this(statusCode, mediaType, body.run { Buffer().writeUtf8(body) }, headers)
+        constructor(
+            statusCode: Int,
+            mediaType: MediaType?,
+            body: String,
+            headers: Map<String, String>
+        ) : this(statusCode, mediaType, body.run { Buffer().writeUtf8(body) }, headers)
     }
 
     class DefaultOkHttpInterceptor : SplunkOkHttpInterceptor {
-        override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest = intercepted
+        override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest =
+            intercepted
     }
 
     class AllowAllHeadersInterceptor : SplunkOkHttpInterceptor {

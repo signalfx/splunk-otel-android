@@ -20,17 +20,17 @@ import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.api.subprocess.SubprocessDetector
 import com.splunk.rum.integration.agent.api.user.User
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.AttributesBuilder
@@ -137,7 +137,9 @@ class SplunkRum private constructor(
                 return instance
             }
 
-            val isSubprocess = SubprocessDetector.isSubprocess(applicationId = agentConfiguration.instrumentedProcessName)
+            val isSubprocess = SubprocessDetector.isSubprocess(
+                applicationId = agentConfiguration.instrumentedProcessName
+            )
 
             if (isSubprocess && agentConfiguration.instrumentedProcessName != null) {
                 Logger.d(TAG, "install() - Subprocess detected exiting")
@@ -155,7 +157,12 @@ class SplunkRum private constructor(
 
             val userManager = UserManager()
 
-            val openTelemetry = SplunkRumAgentCore.install(application, agentConfiguration, userManager, moduleConfigurations.toList())
+            val openTelemetry = SplunkRumAgentCore.install(
+                application,
+                agentConfiguration,
+                userManager,
+                moduleConfigurations.toList()
+            )
 
             instanceInternal = SplunkRum(
                 agentConfiguration = agentConfiguration,
@@ -171,7 +178,10 @@ class SplunkRum private constructor(
          * Creates a new [SplunkRumBuilder], used to set up a [SplunkRum] instance.
          */
         @JvmStatic
-        @Deprecated("Use SplunkRum.install()", ReplaceWith("install", "com.splunk.rum.integration.agent.api.SplunkRumBuilder"))
+        @Deprecated(
+            "Use SplunkRum.install()",
+            ReplaceWith("install", "com.splunk.rum.integration.agent.api.SplunkRumBuilder")
+        )
         fun builder(): SplunkRumBuilder = SplunkRumBuilder()
 
         /**
@@ -180,7 +190,10 @@ class SplunkRum private constructor(
         @JvmStatic
         @Deprecated(
             "Use SplunkRum.instance.state.status == Status.Running",
-            ReplaceWith("instance.state.status == Status.Running", "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance")
+            ReplaceWith(
+                "instance.state.status == Status.Running",
+                "com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance"
+            )
         )
         fun isInitialized(): Boolean = instance.state.status == Status.Running
 

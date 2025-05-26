@@ -45,13 +45,18 @@ import java.io.File
  */
 class AgentStorage(context: Context) : IAgentStorage {
 
-    private val preferencesFileManager = FileManagerFactory.createEncryptedFileManagerIfPossible(context, "Agent-Preferences")
+    private val preferencesFileManager = FileManagerFactory.createEncryptedFileManagerIfPossible(
+        context,
+        "Agent-Preferences"
+    )
     private val preferences: Preferences
 
-    private val encryptedStorage = Storage(FilePermanentCache(FileManagerFactory.createEncryptedFileManagerIfPossible(context, "Agent-Storage")))
+    private val encryptedStorage =
+        Storage(FilePermanentCache(FileManagerFactory.createEncryptedFileManagerIfPossible(context, "Agent-Storage")))
 
     private val rootDir = File(context.noBackupFilesDirCompat, "agent")
-    private val agentVersionDir = File(rootDir, "$VERSION${if (preferencesFileManager is EncryptedFileManager) "e" else ""}")
+    private val agentVersionDir =
+        File(rootDir, "$VERSION${if (preferencesFileManager is EncryptedFileManager) "e" else ""}")
     private val preferencesFile = File(agentVersionDir, "preferences/preferences.dat")
     private val logDir = File(agentVersionDir, "logs")
     private val spanDir = File(agentVersionDir, "spans")

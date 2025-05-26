@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.module
+package com.splunk.rum.integration.agent.common.module
 
 interface ModuleConfiguration {
     val name: String
