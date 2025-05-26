@@ -50,6 +50,10 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
             }
 
             try {
+                if(log.bodyValue != null) {
+                    spanBuilder.setAttribute("body", log.bodyValue.toString())
+                }
+
                 log.attributes.asMap().forEach { (key, value) ->
                     when (value) {
                         is String -> spanBuilder.setAttribute(key.key, value)
