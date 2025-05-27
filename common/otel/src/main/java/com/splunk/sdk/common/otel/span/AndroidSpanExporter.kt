@@ -39,7 +39,6 @@ internal class AndroidSpanExporter(
     private val deferredUntilForeground: Boolean,
     context: Context
 ) : SpanExporter {
-    private val buffer = mutableListOf<SpanData>()
     private val appStateObserver = AppStateObserver()
     private var isForeground = false
 
@@ -48,33 +47,10 @@ internal class AndroidSpanExporter(
         appStateObserver.attach(context.applicationContext as Application)
     }
 
-    override fun export(spans: MutableCollection<SpanData>): CompletableResultCode = if (deferredUntilForeground &&
-        !isForeground
-    ) {
-        buffer.addAll(spans)
-        CompletableResultCode.ofSuccess()
-    } else {
-        flushBufferedSpans(spans)
-        CompletableResultCode.ofSuccess()
-    }
+    override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {
+        if (spans.isEmpty()) return CompletableResultCode.ofSuccess()
 
-    override fun flush(): CompletableResultCode {
-        flushBufferedSpans()
-        return CompletableResultCode.ofSuccess()
-    }
-
-    override fun shutdown(): CompletableResultCode {
-        buffer.clear()
-        return CompletableResultCode.ofSuccess()
-    }
-
-    private fun flushBufferedSpans(extra: Collection<SpanData> = emptyList()) {
-        val allSpans = buffer + extra
-        buffer.clear()
-
-        if (allSpans.isEmpty()) return
-
-        val exportRequest = TraceRequestMarshaler.create(allSpans)
+        val exportRequest = TraceRequestMarshaler.create(spans)
         val id = UUID.randomUUID().toString()
 
         // Save data to our storage.
@@ -83,8 +59,37 @@ internal class AndroidSpanExporter(
             agentStorage.writeOtelSpanData(id, it.toByteArray())
         }
 
-        // Job scheduling
-        jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+        return if (deferredUntilForeground && !isForeground) {
+            // Just store span ID for deferred upload
+            agentStorage.addBufferedSpanId(id)
+            CompletableResultCode.ofSuccess()
+        } else {
+            // Schedule upload immediately
+            jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+
+            // Also schedule previously buffered spans
+            flushBufferedSpanIds()
+
+            CompletableResultCode.ofSuccess()
+        }
+    }
+
+    override fun flush(): CompletableResultCode {
+        flushBufferedSpanIds()
+        return CompletableResultCode.ofSuccess()
+    }
+
+    override fun shutdown(): CompletableResultCode {
+        agentStorage.clearBufferedSpanIds()
+        return CompletableResultCode.ofSuccess()
+    }
+
+    private fun flushBufferedSpanIds() {
+        val bufferedIds = agentStorage.getBufferedSpanIds()
+        bufferedIds.forEach { id ->
+            jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+        }
+        agentStorage.clearBufferedSpanIds()
     }
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {
@@ -99,10 +104,8 @@ internal class AndroidSpanExporter(
 
         override fun onAppBackgrounded() {
             isForeground = false
-            if (deferredUntilForeground) {
-                flushBufferedSpans()
-            }
         }
+
         override fun onAppClosed() {
             isForeground = false
         }
