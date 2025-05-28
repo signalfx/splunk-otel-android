@@ -35,9 +35,7 @@ interface ISession {
 
 class Session internal constructor(override val state: ISession.State) : ISession {
 
-    data class Configuration @JvmOverloads constructor(
-        val samplingRate: Double = 1.0
-    ) {
+    data class Configuration @JvmOverloads constructor(val samplingRate: Double = 1.0) {
         init {
             if (samplingRate !in 0.0..1.0) {
                 Logger.e(

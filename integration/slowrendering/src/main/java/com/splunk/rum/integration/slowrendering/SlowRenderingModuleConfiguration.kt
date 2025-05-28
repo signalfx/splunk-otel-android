@@ -33,8 +33,7 @@ import java.time.Duration
 data class SlowRenderingModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
     val interval: Duration = Duration.ofSeconds(1)
-) :
-    ModuleConfiguration {
+) : ModuleConfiguration {
 
     override val name: String = "slowrendering"
 

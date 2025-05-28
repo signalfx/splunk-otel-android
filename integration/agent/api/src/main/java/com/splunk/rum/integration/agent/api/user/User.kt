@@ -28,17 +28,13 @@ class User internal constructor(userManager: IUserManager) {
 
     val preferences: Preferences = Preferences(userManager)
 
-    class State internal constructor(
-        private val userManager: IUserManager
-    ) {
+    class State internal constructor(private val userManager: IUserManager) {
 
         val trackingMode: TrackingMode
             get() = userManager.trackingMode.toPublic()
     }
 
-    class Preferences internal constructor(
-        private val userManager: IUserManager
-    ) {
+    class Preferences internal constructor(private val userManager: IUserManager) {
 
         var trackingMode: TrackingMode? = null
             set(value) {
@@ -49,9 +45,7 @@ class User internal constructor(userManager: IUserManager) {
             }
     }
 
-    data class Configuration @JvmOverloads constructor(
-        val trackingMode: TrackingMode = TrackingMode.NO_TRACKING
-    )
+    data class Configuration @JvmOverloads constructor(val trackingMode: TrackingMode = TrackingMode.NO_TRACKING)
 
     enum class TrackingMode {
         NO_TRACKING,
