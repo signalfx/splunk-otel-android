@@ -21,7 +21,6 @@ android {
 
 dependencies {
     api(project(":integration:agent:api"))
-    // TODO api(project(":integration:session-recording"))
     api(project(":integration:crash"))
     api(project(":integration:anr"))
     api(project(":integration:slowrendering"))
@@ -33,5 +32,6 @@ dependencies {
     api(project(":integration:customtracking"))
     api(project(":integration:networkmonitor"))
     api(project(":integration:webview"))
+    api(project(":integration:sessionreplay"))
+    api(project(":integration:navigation"))
 }
-

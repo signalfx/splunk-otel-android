@@ -34,9 +34,7 @@ class State internal constructor(agentConfiguration: AgentConfiguration) : IStat
     override val status: Status = if (SplunkRumAgentCore.isRunning) {
         Status.Running
     } else {
-        Status.NotRunning(
-            cause = Status.NotRunning.Cause.SampledOut
-        )
+        Status.NotRunning.SampledOut
     }
     override val endpointConfiguration: EndpointConfiguration = agentConfiguration.endpoint
     override val deploymentEnvironment: String = agentConfiguration.deploymentEnvironment
@@ -44,9 +42,9 @@ class State internal constructor(agentConfiguration: AgentConfiguration) : IStat
     override val instrumentedProcessName: String? = agentConfiguration.instrumentedProcessName
 }
 
-class Noop(notRunningCause: Status.NotRunning.Cause = Status.NotRunning.Cause.NotInstalled) : IState {
+class Noop(notRunningCause: Status.NotRunning = Status.NotRunning.NotInstalled) : IState {
     override val appName: String = ""
-    override val status: Status = Status.NotRunning(notRunningCause)
+    override val status: Status = notRunningCause
     override val endpointConfiguration: EndpointConfiguration = EndpointConfiguration("", "")
     override val appVersion: String = "0.0.0"
     override val deploymentEnvironment: String = ""

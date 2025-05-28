@@ -45,7 +45,7 @@ import io.opentelemetry.sdk.trace.data.SpanData
  * @property instrumentedProcessName The name of the instrumented process.
  * @property deferredUntilForeground Whether to defer tracing until the app is brought to the foreground.
  */
-data class AgentConfiguration(
+data class AgentConfiguration @JvmOverloads constructor(
     val endpoint: EndpointConfiguration,
     val appName: String,
     val deploymentEnvironment: String,
@@ -54,7 +54,7 @@ data class AgentConfiguration(
     val globalAttributes: MutableAttributes = MutableAttributes(),
     val spanInterceptor: ((SpanData) -> SpanData?)? = null,
     val user: User.Configuration = User.Configuration(),
-    val session: SessionConfiguration = SessionConfiguration(),
+    val session: Session.Configuration = Session.Configuration(),
     val instrumentedProcessName: String? = null,
     val deferredUntilForeground: Boolean = false
 ) {

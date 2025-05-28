@@ -23,7 +23,9 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
  *
  * @property isEnabled Whether the module is enabled.
  */
-data class InteractionsModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
+data class InteractionsModuleConfiguration @JvmOverloads constructor(
+    val isEnabled: Boolean = true
+) : ModuleConfiguration {
 
     override val name: String = "interactions"
 

@@ -31,7 +31,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     private const val TAG = "NavigationIntegration"
 
     override fun onAttach(context: Context) {
-        Navigation.listener = navigationListener
+        Navigation.instance.listener = navigationListener
     }
 
     private val navigationListener = object : Navigation.Listener {

@@ -24,11 +24,11 @@ interface IUserManager {
 }
 
 class UserManager : IUserManager {
-    override var trackingMode: InternalUserTrackingMode = InternalUserTrackingMode.NoTracking
+    override var trackingMode: InternalUserTrackingMode = InternalUserTrackingMode.NO_TRACKING
         set(value) {
             userId = when (value) {
-                InternalUserTrackingMode.NoTracking -> null
-                InternalUserTrackingMode.AnonymousTracking -> NanoId.generate()
+                InternalUserTrackingMode.NO_TRACKING -> null
+                InternalUserTrackingMode.ANONYMOUS_TRACKING -> NanoId.generate()
             }
             field = value
         }
@@ -38,11 +38,11 @@ class UserManager : IUserManager {
 }
 
 object NoOpUserManager : IUserManager {
-    override var trackingMode: InternalUserTrackingMode = InternalUserTrackingMode.NoTracking
+    override var trackingMode: InternalUserTrackingMode = InternalUserTrackingMode.NO_TRACKING
     override val userId: String? = null
 }
 
 enum class InternalUserTrackingMode {
-    NoTracking,
-    AnonymousTracking
+    NO_TRACKING,
+    ANONYMOUS_TRACKING
 }

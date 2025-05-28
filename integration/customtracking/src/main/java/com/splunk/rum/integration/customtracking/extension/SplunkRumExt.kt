@@ -25,7 +25,6 @@ import io.opentelemetry.api.trace.Span
 /**
  * Extension property to access the [CustomTracking] instance via [SplunkRum].
  */
-@Suppress("UnusedReceiverParameter")
 val SplunkRum.customTracking: CustomTracking
     get() = CustomTracking.instance
 

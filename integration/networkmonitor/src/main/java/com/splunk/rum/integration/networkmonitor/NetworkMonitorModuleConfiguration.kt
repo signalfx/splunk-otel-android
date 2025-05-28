@@ -23,7 +23,9 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
  *
  * @property isEnabled Whether the module is enabled.
  */
-class NetworkMonitorModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
+class NetworkMonitorModuleConfiguration @JvmOverloads constructor(
+    val isEnabled: Boolean = true
+) : ModuleConfiguration {
 
     override val name: String = "networkMonitor"
 

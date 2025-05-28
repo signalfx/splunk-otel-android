@@ -73,8 +73,6 @@ dependencies {
     //implementation("com.cisco.android:rum-common-utils:24.4.10-2246")
 
     implementation(project(":agent"))
-    implementation(project(":integration:sessionreplay"))
-    implementation(project(":integration:navigation"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)

@@ -148,7 +148,7 @@ class SplunkRum private constructor(
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
-                        Status.NotRunning.Cause.Subprocess
+                        Status.NotRunning.Subprocess
                     ),
                     userManager = NoOpUserManager,
                     sessionManager = NoOpSplunkSessionManager
