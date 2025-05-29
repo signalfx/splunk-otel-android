@@ -51,21 +51,21 @@ internal class AndroidSpanExporter(
         if (spans.isEmpty()) return CompletableResultCode.ofSuccess()
 
         val exportRequest = TraceRequestMarshaler.create(spans)
-        val id = UUID.randomUUID().toString()
+        val spansID = UUID.randomUUID().toString()
 
         // Save data to our storage.
         ByteArrayOutputStream().use {
             exportRequest.writeBinaryTo(it)
-            agentStorage.writeOtelSpanData(id, it.toByteArray())
+            agentStorage.writeOtelSpanData(spansID, it.toByteArray())
         }
 
         return if (deferredUntilForeground && !isForeground) {
             // Just store span ID for deferred upload
-            agentStorage.addBufferedSpanId(id)
+            agentStorage.addBufferedSpanId(spansID)
             CompletableResultCode.ofSuccess()
         } else {
             // Schedule upload immediately
-            jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+            jobManager.scheduleJob(UploadOtelSpanData(spansID, jobIdStorage))
 
             // Also schedule previously buffered spans
             flushBufferedSpanIds()
