@@ -30,6 +30,7 @@ import com.splunk.sdk.common.storage.extensions.MB
 import com.splunk.sdk.common.storage.extensions.statFsFreeSpace
 import com.splunk.sdk.common.storage.policy.StoragePolicy
 import java.io.File
+import org.json.JSONArray
 
 /**
  * Ideas:
@@ -182,6 +183,33 @@ class AgentStorage(context: Context) : IAgentStorage {
         file.delete()
     }
 
+    override fun addBufferedSpanId(id: String) {
+        val ids = getBufferedSpanIds().toMutableSet()
+        if (ids.add(id)) {
+            val array = JSONArray(ids)
+            preferences.putString(SPAN_IDS_KEY, array.toString()).commit()
+        }
+    }
+
+    override fun getBufferedSpanIds(): List<String> {
+        val json = preferences.getString(SPAN_IDS_KEY)
+        return if (json.isNullOrBlank()) {
+            emptyList()
+        } else {
+            try {
+                val array = JSONArray(json)
+                List(array.length()) { array.getString(it) }
+            } catch (e: Exception) {
+                Logger.e(TAG, "getBufferedSpanIds(): spanIds: $e")
+                emptyList()
+            }
+        }
+    }
+
+    override fun clearBufferedSpanIds() {
+        preferences.remove(SPAN_IDS_KEY)
+    }
+
     private fun otelLogDataFile(id: String) = File(logDir, "$id.dat")
     private fun otelSpanDataFile(id: String) = File(spanDir, "$id.dat")
 
@@ -218,6 +246,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val PREVIOUS_SESSION_ID = "PREVIOUS_SESSION_ID"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
+        private const val SPAN_IDS_KEY = "BUFFERED_SPAN_IDS"
 
         private const val TAG = "AgentStorage"
 
