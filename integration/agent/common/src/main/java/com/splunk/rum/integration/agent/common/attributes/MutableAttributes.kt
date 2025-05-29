@@ -24,7 +24,7 @@ import java.util.function.BiConsumer
 /**
  * A utility class for managing custom RUM attributes.
  */
-class MutableAttributes(
+class MutableAttributes @JvmOverloads constructor(
     @Volatile
     private var attributes: Attributes = Attributes.empty()
 ) : Attributes {

@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.customtracking
 
 import com.cisco.android.common.logger.Logger
-import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.sdk.common.otel.extensions.createZeroLengthSpan
 import com.splunk.sdk.common.otel.internal.RumConstants
@@ -37,7 +36,7 @@ class CustomTracking internal constructor() {
      * @param name The name of the event.
      * @param attributes Any {@link Attributes} to associate with the event.
      */
-    fun trackCustomEvent(name: String, attributes: MutableAttributes) {
+    fun trackCustomEvent(name: String, attributes: Attributes) {
         val tracer = getTracer() ?: return
         tracer.spanBuilder(name).setAllAttributes(attributes).createZeroLengthSpan()
     }
@@ -80,7 +79,7 @@ class CustomTracking internal constructor() {
      * @param throwable A [Throwable] associated with this event.
      * @param attributes Any [Attributes] to associate with the event.
      */
-    fun trackException(throwable: Throwable, attributes: MutableAttributes?) {
+    fun trackException(throwable: Throwable, attributes: Attributes?) {
         val tracer = getTracer() ?: return
         val spanBuilder = tracer.spanBuilder(throwable.javaClass.simpleName)
         attributes?.let {

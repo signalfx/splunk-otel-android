@@ -29,11 +29,13 @@ class User internal constructor(userManager: IUserManager) {
     val preferences: Preferences = Preferences(userManager)
 
     class State internal constructor(private val userManager: IUserManager) {
+
         val trackingMode: TrackingMode
             get() = userManager.trackingMode.toPublic()
     }
 
     class Preferences internal constructor(private val userManager: IUserManager) {
+
         var trackingMode: TrackingMode? = null
             set(value) {
                 field = value
@@ -43,20 +45,20 @@ class User internal constructor(userManager: IUserManager) {
             }
     }
 
-    data class Configuration(val trackingMode: TrackingMode = TrackingMode.NoTracking)
+    data class Configuration @JvmOverloads constructor(val trackingMode: TrackingMode = TrackingMode.NO_TRACKING)
 
     enum class TrackingMode {
-        NoTracking,
-        AnonymousTracking
+        NO_TRACKING,
+        ANONYMOUS_TRACKING
     }
 }
 
 private fun User.TrackingMode.toInternal(): InternalUserTrackingMode = when (this) {
-    User.TrackingMode.NoTracking -> InternalUserTrackingMode.NoTracking
-    User.TrackingMode.AnonymousTracking -> InternalUserTrackingMode.AnonymousTracking
+    User.TrackingMode.NO_TRACKING -> InternalUserTrackingMode.NO_TRACKING
+    User.TrackingMode.ANONYMOUS_TRACKING -> InternalUserTrackingMode.ANONYMOUS_TRACKING
 }
 
 private fun InternalUserTrackingMode.toPublic(): User.TrackingMode = when (this) {
-    InternalUserTrackingMode.NoTracking -> User.TrackingMode.NoTracking
-    InternalUserTrackingMode.AnonymousTracking -> User.TrackingMode.AnonymousTracking
+    InternalUserTrackingMode.NO_TRACKING -> User.TrackingMode.NO_TRACKING
+    InternalUserTrackingMode.ANONYMOUS_TRACKING -> User.TrackingMode.ANONYMOUS_TRACKING
 }

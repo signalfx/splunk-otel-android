@@ -23,7 +23,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
  *
  * @property isEnabled Whether the module is enabled.
  */
-class OkHttp3ModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
+data class OkHttp3ModuleConfiguration @JvmOverloads constructor(val isEnabled: Boolean = true) : ModuleConfiguration {
 
     override val name: String = "okHttp3"
 

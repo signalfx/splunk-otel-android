@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.navigation
 
-object Navigation {
+class Navigation internal constructor() {
 
     internal var listener: Listener? = null
 
@@ -33,5 +33,11 @@ object Navigation {
 
     internal interface Listener {
         fun onScreenNameChanged(screenName: String)
+    }
+
+    companion object {
+
+        @JvmStatic
+        val instance by lazy { Navigation() }
     }
 }

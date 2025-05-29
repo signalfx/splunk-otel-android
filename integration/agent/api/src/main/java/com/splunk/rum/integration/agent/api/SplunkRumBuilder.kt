@@ -273,7 +273,7 @@ class SplunkRumBuilder {
                 deploymentEnvironment =
                 deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
                 enableDebugLogging = enableDebug,
-                session = SessionConfiguration(sessionBasedSampling),
+                session = Session.Configuration(sessionBasedSampling),
                 globalAttributes = globalAttributes,
                 instrumentedProcessName = instrumentedProcessName,
                 deferredUntilForeground = deferredUntilForeground,

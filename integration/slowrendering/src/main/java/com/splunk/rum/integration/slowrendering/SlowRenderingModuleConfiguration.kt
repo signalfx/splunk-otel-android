@@ -30,9 +30,10 @@ import java.time.Duration
  *                    A shorter interval provides more frequent checks but uses more resources.
  *                    Default is 1 second.
  */
-
-class SlowRenderingModuleConfiguration(val isEnabled: Boolean = true, val interval: Duration = Duration.ofSeconds(1)) :
-    ModuleConfiguration {
+data class SlowRenderingModuleConfiguration @JvmOverloads constructor(
+    val isEnabled: Boolean = true,
+    val interval: Duration = Duration.ofSeconds(1)
+) : ModuleConfiguration {
 
     override val name: String = "slowrendering"
 

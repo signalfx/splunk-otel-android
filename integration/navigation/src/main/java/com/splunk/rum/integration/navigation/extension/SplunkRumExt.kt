@@ -22,6 +22,5 @@ import com.splunk.rum.integration.navigation.Navigation
 /**
  * Tracks navigation events.
  */
-@Suppress("UnusedReceiverParameter")
 val SplunkRum.navigation: Navigation
-    get() = Navigation
+    get() = Navigation.instance
