@@ -67,9 +67,9 @@ class App : Application() {
             agentConfiguration = AgentConfiguration(
                 endpoint = EndpointConfiguration(
                     realm = "lab0",
-                    rumAccessToken = "GHnFoSZy5Fr9u9EL_8yKkQ"
+                    rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw"
                 ),
-                appName = "DavidK-App",
+                appName = "Android demo app",
                 enableDebugLogging = true,
                 globalAttributes = globalAttributes,
                 deploymentEnvironment = "test",

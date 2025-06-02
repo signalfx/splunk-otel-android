@@ -29,6 +29,7 @@ import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -73,25 +74,25 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             val attributes = Attributes.of(
                 AttributeKey.stringKey("event.name"), "session_replay_data",
-                AttributeKey.longKey("rr-web.total-chunks"), 1,
+                AttributeKey.longKey("rr-web.total-chunks"), 1L,
                 AttributeKey.longKey("rr-web.chunk"), index,
                 AttributeKey.longKey("rr-web.event"), index,
-                AttributeKey.longKey("rr-web.offset"), 1,
+                AttributeKey.longKey("rr-web.offset"), 1L,
             )
 
             val logRecordBuilder = instance.sdkLoggerProvider
-                .loggerBuilder("SessionReplayDataScopeName")
+                .loggerBuilder(RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME)
                 .build()
                 .logRecordBuilder()
 
             // TODO data and metadata
-            val dataString = Base64.getEncoder().encodeToString(data)
-            val body = Value.of(
-                JSONObject()
-                    .put("data", dataString)
-                    .toString()
-            )
-            logRecordBuilder.setBody(body)
+//            val dataString = Base64.getEncoder().encodeToString(data)
+//            val body = Value.of(
+//                JSONObject()
+//                    .put("data", dataString)
+//                    .toString()
+//            )
+            logRecordBuilder.setBody(Value.of(data))
                 .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
                 .setAllAttributes(attributes)
                 .emit()

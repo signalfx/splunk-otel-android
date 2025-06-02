@@ -74,7 +74,11 @@ class OpenTelemetryInitializer(
         spanProcessors += BatchSpanProcessor.builder(spanExporter).build()
 
         logRecordProcessors += BatchLogRecordProcessor.builder(
-            AndroidLogRecordExporter()
+            AndroidLogRecordExporter(
+                agentStorage = agentStorage,
+                jobManager = jobManager,
+                jobIdStorage = jobIdStorage,
+            )
         ).build()
     }
 
@@ -133,8 +137,8 @@ class OpenTelemetryInitializer(
     }
 
     private fun getDeviceId(agentStorage: IAgentStorage): String = agentStorage.readDeviceId() ?: run {
-            val deviceId = UUID.randomUUID().toString()
-            agentStorage.writeDeviceId(deviceId)
-            deviceId
-        }
+        val deviceId = UUID.randomUUID().toString()
+        agentStorage.writeDeviceId(deviceId)
+        deviceId
+    }
 }
