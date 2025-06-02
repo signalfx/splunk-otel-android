@@ -57,7 +57,6 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         get() = createNewSessionIfNeeded()
         private set(value) {
             previousSessionId = agentStorage.readSessionId()
-
             agentStorage.writeSessionId(value)
             agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
         }
@@ -96,9 +95,9 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         }
 
         val isCurrentSessionIdValid = savedSessionId != null &&
-            backgroundValidity &&
-            sessionValidUntil != null &&
-            sessionValidUntil > now
+                backgroundValidity &&
+                sessionValidUntil != null &&
+                sessionValidUntil > now
 
         if (isCurrentSessionIdValid) {
             return requireNotNull(savedSessionId)

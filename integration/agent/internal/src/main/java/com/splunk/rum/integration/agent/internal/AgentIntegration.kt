@@ -50,6 +50,11 @@ class AgentIntegration private constructor(context: Context) {
         val storage = AgentStorage.attach(context)
 
         sessionManager = SplunkSessionManager(storage)
+        sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String) {
+
+            }
+        }
     }
 
     fun install(context: Context, openTelemetry: OpenTelemetry, moduleConfigurations: List<ModuleConfiguration>) {

@@ -9,5 +9,6 @@ internal data class UploadSessionReplayData(val id: String, val jobIdStorage: Jo
 
     override val jobNumberLimit: Long = 80L
 
-    override fun createJobInfo(context: Context): JobInfo = UploadSessionReplayDataJob.createJobInfoBuilder(context, jobIdStorage.getOrCreateId(id), id).build()
+    override fun createJobInfo(context: Context): JobInfo =
+        UploadSessionReplayDataJob.createJobInfoBuilder(context, jobIdStorage.getOrCreateId(id), id).build()
 }

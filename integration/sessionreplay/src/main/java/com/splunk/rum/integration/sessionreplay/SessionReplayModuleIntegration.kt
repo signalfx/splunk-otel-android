@@ -62,6 +62,11 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         SessionReplay.instance.dataListeners += sessionReplayDataListener
     }
 
+    override fun onSessionChange(sessionId: String) {
+        super.onSessionChange(sessionId)
+        SessionReplay.instance.newDataChunk()
+    }
+
     private fun setupComposeIdentification() {
         runIfComposeUiExists {
             ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) {

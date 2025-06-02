@@ -28,7 +28,6 @@ import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.context.Context
 import io.opentelemetry.exporter.internal.otlp.logs.LogsRequestMarshaler
-import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
@@ -43,15 +42,14 @@ import kotlin.math.log
 internal class AndroidLogRecordExporter(
     private val agentStorage: IAgentStorage,
     private val jobManager: IJobManager,
-    private val jobIdStorage: JobIdStorage,
+    private val jobIdStorage: JobIdStorage
 ) : LogRecordExporter {
 
     override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
-        logs.forEach { log ->
-            val parentContext = Context.current()
-            val activeSpan = Span.fromContextOrNull(parentContext)
-        val sessionReplayLogs = logs.filter { it.instrumentationScopeInfo.name == RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
-        val generalLogs = logs.filter { it.instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
+        val sessionReplayLogs =
+            logs.filter { it.instrumentationScopeInfo.name == RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
+        val generalLogs =
+            logs.filter { it.instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
 
         if (sessionReplayLogs.isNotEmpty()) {
             val exportRequest = LogsRequestMarshaler.create(sessionReplayLogs)
@@ -97,6 +95,7 @@ internal class AndroidLogRecordExporter(
                             val listValue = value.joinToString(",") { it.toString() }
                             spanBuilder.setAttribute(key.key, listValue)
                         }
+
                         else -> spanBuilder.setAttribute(key.key, value.toString())
                     }
                 }
