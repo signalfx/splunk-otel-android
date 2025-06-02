@@ -26,6 +26,14 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments.put("clearPackageData", "true")
+
+        // Read from global gradle.properties (~/.gradle/gradle.properties)
+        // If not found, fallback to empty string
+        val realm = project.findProperty("realm") as? String ?: ""
+        val token = project.findProperty("rumAccessToken") as? String ?: ""
+
+        buildConfigField("String", "REALM", "\"$realm\"")
+        buildConfigField("String", "RUM_ACCESS_TOKEN", "\"$token\"")
     }
 
     buildTypes {
