@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.attributes
+package com.splunk.rum.integration.agent.common.attributes
 
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -24,7 +24,7 @@ import java.util.function.BiConsumer
 /**
  * A utility class for managing custom RUM attributes.
  */
-class MutableAttributes(
+class MutableAttributes @JvmOverloads constructor(
     @Volatile
     private var attributes: Attributes = Attributes.empty()
 ) : Attributes {
@@ -45,8 +45,7 @@ class MutableAttributes(
      * @throws ClassCastException if the stored value is not of the expected type
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <T> get(key: String): T? =
-        attributes.get(AttributeKey.stringKey(key)) as (T)
+    operator fun <T> get(key: String): T? = attributes.get(AttributeKey.stringKey(key)) as (T)
 
     /**
      * Sets a String value for the given key.
@@ -149,16 +148,16 @@ class MutableAttributes(
         attributes = attributes.edit(updateAttributes)
     }
 
-    override fun forEach(consumer: BiConsumer<in AttributeKey<*>, in Any>) =
-        attributes.forEach(consumer)
+    override fun forEach(consumer: BiConsumer<in AttributeKey<*>, in Any>) = attributes.forEach(consumer)
 
     override fun size(): Int = attributes.size()
 
     override fun isEmpty(): Boolean = attributes.isEmpty
 
-    override fun asMap(): MutableMap<AttributeKey<*>, Any> = attributes.asMap()
+    override fun asMap(): Map<AttributeKey<*>, Any> = attributes.asMap()
 
     override fun toBuilder(): AttributesBuilder = attributes.toBuilder()
 
-    private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes = toBuilder().apply(block).build()
+    private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes =
+        toBuilder().apply(block).build()
 }

@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.slowrendering
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import java.time.Duration
 
 /**
@@ -30,8 +30,7 @@ import java.time.Duration
  *                    A shorter interval provides more frequent checks but uses more resources.
  *                    Default is 1 second.
  */
-
-class SlowRenderingModuleConfiguration(
+data class SlowRenderingModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
     val interval: Duration = Duration.ofSeconds(1)
 ) : ModuleConfiguration {

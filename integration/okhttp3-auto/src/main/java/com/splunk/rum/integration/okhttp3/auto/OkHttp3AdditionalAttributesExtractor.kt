@@ -41,7 +41,6 @@ internal class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interc
     }
 
     private fun onResponse(attributes: AttributesBuilder, response: Response?) {
-
         response?.headers?.forEach { header ->
             if (!header.first.equals(RumConstants.SERVER_TIMING_HEADER, ignoreCase = true)) {
                 return@forEach

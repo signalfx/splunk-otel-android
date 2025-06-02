@@ -17,9 +17,9 @@
 package com.splunk.rum.integration.lifecycle.tracer.activity
 
 import android.app.Activity
-import com.splunk.rum.integration.lifecycle.tracer.ActiveSpan
-import com.splunk.rum.integration.lifecycle.screen.VisibleScreenTracker
 import com.splunk.rum.integration.lifecycle.descriptor.ScreenNameDescriptor
+import com.splunk.rum.integration.lifecycle.screen.VisibleScreenTracker
+import com.splunk.rum.integration.lifecycle.tracer.ActiveSpan
 import io.opentelemetry.api.trace.Tracer
 
 internal class ActivityTracerManager(
@@ -32,9 +32,11 @@ internal class ActivityTracerManager(
 
     fun addEvent(activity: Activity, eventName: String): ActivityTracer = getTracer(activity).addEvent(eventName)
 
-    fun startSpanIfNoneInProgress(activity: Activity, spanName: String): ActivityTracer = getTracer(activity).startSpanIfNoneInProgress(spanName)
+    fun startSpanIfNoneInProgress(activity: Activity, spanName: String): ActivityTracer =
+        getTracer(activity).startSpanIfNoneInProgress(spanName)
 
-    fun initiateRestartSpanIfNecessary(activity: Activity): ActivityTracer = getTracer(activity).initiateRestartSpanIfNecessary()
+    fun initiateRestartSpanIfNecessary(activity: Activity): ActivityTracer =
+        getTracer(activity).initiateRestartSpanIfNecessary()
 
     fun startActivityCreation(activity: Activity): ActivityTracer = getTracer(activity).startActivityCreation()
 

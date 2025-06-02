@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.customtracking.extension
 
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.customtracking.CustomTracking
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
@@ -25,11 +25,13 @@ import io.opentelemetry.api.trace.Span
 /**
  * Extension property to access the [CustomTracking] instance via [SplunkRum].
  */
-@Suppress("UnusedReceiverParameter")
 val SplunkRum.customTracking: CustomTracking
     get() = CustomTracking.instance
 
-@Deprecated("Use customTracking.trackCustomEvent(name, attributes)", ReplaceWith("customTracking.trackCustomEvent(name, attributes)"))
+@Deprecated(
+    "Use customTracking.trackCustomEvent(name, attributes)",
+    ReplaceWith("customTracking.trackCustomEvent(name, attributes)")
+)
 fun SplunkRum.addRumEvent(name: String, attributes: Attributes) {
     customTracking.trackCustomEvent(name, MutableAttributes(attributes))
 }
@@ -38,7 +40,10 @@ fun SplunkRum.addRumEvent(name: String, attributes: Attributes) {
 fun SplunkRum.startWorkflow(workflowName: String): Span? = customTracking.trackWorkflow(workflowName)
 
 @JvmOverloads
-@Deprecated("Use customTracking.trackException(throwable, attributes)", ReplaceWith("customTracking.trackException(throwable, attributes)"))
+@Deprecated(
+    "Use customTracking.trackException(throwable, attributes)",
+    ReplaceWith("customTracking.trackException(throwable, attributes)")
+)
 fun SplunkRum.addRumException(throwable: Throwable, attributes: Attributes = Attributes.empty()) {
     customTracking.trackException(throwable, MutableAttributes(attributes))
 }

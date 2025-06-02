@@ -47,6 +47,9 @@ internal class AndroidLogRecordExporter(
 ) : LogRecordExporter {
 
     override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
+        logs.forEach { log ->
+            val parentContext = Context.current()
+            val activeSpan = Span.fromContextOrNull(parentContext)
         val sessionReplayLogs = logs.filter { it.instrumentationScopeInfo.name == RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
         val generalLogs = logs.filter { it.instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
 
@@ -80,7 +83,10 @@ internal class AndroidLogRecordExporter(
             }
 
             try {
-                spanBuilder.setAttribute("body", log.body.asString())
+                if (log.bodyValue != null) {
+                    spanBuilder.setAttribute("body", log.bodyValue.toString())
+                }
+
                 log.attributes.asMap().forEach { (key, value) ->
                     when (value) {
                         is String -> spanBuilder.setAttribute(key.key, value)
@@ -91,7 +97,6 @@ internal class AndroidLogRecordExporter(
                             val listValue = value.joinToString(",") { it.toString() }
                             spanBuilder.setAttribute(key.key, listValue)
                         }
-
                         else -> spanBuilder.setAttribute(key.key, value.toString())
                     }
                 }
@@ -103,7 +108,6 @@ internal class AndroidLogRecordExporter(
                         ?.join(5, TimeUnit.SECONDS)
                 }
             }
-
         }
 
         return CompletableResultCode.ofSuccess()

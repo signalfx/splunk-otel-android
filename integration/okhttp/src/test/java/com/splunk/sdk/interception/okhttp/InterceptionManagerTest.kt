@@ -24,6 +24,7 @@ import com.splunk.rum.integration.okhttp.interceptor.SplunkOkHttpInterceptor
 import com.splunk.rum.integration.okhttp.listener.OkHttpConnectorListenerDummy
 import com.splunk.rum.integration.okhttp.model.Mask
 import com.splunk.rum.integration.okhttp.model.SplunkChain
+import java.net.URL
 import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
@@ -39,7 +40,6 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import java.net.URL
 
 class InterceptionManagerTest {
 
@@ -471,10 +471,7 @@ class InterceptionManagerTest {
     /**
      * WARNING: Must be called after whenOkHttpBuilt().
      */
-    private fun whenSuccessfulCallExecuted(
-        testRequest: TestRequest,
-        testResponse: TestResponse
-    ) {
+    private fun whenSuccessfulCallExecuted(testRequest: TestRequest, testResponse: TestResponse) {
         val request = buildRequest(testRequest)
         val response = buildResponse(testResponse)
 
@@ -558,28 +555,28 @@ class InterceptionManagerTest {
     }
 
     private fun buildRequest(testRequest: TestRequest): Request = Request.Builder()
-            .url(testRequest.url)
-            .method(testRequest.method, testRequest.body?.toRequestBody(testRequest.mediaType))
-            .also { builder ->
-                testRequest.headers.forEach {
-                    builder.addHeader(it.key, it.value)
-                }
+        .url(testRequest.url)
+        .method(testRequest.method, testRequest.body?.toRequestBody(testRequest.mediaType))
+        .also { builder ->
+            testRequest.headers.forEach {
+                builder.addHeader(it.key, it.value)
             }
-            .build()
+        }
+        .build()
 
     private fun buildResponse(testResponse: TestResponse): MockResponse = MockResponse()
-            .setResponseCode(testResponse.statusCode)
-            .also { response ->
-                if (testResponse.mediaType != null) {
-                    response.addHeader("Content-Type", testResponse.mediaType.toString())
-                }
-                if (testResponse.body != null) {
-                    response.setBody(testResponse.body)
-                }
-                testResponse.headers.forEach {
-                    response.addHeader(it.key, it.value)
-                }
+        .setResponseCode(testResponse.statusCode)
+        .also { response ->
+            if (testResponse.mediaType != null) {
+                response.addHeader("Content-Type", testResponse.mediaType.toString())
             }
+            if (testResponse.body != null) {
+                response.setBody(testResponse.body)
+            }
+            testResponse.headers.forEach {
+                response.addHeader(it.key, it.value)
+            }
+        }
 
     data class TestRequest(
         val url: URL,
@@ -595,11 +592,17 @@ class InterceptionManagerTest {
         val body: Buffer?,
         val headers: Map<String, String>
     ) {
-        constructor(statusCode: Int, mediaType: MediaType?, body: String, headers: Map<String, String>) : this(statusCode, mediaType, body.run { Buffer().writeUtf8(body) }, headers)
+        constructor(
+            statusCode: Int,
+            mediaType: MediaType?,
+            body: String,
+            headers: Map<String, String>
+        ) : this(statusCode, mediaType, body.run { Buffer().writeUtf8(body) }, headers)
     }
 
     class DefaultOkHttpInterceptor : SplunkOkHttpInterceptor {
-        override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest = intercepted
+        override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest =
+            intercepted
     }
 
     class AllowAllHeadersInterceptor : SplunkOkHttpInterceptor {

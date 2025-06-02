@@ -18,8 +18,8 @@ package com.splunk.rum.integration.httpurlconnection.auto
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
 
@@ -29,10 +29,14 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
 
     private const val TAG = "HttpURLIntegration"
 
-    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
         Logger.d(TAG, "onInstall()")
 
-        //install HttpURLConnection auto-instrumentation if isEnabled is true
+        // install HttpURLConnection auto-instrumentation if isEnabled is true
         if (moduleConfiguration.isEnabled) {
             val httpUrlInstrumentation = HttpUrlInstrumentation()
             httpUrlInstrumentation.addAttributesExtractor(HttpURLAdditionalAttributesExtractor())

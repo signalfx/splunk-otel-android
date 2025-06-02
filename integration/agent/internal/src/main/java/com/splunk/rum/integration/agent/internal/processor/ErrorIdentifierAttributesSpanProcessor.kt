@@ -32,7 +32,8 @@ class ErrorIdentifierAttributesSpanProcessor(application: Application) : SpanPro
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         if (span.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_ERROR ||
-            span.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_CRASH) {
+            span.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_CRASH
+        ) {
             applicationId?.let {
                 span.setAttribute(RumConstants.APPLICATION_ID_KEY, it)
             }

@@ -32,9 +32,9 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.splunk.app.lib.ResourceType
 import com.splunk.app.lib.TestConstants
 import com.splunk.app.lib.resType
-import org.hamcrest.Matcher
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import org.hamcrest.Matcher
 
 /**
  * Utility function to call a specific screen. Instead of instantiating page objects,
@@ -142,9 +142,7 @@ open class Screen {
     }
 
     /** Wait for some time to allow any MELT data to be sent. */
-    fun waitForSendingData(
-        timeout: Long = TestConstants.DEFAULT_MELT_TIMEOUT
-    ) {
+    fun waitForSendingData(timeout: Long = TestConstants.DEFAULT_MELT_TIMEOUT) {
         Thread.sleep(timeout)
     }
 }

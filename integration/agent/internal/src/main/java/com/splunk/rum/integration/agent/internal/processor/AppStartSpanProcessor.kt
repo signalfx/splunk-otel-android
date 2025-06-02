@@ -17,8 +17,8 @@
 package com.splunk.rum.integration.agent.internal.processor
 
 import android.os.SystemClock
+import com.splunk.rum.integration.agent.common.module.toSplunkString
 import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modules
-import com.splunk.rum.integration.agent.module.extension.toSplunkString
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.trace.Span
@@ -46,11 +46,16 @@ class AppStartSpanProcessor : SpanProcessor {
     override fun isEndRequired(): Boolean = true
 
     private fun reportInitialization(appStartSpan: Span) {
-        val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: throw IllegalStateException("unable to report initialization")
+        val provider =
+            SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
+                ?: throw IllegalStateException("unable to report initialization")
         val modules = modules.values
 
-        val firstInitialization = modules.minByOrNull { it.initialization?.startTimestamp ?: Long.MAX_VALUE }?.initialization ?: throw IllegalStateException("Module initialization did not started")
-        val startTimestamp = firstInitialization.startTimestamp + SystemClock.elapsedRealtime() - firstInitialization.startElapsed
+        val firstInitialization =
+            modules.minByOrNull { it.initialization?.startTimestamp ?: Long.MAX_VALUE }?.initialization
+                ?: throw IllegalStateException("Module initialization did not started")
+        val startTimestamp =
+            firstInitialization.startTimestamp + SystemClock.elapsedRealtime() - firstInitialization.startElapsed
 
         val span = provider.get(RumConstants.RUM_TRACER_NAME)
             .spanBuilder("SplunkRum.initialize")
@@ -59,18 +64,29 @@ class AppStartSpanProcessor : SpanProcessor {
             .setAttribute("component", "appstart")
             .startSpan()
 
-        val resources = modules.joinToString(",", "[", "]") { it.configuration?.toSplunkString() ?: "${it.name}.enabled:true" }
+        val resources = modules.joinToString(",", "[", "]") {
+            it.configuration?.toSplunkString()
+                ?: "${it.name}.enabled:true"
+        }
 
         span.setAttribute("config_settings", resources)
 
         for (module in modules) {
-            if (module.initialization == null)
+            if (module.initialization == null) {
                 throw IllegalStateException("Module '${module.name}' initialization has not been started")
+            }
 
-            if (module.initialization.endElapsed == null)
+            if (module.initialization.endElapsed == null) {
                 throw IllegalStateException("Module '${module.name}' is not initialized")
+            }
 
-            span.addEvent("${module.name}_initialized", module.initialization.run { endElapsed!! - startElapsed }, TimeUnit.MILLISECONDS)
+            span.addEvent(
+                "${module.name}_initialized",
+                module.initialization.run {
+                    endElapsed!! - startElapsed
+                },
+                TimeUnit.MILLISECONDS
+            )
         }
 
         span.end()

@@ -30,8 +30,9 @@ internal class ActivityTracer(
 ) {
 
     fun startSpanIfNoneInProgress(spanName: String): ActivityTracer {
-        if (activeSpan.isSpanInProgress())
+        if (activeSpan.isSpanInProgress()) {
             return this
+        }
 
         activeSpan.startSpan { createSpan(spanName) }
         return this
@@ -43,16 +44,18 @@ internal class ActivityTracer(
     }
 
     fun initiateRestartSpanIfNecessary(): ActivityTracer {
-        if (activeSpan.isSpanInProgress())
+        if (activeSpan.isSpanInProgress()) {
             return this
+        }
 
         activeSpan.startSpan { createSpan("Restarted") }
         return this
     }
 
     fun endSpanForActivityResumed() {
-        if (initialAppActivity == null)
+        if (initialAppActivity == null) {
             initialAppActivity = activityName
+        }
 
         endActiveSpan()
     }

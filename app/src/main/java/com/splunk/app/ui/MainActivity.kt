@@ -36,10 +36,11 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(viewBinding.toolbar)
         viewBinding.toolbar.setNavigationOnClickListener { navigateUp() }
 
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             navigateTo(MenuFragment())
-        else
+        } else {
             contentView?.post { updateToolbar() }
+        }
     }
 
     override fun onBackPressed() {
@@ -60,8 +61,9 @@ class MainActivity : AppCompatActivity() {
         if (supportFragmentManager.backStackEntryCount > 1) {
             supportFragmentManager.popBackStackImmediate()
             updateToolbar()
-        } else
+        } else {
             finish()
+        }
     }
 
     private fun updateToolbar() {

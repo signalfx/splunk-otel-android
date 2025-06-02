@@ -22,4 +22,5 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 /**
  * Splunk [Modifier] for Jetpack Compose that adds additional info into wireframe.
  */
-fun Modifier.splunkRum(id: String? = null, isSensitive: Boolean? = null, positionInList: Int? = null): Modifier = ComposeElementIdentification.resolveChain(this, id, isSensitive, positionInList)
+fun Modifier.splunkRum(id: String? = null, isSensitive: Boolean? = null, positionInList: Int? = null): Modifier =
+    ComposeElementIdentification.resolveChain(this, id, isSensitive, positionInList)

@@ -16,12 +16,16 @@
 
 package com.splunk.rum.integration.agent.api
 
+import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 
 interface ISession {
     val state: State
 
-    class State internal constructor(private val sessionConfiguration: SessionConfiguration, private val sessionManager: ISplunkSessionManager) {
+    class State internal constructor(
+        private val sessionConfiguration: Session.Configuration,
+        private val sessionManager: ISplunkSessionManager
+    ) {
         val sessionId: String
             get() = sessionManager.sessionId
         val samplingRate: Double
@@ -29,6 +33,16 @@ interface ISession {
     }
 }
 
-class Session internal constructor(
-    override val state: ISession.State,
-) : ISession
+class Session internal constructor(override val state: ISession.State) : ISession {
+
+    data class Configuration @JvmOverloads constructor(val samplingRate: Double = 1.0) {
+        init {
+            if (samplingRate !in 0.0..1.0) {
+                Logger.e(
+                    "SessionConfiguration",
+                    "samplingRate = $samplingRate is not in allowed range 0.0 <= sampling rate <= 1.0"
+                )
+            }
+        }
+    }
+}

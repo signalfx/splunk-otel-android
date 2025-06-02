@@ -25,10 +25,7 @@ import okhttp3.Response
 /**
  * Wrapper for [Interceptor.Chain] that can be used to read intercepted request and response.
  */
-open class SplunkChain(
-    private val chain: Interceptor.Chain,
-    private val processedResponse: Response?
-) {
+open class SplunkChain(private val chain: Interceptor.Chain, private val processedResponse: Response?) {
 
     val call: Call
         get() = chain.call()

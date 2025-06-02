@@ -30,6 +30,7 @@ import com.splunk.sdk.common.storage.extensions.MB
 import com.splunk.sdk.common.storage.extensions.statFsFreeSpace
 import com.splunk.sdk.common.storage.policy.StoragePolicy
 import java.io.File
+import org.json.JSONArray
 
 /**
  * Ideas:
@@ -46,13 +47,18 @@ import java.io.File
  */
 class AgentStorage(context: Context) : IAgentStorage {
 
-    private val preferencesFileManager = FileManagerFactory.createEncryptedFileManagerIfPossible(context, "Agent-Preferences")
+    private val preferencesFileManager = FileManagerFactory.createEncryptedFileManagerIfPossible(
+        context,
+        "Agent-Preferences"
+    )
     private val preferences: Preferences
 
-    private val encryptedStorage = Storage(FilePermanentCache(FileManagerFactory.createEncryptedFileManagerIfPossible(context, "Agent-Storage")))
+    private val encryptedStorage =
+        Storage(FilePermanentCache(FileManagerFactory.createEncryptedFileManagerIfPossible(context, "Agent-Storage")))
 
     private val rootDir = File(context.noBackupFilesDirCompat, "agent")
-    private val agentVersionDir = File(rootDir, "$VERSION${if (preferencesFileManager is EncryptedFileManager) "e" else ""}")
+    private val agentVersionDir =
+        File(rootDir, "$VERSION${if (preferencesFileManager is EncryptedFileManager) "e" else ""}")
     private val preferencesFile = File(agentVersionDir, "preferences/preferences.dat")
     private val logDir = File(agentVersionDir, "logs")
     private val spanDir = File(agentVersionDir, "spans")
@@ -125,10 +131,11 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun writePreviousSessionId(value: String?) {
-        if (value == null)
+        if (value == null) {
             preferences.remove(PREVIOUS_SESSION_ID)
-        else
+        } else {
             preferences.putString(PREVIOUS_SESSION_ID, value).commit()
+        }
     }
 
     override fun readPreviousSessionId(): String? = preferences.getString(PREVIOUS_SESSION_ID)
@@ -207,6 +214,33 @@ class AgentStorage(context: Context) : IAgentStorage {
         file.delete()
     }
 
+    override fun addBufferedSpanId(id: String) {
+        val ids = getBufferedSpanIds().toMutableSet()
+        if (ids.add(id)) {
+            val array = JSONArray(ids)
+            preferences.putString(SPAN_IDS_KEY, array.toString()).commit()
+        }
+    }
+
+    override fun getBufferedSpanIds(): List<String> {
+        val json = preferences.getString(SPAN_IDS_KEY)
+        return if (json.isNullOrBlank()) {
+            emptyList()
+        } else {
+            try {
+                val array = JSONArray(json)
+                List(array.length()) { array.getString(it) }
+            } catch (e: Exception) {
+                Logger.e(TAG, "getBufferedSpanIds(): spanIds: $e")
+                emptyList()
+            }
+        }
+    }
+
+    override fun clearBufferedSpanIds() {
+        preferences.remove(SPAN_IDS_KEY)
+    }
+
     private fun otelLogDataFile(id: String) = File(logDir, "$id.dat")
     private fun otelSpanDataFile(id: String) = File(spanDir, "$id.dat")
     private fun sessionReplayDataFile(id: String) = File(sessionReplayDir, "$id.dat")
@@ -218,8 +252,9 @@ class AgentStorage(context: Context) : IAgentStorage {
         val filesToDelete = ArrayList<File>()
 
         for (file in files) {
-            if (file.exists() && file != agentVersionDir)
+            if (file.exists() && file != agentVersionDir) {
                 filesToDelete += file
+            }
         }
 
         return if (filesToDelete.isNotEmpty()) {
@@ -231,8 +266,9 @@ class AgentStorage(context: Context) : IAgentStorage {
             }
 
             false
-        } else
+        } else {
             true
+        }
     }
 
     companion object {
@@ -243,6 +279,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val PREVIOUS_SESSION_ID = "PREVIOUS_SESSION_ID"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
+        private const val SPAN_IDS_KEY = "BUFFERED_SPAN_IDS"
 
         private const val TAG = "AgentStorage"
 

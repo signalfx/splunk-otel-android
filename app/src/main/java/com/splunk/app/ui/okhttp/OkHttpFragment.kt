@@ -22,18 +22,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.cisco.android.common.utils.extensions.safeSchedule
 import com.cisco.android.common.utils.runOnBackgroundThread
-import com.cisco.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentOkhttpBinding
 import com.splunk.app.ui.BaseFragment
+import com.splunk.app.util.CommonUtils
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.trace.SdkTracerProvider
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import okhttp3.Cache
 import okhttp3.Call
 import okhttp3.Callback
@@ -48,11 +52,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.BufferedSink
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
 
 class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
@@ -85,8 +84,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
     }
 
     private val cachedClient = OkHttpClient.Builder()
-      .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
-      .build()
+        .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
+        .build()
 
     private val executor = Executors.newScheduledThreadPool(1)
 
@@ -123,7 +122,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun synchronousGet() {
         executeGetRequest("https://publicobject.com/helloworld.txt")
-        showDoneToast("synchronousGet")
+        CommonUtils.showDoneToast(context, "Synchronous Get")
     }
 
     /**
@@ -133,7 +132,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun asynchronousGet() {
         executeAsynchronousGet("https://httpbin.org/robots.txt")
-        showDoneToast("asynchronousGet")
+        CommonUtils.showDoneToast(context, "Asynchronous Get")
     }
 
     /**
@@ -143,7 +142,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         val url = "https://httpbin.org/headers"
         executeAsynchronousGet(url)
         executeAsynchronousGet(url)
-        showDoneToast("concurrentAsynchronousGet")
+        CommonUtils.showDoneToast(context, "Concurrent Asynchronous Get")
     }
 
     /**
@@ -151,7 +150,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
 
     fun parentContextPropagationInAsyncGet() {
-
         val lock = CountDownLatch(1)
 
         val openTelemetry = OpenTelemetrySdk.builder()
@@ -169,13 +167,21 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                             Span.current().spanContext
                         // Verify context propagation.
                         if (span.spanContext.traceId ==
-                            currentSpan.traceId) {
-                            Log.d( TAG, "Testing parent context propagation in async get - trace id's are same as expected.")
+                            currentSpan.traceId
+                        ) {
+                            Log.d(
+                                TAG,
+                                "Testing parent context propagation in async get - trace id's are same as expected."
+                            )
                         } else {
-                            Log.e( TAG, "Testing parent context propagation in async get - trace id's are unexpectedly not same.")
+                            Log.e(
+                                TAG,
+                                "Testing parent context propagation in async get - trace id's are unexpectedly not same."
+                            )
                         }
                         chain.proceed(chain.request())
-                    })
+                    }
+                )
                 .build()
 
             val request = Request.Builder()
@@ -185,22 +191,27 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             client.newCall(request).enqueue(
                 object : Callback {
                     override fun onFailure(call: Call, e: IOException) {}
-                    override fun onResponse(
-                        call: Call, response: Response
-                    ) {
+                    override fun onResponse(call: Call, response: Response) {
                         // Verify that the original caller's context is the current one here.
                         if (span == Span.current()) {
-                            Log.d( TAG, "Testing parent context propagation in async get - contexts are same as expected.")
+                            Log.d(
+                                TAG,
+                                "Testing parent context propagation in async get - contexts are same as expected."
+                            )
                         } else {
-                            Log.e( TAG, "Testing parent context propagation in async get - Contexts are unexpectedly different.")
+                            Log.e(
+                                TAG,
+                                "Testing parent context propagation in async get - Contexts are unexpectedly different."
+                            )
                         }
                         lock.countDown()
                     }
-                })
+                }
+            )
         }
         lock.await()
         span.end()
-        showDoneToast("parentContextPropagationInAsyncGet")
+        CommonUtils.showDoneToast(context, "Parent Context Propagation In Async Get")
     }
 
     /**
@@ -208,7 +219,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun unsuccessfulGet() {
         executeGetRequest("https://httpbin.org/status/404")
-        showDoneToast("unsuccessfulGet")
+        CommonUtils.showDoneToast(context, "Unsuccessful Get")
     }
 
     /**
@@ -217,7 +228,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     fun retryRequest() {
         executeGetRequest("https://httpbin.org/status/503", true)
-        showDoneToast("retryRequest")
+        CommonUtils.showDoneToast(context, "Retry Request")
     }
 
     /**
@@ -243,7 +254,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             }
         }
 
-        showDoneToast("multipleHeaders")
+        CommonUtils.showDoneToast(context, "Multiple Headers")
     }
 
     /**
@@ -251,26 +262,25 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * server-timing header is present in the response.
      */
     fun serverTimingHeaderInResponse() {
-
-        //one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
+        // one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
         executeGetRequest(
             "https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'"
         )
 
-        //invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
+        // invalid Server-Timing header, link.traceId and link.spanId attributes will not be set
         executeGetRequest(
             "https://httpbin.org/response-headers?Server-Timing=incorrectSyntax"
         )
 
-        //two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
+        // two valid Server-Timing headers, last one wins - link.traceId and link.spanId attributes will be populated
         // with the values from last valid header found
         executeGetRequest(
             "https://httpbin.org/response-headers" +
-                    "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
-                    "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
+                "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
+                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
         )
 
-        showDoneToast("serverTimingHeaderInResponse")
+        CommonUtils.showDoneToast(context, "Server-Timing Header In Response")
     }
 
     /**
@@ -285,10 +295,11 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         | * _1.0_ May 6, 2013
         | * _1.1_ June 15, 2013
         | * _1.2_ August 11, 2013
-        |""".trimMargin()
+        |
+        """.trimMargin()
 
         executePostRequest("https://api.github.com/markdown/raw", postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
-        showDoneToast("postMarkdown")
+        CommonUtils.showDoneToast(context, "Post Markdown")
     }
 
     /**
@@ -317,7 +328,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         }
 
         executePostRequest("https://api.github.com/markdown/raw", requestBody)
-        showDoneToast("postStreaming")
+        CommonUtils.showDoneToast(context, "Post Streaming")
     }
 
     /**
@@ -334,11 +345,12 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             | * _1.0_ May 6, 2013
             | * _1.1_ June 15, 2013
             | * _1.2_ August 11, 2013
-            |""".trimMargin()
+            |
+            """.trimMargin()
         )
 
         executePostRequest("https://api.github.com/markdown/raw", file.asRequestBody(MEDIA_TYPE_MARKDOWN))
-        showDoneToast("postFile")
+        CommonUtils.showDoneToast(context, "Post File")
     }
 
     /**
@@ -351,7 +363,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             .build()
 
         executePostRequest("https://en.wikipedia.org/w/index.php", formBody)
-        showDoneToast("postFormParameters")
+        CommonUtils.showDoneToast(context, "Post Form Parameters")
     }
 
     /**
@@ -366,14 +378,15 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             .setType(MultipartBody.FORM)
             .addFormDataPart("title", "Square Logo")
             .addFormDataPart(
-                "image", "logo-square.png",
+                "image",
+                "logo-square.png",
                 writeOutBitmapIntoFile(File(activity?.filesDir, "logo-square.png")).asRequestBody(MEDIA_TYPE_PNG)
             )
             .build()
 
         val headers = mapOf("Authorization" to "Client-ID $IMGUR_CLIENT_ID")
         executePostRequest("https://api.imgur.com/3/image", requestBody, headers)
-        showDoneToast("postMutlipartRequest")
+        CommonUtils.showDoneToast(context, "Post Mutlipart Request")
     }
 
     /**
@@ -387,7 +400,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         runOnBackgroundThread {
             try {
                 client.newCall(request).execute()
-                showDoneToast("networkError")
+                CommonUtils.showDoneToast(context, "Network Error")
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -434,7 +447,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             }
 
             Log.v(TAG, "Response 2 equals Response 1? " + (response1Body == response2Body))
-            showDoneToast("responseCaching")
+            CommonUtils.showDoneToast(context, "Response Caching")
         }
     }
 
@@ -467,7 +480,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                         TAG,
                         String.format(
                             "%.2f Call was expected to fail, but completed: %s%n",
-                            (System.nanoTime() - startNanos) / 1e9f, response
+                            (System.nanoTime() - startNanos) / 1e9f,
+                            response
                         )
                     )
                 }
@@ -476,10 +490,11 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                     TAG,
                     String.format(
                         "%.2f Call failed as expected: %s%n",
-                        (System.nanoTime() - startNanos) / 1e9f, e
+                        (System.nanoTime() - startNanos) / 1e9f,
+                        e
                     )
                 )
-                showDoneToast("canceledCall")
+                CommonUtils.showDoneToast(context, "Canceled Call")
             }
         }
     }
@@ -561,12 +576,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
                 Log.v(TAG, (response.body?.string() ?: "null"))
             }
-        }
-    }
-
-    private fun showDoneToast(methodName: String) {
-        runOnUiThread {
-            Toast.makeText(context, getString(R.string.http_toast, methodName), Toast.LENGTH_SHORT).show()
         }
     }
 

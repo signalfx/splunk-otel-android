@@ -18,10 +18,10 @@ package com.splunk.rum.integration.slowrendering
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacySlowRenderingModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
-import com.splunk.rum.integration.agent.module.extension.find
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingInstrumentation
 
@@ -31,11 +31,19 @@ internal object SlowRenderingModuleIntegration : ModuleIntegration<SlowRendering
 
     private const val TAG = "SlowRendering"
 
-    override fun onInstall(context: Context, oTelInstallationContext: InstallationContext, moduleConfigurations: List<ModuleConfiguration>) {
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
         Logger.d(TAG, "onInstall()")
 
-        val isEnabled = moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
-        val interval = moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.interval ?: moduleConfiguration.interval
+        val isEnabled =
+            moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.isEnabled
+                ?: moduleConfiguration.isEnabled
+        val interval =
+            moduleConfigurations.find<LegacySlowRenderingModuleConfiguration>()?.interval
+                ?: moduleConfiguration.interval
 
         if (isEnabled) {
             Logger.d(TAG, "Installing Slow Rendering Detector")

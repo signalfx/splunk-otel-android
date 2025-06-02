@@ -29,7 +29,7 @@ dependencies {
     implementation(Dependencies.Otel.androidCore)
 
     api(project(":common:otel"))
-    api(project(":integration:agent:module"))
+    api(project(":integration:agent:common"))
 
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:storage"))

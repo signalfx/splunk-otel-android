@@ -66,11 +66,22 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     private fun setupComposeIdentification() {
         runIfComposeUiExists {
-            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) { id, isSensitive, _ ->
+            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) {
+                    id,
+                    isSensitive,
+                    _
+                ->
                 SessionReplayDrawModifier(id, isSensitive)
             }
 
-            ComposeElementIdentification.insertModifierIfNeeded(PointerInputObserverInjectorModifier::class, OrderPriority.LOW) { id, _, positionInList ->
+            ComposeElementIdentification.insertModifierIfNeeded(
+                PointerInputObserverInjectorModifier::class,
+                OrderPriority.LOW
+            ) {
+                    id,
+                    _,
+                    positionInList
+                ->
                 id?.let { PointerInputObserverInjectorModifier(id, positionInList) }
             }
         }
@@ -78,8 +89,9 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     private val interactionsListener = object : OnInteractionListener {
         override fun onInteraction(interaction: Interaction, legacyData: LegacyData?) {
-            if (!moduleConfiguration.isEnabled)
+            if (!moduleConfiguration.isEnabled) {
                 return
+            }
 
             Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
 
@@ -112,10 +124,11 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                     return
             }
 
-            val targetType = if (interaction is Interaction.Targetable)
+            val targetType = if (interaction is Interaction.Targetable) {
                 interaction.targetElementPath?.lastOrNull()?.view?.id
-            else
+            } else {
                 null
+            }
 
             logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()

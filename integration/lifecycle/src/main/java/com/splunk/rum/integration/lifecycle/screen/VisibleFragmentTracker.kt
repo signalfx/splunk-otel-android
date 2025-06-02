@@ -19,9 +19,8 @@ package com.splunk.rum.integration.lifecycle.screen
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 
-internal class VisibleFragmentTracker(
-    private val visibleScreenTracker: VisibleScreenTracker,
-) : FragmentManager.FragmentLifecycleCallbacks() {
+internal class VisibleFragmentTracker(private val visibleScreenTracker: VisibleScreenTracker) :
+    FragmentManager.FragmentLifecycleCallbacks() {
 
     override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
         visibleScreenTracker.onFragmentResumed(f)

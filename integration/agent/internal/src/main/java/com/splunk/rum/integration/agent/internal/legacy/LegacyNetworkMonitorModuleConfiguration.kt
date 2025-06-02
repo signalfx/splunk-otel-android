@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.module
+package com.splunk.rum.integration.agent.internal.legacy
 
-interface ModuleConfiguration {
-    val name: String
-    val attributes: List<Pair<String, String>>
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+
+@Deprecated("Only to support legacy API, can be removed with legacy API.")
+class LegacyNetworkMonitorModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
+
+    override val name: String = "networkMonitor"
+
+    override val attributes: List<Pair<String, String>> = listOf(
+        "enabled" to isEnabled.toString()
+    )
 }

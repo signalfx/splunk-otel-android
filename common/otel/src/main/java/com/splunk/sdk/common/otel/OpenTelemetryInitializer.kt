@@ -19,12 +19,10 @@ package com.splunk.sdk.common.otel
 import android.app.Application
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.job.JobManager
-import com.splunk.sdk.common.otel.internal.Resources
 import com.splunk.sdk.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.sdk.common.otel.span.AndroidSpanExporter
 import com.splunk.sdk.common.otel.span.SpanInterceptorExporter
 import com.splunk.sdk.common.storage.AgentStorage
-import com.splunk.sdk.common.storage.IAgentStorage
 import io.opentelemetry.api.baggage.propagation.W3CBaggagePropagator
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator
 import io.opentelemetry.context.propagation.ContextPropagators
@@ -38,14 +36,12 @@ import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.SpanProcessor
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
-import java.util.UUID
 
 class OpenTelemetryInitializer(
     application: Application,
     deferredUntilForeground: Boolean,
-    spanInterceptor: ((SpanData) -> SpanData?)? = null,
+    spanInterceptor: ((SpanData) -> SpanData?)? = null
 ) {
-
     private var resource: Resource
 
     private val spanProcessors: MutableList<SpanProcessor> = mutableListOf()
@@ -56,9 +52,7 @@ class OpenTelemetryInitializer(
         val jobManager = JobManager.attach(application)
         val jobIdStorage = JobIdStorage.init(application)
 
-        val deviceId = getDeviceId(agentStorage)
-
-        resource = Resources.createDefault(deviceId)
+        resource = Resource.getDefault()
 
         val spanExporter = SpanInterceptorExporter(
             AndroidSpanExporter(
@@ -134,11 +128,5 @@ class OpenTelemetryInitializer(
             W3CBaggagePropagator.getInstance()
         )
         return ContextPropagators.create(propagator)
-    }
-
-    private fun getDeviceId(agentStorage: IAgentStorage): String = agentStorage.readDeviceId() ?: run {
-        val deviceId = UUID.randomUUID().toString()
-        agentStorage.writeDeviceId(deviceId)
-        deviceId
     }
 }

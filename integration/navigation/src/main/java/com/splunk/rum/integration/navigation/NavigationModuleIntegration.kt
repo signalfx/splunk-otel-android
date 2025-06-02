@@ -31,20 +31,20 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     private const val TAG = "NavigationIntegration"
 
     override fun onAttach(context: Context) {
-        Navigation.listener = navigationListener
+        Navigation.instance.listener = navigationListener
     }
 
     private val navigationListener = object : Navigation.Listener {
         override fun onScreenNameChanged(screenName: String) {
-            if (!moduleConfiguration.isEnabled)
+            if (!moduleConfiguration.isEnabled) {
                 return
+            }
 
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
 
             val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: return
 
-            SplunkInternalGlobalAttributeSpanProcessor.attributes.removeIf { it.name == "screen.name" }
-            SplunkInternalGlobalAttributeSpanProcessor.attributes += SplunkInternalGlobalAttributeSpanProcessor.Attribute.String("screen.name", screenName)
+            SplunkInternalGlobalAttributeSpanProcessor.attributes["screen.name"] = screenName
 
             provider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder("Created")

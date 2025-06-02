@@ -26,13 +26,12 @@ import okhttp3.Headers
  *
  * @param allowedHeaders Set of regexes that are used to filter headers.
  */
-class SplunkHeadersInterceptor(
-    val allowedHeaders: List<Regex>
-) : SplunkOkHttpInterceptor {
+class SplunkHeadersInterceptor(val allowedHeaders: List<Regex>) : SplunkOkHttpInterceptor {
 
     constructor(allowedHeaders: Set<String>) : this(allowedHeaders.map { it.toRegex() })
 
-    override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest = intercepted.apply {
+    override fun onIntercept(original: SplunkChain, intercepted: SplunkNetworkRequest): SplunkNetworkRequest =
+        intercepted.apply {
             requestHeaders = original.request.headers.parseAndFilter()
             responseHeaders = original.response?.headers?.parseAndFilter()
         }
@@ -45,10 +44,11 @@ class SplunkHeadersInterceptor(
                 val name = header.first.lowercase()
                 val value = header.second
 
-                if (name in parsedHeaders)
+                if (name in parsedHeaders) {
                     parsedHeaders[name]?.add(value)
-                else
+                } else {
                     parsedHeaders[name] = mutableListOf(value)
+                }
             }
         }
 

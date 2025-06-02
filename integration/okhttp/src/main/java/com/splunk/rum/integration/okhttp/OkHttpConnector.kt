@@ -21,14 +21,14 @@ import com.splunk.rum.integration.agent.api.network.SplunkNetworkRequest
 import com.splunk.rum.integration.okhttp.filter.InterceptionFilter
 import com.splunk.rum.integration.okhttp.interceptor.SplunkOkHttpInterceptor
 import com.splunk.rum.integration.okhttp.model.SplunkChain
+import java.io.IOException
+import java.net.URL
 import okhttp3.Connection
 import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import java.io.IOException
-import java.net.URL
 
 internal class OkHttpConnector(
     private val client: OkHttpClient.Builder,
@@ -44,8 +44,9 @@ internal class OkHttpConnector(
     private var networkInterceptor: Interceptor? = null
 
     fun register() {
-        if (networkInterceptor != null)
+        if (networkInterceptor != null) {
             return
+        }
 
         val newNetworkInterceptor = Interceptor { chain -> processChain(chain) }
 
@@ -54,8 +55,9 @@ internal class OkHttpConnector(
     }
 
     fun unregister() {
-        if (networkInterceptor != null)
+        if (networkInterceptor != null) {
             client.networkInterceptors().remove(networkInterceptor)
+        }
     }
 
     private fun onIntercept(original: SplunkChain, prefilteredInterceptedRequest: SplunkNetworkRequest) {
@@ -102,13 +104,19 @@ internal class OkHttpConnector(
         return response
     }
 
-    private fun parseRequestAndResponse(start: Long, duration: Long, request: Request, response: Response?, connection: Connection?): SplunkNetworkRequest = SplunkNetworkRequest(
-            url = request.parseURL(),
-            method = request.parseMethod(),
-            statusCode = response?.parseStatusCode() ?: UNKNOWN_STATUS_CODE,
-            requestHeaders = request.parseHeaders(),
-            responseHeaders = response?.parseHeaders() ?: mutableMapOf()
-        )
+    private fun parseRequestAndResponse(
+        start: Long,
+        duration: Long,
+        request: Request,
+        response: Response?,
+        connection: Connection?
+    ): SplunkNetworkRequest = SplunkNetworkRequest(
+        url = request.parseURL(),
+        method = request.parseMethod(),
+        statusCode = response?.parseStatusCode() ?: UNKNOWN_STATUS_CODE,
+        requestHeaders = request.parseHeaders(),
+        responseHeaders = response?.parseHeaders() ?: mutableMapOf()
+    )
 
     private fun Request.parseURL(): URL = url.toUrl()
 
@@ -132,10 +140,11 @@ internal class OkHttpConnector(
             if (InterceptionFilter.isHeaderAllowed(name)) {
                 val value = allowedHeader.second
 
-                if (name in parsedHeaders)
+                if (name in parsedHeaders) {
                     parsedHeaders[name]?.add(value)
-                else
+                } else {
                     parsedHeaders[name] = mutableListOf(value)
+                }
             }
         }
 

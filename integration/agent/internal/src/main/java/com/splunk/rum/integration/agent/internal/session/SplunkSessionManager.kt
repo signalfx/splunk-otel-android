@@ -42,9 +42,7 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
     override fun install(context: Context) = Unit
 }
 
-class SplunkSessionManager internal constructor(
-    private val agentStorage: IAgentStorage
-) : ISplunkSessionManager {
+class SplunkSessionManager internal constructor(private val agentStorage: IAgentStorage) : ISplunkSessionManager {
 
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val appStateObserver = AppStateObserver()
@@ -89,12 +87,18 @@ class SplunkSessionManager internal constructor(
         val sessionValidUntil = agentStorage.readSessionValidUntil()
         val now = System.currentTimeMillis()
 
-        val backgroundValidity = if (sessionValidInBackgroundUntil != null) sessionValidInBackgroundUntil > now else true
+        val backgroundValidity = if (sessionValidInBackgroundUntil !=
+            null
+        ) {
+            sessionValidInBackgroundUntil > now
+        } else {
+            true
+        }
 
         val isCurrentSessionIdValid = savedSessionId != null &&
-                backgroundValidity &&
-                sessionValidUntil != null &&
-                sessionValidUntil > now
+            backgroundValidity &&
+            sessionValidUntil != null &&
+            sessionValidUntil > now
 
         if (isCurrentSessionIdValid) {
             return requireNotNull(savedSessionId)

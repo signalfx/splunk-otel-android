@@ -110,6 +110,7 @@ object Dependencies {
         const val instrumentationBomAlpha = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$oTelInstrumentationBomAlpha"
         const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
 
+        const val api = "io.opentelemetry:opentelemetry-api"
         const val sdk = "io.opentelemetry:opentelemetry-sdk"
         const val exporterOtlpCommon = "io.opentelemetry:opentelemetry-exporter-otlp-common"
         const val exporterOtlp = "io.opentelemetry:opentelemetry-exporter-otlp"
@@ -120,6 +121,8 @@ object Dependencies {
 
         const val androidCore = "io.opentelemetry.android:core"
         const val androidSession = "io.opentelemetry.android:session"
+        const val androidServices = "io.opentelemetry.android:services"
+        const val androidCommon = "io.opentelemetry.android:common"
         const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation"
         const val androidHttpUrlLibrary = "io.opentelemetry.android.instrumentation:httpurlconnection-library"
         const val androidOkHttp3Library = "io.opentelemetry.android.instrumentation:okhttp3-library"

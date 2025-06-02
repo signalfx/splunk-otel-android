@@ -23,9 +23,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.splunk.rum.integration.lifecycle.tracer.fragment.FragmentTracerManager
 
-internal class FragmentCallback(
-    private val manager: FragmentTracerManager
-) : FragmentManager.FragmentLifecycleCallbacks() {
+internal class FragmentCallback(private val manager: FragmentTracerManager) :
+    FragmentManager.FragmentLifecycleCallbacks() {
 
     override fun onFragmentPreAttached(fm: FragmentManager, f: Fragment, context: Context) {
         manager.getTracer(f)

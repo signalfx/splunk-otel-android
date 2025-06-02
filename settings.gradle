@@ -19,7 +19,7 @@ include ':instrumentation:runtime:startup',
 
 // Integration
 include ':integration:agent:api',
-        ':integration:agent:module',
+        ':integration:agent:common',
         ':integration:agent:internal',
         ':integration:startup',
         ':integration:httpurlconnection-auto',

@@ -29,8 +29,9 @@ internal class FragmentTracer(
 ) {
 
     fun startSpanIfNoneInProgress(action: String): FragmentTracer {
-        if (activeSpan.isSpanInProgress())
+        if (activeSpan.isSpanInProgress()) {
             return this
+        }
 
         activeSpan.startSpan { createSpan(action) }
         return this

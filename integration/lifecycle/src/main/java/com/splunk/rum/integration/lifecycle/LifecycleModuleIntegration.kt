@@ -45,25 +45,35 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
         registerFragmentLifecycle(application, tracer, visibleScreenTracker)
     }
 
-    private fun registerActivityLifecycle(application: Application, tracer: Tracer, visibleScreenTracker: VisibleScreenTracker) {
+    private fun registerActivityLifecycle(
+        application: Application,
+        tracer: Tracer,
+        visibleScreenTracker: VisibleScreenTracker
+    ) {
         val tracerManager = ActivityTracerManager(tracer, visibleScreenTracker, null)
 
-        val activityCallback = if (Build.VERSION.SDK_INT >= 29)
+        val activityCallback = if (Build.VERSION.SDK_INT >= 29) {
             ActivityCallback29(tracerManager)
-        else
+        } else {
             ActivityCallback21(tracerManager)
+        }
 
         application.registerActivityLifecycleCallbacks(activityCallback)
     }
 
-    private fun registerFragmentLifecycle(application: Application, tracer: Tracer, visibleScreenTracker: VisibleScreenTracker) {
+    private fun registerFragmentLifecycle(
+        application: Application,
+        tracer: Tracer,
+        visibleScreenTracker: VisibleScreenTracker
+    ) {
         val tracerManager = FragmentTracerManager(tracer, visibleScreenTracker)
         val callback = FragmentCallback(tracerManager)
 
-        val fragmentObserver = if (Build.VERSION.SDK_INT >= 29)
+        val fragmentObserver = if (Build.VERSION.SDK_INT >= 29) {
             FragmentActivityCallback29(callback)
-        else
+        } else {
             FragmentActivityCallback21(callback)
+        }
 
         application.registerActivityLifecycleCallbacks(fragmentObserver)
     }

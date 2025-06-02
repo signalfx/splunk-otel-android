@@ -19,11 +19,12 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
-import com.splunk.rum.integration.agent.api.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.api.spanfilter.SpanFilterBuilder
 import com.splunk.rum.integration.agent.api.spanfilter.toSpanInterceptor
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.legacy.LegacyAnrModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
+import com.splunk.rum.integration.agent.internal.legacy.LegacyNetworkMonitorModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacySlowRenderingModuleConfiguration
 import io.opentelemetry.api.common.Attributes
 import java.net.URL
@@ -52,6 +53,7 @@ class SplunkRumBuilder {
     private var anrReportingEnabled: Boolean = true
     private var slowRenderingDetectionEnabled: Boolean = true
     private var slowRenderingDetectionPollInterval: Duration = Duration.ofSeconds(1)
+    private var networkMonitorEnabled: Boolean = true
 
     /**
      * Sets the RUM auth token to be used by the RUM library.
@@ -86,8 +88,9 @@ class SplunkRumBuilder {
      * @param realm A valid Splunk "realm", e.g. "us0", "eu0".
      */
     fun setRealm(realm: String): SplunkRumBuilder {
-        if (beaconEndpoint != null)
+        if (beaconEndpoint != null) {
             throw IllegalStateException("setRealm can not be set when setBeaconEndpoint was called")
+        }
 
         this.realm = realm
         return this
@@ -100,8 +103,9 @@ class SplunkRumBuilder {
      * and let this configuration set the full endpoint URL for you.
      */
     fun setBeaconEndpoint(endpoint: String): SplunkRumBuilder {
-        if (beaconEndpoint != null)
+        if (beaconEndpoint != null) {
             throw IllegalStateException("setBeaconEndpoint can not be set when setRealm was called")
+        }
 
         beaconEndpoint = endpoint
         return this
@@ -112,8 +116,8 @@ class SplunkRumBuilder {
      *
      * This feature is disabled by default. You can enable it by calling this method.
      */
-    fun enableDebug(debug: Boolean): SplunkRumBuilder {
-        enableDebug = debug
+    fun enableDebug(): SplunkRumBuilder {
+        enableDebug = true
         return this
     }
 
@@ -145,12 +149,13 @@ class SplunkRumBuilder {
      * @param ratio The desired ratio of sampling. Must be within <0.0, 1.0>.
      */
     fun enableSessionBasedSampling(ratio: Double): SplunkRumBuilder {
-        if (ratio < 0)
+        if (ratio < 0) {
             Logger.w(TAG, "enableSessionBasedSampling(ratio: $ratio) - ratio can not be lower then 0")
-        else if (ratio > 1)
+        } else if (ratio > 1) {
             Logger.w(TAG, "enableSessionBasedSampling(ratio: $ratio) - ratio can not be greater then 1")
-        else
+        } else {
             sessionBasedSampling = ratio
+        }
 
         return this
     }
@@ -171,14 +176,14 @@ class SplunkRumBuilder {
      *
      * Use case: Track only app session started by user opening app.
      */
-    fun enableBackgroundInstrumentationDeferredUntilForeground(enable: Boolean): SplunkRumBuilder {
-        deferredUntilForeground = enable
+    fun enableBackgroundInstrumentationDeferredUntilForeground(): SplunkRumBuilder {
+        deferredUntilForeground = true
 
         return this
     }
 
     @Deprecated("This is no longer supported")
-    fun enableDiskBuffering(enable: Boolean): SplunkRumBuilder = this
+    fun enableDiskBuffering(): SplunkRumBuilder = this
 
     @Deprecated("This is no longer supported")
     fun limitDiskUsageMegabytes(maxUsageMegabytes: Int): SplunkRumBuilder = this
@@ -200,7 +205,7 @@ class SplunkRumBuilder {
      * This feature is enabled by default. You can disable it by calling this method.
      */
     @Deprecated("ANRReporting is now controlled by the ANRModuleConfiguration")
-    fun disableANRReporting(): SplunkRumBuilder {
+    fun disableAnrDetection(): SplunkRumBuilder {
         anrReportingEnabled = false
         return this
     }
@@ -222,6 +227,19 @@ class SplunkRumBuilder {
     }
 
     /**
+     * Disables the network monitoring feature.
+     *
+     * This feature is enabled by default. You can disable it by calling this method.
+     *
+     * @return `this`
+     */
+    @Deprecated("NetworkMonitor is now controlled by the NetworkMonitorModuleConfiguration")
+    fun disableNetworkMonitor(): SplunkRumBuilder {
+        networkMonitorEnabled = false
+        return this
+    }
+
+    /**
      * Creates a new instance of [SplunkRum] with the settings of this [SplunkRumBuilder].
      *
      * You must configure at least the [setApplicationName], the [setRealm] or the [setBeaconEndpoint] beacon,
@@ -237,7 +255,8 @@ class SplunkRumBuilder {
 
         val endpointConfiguration = when {
             realm != null -> EndpointConfiguration(
-                realm = realm, accessToken ?: throw IllegalStateException("rumAccessToken was not set")
+                realm = realm,
+                accessToken ?: throw IllegalStateException("rumAccessToken was not set")
             )
             beaconEndpoint != null -> EndpointConfiguration(
                 traces = URL(beaconEndpoint)
@@ -251,9 +270,10 @@ class SplunkRumBuilder {
             agentConfiguration = AgentConfiguration(
                 endpoint = endpointConfiguration,
                 appName = appName ?: throw IllegalStateException("applicationName was not set"),
-                deploymentEnvironment = deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
+                deploymentEnvironment =
+                deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
                 enableDebugLogging = enableDebug,
-                session = SessionConfiguration(sessionBasedSampling),
+                session = Session.Configuration(sessionBasedSampling),
                 globalAttributes = globalAttributes,
                 instrumentedProcessName = instrumentedProcessName,
                 deferredUntilForeground = deferredUntilForeground,
@@ -261,7 +281,7 @@ class SplunkRumBuilder {
                     val spanFilterBuilder = SpanFilterBuilder()
                     it.accept(spanFilterBuilder)
                     spanFilterBuilder.toSpanInterceptor()
-                },
+                }
             ),
             moduleConfigurations = arrayOf(
                 LegacyCrashModuleConfiguration(
@@ -273,6 +293,9 @@ class SplunkRumBuilder {
                 LegacySlowRenderingModuleConfiguration(
                     isEnabled = slowRenderingDetectionEnabled,
                     interval = slowRenderingDetectionPollInterval
+                ),
+                LegacyNetworkMonitorModuleConfiguration(
+                    isEnabled = networkMonitorEnabled
                 )
             )
         )

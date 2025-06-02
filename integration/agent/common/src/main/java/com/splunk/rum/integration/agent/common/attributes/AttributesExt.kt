@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api
+package com.splunk.rum.integration.agent.common.attributes
 
-import com.cisco.android.common.logger.Logger
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
+import io.opentelemetry.api.common.Attributes
 
-data class SessionConfiguration(
-    val samplingRate: Double = 1.0
-) {
-    init {
-        if (samplingRate !in 0.0..1.0) {
-            Logger.e("SessionConfiguration", "samplingRate = $samplingRate is not in allowed range 0.0 <= sampling rate <= 1.0")
-        }
-    }
-}
+/**
+ * Converts this [Attributes] instance into a [MutableAttributes].
+ *
+ * This is a convenience method for clients who need to modify attributes.
+ *
+ * @receiver The original [Attributes] to be wrapped in a mutable representation.
+ * @return A [MutableAttributes] instance that reflects the original [Attributes]' values.
+ */
+fun Attributes.toMutableAttributes() = MutableAttributes(this)

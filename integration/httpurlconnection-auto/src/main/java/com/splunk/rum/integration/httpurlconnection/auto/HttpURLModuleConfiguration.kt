@@ -16,14 +16,14 @@
 
 package com.splunk.rum.integration.httpurlconnection.auto
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
 /**
  * Configuration for the HttpURLConnection module.
  *
  * @property isEnabled Whether the module is enabled.
  */
-class HttpURLModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
+data class HttpURLModuleConfiguration @JvmOverloads constructor(val isEnabled: Boolean = true) : ModuleConfiguration {
     override val name: String = "httpURLConnection"
 
     override val attributes: List<Pair<String, String>> = listOf(

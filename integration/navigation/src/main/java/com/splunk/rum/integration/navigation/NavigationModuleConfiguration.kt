@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.navigation
 
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
 /**
  * Configuration for the navigation module.
@@ -25,7 +25,7 @@ import com.splunk.rum.integration.agent.module.ModuleConfiguration
  * @property isFragmentTrackingEnabled Whether fragment tracking is enabled.
  * @property isActivityTrackingEnabled Whether activity tracking is enabled.
  */
-data class NavigationModuleConfiguration(
+data class NavigationModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
     val isFragmentTrackingEnabled: Boolean = false,
     val isActivityTrackingEnabled: Boolean = false

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2024 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.attributes
+package com.splunk.rum.integration.agent.common.module
 
-import io.opentelemetry.api.common.Attributes
-
-/**
- * Converts this [Attributes] instance into a [MutableAttributes].
- *
- * This is a convenience method for clients who need to modify attributes.
- *
- * @receiver The original [Attributes] to be wrapped in a mutable representation.
- * @return A [MutableAttributes] instance that reflects the original [Attributes]' values.
- */
-fun Attributes.toMutableAttributes() = MutableAttributes(this)
+interface ModuleConfiguration {
+    val name: String
+    val attributes: List<Pair<String, String>>
+}

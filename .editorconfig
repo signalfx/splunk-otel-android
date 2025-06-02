@@ -1,29 +1,3 @@
-# In order to know which rules to disable for auto formatting just run KtLint without -F (formatting)
-
 [*.{kt,kts}]
 ktlint_code_style = android_studio
-ktlint_standard_max-line-length = disabled
-ktlint_standard_parameter-list-wrapping = disabled
-ktlint_standard_function-signature = disabled
-ktlint_standard_argument-list-wrapping = disabled
-ktlint_standard_multiline-if-else = disabled
-ktlint_standard_wrapping = disabled
-ktlint_standard_no-empty-first-line-in-method-block = disabled
-ktlint_standard_discouraged-comment-location = disabled
-ktlint_standard_property-wrapping = disabled
-ktlint_standard_enum-wrapping = disabled
-ktlint_standard_statement-wrapping = disabled
-ktlint_standard_comment-wrapping = disabled
-ktlint_standard_property-naming = disabled
-ktlint_standard_import-ordering = disabled
-ktlint_standard_paren-spacing = disabled
-ktlint_standard_indent = disabled
-ktlint_standard_comment-spacing = disabled
-ktlint_standard_kdoc = disabled
-ktlint_standard_blank-line-between-when-conditions = disabled
-# Jetpack Compose functions
-ktlint_standard_function-naming = disabled
-
-# Necessary for 'ktlint_standard_wrapping'
-ktlint_standard_trailing-comma-on-call-site = disabled
-ktlint_standard_trailing-comma-on-declaration-site = disabled
+max_line_length = 120

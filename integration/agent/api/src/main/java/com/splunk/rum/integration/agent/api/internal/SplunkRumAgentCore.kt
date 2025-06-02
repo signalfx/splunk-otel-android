@@ -23,6 +23,7 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.extension.toResource
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.processor.AppStartSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.ErrorIdentifierAttributesSpanProcessor
@@ -31,7 +32,6 @@ import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcesso
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.user.IUserManager
-import com.splunk.rum.integration.agent.module.ModuleConfiguration
 import com.splunk.sdk.common.otel.OpenTelemetryInitializer
 import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.api.OpenTelemetry
@@ -57,8 +57,9 @@ internal object SplunkRumAgentCore {
 
         if (!shouldBeRunning) return OpenTelemetry.noop()
 
-        if (agentConfiguration.enableDebugLogging)
+        if (agentConfiguration.enableDebugLogging) {
             Logger.consumers += AndroidLogConsumer()
+        }
 
         Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
@@ -71,7 +72,11 @@ internal object SplunkRumAgentCore {
         val agentIntegration = AgentIntegration
             .obtainInstance(application)
 
-        val initializer = OpenTelemetryInitializer(application, agentConfiguration.deferredUntilForeground, agentConfiguration.spanInterceptor)
+        val initializer = OpenTelemetryInitializer(
+            application,
+            agentConfiguration.deferredUntilForeground,
+            agentConfiguration.spanInterceptor
+        )
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
             .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
@@ -82,8 +87,9 @@ internal object SplunkRumAgentCore {
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
 
-        if (agentConfiguration.enableDebugLogging)
+        if (agentConfiguration.enableDebugLogging) {
             initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
+        }
 
         val openTelemetry = initializer.build()
 

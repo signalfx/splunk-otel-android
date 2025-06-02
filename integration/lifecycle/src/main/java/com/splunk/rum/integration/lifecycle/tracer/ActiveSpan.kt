@@ -20,9 +20,7 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.context.Scope
 
-internal class ActiveSpan(
-    private val lastVisibleScreenProvider: () -> String?
-) {
+internal class ActiveSpan(private val lastVisibleScreenProvider: () -> String?) {
 
     private var span: Span? = null
     private var scope: Scope? = null
@@ -30,8 +28,9 @@ internal class ActiveSpan(
     fun isSpanInProgress(): Boolean = span != null
 
     fun startSpan(spanCreator: () -> Span?) {
-        if (span != null)
+        if (span != null) {
             return
+        }
 
         span = spanCreator()
         scope = span?.makeCurrent()
@@ -53,8 +52,9 @@ internal class ActiveSpan(
         val span = span ?: return
 
         val previouslyVisibleScreen = lastVisibleScreenProvider()
-        if (previouslyVisibleScreen != null && screenName != previouslyVisibleScreen)
+        if (previouslyVisibleScreen != null && screenName != previouslyVisibleScreen) {
             span.setAttribute(LAST_SCREEN_NAME_KEY, previouslyVisibleScreen)
+        }
     }
 
     private companion object {

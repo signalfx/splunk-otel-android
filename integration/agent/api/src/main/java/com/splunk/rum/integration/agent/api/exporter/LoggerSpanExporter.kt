@@ -28,12 +28,16 @@ internal class LoggerSpanExporter : SpanExporter {
     private val isShutdown = AtomicBoolean(false)
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {
-        if (isShutdown.get())
+        if (isShutdown.get()) {
             return CompletableResultCode.ofFailure()
+        }
 
         for (span in spans) {
             val instrumentationScopeInfo = span.instrumentationScopeInfo
-            Logger.i(TAG, "name=${span.name}, traceId=${span.traceId}, spanId=${span.spanId}, parentSpanId=${span.parentSpanId}, kind=${span.kind}, attributes=${span.attributes.toSplunkString()}, instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, instrumentationScopeInfo.version=${instrumentationScopeInfo.version}")
+            Logger.i(
+                TAG,
+                "name=${span.name}, traceId=${span.traceId}, spanId=${span.spanId}, parentSpanId=${span.parentSpanId}, kind=${span.kind}, attributes=${span.attributes.toSplunkString()}, instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
+            )
         }
 
         return CompletableResultCode.ofSuccess()
@@ -41,14 +45,15 @@ internal class LoggerSpanExporter : SpanExporter {
 
     override fun flush(): CompletableResultCode = CompletableResultCode.ofSuccess()
 
-    override fun shutdown(): CompletableResultCode = if (!isShutdown.compareAndSet(false, true))
-            CompletableResultCode.ofSuccess()
-        else
-            flush()
+    override fun shutdown(): CompletableResultCode = if (!isShutdown.compareAndSet(false, true)) {
+        CompletableResultCode.ofSuccess()
+    } else {
+        flush()
+    }
 
     private fun Attributes.toSplunkString(): String = asMap()
-            .toList()
-            .joinToString(", ", "[", "]") { "${it.first}=${it.second}" }
+        .toList()
+        .joinToString(", ", "[", "]") { "${it.first}=${it.second}" }
 
     private companion object {
         const val TAG = "LoggerSpanExporter"
