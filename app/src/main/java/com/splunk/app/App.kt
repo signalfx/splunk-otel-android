@@ -54,7 +54,7 @@ class App : Application() {
      * ❗️If these properties are missing, empty String will be used for both realm and accessToken. ❗️
      */
     private val realm = BuildConfig.REALM
-    private val accessToken = BuildConfig.REALM
+    private val rumAccessToken = BuildConfig.RUM_ACCESS_TOKEN
 
     override fun onCreate() {
         super.onCreate()
@@ -90,7 +90,7 @@ class App : Application() {
             agentConfiguration = AgentConfiguration(
                 endpoint = EndpointConfiguration(
                     realm = realm,
-                    rumAccessToken = accessToken
+                    rumAccessToken = rumAccessToken
                 ),
                 appName = "Android demo app",
                 enableDebugLogging = true,
