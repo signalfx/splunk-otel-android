@@ -78,9 +78,8 @@ internal class UploadSessionReplayDataJob : JobService() {
                     override fun onSuccess(response: Response) {
                         Logger.d(
                             TAG,
-                            "startUpload() onSuccess: response=$response, code=${response.code}, body=${response.body.toString(
-                                Charsets.UTF_8
-                            )}"
+                            "startUpload() onSuccess: response=$response, code=${response.code}," +
+                                " body=${response.body.toString(Charsets.UTF_8)}"
                         )
                         deleteData(id)
                         if (response.isSuccessful) {
