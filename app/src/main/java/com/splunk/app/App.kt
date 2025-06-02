@@ -72,19 +72,19 @@ class App : Application() {
                     isActivityTrackingEnabled = false
                 ),
                 CrashModuleConfiguration(
-                    isEnabled = false
+                    isEnabled = true
                 ),
                 AnrModuleConfiguration(
-                    isEnabled = false
+                    isEnabled = true
                 ),
                 HttpURLModuleConfiguration(
-                    isEnabled = false
+                    isEnabled = true
                 ),
                 OkHttp3ModuleConfiguration(
-                    isEnabled = false
+                    isEnabled = true
                 ),
                 NetworkMonitorModuleConfiguration(
-                    isEnabled = false
+                    isEnabled = true
                 ),
                 SlowRenderingModuleConfiguration(
                     isEnabled = true,

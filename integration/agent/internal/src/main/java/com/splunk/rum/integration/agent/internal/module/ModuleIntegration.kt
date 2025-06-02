@@ -48,10 +48,7 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     ) {
     }
 
-    protected open fun onSessionChange(
-        sessionId: String
-    ) {
-
+    protected open fun onSessionChange(sessionId: String) {
     }
 
     private val installationListener = object : AgentIntegration.Listener {

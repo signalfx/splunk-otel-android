@@ -26,7 +26,6 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.sdk.common.otel.internal.RumConstants
@@ -34,8 +33,6 @@ import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
-import org.json.JSONObject
-import java.util.Base64
 import java.util.concurrent.TimeUnit
 
 internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
@@ -90,7 +87,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                 AttributeKey.longKey("rr-web.total-chunks"), 1L,
                 AttributeKey.longKey("rr-web.chunk"), index,
                 AttributeKey.longKey("rr-web.event"), index,
-                AttributeKey.longKey("rr-web.offset"), 1L,
+                AttributeKey.longKey("rr-web.offset"), 1L
             )
 
             val logRecordBuilder = instance.sdkLoggerProvider

@@ -52,7 +52,6 @@ class AgentIntegration private constructor(context: Context) {
         sessionManager = SplunkSessionManager(storage)
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String) {
-
             }
         }
     }
