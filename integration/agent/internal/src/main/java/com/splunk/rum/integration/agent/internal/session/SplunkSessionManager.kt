@@ -57,7 +57,6 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         get() = createNewSessionIfNeeded()
         private set(value) {
             previousSessionId = agentStorage.readSessionId()
-
             agentStorage.writeSessionId(value)
             agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
         }

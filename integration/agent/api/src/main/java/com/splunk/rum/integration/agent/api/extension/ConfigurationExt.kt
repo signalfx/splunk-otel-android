@@ -36,4 +36,10 @@ internal fun AgentConfiguration.toResource(): Resource = Resource.getDefault().t
     .put(OS_NAME, "Android")
     .put(OS_TYPE, "linux")
     .put(OS_VERSION, Build.VERSION.RELEASE)
+    // TODO is this needed?
+    .put("splunk.scriptInstance", "")
+    .put("splunk.rumVersion", "0.20.0-beta.4")
+    .put("process.runtime.name", "mobile")
+    .put("service.name", "unknown_service")
+    .put("splunk.rumSessionId", "23fc7322c65d8f001ba15473d3e80346")
     .build()
