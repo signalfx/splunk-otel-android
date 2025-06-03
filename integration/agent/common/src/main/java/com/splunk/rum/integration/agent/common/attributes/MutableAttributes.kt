@@ -24,10 +24,8 @@ import java.util.function.BiConsumer
 /**
  * A utility class for managing custom RUM attributes.
  */
-class MutableAttributes @JvmOverloads constructor(
-    @Volatile
-    private var attributes: Attributes = Attributes.empty()
-) : Attributes {
+class MutableAttributes @JvmOverloads constructor(private var attributes: Attributes = Attributes.empty()) :
+    Attributes {
 
     /**
      * Retrieves the value associated with the given [AttributeKey].
@@ -35,6 +33,7 @@ class MutableAttributes @JvmOverloads constructor(
      * @param key the attribute key to retrieve
      * @return the value if present, or null
      */
+    @Synchronized
     override operator fun <T> get(key: AttributeKey<T>): T? = key.let { attributes.get(it) }
 
     /**
@@ -42,10 +41,25 @@ class MutableAttributes @JvmOverloads constructor(
      *
      * @param key the string key to retrieve
      * @return the value if present, or null
-     * @throws ClassCastException if the stored value is not of the expected type
      */
+
     @Suppress("UNCHECKED_CAST")
-    operator fun <T> get(key: String): T? = attributes.get(AttributeKey.stringKey(key)) as (T)
+    @Synchronized
+    operator fun <T> get(key: String): T? {
+        var value: Any? = null
+
+        try {
+            attributes.forEach { aKey, aValue ->
+                if (aKey.key == key) {
+                    value = aValue as? T
+                    throw StopException()
+                }
+            }
+        } catch (_: StopException) {
+        }
+
+        return value as? T
+    }
 
     /**
      * Sets a String value for the given key.
@@ -53,6 +67,7 @@ class MutableAttributes @JvmOverloads constructor(
      * @param key the key to set
      * @param value the value to associate
      */
+    @Synchronized
     operator fun set(key: String, value: String) {
         attributes = attributes.edit { put(AttributeKey.stringKey(key), value) }
     }
@@ -63,6 +78,7 @@ class MutableAttributes @JvmOverloads constructor(
      * @param key the key to set
      * @param value the value to associate
      */
+    @Synchronized
     operator fun set(key: String, value: Long) {
         attributes = attributes.edit { put(AttributeKey.longKey(key), value) }
     }
@@ -73,6 +89,7 @@ class MutableAttributes @JvmOverloads constructor(
      * @param key the key to set
      * @param value the value to associate
      */
+    @Synchronized
     operator fun set(key: String, value: Double) {
         attributes = attributes.edit { put(AttributeKey.doubleKey(key), value) }
     }
@@ -83,6 +100,7 @@ class MutableAttributes @JvmOverloads constructor(
      * @param key the key to set
      * @param value the value to associate
      */
+    @Synchronized
     operator fun set(key: String, value: Boolean) {
         attributes = attributes.edit { put(AttributeKey.booleanKey(key), value) }
     }
@@ -93,6 +111,7 @@ class MutableAttributes @JvmOverloads constructor(
      * @param key the attribute key
      * @param value the value to associate
      */
+    @Synchronized
     operator fun <T : Any> set(key: AttributeKey<T>, value: T) {
         attributes = attributes.edit { put(key, value) }
     }
@@ -102,6 +121,7 @@ class MutableAttributes @JvmOverloads constructor(
      *
      * @param key the attribute key
      */
+    @Synchronized
     fun <T> remove(key: AttributeKey<T>) {
         attributes = attributes.edit { remove(key) }
     }
@@ -111,6 +131,7 @@ class MutableAttributes @JvmOverloads constructor(
      *
      * @param key the string key to remove
      */
+    @Synchronized
     fun remove(key: String) {
         attributes = attributes.edit { removeIf { it.key == key } }
     }
@@ -118,6 +139,7 @@ class MutableAttributes @JvmOverloads constructor(
     /**
      * Removes all attributes.
      */
+    @Synchronized
     fun removeAll() {
         attributes = Attributes.empty()
     }
@@ -127,6 +149,7 @@ class MutableAttributes @JvmOverloads constructor(
      *
      * @param attributesToAdd the attributes to merge
      */
+    @Synchronized
     fun setAll(attributesToAdd: Attributes) {
         attributes = attributes.edit { putAll(attributesToAdd) }
     }
@@ -136,6 +159,7 @@ class MutableAttributes @JvmOverloads constructor(
      *
      * @return the current attributes
      */
+    @Synchronized
     fun getAll(): Attributes = attributes
 
     /**
@@ -144,20 +168,28 @@ class MutableAttributes @JvmOverloads constructor(
      *
      * @param updateAttributes a lambda to modify the current attributes. The lambda receives an [AttributesBuilder].
      */
+    @Synchronized
     fun update(updateAttributes: AttributesBuilder.() -> Unit) {
         attributes = attributes.edit(updateAttributes)
     }
 
+    @Synchronized
     override fun forEach(consumer: BiConsumer<in AttributeKey<*>, in Any>) = attributes.forEach(consumer)
 
+    @Synchronized
     override fun size(): Int = attributes.size()
 
+    @Synchronized
     override fun isEmpty(): Boolean = attributes.isEmpty
 
+    @Synchronized
     override fun asMap(): Map<AttributeKey<*>, Any> = attributes.asMap()
 
+    @Synchronized
     override fun toBuilder(): AttributesBuilder = attributes.toBuilder()
 
     private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes =
         toBuilder().apply(block).build()
+
+    private class StopException : Exception()
 }
