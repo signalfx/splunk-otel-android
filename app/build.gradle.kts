@@ -29,11 +29,11 @@ android {
 
         // Read from global gradle.properties (~/.gradle/gradle.properties)
         // If not found, fallback to empty string
-        val realm = project.findProperty("realm") as? String ?: ""
-        val token = project.findProperty("rumAccessToken") as? String ?: ""
+        val realm = project.findProperty("splunkRealm") as? String ?: ""
+        val token = project.findProperty("splunkRumAccessToken") as? String ?: ""
 
-        buildConfigField("String", "REALM", "\"$realm\"")
-        buildConfigField("String", "RUM_ACCESS_TOKEN", "\"$token\"")
+        buildConfigField("String", "SPLUNK_REALM", "\"$realm\"")
+        buildConfigField("String", "SPLUNK_RUM_ACCESS_TOKEN", "\"$token\"")
     }
 
     buildTypes {
