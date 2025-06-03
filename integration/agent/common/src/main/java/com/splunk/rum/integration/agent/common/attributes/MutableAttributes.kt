@@ -42,11 +42,10 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
      * @param key the string key to retrieve
      * @return the value if present, or null
      */
-
     @Suppress("UNCHECKED_CAST")
     @Synchronized
     operator fun <T> get(key: String): T? {
-        var value: Any? = null
+        var value: T? = null
 
         try {
             attributes.forEach { aKey, aValue ->
@@ -58,7 +57,7 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
         } catch (_: StopException) {
         }
 
-        return value as? T
+        return value
     }
 
     /**

@@ -36,6 +36,20 @@ class MutableAttributesTest {
     }
 
     @Test
+    fun `modify value with String key`() {
+        val mutableAttributes = MutableAttributes()
+
+        mutableAttributes["key"] = "value"
+        Assert.assertEquals("value", mutableAttributes["key"])
+
+        mutableAttributes["key"] = "value1"
+        Assert.assertEquals("value1", mutableAttributes["key"])
+
+        mutableAttributes["key"] = 0L
+        Assert.assertEquals(0L, mutableAttributes["key"])
+    }
+
+    @Test
     fun `get and set with AttributeKey`() {
         val mutableAttributes = MutableAttributes()
 
