@@ -26,6 +26,14 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments.put("clearPackageData", "true")
+
+        // Read from global gradle.properties (~/.gradle/gradle.properties)
+        // If not found, fallback to empty string
+        val realm = project.findProperty("splunkRealm") as? String ?: ""
+        val token = project.findProperty("splunkRumAccessToken") as? String ?: ""
+
+        buildConfigField("String", "SPLUNK_REALM", "\"$realm\"")
+        buildConfigField("String", "SPLUNK_RUM_ACCESS_TOKEN", "\"$token\"")
     }
 
     buildTypes {
