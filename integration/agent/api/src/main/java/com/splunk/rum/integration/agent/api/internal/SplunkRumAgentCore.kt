@@ -17,13 +17,11 @@
 package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
-import android.os.Build
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
-import com.splunk.rum.integration.agent.api.extension.toResource
 import com.splunk.rum.integration.agent.api.resource.AgentResource
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration

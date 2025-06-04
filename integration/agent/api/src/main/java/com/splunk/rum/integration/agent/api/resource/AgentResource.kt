@@ -22,11 +22,10 @@ internal object AgentResource {
      * - AgentConfiguration-specific attributes
      * - Device and OS-specific attributes
      */
-    internal fun allResource(agentConfiguration: AgentConfiguration): Resource =
-        Resource
-            .getDefault()
-            .merge(agentConfigResource(agentConfiguration))
-            .merge(buildResource())
+    internal fun allResource(agentConfiguration: AgentConfiguration): Resource = Resource
+        .getDefault()
+        .merge(agentConfigResource(agentConfiguration))
+        .merge(buildResource())
 
     private fun agentConfigResource(agentConfiguration: AgentConfiguration): Resource = Resource.empty().toBuilder()
         .put("app", agentConfiguration.appName)
@@ -35,13 +34,13 @@ internal object AgentResource {
         .build()
 
     private fun buildResource(): Resource = Resource.empty().toBuilder()
-            .put("rum.sdk.version", BuildConfig.VERSION_NAME)
-            .put(DEVICE_MODEL_IDENTIFIER, Build.MODEL)
-            .put(DEVICE_MODEL_NAME, Build.MODEL)
-            .put(DEVICE_MANUFACTURER, Build.MANUFACTURER)
-            .put(OS_NAME, "Android")
-            .put(OS_TYPE, "linux")
-            .put(OS_VERSION, Build.VERSION.RELEASE)
-            .put(OS_DESCRIPTION, OS_DESCRIPTION_TEMPLATE.format(Build.VERSION.RELEASE, Build.ID, Build.VERSION.SDK_INT))
-            .build()
+        .put("rum.sdk.version", BuildConfig.VERSION_NAME)
+        .put(DEVICE_MODEL_IDENTIFIER, Build.MODEL)
+        .put(DEVICE_MODEL_NAME, Build.MODEL)
+        .put(DEVICE_MANUFACTURER, Build.MANUFACTURER)
+        .put(OS_NAME, "Android")
+        .put(OS_TYPE, "linux")
+        .put(OS_VERSION, Build.VERSION.RELEASE)
+        .put(OS_DESCRIPTION, OS_DESCRIPTION_TEMPLATE.format(Build.VERSION.RELEASE, Build.ID, Build.VERSION.SDK_INT))
+        .build()
 }
