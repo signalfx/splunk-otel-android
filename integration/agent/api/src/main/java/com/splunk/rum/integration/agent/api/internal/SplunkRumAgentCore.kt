@@ -80,7 +80,7 @@ internal object SplunkRumAgentCore {
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
             .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
-            .joinResources(AgentResource.allResource(agentConfiguration))
+            .joinResources(AgentResource.allResource(application, agentConfiguration))
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))

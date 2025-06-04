@@ -1,8 +1,10 @@
 package com.splunk.rum.integration.agent.api.resource
 
+import android.content.Context
 import android.os.Build
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.BuildConfig
+import com.splunk.rum.integration.agent.api.extension.appVersion
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MANUFACTURER
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER
@@ -22,16 +24,17 @@ internal object AgentResource {
      * - AgentConfiguration-specific attributes
      * - Device and OS-specific attributes
      */
-    internal fun allResource(agentConfiguration: AgentConfiguration): Resource = Resource
+    internal fun allResource(context: Context, agentConfiguration: AgentConfiguration): Resource = Resource
         .getDefault()
-        .merge(agentConfigResource(agentConfiguration))
+        .merge(agentConfigResource(context, agentConfiguration))
         .merge(buildResource())
 
-    private fun agentConfigResource(agentConfiguration: AgentConfiguration): Resource = Resource.empty().toBuilder()
-        .put("app", agentConfiguration.appName)
-        .put("app.version", requireNotNull(agentConfiguration.appVersion))
-        .put("deployment.environment", agentConfiguration.deploymentEnvironment)
-        .build()
+    private fun agentConfigResource(context: Context, agentConfiguration: AgentConfiguration): Resource =
+        Resource.empty().toBuilder()
+            .put("app", agentConfiguration.appName)
+            .put("app.version", agentConfiguration.appVersion ?: context.appVersion)
+            .put("deployment.environment", agentConfiguration.deploymentEnvironment)
+            .build()
 
     private fun buildResource(): Resource = Resource.empty().toBuilder()
         .put("rum.sdk.version", BuildConfig.VERSION_NAME)
