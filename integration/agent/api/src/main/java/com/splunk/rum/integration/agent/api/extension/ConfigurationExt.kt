@@ -16,24 +16,11 @@
 
 package com.splunk.rum.integration.agent.api.extension
 
-import android.os.Build
 import com.splunk.rum.integration.agent.api.AgentConfiguration
-import com.splunk.rum.integration.agent.api.BuildConfig
 import io.opentelemetry.sdk.resources.Resource
-import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER
-import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_NAME
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_NAME
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_TYPE
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_VERSION
 
 internal fun AgentConfiguration.toResource(): Resource = Resource.getDefault().toBuilder()
     .put("app", appName)
     .put("app.version", requireNotNull(appVersion))
     .put("deployment.environment", deploymentEnvironment)
-    .put("rum.sdk.version", BuildConfig.VERSION_NAME)
-    .put(DEVICE_MODEL_IDENTIFIER, Build.MODEL)
-    .put(DEVICE_MODEL_NAME, Build.MODEL)
-    .put(OS_NAME, "Android")
-    .put(OS_TYPE, "linux")
-    .put(OS_VERSION, Build.VERSION.RELEASE)
     .build()
