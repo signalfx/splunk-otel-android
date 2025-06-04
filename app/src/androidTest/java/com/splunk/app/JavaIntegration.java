@@ -46,6 +46,10 @@ import java.time.Duration;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 
+// :integration:agent:api (SplunkRum) <-- :integration:customtracking
+// SplunkRum.customTracking
+
+
 public class JavaIntegration extends Application {
 
     @Override
@@ -65,6 +69,15 @@ public class JavaIntegration extends Application {
         state.getEndpointConfiguration();
         state.isDebugLoggingEnabled();
         state.getStatus();
+
+        // Variant A
+        // EndpointConfiguration
+        // UserState
+        // UserPreferences
+
+        // Variant B
+        // EndpointConfiguration
+        // User.State
 
         User.State userState = agent.getUser().getState();
         userState.getTrackingMode();
