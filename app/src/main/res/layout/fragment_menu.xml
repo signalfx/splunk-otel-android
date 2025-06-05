@@ -371,8 +371,41 @@
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
 			android:text="@string/menu_legacy_update_global_attributes"
-			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintTop_toBottomOf="@id/legacy_set_global_attribute" />
+
+		<TextView
+			android:id="@+id/slow_rendering_title"
+			style="@style/Header"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="30dp"
+			android:text="@string/slow_rendering_title"
+			android:textSize="18sp"
+			android:textStyle="bold"
+			app:layout_constraintTop_toBottomOf="@+id/legacy_update_global_attributes" />
+
+		<TextView
+			android:id="@+id/slow_render"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/slow_render"
+			app:layout_constraintTop_toBottomOf="@id/slow_rendering_title" />
+
+		<TextView
+			android:id="@+id/frozen_render"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="5dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/frozen_render"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/slow_render" />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
