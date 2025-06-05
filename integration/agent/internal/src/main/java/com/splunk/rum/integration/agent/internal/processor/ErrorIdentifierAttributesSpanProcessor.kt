@@ -18,7 +18,9 @@ package com.splunk.rum.integration.agent.internal.processor
 
 import android.app.Application
 import com.splunk.sdk.common.otel.internal.RumConstants
-import com.splunk.sdk.utils.ApplicationInfoUtils
+import com.splunk.sdk.utils.extensions.applicationId
+import com.splunk.sdk.utils.extensions.splunkBuildId
+import com.splunk.sdk.utils.extensions.versionCode
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
@@ -26,9 +28,9 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 
 class ErrorIdentifierAttributesSpanProcessor(application: Application) : SpanProcessor {
 
-    private var applicationId: String? = ApplicationInfoUtils.retrieveApplicationId(application)
-    private var versionCode: String? = ApplicationInfoUtils.retrieveVersionCode(application)
-    private var splunkBuildId: String? = ApplicationInfoUtils.retrieveSplunkBuildID(application)
+    private var applicationId: String? = application.applicationId
+    private var versionCode: String? = application.versionCode
+    private var splunkBuildId: String? = application.splunkBuildId
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         if (span.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_ERROR ||

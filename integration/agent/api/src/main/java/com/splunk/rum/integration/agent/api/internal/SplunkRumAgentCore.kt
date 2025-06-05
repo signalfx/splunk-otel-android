@@ -22,7 +22,7 @@ import com.cisco.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
-import com.splunk.rum.integration.agent.api.extension.toResource
+import com.splunk.rum.integration.agent.api.resource.AgentResource
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.processor.AppStartSpanProcessor
@@ -80,7 +80,7 @@ internal object SplunkRumAgentCore {
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
             .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
-            .joinResources(finalConfiguration.toResource())
+            .joinResources(AgentResource.allResource(application, finalConfiguration))
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
