@@ -26,8 +26,8 @@
     <string name="track_exception">Track Exception</string>
     <string name="track_exception_with_attributes">Track Exception With Attributes</string>
     <string name="slow_rendering_title">Slow Rendering</string>
-    <string name="slow_render">Slow Render</string>
-    <string name="frozen_render">Frozen Render</string>
+    <string name="slow_render">Slow Render (30ms delay)</string>
+    <string name="frozen_render">Frozen Render (800ms delay)</string>
 
     <!-- Global Attributes -->
     <string name="menu_global_attributes_title">Global Attributes</string>

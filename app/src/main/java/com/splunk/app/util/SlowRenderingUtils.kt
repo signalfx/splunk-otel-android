@@ -64,13 +64,19 @@ object SlowRenderingUtils {
             .findViewById<ViewGroup>(android.R.id.content)
 
         rootView.addView(slowRenderView)
-        Toast.makeText(fragment.context, "Running $testName test for ${durationMs / 1000} seconds", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            fragment.context,
+            "Running $testName test for ${durationMs / 1000} seconds",
+            Toast.LENGTH_SHORT
+        ).show()
 
         Handler(Looper.getMainLooper()).postDelayed({
             rootView.removeView(slowRenderView)
             slowRenderView.stopRendering()
-            showDoneToast(fragment.context,
-                testName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() })
+            showDoneToast(
+                fragment.context,
+                testName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
+            )
         }, durationMs)
     }
 
