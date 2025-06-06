@@ -20,6 +20,7 @@ import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.session.Session
+import com.splunk.rum.integration.agent.api.session.SessionConfiguration
 import com.splunk.rum.integration.agent.api.spanfilter.SpanFilterBuilder
 import com.splunk.rum.integration.agent.api.spanfilter.toSpanInterceptor
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
@@ -274,7 +275,7 @@ class SplunkRumBuilder {
                 deploymentEnvironment =
                 deploymentEnvironment ?: throw IllegalStateException("deploymentEnvironment was not set"),
                 enableDebugLogging = enableDebug,
-                session = Session.Configuration(sessionBasedSampling),
+                session = SessionConfiguration(sessionBasedSampling),
                 globalAttributes = globalAttributes,
                 instrumentedProcessName = instrumentedProcessName,
                 deferredUntilForeground = deferredUntilForeground,
