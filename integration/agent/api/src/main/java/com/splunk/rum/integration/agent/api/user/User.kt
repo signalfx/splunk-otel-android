@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.api.user
 
 import com.splunk.rum.integration.agent.internal.user.IUserManager
-import com.splunk.rum.integration.agent.internal.user.InternalUserTrackingMode
 
 /**
  * Class representing a user.

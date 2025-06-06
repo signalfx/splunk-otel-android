@@ -16,10 +16,8 @@
 
 package com.splunk.rum.integration.agent.api
 
-import com.splunk.rum.integration.agent.api.session.Session
 import com.splunk.rum.integration.agent.api.session.SessionConfiguration
 import com.splunk.rum.integration.agent.api.spaninterceptor.toMutableSpanData
-import com.splunk.rum.integration.agent.api.user.User
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import io.opentelemetry.sdk.trace.data.SpanData
