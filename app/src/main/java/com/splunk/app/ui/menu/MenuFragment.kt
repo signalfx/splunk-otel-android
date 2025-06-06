@@ -17,6 +17,7 @@
 package com.splunk.app.ui.menu
 
 import android.app.AlertDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +32,7 @@ import com.splunk.app.ui.webview.WebViewFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.app.util.CommonUtils
 import com.splunk.app.util.FragmentAnimation
+import com.splunk.app.util.SlowRenderingUtils
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.api.extension.splunkRumId
 import com.splunk.rum.integration.navigation.extension.navigation
@@ -76,7 +78,8 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         viewBinding.getAllGlobalAttributes.setOnClickListener(onClickListener)
         viewBinding.legacySetGlobalAttribute.setOnClickListener(onClickListener)
         viewBinding.legacyUpdateGlobalAttributes.setOnClickListener(onClickListener)
-
+        viewBinding.slowRender.setOnClickListener(onClickListener)
+        viewBinding.frozenRender.setOnClickListener(onClickListener)
         viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"
 
         SplunkRum.instance.navigation.track("Menu")
@@ -233,6 +236,25 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                         .put(AttributeKey.booleanKey("legacyUpdate3"), false)
                 }
                 CommonUtils.showDoneToast(context, "Updated Global Attributes using legacy API")
+            }
+
+            viewBinding.slowRender.id -> {
+                SlowRenderingUtils.simulateSlowRendering(
+                    fragment = this,
+                    testName = "slow render",
+                    renderDelayMs = 30,
+                    color = Color.BLUE
+                )
+            }
+
+            viewBinding.frozenRender.id -> {
+                SlowRenderingUtils.simulateSlowRendering(
+                    fragment = this,
+                    testName = "frozen render",
+                    renderDelayMs = 800,
+                    color = Color.RED,
+                    refreshInterval = 1000
+                )
             }
         }
     }
