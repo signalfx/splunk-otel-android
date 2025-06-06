@@ -16,15 +16,19 @@
 
 package com.splunk.rum.integration.agent.api.user
 
-import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.InternalUserTrackingMode
 
-/**
- * Class representing a user.
- */
-class User internal constructor(userManager: IUserManager) {
+enum class UserTrackingMode {
+    NO_TRACKING,
+    ANONYMOUS_TRACKING
+}
 
-    val state: UserState = UserState(userManager)
+internal fun UserTrackingMode.toInternal(): InternalUserTrackingMode = when (this) {
+    UserTrackingMode.NO_TRACKING -> InternalUserTrackingMode.NO_TRACKING
+    UserTrackingMode.ANONYMOUS_TRACKING -> InternalUserTrackingMode.ANONYMOUS_TRACKING
+}
 
-    val preferences: UserPreferences = UserPreferences(userManager)
+internal fun InternalUserTrackingMode.toPublic(): UserTrackingMode = when (this) {
+    InternalUserTrackingMode.NO_TRACKING -> UserTrackingMode.NO_TRACKING
+    InternalUserTrackingMode.ANONYMOUS_TRACKING -> UserTrackingMode.ANONYMOUS_TRACKING
 }

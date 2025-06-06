@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.user
+package com.splunk.rum.integration.agent.api.session
 
-import com.splunk.rum.integration.agent.internal.user.IUserManager
-import com.splunk.rum.integration.agent.internal.user.InternalUserTrackingMode
-
-/**
- * Class representing a user.
- */
-class User internal constructor(userManager: IUserManager) {
-
-    val state: UserState = UserState(userManager)
-
-    val preferences: UserPreferences = UserPreferences(userManager)
+interface ISession {
+    val state: SessionState
 }

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.user
+package com.splunk.rum.integration.agent.api.session
 
-import com.splunk.rum.integration.agent.internal.user.IUserManager
-import com.splunk.rum.integration.agent.internal.user.InternalUserTrackingMode
+import com.cisco.android.common.logger.Logger
 
-/**
- * Class representing a user.
- */
-class User internal constructor(userManager: IUserManager) {
-
-    val state: UserState = UserState(userManager)
-
-    val preferences: UserPreferences = UserPreferences(userManager)
+data class SessionConfiguration @JvmOverloads constructor(val samplingRate: Double = 1.0) {
+    init {
+        if (samplingRate !in 0.0..1.0) {
+            Logger.e(
+                "SessionConfiguration",
+                "samplingRate = $samplingRate is not in allowed range 0.0 <= sampling rate <= 1.0"
+            )
+        }
+    }
 }

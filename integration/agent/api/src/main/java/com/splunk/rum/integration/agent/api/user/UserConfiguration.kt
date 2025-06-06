@@ -16,15 +16,6 @@
 
 package com.splunk.rum.integration.agent.api.user
 
-import com.splunk.rum.integration.agent.internal.user.IUserManager
-import com.splunk.rum.integration.agent.internal.user.InternalUserTrackingMode
-
-/**
- * Class representing a user.
- */
-class User internal constructor(userManager: IUserManager) {
-
-    val state: UserState = UserState(userManager)
-
-    val preferences: UserPreferences = UserPreferences(userManager)
-}
+data class UserConfiguration @JvmOverloads constructor(
+    val trackingMode: UserTrackingMode = UserTrackingMode.NO_TRACKING
+)

@@ -21,6 +21,9 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
+import com.splunk.rum.integration.agent.api.session.ISession
+import com.splunk.rum.integration.agent.api.session.Session
+import com.splunk.rum.integration.agent.api.session.SessionState
 import com.splunk.rum.integration.agent.api.subprocess.SubprocessDetector
 import com.splunk.rum.integration.agent.api.user.User
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
@@ -49,7 +52,7 @@ class SplunkRum private constructor(
     sessionManager: ISplunkSessionManager,
     val openTelemetry: OpenTelemetry,
     val state: IState = State(agentConfiguration),
-    val session: ISession = Session(ISession.State(agentConfiguration.session, sessionManager)),
+    val session: ISession = Session(SessionState(agentConfiguration.session, sessionManager)),
     val user: User = User(userManager),
     val globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 ) {

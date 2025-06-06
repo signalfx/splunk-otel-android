@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
+import com.splunk.rum.integration.agent.api.session.Session
 import com.splunk.rum.integration.agent.api.spanfilter.SpanFilterBuilder
 import com.splunk.rum.integration.agent.api.spanfilter.toSpanInterceptor
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
