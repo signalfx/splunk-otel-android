@@ -20,7 +20,7 @@ import java.security.SecureRandom
 
 internal object TraceId {
 
-    private const val LENGTH = 16
+    private const val LENGTH = 32
     private val INVALID = "0".repeat(LENGTH)
     private val CHARACTERS = "0123456789abcdef"
 
