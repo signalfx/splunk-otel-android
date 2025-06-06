@@ -77,7 +77,7 @@ class App : Application() {
                     realm = realm,
                     rumAccessToken = rumAccessToken
                 ),
-                appName = "StabilityTest",
+                appName = "Android demo app",
                 enableDebugLogging = true,
                 globalAttributes = globalAttributes,
                 deploymentEnvironment = "test",
