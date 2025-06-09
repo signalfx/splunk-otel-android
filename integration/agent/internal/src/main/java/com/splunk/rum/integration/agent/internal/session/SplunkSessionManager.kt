@@ -21,8 +21,8 @@ import android.content.Context
 import com.cisco.android.common.utils.AppStateObserver
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.cisco.android.common.utils.extensions.safeSchedule
+import com.splunk.rum.integration.agent.internal.id.SessionId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
-import com.splunk.rum.integration.agent.internal.utils.TraceId
 import com.splunk.sdk.common.storage.IAgentStorage
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -107,7 +107,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         deleteSessionInBackgroundValidationTime()
         deleteSessionValidationTime()
 
-        val newSessionId = TraceId.random()
+        val newSessionId = SessionId.generate()
         sessionId = newSessionId
         sessionListeners.forEachFast { it.onSessionChanged(newSessionId) }
         return newSessionId

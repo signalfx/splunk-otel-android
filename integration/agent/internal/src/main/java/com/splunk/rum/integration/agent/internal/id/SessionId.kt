@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2024 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.internal.utils
+package com.splunk.rum.integration.agent.internal.id
 
-import java.security.SecureRandom
-
-internal object TraceId {
+object SessionId {
 
     private const val LENGTH = 32
-    private val INVALID = "0".repeat(LENGTH)
-    private val CHARACTERS = "0123456789abcdef"
 
-    fun random(): String {
-        val random = SecureRandom()
-        var result: String
-
-        do {
-            result = ""
-
-            for (i in 0 until LENGTH) {
-                result += CHARACTERS[random.nextInt(CHARACTERS.length)]
-            }
-        } while (result == INVALID)
-
-        return result
-    }
+    /**
+     * Generates a random lowercase hexadecimal session ID with length of 32 characters.
+     *
+     * @return The generated ID:
+     * - Is exactly 32 characters long.
+     * - Consists only of characters `0` through `9` and `a` through `f`.
+     * - Is never composed entirely of zeroes (e.g., "000000...").
+     */
+    fun generate() = SimpleId.generate(LENGTH)
 }
