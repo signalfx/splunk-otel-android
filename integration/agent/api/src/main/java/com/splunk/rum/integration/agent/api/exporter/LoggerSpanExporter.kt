@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api.exporter
 import com.cisco.android.common.logger.Logger
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.common.CompletableResultCode
+import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.util.concurrent.atomic.AtomicBoolean
@@ -36,7 +37,15 @@ internal class LoggerSpanExporter : SpanExporter {
             val instrumentationScopeInfo = span.instrumentationScopeInfo
             Logger.i(
                 TAG,
-                "name=${span.name}, traceId=${span.traceId}, spanId=${span.spanId}, parentSpanId=${span.parentSpanId}, kind=${span.kind}, attributes=${span.attributes.toSplunkString()}, instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
+                "name=${span.name}, " +
+                    "traceId=${span.traceId}, " +
+                    "spanId=${span.spanId}, " +
+                    "parentSpanId=${span.parentSpanId}, " +
+                    "kind=${span.kind}, " +
+                    "resources=${span.resource.toSplunkString()}" +
+                    "attributes=${span.attributes.toSplunkString()}, " +
+                    "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
+                    "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
             )
         }
 
@@ -54,6 +63,8 @@ internal class LoggerSpanExporter : SpanExporter {
     private fun Attributes.toSplunkString(): String = asMap()
         .toList()
         .joinToString(", ", "[", "]") { "${it.first}=${it.second}" }
+
+    private fun Resource.toSplunkString(): String = this.attributes.toSplunkString()
 
     private companion object {
         const val TAG = "LoggerSpanExporter"
