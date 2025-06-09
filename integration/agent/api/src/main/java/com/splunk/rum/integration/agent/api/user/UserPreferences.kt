@@ -18,12 +18,13 @@ package com.splunk.rum.integration.agent.api.user
 
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 
-/**
- * Class representing a user.
- */
-class User internal constructor(userManager: IUserManager) {
+class UserPreferences internal constructor(private val userManager: IUserManager) {
 
-    val state: UserState = UserState(userManager)
-
-    val preferences: UserPreferences = UserPreferences(userManager)
+    var trackingMode: UserTrackingMode? = null
+        set(value) {
+            field = value
+            value?.let {
+                userManager.trackingMode = it.toInternal()
+            }
+        }
 }

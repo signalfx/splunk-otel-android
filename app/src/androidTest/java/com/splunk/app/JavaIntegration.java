@@ -20,11 +20,15 @@ import android.app.Application;
 
 import com.splunk.rum.integration.agent.api.AgentConfiguration;
 import com.splunk.rum.integration.agent.api.EndpointConfiguration;
-import com.splunk.rum.integration.agent.api.ISession;
+import com.splunk.rum.integration.agent.api.session.ISession;
 import com.splunk.rum.integration.agent.api.IState;
-import com.splunk.rum.integration.agent.api.Session;
+import com.splunk.rum.integration.agent.api.session.Session;
 import com.splunk.rum.integration.agent.api.SplunkRum;
+import com.splunk.rum.integration.agent.api.session.SessionConfiguration;
 import com.splunk.rum.integration.agent.api.user.User;
+import com.splunk.rum.integration.agent.api.user.UserConfiguration;
+import com.splunk.rum.integration.agent.api.user.UserState;
+import com.splunk.rum.integration.agent.api.user.UserTrackingMode;
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes;
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration;
 import com.splunk.rum.integration.anr.AnrModuleConfiguration;
@@ -66,7 +70,7 @@ public class JavaIntegration extends Application {
         state.isDebugLoggingEnabled();
         state.getStatus();
 
-        User.State userState = agent.getUser().getState();
+        UserState userState = agent.getUser().getState();
         userState.getTrackingMode();
 
         ISession session = agent.getSession();
@@ -96,8 +100,8 @@ public class JavaIntegration extends Application {
                 true,
                 globalAttributes,
                 (spanData) -> spanData,
-                new User.Configuration(User.TrackingMode.ANONYMOUS_TRACKING),
-                new Session.Configuration(0.8),
+                new UserConfiguration(UserTrackingMode.ANONYMOUS_TRACKING),
+                new SessionConfiguration(0.8),
                 "app",
                 false
         );
