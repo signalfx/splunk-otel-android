@@ -53,5 +53,5 @@ class Noop(notRunningCause: Status.NotRunning = Status.NotRunning.NotInstalled) 
     override val isDebugLoggingEnabled: Boolean = false
     override val instrumentedProcessName: String?
         get() = null
-    override  val deferredUntilForeground:Boolean = false
+    override val deferredUntilForeground: Boolean = false
 }
