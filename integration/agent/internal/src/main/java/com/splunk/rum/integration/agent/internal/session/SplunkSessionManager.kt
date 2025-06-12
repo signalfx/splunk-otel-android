@@ -85,6 +85,11 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     }
 
     override fun sessionId(timestamp: Long): String {
+        return sessionIds
+            .filter { it.validFrom <= timestamp }
+            .maxByOrNull { it.validFrom }
+            ?.id
+            ?: throw IllegalArgumentException("No valid session for timestamp: $timestamp")
     }
 
     @Synchronized
