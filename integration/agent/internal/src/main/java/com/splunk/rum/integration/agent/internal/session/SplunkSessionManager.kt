@@ -24,6 +24,7 @@ import com.cisco.android.common.utils.extensions.safeSchedule
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
 import com.splunk.rum.integration.agent.internal.utils.TraceId
 import com.splunk.sdk.common.storage.IAgentStorage
+import com.splunk.sdk.common.storage.SessionId
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 
@@ -33,6 +34,7 @@ interface ISplunkSessionManager {
     val sessionListeners: MutableSet<SessionListener>
 
     fun install(context: Context)
+    fun sessionId(timestamp: Long): String
 }
 
 object NoOpSplunkSessionManager : ISplunkSessionManager {
@@ -40,6 +42,7 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
     override val previousSessionId: String? = null
     override val sessionListeners: MutableSet<SessionListener> = mutableSetOf()
     override fun install(context: Context) = Unit
+    override fun sessionId(timestamp: Long): String = ""
 }
 
 class SplunkSessionManager internal constructor(private val agentStorage: IAgentStorage) : ISplunkSessionManager {
@@ -48,6 +51,8 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     private val appStateObserver = AppStateObserver()
 
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
+
+    private val sessionIds: MutableList<SessionId> = agentStorage.readSessionIds().toMutableList()
 
     /**
      * The value is valid after the [install] function is called.
@@ -79,6 +84,9 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         appStateObserver.attach(context.applicationContext as Application)
     }
 
+    override fun sessionId(timestamp: Long): String {
+    }
+
     @Synchronized
     private fun createNewSessionIfNeeded(): String {
         val savedSessionId = agentStorage.readSessionId()
@@ -108,6 +116,8 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
         val newSessionId = TraceId.random()
         sessionId = newSessionId
+        sessionIds.add(SessionId(newSessionId, now))
+        agentStorage.writeSessionIds(sessionIds)
         sessionListeners.forEachFast { it.onSessionChanged(newSessionId) }
         return newSessionId
     }

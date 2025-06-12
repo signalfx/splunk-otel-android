@@ -34,6 +34,7 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
+import org.json.JSONObject
 
 internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
     defaultModuleConfiguration = SessionReplayModuleConfiguration()
@@ -66,7 +67,10 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
     private fun setupComposeIdentification() {
         runIfComposeUiExists {
-            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) {
+            ComposeElementIdentification.insertModifierIfNeeded(
+                SessionReplayDrawModifier::class,
+                OrderPriority.HIGH
+            ) {
                     id,
                     isSensitive,
                     _
@@ -82,12 +86,18 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             val instance = SplunkOpenTelemetrySdk.instance ?: return false
 
+            val segmentMetadata = JSONObject().put("startUnixMs", metadata.startUnixMs)
+                .put("endUnixMs", metadata.endUnixMs)
+                .put("source", metadata.platform)
+                .toString()
+
             val attributes = Attributes.of(
                 AttributeKey.stringKey("event.name"), "session_replay_data",
                 AttributeKey.longKey("rr-web.total-chunks"), 1L,
                 AttributeKey.longKey("rr-web.chunk"), index,
                 AttributeKey.longKey("rr-web.event"), index,
-                AttributeKey.longKey("rr-web.offset"), 1L
+                AttributeKey.longKey("rr-web.offset"), 1L,
+                AttributeKey.stringKey("segmentMetadata"), segmentMetadata
             )
 
             val logRecordBuilder = instance.sdkLoggerProvider
@@ -95,13 +105,6 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                 .build()
                 .logRecordBuilder()
 
-            // TODO data and metadata
-//            val dataString = Base64.getEncoder().encodeToString(data)
-//            val body = Value.of(
-//                JSONObject()
-//                    .put("data", dataString)
-//                    .toString()
-//            )
             logRecordBuilder.setBody(Value.of(data))
                 .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
                 .setAllAttributes(attributes)

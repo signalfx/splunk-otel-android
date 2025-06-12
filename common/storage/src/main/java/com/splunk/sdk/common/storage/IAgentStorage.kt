@@ -61,4 +61,7 @@ interface IAgentStorage {
     fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean
     fun readOtelSessionReplayData(id: String): ByteArray?
     fun deleteOtelSessionReplayData(id: String)
+
+    fun readSessionIds(): List<SessionId>
+    fun writeSessionIds(sessionIds: List<SessionId>)
 }

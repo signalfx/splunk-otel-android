@@ -25,6 +25,7 @@ import com.cisco.android.common.storage.extensions.noBackupFilesDirCompat
 import com.cisco.android.common.storage.filemanager.EncryptedFileManager
 import com.cisco.android.common.storage.filemanager.FileManagerFactory
 import com.cisco.android.common.storage.preferences.Preferences
+import com.cisco.android.common.utils.extensions.toJSONArray
 import com.cisco.android.common.utils.runOnBackgroundThread
 import com.splunk.sdk.common.storage.extensions.MB
 import com.splunk.sdk.common.storage.extensions.statFsFreeSpace
@@ -214,6 +215,21 @@ class AgentStorage(context: Context) : IAgentStorage {
         file.delete()
     }
 
+    override fun readSessionIds(): List<SessionId> {
+        val value = preferences.getString(SESSION_IDS)
+        if (value.isNullOrBlank()) return emptyList()
+
+        val sessionIds = value.toJSONArray()
+        return runCatching {
+            (0 until sessionIds.length()).map { sessionIds.getJSONObject(it) }.map { SessionId.fromJSONObject(it) }
+        }.getOrElse { emptyList() }
+    }
+
+    override fun writeSessionIds(sessionIds: List<SessionId>) {
+        val json = sessionIds.toJSONArray { array, item -> array.put(item.toJsonObject()) }.toString()
+        preferences.putString(SESSION_IDS, json)
+    }
+
     override fun addBufferedSpanId(id: String) {
         val ids = getBufferedSpanIds().toMutableSet()
         if (ids.add(id)) {
@@ -276,6 +292,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val SESSION_REPLAY_BASE_URL = "SESSION_REPLAY_BASE_URL"
         private const val DEVICE_ID = "DEVICE_ID"
         private const val SESSION_ID = "SESSION_ID"
+        private const val SESSION_IDS = "SESSION_IDS"
         private const val PREVIOUS_SESSION_ID = "PREVIOUS_SESSION_ID"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
