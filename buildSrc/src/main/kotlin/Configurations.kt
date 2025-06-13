@@ -23,13 +23,5 @@ object Configurations {
     }
 
     const val sdkVersionCode = 1
-    val sdkVersionName = "24.4.1" // version()
-
-    /**
-     * TODO: Uncomment this and use the "dynamic" version after the release; otherwise, the merge to master will not work.
-     */
-    private fun version(): String {
-        val format = SimpleDateFormat("yy.M.d-HHmm").apply { timeZone = TimeZone.getTimeZone("UTC") }
-        return format.format(Date(System.currentTimeMillis()))
-    }
+    val sdkVersionName = "2.0.0-beta"
 }

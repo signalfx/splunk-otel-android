@@ -70,7 +70,7 @@ class ConfigPublish : Plugin<Project> by local plugin {
             }
             repositories {
                 maven {
-                    name = "maven"
+                    name = "artifactory"
                     url = uri(Configurations.Artifactory.bareRepositoryURL)
                     credentials {
                         username = System.getenv("ARTIFACT_REPO_USERNAME")
