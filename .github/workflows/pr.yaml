@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate-title:
+  validate_pr_title:
     runs-on: ubuntu-latest
     steps:
       - name: Validate PR title
