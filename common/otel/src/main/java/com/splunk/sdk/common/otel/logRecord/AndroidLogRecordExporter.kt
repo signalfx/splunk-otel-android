@@ -51,6 +51,7 @@ internal class AndroidLogRecordExporter(
         val generalLogs =
             logs.filter { it.instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
 
+        // We need special handling of Session Replay data because of the current state of the backend implementation.
         if (sessionReplayLogs.isNotEmpty()) {
             val exportRequest = LogsRequestMarshaler.create(sessionReplayLogs)
             val id = UUID.randomUUID().toString()
