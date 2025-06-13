@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2024 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.user
+package com.splunk.rum.integration.agent.internal.id
 
-import com.splunk.rum.integration.agent.internal.user.IUserManager
+object SessionId {
 
-/**
- * Class representing a user.
- */
-class User internal constructor(userManager: IUserManager) {
+    private const val LENGTH = 32
 
-    val state: UserState = UserState(userManager)
-
-    val preferences: UserPreferences = UserPreferences(userManager)
+    /**
+     * Generates a random lowercase hexadecimal session ID with length of 32 characters.
+     *
+     * @return The generated ID:
+     * - Is exactly 32 characters long.
+     * - Consists only of characters `0` through `9` and `a` through `f`.
+     * - Is never composed entirely of zeroes (e.g., "000000...").
+     */
+    fun generate() = SimpleId.generate(LENGTH)
 }

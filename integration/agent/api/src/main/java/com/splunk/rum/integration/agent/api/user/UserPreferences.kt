@@ -14,28 +14,17 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.internal.utils
+package com.splunk.rum.integration.agent.api.user
 
-import java.security.SecureRandom
+import com.splunk.rum.integration.agent.internal.user.IUserManager
 
-internal object TraceId {
+class UserPreferences internal constructor(private val userManager: IUserManager) {
 
-    private const val LENGTH = 16
-    private val INVALID = "0".repeat(LENGTH)
-    private val CHARACTERS = "0123456789abcdef"
-
-    fun random(): String {
-        val random = SecureRandom()
-        var result: String
-
-        do {
-            result = ""
-
-            for (i in 0 until LENGTH) {
-                result += CHARACTERS[random.nextInt(CHARACTERS.length)]
+    var trackingMode: UserTrackingMode? = null
+        set(value) {
+            field = value
+            value?.let {
+                userManager.trackingMode = it.toInternal()
             }
-        } while (result == INVALID)
-
-        return result
-    }
+        }
 }

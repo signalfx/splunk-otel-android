@@ -35,6 +35,27 @@ import java.time.Duration
 
 class App : Application() {
 
+    /**
+     * BuildConfig.SPLUNK_REALM and BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
+     *
+     * These values are injected at build time from your personal Gradle global properties.
+     * This allows sensitive data (like tokens and keys) to be kept *out* of the codebase.
+     *
+     * To configure:
+     * 1. Open (or create) the global properties file:
+     *      ~/.gradle/gradle.properties
+     *
+     * 2. Add the following lines:
+     *      splunkRealm=yourRealmValue
+     *      splunkRumAccessToken=yourAccessToken
+     *
+     * 3. Sync Gradle and rebuild the project.
+     *
+     * ❗️If these properties are missing, empty String will be used for both realm and accessToken. ❗️
+     */
+    private val realm = BuildConfig.SPLUNK_REALM
+    private val rumAccessToken = BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
+
     override fun onCreate() {
         super.onCreate()
 
@@ -53,8 +74,8 @@ class App : Application() {
             application = this,
             agentConfiguration = AgentConfiguration(
                 endpoint = EndpointConfiguration(
-                    realm = "lab0",
-                    rumAccessToken = "1CucSUVwF5f2hNyuHwKNfw"
+                    realm = realm,
+                    rumAccessToken = rumAccessToken
                 ),
                 appName = "Android demo app",
                 enableDebugLogging = true,
