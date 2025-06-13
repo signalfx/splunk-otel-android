@@ -1,1 +1,1 @@
--repackageclasses 'com.cisco.mrum.common.otel.api'
+-repackageclasses 'com.splunk.rum.common.otel'
