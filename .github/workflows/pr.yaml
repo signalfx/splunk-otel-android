@@ -8,6 +8,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate_pr_title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR title
+        shell: bash
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "Validating PR title: \"$PR_TITLE\""
+
+          REGEX='^\[?(WIP|wip)?\]?\s*(DEMRUM-[0-9]+(,\s?DEMRUM-[0-9]+)*|NO-TICKET):\s.+$'
+
+          if [[ "$PR_TITLE" =~ $REGEX ]]; then
+            echo "✅ PR title is valid."
+          else
+            echo "❌ PR title is invalid."
+            echo ""
+            echo "It must match one of the following formats:"
+            echo "- DEMRUM-1234: Description"
+            echo "- DEMRUM-1234, DEMRUM-5678: Description"
+            echo "- NO-TICKET: Description"
+            exit 1
+          fi
   build:
     runs-on: ubuntu-24.04
     steps:
@@ -17,7 +39,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-
       - name: Build and test
         run: touch ./local.properties; ./gradlew check javadoc assemble
       - name: Upload coverage to Codecov
@@ -31,7 +52,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-
       - name: Run ktlint
         run: ./gradlew ktlintCheck
   check_links:
