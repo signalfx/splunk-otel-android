@@ -19,19 +19,16 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.rum.integration.okhttp3.auto"
+    namespace = "com.splunk.rum.integration.okhttp.common"
 }
 
 dependencies {
     api(platform(Dependencies.Otel.androidBom))
 
-    implementation(project(":integration:agent:internal"))
-    implementation(project(":integration:okhttp:common"))
-
-    implementation(Dependencies.Otel.androidOkHttp3Library)
-    implementation(Dependencies.Otel.instrumentationApi)
+    implementation(project(":common:utils"))
+    implementation(project(":common:otel"))
 
     implementation(Dependencies.okhttp)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.Otel.instrumentationApi)
 }

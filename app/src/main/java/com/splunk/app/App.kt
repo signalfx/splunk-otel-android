@@ -28,7 +28,8 @@ import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfigurat
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration
-import com.splunk.rum.integration.okhttp3.auto.OkHttp3ModuleConfiguration
+import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration
+import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration
 import java.time.Duration
@@ -99,10 +100,18 @@ class App : Application() {
                     isEnabled = true
                 ),
                 HttpURLModuleConfiguration(
-                    isEnabled = true
+                    isEnabled = true,
+                    capturedRequestHeaders = listOf("Host", "Accept"),
+                    capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
                 ),
-                OkHttp3ModuleConfiguration(
-                    isEnabled = true
+                OkHttp3AutoModuleConfiguration(
+                    isEnabled = true,
+                    capturedRequestHeaders = listOf("User-Agent", "Accept"),
+                    capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
+                ),
+                OkHttp3ManualModuleConfiguration(
+                    capturedRequestHeaders = listOf("Content-Type", "Accept"),
+                    capturedResponseHeaders = listOf("Server", "Content-Type", "Content-Length")
                 ),
                 NetworkMonitorModuleConfiguration(
                     isEnabled = true

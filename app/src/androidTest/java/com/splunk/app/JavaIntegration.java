@@ -22,10 +22,8 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration;
 import com.splunk.rum.integration.agent.api.EndpointConfiguration;
 import com.splunk.rum.integration.agent.api.session.ISession;
 import com.splunk.rum.integration.agent.api.IState;
-import com.splunk.rum.integration.agent.api.session.Session;
 import com.splunk.rum.integration.agent.api.SplunkRum;
 import com.splunk.rum.integration.agent.api.session.SessionConfiguration;
-import com.splunk.rum.integration.agent.api.user.User;
 import com.splunk.rum.integration.agent.api.user.UserConfiguration;
 import com.splunk.rum.integration.agent.api.user.UserState;
 import com.splunk.rum.integration.agent.api.user.UserTrackingMode;
@@ -40,7 +38,7 @@ import com.splunk.rum.integration.lifecycle.LifecycleModuleConfiguration;
 import com.splunk.rum.integration.navigation.Navigation;
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration;
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration;
-import com.splunk.rum.integration.okhttp3.auto.OkHttp3ModuleConfiguration;
+import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration;
 import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration;
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration;
 import com.splunk.rum.integration.startup.StartupModuleConfiguration;
@@ -114,7 +112,7 @@ public class JavaIntegration extends Application {
                 new LifecycleModuleConfiguration(),
                 new NavigationModuleConfiguration(true, true),
                 new NetworkMonitorModuleConfiguration(),
-                new OkHttp3ModuleConfiguration(),
+                new OkHttp3AutoModuleConfiguration(),
                 new SessionReplayModuleConfiguration(),
                 new SlowRenderingModuleConfiguration(true),
                 new StartupModuleConfiguration()
