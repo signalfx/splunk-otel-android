@@ -29,6 +29,7 @@ internal object AgentResource {
         .getDefault()
         .merge(agentConfigResource(context, agentConfiguration))
         .merge(buildResource())
+        .merge(sessionReplayResource())
 
     private fun agentConfigResource(context: Context, agentConfiguration: AgentConfiguration): Resource =
         Resource.empty().toBuilder()
@@ -46,5 +47,16 @@ internal object AgentResource {
         .put(OS_TYPE, "linux")
         .put(OS_VERSION, Build.VERSION.RELEASE)
         .put(OS_DESCRIPTION, OS_DESCRIPTION_TEMPLATE.format(Build.VERSION.RELEASE, Build.ID, Build.VERSION.SDK_INT))
+        .build()
+
+    /**
+     * This is WIP currently
+     */
+    private fun sessionReplayResource(): Resource = Resource.empty().toBuilder()
+        .put("splunk.scriptInstance", "") // TODO separate task
+        .put("splunk.rumVersion", "0.20.0-beta.4")
+        .put("process.runtime.name", "mobile")
+        .put("service.name", "unknown_service")
+        .put("splunk.rumSessionId", "23fc7322c65d8f001ba15473d3e80346") // TODO separate task
         .build()
 }

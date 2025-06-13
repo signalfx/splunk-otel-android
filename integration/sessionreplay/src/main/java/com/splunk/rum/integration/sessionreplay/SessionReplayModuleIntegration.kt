@@ -28,17 +28,22 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
+import org.json.JSONObject
 
 internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
     defaultModuleConfiguration = SessionReplayModuleConfiguration()
 ) {
 
     private const val TAG = "SessionReplayIntegration"
+
+    // TODO task to reset index when session changes?
+    private var index = 1L
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach()")
@@ -55,9 +60,17 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         SessionReplay.instance.dataListeners += sessionReplayDataListener
     }
 
+    override fun onSessionChange(sessionId: String) {
+        super.onSessionChange(sessionId)
+        SessionReplay.instance.newDataChunk()
+    }
+
     private fun setupComposeIdentification() {
         runIfComposeUiExists {
-            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) {
+            ComposeElementIdentification.insertModifierIfNeeded(
+                SessionReplayDrawModifier::class,
+                OrderPriority.HIGH
+            ) {
                     id,
                     isSensitive,
                     _
@@ -73,16 +86,22 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             val instance = SplunkOpenTelemetrySdk.instance ?: return false
 
+            val segmentMetadata = JSONObject().put("startUnixMs", metadata.startUnixMs)
+                .put("endUnixMs", metadata.endUnixMs)
+                .put("source", metadata.platform)
+                .toString()
+
             val attributes = Attributes.of(
-                AttributeKey.stringKey("event.name"),
-                "session_replay_data"
-//                AttributeKey.stringKey("replay.record_id"), recordData.id,
-//                AttributeKey.longKey("replay.start_timestamp"), recordData.start * 1_000_000,
-//                AttributeKey.longKey("replay.end_timestamp"), recordData.end * 1_000_000
+                AttributeKey.stringKey("event.name"), "session_replay_data",
+                AttributeKey.longKey("rr-web.total-chunks"), 1L,
+                AttributeKey.longKey("rr-web.chunk"), index,
+                AttributeKey.longKey("rr-web.event"), index,
+                AttributeKey.longKey("rr-web.offset"), 1L,
+                AttributeKey.stringKey("segmentMetadata"), segmentMetadata
             )
 
             val logRecordBuilder = instance.sdkLoggerProvider
-                .loggerBuilder("SessionReplayDataScopeName")
+                .loggerBuilder(RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME)
                 .build()
                 .logRecordBuilder()
 
@@ -90,6 +109,8 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                 .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
                 .setAllAttributes(attributes)
                 .emit()
+
+            index += 1
 
             return true
         }

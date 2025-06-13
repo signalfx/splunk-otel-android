@@ -68,7 +68,11 @@ class OpenTelemetryInitializer(
         spanProcessors += BatchSpanProcessor.builder(spanExporter).build()
 
         logRecordProcessors += BatchLogRecordProcessor.builder(
-            AndroidLogRecordExporter()
+            AndroidLogRecordExporter(
+                agentStorage = agentStorage,
+                jobManager = jobManager,
+                jobIdStorage = jobIdStorage
+            )
         ).build()
     }
 

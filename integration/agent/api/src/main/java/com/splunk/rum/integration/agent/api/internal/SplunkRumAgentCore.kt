@@ -29,6 +29,7 @@ import com.splunk.rum.integration.agent.internal.processor.AppStartSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcessor
+import com.splunk.rum.integration.agent.internal.processor.SessionReplaySessionIdLogProcessor
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.user.IUserManager
@@ -86,6 +87,8 @@ internal object SplunkRumAgentCore {
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addSpanProcessor(AppStartSpanProcessor())
+            // Session Replay module is special case of Log Records that are NOT converted to Spans.
+            .addLogRecordProcessor(SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager))
 
         if (agentConfiguration.enableDebugLogging) {
             initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())

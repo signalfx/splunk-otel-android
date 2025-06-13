@@ -25,6 +25,10 @@ interface IAgentStorage {
     fun deleteBaseUrl()
     fun readBaseUrl(): String?
 
+    fun writeSessionReplayBaseUrl(value: String)
+    fun deleteSessionReplayBaseUrl()
+    fun readSessionReplayBaseUrl(): String?
+
     fun writeDeviceId(value: String)
     fun readDeviceId(): String?
 
@@ -46,10 +50,18 @@ interface IAgentStorage {
     fun writeOtelLogData(id: String, data: ByteArray): Boolean
     fun readOtelLogData(id: String): ByteArray?
     fun deleteOtelLogData(id: String)
+
     fun writeOtelSpanData(id: String, data: ByteArray): Boolean
     fun readOtelSpanData(id: String): ByteArray?
     fun deleteOtelSpanData(id: String)
     fun addBufferedSpanId(id: String)
     fun getBufferedSpanIds(): List<String>
     fun clearBufferedSpanIds()
+
+    fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean
+    fun readOtelSessionReplayData(id: String): ByteArray?
+    fun deleteOtelSessionReplayData(id: String)
+
+    fun readSessionIds(): List<SessionId>
+    fun writeSessionIds(sessionIds: List<SessionId>)
 }

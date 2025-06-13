@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.internal.module
 import android.content.Context
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.android.instrumentation.InstallationContext
 
 abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultModuleConfiguration: T) {
@@ -31,7 +32,9 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     }
 
     fun attach(context: Context) {
-        AgentIntegration.obtainInstance(context).listeners += installationListener
+        val agentIntegration = AgentIntegration.obtainInstance(context)
+        agentIntegration.listeners += installationListener
+        agentIntegration.sessionManager.sessionListeners += sessionChangeListener
 
         onAttach(context)
     }
@@ -43,6 +46,9 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
+    }
+
+    protected open fun onSessionChange(sessionId: String) {
     }
 
     private val installationListener = object : AgentIntegration.Listener {
@@ -57,6 +63,12 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
             this@ModuleIntegration.onInstall(context, oTelInstallationContext, moduleConfigurations)
 
             AgentIntegration.registerModuleInitializationEnd(defaultModuleConfiguration.name)
+        }
+    }
+
+    private val sessionChangeListener = object : SplunkSessionManager.SessionListener {
+        override fun onSessionChanged(sessionId: String) {
+            onSessionChange(sessionId)
         }
     }
 }
