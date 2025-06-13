@@ -30,6 +30,8 @@ import com.splunk.app.ui.BaseFragment
 import com.splunk.app.util.CommonUtils
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
+import com.splunk.rum.integration.okhttp3.manual.extension.createRumOkHttpCallFactory
+import com.splunk.rum.integration.okhttp3.manual.extension.okHttpManualInstrumentation
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.trace.SdkTracerProvider
@@ -59,6 +61,11 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         OkHttpClient()
     }
 
+    /*private val client: Call.Factory by lazy {
+        instrumentedCallFactory(OkHttpClient())
+        //instrumentedCallFactoryLegacyAPI(OkHttpClient())
+    }*/
+
     val retryInterceptor = Interceptor { chain: Interceptor.Chain ->
         val request = chain.request()
         var response = chain.proceed(request)
@@ -75,17 +82,17 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
     }
 
     private val retryClient: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .retryOnConnectionFailure(true)
-            .addInterceptor(
-                retryInterceptor
-            )
-            .build()
+        retryClient()
     }
 
-    private val cachedClient = OkHttpClient.Builder()
-        .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
-        .build()
+   /* private val retryClient: Call.Factory by lazy {
+        instrumentedCallFactory(retryClient())
+        //instrumentedCallFactoryLegacyAPI(retryClient())
+    }*/
+
+    private val cachedClient = cachedClient()
+    // private val cachedClient = instrumentedCallFactory(cachedClient())
+    // private val cachedClient = instrumentedCallFactoryLegacyAPI(cachedClient())
 
     private val executor = Executors.newScheduledThreadPool(1)
 
@@ -116,6 +123,29 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
         SplunkRum.instance.navigation.track("OkHttp")
     }
+
+    private fun retryClient(): OkHttpClient = OkHttpClient.Builder()
+        .retryOnConnectionFailure(true)
+        .addInterceptor(
+            retryInterceptor
+        )
+        .build()
+
+    private fun cachedClient(): OkHttpClient = OkHttpClient.Builder()
+        .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
+        .build()
+
+    /**
+     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation.
+     */
+    private fun instrumentedCallFactory(client: OkHttpClient): Call.Factory =
+        SplunkRum.instance.okHttpManualInstrumentation.buildOkHttpCallFactory(client)
+
+    /**
+     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation using the Legacy API.
+     */
+    private fun instrumentedCallFactoryLegacyAPI(client: OkHttpClient): Call.Factory =
+        SplunkRum.instance.createRumOkHttpCallFactory(client)
 
     /**
      * Demonstrates a synchronous successful okhttp GET - Download a file, print its headers, and print its response body as a string.
@@ -160,29 +190,9 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
         span!!.makeCurrent().use { ignored ->
 
-            val client: OkHttpClient = OkHttpClient.Builder()
-                .addInterceptor(
-                    Interceptor { chain: Interceptor.Chain ->
-                        val currentSpan =
-                            Span.current().spanContext
-                        // Verify context propagation.
-                        if (span.spanContext.traceId ==
-                            currentSpan.traceId
-                        ) {
-                            Log.d(
-                                TAG,
-                                "Testing parent context propagation in async get - trace id's are same as expected."
-                            )
-                        } else {
-                            Log.e(
-                                TAG,
-                                "Testing parent context propagation in async get - trace id's are unexpectedly not same."
-                            )
-                        }
-                        chain.proceed(chain.request())
-                    }
-                )
-                .build()
+            val client: OkHttpClient = contextPropagationClient(span)
+            // val client: Call.Factory = instrumentedCallFactory(contextPropagationClient(span))
+            // val client: Call.Factory = instrumentedCallFactoryLegacyAPI(contextPropagationClient(span))
 
             val request = Request.Builder()
                 .url("https://publicobject.com/helloworld.txt")
@@ -213,6 +223,24 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         span.end()
         CommonUtils.showDoneToast(context, "Parent Context Propagation In Async Get")
     }
+
+    private fun contextPropagationClient(span: Span): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(
+            Interceptor { chain: Interceptor.Chain ->
+                val currentSpan = Span.current().spanContext
+                // Verify context propagation.
+                if (span.spanContext.traceId == currentSpan.traceId) {
+                    Log.d(TAG, "Testing parent context propagation in async get - trace id's are same as expected.")
+                } else {
+                    Log.e(
+                        TAG,
+                        "Testing parent context propagation in async get - trace id's are unexpectedly not same."
+                    )
+                }
+                chain.proceed(chain.request())
+            }
+        )
+        .build()
 
     /**
      * Demonstrates an unsuccessful okhttp GET.

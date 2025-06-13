@@ -1,0 +1,11 @@
+APPDYNAMICS
+END USER LICENSE AGREEMENT
+
+By accessing the Software herein, you (and the organization you represent) ("You") acknowledge and agree that the use
+of the Software and open source software are governed by (1) the End User License Agreement found at
+https://www.cisco.com/c/en/us/about/legal/cloud-and-software/end_user_license_agreement.html and the applicable Product
+Specific Terms found at https://www.cisco.com/c/en/us/about/legal/cloud-and-software/software-terms.html or (2) any
+other superseding agreement between AppDynamics, or its parent company Cisco Systems, Inc., as applicable, and You.
+References to End User in such agreements shall mean You.
+
+AppDynamics Proprietary and Confidential * Revision 2023.04

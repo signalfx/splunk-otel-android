@@ -19,9 +19,9 @@ package com.splunk.rum.integration.okhttp3.auto
 import android.content.Context
 import com.splunk.rum.integration.agent.internal.module.ModuleInstaller
 
-internal class OkHttp3ModuleInstaller : ModuleInstaller() {
+internal class OkHttp3AutoModuleInstaller : ModuleInstaller() {
 
     override fun onInstall(context: Context) {
-        OkHttp3ModuleIntegration.attach(context)
+        OkHttp3AutoModuleIntegration.attach(context)
     }
 }

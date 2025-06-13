@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.okhttp3.auto
+package com.splunk.rum.integration.okhttp3.manual
 
-import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import android.content.Context
+import com.splunk.rum.integration.agent.internal.module.ModuleInstaller
 
-/**
- * OkHttp module configuration.
- *
- * @property isEnabled Whether the module is enabled.
- */
-data class OkHttp3ModuleConfiguration @JvmOverloads constructor(val isEnabled: Boolean = true) : ModuleConfiguration {
+internal class OkHttp3ManualModuleInstaller : ModuleInstaller() {
 
-    override val name: String = "okHttp3"
-
-    override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to isEnabled.toString()
-    )
+    override fun onInstall(context: Context) {
+        OkHttp3ManualModuleIntegration.attach(context)
+    }
 }

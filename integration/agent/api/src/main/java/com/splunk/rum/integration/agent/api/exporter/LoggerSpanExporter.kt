@@ -41,7 +41,7 @@ internal class LoggerSpanExporter : SpanExporter {
                     "spanId=${span.spanId}, " +
                     "parentSpanId=${span.parentSpanId}, " +
                     "kind=${span.kind}, " +
-                    "resources=${span.resource.attributes.toSplunkString()}" +
+                    "resources=${span.resource.attributes.toSplunkString()}, " +
                     "attributes=${span.attributes.toSplunkString()}, " +
                     "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
                     "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"

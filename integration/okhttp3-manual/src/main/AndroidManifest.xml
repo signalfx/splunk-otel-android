@@ -2,8 +2,8 @@
 
     <application>
         <provider
-            android:name=".OkHttp3AutoModuleInstaller"
-            android:authorities="${applicationId}.OkHttp3AutoModuleInstaller"
+            android:name=".OkHttp3ManualModuleInstaller"
+            android:authorities="${applicationId}.OkHttp3ManualModuleInstaller"
             android:enabled="true"
             android:exported="false" />
     </application>

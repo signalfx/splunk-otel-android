@@ -26,6 +26,7 @@ dependencies {
     api(project(":integration:slowrendering"))
     api(project(":integration:httpurlconnection-auto"))
     api(project(":integration:okhttp3-auto"))
+    api(project(":integration:okhttp3-manual"))
     api(project(":integration:startup"))
     api(project(":integration:interactions"))
     api(project(":integration:lifecycle"))
