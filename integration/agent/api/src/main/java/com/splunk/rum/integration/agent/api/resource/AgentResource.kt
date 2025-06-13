@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.BuildConfig
-import com.splunk.sdk.utils.extensions.appVersion
+import com.splunk.rum.utils.extensions.appVersion
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MANUFACTURER
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER

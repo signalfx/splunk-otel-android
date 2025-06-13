@@ -3,10 +3,10 @@
 
     <application>
         <service
-            android:name="com.splunk.sdk.common.otel.span.UploadOtelSpanDataJob"
+            android:name="com.splunk.rum.common.otel.span.UploadOtelSpanDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
-            android:name="com.splunk.sdk.common.otel.logRecord.UploadOtelLogRecordDataJob"
+            android:name="com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 

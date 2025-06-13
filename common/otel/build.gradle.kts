@@ -20,7 +20,7 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.sdk.otel"
+    namespace = "com.splunk.rum.common.otel"
 }
 
 dependencies {

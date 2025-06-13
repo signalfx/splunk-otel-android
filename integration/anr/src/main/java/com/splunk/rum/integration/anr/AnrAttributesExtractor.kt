@@ -1,6 +1,6 @@
 package com.splunk.rum.integration.anr
 
-import com.splunk.sdk.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context as OtelContext
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor

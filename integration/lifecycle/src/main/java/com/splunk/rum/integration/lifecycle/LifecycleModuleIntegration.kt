@@ -19,6 +19,7 @@ package com.splunk.rum.integration.lifecycle
 import android.app.Application
 import android.content.Context
 import android.os.Build
+import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.lifecycle.screen.VisibleScreenTracker
 import com.splunk.rum.integration.lifecycle.tracer.activity.ActivityTracerManager
@@ -28,7 +29,6 @@ import com.splunk.rum.integration.lifecycle.tracer.fragment.FragmentTracerManage
 import com.splunk.rum.integration.lifecycle.tracer.fragment.activity.FragmentActivityCallback21
 import com.splunk.rum.integration.lifecycle.tracer.fragment.activity.FragmentActivityCallback29
 import com.splunk.rum.integration.lifecycle.tracer.fragment.callback.FragmentCallback
-import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
 import io.opentelemetry.api.trace.Tracer
 
 internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleConfiguration>(

@@ -19,13 +19,13 @@ package com.splunk.rum.integration.startup
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.utils.extensions.forEachFast
+import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.extensions.toInstant
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
-import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.sdk.common.otel.extensions.toInstant
-import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.android.instrumentation.InstallationContext
 
 internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfiguration>(

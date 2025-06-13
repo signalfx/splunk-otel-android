@@ -17,10 +17,10 @@
 package com.splunk.rum.integration.agent.internal.processor
 
 import android.os.SystemClock
+import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.toSplunkString
 import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modules
-import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan

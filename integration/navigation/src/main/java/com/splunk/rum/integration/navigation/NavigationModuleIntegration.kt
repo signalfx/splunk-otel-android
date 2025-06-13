@@ -18,11 +18,11 @@ package com.splunk.rum.integration.navigation
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
-import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.sdk.common.otel.extensions.createZeroLengthSpan
-import com.splunk.sdk.common.otel.internal.RumConstants
 
 internal object NavigationModuleIntegration : ModuleIntegration<NavigationModuleConfiguration>(
     defaultModuleConfiguration = NavigationModuleConfiguration()

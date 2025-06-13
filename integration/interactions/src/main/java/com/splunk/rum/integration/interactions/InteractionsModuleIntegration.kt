@@ -28,12 +28,12 @@ import com.cisco.android.instrumentation.recording.interactions.model.LegacyData
 import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.cisco.android.instrumentation.recording.wireframe.model.Wireframe
 import com.cisco.android.instrumentation.recording.wireframe.stats.WireframeStats
+import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
-import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
 

@@ -17,10 +17,10 @@
 package com.splunk.rum.integration.agent.internal.processor
 
 import android.app.Application
-import com.splunk.sdk.common.otel.internal.RumConstants
-import com.splunk.sdk.utils.extensions.applicationId
-import com.splunk.sdk.utils.extensions.splunkBuildId
-import com.splunk.sdk.utils.extensions.versionCode
+import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.utils.extensions.applicationId
+import com.splunk.rum.utils.extensions.splunkBuildId
+import com.splunk.rum.utils.extensions.versionCode
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan

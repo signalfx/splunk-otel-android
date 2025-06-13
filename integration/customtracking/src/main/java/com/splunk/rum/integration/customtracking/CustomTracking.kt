@@ -17,9 +17,9 @@
 package com.splunk.rum.integration.customtracking
 
 import com.cisco.android.common.logger.Logger
-import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.sdk.common.otel.extensions.createZeroLengthSpan
-import com.splunk.sdk.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
+import com.splunk.rum.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer

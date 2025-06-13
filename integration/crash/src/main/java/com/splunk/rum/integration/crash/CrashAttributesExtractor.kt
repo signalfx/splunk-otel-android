@@ -1,6 +1,6 @@
 package com.splunk.rum.integration.crash
 
-import com.splunk.sdk.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.RumConstants
 import io.opentelemetry.android.instrumentation.crash.CrashDetails
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context
