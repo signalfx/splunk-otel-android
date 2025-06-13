@@ -34,7 +34,6 @@ import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 /**
  * This Exporter is added to Otel by default, it handles the offline/persistance.
