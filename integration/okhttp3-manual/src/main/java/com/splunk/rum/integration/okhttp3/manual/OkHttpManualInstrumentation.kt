@@ -30,8 +30,10 @@ class OkHttpManualInstrumentation internal constructor() {
      * @param client The [OkHttpClient] to wrap with Splunk RUM instrumentation.
      * @return A [Call.Factory] implementation.
      */
-    fun buildOkHttpCallFactory(client: OkHttpClient): Call.Factory =
-        OkHttp3ManualModuleIntegration.okHttpTelemetry.newCallFactory(client)
+    fun buildOkHttpCallFactory(client: OkHttpClient): Factory =
+        OkHttp3ManualModuleIntegration.okHttpTelemetry?.let { okHttpTelemetry ->
+            okHttpTelemetry.newCallFactory(client)
+        } ?: throw IllegalStateException("OkHttp3 manual instrumentation is not initialized")
 
     companion object {
         /**

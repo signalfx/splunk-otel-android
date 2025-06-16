@@ -20,7 +20,7 @@ import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.okhttp.common.OkHttp3AdditionalAttributesExtractor
+import com.splunk.rum.integration.okhttp3.common.OkHttp3AdditionalAttributesExtractor
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation

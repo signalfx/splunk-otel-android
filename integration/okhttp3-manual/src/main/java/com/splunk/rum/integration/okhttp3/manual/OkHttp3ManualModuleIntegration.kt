@@ -20,7 +20,7 @@ import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.okhttp.common.OkHttp3AdditionalAttributesExtractor
+import com.splunk.rum.integration.okhttp3.common.OkHttp3AdditionalAttributesExtractor
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTelemetry
 
@@ -29,7 +29,7 @@ internal object OkHttp3ManualModuleIntegration : ModuleIntegration<OkHttp3Manual
 ) {
     private const val TAG = "OkHttp3ManualIntegration"
 
-    internal lateinit var okHttpTelemetry: OkHttpTelemetry
+    internal var okHttpTelemetry: OkHttpTelemetry? = null
         private set
 
     override fun onInstall(
