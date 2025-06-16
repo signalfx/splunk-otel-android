@@ -11,12 +11,12 @@ apply<ConfigAndroidLibrary>()
 apply<plugins.ConfigPublish>()
 
 ext {
-    set(artifactIdProperty, "rum-agent")
+    set(artifactIdProperty, "splunk-otel-android")
     set(versionProperty, Configurations.sdkVersionName)
 }
 
 android {
-    namespace = "com.cisco.android.rum"
+    namespace = "com.splunk.rum"
 }
 
 dependencies {

@@ -16,8 +16,8 @@
 
 package com.splunk.rum.integration.okhttp3.common
 
-import com.splunk.sdk.common.otel.internal.RumConstants
-import com.splunk.sdk.utils.ServerTimingHeaderParser
+import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.utils.ServerTimingHeaderParser
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
