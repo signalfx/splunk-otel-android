@@ -24,7 +24,7 @@ import com.cisco.android.common.utils.extensions.safeSchedule
 import com.splunk.rum.integration.agent.internal.id.SessionId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
 import com.splunk.sdk.common.storage.IAgentStorage
-import com.splunk.sdk.common.storage.SessionId
+import com.splunk.sdk.common.storage.SessionId as SessionIdStorageData
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 
@@ -52,7 +52,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
 
-    private val sessionIds: MutableList<SessionId> = agentStorage.readSessionIds().toMutableList()
+    private val sessionIds: MutableList<SessionIdStorageData> = agentStorage.readSessionIds().toMutableList()
 
     /**
      * The value is valid after the [install] function is called.
@@ -119,7 +119,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
         val newSessionId = SessionId.generate()
         sessionId = newSessionId
-        sessionIds.add(SessionId(newSessionId, now))
+        sessionIds.add(SessionIdStorageData(newSessionId, now))
         agentStorage.writeSessionIds(sessionIds)
         sessionListeners.forEachFast { it.onSessionChanged(newSessionId) }
         return newSessionId
