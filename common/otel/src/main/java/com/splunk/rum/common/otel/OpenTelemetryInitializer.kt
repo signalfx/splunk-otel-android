@@ -21,6 +21,7 @@ import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.job.JobManager
 import com.splunk.rum.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.rum.common.otel.span.AndroidSpanExporter
+import com.splunk.rum.common.otel.span.SpanInterceptorExporter
 import com.splunk.rum.common.storage.AgentStorage
 import io.opentelemetry.api.baggage.propagation.W3CBaggagePropagator
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator
@@ -53,7 +54,7 @@ class OpenTelemetryInitializer(
 
         resource = Resource.getDefault()
 
-        val spanExporter = com.splunk.rum.common.otel.span.SpanInterceptorExporter(
+        val spanExporter = SpanInterceptorExporter(
             AndroidSpanExporter(
                 agentStorage = agentStorage,
                 jobManager = jobManager,
