@@ -18,8 +18,8 @@ package com.splunk.rum.integration.agent.api.configuration
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
+import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
-import com.splunk.sdk.common.storage.IAgentStorage
 
 internal class ConfigurationManager private constructor(private val agentStorage: IAgentStorage) {
     fun preProcessConfiguration(context: Context, proposalConfig: AgentConfiguration): AgentConfiguration {

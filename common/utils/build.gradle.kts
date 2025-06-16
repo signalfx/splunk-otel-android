@@ -20,7 +20,7 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.sdk.common.utils"
+    namespace = "com.splunk.rum.common.utils"
 }
 
 dependencies {
