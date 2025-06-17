@@ -87,6 +87,7 @@ class CustomTracking internal constructor() {
         }
         val timestamp = Instant.now()
         spanBuilder.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
+            .setAttribute(RumConstants.ERROR_KEY, "true")
             .setStartTimestamp(timestamp)
             .startSpan()
             .recordException(throwable)
