@@ -68,7 +68,12 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
                     }
                 }
             } finally {
-                spanBuilder.createZeroLengthSpan(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+                val effectiveTimestamp = if (log.timestampEpochNanos != 0L) {
+                    log.timestampEpochNanos
+                } else {
+                    log.observedTimestampEpochNanos
+                }
+                spanBuilder.createZeroLengthSpan(effectiveTimestamp, TimeUnit.NANOSECONDS)
 
                 if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
                     SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.forceFlush()
