@@ -28,12 +28,12 @@ import com.cisco.android.instrumentation.recording.interactions.model.LegacyData
 import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.cisco.android.instrumentation.recording.wireframe.model.Wireframe
 import com.cisco.android.instrumentation.recording.wireframe.stats.WireframeStats
+import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
-import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
 
@@ -43,6 +43,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     private const val TAG = "InteractionsIntegration"
 
+    private val attributeEventName = AttributeKey.stringKey("event.name")
     private val attributeKeyComponent = AttributeKey.stringKey("component")
     private val attributeKeyActionName = AttributeKey.stringKey("action.name")
     private val attributeKeyTargetType = AttributeKey.stringKey("target.type")
@@ -133,6 +134,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
+                .setAttribute(attributeEventName, "action")
                 .setAttribute(attributeKeyComponent, "ui")
                 .setAttribute(attributeKeyActionName, actionName)
                 .setAttribute(attributeKeyTargetType, targetType)

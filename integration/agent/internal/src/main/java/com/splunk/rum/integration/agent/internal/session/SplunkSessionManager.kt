@@ -21,6 +21,7 @@ import android.content.Context
 import com.cisco.android.common.utils.AppStateObserver
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.cisco.android.common.utils.extensions.safeSchedule
+import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.internal.id.SessionId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
 import com.splunk.sdk.common.storage.IAgentStorage

@@ -1,1 +1,1 @@
--repackageclasses 'com.splunk.sdk.common.storage'
+-repackageclasses 'com.splunk.rum.common.storage'

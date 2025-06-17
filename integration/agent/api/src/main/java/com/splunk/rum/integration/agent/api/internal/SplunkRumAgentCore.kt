@@ -19,6 +19,8 @@ package com.splunk.rum.integration.agent.api.internal
 import android.app.Application
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.logger.consumers.AndroidLogConsumer
+import com.splunk.rum.common.otel.OpenTelemetryInitializer
+import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
@@ -33,8 +35,6 @@ import com.splunk.rum.integration.agent.internal.processor.SessionReplaySessionI
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.user.IUserManager
-import com.splunk.sdk.common.otel.OpenTelemetryInitializer
-import com.splunk.sdk.common.storage.AgentStorage
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 

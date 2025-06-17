@@ -26,6 +26,7 @@ interface IState {
     val deploymentEnvironment: String
     val isDebugLoggingEnabled: Boolean
     val instrumentedProcessName: String?
+    val deferredUntilForeground: Boolean
 }
 
 class State internal constructor(agentConfiguration: AgentConfiguration) : IState {
@@ -40,6 +41,7 @@ class State internal constructor(agentConfiguration: AgentConfiguration) : IStat
     override val deploymentEnvironment: String = agentConfiguration.deploymentEnvironment
     override val isDebugLoggingEnabled: Boolean = agentConfiguration.enableDebugLogging
     override val instrumentedProcessName: String? = agentConfiguration.instrumentedProcessName
+    override val deferredUntilForeground: Boolean = agentConfiguration.deferredUntilForeground
 }
 
 class Noop(notRunningCause: Status.NotRunning = Status.NotRunning.NotInstalled) : IState {
@@ -51,4 +53,5 @@ class Noop(notRunningCause: Status.NotRunning = Status.NotRunning.NotInstalled) 
     override val isDebugLoggingEnabled: Boolean = false
     override val instrumentedProcessName: String?
         get() = null
+    override val deferredUntilForeground: Boolean = false
 }
