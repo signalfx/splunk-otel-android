@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.okhttp3.auto
+package com.splunk.rum.integration.okhttp3.common
 
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.utils.ServerTimingHeaderParser
@@ -24,7 +24,7 @@ import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import okhttp3.Interceptor
 import okhttp3.Response
 
-internal class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Chain, Response> {
+class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Chain, Response> {
 
     override fun onStart(attributes: AttributesBuilder, parentContext: Context, chain: Interceptor.Chain) {
         attributes.put(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_HTTP)

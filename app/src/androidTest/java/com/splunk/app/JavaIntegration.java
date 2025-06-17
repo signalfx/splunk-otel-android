@@ -22,10 +22,8 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration;
 import com.splunk.rum.integration.agent.api.EndpointConfiguration;
 import com.splunk.rum.integration.agent.api.session.ISession;
 import com.splunk.rum.integration.agent.api.IState;
-import com.splunk.rum.integration.agent.api.session.Session;
 import com.splunk.rum.integration.agent.api.SplunkRum;
 import com.splunk.rum.integration.agent.api.session.SessionConfiguration;
-import com.splunk.rum.integration.agent.api.user.User;
 import com.splunk.rum.integration.agent.api.user.UserConfiguration;
 import com.splunk.rum.integration.agent.api.user.UserState;
 import com.splunk.rum.integration.agent.api.user.UserTrackingMode;
@@ -40,12 +38,14 @@ import com.splunk.rum.integration.lifecycle.LifecycleModuleConfiguration;
 import com.splunk.rum.integration.navigation.Navigation;
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration;
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration;
-import com.splunk.rum.integration.okhttp3.auto.OkHttp3ModuleConfiguration;
+import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration;
+import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration;
 import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration;
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration;
 import com.splunk.rum.integration.startup.StartupModuleConfiguration;
 
 import java.time.Duration;
+import java.util.Arrays;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -109,12 +109,23 @@ public class JavaIntegration extends Application {
         ModuleConfiguration[] moduleConfigurations = new ModuleConfiguration[]{
                 new AnrModuleConfiguration(),
                 new CrashModuleConfiguration(),
-                new HttpURLModuleConfiguration(),
+                new HttpURLModuleConfiguration(
+                        true,
+                        Arrays.asList("Host", "Accept"),
+                        Arrays.asList("Date", "Content-Type", "Content-Length")
+                ),
                 new InteractionsModuleConfiguration(),
                 new LifecycleModuleConfiguration(),
                 new NavigationModuleConfiguration(true, true),
                 new NetworkMonitorModuleConfiguration(),
-                new OkHttp3ModuleConfiguration(),
+                new OkHttp3AutoModuleConfiguration( true,
+                        Arrays.asList("User-Agent", "Accept"),
+                        Arrays.asList("Date", "Content-Type", "Content-Length")
+                ),
+                new OkHttp3ManualModuleConfiguration(
+                        Arrays.asList("Content-Type", "Accept"),
+                        Arrays.asList("Server", "Content-Type", "Content-Length")
+                ),
                 new SessionReplayModuleConfiguration(),
                 new SlowRenderingModuleConfiguration(true),
                 new StartupModuleConfiguration()

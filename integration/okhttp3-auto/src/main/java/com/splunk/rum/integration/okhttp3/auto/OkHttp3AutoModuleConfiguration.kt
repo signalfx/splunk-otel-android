@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.httpurlconnection.auto
+package com.splunk.rum.integration.okhttp3.auto
 
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
 /**
- * Configuration for the HttpURLConnection module.
+ * OkHttp module configuration.
  *
  * @property isEnabled Whether the module is enabled.
  * @property capturedRequestHeaders The list of request headers to capture.
  * @property capturedResponseHeaders The list of response headers to capture.
  */
-data class HttpURLModuleConfiguration @JvmOverloads constructor(
+data class OkHttp3AutoModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
     val capturedRequestHeaders: List<String> = emptyList(),
     val capturedResponseHeaders: List<String> = emptyList()
 ) : ModuleConfiguration {
 
-    override val name: String = "httpURLConnection"
+    override val name: String = "okHttp3-auto"
 
     override val attributes: List<Pair<String, String>> = listOf(
         "enabled" to isEnabled.toString(),

@@ -149,6 +149,9 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 val url = URL(inputUrl)
                 connection = url.openConnection() as HttpURLConnection
 
+                // Add request header
+                connection.setRequestProperty("Accept", "application/json")
+
                 val responseCode = connection.responseCode
                 val responseMessage = connection.responseMessage
                 val readInput = if (getInputStream) {
