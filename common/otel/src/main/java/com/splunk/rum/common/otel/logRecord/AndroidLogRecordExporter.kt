@@ -40,7 +40,7 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
 
             // traceId and spanId should be inside the context already from global OTel instance
             val spanBuilder = SplunkOpenTelemetrySdk.instance!!.sdkTracerProvider.get(RumConstants.RUM_TRACER_NAME)
-                .spanBuilder(log.attributes[AttributeKey.stringKey("event.name")] ?: "")
+                .spanBuilder(log.attributes[AttributeKey.stringKey("eventName")] ?: "")
                 .setSpanKind(SpanKind.INTERNAL)
                 .setParent(parentContext)
                 .setStartTimestamp(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
