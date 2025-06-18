@@ -160,10 +160,13 @@ class SplunkRum private constructor(
 
             val userManager = UserManager()
 
+            val sessionManager = AgentIntegration.obtainInstance(application).sessionManager
+
             val openTelemetry = SplunkRumAgentCore.install(
                 application,
                 agentConfiguration,
                 userManager,
+                sessionManager,
                 moduleConfigurations.toList()
             )
 
@@ -171,7 +174,7 @@ class SplunkRum private constructor(
                 agentConfiguration = agentConfiguration,
                 openTelemetry = openTelemetry,
                 userManager = userManager,
-                sessionManager = AgentIntegration.obtainInstance(application).sessionManager
+                sessionManager = sessionManager
             )
 
             return instance

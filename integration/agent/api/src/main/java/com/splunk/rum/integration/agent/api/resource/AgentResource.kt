@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.BuildConfig
+import com.splunk.rum.integration.agent.internal.id.SimpleId
 import com.splunk.rum.utils.extensions.appVersion
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MANUFACTURER
@@ -18,6 +19,7 @@ internal object AgentResource {
 
     private const val OS_DESCRIPTION_TEMPLATE = "Android Version %s (Build %s API level %s)"
     private const val FALLBACK_VERSION = "0.0.0"
+    private const val SCRIPT_ID_LENGTH = 16
 
     /**
      * Builds a complete Resource by combining:
@@ -25,11 +27,12 @@ internal object AgentResource {
      * - AgentConfiguration-specific attributes
      * - Device and OS-specific attributes
      */
-    internal fun allResource(context: Context, agentConfiguration: AgentConfiguration): Resource = Resource
-        .getDefault()
-        .merge(agentConfigResource(context, agentConfiguration))
-        .merge(buildResource())
-        .merge(sessionReplayResource())
+    internal fun allResource(context: Context, agentConfiguration: AgentConfiguration, sessionId: String): Resource =
+        Resource
+            .getDefault()
+            .merge(agentConfigResource(context, agentConfiguration))
+            .merge(buildResource())
+            .merge(sessionReplayResource(sessionId))
 
     private fun agentConfigResource(context: Context, agentConfiguration: AgentConfiguration): Resource =
         Resource.empty().toBuilder()
@@ -52,11 +55,11 @@ internal object AgentResource {
     /**
      * This is WIP currently
      */
-    private fun sessionReplayResource(): Resource = Resource.empty().toBuilder()
-        .put("splunk.scriptInstance", "") // TODO separate task
-        .put("splunk.rumVersion", "0.20.0-beta.4")
+    private fun sessionReplayResource(sessionId: String): Resource = Resource.empty().toBuilder()
+        .put("splunk.scriptInstance", SimpleId.generate(SCRIPT_ID_LENGTH))
+        .put("splunk.rumVersion", BuildConfig.VERSION_NAME)
         .put("process.runtime.name", "mobile")
         .put("service.name", "unknown_service")
-        .put("splunk.rumSessionId", "23fc7322c65d8f001ba15473d3e80346") // TODO separate task
+        .put("splunk.rumSessionId", sessionId)
         .build()
 }

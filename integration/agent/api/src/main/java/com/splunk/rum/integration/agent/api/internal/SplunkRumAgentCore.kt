@@ -34,6 +34,7 @@ import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcesso
 import com.splunk.rum.integration.agent.internal.processor.SessionReplaySessionIdLogProcessor
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
+import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
@@ -47,6 +48,7 @@ internal object SplunkRumAgentCore {
         application: Application,
         agentConfiguration: AgentConfiguration,
         userManager: IUserManager,
+        sessionManager: ISplunkSessionManager,
         moduleConfigurations: List<ModuleConfiguration>
     ): OpenTelemetry {
         // Sampling.
@@ -81,7 +83,7 @@ internal object SplunkRumAgentCore {
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
             .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
-            .joinResources(AgentResource.allResource(application, finalConfiguration))
+            .joinResources(AgentResource.allResource(application, finalConfiguration, sessionManager.sessionId))
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
