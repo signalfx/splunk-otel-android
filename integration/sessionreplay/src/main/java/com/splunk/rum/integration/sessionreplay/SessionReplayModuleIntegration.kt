@@ -64,6 +64,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
     override fun onSessionChange(sessionId: String) {
         super.onSessionChange(sessionId)
+        Logger.d(TAG, "onSessionChange()")
         timeIndex.put(1)
         SessionReplay.instance.newDataChunk()
     }
@@ -95,7 +96,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                 .toString()
 
             val index = timeIndex.getAt(metadata.startUnixMs.toInstant()) ?: 1
-            timeIndex.put(index + 1)
+            timeIndex.putAt((metadata.endUnixMs - 1).toInstant(), index + 1)
 
             val attributes = Attributes.of(
                 AttributeKey.stringKey("event.name"), "session_replay_data",
