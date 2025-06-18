@@ -38,5 +38,5 @@ object RumConstants {
     val SPLUNK_BUILD_ID: AttributeKey<String> = AttributeKey.stringKey("splunk.build_id")
 
     val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
-    const val DEFAULT_LOG_EVENT_NAME = "log"
+    const val DEFAULT_LOG_EVENT_NAME = "splunk.log"
 }
