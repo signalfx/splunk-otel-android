@@ -25,10 +25,8 @@ object RumConstants {
     const val COMPONENT_HTTP: String = "http"
     const val SERVER_TIMING_HEADER = "server-timing"
     const val CRASH_INSTRUMENTATION_SCOPE_NAME = "io.opentelemetry.crash"
-    const val CRASH_EVENT_NAME = "device.crash"
 
     val WORKFLOW_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("workflow.name")
-    val EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
     val COMPONENT_KEY: AttributeKey<String> = AttributeKey.stringKey("component")
 
     val APPLICATION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("service.application_id")
