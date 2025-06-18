@@ -24,7 +24,6 @@ internal class CrashAttributesExtractor : AttributesExtractor<CrashDetails, Void
         }
         attributes.put(RumConstants.COMPONENT_KEY, component)
         attributes.put(RumConstants.ERROR_KEY, "true")
-
     }
 
     override fun onEnd(
