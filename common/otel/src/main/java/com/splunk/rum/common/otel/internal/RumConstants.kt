@@ -29,6 +29,9 @@ object RumConstants {
     val WORKFLOW_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("workflow.name")
     val COMPONENT_KEY: AttributeKey<String> = AttributeKey.stringKey("component")
 
+    // Required by backend for symbolication. Applied to crashes, ANRs and manually reported errors
+    val ERROR_KEY: AttributeKey<String> = AttributeKey.stringKey("error")
+
     val APPLICATION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("service.application_id")
     val APP_VERSION_CODE_KEY: AttributeKey<String> = AttributeKey.stringKey("service.version_code")
 
