@@ -23,13 +23,12 @@ import com.cisco.android.instrumentation.recording.core.api.Metadata
 import com.cisco.android.instrumentation.recording.core.api.SessionReplay
 import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
-import com.splunk.sdk.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -95,9 +94,9 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             val attributes = Attributes.of(
                 AttributeKey.stringKey("event.name"), "session_replay_data",
                 AttributeKey.longKey("rr-web.total-chunks"), 1L,
-                AttributeKey.longKey("rr-web.chunk"), index,
+                AttributeKey.longKey("rr-web.chunk"), 1L,
                 AttributeKey.longKey("rr-web.event"), index,
-                AttributeKey.longKey("rr-web.offset"), 1L,
+                AttributeKey.longKey("rr-web.offset"), index,
                 AttributeKey.stringKey("segmentMetadata"), segmentMetadata
             )
 

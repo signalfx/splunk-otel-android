@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.otel.span
+package com.splunk.rum.common.storage
 
-import android.app.job.JobInfo
-import android.content.Context
-import com.cisco.android.common.job.JobIdStorage
-import com.cisco.android.common.job.JobType
+import org.json.JSONObject
 
-internal data class UploadSessionReplayData(val id: String, val jobIdStorage: JobIdStorage) : JobType {
-
-    override val jobNumberLimit: Long = 80L
-
-    override fun createJobInfo(context: Context): JobInfo =
-        UploadSessionReplayDataJob.createJobInfoBuilder(context, jobIdStorage.getOrCreateId(id), id).build()
+data class SessionId(val id: String, val validFrom: Long) {
+    companion object {
+        fun fromJSONObject(jsonObject: JSONObject): SessionId = SessionId(
+            id = jsonObject.getString(ID),
+            validFrom = jsonObject.getLong(VALID_FROM)
+        )
+    }
 }
+
+fun SessionId.toJsonObject(): JSONObject = JSONObject()
+    .put(ID, id)
+    .put(VALID_FROM, validFrom)
+
+private const val ID = "id"
+private const val VALID_FROM = "validFrom"

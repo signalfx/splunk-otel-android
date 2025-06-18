@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.sdk.common.otel.span
+package com.splunk.rum.common.otel.span
 
 import android.annotation.SuppressLint
 import android.app.job.JobInfo
@@ -28,7 +28,7 @@ import com.cisco.android.common.http.model.Header
 import com.cisco.android.common.http.model.Response
 import com.cisco.android.common.job.JobIdStorage
 import com.cisco.android.common.logger.Logger
-import com.splunk.sdk.common.storage.AgentStorage
+import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 
 @SuppressLint("NewApi")

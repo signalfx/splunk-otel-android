@@ -21,6 +21,7 @@ import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.spaninterceptor.toMutableSpanData
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.anr.AnrModuleConfiguration
 import com.splunk.rum.integration.crash.CrashModuleConfiguration
@@ -81,7 +82,10 @@ class App : Application() {
                 enableDebugLogging = true,
                 globalAttributes = globalAttributes,
                 deploymentEnvironment = "test",
-                deferredUntilForeground = true
+                deferredUntilForeground = true,
+                spanInterceptor = { spanData ->
+                    spanData.toMutableSpanData()
+                }
             ),
             moduleConfigurations = arrayOf(
                 InteractionsModuleConfiguration(
