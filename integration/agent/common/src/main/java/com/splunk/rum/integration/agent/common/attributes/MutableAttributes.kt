@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.splunk.rum.integration.agent.common.attributes
 
 import io.opentelemetry.api.common.AttributeKey
@@ -47,14 +46,13 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
     operator fun <T> get(key: String): T? {
         var value: T? = null
 
-        try {
-            attributes.forEach { aKey, aValue ->
-                if (aKey.key == key) {
-                    value = aValue as? T
-                    throw StopException()
-                }
+        any { aKey, aValue ->
+            if (aKey.key == key) {
+                value = aValue as? T
+                true
+            } else {
+                false
             }
-        } catch (_: StopException) {
         }
 
         return value
@@ -113,6 +111,13 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
     @Synchronized
     operator fun <T : Any> set(key: AttributeKey<T>, value: T) {
         attributes = attributes.edit { put(key, value) }
+    }
+
+    /**
+     * Checks if the given key exists in the attributes.
+     */
+    operator fun contains(key: String): Boolean = any { aKey, _ ->
+        key == aKey.key
     }
 
     /**
@@ -189,6 +194,22 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
 
     private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes =
         toBuilder().apply(block).build()
+
+    private fun any(consumer: (AttributeKey<*>, Any) -> Boolean): Boolean {
+        var found = false
+
+        try {
+            attributes.forEach { key, value ->
+                if (consumer(key, value)) {
+                    throw StopException()
+                }
+            }
+        } catch (_: StopException) {
+            found = true
+        }
+
+        return found
+    }
 
     private class StopException : Exception()
 }
