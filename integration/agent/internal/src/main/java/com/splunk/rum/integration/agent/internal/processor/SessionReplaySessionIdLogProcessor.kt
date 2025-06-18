@@ -16,7 +16,6 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.cisco.android.common.logger.Logger
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
@@ -30,9 +29,5 @@ class SessionReplaySessionIdLogProcessor(private val sessionManager: ISplunkSess
         if (logRecordData.instrumentationScopeInfo.name == RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
             logRecord.setAttribute(SESSION_ID_KEY, sessionManager.sessionId(logRecordData.timestampEpochNanos))
         }
-        Logger.d(
-            "ONDREJ",
-            "onEmit SR Logs: resources - ${logRecordData.resource.attributes}, attributes - ${logRecordData.attributes}"
-        )
     }
 }
