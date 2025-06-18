@@ -137,7 +137,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 .setAttribute(attributeEventName, "action")
                 .setAttribute(attributeKeyComponent, "ui")
                 .setAttribute(attributeKeyActionName, actionName)
-                .setAttribute(attributeKeyTargetType, targetType)
+                .setAttribute(attributeKeyTargetType, targetType.orEmpty())
                 .emit()
         }
     }
