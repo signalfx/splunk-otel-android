@@ -30,7 +30,7 @@ internal class ConfigurationManager private constructor(private val agentStorage
         }
 
         agentStorage.writeSessionReplayBaseUrl(config.endpoint.sessionReplayEndpoint!!.toExternalForm())
-        agentStorage.writeBaseUrl(config.endpoint.tracesEndpoint!!.toExternalForm())
+        agentStorage.writeBaseUrl(config.endpoint.traceEndpoint!!.toExternalForm())
 
         Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
 
