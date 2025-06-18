@@ -68,11 +68,8 @@ internal class AndroidLogRecordExporter : LogRecordExporter {
                     }
                 }
             } finally {
-                val effectiveTimestamp = if (log.timestampEpochNanos != 0L) {
-                    log.timestampEpochNanos
-                } else {
-                    log.observedTimestampEpochNanos
-                }
+                val effectiveTimestamp = log.timestampEpochNanos.takeIf { it != 0L }
+                    ?: log.observedTimestampEpochNanos
                 spanBuilder.createZeroLengthSpan(effectiveTimestamp, TimeUnit.NANOSECONDS)
 
                 if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
