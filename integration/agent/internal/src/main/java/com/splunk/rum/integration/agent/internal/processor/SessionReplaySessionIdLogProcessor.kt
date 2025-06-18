@@ -16,9 +16,9 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
-import com.splunk.sdk.common.otel.internal.RumConstants
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord
