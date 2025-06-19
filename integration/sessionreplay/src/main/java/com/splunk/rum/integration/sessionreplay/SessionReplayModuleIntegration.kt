@@ -32,6 +32,7 @@ import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.sessionreplay.index.TimeIndex
 import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
