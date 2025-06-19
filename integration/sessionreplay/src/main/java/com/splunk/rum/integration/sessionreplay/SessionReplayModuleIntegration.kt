@@ -100,10 +100,10 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             val attributes = Attributes.of(
                 RumConstants.LOG_EVENT_NAME_KEY, "session_replay_data",
-                AttributeKey.longKey("rr-web.total-chunks"), 1L,
-                AttributeKey.longKey("rr-web.chunk"), 1L,
+                AttributeKey.doubleKey("rr-web.total-chunks"), 1.0,
+                AttributeKey.doubleKey("rr-web.chunk"), 1.0,
                 AttributeKey.longKey("rr-web.event"), index,
-                AttributeKey.longKey("rr-web.offset"), index,
+                AttributeKey.doubleKey("rr-web.offset"), index.toDouble(),
                 AttributeKey.stringKey("segmentMetadata"), segmentMetadata
             )
 
