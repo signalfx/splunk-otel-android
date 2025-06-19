@@ -18,7 +18,7 @@ package com.splunk.rum.integration.agent.internal.id
 
 import java.security.SecureRandom
 
-internal object SimpleId {
+object SimpleId {
 
     private const val CHARACTERS = "0123456789abcdef"
     private val random = SecureRandom()
@@ -34,7 +34,7 @@ internal object SimpleId {
      *
      * @throws IllegalArgumentException if [length] is not positive.
      */
-    internal fun generate(length: Int): String {
+    fun generate(length: Int): String {
         require(length > 0) { "ID length must be positive" }
 
         val invalid = "0".repeat(length)

@@ -136,7 +136,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, "action")
                 .setAttribute(attributeKeyComponent, "ui")
                 .setAttribute(attributeKeyActionName, actionName)
-                .setAttribute(attributeKeyTargetType, targetType)
+                .setAttribute(attributeKeyTargetType, targetType.orEmpty())
                 .emit()
         }
     }

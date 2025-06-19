@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,56 @@
 
 package com.splunk.rum.common.otel.logRecord
 
+import com.cisco.android.common.job.IJobManager
+import com.cisco.android.common.job.JobIdStorage
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.span.UploadSessionReplayData
+import com.splunk.rum.common.storage.IAgentStorage
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.context.Context
+import io.opentelemetry.exporter.internal.otlp.logs.LogsRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.data.internal.ExtendedLogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
+import java.io.ByteArrayOutputStream
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 /**
  * This Exporter is added to Otel by default, it handles the offline/persistance.
  */
-internal class AndroidLogRecordExporter : LogRecordExporter {
+internal class AndroidLogRecordExporter(
+    private val agentStorage: IAgentStorage,
+    private val jobManager: IJobManager,
+    private val jobIdStorage: JobIdStorage
+) : LogRecordExporter {
 
     override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
-        logs.forEach { log ->
+        val sessionReplayLogs =
+            logs.filter { it.instrumentationScopeInfo.name == RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
+        val generalLogs =
+            logs.filter { it.instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
+
+        // We need special handling of Session Replay data because of the current state of the backend implementation.
+        if (sessionReplayLogs.isNotEmpty()) {
+            val exportRequest = LogsRequestMarshaler.create(sessionReplayLogs)
+            val id = UUID.randomUUID().toString()
+
+            // Save data to our storage.
+            ByteArrayOutputStream().use {
+                exportRequest.writeBinaryTo(it)
+                agentStorage.writeOtelSessionReplayData(id, it.toByteArray())
+            }
+
+            // Job scheduling
+            jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
+        }
+
+        generalLogs.forEach { log ->
             val parentContext = Context.current()
             val activeSpan = Span.fromContextOrNull(parentContext)
 

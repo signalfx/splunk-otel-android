@@ -25,6 +25,7 @@ import com.cisco.android.common.storage.extensions.noBackupFilesDirCompat
 import com.cisco.android.common.storage.filemanager.EncryptedFileManager
 import com.cisco.android.common.storage.filemanager.FileManagerFactory
 import com.cisco.android.common.storage.preferences.Preferences
+import com.cisco.android.common.utils.extensions.toJSONArray
 import com.cisco.android.common.utils.runOnBackgroundThread
 import com.splunk.rum.common.storage.extensions.MB
 import com.splunk.rum.common.storage.extensions.statFsFreeSpace
@@ -42,7 +43,8 @@ import org.json.JSONArray
  *  agent/
  *    └─<STORAGE_VERSION>/
  *           ├─logs/
- *           └─spans/
+ *           ├─spans/
+ *           └─session_replay/
  */
 class AgentStorage(context: Context) : IAgentStorage {
 
@@ -61,6 +63,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     private val preferencesFile = File(agentVersionDir, "preferences/preferences.dat")
     private val logDir = File(agentVersionDir, "logs")
     private val spanDir = File(agentVersionDir, "spans")
+    private val sessionReplayDir = File(agentVersionDir, "session_replay")
 
     init {
         preferences = Preferences(FileSimplePermanentCache(preferencesFile, preferencesFileManager))
@@ -68,6 +71,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         agentVersionDir.mkdirs()
         logDir.mkdirs()
         spanDir.mkdirs()
+        sessionReplayDir.mkdirs()
     }
 
     override val freeSpace: Long
@@ -100,6 +104,16 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun readBaseUrl(): String? = preferences.getString(BASE_URL)
+
+    override fun writeSessionReplayBaseUrl(value: String) {
+        preferences.putString(SESSION_REPLAY_BASE_URL, value).commit()
+    }
+
+    override fun deleteSessionReplayBaseUrl() {
+        preferences.remove(SESSION_REPLAY_BASE_URL)
+    }
+
+    override fun readSessionReplayBaseUrl(): String? = preferences.getString(SESSION_REPLAY_BASE_URL)
 
     override fun writeDeviceId(value: String) {
         preferences.putString(DEVICE_ID, value).commit()
@@ -183,6 +197,39 @@ class AgentStorage(context: Context) : IAgentStorage {
         file.delete()
     }
 
+    override fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean {
+        val file: File = sessionReplayDataFile(id)
+        val success = encryptedStorage.writeBytes(file, data)
+        Logger.d(TAG, "writeOtelSessionReplayData(): id = $id, success = $success")
+
+        return success
+    }
+
+    override fun readOtelSessionReplayData(id: String): ByteArray? {
+        val file: File = sessionReplayDataFile(id)
+        return encryptedStorage.readBytes(file)
+    }
+
+    override fun deleteOtelSessionReplayData(id: String) {
+        val file: File = sessionReplayDataFile(id)
+        file.delete()
+    }
+
+    override fun readSessionIds(): List<SessionId> {
+        val value = preferences.getString(SESSION_IDS)
+        if (value.isNullOrBlank()) return emptyList()
+
+        val sessionIds = value.toJSONArray()
+        return runCatching {
+            (0 until sessionIds.length()).map { sessionIds.getJSONObject(it) }.map { SessionId.fromJSONObject(it) }
+        }.getOrElse { emptyList() }
+    }
+
+    override fun writeSessionIds(sessionIds: List<SessionId>) {
+        val json = sessionIds.toJSONArray { array, item -> array.put(item.toJsonObject()) }.toString()
+        preferences.putString(SESSION_IDS, json)
+    }
+
     override fun addBufferedSpanId(id: String) {
         val ids = getBufferedSpanIds().toMutableSet()
         if (ids.add(id)) {
@@ -212,6 +259,7 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     private fun otelLogDataFile(id: String) = File(logDir, "$id.dat")
     private fun otelSpanDataFile(id: String) = File(spanDir, "$id.dat")
+    private fun sessionReplayDataFile(id: String) = File(sessionReplayDir, "$id.dat")
 
     fun cleanUpStorage(context: Context): Boolean {
         val files = ArrayList<File>()
@@ -240,9 +288,11 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     companion object {
-        private const val BASE_URL = "LOG_BASE_URL"
+        private const val BASE_URL = "BASE_URL"
+        private const val SESSION_REPLAY_BASE_URL = "SESSION_REPLAY_BASE_URL"
         private const val DEVICE_ID = "DEVICE_ID"
         private const val SESSION_ID = "SESSION_ID"
+        private const val SESSION_IDS = "SESSION_IDS"
         private const val PREVIOUS_SESSION_ID = "PREVIOUS_SESSION_ID"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"

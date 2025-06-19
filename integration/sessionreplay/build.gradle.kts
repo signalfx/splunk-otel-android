@@ -35,4 +35,6 @@ dependencies {
     implementation(Dependencies.SessionReplay.commonLogger)
 
     compileOnly(Dependencies.Android.Compose.ui)
+
+    testImplementation(Dependencies.Test.junit)
 }

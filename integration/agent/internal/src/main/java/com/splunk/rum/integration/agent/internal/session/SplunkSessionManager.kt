@@ -22,6 +22,7 @@ import com.cisco.android.common.utils.AppStateObserver
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.cisco.android.common.utils.extensions.safeSchedule
 import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.storage.SessionId as SessionIdStorageData
 import com.splunk.rum.integration.agent.internal.id.SessionId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
 import java.util.concurrent.Executors
@@ -33,6 +34,7 @@ interface ISplunkSessionManager {
     val sessionListeners: MutableSet<SessionListener>
 
     fun install(context: Context)
+    fun sessionId(timestamp: Long): String
 }
 
 object NoOpSplunkSessionManager : ISplunkSessionManager {
@@ -40,6 +42,7 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
     override val previousSessionId: String? = null
     override val sessionListeners: MutableSet<SessionListener> = mutableSetOf()
     override fun install(context: Context) = Unit
+    override fun sessionId(timestamp: Long): String = ""
 }
 
 class SplunkSessionManager internal constructor(private val agentStorage: IAgentStorage) : ISplunkSessionManager {
@@ -49,6 +52,8 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
 
+    private val sessionIds: MutableList<SessionIdStorageData> = agentStorage.readSessionIds().toMutableList()
+
     /**
      * The value is valid after the [install] function is called.
      */
@@ -57,7 +62,6 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         get() = createNewSessionIfNeeded()
         private set(value) {
             previousSessionId = agentStorage.readSessionId()
-
             agentStorage.writeSessionId(value)
             agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
         }
@@ -79,6 +83,12 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         appStateObserver.listener = AppStateObserverListener()
         appStateObserver.attach(context.applicationContext as Application)
     }
+
+    override fun sessionId(timestamp: Long): String = sessionIds
+        .filter { it.validFrom <= timestamp }
+        .maxByOrNull { it.validFrom }
+        ?.id
+        ?: throw IllegalArgumentException("No valid session for timestamp: $timestamp")
 
     @Synchronized
     private fun createNewSessionIfNeeded(): String {
@@ -109,6 +119,8 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
         val newSessionId = SessionId.generate()
         sessionId = newSessionId
+        sessionIds.add(SessionIdStorageData(newSessionId, now))
+        agentStorage.writeSessionIds(sessionIds)
         sessionListeners.forEachFast { it.onSessionChanged(newSessionId) }
         return newSessionId
     }
