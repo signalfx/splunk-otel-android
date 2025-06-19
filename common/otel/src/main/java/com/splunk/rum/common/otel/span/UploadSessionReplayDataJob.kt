@@ -82,11 +82,7 @@ internal class UploadSessionReplayDataJob : JobService() {
                                 " body=${response.body.toString(Charsets.UTF_8)}"
                         )
                         deleteData(id)
-                        if (response.isSuccessful) {
-                            jobFinished(params, false)
-                        } else {
-                            jobFinished(params, false)
-                        }
+                        jobFinished(params, false)
                     }
 
                     override fun onFailed(e: Exception) {
