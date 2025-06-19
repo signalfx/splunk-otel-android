@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.context.Context
@@ -24,6 +25,14 @@ import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
 class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
+
+    init {
+        /**
+         * Having a value for the screen.name attribute is mandatory for metrics to be derived on the platform.
+         * Using [RumConstants.DEFAULT_SCREEN_NAME] ensures that a screen.name is always present.
+         */
+        attributes[RumConstants.SCREEN_NAME_KEY] = RumConstants.DEFAULT_SCREEN_NAME
+    }
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         attributes.forEach { key, value ->

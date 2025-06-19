@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.lifecycle.tracer.fragment
 
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.lifecycle.tracer.ActiveSpan
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
@@ -61,12 +62,11 @@ internal class FragmentTracer(
             .setAttribute(FRAGMENT_NAME_KEY, fragmentName)
             .startSpan()
 
-        span.setAttribute(SCREEN_NAME_KEY, screenName)
+        span.setAttribute(RumConstants.SCREEN_NAME_KEY, screenName)
         return span
     }
 
     private companion object {
         val FRAGMENT_NAME_KEY: AttributeKey<String?> = AttributeKey.stringKey("fragmentName")
-        val SCREEN_NAME_KEY: AttributeKey<String?> = AttributeKey.stringKey("screen.name")
     }
 }

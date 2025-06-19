@@ -26,14 +26,12 @@ dependencies {
     api(platform(Dependencies.Otel.androidBom))
 
     implementation(project(":integration:agent:internal"))
-    implementation(project(":common:otel"))
-    implementation(project(":common:utils"))
+    implementation(project(":integration:okhttp3:common"))
+
+    implementation(Dependencies.Otel.androidOkHttp3Library)
+    implementation(Dependencies.Otel.instrumentationApi)
 
     implementation(Dependencies.okhttp)
 
-    implementation(Dependencies.Otel.instrumentationApi)
-    implementation(Dependencies.Otel.androidOkHttp3Library)
-
     implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
 }

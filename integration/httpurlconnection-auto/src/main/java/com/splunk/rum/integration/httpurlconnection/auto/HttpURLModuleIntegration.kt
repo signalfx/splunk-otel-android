@@ -36,11 +36,21 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
     ) {
         Logger.d(TAG, "onInstall()")
 
-        // install HttpURLConnection auto-instrumentation if isEnabled is true
+        // install HttpURLConnection auto-instrumentation if it is enabled
         if (moduleConfiguration.isEnabled) {
-            val httpUrlInstrumentation = HttpUrlInstrumentation()
-            httpUrlInstrumentation.addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
-            httpUrlInstrumentation.install(oTelInstallationContext)
+            HttpUrlInstrumentation().apply {
+                addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
+
+                moduleConfiguration.capturedRequestHeaders
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { setCapturedRequestHeaders(it) }
+
+                moduleConfiguration.capturedResponseHeaders
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { setCapturedResponseHeaders(it) }
+
+                install(oTelInstallationContext)
+            }
         }
     }
 }
