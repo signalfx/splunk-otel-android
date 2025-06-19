@@ -30,6 +30,7 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.exporter.internal.otlp.logs.LogsRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
+import io.opentelemetry.sdk.logs.data.internal.ExtendedLogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import java.io.ByteArrayOutputStream
 import java.util.UUID
@@ -69,9 +70,24 @@ internal class AndroidLogRecordExporter(
             val parentContext = Context.current()
             val activeSpan = Span.fromContextOrNull(parentContext)
 
+            /**
+             * Determines the name of the span to be created from the log record.
+             *
+             * The resolution order is as follows:
+             * 1. Use the `eventName` property from `ExtendedLogRecordData` if available.
+             * 2. Otherwise, fall back to the [RumConstants.LOG_EVENT_NAME_KEY] attribute in the log's attributes.
+             * 3. If neither is present, default to the name [RumConstants.DEFAULT_LOG_EVENT_NAME].
+             *
+             * This ensures that the span always has a meaningful or fallback name, even when
+             * the source log record lacks explicit naming metadata.
+             */
+            val spanName = (log as ExtendedLogRecordData).eventName
+                ?: log.attributes.get(RumConstants.LOG_EVENT_NAME_KEY)
+                ?: RumConstants.DEFAULT_LOG_EVENT_NAME
+
             // traceId and spanId should be inside the context already from global OTel instance
             val spanBuilder = SplunkOpenTelemetrySdk.instance!!.sdkTracerProvider.get(RumConstants.RUM_TRACER_NAME)
-                .spanBuilder(log.attributes[AttributeKey.stringKey("event.name")] ?: "")
+                .spanBuilder(spanName)
                 .setSpanKind(SpanKind.INTERNAL)
                 .setParent(parentContext)
                 .setStartTimestamp(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
@@ -95,12 +111,13 @@ internal class AndroidLogRecordExporter(
                             val listValue = value.joinToString(",") { it.toString() }
                             spanBuilder.setAttribute(key.key, listValue)
                         }
-
                         else -> spanBuilder.setAttribute(key.key, value.toString())
                     }
                 }
             } finally {
-                spanBuilder.createZeroLengthSpan(log.timestampEpochNanos, TimeUnit.NANOSECONDS)
+                val effectiveTimestamp = log.timestampEpochNanos.takeIf { it != 0L }
+                    ?: log.observedTimestampEpochNanos
+                spanBuilder.createZeroLengthSpan(effectiveTimestamp, TimeUnit.NANOSECONDS)
 
                 if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
                     SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.forceFlush()

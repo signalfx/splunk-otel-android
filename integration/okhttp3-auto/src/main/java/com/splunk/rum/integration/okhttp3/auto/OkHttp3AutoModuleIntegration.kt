@@ -20,12 +20,15 @@ import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import io.opentelemetry.android.instrumentation.AndroidInstrumentationLoader
+import com.splunk.rum.integration.okhttp3.common.OkHttp3AdditionalAttributesExtractor
 import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation
+import okhttp3.Interceptor
+import okhttp3.Response
 
-internal object OkHttp3ModuleIntegration : ModuleIntegration<OkHttp3ModuleConfiguration>(
-    defaultModuleConfiguration = OkHttp3ModuleConfiguration()
+internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModuleConfiguration>(
+    defaultModuleConfiguration = OkHttp3AutoModuleConfiguration()
 ) {
 
     private const val TAG = "OkHttp3Integration"
@@ -37,13 +40,23 @@ internal object OkHttp3ModuleIntegration : ModuleIntegration<OkHttp3ModuleConfig
     ) {
         Logger.d(TAG, "onInstall()")
 
-        // install OkHttp3 auto-instrumentation if isEnabled is true
+        // install OkHttp3 auto-instrumentation if it is enabled
         if (moduleConfiguration.isEnabled) {
-            val okHttpInstrumentation = AndroidInstrumentationLoader.getInstrumentation(
-                OkHttpInstrumentation::class.java
-            )
-            okHttpInstrumentation?.addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
-            okHttpInstrumentation?.install(oTelInstallationContext)
+            OkHttpInstrumentation().apply {
+                addAttributesExtractor(
+                    OkHttp3AdditionalAttributesExtractor() as AttributesExtractor<Interceptor.Chain, Response>
+                )
+
+                moduleConfiguration.capturedRequestHeaders
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { setCapturedRequestHeaders(it) }
+
+                moduleConfiguration.capturedResponseHeaders
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { setCapturedResponseHeaders(it) }
+
+                install(oTelInstallationContext)
+            }
         }
     }
 }

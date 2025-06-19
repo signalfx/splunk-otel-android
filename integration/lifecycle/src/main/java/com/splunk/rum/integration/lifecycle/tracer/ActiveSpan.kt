@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.lifecycle.tracer
 
-import io.opentelemetry.api.common.AttributeKey
+import com.splunk.rum.common.otel.internal.RumConstants
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.context.Scope
 
@@ -53,11 +53,7 @@ internal class ActiveSpan(private val lastVisibleScreenProvider: () -> String?) 
 
         val previouslyVisibleScreen = lastVisibleScreenProvider()
         if (previouslyVisibleScreen != null && screenName != previouslyVisibleScreen) {
-            span.setAttribute(LAST_SCREEN_NAME_KEY, previouslyVisibleScreen)
+            span.setAttribute(RumConstants.LAST_SCREEN_NAME_KEY, previouslyVisibleScreen)
         }
-    }
-
-    private companion object {
-        val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
     }
 }

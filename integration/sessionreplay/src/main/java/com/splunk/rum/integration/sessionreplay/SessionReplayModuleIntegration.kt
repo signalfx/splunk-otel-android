@@ -32,7 +32,6 @@ import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.sessionreplay.index.TimeIndex
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
@@ -99,7 +98,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             timeIndex.putAt((metadata.endUnixMs - 1).toInstant(), index + 1)
 
             val attributes = Attributes.of(
-                AttributeKey.stringKey("event.name"), "session_replay_data",
+                RumConstants.LOG_EVENT_NAME_KEY, "session_replay_data",
                 AttributeKey.longKey("rr-web.total-chunks"), 1L,
                 AttributeKey.longKey("rr-web.chunk"), 1L,
                 AttributeKey.longKey("rr-web.event"), index,

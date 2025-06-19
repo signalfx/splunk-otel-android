@@ -13,6 +13,7 @@ internal class AnrAttributesExtractor : AttributesExtractor<Array<StackTraceElem
         stackTrace: Array<StackTraceElement>
     ) {
         attributes.put(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
+        attributes.put(RumConstants.ERROR_KEY, "true")
     }
 
     override fun onEnd(

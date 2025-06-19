@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.httpurlconnection.auto
+package com.splunk.rum.integration.okhttp3.manual
 
 import android.content.Context
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
+import com.splunk.rum.integration.okhttp3.common.OkHttp3AdditionalAttributesExtractor
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
+import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTelemetry
 
-internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfiguration>(
-    defaultModuleConfiguration = HttpURLModuleConfiguration()
+internal object OkHttp3ManualModuleIntegration : ModuleIntegration<OkHttp3ManualModuleConfiguration>(
+    defaultModuleConfiguration = OkHttp3ManualModuleConfiguration()
 ) {
+    private const val TAG = "OkHttp3ManualIntegration"
 
-    private const val TAG = "HttpURLIntegration"
+    internal var okHttpTelemetry: OkHttpTelemetry? = null
+        private set
 
     override fun onInstall(
         context: Context,
@@ -36,21 +39,16 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
     ) {
         Logger.d(TAG, "onInstall()")
 
-        // install HttpURLConnection auto-instrumentation if it is enabled
-        if (moduleConfiguration.isEnabled) {
-            HttpUrlInstrumentation().apply {
-                addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
-
-                moduleConfiguration.capturedRequestHeaders
-                    .takeIf { it.isNotEmpty() }
+        // Setup OkHttp3 manual instrumentation
+        okHttpTelemetry = OkHttpTelemetry.builder(oTelInstallationContext.openTelemetry)
+            .addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
+            .apply {
+                moduleConfiguration.capturedRequestHeaders.takeIf { it.isNotEmpty() }
                     ?.let { setCapturedRequestHeaders(it) }
 
-                moduleConfiguration.capturedResponseHeaders
-                    .takeIf { it.isNotEmpty() }
+                moduleConfiguration.capturedResponseHeaders.takeIf { it.isNotEmpty() }
                     ?.let { setCapturedResponseHeaders(it) }
-
-                install(oTelInstallationContext)
             }
-        }
+            .build()
     }
 }
