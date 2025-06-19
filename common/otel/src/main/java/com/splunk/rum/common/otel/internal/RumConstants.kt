@@ -40,6 +40,9 @@ object RumConstants {
 
     val SPLUNK_BUILD_ID: AttributeKey<String> = AttributeKey.stringKey("splunk.build_id")
 
+    val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
+    const val DEFAULT_LOG_EVENT_NAME = "splunk.log"
+
     val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
     const val DEFAULT_SCREEN_NAME = "unknown"

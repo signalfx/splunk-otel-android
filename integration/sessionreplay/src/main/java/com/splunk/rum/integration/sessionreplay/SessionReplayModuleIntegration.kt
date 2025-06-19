@@ -23,13 +23,13 @@ import com.cisco.android.instrumentation.recording.core.api.Metadata
 import com.cisco.android.instrumentation.recording.core.api.SessionReplay
 import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
@@ -74,7 +74,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             val instance = SplunkOpenTelemetrySdk.instance ?: return false
 
             val attributes = Attributes.of(
-                AttributeKey.stringKey("event.name"),
+                RumConstants.LOG_EVENT_NAME_KEY,
                 "session_replay_data"
 //                AttributeKey.stringKey("replay.record_id"), recordData.id,
 //                AttributeKey.longKey("replay.start_timestamp"), recordData.start * 1_000_000,
