@@ -43,20 +43,7 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
      */
     @Suppress("UNCHECKED_CAST")
     @Synchronized
-    operator fun <T> get(key: String): T? {
-        var value: T? = null
-
-        any { aKey, aValue ->
-            if (aKey.key == key) {
-                value = aValue as? T
-                true
-            } else {
-                false
-            }
-        }
-
-        return value
-    }
+    operator fun <T> get(key: String): T? = find { aKey, aValue -> aKey.key == key } as? T
 
     /**
      * Sets a String value for the given key.
@@ -116,9 +103,7 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
     /**
      * Checks if the given key exists in the attributes.
      */
-    operator fun contains(key: String): Boolean = any { aKey, _ ->
-        key == aKey.key
-    }
+    operator fun contains(key: String): Boolean = find { aKey, _ -> key == aKey.key } != null
 
     /**
      * Removes the attribute associated with the given [AttributeKey].
@@ -195,20 +180,20 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
     private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes =
         toBuilder().apply(block).build()
 
-    private fun any(consumer: (AttributeKey<*>, Any) -> Boolean): Boolean {
-        var found = false
+    private fun find(consumer: (AttributeKey<*>, Any) -> Boolean): Any? {
+        var theValue: Any? = null
 
         try {
             attributes.forEach { key, value ->
                 if (consumer(key, value)) {
+                    theValue = value
                     throw StopException()
                 }
             }
         } catch (_: StopException) {
-            found = true
         }
 
-        return found
+        return theValue
     }
 
     private class StopException : Exception()
