@@ -43,7 +43,6 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     private const val TAG = "InteractionsIntegration"
 
-    private val attributeEventName = AttributeKey.stringKey("event.name")
     private val attributeKeyComponent = AttributeKey.stringKey("component")
     private val attributeKeyActionName = AttributeKey.stringKey("action.name")
     private val attributeKeyTargetType = AttributeKey.stringKey("target.type")
@@ -134,10 +133,10 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                .setAttribute(attributeEventName, "action")
+                .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, "action")
                 .setAttribute(attributeKeyComponent, "ui")
                 .setAttribute(attributeKeyActionName, actionName)
-                .setAttribute(attributeKeyTargetType, targetType)
+                .setAttribute(attributeKeyTargetType, targetType.orEmpty())
                 .emit()
         }
     }

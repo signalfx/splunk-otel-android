@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.lifecycle.tracer.activity
 
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.lifecycle.tracer.ActiveSpan
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
@@ -79,11 +80,10 @@ internal class ActivityTracer(
             .setAttribute(ACTIVITY_NAME_KEY, activityName)
 
         return spanBuilder.startSpan()
-            .setAttribute(SCREEN_NAME_KEY, screenName)
+            .setAttribute(RumConstants.SCREEN_NAME_KEY, screenName)
     }
 
     private companion object {
         val ACTIVITY_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("activityName")
-        val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
     }
 }

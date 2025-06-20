@@ -44,7 +44,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
             val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: return
 
-            SplunkInternalGlobalAttributeSpanProcessor.attributes["screen.name"] = screenName
+            SplunkInternalGlobalAttributeSpanProcessor.attributes[RumConstants.SCREEN_NAME_KEY] = screenName
 
             provider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder("Created")

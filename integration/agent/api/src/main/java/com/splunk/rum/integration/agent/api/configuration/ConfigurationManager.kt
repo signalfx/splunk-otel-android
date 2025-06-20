@@ -29,7 +29,7 @@ internal class ConfigurationManager private constructor(private val agentStorage
             config = config.copy(appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName)
         }
 
-        // TODO separate task
+        agentStorage.writeSessionReplayBaseUrl(config.endpoint.sessionReplayEndpoint!!.toExternalForm())
         agentStorage.writeBaseUrl(config.endpoint.traceEndpoint!!.toExternalForm())
 
         Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
