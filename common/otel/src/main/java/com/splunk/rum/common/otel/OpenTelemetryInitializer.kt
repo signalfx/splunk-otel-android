@@ -50,7 +50,7 @@ class OpenTelemetryInitializer(
     init {
         val agentStorage = AgentStorage.attach(application)
         val jobManager = JobManager.attach(application)
-        val jobIdStorage = JobIdStorage.init(application)
+        val jobIdStorage = JobIdStorage.init(application, isEncrypted = false)
 
         resource = Resource.getDefault()
 
