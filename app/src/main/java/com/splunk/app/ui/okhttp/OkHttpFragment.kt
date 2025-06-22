@@ -54,6 +54,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.BufferedSink
+import androidx.core.graphics.createBitmap
 
 class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
@@ -608,7 +609,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
     }
 
     private fun writeOutBitmapIntoFile(file: File): File {
-        val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(100, 100)
 
         try {
             FileOutputStream(file).use { out ->

@@ -25,7 +25,7 @@ android {
         versionName = Configurations.sdkVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments.put("clearPackageData", "true")
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
         // Read from global gradle.properties (~/.gradle/gradle.properties)
         // If not found, fallback to empty string

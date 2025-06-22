@@ -49,11 +49,11 @@ internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModu
 
                 moduleConfiguration.capturedRequestHeaders
                     .takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedRequestHeaders(it) }
+                    ?.let { capturedRequestHeaders = it }
 
                 moduleConfiguration.capturedResponseHeaders
                     .takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedResponseHeaders(it) }
+                    ?.let { capturedResponseHeaders = it }
 
                 install(oTelInstallationContext)
             }

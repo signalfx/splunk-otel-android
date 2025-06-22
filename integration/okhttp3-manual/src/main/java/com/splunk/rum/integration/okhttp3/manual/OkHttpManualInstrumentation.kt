@@ -31,9 +31,7 @@ class OkHttpManualInstrumentation internal constructor() {
      * @return A [Call.Factory] implementation.
      */
     fun buildOkHttpCallFactory(client: OkHttpClient): Factory =
-        OkHttp3ManualModuleIntegration.okHttpTelemetry?.let { okHttpTelemetry ->
-            okHttpTelemetry.newCallFactory(client)
-        } ?: throw IllegalStateException("OkHttp3 manual instrumentation is not initialized")
+        OkHttp3ManualModuleIntegration.okHttpTelemetry?.newCallFactory(client) ?: throw IllegalStateException("OkHttp3 manual instrumentation is not initialized")
 
     companion object {
         /**

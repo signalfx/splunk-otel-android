@@ -36,7 +36,7 @@ class AgentIntegration private constructor(context: Context) {
 
     // The opentelemetry-android InstallationContext API needs an argument of type
     // io.opentelemetry.android.session.SessionManager. val oTelSessionManager is a no-op definition of same.
-    val oTelSessionManager = object : SessionManager {
+    private val oTelSessionManager = object : SessionManager {
         override fun getSessionId(): String = "dummy-session-id"
 
         override fun addObserver(observer: SessionObserver) {

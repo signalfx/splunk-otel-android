@@ -3,22 +3,6 @@ import groovy.util.NodeList
 import org.codehaus.groovy.runtime.StringGroovyMethods.center
 import org.gradle.api.Project
 
-fun Project.optProperty(name: String): Any? {
-    return if (project.hasProperty(name)) {
-        project.property(name)
-    } else {
-        null
-    }
-}
-
-fun Project.propOrDefault(name: String, default: Any): Any? {
-    return if (project.hasProperty(name)) {
-        project.property(name)
-    } else {
-        default
-    }
-}
-
 fun Project.getVersionPostfix(): String {
     return if (rootProject.hasProperty("maven.deploy.artifactory.snapshot")) {
         val postfix = rootProject.properties["maven.deploy.artifactory.snapshot"].toString()
@@ -31,8 +15,6 @@ fun Project.getVersionPostfix(): String {
 fun String.toBoxString(): String {
     return "║" + center(this, 98) + "║"
 }
-
-fun Any?.wrapAsBuildConfigField(): String = this?.run { "\"" + this.toString() + "\"" } ?: "\"\""
 
 fun Node.addCiscoInfo() {
     if ((get("name") as NodeList).size == 0) {

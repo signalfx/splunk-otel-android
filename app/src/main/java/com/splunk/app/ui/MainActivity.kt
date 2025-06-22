@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         contentView?.post { updateToolbar() }
     }
 
-    fun navigateUp() {
+    private fun navigateUp() {
         if (supportFragmentManager.backStackEntryCount > 1) {
             supportFragmentManager.popBackStackImmediate()
             updateToolbar()

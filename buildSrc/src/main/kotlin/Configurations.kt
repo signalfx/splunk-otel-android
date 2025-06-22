@@ -1,7 +1,4 @@
 import org.gradle.api.JavaVersion
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
 
 object Configurations {
 
@@ -23,5 +20,5 @@ object Configurations {
     }
 
     const val sdkVersionCode = 1
-    val sdkVersionName = "2.0.0-beta"
+    const val sdkVersionName = "2.0.0-beta"
 }

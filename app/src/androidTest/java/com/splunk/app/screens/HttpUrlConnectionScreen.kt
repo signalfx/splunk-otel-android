@@ -25,12 +25,12 @@ class HttpUrlConnectionScreen : Screen() {
     /**
      * EditTexts
      */
-    val customUrlInputEditText: Matcher<View> = view(R.id.customUrl)
+    private val customUrlInputEditText: Matcher<View> = view(R.id.customUrl)
 
     /**
      * Buttons
      */
-    val customUrlGetButton: Matcher<View> = view(R.id.customUrlGet)
+    private val customUrlGetButton: Matcher<View> = view(R.id.customUrlGet)
     val successfulGetButton: Matcher<View> = view(R.id.successfulGet)
     val unsuccessfulGetButton: Matcher<View> = view(R.id.unSuccessfulGet)
     val getWithoutInputStreamButton: Matcher<View> = view(R.id.getWithoutInputStream)

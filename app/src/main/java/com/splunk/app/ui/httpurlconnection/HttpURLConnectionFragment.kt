@@ -38,10 +38,6 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentHttpUrlConnectionBinding
         get() = FragmentHttpUrlConnectionBinding::inflate
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewBinding.customUrlGet.setOnClickListener { customUrlGet() }
@@ -60,7 +56,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
     /**
      * Demonstrates a custom url HttpURLConnection GET request
      */
-    fun customUrlGet() {
+    private fun customUrlGet() {
         executeGet(viewBinding.customUrl.text.toString())
         CommonUtils.showDoneToast(context, "Custom Url Get")
     }
@@ -68,7 +64,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
     /**
      * Demonstrates a successful HttpURLConnection GET request
      */
-    fun successfulGet() {
+    private fun successfulGet() {
         executeGet("https://httpbin.org/get")
         CommonUtils.showDoneToast(context, "Successful Get")
     }
@@ -78,7 +74,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * and thereby requiring either the disconnect or the harvester thread (if disconnect is not called)
      * to end the span. This test covers OPTIONS and TRACE requests too.
      */
-    fun getWithoutInputStream() {
+    private fun getWithoutInputStream() {
         executeGet("https://httpbin.org/get", false)
         CommonUtils.showDoneToast(context, "Get Without InputStream")
     }
@@ -87,7 +83,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * Demonstrates four concurrent HttpURLConnection GET request (running on different threads in parallel)
      * Helps test proper synchronization is achieved in our callback APIs code.
      */
-    fun fourConcurrentGetRequests() {
+    private fun fourConcurrentGetRequests() {
         executeGet("https://httpbin.org/get")
         executeGet("https://google.com")
         executeGet("https://android.com")
@@ -99,7 +95,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * Demonstrates a HttpURLConnection GET request with no call to getInputStream and disconnect
      * and thereby requiring the harvester thread to end the span.
      */
-    fun sustainedConnection() {
+    private fun sustainedConnection() {
         executeGet("https://httpbin.org/get", false, false)
         CommonUtils.showDoneToast(context, "Sustained Connection")
     }
@@ -108,7 +104,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * Demonstrates a HttpURLConnection GET request with 20s wait after initial read
      * and thereby requiring the harvester thread to end the span.
      */
-    fun stalledRequest() {
+    private fun stalledRequest() {
         executeGet("https://httpbin.org/get", false, true, true)
         CommonUtils.showDoneToast(context, "Stalled Request")
     }
@@ -117,7 +113,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * Demonstrates addition of link.traceId and link.spanId attributes in span when
      * server-timing header is present in the response.
      */
-    fun serverTimingHeaderInResponse() {
+    private fun serverTimingHeaderInResponse() {
         // one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
         executeGet(
             "https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'"
@@ -161,11 +157,11 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 } else {
                     ""
                 }
-                val readInputString = if (getInputStream) ("input Stream: " + readInput) else ""
+                val readInputString = if (getInputStream) ("input Stream: $readInput") else ""
 
                 stallRequest.takeIf { it }?.let { Thread.sleep(20000) }
 
-                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage + readInputString)
+                Log.v(TAG, "response code: $responseCode response message: $responseMessage$readInputString")
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -177,7 +173,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
     /**
      * Demonstrates an unsuccessful HttpURLConnection GET request
      */
-    fun unSuccessfulGet() {
+    private fun unSuccessfulGet() {
         runOnBackgroundThread {
             val connection = URL("https://httpbin.org/status/404").openConnection() as HttpURLConnection
             try {
@@ -202,7 +198,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
     /**
      * Demonstrates a HttpURLConnection POST request
      */
-    fun post() {
+    private fun post() {
         runOnBackgroundThread {
             val connection = URL("https://httpbin.org/post").openConnection() as HttpURLConnection
             connection.doOutput = true
