@@ -35,7 +35,7 @@ import java.net.UnknownHostException
 internal class UploadSessionReplayDataJob : JobService() {
 
     private val storage by lazy { AgentStorage.attach(application) }
-    private val jobIdStorage by lazy { JobIdStorage.init(application) }
+    private val jobIdStorage by lazy { JobIdStorage.init(application, isEncrypted = false) }
     private val httpClient by lazy { HttpClient() }
 
     override fun onStopJob(params: JobParameters?): Boolean {

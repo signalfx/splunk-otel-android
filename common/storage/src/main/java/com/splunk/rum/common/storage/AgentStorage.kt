@@ -48,14 +48,11 @@ import org.json.JSONArray
  */
 class AgentStorage(context: Context) : IAgentStorage {
 
-    private val preferencesFileManager = FileManagerFactory.createEncryptedFileManagerIfPossible(
-        context,
-        "Agent-Preferences"
-    )
+    private val preferencesFileManager = FileManagerFactory.createPlainFileManager()
     private val preferences: Preferences
 
     private val encryptedStorage =
-        Storage(FilePermanentCache(FileManagerFactory.createEncryptedFileManagerIfPossible(context, "Agent-Storage")))
+        Storage(FilePermanentCache(FileManagerFactory.createPlainFileManager()))
 
     private val rootDir = File(context.noBackupFilesDirCompat, "agent")
     private val agentVersionDir =
