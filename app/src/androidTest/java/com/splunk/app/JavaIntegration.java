@@ -17,7 +17,6 @@
 package com.splunk.app;
 
 import android.app.Application;
-import android.view.View;
 
 import com.splunk.rum.integration.agent.api.AgentConfiguration;
 import com.splunk.rum.integration.agent.api.EndpointConfiguration;
@@ -41,7 +40,6 @@ import com.splunk.rum.integration.navigation.NavigationModuleConfiguration;
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration;
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration;
 import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration;
-import com.splunk.rum.integration.okhttp3.manual.extension.SplunkRumExtKt;
 import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration;
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration;
 import com.splunk.rum.integration.startup.StartupModuleConfiguration;
