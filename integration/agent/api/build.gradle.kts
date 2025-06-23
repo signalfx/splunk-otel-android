@@ -42,6 +42,4 @@ dependencies {
     implementation(project(":common:utils"))
 
     compileOnly(Dependencies.Android.Compose.ui)
-
-    testImplementation(Dependencies.Test.junit)
 }

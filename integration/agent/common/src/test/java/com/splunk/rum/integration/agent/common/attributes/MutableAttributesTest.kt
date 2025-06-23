@@ -118,6 +118,22 @@ class MutableAttributesTest {
     }
 
     @Test
+    fun `contains checks for key existence`() {
+        val mutableAttributes = MutableAttributes()
+
+        mutableAttributes["stringKey"] = "stringValue"
+        mutableAttributes["longAttributeKey"] = 123L
+
+        Assert.assertTrue("stringKey" in mutableAttributes)
+        Assert.assertTrue("longAttributeKey" in mutableAttributes)
+        Assert.assertTrue("nonExistentStringKey" !in mutableAttributes)
+
+        mutableAttributes.remove("stringKey")
+        Assert.assertTrue("stringKey" !in mutableAttributes)
+        Assert.assertTrue("longAttributeKey" in mutableAttributes)
+    }
+
+    @Test
     fun `setAll adds attributes from another Attributes instance`() {
         val mutableAttributes = MutableAttributes()
         mutableAttributes["existingKey"] = "existingValue"
@@ -152,17 +168,20 @@ class MutableAttributesTest {
     fun `update modifies attributes`() {
         val mutableAttributes = MutableAttributes()
         mutableAttributes["initialKey"] = "initialValue"
+        mutableAttributes["keyToUpdate"] = "value1"
 
         mutableAttributes.update {
             put("updatedKey", "updatedValue")
             remove(AttributeKey.stringKey("initialKey"))
             put("anotherKey", 12345L)
+            put("keyToUpdate", "value2")
         }
 
         Assert.assertNull(mutableAttributes["initialKey"])
         Assert.assertEquals("updatedValue", mutableAttributes["updatedKey"])
+        Assert.assertEquals("value2", mutableAttributes["keyToUpdate"])
         Assert.assertEquals(12345L, mutableAttributes["anotherKey"])
-        Assert.assertEquals(2, mutableAttributes.size())
+        Assert.assertEquals(3, mutableAttributes.size())
     }
 
     @Test

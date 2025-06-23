@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.splunk.rum.integration.agent.common.attributes
 
 import io.opentelemetry.api.common.AttributeKey
@@ -44,21 +43,7 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
      */
     @Suppress("UNCHECKED_CAST")
     @Synchronized
-    operator fun <T> get(key: String): T? {
-        var value: T? = null
-
-        try {
-            attributes.forEach { aKey, aValue ->
-                if (aKey.key == key) {
-                    value = aValue as? T
-                    throw StopException()
-                }
-            }
-        } catch (_: StopException) {
-        }
-
-        return value
-    }
+    operator fun <T> get(key: String): T? = find { aKey, aValue -> aKey.key == key } as? T
 
     /**
      * Sets a String value for the given key.
@@ -114,6 +99,11 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
     operator fun <T : Any> set(key: AttributeKey<T>, value: T) {
         attributes = attributes.edit { put(key, value) }
     }
+
+    /**
+     * Checks if the given key exists in the attributes.
+     */
+    operator fun contains(key: String): Boolean = find { aKey, _ -> key == aKey.key } != null
 
     /**
      * Removes the attribute associated with the given [AttributeKey].
@@ -189,6 +179,22 @@ class MutableAttributes @JvmOverloads constructor(private var attributes: Attrib
 
     private inline fun Attributes.edit(block: AttributesBuilder.() -> Unit): Attributes =
         toBuilder().apply(block).build()
+
+    private fun find(consumer: (AttributeKey<*>, Any) -> Boolean): Any? {
+        var theValue: Any? = null
+
+        try {
+            attributes.forEach { key, value ->
+                if (consumer(key, value)) {
+                    theValue = value
+                    throw StopException()
+                }
+            }
+        } catch (_: StopException) {
+        }
+
+        return theValue
+    }
 
     private class StopException : Exception()
 }
