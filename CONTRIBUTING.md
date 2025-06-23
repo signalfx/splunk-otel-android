@@ -34,7 +34,7 @@ See [SECURITY.md](SECURITY.md#reporting-security-issues) for instructions.
 ## Documentation
 
 The Splunk Observability documentation is hosted on the [Splunk Observability
-Cloud docs site](https://docs.splunk.com/Observability), which contains all the
+Cloud docs site](https://help.splunk.com/en/splunk-cloud-platform), which contains all the
 prescriptive guidance for Splunk Observability products. Prescriptive guidance
 consists of step-by-step instructions, conceptual material, and decision support
 for customers. Reference documentation and development documentation is still

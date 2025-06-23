@@ -55,15 +55,12 @@ jobs:
       - name: Run ktlint
         run: ./gradlew ktlintCheck
         
-  # check_links:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4.2.2
-  #     - name: Link Checker
-  #       uses: lycheeverse/lychee-action@v2.4.1
-  #       with:
-  #         fail: true
-  #         lycheeVersion: v0.19.1
-  #
-  # Temporarily disabled because Splunk Docs URLs return 403 errors to CI scanners,
-  # which causes the link checker to fail even though the links are valid.
+  check_links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Link Checker
+        uses: lycheeverse/lychee-action@v2.4.1
+        with:
+          fail: true
+          lycheeVersion: v0.19.1
