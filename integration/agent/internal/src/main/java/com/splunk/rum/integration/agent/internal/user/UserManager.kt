@@ -23,8 +23,8 @@ interface IUserManager {
     val userId: String?
 }
 
-class UserManager : IUserManager {
-    override var trackingMode: InternalUserTrackingMode = InternalUserTrackingMode.NO_TRACKING
+class UserManager(userTrackingMode: InternalUserTrackingMode) : IUserManager {
+    override var trackingMode: InternalUserTrackingMode = userTrackingMode
         set(value) {
             userId = when (value) {
                 InternalUserTrackingMode.NO_TRACKING -> null
