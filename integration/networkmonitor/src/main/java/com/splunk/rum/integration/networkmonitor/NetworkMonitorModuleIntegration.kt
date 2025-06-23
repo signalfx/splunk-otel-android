@@ -48,9 +48,9 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
     ) {
         Logger.d(TAG, "onInstall()")
 
-val isEnabled =
-    moduleConfigurations.find<LegacyNetworkMonitorModuleConfiguration>()?.isEnabled
-        ?: moduleConfiguration.isEnabled
+        val isEnabled =
+            moduleConfigurations.find<LegacyNetworkMonitorModuleConfiguration>()?.isEnabled
+                ?: moduleConfiguration.isEnabled
 
         if (isEnabled) {
             // install Network Monitor instrumentation if isEnabled is true
