@@ -38,11 +38,13 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
-        if (moduleConfiguration.isEnabled)
+        if (moduleConfiguration.isEnabled) {
             Navigation.instance.listener = navigationListener
+        }
 
-        if (moduleConfiguration.isAutomatedTrackingEnabled)
+        if (moduleConfiguration.isAutomatedTrackingEnabled) {
             ScreenTrackerIntegration.attach(context)
+        }
     }
 
     private val navigationListener = object : Navigation.Listener {
