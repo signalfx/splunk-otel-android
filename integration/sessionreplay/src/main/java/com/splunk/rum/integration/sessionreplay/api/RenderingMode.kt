@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.sessionreplay.extension
+package com.splunk.rum.integration.sessionreplay.api
 
-import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.sessionreplay.api.SessionReplay
+enum class RenderingMode {
 
-/**
- * Extension property to access the [SessionReplay] instance via [SplunkRum].
- */
-@Suppress("UnusedReceiverParameter")
-val SplunkRum.sessionReplay: SessionReplay
-    get() = SessionReplay.instance
+    /**
+     * Recording screen image (what a user sees). Sensitive parts of screen, for example credit card number, can be hidden.
+     *
+     */
+    NATIVE,
+
+    /**
+     * Wireframe representation of screen data.
+     */
+    WIREFRAME_ONLY
+}

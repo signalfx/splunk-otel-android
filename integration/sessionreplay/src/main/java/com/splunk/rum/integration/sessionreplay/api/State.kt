@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.sessionreplay.extension
+package com.splunk.rum.integration.sessionreplay.api
 
-import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.sessionreplay.api.SessionReplay
+import com.cisco.android.instrumentation.recording.core.api.SessionReplay
+import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
 
-/**
- * Extension property to access the [SessionReplay] instance via [SplunkRum].
- */
-@Suppress("UnusedReceiverParameter")
-val SplunkRum.sessionReplay: SessionReplay
-    get() = SessionReplay.instance
+class State internal constructor() {
+
+    /**
+     * The current SDK status.
+     */
+    val status: Status
+        get() = SessionReplay.instance.state.status.toSplunk()
+
+    /**
+     * Screen data rendering mode.
+     */
+    val renderingMode: RenderingMode
+        get() = SessionReplay.instance.state.renderingMode.toSplunk()
+}
