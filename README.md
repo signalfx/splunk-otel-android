@@ -21,7 +21,7 @@
 
 # Splunk OpenTelemetry Instrumentation for Android
 
-For official documentation on the Splunk OTel Instrumentation for Android, see [Instrument Android applications for Splunk RUM](https://docs.splunk.com/observability/en/gdi/get-data-in/rum/android/get-android-data-in.html).
+For official documentation on the Splunk OTel Instrumentation for Android, see [Instrument Android applications for Splunk RUM](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
 
 ## Features
 
@@ -50,7 +50,7 @@ rum.access.token=<a valid Splunk RUM access token for the realm>
 ## Troubleshooting
 
 For troubleshooting issues with the Splunk OpenTelemetry instrumentation of Android, see
-[Troubleshoot Android instrumentation for Splunk Observability Cloud](https://docs.splunk.com/observability/en/gdi/get-data-in/rum/android/troubleshooting.html)
+[Troubleshoot Android instrumentation for Splunk Observability Cloud](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications/troubleshooting)
 in the official documentation.
 
 # License

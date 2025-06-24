@@ -91,7 +91,7 @@ This version is succeeded by a patch release: Users should use 1.3.1 instead of 
 
 This is the first version of `splunk-otel-android` that is based on the upstream version of
 `opentelemetry-android`. Please note that this requires an additional project dependency,
-as [documented here](https://docs.splunk.com/observability/en/gdi/get-data-in/rum/android/install-rum-android.html#install-the-android-agent-as-a-dependency).
+as [documented here](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications/install-the-android-rum-agent).
 
 * Depend on upstream [opentelemetry-android](https://github.com/open-telemetry/opentelemetry-android) (#640)
 * Depend on updated java semantic conventions (#658)
