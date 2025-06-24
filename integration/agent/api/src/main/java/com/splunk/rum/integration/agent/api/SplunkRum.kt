@@ -26,6 +26,7 @@ import com.splunk.rum.integration.agent.api.session.Session
 import com.splunk.rum.integration.agent.api.session.SessionState
 import com.splunk.rum.integration.agent.api.subprocess.SubprocessDetector
 import com.splunk.rum.integration.agent.api.user.User
+import com.splunk.rum.integration.agent.api.user.toInternal
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
@@ -158,7 +159,7 @@ class SplunkRum private constructor(
                 )
             }
 
-            val userManager = UserManager()
+            val userManager = UserManager(agentConfiguration.user.trackingMode.toInternal())
 
             val sessionManager = AgentIntegration.obtainInstance(application).sessionManager
 
