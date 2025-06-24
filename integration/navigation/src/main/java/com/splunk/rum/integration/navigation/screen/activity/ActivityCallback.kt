@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation
+package com.splunk.rum.integration.navigation.screen.activity
 
-class Navigation internal constructor() {
+import com.cisco.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.rum.integration.navigation.screen.VisibleScreenTracker
 
-    internal var listener: Listener? = null
-
-    fun track(screenName: String) {
-        listener?.onScreenNameChanged(screenName)
-    }
-
-    internal interface Listener {
-        fun onScreenNameChanged(screenName: String)
-    }
-
-    companion object {
-
-        @JvmStatic
-        val instance by lazy { Navigation() }
-    }
+internal interface ActivityCallback : ActivityLifecycleCallbacksAdapter {
+    val tracker: VisibleScreenTracker
 }

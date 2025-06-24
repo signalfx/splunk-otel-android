@@ -93,9 +93,8 @@ class App : Application() {
                     isEnabled = true
                 ),
                 NavigationModuleConfiguration(
-                    isEnabled = true,
-                    isFragmentTrackingEnabled = false,
-                    isActivityTrackingEnabled = false
+                    isEnabled = false,
+                    isAutomatedTrackingEnabled = true
                 ),
                 CrashModuleConfiguration(
                     isEnabled = true

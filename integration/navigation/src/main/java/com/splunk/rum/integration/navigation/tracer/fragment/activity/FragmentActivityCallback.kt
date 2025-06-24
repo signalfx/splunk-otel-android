@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation
+package com.splunk.rum.integration.navigation.tracer.fragment.activity
 
-class Navigation internal constructor() {
+import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
+import com.cisco.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 
-    internal var listener: Listener? = null
-
-    fun track(screenName: String) {
-        listener?.onScreenNameChanged(screenName)
-    }
-
-    internal interface Listener {
-        fun onScreenNameChanged(screenName: String)
-    }
-
-    companion object {
-
-        @JvmStatic
-        val instance by lazy { Navigation() }
-    }
+internal interface FragmentActivityCallback : ActivityLifecycleCallbacksAdapter {
+    val fragmentCallback: FragmentLifecycleCallbacks
 }
