@@ -49,7 +49,6 @@ class SplunkRumBuilder {
     private var spanFilter: Consumer<SpanFilterBuilder>? = null
     private var instrumentedProcessName: String? = null
     private var deferredUntilForeground: Boolean = false
-    private var maxUsageMegabytes: Int = 25
     private var crashReportingEnabled: Boolean = true
     private var anrReportingEnabled: Boolean = true
     private var slowRenderingDetectionEnabled: Boolean = true
@@ -300,8 +299,6 @@ class SplunkRumBuilder {
                 )
             )
         )
-
-        // TODO limitDiskUsageMegabytes
 
         return agent
     }
