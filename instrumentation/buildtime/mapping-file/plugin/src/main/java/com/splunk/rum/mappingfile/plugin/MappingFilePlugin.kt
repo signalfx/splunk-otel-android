@@ -82,7 +82,7 @@ class MappingFilePlugin : Plugin<Project> {
         // TODO: create gradle plugin extension for customer to put in these values instead
         val accessToken = project.findProperty("splunk.accessToken") as String?
             ?: System.getenv("SPLUNK_ACCESS_TOKEN")
-            ?: "sQGkZlC8Q5cKpEdm5yTGEA"
+            ?: ""
         val realm = project.findProperty("splunk.realm") as String?
             ?: System.getenv("SPLUNK_REALM")
             ?: "lab0"
