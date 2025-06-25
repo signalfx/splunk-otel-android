@@ -25,4 +25,6 @@ android {
 
 dependencies {
     implementation(Dependencies.SessionReplay.commonLogger)
+
+    testImplementation(Dependencies.Test.junit)
 }
