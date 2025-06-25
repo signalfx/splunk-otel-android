@@ -138,8 +138,8 @@ class SplunkRum private constructor(
     fun addRumEvent(name: String, attributes: Attributes) {
         ReflectionUtils.invokeOnCompanionInstance<Unit>(
             className = "com.splunk.rum.integration.customtracking.CustomTracking",
-            methodName = "trackWorkflow",
-            parameterTypes = arrayOf(String::class.java),
+            methodName = "trackCustomEvent",
+            parameterTypes = arrayOf(String::class.java, Attributes::class.java),
             args = arrayOf(name, attributes)
         )
     }
