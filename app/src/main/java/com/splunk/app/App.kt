@@ -17,7 +17,6 @@
 package com.splunk.app
 
 import android.app.Application
-import android.webkit.WebView
 import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
@@ -34,7 +33,6 @@ import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration
 import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration
-import io.opentelemetry.api.common.Attributes
 import java.time.Duration
 
 class App : Application() {
@@ -131,11 +129,5 @@ class App : Application() {
 
         agent.sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
         agent.sessionReplay.start()
-
-        agent.integrateWithBrowserRum(WebView(this))
-        agent.addRumEvent("event", Attributes.empty())
-        agent.addRumException(Throwable())
-        agent.addRumException(Throwable(), Attributes.empty())
-        agent.startWorkflow("name")
     }
 }
