@@ -17,9 +17,8 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
+import android.webkit.WebView
 import com.cisco.android.common.logger.Logger
-import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
-import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.api.session.ISession
 import com.splunk.rum.integration.agent.api.session.Session
@@ -35,9 +34,12 @@ import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManage
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
+import com.splunk.rum.utils.ReflectionUtils
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
+import io.opentelemetry.api.trace.Span
 import java.util.function.Consumer
 
 /**
@@ -97,6 +99,90 @@ class SplunkRum private constructor(
     )
     fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
         globalAttributes.update { attributesUpdater.accept(this) }
+    }
+
+    /**
+     * This method will enable Splunk Browser-based RUM to integrate with the current Android RUM
+     * Session. It injects a javascript object named "SplunkRumNative" into your WebView which
+     * exposes the Android Session ID to the browser-based RUM javascript implementation.
+     *
+     * @param webView The WebView to inject the javascript object into.
+     */
+    @Deprecated(
+        message = "Use SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)",
+        replaceWith = ReplaceWith("SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)")
+    )
+    fun integrateWithBrowserRum(webView: WebView) {
+        ReflectionUtils.invokeOnClassInstance<Unit>(
+            className = "com.splunk.rum.integration.webview.WebViewNativeBridge",
+            methodName = "integrateWithBrowserRum",
+            parameterTypes = arrayOf(WebView::class.java),
+            args = arrayOf(webView)
+        )
+    }
+
+    /**
+     * Add a custom event to RUM monitoring. This can be useful to capture business events, or
+     * simply add instrumentation to your application.
+     *
+     * <p>This event will be turned into a Span and sent to the RUM ingest along with other,
+     * auto-generated spans.
+     *
+     * @param name The name of the event.
+     * @param attributes Any {@link Attributes} to associate with the event.
+     */
+    @Deprecated(
+        message = "Use SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)",
+        replaceWith = ReplaceWith("SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)")
+    )
+    fun addRumEvent(name: String, attributes: Attributes) {
+        ReflectionUtils.invokeOnCompanionInstance<Unit>(
+            className = "com.splunk.rum.integration.customtracking.CustomTracking",
+            methodName = "trackWorkflow",
+            parameterTypes = arrayOf(String::class.java),
+            args = arrayOf(name, attributes)
+        )
+    }
+
+    /**
+     * Start a Span to time a named workflow.
+     *
+     * @param workflowName The name of the workflow to start.
+     * @return A {@link Span} that has been started.
+     */
+    @Deprecated(
+        message = "Use SplunkRum.instance.customTracking.trackWorkflow(workflowName)",
+        replaceWith = ReplaceWith("SplunkRum.instance.customTracking.trackWorkflow(workflowName)")
+    )
+    fun startWorkflow(workflowName: String): Span? = ReflectionUtils.invokeOnCompanionInstance<Span>(
+        className = "com.splunk.rum.integration.customtracking.CustomTracking",
+        methodName = "trackWorkflow",
+        parameterTypes = arrayOf(String::class.java),
+        args = arrayOf(workflowName)
+    )
+
+    /**
+     * Add a custom exception to RUM monitoring. This can be useful for tracking custom error
+     * handling in your application.
+     *
+     * <p>This event will be turned into a Span and sent to the RUM ingest along with other,
+     * auto-generated spans.
+     *
+     * @param throwable A {@link Throwable} associated with this event.
+     * @param attributes Any {@link Attributes} to associate with the event.
+     */
+    @Deprecated(
+        message = "Use SplunkRum.instance.customTracking.trackException(throwable, attributes)",
+        replaceWith = ReplaceWith("SplunkRum.instance.customTracking.trackException(throwable, attributes)")
+    )
+    @JvmOverloads
+    fun addRumException(throwable: Throwable, attributes: Attributes = Attributes.empty()) {
+        ReflectionUtils.invokeOnCompanionInstance<Unit>(
+            className = "com.splunk.rum.integration.customtracking.CustomTracking",
+            methodName = "trackException",
+            parameterTypes = arrayOf(Throwable::class.java, Attributes::class.java),
+            args = arrayOf(throwable, attributes)
+        )
     }
 
     companion object {
