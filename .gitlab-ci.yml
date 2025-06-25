@@ -64,6 +64,17 @@ oss-scan:
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
 
+dry-run-release:
+  stage: release
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+.*-dryrun$/'
+  extends: .prepare-android-environment
+  script:
+    - touch local.properties
+    - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
+    - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
+    - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype closeSonatypeStagingRepository
+
 release:
   stage: release
   rules:
