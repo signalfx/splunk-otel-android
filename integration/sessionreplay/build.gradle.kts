@@ -31,7 +31,8 @@ dependencies {
 
     implementation(Dependencies.Otel.androidInstrumentation)
 
-    api(Dependencies.SessionReplay.instrumentationSessionRecordingCore)
+    implementation(Dependencies.SessionReplay.instrumentationSessionRecordingCore)
+    implementation(Dependencies.SessionReplay.instrumentationSessionRecordingInteractions)
     implementation(Dependencies.SessionReplay.commonLogger)
 
     compileOnly(Dependencies.Android.Compose.ui)

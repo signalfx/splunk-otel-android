@@ -17,7 +17,6 @@
 package com.splunk.app
 
 import android.app.Application
-import com.cisco.android.instrumentation.recording.core.api.RenderingMode
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
@@ -31,6 +30,7 @@ import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration
 import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration
+import com.splunk.rum.integration.sessionreplay.api.RenderingMode
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration
 import java.time.Duration
