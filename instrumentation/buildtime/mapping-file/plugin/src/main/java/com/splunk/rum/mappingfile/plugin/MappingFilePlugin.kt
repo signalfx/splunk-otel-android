@@ -17,10 +17,10 @@
 package com.splunk.rum.mappingfile.plugin
 
 import com.android.build.gradle.AppExtension
-import org.gradle.api.Plugin
-import org.gradle.api.Project
 import java.io.File
 import java.util.*
+import org.gradle.api.Plugin
+import org.gradle.api.Project
 
 class MappingFilePlugin : Plugin<Project> {
 
@@ -62,10 +62,7 @@ class MappingFilePlugin : Plugin<Project> {
         setupUploadTask(variant, buildId)
     }
 
-    private fun setupUploadTask(
-        variant: com.android.build.gradle.api.ApplicationVariant,
-        buildId: String
-    ) {
+    private fun setupUploadTask(variant: com.android.build.gradle.api.ApplicationVariant, buildId: String) {
         // Hook into the assemble task to upload after build completes
         val assembleTaskName = "assemble${variant.name.capitalize(Locale.ROOT)}"
         project.tasks.named(assembleTaskName).configure { assembleTask ->
@@ -75,10 +72,7 @@ class MappingFilePlugin : Plugin<Project> {
         }
     }
 
-    private fun uploadMappingFileAfterBuild(
-        variant: com.android.build.gradle.api.ApplicationVariant,
-        buildId: String
-    ) {
+    private fun uploadMappingFileAfterBuild(variant: com.android.build.gradle.api.ApplicationVariant, buildId: String) {
         // TODO: create gradle plugin extension for customer to put in these values instead
         val accessToken = project.findProperty("splunk.accessToken") as String?
             ?: System.getenv("SPLUNK_ACCESS_TOKEN")
@@ -123,7 +117,10 @@ class MappingFilePlugin : Plugin<Project> {
         }
     }
 
-    private fun injectViaManifestModification(variant: com.android.build.gradle.api.ApplicationVariant, buildId: String) {
+    private fun injectViaManifestModification(
+        variant: com.android.build.gradle.api.ApplicationVariant,
+        buildId: String
+    ) {
         variant.outputs.forEach { output ->
             try {
                 val processManifestTask = output.processManifest
@@ -144,7 +141,10 @@ class MappingFilePlugin : Plugin<Project> {
         }
     }
 
-    private fun injectMetadataIntoMergedManifest(variant: com.android.build.gradle.api.ApplicationVariant, buildId: String) {
+    private fun injectMetadataIntoMergedManifest(
+        variant: com.android.build.gradle.api.ApplicationVariant,
+        buildId: String
+    ) {
         println("Splunk RUM: Searching for manifest files")
 
         val buildDir = project.layout.buildDirectory.get().asFile
@@ -198,7 +198,6 @@ class MappingFilePlugin : Plugin<Project> {
                 println("Splunk RUM: Could not find <application> tag in: ${manifestFile.name}")
                 return false
             }
-
         } catch (e: Exception) {
             println("Splunk RUM: Error modifying ${manifestFile.name}: ${e.message}")
             return false
@@ -244,7 +243,9 @@ class MappingFilePlugin : Plugin<Project> {
 
                 // Add file
                 writer.append("--$boundary").append("\r\n")
-                writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"${mappingFile.name}\"").append("\r\n")
+                writer.append(
+                    "Content-Disposition: form-data; name=\"file\"; filename=\"${mappingFile.name}\""
+                ).append("\r\n")
                 writer.append("Content-Type: application/octet-stream").append("\r\n")
                 writer.append("\r\n")
                 writer.flush()
@@ -268,7 +269,8 @@ class MappingFilePlugin : Plugin<Project> {
                     println("Splunk RUM: Response body: $response")
                 }
             } else {
-                val errorResponse = connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "No error details"
+                val errorResponse =
+                    connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "No error details"
                 println("Splunk RUM: Error response body: $errorResponse")
 
                 // Printing response headers for debugging
