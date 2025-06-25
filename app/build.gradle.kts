@@ -8,6 +8,8 @@ plugins {
     // Uncomment this to test HttpURLConnection instrumentation
     //id("com.splunk.android.rum-okhttp3-auto-plugin") version "24.4.1"
     //id("com.splunk.android.rum-httpurlconnection-auto-plugin") version "24.4.1"
+    // Uncomment this to test mapping file plugin
+    //id("com.splunk.rum-mapping-file-plugin") version "2.0.0-beta"
 }
 
 apply<ConfigAndroidApp>()
