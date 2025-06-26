@@ -44,8 +44,8 @@ nexusPublishing {
         sonatype {
             username.set(System.getenv("SONATYPE_USER"))
             password.set(System.getenv("SONATYPE_KEY"))
-            nexusUrl.set(uri("https://oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots/"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
         }
     }
 }
