@@ -67,14 +67,19 @@ oss-scan:
 dry-run-release:
   stage: release
   rules:
-    - when: manual 
+    - when: manual
   extends: .prepare-android-environment
   script:
     - touch local.properties
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
+    - echo "=== DEBUGGING SIGNING VARIABLES ==="
+    - echo "GPG_SECRET_KEY length is ${#GPG_SECRET_KEY}"
+    - echo "GPG_PASSWORD is set"
+    - echo "SONATYPE_USER is $SONATYPE_USER"
+    - echo "======================================="
     - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype
-
+      
 release:
   stage: release
   rules:
