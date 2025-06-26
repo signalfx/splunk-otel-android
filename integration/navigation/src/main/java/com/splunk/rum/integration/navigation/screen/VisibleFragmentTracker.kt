@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation
+package com.splunk.rum.integration.navigation.screen
 
-class Navigation internal constructor() {
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 
-    internal var listener: Listener? = null
+internal class VisibleFragmentTracker(private val visibleScreenTracker: VisibleScreenTracker) :
+    FragmentManager.FragmentLifecycleCallbacks() {
 
-    fun track(screenName: String) {
-        listener?.onScreenNameChanged(screenName)
+    override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+        visibleScreenTracker.onFragmentResumed(f)
     }
 
-    internal interface Listener {
-        fun onScreenNameChanged(screenName: String)
-    }
-
-    companion object {
-
-        @JvmStatic
-        val instance by lazy { Navigation() }
+    override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
+        visibleScreenTracker.onFragmentPaused(f)
     }
 }

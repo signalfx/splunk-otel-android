@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation
+package com.splunk.rum.integration.navigation.screen;
 
-class Navigation internal constructor() {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    internal var listener: Listener? = null
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface RumScreenName {
 
-    fun track(screenName: String) {
-        listener?.onScreenNameChanged(screenName)
-    }
+    String name();
 
-    internal interface Listener {
-        fun onScreenNameChanged(screenName: String)
-    }
-
-    companion object {
-
-        @JvmStatic
-        val instance by lazy { Navigation() }
-    }
+    boolean isIgnored() default false;
 }

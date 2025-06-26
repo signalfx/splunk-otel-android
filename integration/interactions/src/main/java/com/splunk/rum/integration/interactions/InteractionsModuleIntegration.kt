@@ -66,7 +66,10 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     private fun setupComposeIdentification() {
         runIfComposeUiExists {
-            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) {
+            ComposeElementIdentification.insertModifierIfNeeded(
+                SessionReplayDrawModifier::class,
+                OrderPriority.HIGH
+            ) {
                     id,
                     isSensitive,
                     _
@@ -93,7 +96,9 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 return
             }
 
-            Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
+            if (interaction !is Interaction.Touch.Pointer) {
+                Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
+            }
 
             val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider ?: return
 

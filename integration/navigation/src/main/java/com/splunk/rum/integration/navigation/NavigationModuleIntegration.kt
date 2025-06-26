@@ -21,8 +21,11 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
+import com.splunk.rum.integration.navigation.screen.ScreenTrackerIntegration
+import io.opentelemetry.android.instrumentation.InstallationContext
 
 internal object NavigationModuleIntegration : ModuleIntegration<NavigationModuleConfiguration>(
     defaultModuleConfiguration = NavigationModuleConfiguration()
@@ -30,16 +33,22 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
     private const val TAG = "NavigationIntegration"
 
-    override fun onAttach(context: Context) {
-        Navigation.instance.listener = navigationListener
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
+        if (moduleConfiguration.isEnabled) {
+            Navigation.instance.listener = navigationListener
+        }
+
+        if (moduleConfiguration.isAutomatedTrackingEnabled) {
+            ScreenTrackerIntegration.attach(context)
+        }
     }
 
     private val navigationListener = object : Navigation.Listener {
         override fun onScreenNameChanged(screenName: String) {
-            if (!moduleConfiguration.isEnabled) {
-                return
-            }
-
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
 
             val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: return

@@ -33,7 +33,6 @@ include ':integration:agent:api',
         ':integration:interactions',
         ':integration:navigation',
         ':integration:okhttp',
-        ':integration:lifecycle',
         ':integration:customtracking',
         ':integration:networkmonitor',
         ':integration:webview'
