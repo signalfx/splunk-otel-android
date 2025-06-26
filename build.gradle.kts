@@ -10,6 +10,10 @@ buildscript {
     }
 }
 
+plugins {
+    id(Dependencies.nexusPublishPluginId) version Dependencies.nexusPublishPluginVersion
+}
+
 allprojects {
     apply<plugins.ConfigKtLint>()
 
@@ -30,6 +34,18 @@ allprojects {
 
         maven {
             setUrl("https://sdk.smartlook.com/android/release")
+        }
+    }
+}
+
+// Configure nexus publishing for Maven Central identical to main branch
+nexusPublishing {
+    repositories {
+        sonatype {
+            username.set(System.getenv("SONATYPE_USER"))
+            password.set(System.getenv("SONATYPE_KEY"))
+            nexusUrl.set(uri("https://oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots/"))
         }
     }
 }

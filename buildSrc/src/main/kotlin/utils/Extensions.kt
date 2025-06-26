@@ -19,15 +19,6 @@ fun Project.propOrDefault(name: String, default: Any): Any? {
     }
 }
 
-fun Project.getVersionPostfix(): String {
-    return if (rootProject.hasProperty("maven.deploy.artifactory.snapshot")) {
-        val postfix = rootProject.properties["maven.deploy.artifactory.snapshot"].toString()
-        "-$postfix-TEST"
-    } else {
-        ""
-    }
-}
-
 fun String.toBoxString(): String {
     return "║" + center(this, 98) + "║"
 }
