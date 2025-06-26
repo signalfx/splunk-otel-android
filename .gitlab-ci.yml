@@ -73,6 +73,9 @@ dry-run-release:
     - touch local.properties
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
+    - echo "=== DEBUGGING GROUP ID ==="
+    - ./gradlew properties | grep -i group
+    - echo "=========================="
     - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype
 
 release:
