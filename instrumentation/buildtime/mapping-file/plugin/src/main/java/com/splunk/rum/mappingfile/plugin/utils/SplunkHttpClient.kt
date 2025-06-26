@@ -46,9 +46,8 @@ class SplunkHttpClient {
         }
     }
 
-    private fun buildUploadUrl(realm: String, applicationId: String, versionCode: Int, buildId: String): String {
-        return "https://api.$realm.signalfx.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId"
-    }
+    private fun buildUploadUrl(realm: String, applicationId: String, versionCode: Int, buildId: String): String =
+        "https://api.$realm.signalfx.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId"
 
     private fun setupConnection(connection: HttpURLConnection, accessToken: String) {
         connection.requestMethod = "PUT"

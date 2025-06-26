@@ -16,8 +16,8 @@
 
 package com.splunk.rum.mappingfile.plugin.utils
 
-import org.gradle.api.Project
 import java.io.File
+import org.gradle.api.Project
 
 class MappingFileUploader(private val project: Project) {
 

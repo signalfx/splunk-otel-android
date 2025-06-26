@@ -19,9 +19,9 @@ package com.splunk.rum.mappingfile.plugin
 import com.android.build.gradle.AppExtension
 import com.splunk.rum.mappingfile.plugin.utils.BuildIdInjector
 import com.splunk.rum.mappingfile.plugin.utils.MappingFileUploader
+import java.util.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import java.util.*
 
 class MappingFilePlugin : Plugin<Project> {
 

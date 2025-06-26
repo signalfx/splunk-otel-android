@@ -16,9 +16,9 @@
 
 package com.splunk.rum.mappingfile.plugin.utils
 
-import org.gradle.api.Project
 import java.io.File
 import java.util.*
+import org.gradle.api.Project
 
 class BuildIdInjector(private val project: Project) {
 
