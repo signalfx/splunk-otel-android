@@ -38,8 +38,6 @@ allprojects {
     }
 }
 
-
-
 // Configure nexus publishing for Maven Central identical to main branch
 nexusPublishing {
     packageGroup.set("com.splunk")
@@ -51,13 +49,5 @@ nexusPublishing {
             nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
             snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
         }
-    }
-}
-
-tasks.register("printEnvironmentVars") {
-    doLast {
-        println("SONATYPE_USER: ${System.getenv("SONATYPE_USER")?.take(3)}***")
-        println("SONATYPE_KEY: ${System.getenv("SONATYPE_KEY")?.take(3)}***")
-        println("Environment variables are ${if (System.getenv("SONATYPE_USER") != null && System.getenv("SONATYPE_KEY") != null) "SET" else "NOT SET"}")
     }
 }

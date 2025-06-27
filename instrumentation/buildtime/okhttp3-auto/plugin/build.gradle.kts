@@ -38,6 +38,10 @@ tasks.jar {
     }
 }
 
+tasks.withType<PublishToMavenRepository>().configureEach {
+    dependsOn(tasks.withType<Sign>())
+}
+
 gradlePlugin {
     plugins {
         create("androidInstrumentationPlugin") {
