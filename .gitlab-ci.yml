@@ -64,6 +64,18 @@ oss-scan:
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
 
+dry-run-release:
+  stage: release
+  rules:
+    - when: manual
+  extends: .prepare-android-environment
+  script:
+    - touch local.properties
+    - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
+    - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
+    - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks --stacktrace build signMavenPublication publishToSonatype
+
+
 release:
   stage: release
   rules:
