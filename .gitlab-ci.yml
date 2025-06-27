@@ -78,18 +78,10 @@ dry-run-release:
 
     - echo "Debug - SONATYPE_USER length:" ${#SONATYPE_USER}
     - echo "Debug - SONATYPE_KEY length:" ${#SONATYPE_KEY}
-    - echo "Debug - GPG_SECRET_KEY length:" ${#GPG_SECRET_KEY}
-    - echo "Debug - GPG_PASSWORD length:" ${#GPG_PASSWORD}
 
-    - ./gradlew properties | grep -E "(group|version|mavenArtifactId|mavenVersion)"
-    - ./gradlew tasks --group=publishing
+    - ./gradlew printPublications || echo "No  print Publications task found"
 
-    - ./gradlew projects --console=plain
-    - ./gradlew printPublications || echo "No printPublications task found"
-
-    - ./gradlew tasks --group=nexus || echo "No nexus tasks found"
-
-    - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks --stacktrace --info build signMavenPublication publishToSonatype
+    - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks --stacktrace build signMavenPublication publishToSonatype
 
 release:
   stage: release
