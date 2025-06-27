@@ -76,10 +76,10 @@ dry-run-release:
     - export SONATYPE_USER=$SONATYPE_USERNAME
     - export SONATYPE_KEY=$SONATYPE_PASSWORD
 
-    - echo "Debug - SONATYPE_USER length:" ${#SONATYPE_USER}
-    - echo "Debug - SONATYPE_KEY length:" ${#SONATYPE_KEY}
+    - echo "Testing credentials in CI..."
+    - "curl -H \"Accept: application/json\" -H \"Content-Type: application/json\" -u \"$SONATYPE_USER:$SONATYPE_KEY\" \"https://ossrh-staging-api.central.sonatype.com/service/local/staging/profiles\""
 
-    - ./gradlew printPublications || echo "No  print Publications task found"
+    - ./gradlew -q printEnvironmentVars || echo "No printEnvironmentVars task"
 
     - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks --stacktrace build signMavenPublication publishToSonatype
 
