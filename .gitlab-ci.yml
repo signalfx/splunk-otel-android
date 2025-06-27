@@ -74,8 +74,8 @@ dry-run-release:
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
     - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks --stacktrace build signMavenPublication publishToSonatype
-    - echo "Verifying staging repository..."
-    - ./gradlew getSonatypeStagingRepository
+    - echo "=== Getting available nexus tasks ==="
+    - ./gradlew tasks --group=nexus
 
 release:
   stage: release
