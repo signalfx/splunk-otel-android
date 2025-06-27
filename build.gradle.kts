@@ -38,8 +38,12 @@ allprojects {
     }
 }
 
+
+
 // Configure nexus publishing for Maven Central identical to main branch
 nexusPublishing {
+    packageGroup.set("com.splunk")
+
     repositories {
         sonatype {
             username.set(System.getenv("SONATYPE_USER"))
