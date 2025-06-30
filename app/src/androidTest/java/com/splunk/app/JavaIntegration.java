@@ -90,6 +90,7 @@ public class JavaIntegration extends Application {
 
         agent.addRumEvent("event", Attributes.of(AttributeKey.stringKey("key"), "value"));
         agent.addRumException(new Throwable());
+        agent.addRumException(new Throwable(), Attributes.of(AttributeKey.stringKey("key"), "value"));
         Span workflow = agent.startWorkflow("workflow");
 
         agent.integrateWithBrowserRum(new WebView(this));

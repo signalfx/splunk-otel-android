@@ -18,29 +18,14 @@ package com.splunk.rum.utils
 
 /**
  * @deprecated
- * Hackish support for legacy API mapping via reflection.
+ * Temporary support for legacy API mapping via reflection.
  *
  * This utility uses reflection to invoke methods on singleton instances or companion objects.
  * It is fragile and should only be used as a last resort for legacy APIs.
  * Prefer direct calls to stable, public APIs whenever possible.
  */
-@Deprecated("Hackish support for legacy API mapping")
-object ReflectionUtils {
-
-    fun <T> invokeOnClassInstance(
-        className: String,
-        methodName: String,
-        parameterTypes: Array<Class<*>>,
-        args: Array<Any?>
-    ): T? = try {
-        val clazz = Class.forName(className)
-        val instance = clazz.getField("INSTANCE").get(null)
-        val method = clazz.getDeclaredMethod(methodName, *parameterTypes)
-        @Suppress("UNCHECKED_CAST")
-        method.invoke(instance, *args) as? T
-    } catch (_: Exception) {
-        null
-    }
+@Deprecated("Temporary support for legacy API mapping")
+object LegacyAPIReflectionUtils {
 
     @Suppress("UNCHECKED_CAST")
     fun <T> invokeOnCompanionInstance(
@@ -51,18 +36,18 @@ object ReflectionUtils {
     ): T? = try {
         val clazz = Class.forName(className)
 
-        val instance = try {
-            clazz.getField("INSTANCE").get(null)
-        } catch (_: NoSuchFieldException) {
-            val companion = clazz.getDeclaredField("Companion").apply { isAccessible = true }.get(null)
-            val instanceMethod = companion.javaClass.getDeclaredMethod("getInstance").apply { isAccessible = true }
-            instanceMethod.invoke(companion)
-        }
+        val companion = clazz.getDeclaredField("Companion")
+            .apply { isAccessible = true }
+            .get(null)
 
-        clazz.getDeclaredMethod(methodName, *parameterTypes).apply { isAccessible = true }
+        val instance = companion.javaClass.getDeclaredMethod("getInstance")
+            .apply { isAccessible = true }
+            .invoke(companion)
+
+        clazz.getDeclaredMethod(methodName, *parameterTypes)
+            .apply { isAccessible = true }
             .invoke(instance, *args) as? T
     } catch (e: Exception) {
-        e.printStackTrace()
         null
     }
 }

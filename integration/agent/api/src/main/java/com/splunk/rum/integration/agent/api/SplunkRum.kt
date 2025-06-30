@@ -34,7 +34,7 @@ import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManage
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
-import com.splunk.rum.utils.ReflectionUtils
+import com.splunk.rum.utils.LegacyAPIReflectionUtils
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -113,7 +113,7 @@ class SplunkRum private constructor(
         replaceWith = ReplaceWith("SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)")
     )
     fun integrateWithBrowserRum(webView: WebView) {
-        ReflectionUtils.invokeOnClassInstance<Unit>(
+        LegacyAPIReflectionUtils.invokeOnCompanionInstance<Unit>(
             className = "com.splunk.rum.integration.webview.WebViewNativeBridge",
             methodName = "integrateWithBrowserRum",
             parameterTypes = arrayOf(WebView::class.java),
@@ -136,7 +136,7 @@ class SplunkRum private constructor(
         replaceWith = ReplaceWith("SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)")
     )
     fun addRumEvent(name: String, attributes: Attributes) {
-        ReflectionUtils.invokeOnCompanionInstance<Unit>(
+        LegacyAPIReflectionUtils.invokeOnCompanionInstance<Unit>(
             className = "com.splunk.rum.integration.customtracking.CustomTracking",
             methodName = "trackCustomEvent",
             parameterTypes = arrayOf(String::class.java, Attributes::class.java),
@@ -154,7 +154,7 @@ class SplunkRum private constructor(
         message = "Use SplunkRum.instance.customTracking.trackWorkflow(workflowName)",
         replaceWith = ReplaceWith("SplunkRum.instance.customTracking.trackWorkflow(workflowName)")
     )
-    fun startWorkflow(workflowName: String): Span? = ReflectionUtils.invokeOnCompanionInstance<Span>(
+    fun startWorkflow(workflowName: String): Span? = LegacyAPIReflectionUtils.invokeOnCompanionInstance<Span>(
         className = "com.splunk.rum.integration.customtracking.CustomTracking",
         methodName = "trackWorkflow",
         parameterTypes = arrayOf(String::class.java),
@@ -177,7 +177,7 @@ class SplunkRum private constructor(
     )
     @JvmOverloads
     fun addRumException(throwable: Throwable, attributes: Attributes = Attributes.empty()) {
-        ReflectionUtils.invokeOnCompanionInstance<Unit>(
+        LegacyAPIReflectionUtils.invokeOnCompanionInstance<Unit>(
             className = "com.splunk.rum.integration.customtracking.CustomTracking",
             methodName = "trackException",
             parameterTypes = arrayOf(Throwable::class.java, Attributes::class.java),
