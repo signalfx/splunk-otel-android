@@ -60,6 +60,7 @@ internal class FragmentTracer(
     private fun createSpan(spanName: String): Span {
         val span = tracer.spanBuilder(spanName)
             .setAttribute(FRAGMENT_NAME_KEY, fragmentName)
+            .setAttribute(RumConstants.COMPONENT_KEY, "ui")
             .startSpan()
 
         span.setAttribute(RumConstants.SCREEN_NAME_KEY, screenName)
@@ -67,6 +68,6 @@ internal class FragmentTracer(
     }
 
     private companion object {
-        val FRAGMENT_NAME_KEY: AttributeKey<String?> = AttributeKey.stringKey("fragmentName")
+        val FRAGMENT_NAME_KEY: AttributeKey<String?> = AttributeKey.stringKey("fragment.name")
     }
 }

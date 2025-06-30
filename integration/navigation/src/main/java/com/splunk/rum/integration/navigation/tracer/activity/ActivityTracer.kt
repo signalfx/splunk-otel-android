@@ -78,12 +78,13 @@ internal class ActivityTracer(
     private fun createSpan(spanName: String): Span {
         val spanBuilder = tracer.spanBuilder(spanName)
             .setAttribute(ACTIVITY_NAME_KEY, activityName)
+            .setAttribute(RumConstants.COMPONENT_KEY, "ui")
 
         return spanBuilder.startSpan()
             .setAttribute(RumConstants.SCREEN_NAME_KEY, screenName)
     }
 
     private companion object {
-        val ACTIVITY_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("activityName")
+        val ACTIVITY_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("activity.name")
     }
 }
