@@ -18,7 +18,7 @@ package com.splunk.rum.integration.webview
 
 import android.webkit.WebView
 
-object WebViewNativeBridge {
+class WebViewNativeBridge internal constructor() {
 
     /**
      * This method will enable Splunk Browser-based RUM to integrate with the current Android RUM
@@ -29,5 +29,14 @@ object WebViewNativeBridge {
      */
     fun integrateWithBrowserRum(webView: WebView) {
         webView.addJavascriptInterface(NativeRumSessionId(), "SplunkRumNative")
+    }
+
+    companion object {
+
+        /**
+         * The instance of [WebViewNativeBridge].
+         */
+        @JvmStatic
+        val instance by lazy { WebViewNativeBridge() }
     }
 }

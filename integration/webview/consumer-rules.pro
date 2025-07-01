@@ -1,0 +1,1 @@
+-keep class com.splunk.rum.integration.webview.WebViewNativeBridge { *; }

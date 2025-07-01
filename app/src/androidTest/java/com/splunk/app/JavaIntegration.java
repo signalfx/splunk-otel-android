@@ -17,6 +17,7 @@
 package com.splunk.app;
 
 import android.app.Application;
+import android.webkit.WebView;
 
 import com.splunk.rum.integration.agent.api.AgentConfiguration;
 import com.splunk.rum.integration.agent.api.EndpointConfiguration;
@@ -49,6 +50,7 @@ import java.util.Arrays;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.Span;
 
 public class JavaIntegration extends Application {
 
@@ -85,6 +87,13 @@ public class JavaIntegration extends Application {
 
         Navigation navigation = Navigation.getInstance();
         navigation.track("sample_screen_name");
+
+        agent.addRumEvent("event", Attributes.of(AttributeKey.stringKey("key"), "value"));
+        agent.addRumException(new Throwable());
+        agent.addRumException(new Throwable(), Attributes.of(AttributeKey.stringKey("key"), "value"));
+        Span workflow = agent.startWorkflow("workflow");
+
+        agent.integrateWithBrowserRum(new WebView(this));
     }
 
     private SplunkRum install() {
