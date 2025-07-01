@@ -36,7 +36,8 @@ class CustomTracking internal constructor() {
      * @param name The name of the event.
      * @param attributes Any {@link Attributes} to associate with the event.
      */
-    fun trackCustomEvent(name: String, attributes: Attributes) {
+    @JvmOverloads
+    fun trackCustomEvent(name: String, attributes: Attributes = Attributes.empty()) {
         val tracer = getTracer() ?: return
         tracer.spanBuilder(name).setAllAttributes(attributes).createZeroLengthSpan()
     }
