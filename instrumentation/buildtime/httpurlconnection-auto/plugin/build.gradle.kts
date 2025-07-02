@@ -9,7 +9,7 @@ plugins {
 }
 
 group = defaultGroupId
-version = Configurations.sdkVersionName
+version = Dependencies.httpurlconnectionAutoVersion
 
 val javadocJar by tasks.creating(Jar::class) {
     archiveClassifier.set("javadoc")
@@ -35,16 +35,6 @@ tasks.jar {
     }
     metaInf {
         from("$projectDir/src/main/assets/LICENSE.txt")
-    }
-}
-
-gradlePlugin {
-    plugins {
-        create("androidInstrumentationPlugin") {
-            id = "$defaultGroupId.${artifactPrefix}httpurlconnection-auto-plugin"
-            implementationClass = "com.splunk.rum.httpurlconnection.auto.plugin.HttpURLInstrumentationPlugin"
-            displayName = "Splunk Android HttpURLConnection Auto-Instrumentation Plugin"
-        }
     }
 }
 

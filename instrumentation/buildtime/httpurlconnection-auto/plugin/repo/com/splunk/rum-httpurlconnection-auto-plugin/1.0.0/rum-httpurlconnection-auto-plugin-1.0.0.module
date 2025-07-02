@@ -1,0 +1,96 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.splunk",
+    "module": "rum-httpurlconnection-auto-plugin",
+    "version": "1.0.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 19,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.8.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "rum-httpurlconnection-auto-plugin-1.0.0.jar",
+          "url": "rum-httpurlconnection-auto-plugin-1.0.0.jar",
+          "size": 3940,
+          "sha512": "10182cb01abd5901850407f420f79580c970122bbab0407c69d17edc624c213498bc6ba837e2b7769b4a716e5d7a5375822f33be002a8815f214ef4e1c254459",
+          "sha256": "fcc76a0761c9a20b68cd4bcacfc44c84240cec8d1e96517b2b35190e4c885636",
+          "sha1": "404ba4b7ab6829f71b4a147ab6c6863da7a4e896",
+          "md5": "3e43dfb9e408e4df0aadd41ead1b5d3d"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 19,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "net.bytebuddy",
+          "module": "byte-buddy-gradle-plugin",
+          "version": {
+            "requires": "1.17.2"
+          }
+        },
+        {
+          "group": "net.bytebuddy",
+          "module": "byte-buddy",
+          "version": {
+            "requires": "1.17.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.8.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "rum-httpurlconnection-auto-plugin-1.0.0.jar",
+          "url": "rum-httpurlconnection-auto-plugin-1.0.0.jar",
+          "size": 3940,
+          "sha512": "10182cb01abd5901850407f420f79580c970122bbab0407c69d17edc624c213498bc6ba837e2b7769b4a716e5d7a5375822f33be002a8815f214ef4e1c254459",
+          "sha256": "fcc76a0761c9a20b68cd4bcacfc44c84240cec8d1e96517b2b35190e4c885636",
+          "sha1": "404ba4b7ab6829f71b4a147ab6c6863da7a4e896",
+          "md5": "3e43dfb9e408e4df0aadd41ead1b5d3d"
+        }
+      ]
+    }
+  ]
+}

@@ -5,9 +5,6 @@ import java.net.InetAddress
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // Uncomment this to test HttpURLConnection instrumentation
-    //id("com.splunk.android.rum-okhttp3-auto-plugin") version "24.4.1"
-    //id("com.splunk.android.rum-httpurlconnection-auto-plugin") version "24.4.1"
 }
 
 apply<ConfigAndroidApp>()

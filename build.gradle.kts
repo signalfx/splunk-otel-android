@@ -2,11 +2,21 @@ buildscript {
     repositories {
         mavenCentral()
         google()
+
+        maven {
+            url = uri("$projectDir/instrumentation/buildtime/okhttp3-auto/plugin/repo")
+        }
+
+        maven {
+            url = uri("$projectDir/instrumentation/buildtime/httpurlconnection-auto/plugin/repo")
+        }
     }
 
     dependencies {
         classpath(Dependencies.gradle)
         classpath(Dependencies.kotlin)
+        classpath(Dependencies.http3Auto)
+        classpath(Dependencies.httpurlconnectionAuto)
     }
 }
 

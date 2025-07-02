@@ -1,0 +1,96 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.splunk",
+    "module": "rum-okhttp3-auto-plugin",
+    "version": "1.0.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 19,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.8.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "rum-okhttp3-auto-plugin-1.0.0.jar",
+          "url": "rum-okhttp3-auto-plugin-1.0.0.jar",
+          "size": 3839,
+          "sha512": "a09e0e3068631d88531b994020ed6dbcd5fa1628f8bed53e39c1a10ef8b6c6f0570e6e31f330f9d2b6c24253384aea637339c2cc3ca6140a638afb84a1e53db2",
+          "sha256": "9ad4a0953943434912dca8476e673c9b14fccebcf2b77c47685b2600740d7606",
+          "sha1": "003b1f7a182638989f182205aa00f377409ed387",
+          "md5": "01e7fefb10b44e4464cb569ff7fd4b67"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 19,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "net.bytebuddy",
+          "module": "byte-buddy-gradle-plugin",
+          "version": {
+            "requires": "1.17.2"
+          }
+        },
+        {
+          "group": "net.bytebuddy",
+          "module": "byte-buddy",
+          "version": {
+            "requires": "1.17.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.8.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "rum-okhttp3-auto-plugin-1.0.0.jar",
+          "url": "rum-okhttp3-auto-plugin-1.0.0.jar",
+          "size": 3839,
+          "sha512": "a09e0e3068631d88531b994020ed6dbcd5fa1628f8bed53e39c1a10ef8b6c6f0570e6e31f330f9d2b6c24253384aea637339c2cc3ca6140a638afb84a1e53db2",
+          "sha256": "9ad4a0953943434912dca8476e673c9b14fccebcf2b77c47685b2600740d7606",
+          "sha1": "003b1f7a182638989f182205aa00f377409ed387",
+          "md5": "01e7fefb10b44e4464cb569ff7fd4b67"
+        }
+      ]
+    }
+  ]
+}
