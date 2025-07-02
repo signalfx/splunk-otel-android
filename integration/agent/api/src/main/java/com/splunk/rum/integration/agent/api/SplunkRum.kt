@@ -138,11 +138,11 @@ class SplunkRum private constructor(
             agentConfiguration: AgentConfiguration,
             vararg moduleConfigurations: ModuleConfiguration
         ): SplunkRum {
+            Log.e("SPLUNKRUM", "CONFIRMED USING SNAPSHOT EDITION!")
+
             if (instanceInternal != null) {
                 return instance
             }
-
-            Log.e("SPLUNKRUM", "CONFIRMED USING SNAPSHOT EDITION")
 
             val isSubprocess = SubprocessDetector.isSubprocess(
                 applicationId = agentConfiguration.instrumentedProcessName

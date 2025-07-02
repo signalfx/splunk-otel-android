@@ -19,5 +19,5 @@ object Configurations {
     }
 
     const val sdkVersionCode = 1
-    val sdkVersionName = "2.0.0-testpublish"
+    val sdkVersionName = "2.0.0-testpublish1"
 }

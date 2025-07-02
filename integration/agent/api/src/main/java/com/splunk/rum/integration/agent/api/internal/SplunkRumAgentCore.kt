@@ -64,7 +64,7 @@ internal object SplunkRumAgentCore {
             Logger.consumers += AndroidLogConsumer()
         }
 
-        Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
+        Logger.d(TAG, "install!(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
         val storage = AgentStorage.attach(application)
 
