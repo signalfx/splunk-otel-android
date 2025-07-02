@@ -82,7 +82,7 @@ class ConfigPublish : Plugin<Project> by local plugin {
 
     tasks.withType(AbstractPublishToMaven::class.java) {
         doLast {
-            // Using actual publication version instead of the property
+            // Using actual publication version instead of the property to include potential -SNAPSHOT suffix
             val publication = project.extensions.getByType<PublishingExtension>()
                 .publications.getByName("maven") as MavenPublication
             val artifact = "$defaultGroupId:${project.properties[artifactIdProperty]}:${publication.version}"
