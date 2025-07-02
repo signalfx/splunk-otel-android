@@ -60,7 +60,15 @@ class ConfigPublish : Plugin<Project> by local plugin {
                     from(components["release"])
                     groupId = defaultGroupId
                     artifactId = project.properties[artifactIdProperty].toString()
-                    version = project.properties[versionProperty].toString()
+
+                    val baseVersion = project.properties[versionProperty].toString()
+                    version = if (project.findProperty("release") != "true") {
+                        "$baseVersion-SNAPSHOT"
+                    } else {
+                        baseVersion
+                    }
+
+                    println("DEBUG ConfigPublish [${project.name}]: version'$version'")
 
                     artifact(sourcesJar)
                     artifact(androidJavadocsJar)
