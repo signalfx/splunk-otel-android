@@ -77,8 +77,6 @@ dry-run-release:
     - touch local.properties
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
-    - export SONATYPE_USER=$SONATYPE_USERNAME
-    - export SONATYPE_KEY=$SONATYPE_PASSWORD
 
     # Snapshot Publish that matches Build Job
 #    - echo "=== TESTING SNAPSHOT PUBLISHING ==="
