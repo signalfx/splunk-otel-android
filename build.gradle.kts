@@ -44,7 +44,6 @@ allprojects {
     }
 }
 
-// Configure nexus publishing for Maven Central identical to main branch
 nexusPublishing {
     packageGroup.set("com.splunk")
     repositories {
