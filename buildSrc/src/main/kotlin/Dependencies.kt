@@ -8,11 +8,16 @@ object Dependencies {
     private const val desugarVersion = "2.1.3"
     private const val bytebuddyVersion = "1.17.2"
 
+    const val http3AutoVersion = "1.0.0"
+    const val httpurlconnectionAutoVersion = "1.0.0"
+
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
     const val gradleApi = "com.android.tools.build:gradle-api:$gradleVersion"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
     const val desugar = "com.android.tools:desugar_jdk_libs:$desugarVersion"
+    const val http3Auto = "com.splunk:rum-okhttp3-auto-plugin:$http3AutoVersion"
+    const val httpurlconnectionAuto = "com.splunk:rum-httpurlconnection-auto-plugin:$httpurlconnectionAutoVersion"
 
     // SDK module level dependencies
 

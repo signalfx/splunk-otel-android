@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- This module was also published with a richer model, Gradle metadata,  -->
+  <!-- which should be used instead. Do not delete the following line which  -->
+  <!-- is to indicate to Gradle or any Gradle module metadata file consumer  -->
+  <!-- that they should prefer consuming it instead. -->
+  <!-- do_not_remove: published-with-gradle-metadata -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.splunk</groupId>
+  <artifactId>rum-okhttp3-auto-plugin</artifactId>
+  <version>1.0.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib-jdk8</artifactId>
+      <version>1.8.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy-gradle-plugin</artifactId>
+      <version>1.17.2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+      <version>1.17.2</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+  <name>Cisco RUM Agent for Android</name>
+  <description>Cisco's Real User Monitoring Agent for your Android application.</description>
+  <url>http://cisco.com</url>
+  <licenses>
+    <license>
+      <url>https://www.cisco.com/c/dam/en_us/about/doing_business/legal/eula/cisco_end_user_license_agreement-eng.pdf</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>ad</id>
+      <name>AppDynamics Inc.</name>
+      <email>info@appdynamics.com</email>
+      <organization>AppDynamics Inc.</organization>
+      <organizationUrl>https://www.appdynamics.com/</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git@github.com:Appdynamics/android_agent.git</connection>
+    <url>git:git@github.com:Appdynamics/android_agent.git</url>
+  </scm>
+</project>
