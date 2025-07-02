@@ -36,6 +36,10 @@ allprojects {
             setUrl("https://sdk.smartlook.com/android/release")
         }
     }
+
+    if (findProperty("release") != "true") {
+        version = "$version-SNAPSHOT"
+    }
 }
 
 // Configure nexus publishing for Maven Central identical to main branch

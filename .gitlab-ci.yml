@@ -38,16 +38,20 @@ stages:
 build:
   stage: build
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
   extends: .prepare-android-environment
   script:
     - touch local.properties
+    - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
+    - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
+    - export SONATYPE_USER=$SONATYPE_USERNAME
+    - export SONATYPE_KEY=$SONATYPE_PASSWORD
     - ./gradlew build publish
 
 sast-scan:
   stage: verify
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
   extends: .sast_scan
   variables:
     SAST_SCANNER: "Semgrep"
@@ -62,7 +66,7 @@ oss-scan:
     - PATH=$JAVA_HOME/bin:$PATH
     - touch local.properties
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
 
 dry-run-release:
   stage: release
@@ -73,7 +77,20 @@ dry-run-release:
     - touch local.properties
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
+    - export SONATYPE_USER=$SONATYPE_USERNAME
+    - export SONATYPE_KEY=$SONATYPE_PASSWORD
+
+    # Snapshot Publish that matches Build Job
+    - echo "=== TESTING SNAPSHOT PUBLISHING ==="
+    - echo "Publishing version with -SNAPSHOT suffix..."
+    - ./gradlew build publish
+    - echo "Snapshot publish test complete"
+
+    # Dry Run Staging Release
+    - echo "=== TESTING STAGING RELEASE ==="
+    - echo "Publishing clean version to staging repository..."
     - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks --stacktrace build signMavenPublication publishToSonatype
+    - echo "Dry run test complete"
 
 release:
   stage: release
@@ -85,4 +102,6 @@ release:
     - touch local.properties
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
+    - export SONATYPE_USER=$SONATYPE_USERNAME
+    - export SONATYPE_KEY=$SONATYPE_PASSWORD
     - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype closeAndReleaseSonatypeStagingRepository
