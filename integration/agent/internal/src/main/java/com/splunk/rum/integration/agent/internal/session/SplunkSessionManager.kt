@@ -34,6 +34,7 @@ interface ISplunkSessionManager {
     val sessionListeners: MutableSet<SessionListener>
 
     fun install(context: Context)
+    fun reset()
     fun sessionId(timestamp: Long): String
 }
 
@@ -42,6 +43,8 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
     override val previousSessionId: String? = null
     override val sessionListeners: MutableSet<SessionListener> = mutableSetOf()
     override fun install(context: Context) = Unit
+    override fun reset() = Unit
+
     override fun sessionId(timestamp: Long): String = ""
 }
 
@@ -66,9 +69,8 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
             agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
         }
 
-    override var previousSessionId: String?
-        get() = agentStorage.readPreviousSessionId()
-        private set(value) = agentStorage.writePreviousSessionId(value)
+    override var previousSessionId: String? = null
+        private set
 
     override val sessionListeners: MutableSet<SessionListener> = HashSet()
 
@@ -77,11 +79,14 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     private var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
 
     override fun install(context: Context) {
-        clearLastSession()
         createNewSessionIfNeeded()
 
         appStateObserver.listener = AppStateObserverListener()
         appStateObserver.attach(context.applicationContext as Application)
+    }
+
+    override fun reset() {
+        clearLastSession()
     }
 
     override fun sessionId(timestamp: Long): String = sessionIds
@@ -128,6 +133,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     private fun clearLastSession() {
         deleteSessionValidationTime()
         deleteSessionInBackgroundValidationTime()
+        agentStorage.deleteSessionId()
     }
 
     private fun watchSessionInBackgroundValidity() {
