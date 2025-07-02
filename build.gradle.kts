@@ -37,18 +37,9 @@ allprojects {
         }
     }
 
-//    if (findProperty("release") != "true") {
-//        version = "$version-SNAPSHOT"
-//    }
-
     afterEvaluate {
-        val releaseProperty = findProperty("release")
-        println("DEBUGGING: release property = '$releaseProperty'")
-        println("DEBUGGING: original version = '$version'")
-
         if (findProperty("release") != "true") {
             version = "$version-SNAPSHOT"
-            println("DEBUGGING: updated version to '$version'")
         }
     }
 }

@@ -69,8 +69,6 @@ class ConfigPublish : Plugin<Project> by local plugin {
                         baseVersion
                     }
 
-                    println("DEBUG ConfigPublish [${project.name}]: version'$version'")
-
                     artifact(sourcesJar)
                     artifact(androidJavadocsJar)
                     pom.withXml { asNode().addCiscoInfo() }

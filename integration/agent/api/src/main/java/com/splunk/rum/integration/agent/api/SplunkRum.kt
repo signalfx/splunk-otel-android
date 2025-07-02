@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
-import android.util.Log
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
@@ -138,8 +137,6 @@ class SplunkRum private constructor(
             agentConfiguration: AgentConfiguration,
             vararg moduleConfigurations: ModuleConfiguration
         ): SplunkRum {
-            Log.e("SPLUNKRUM", "CONFIRMED USING SNAPSHOT EDITION!")
-
             if (instanceInternal != null) {
                 return instance
             }
