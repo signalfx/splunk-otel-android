@@ -44,8 +44,6 @@ build:
     - touch local.properties
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
-    - export SONATYPE_USER=$SONATYPE_USERNAME
-    - export SONATYPE_KEY=$SONATYPE_PASSWORD
     - ./gradlew build publish
 
 sast-scan:
@@ -79,10 +77,10 @@ dry-run-release:
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
 
     # Snapshot Publish that matches Build Job
-#    - echo "=== TESTING SNAPSHOT PUBLISHING ==="
-#    - echo "Publishing version with -SNAPSHOT suffix..."
-#    - ./gradlew build publish
-#    - echo "Snapshot publish test complete"
+    - echo "=== TESTING SNAPSHOT PUBLISHING ==="
+    - echo "Publishing version with -SNAPSHOT suffix..."
+    - ./gradlew build publish
+    - echo "Snapshot publish test complete"
 
     # Dry Run Staging Release
     - echo "=== TESTING STAGING RELEASE ==="
@@ -100,6 +98,4 @@ release:
     - touch local.properties
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
-    - export SONATYPE_USER=$SONATYPE_USERNAME
-    - export SONATYPE_KEY=$SONATYPE_PASSWORD
     - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype closeAndReleaseSonatypeStagingRepository
