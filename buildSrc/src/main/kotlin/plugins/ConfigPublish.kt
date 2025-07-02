@@ -11,6 +11,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
@@ -83,7 +84,11 @@ class ConfigPublish : Plugin<Project> by local plugin {
 
     tasks.withType(AbstractPublishToMaven::class.java) {
         doLast {
-            val artifact = "$defaultGroupId:${project.properties[artifactIdProperty]}:${project.properties[versionProperty]}"
+            // Using actual publication version instead of the property
+            val publication = project.extensions.getByType<PublishingExtension>()
+                .publications.getByName("maven") as MavenPublication
+            val artifact = "$defaultGroupId:${project.properties[artifactIdProperty]}:${publication.version}"
+
             println("╔══════════════════════════════════════════════════════════════════════════════════════════════════╗")
             println("published".toBoxString())
             println(artifact.toBoxString())

@@ -80,6 +80,9 @@ dry-run-release:
     - export SONATYPE_USER=$SONATYPE_USERNAME
     - export SONATYPE_KEY=$SONATYPE_PASSWORD
 
+    - echo "Testing snapshot repository access..."
+    - timeout 10 curl -u "$SONATYPE_USER:$SONATYPE_KEY" "https://central.sonatype.com/repository/maven-snapshots/" || echo "Snapshot repo access failed"
+
     # Snapshot Publish that matches Build Job
     - echo "=== TESTING SNAPSHOT PUBLISHING ==="
     - echo "Publishing version with -SNAPSHOT suffix..."
