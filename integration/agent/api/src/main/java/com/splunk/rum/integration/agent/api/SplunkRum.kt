@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
+import android.util.Log
 import com.cisco.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
@@ -140,6 +141,8 @@ class SplunkRum private constructor(
             if (instanceInternal != null) {
                 return instance
             }
+
+            Log.e("SPLUNKRUM", "CONFIRMED USING SNAPSHOT EDITION")
 
             val isSubprocess = SubprocessDetector.isSubprocess(
                 applicationId = agentConfiguration.instrumentedProcessName
