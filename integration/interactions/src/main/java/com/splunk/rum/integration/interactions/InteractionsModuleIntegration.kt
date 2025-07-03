@@ -69,22 +69,14 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             ComposeElementIdentification.insertModifierIfNeeded(
                 SessionReplayDrawModifier::class,
                 OrderPriority.HIGH
-            ) {
-                    id,
-                    isSensitive,
-                    _
-                ->
+            ) { id, isSensitive, _ ->
                 SessionReplayDrawModifier(id, isSensitive)
             }
 
             ComposeElementIdentification.insertModifierIfNeeded(
                 PointerInputObserverInjectorModifier::class,
                 OrderPriority.LOW
-            ) {
-                    id,
-                    _,
-                    positionInList
-                ->
+            ) { id, _, positionInList ->
                 id?.let { PointerInputObserverInjectorModifier(id, positionInList) }
             }
         }
@@ -96,8 +88,11 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 return
             }
 
-            if (interaction !is Interaction.Touch.Pointer) {
-                Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
+            if (interaction is Interaction.Touch.Pointer ||
+                interaction is Interaction.Touch.Continuous &&
+                !interaction.isLast
+            ) {
+                return
             }
 
             val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider ?: return
@@ -128,6 +123,8 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 is Interaction.Touch.Pointer ->
                     return
             }
+
+            Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
 
             val targetType = if (interaction is Interaction.Targetable) {
                 interaction.targetElementPath?.lastOrNull()?.view?.id
