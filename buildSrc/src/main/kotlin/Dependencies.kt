@@ -14,6 +14,10 @@ object Dependencies {
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
     const val desugar = "com.android.tools:desugar_jdk_libs:$desugarVersion"
 
+    // Nexus publish plugin
+    const val nexusPublishPluginId = "io.github.gradle-nexus.publish-plugin"
+    const val nexusPublishPluginVersion = "2.0.0"
+
     // SDK module level dependencies
 
     /**
