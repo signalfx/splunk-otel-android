@@ -23,9 +23,15 @@ import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.trace.data.SpanData
 
 /**
- * Delegating wrapper around otel SpanDataModifier.
+ * Delegating wrapper around OpenTelemetry's SpanData modifier.
+ *
+ * @deprecated Replaced by the `spanInterceptor` lambda in [AgentConfiguration].
+ * Configure `spanInterceptor: ((SpanData) -> SpanData?)?` during agent install instead of using this builder.
  */
-@Deprecated("TODO")
+@Deprecated(
+    message = "Use AgentConfiguration.spanInterceptor instead.",
+    replaceWith = ReplaceWith("AgentConfiguration(spanInterceptor = { /* your filtering logic */ })")
+)
 class SpanFilterBuilder internal constructor() {
     internal val rejectSpanNames: MutableList<(String) -> Boolean> = mutableListOf()
     internal val rejectSpanAttributes: MutableMap<AttributeKey<*>, (Any) -> Boolean> = mutableMapOf()
