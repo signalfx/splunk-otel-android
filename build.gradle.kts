@@ -38,7 +38,7 @@ allprojects {
     }
 
     afterEvaluate {
-        if (findProperty("release") != "true") {
+        if (!isReleaseBuild()) {
             version = "$version-SNAPSHOT"
         }
     }
@@ -54,4 +54,8 @@ nexusPublishing {
             snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
         }
     }
+}
+
+fun Project.isReleaseBuild(): Boolean {
+    return findProperty("release") == "true"
 }
