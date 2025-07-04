@@ -56,6 +56,13 @@ import okio.BufferedSink
 import androidx.core.graphics.createBitmap
 import com.splunk.app.extension.showDoneToast
 
+/**
+ * A fragment demonstrating various OkHttp3 use cases and integrations with Splunk RUM instrumentation.
+ *
+ * This fragment provides buttons in the UI that allow users to trigger different types of HTTP requests
+ * using OkHttp. It showcases a wide range of real-world scenarios.
+ *
+ */
 class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
     override val titleRes: Int = R.string.okhttp_title

@@ -29,6 +29,12 @@ import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.webview.extension.webViewNativeBridge
 
+/**
+ * A fragment that demonstrates how to instrument a WebView with Splunk RUM's Browser RUM integration.
+ *
+ * This fragment loads a local HTML file from `assets/` and integrates with Splunk RUM using one of two
+ * supported integration APIs: `LEGACY` or `LATEST`, based on the passed-in [ApiVariant] argument.
+ */
 class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
 
     override val titleRes: Int = R.string.web_view_title

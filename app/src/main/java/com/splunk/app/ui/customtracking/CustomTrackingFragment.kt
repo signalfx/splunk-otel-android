@@ -29,6 +29,15 @@ import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.customtracking.extension.customTracking
 
+/**
+ * Fragment for demonstrating usage of the Splunk RUM Custom Tracking API.
+ *
+ * This fragment provides buttons to test both the latest and legacy APIs for:
+ * - Tracking custom events
+ * - Tracking workflows (spans)
+ * - Reporting exceptions (with and without attributes)
+ *
+ */
 class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
 
     override val titleRes: Int = R.string.custom_tracking_title
@@ -36,6 +45,9 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentCustomTrackingBinding
         get() = FragmentCustomTrackingBinding::inflate
 
+    /**
+     * A set of test attributes used when sending events, spans, and exceptions.
+     */
     private val testAttributes = MutableAttributes().apply {
         this["user.id"] = "user-123"
         this["user.email"] = "test.user@example.com"
@@ -43,6 +55,9 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
         this["experiment.group"] = "A"
     }
 
+    /**
+     * A simulated test exception with a synthetic stack trace.
+     */
     private val testException: Exception
         get() = Exception("TestException").apply {
             stackTrace = arrayOf(
@@ -74,6 +89,11 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
         }
     }
 
+    /**
+     * Tracks a custom event with optional attributes using the specified API variant.
+     *
+     * @param variant The API variant to use: [ApiVariant.LATEST] or [ApiVariant.LEGACY].
+     */
     private fun trackEvent(variant: ApiVariant) {
         when (variant) {
             ApiVariant.LATEST -> customTracking.trackCustomEvent("TestEvent", testAttributes)
@@ -83,6 +103,11 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
         context?.showDoneToast(R.string.track_custom_event, variant)
     }
 
+    /**
+     * Tracks a workflow span and ends it immediately.
+     *
+     * @param variant The API variant to use for tracking the workflow.
+     */
     private fun trackWorkflow(variant: ApiVariant) {
         val workflowSpan = when (variant) {
             ApiVariant.LATEST -> customTracking.trackWorkflow("TestWorkflow")
@@ -99,6 +124,12 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
         context?.showDoneToast(R.string.track_workflow, variant)
     }
 
+    /**
+     * Tracks an exception with optional attributes using the selected API variant.
+     *
+     * @param variant The API variant to use.
+     * @param attributes Optional set of attributes to include with the exception.
+     */
     private fun trackException(variant: ApiVariant, attributes: MutableAttributes? = null) {
         when (variant) {
             ApiVariant.LATEST -> {

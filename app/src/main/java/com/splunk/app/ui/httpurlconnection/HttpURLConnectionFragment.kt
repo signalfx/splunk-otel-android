@@ -29,6 +29,10 @@ import com.splunk.app.ui.BaseFragment
 import java.net.HttpURLConnection
 import java.net.URL
 
+/**
+ * A fragment that demonstrates various types of [HttpURLConnection] requests,
+ * such as GET, POST, concurrent requests, and responses with `Server-Timing` headers.
+ */
 class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>() {
 
     override val titleRes: Int = R.string.httpurlconnection_title
@@ -221,7 +225,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
     }
 
     private fun String.openHttpConnection(): HttpURLConnection =
-        (URL(this).openConnection() as HttpURLConnection)
+        URL(this).openConnection() as HttpURLConnection
 
     private val Int.isSuccessful: Boolean
         get() = this in 200..299

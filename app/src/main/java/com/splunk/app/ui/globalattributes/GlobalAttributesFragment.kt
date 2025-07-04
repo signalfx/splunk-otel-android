@@ -31,6 +31,14 @@ import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 
+/**
+ * Fragment for demonstrating the usage of Global Attributes in Splunk RUM.
+ *
+ * This screen allows users to:
+ * - Set and remove various global attribute types (String, Long, Double, Boolean, generic types)
+ * - Retrieve individual or all global attributes
+ * - Use both latest and legacy APIs to modify global attributes
+ */
 class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>() {
 
     override val titleRes: Int = R.string.global_attributes_title
@@ -62,43 +70,51 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
         }
     }
 
+    /** Sets a global attribute with a String value. */
     private fun setStringAttribute() {
         globalAttributes["stringKey"] = "String Value"
         context?.showDoneToast(R.string.set_string_global_attribute)
     }
 
+    /** Sets a global attribute with a Long value. */
     private fun setLongAttribute() {
         globalAttributes["longKey"] = 12345L
         context?.showDoneToast(R.string.set_long_global_attribute)
     }
 
+    /** Sets a global attribute with a Double value. */
     private fun setDoubleAttribute() {
         globalAttributes["doubleKey"] = 123.45
         context?.showDoneToast(R.string.set_double_global_attribute)
     }
 
+    /** Sets a global attribute with a Boolean value. */
     private fun setBooleanAttribute() {
         globalAttributes["booleanKey"] = true
         context?.showDoneToast(R.string.set_boolean_global_attribute)
     }
 
+    /** Sets a global attribute using a generic [AttributeKey]. */
     private fun setGenericAttribute() {
         val key = AttributeKey.stringKey("genericKey")
         globalAttributes[key] = "Generic Value"
         context?.showDoneToast(R.string.set_generic_global_attribute)
     }
 
+    /** Removes a global attribute by its string key. */
     private fun removeStringAttribute() {
         globalAttributes.remove("stringKey")
         context?.showDoneToast(R.string.remove_string_global_attribute)
     }
 
+    /** Removes a global attribute using a generic [AttributeKey]. */
     private fun removeGenericAttribute() {
         val key = AttributeKey.stringKey("genericKey")
         globalAttributes.remove(key)
         context?.showDoneToast(R.string.remove_generic_global_attribute)
     }
 
+    /** Retrieves and displays a global String attribute in an alert dialog. */
     private fun getStringAttribute() {
         val value: String? = globalAttributes["stringKey"]
         AlertDialog.Builder(context)
@@ -108,6 +124,7 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
             .show()
     }
 
+    /** Retrieves and displays a global attribute set via a generic [AttributeKey]. */
     private fun getGenericAttribute() {
         val key = AttributeKey.stringKey("genericKey")
         val value = globalAttributes[key]
@@ -118,6 +135,9 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
             .show()
     }
 
+    /**
+     * Sets multiple global attributes at once using the `setAll()` method.
+     */
     private fun setAllGlobalAttributes() {
         val attributes = Attributes.of(
             AttributeKey.stringKey("setAllString"), "String Value",
@@ -129,11 +149,15 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
         context?.showDoneToast(R.string.set_all_global_attributes)
     }
 
+    /** Removes all currently set global attributes. */
     private fun removeAllGlobalAttributes() {
         globalAttributes.removeAll()
         context?.showDoneToast(R.string.remove_all_global_attributes)
     }
 
+    /**
+     * Retrieves and displays all global attributes in a dialog.
+     */
     private fun getAllGlobalAttributes() {
         val attributesText = StringBuilder()
         globalAttributes.forEach { key, value ->
@@ -147,12 +171,18 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
             .show()
     }
 
+    /**
+     * Uses the legacy Splunk RUM API to set a single global attribute.
+     */
     private fun legacySetGlobalAttribute() {
         val key = AttributeKey.stringKey("legacyKey")
         splunkRum.setGlobalAttribute(key, "LegacyVal")
         context?.showDoneToast(R.string.set_string_global_attribute, ApiVariant.LEGACY)
     }
 
+    /**
+     * Uses the legacy Splunk RUM API to update multiple global attributes at once.
+     */
     private fun legacyUpdateGlobalAttributes() {
         splunkRum.updateGlobalAttributes { builder ->
             builder.put(AttributeKey.stringKey("legacyUpdate1"), "Value1")
