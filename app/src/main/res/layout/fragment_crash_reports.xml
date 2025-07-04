@@ -1,0 +1,122 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/crash_title"
+            style="@style/Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_crash_reports_title"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/crash_reports_illegal"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/menu_crash_reports_illegal"
+            app:layout_constraintTop_toBottomOf="@id/crash_title" />
+
+        <TextView
+            android:id="@+id/crash_reports_main_thread"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/menu_crash_on_main_thread"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_illegal" />
+
+        <TextView
+            android:id="@+id/crash_reports_in_background"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/menu_crash_in_background"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_main_thread" />
+
+        <TextView
+            android:id="@+id/crash_reports_no_app_code"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/menu_crash_with_no_app_code"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_in_background" />
+
+        <TextView
+            android:id="@+id/crash_reports_no_stacktrace"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/menu_crash_with_no_stacktrace"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_no_app_code" />
+
+        <TextView
+            android:id="@+id/crash_reports_out_of_memory_error"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/menu_crash_with_out_of_memory_error"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_no_stacktrace" />
+
+        <TextView
+            android:id="@+id/crash_reports_with_chained_exceptions"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/menu_crash_with_chained_exceptions"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_out_of_memory_error" />
+
+        <TextView
+            android:id="@+id/crash_reports_null"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/menu_crash_reports_null"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_with_chained_exceptions" />
+
+        <TextView
+            android:id="@+id/anr_event"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/menu_trigger_anr"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_null" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

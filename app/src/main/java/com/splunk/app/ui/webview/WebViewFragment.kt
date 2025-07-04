@@ -46,7 +46,7 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         val apiVariant = runCatching {
-            arguments?.getString("API_VARIANT")?.let { ApiVariant.valueOf(it) }
+            arguments?.getString(ARG_API_VARIANT)?.let { ApiVariant.valueOf(it) }
         }.getOrNull()
 
         webView.settings.javaScriptEnabled = true
@@ -73,5 +73,14 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
 
     companion object {
         private const val TAG = "WebView"
+        private const val ARG_API_VARIANT = "API_VARIANT"
+
+        fun newInstance(variant: ApiVariant): WebViewFragment {
+            return WebViewFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_API_VARIANT, variant.name)
+                }
+            }
+        }
     }
 }

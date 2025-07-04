@@ -14,109 +14,22 @@
 			style="@style/Header"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/menu_crash_reports_title"
+			android:text="@string/crash_reports_title"
 			android:textSize="18sp"
 			android:textStyle="bold"
 			app:layout_constraintTop_toTopOf="parent" />
 
 		<TextView
-			android:id="@+id/crash_reports_illegal"
+			android:id="@+id/crash_reports"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_reports_illegal"
+			android:text="@string/crash_reports_title"
 			app:layout_constraintTop_toBottomOf="@id/crash_title" />
 
-		<TextView
-			android:id="@+id/crash_reports_main_thread"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_on_main_thread"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_illegal" />
-
-		<TextView
-			android:id="@+id/crash_reports_in_background"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_in_background"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_main_thread" />
-
-		<TextView
-			android:id="@+id/crash_reports_no_app_code"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_with_no_app_code"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_in_background" />
-
-		<TextView
-			android:id="@+id/crash_reports_no_stacktrace"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_with_no_stacktrace"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_no_app_code" />
-
-		<TextView
-			android:id="@+id/crash_reports_out_of_memory_error"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_with_out_of_memory_error"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_no_stacktrace" />
-
-		<TextView
-			android:id="@+id/crash_reports_with_chained_exceptions"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_with_chained_exceptions"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_out_of_memory_error" />
-
-		<TextView
-			android:id="@+id/crash_reports_null"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_reports_null"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_with_chained_exceptions" />
-
-		<TextView
-			android:id="@+id/anr_event"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_trigger_anr"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_null" />
 
 		<TextView
 			android:id="@+id/network_request_title"
@@ -127,7 +40,7 @@
 			android:text="@string/menu_network_request_title"
 			android:textSize="18sp"
 			android:textStyle="bold"
-			app:layout_constraintTop_toBottomOf="@id/anr_event" />
+			app:layout_constraintTop_toBottomOf="@id/crash_reports" />
 
 		<TextView
 			android:id="@+id/okhttp_sample_calls"
@@ -141,7 +54,7 @@
 			app:layout_constraintTop_toBottomOf="@id/network_request_title" />
 
 		<TextView
-			android:id="@+id/httpurlconnection"
+			android:id="@+id/http_url_connection"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -160,7 +73,7 @@
 			android:text="@string/menu_web_view_native_bridge_title"
 			android:textSize="18sp"
 			android:textStyle="bold"
-			app:layout_constraintTop_toBottomOf="@id/httpurlconnection" />
+			app:layout_constraintTop_toBottomOf="@id/http_url_connection" />
 
 		<TextView
 			android:id="@+id/web_view_nextgen"

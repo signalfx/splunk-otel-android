@@ -26,5 +26,5 @@ class MainScreen : Screen() {
      * Buttons
      */
     val okHttpSampleCallsButton: Matcher<View> = view(R.id.okhttp_sample_calls)
-    val httpUrlConnectionButton: Matcher<View> = view(R.id.httpurlconnection)
+    val httpUrlConnectionButton: Matcher<View> = view(R.id.http_url_connection)
 }

@@ -417,7 +417,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
         val headers = mapOf("Authorization" to "Client-ID $IMGUR_CLIENT_ID")
         executePostRequest("https://api.imgur.com/3/image", requestBody, headers)
-        context?.showDoneToast(R.string.post_mutlipart_request)
+        context?.showDoneToast(R.string.post_multipart_request)
     }
 
     /**

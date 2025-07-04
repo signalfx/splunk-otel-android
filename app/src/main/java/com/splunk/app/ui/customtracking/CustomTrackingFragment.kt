@@ -31,7 +31,7 @@ import com.splunk.rum.integration.customtracking.extension.customTracking
 
 class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
 
-    override val titleRes: Int = R.string.customtracking_title
+    override val titleRes: Int = R.string.custom_tracking_title
 
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentCustomTrackingBinding
         get() = FragmentCustomTrackingBinding::inflate

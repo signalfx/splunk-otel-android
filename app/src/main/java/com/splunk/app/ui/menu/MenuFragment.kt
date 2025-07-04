@@ -49,14 +49,6 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         viewBinding.crashReportsIllegal.setOnClickListener(onClickListener)
-        viewBinding.crashReportsMainThread.setOnClickListener(onClickListener)
-        viewBinding.crashReportsInBackground.setOnClickListener(onClickListener)
-        viewBinding.crashReportsNoAppCode.setOnClickListener(onClickListener)
-        viewBinding.crashReportsNoStacktrace.setOnClickListener(onClickListener)
-        viewBinding.crashReportsOutOfMemoryError.setOnClickListener(onClickListener)
-        viewBinding.crashReportsWithChainedExceptions.setOnClickListener(onClickListener)
-        viewBinding.crashReportsNull.setOnClickListener(onClickListener)
-        viewBinding.anrEvent.setOnClickListener(onClickListener)
         viewBinding.okhttpSampleCalls.setOnClickListener(onClickListener)
         viewBinding.httpurlconnection.setOnClickListener(onClickListener)
         viewBinding.webViewNextgen.setOnClickListener(onClickListener)
@@ -88,60 +80,15 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         when (it.id) {
             viewBinding.crashReportsIllegal.id ->
                 throw IllegalArgumentException("Illegal Argument Exception Thrown!")
-            viewBinding.crashReportsMainThread.id ->
-                throw RuntimeException("Crashing on main thread")
-            viewBinding.crashReportsInBackground.id ->
-                Thread { throw RuntimeException("Attempt to crash background thread") }.start()
-            viewBinding.crashReportsNoAppCode.id -> {
-                val e = java.lang.RuntimeException("No Application Code")
-                e.stackTrace = arrayOf(
-                    StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
-                    StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
-                    StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
-                )
-                throw e
-            }
-            viewBinding.crashReportsNoStacktrace.id -> {
-                val e = java.lang.RuntimeException("No Stack Trace")
-                e.stackTrace = arrayOfNulls(0)
-                throw e
-            }
-            viewBinding.crashReportsOutOfMemoryError.id -> {
-                val e = OutOfMemoryError("out of memory")
-                e.stackTrace = arrayOfNulls(0)
-                throw e
-            }
-            viewBinding.crashReportsWithChainedExceptions.id -> {
-                try {
-                    throw NullPointerException("Simulated error in exception 1")
-                } catch (e: NullPointerException) {
-                    throw IllegalArgumentException("Simulated error in exception 2", e)
-                }
-            }
-            viewBinding.crashReportsNull.id ->
-                throw NullPointerException("I am null!")
-            viewBinding.anrEvent.id -> {
-                try {
-                    Thread.sleep(6000)
-                } catch (e: InterruptedException) {
-                    throw RuntimeException(e)
-                }
-            }
             viewBinding.okhttpSampleCalls.id ->
                 navigateTo(OkHttpFragment(), FragmentAnimation.FADE)
             viewBinding.httpurlconnection.id ->
                 navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
             viewBinding.webViewNextgen.id -> {
-                val args = Bundle().apply {
-                    putString("API_VARIANT", ApiVariant.LATEST.name)
-                }
-                navigateTo(WebViewFragment(), FragmentAnimation.FADE, args)
+                navigateTo(WebViewFragment.newInstance(ApiVariant.LATEST), FragmentAnimation.FADE)
             }
             viewBinding.webViewLegacy.id -> {
-                val args = Bundle().apply {
-                    putString("API_VARIANT", ApiVariant.LEGACY.name)
-                }
-                navigateTo(WebViewFragment(), FragmentAnimation.FADE, args)
+                navigateTo(WebViewFragment.newInstance(ApiVariant.LEGACY), FragmentAnimation.FADE)
             }
             viewBinding.menuCustomTrackingButton.id -> {
                 navigateTo(CustomTrackingFragment(), FragmentAnimation.FADE)

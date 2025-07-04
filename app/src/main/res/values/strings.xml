@@ -42,11 +42,13 @@
     <string name="okhttp_title">OkHttp</string>
     <string name="httpurlconnection_title">HttpURLConnection</string>
     <string name="webview_title">WebView</string>
-    <string name="customtracking_title">CustomTracking</string>
 
     <!-- Done toast -->
     <string name="toast_action_done">%1$s: Done!</string>
     <string name="toast_legacy_action_done">%1$s (Legacy): Done!</string>
+
+    <!-- Crash Reports -->
+    <string name="crash_reports_title">Crash Reports</string>
 
     <!-- Custom tracking -->
     <string name="custom_tracking_title">Custom Tracking</string>
@@ -82,7 +84,7 @@
     <string name="post_streaming">Post streaming</string>
     <string name="post_file">Post file</string>
     <string name="post_form_parameters">Post form parameters</string>
-    <string name="post_mutlipart_request">Post mutlipart request</string>
+    <string name="post_multipart_request">Post multipart request</string>
     <string name="network_error">Network Error</string>
     <string name="response_caching">Response caching</string>
     <string name="canceled_call">Canceled call</string>
