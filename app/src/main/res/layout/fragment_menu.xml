@@ -127,142 +127,11 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="30dp"
-			android:text="@string/menu_global_attributes_title"
+			android:text="@string/global_attributes_title"
 			android:textSize="18sp"
 			android:textStyle="bold"
 			app:layout_constraintTop_toBottomOf="@+id/menu_custom_tracking_button" />
 
-		<TextView
-			android:id="@+id/set_string_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="20dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_string_attribute"
-			app:layout_constraintTop_toBottomOf="@id/global_attributes_title" />
-
-		<TextView
-			android:id="@+id/set_long_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_long_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_string_attribute" />
-
-		<TextView
-			android:id="@+id/set_double_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_double_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_long_attribute" />
-
-		<TextView
-			android:id="@+id/set_boolean_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_boolean_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_double_attribute" />
-
-		<TextView
-			android:id="@+id/set_generic_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_generic_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_boolean_attribute" />
-
-		<TextView
-			android:id="@+id/remove_string_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_remove_string_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_generic_attribute" />
-
-		<TextView
-			android:id="@+id/remove_generic_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_remove_generic_attribute"
-			app:layout_constraintTop_toBottomOf="@id/remove_string_attribute" />
-
-		<TextView
-			android:id="@+id/get_string_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_get_string_attribute"
-			app:layout_constraintTop_toBottomOf="@id/remove_generic_attribute" />
-
-		<TextView
-			android:id="@+id/get_generic_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_get_generic_attribute"
-			app:layout_constraintTop_toBottomOf="@id/get_string_attribute" />
-
-		<TextView
-			android:id="@+id/set_all_global_attributes"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_all_global_attributes"
-			app:layout_constraintTop_toBottomOf="@id/get_generic_attribute" />
-
-		<TextView
-			android:id="@+id/remove_all_global_attributes"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_remove_all_global_attributes"
-			app:layout_constraintTop_toBottomOf="@id/set_all_global_attributes" />
-
-		<TextView
-			android:id="@+id/get_all_global_attributes"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_get_all_global_attributes"
-			app:layout_constraintTop_toBottomOf="@id/remove_all_global_attributes" />
 
 		<TextView
 			android:id="@+id/legacy_set_global_attribute"
@@ -272,19 +141,8 @@
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_legacy_set_global_attribute"
+			android:text="@string/legacy_set_global_attribute"
 			app:layout_constraintTop_toBottomOf="@id/get_all_global_attributes" />
-
-		<TextView
-			android:id="@+id/legacy_update_global_attributes"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_legacy_update_global_attributes"
-			app:layout_constraintTop_toBottomOf="@id/legacy_set_global_attribute" />
 
 		<TextView
 			android:id="@+id/slow_rendering_title"

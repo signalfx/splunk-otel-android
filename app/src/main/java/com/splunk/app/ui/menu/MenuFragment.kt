@@ -48,27 +48,13 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewBinding.crashReportsIllegal.setOnClickListener(onClickListener)
+        viewBinding.crashReports.setOnClickListener(onClickListener)
         viewBinding.okhttpSampleCalls.setOnClickListener(onClickListener)
         viewBinding.httpurlconnection.setOnClickListener(onClickListener)
         viewBinding.webViewNextgen.setOnClickListener(onClickListener)
         viewBinding.webViewLegacy.setOnClickListener(onClickListener)
         viewBinding.menuCustomTrackingButton.setOnClickListener(onClickListener)
 
-        viewBinding.setStringAttribute.setOnClickListener(onClickListener)
-        viewBinding.setLongAttribute.setOnClickListener(onClickListener)
-        viewBinding.setDoubleAttribute.setOnClickListener(onClickListener)
-        viewBinding.setBooleanAttribute.setOnClickListener(onClickListener)
-        viewBinding.setGenericAttribute.setOnClickListener(onClickListener)
-        viewBinding.removeStringAttribute.setOnClickListener(onClickListener)
-        viewBinding.removeGenericAttribute.setOnClickListener(onClickListener)
-        viewBinding.getStringAttribute.setOnClickListener(onClickListener)
-        viewBinding.getGenericAttribute.setOnClickListener(onClickListener)
-        viewBinding.setAllGlobalAttributes.setOnClickListener(onClickListener)
-        viewBinding.removeAllGlobalAttributes.setOnClickListener(onClickListener)
-        viewBinding.getAllGlobalAttributes.setOnClickListener(onClickListener)
-        viewBinding.legacySetGlobalAttribute.setOnClickListener(onClickListener)
-        viewBinding.legacyUpdateGlobalAttributes.setOnClickListener(onClickListener)
         viewBinding.slowRender.setOnClickListener(onClickListener)
         viewBinding.frozenRender.setOnClickListener(onClickListener)
         viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"

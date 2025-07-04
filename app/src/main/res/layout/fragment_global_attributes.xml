@@ -1,0 +1,200 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/global_attributes_title"
+            style="@style/Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/global_attributes_title"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/global_attributes_latest_api_title"
+            style="@style/Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/latest_api_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/global_attributes_title"/>
+
+
+        <TextView
+            android:id="@+id/set_string_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_string_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/global_attributes_latest_api_title" />
+
+        <TextView
+            android:id="@+id/set_long_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_long_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/set_string_attribute" />
+
+        <TextView
+            android:id="@+id/set_double_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_double_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/set_long_attribute" />
+
+        <TextView
+            android:id="@+id/set_boolean_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_boolean_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/set_double_attribute" />
+
+        <TextView
+            android:id="@+id/set_generic_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_generic_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/set_boolean_attribute" />
+
+        <TextView
+            android:id="@+id/remove_string_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/remove_string_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/set_generic_attribute" />
+
+        <TextView
+            android:id="@+id/remove_generic_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/remove_generic_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/remove_string_attribute" />
+
+        <TextView
+            android:id="@+id/get_string_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/get_string_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/remove_generic_attribute" />
+
+        <TextView
+            android:id="@+id/get_generic_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/get_generic_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/get_string_attribute" />
+
+        <TextView
+            android:id="@+id/set_all_global_attributes"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_all_global_attributes"
+            app:layout_constraintTop_toBottomOf="@id/get_generic_attribute" />
+
+        <TextView
+            android:id="@+id/remove_all_global_attributes"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/remove_all_global_attributes"
+            app:layout_constraintTop_toBottomOf="@id/set_all_global_attributes" />
+
+        <TextView
+            android:id="@+id/get_all_global_attributes"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/get_all_global_attributes"
+            app:layout_constraintTop_toBottomOf="@id/remove_all_global_attributes" />
+
+        <TextView
+            android:id="@+id/global_attributes_legacy_api_title"
+            style="@style/Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/legacy_api_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/get_all_global_attributes"/>
+
+        <TextView
+            android:id="@+id/legacy_set_global_attribute"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_string_global_attribute"
+            app:layout_constraintTop_toBottomOf="@id/global_attributes_legacy_api_title" />
+
+        <TextView
+            android:id="@+id/legacy_update_global_attributes"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/update_global_attributes"
+            app:layout_constraintTop_toBottomOf="@id/legacy_set_global_attribute" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

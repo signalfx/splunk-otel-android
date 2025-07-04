@@ -14,7 +14,7 @@
             style="@style/Header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/menu_crash_reports_title"
+            android:text="@string/crash_reports_title"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent" />
@@ -27,7 +27,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
-            android:text="@string/menu_crash_reports_illegal"
+            android:text="@string/crash_reports_illegal"
             app:layout_constraintTop_toBottomOf="@id/crash_title" />
 
         <TextView
@@ -38,7 +38,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/menu_crash_on_main_thread"
+            android:text="@string/crash_on_main_thread"
             app:layout_constraintTop_toBottomOf="@id/crash_reports_illegal" />
 
         <TextView
@@ -49,7 +49,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/menu_crash_in_background"
+            android:text="@string/crash_in_background"
             app:layout_constraintTop_toBottomOf="@id/crash_reports_main_thread" />
 
         <TextView
@@ -60,7 +60,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/menu_crash_with_no_app_code"
+            android:text="@string/crash_with_no_app_code"
             app:layout_constraintTop_toBottomOf="@id/crash_reports_in_background" />
 
         <TextView
@@ -71,7 +71,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/menu_crash_with_no_stacktrace"
+            android:text="@string/crash_with_no_stacktrace"
             app:layout_constraintTop_toBottomOf="@id/crash_reports_no_app_code" />
 
         <TextView
@@ -82,7 +82,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/menu_crash_with_out_of_memory_error"
+            android:text="@string/crash_with_out_of_memory_error"
             app:layout_constraintTop_toBottomOf="@id/crash_reports_no_stacktrace" />
 
         <TextView
@@ -93,7 +93,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/menu_crash_with_chained_exceptions"
+            android:text="@string/crash_with_chained_exceptions"
             app:layout_constraintTop_toBottomOf="@id/crash_reports_out_of_memory_error" />
 
         <TextView
@@ -104,7 +104,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/menu_crash_reports_null"
+            android:text="@string/crash_reports_null"
             app:layout_constraintTop_toBottomOf="@id/crash_reports_with_chained_exceptions" />
 
         <TextView
@@ -115,7 +115,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/menu_trigger_anr"
+            android:text="@string/trigger_anr"
             app:layout_constraintTop_toBottomOf="@id/crash_reports_null" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
