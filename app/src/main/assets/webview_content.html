@@ -1,60 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Session ID</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
         body {
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
             font-size: 20px;
-            background-color: #f5f5f5;
         }
-
         button {
             width: calc(100% - 40px);
-            margin: 5px 20px 0;
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-top: 5px;
             padding: 10px 20px;
             background-color: #0056b3;
-            color: #fff;
+            color: white;
             border: none;
             border-radius: 4px;
             font-size: 20px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #004494;
-        }
-
-        #sessionId {
-            margin-top: 40px;
-            word-break: break-word;
-            padding: 0 20px;
             text-align: center;
         }
+        #sessionId {
+            margin-top: 40px;
+        }
     </style>
-
-    <script>
+    <script type="text/javascript">
         function getSessionId() {
-            try {
-                const sessionId = SplunkRumNative.getNativeSessionId();
-                document.getElementById('sessionId').textContent = "Session ID: " + sessionId;
-            } catch (e) {
-                document.getElementById('sessionId').textContent = "Error: " + e.message;
-            }
+            var sessionId = SplunkRumNative.getNativeSessionId();
+            document.getElementById('sessionId').innerText = "Session ID: " + sessionId;
         }
     </script>
 </head>
 <body>
-    <button onclick="getSessionId()">Get Session ID</button>
-    <p id="sessionId"></p>
+<button onclick="getSessionId()">Get Session ID</button>
+<p id="sessionId"></p>
 </body>
 </html>
