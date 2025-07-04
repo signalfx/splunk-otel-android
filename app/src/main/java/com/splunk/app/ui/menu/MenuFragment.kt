@@ -16,7 +16,6 @@
 
 package com.splunk.app.ui.menu
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,10 +28,10 @@ import com.splunk.app.ui.customtracking.CustomTrackingFragment
 import com.splunk.app.ui.globalattributes.GlobalAttributesFragment
 import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
+import com.splunk.app.ui.slowrendering.SlowRenderingFragment
 import com.splunk.app.ui.webview.WebViewFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.app.util.FragmentAnimation
-import com.splunk.app.util.SlowRenderingUtils
 
 class MenuFragment : BaseFragment<FragmentMenuBinding>() {
 
@@ -45,62 +44,30 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         with(viewBinding) {
-            crashReports.setOnClickListener { openCrashReports() }
-            okhttpSampleCalls.setOnClickListener { openOkHttpSamples() }
-            httpUrlConnection.setOnClickListener { openHttpUrlConnection() }
-            webViewLatest.setOnClickListener { openWebViewLatest() }
-            webViewLegacy.setOnClickListener { openWebViewLegacy() }
-            menuCustomTracking.setOnClickListener { openCustomTracking() }
-            globalAttributes.setOnClickListener { openGlobalAttributes() }
-            slowRender.setOnClickListener { simulateSlowRender() }
-            frozenRender.setOnClickListener { simulateFrozenRender() }
+            crashReports.setOnClickListener {
+                navigateTo(CrashReportsFragment(), FragmentAnimation.FADE)
+            }
+            okhttpSampleCalls.setOnClickListener {
+                navigateTo(OkHttpFragment(), FragmentAnimation.FADE)
+            }
+            httpUrlConnection.setOnClickListener {
+                navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
+            }
+            webViewLatest.setOnClickListener {
+                navigateTo(WebViewFragment.newInstance(ApiVariant.LATEST), FragmentAnimation.FADE)
+            }
+            webViewLegacy.setOnClickListener {
+                navigateTo(WebViewFragment.newInstance(ApiVariant.LEGACY), FragmentAnimation.FADE)
+            }
+            menuCustomTracking.setOnClickListener {
+                navigateTo(CustomTrackingFragment(), FragmentAnimation.FADE)
+            }
+            globalAttributes.setOnClickListener {
+                navigateTo(GlobalAttributesFragment(), FragmentAnimation.FADE)
+            }
+            slowRendering.setOnClickListener {
+                navigateTo(SlowRenderingFragment(), FragmentAnimation.FADE)
+            }
         }
-    }
-
-    private fun openCrashReports() {
-        navigateTo(CrashReportsFragment(), FragmentAnimation.FADE)
-    }
-
-    private fun openOkHttpSamples() {
-        navigateTo(OkHttpFragment(), FragmentAnimation.FADE)
-    }
-
-    private fun openHttpUrlConnection() {
-        navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
-    }
-
-    private fun openWebViewLatest() {
-        navigateTo(WebViewFragment.newInstance(ApiVariant.LATEST), FragmentAnimation.FADE)
-    }
-
-    private fun openWebViewLegacy() {
-        navigateTo(WebViewFragment.newInstance(ApiVariant.LEGACY), FragmentAnimation.FADE)
-    }
-
-    private fun openCustomTracking() {
-        navigateTo(CustomTrackingFragment(), FragmentAnimation.FADE)
-    }
-
-    private fun openGlobalAttributes() {
-        navigateTo(GlobalAttributesFragment(), FragmentAnimation.FADE)
-    }
-
-    private fun simulateSlowRender() {
-        SlowRenderingUtils.simulateSlowRendering(
-            fragment = this,
-            testName = "slow render",
-            renderDelayMs = 30,
-            color = Color.BLUE
-        )
-    }
-
-    private fun simulateFrozenRender() {
-        SlowRenderingUtils.simulateSlowRendering(
-            fragment = this,
-            testName = "frozen render",
-            renderDelayMs = 800,
-            color = Color.RED,
-            refreshInterval = 1000
-        )
     }
 }

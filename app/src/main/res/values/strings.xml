@@ -2,21 +2,7 @@
     <string name="app_name" translatable="false">Splunk OTel Android</string>
 
     <string name="menu_title">Menu</string>
-    <string name="menu_okhttp_sample_calls">Okhttp sample calls</string>
     <string name="menu_network_request_title">Network Requests</string>
-    <string name="menu_httpurlconnection_title">HttpURLConnection</string>
-    <string name="menu_web_view_native_bridge_title">Web View Native Bridge</string>
-    <string name="menu_web_view_latest">Get Session ID (Latest)</string>
-    <string name="menu_web_view_legacy">Get Session ID (Legacy)</string>
-    <string name="slow_rendering_title">Slow Rendering</string>
-    <string name="slow_render">Slow Render (30ms delay)</string>
-    <string name="frozen_render">Frozen Render (800ms delay)</string>
-
-    <string name="okhttp_title">OkHttp</string>
-    <string name="httpurlconnection_title">HttpURLConnection</string>
-    <string name="webview_title">WebView</string>
-
-
     <string name="latest_api_title">Latest APIs</string>
     <string name="legacy_api_title">Legacy APIs</string>
 
@@ -60,6 +46,7 @@
     <string name="update_global_attributes">Update Global Attributes</string>
 
     <!-- HttpURLConnection -->
+    <string name="httpurlconnection_title">HttpURLConnection</string>
     <string name="custom_url_section_title">Test with Custom URL</string>
     <string name="custom_url">URL</string>
     <string name="custom_url_get">GET</string>
@@ -74,6 +61,8 @@
     <string name="server_timing_header_in_response">Server-Timing Header In Response</string>
 
     <!-- Okhttp -->
+    <string name="okhttp_sample_calls">Okhttp sample calls</string>
+    <string name="okhttp_title">OkHttp</string>
     <string name="synchronous_get">Synchronous GET</string>
     <string name="asynchronous_get">Asynchronous GET</string>
     <string name="concurrent_asynchronous_get">Concurrent asynchronous GET</string>
@@ -88,5 +77,17 @@
     <string name="network_error">Network Error</string>
     <string name="response_caching">Response caching</string>
     <string name="canceled_call">Canceled call</string>
+
+    <!-- Slow rendering -->
+    <string name="slow_rendering_title">Slow Rendering</string>
+    <string name="slow_render">Slow Render (30ms delay)</string>
+    <string name="frozen_render">Frozen Render (800ms delay)</string>
+
+    <!-- WebView -->
+    <string name="web_view_title">WebView</string>
+    <string name="web_view_native_bridge_title">Web View Native Bridge</string>
+    <string name="web_view_latest">Get Session ID (Latest)</string>
+    <string name="web_view_legacy">Get Session ID (Legacy)</string>
+
 
 </resources>

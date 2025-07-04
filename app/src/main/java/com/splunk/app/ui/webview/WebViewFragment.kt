@@ -27,12 +27,11 @@ import com.splunk.app.databinding.FragmentWebViewBinding
 import com.splunk.app.ui.BaseFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.navigation.extension.navigation
 import com.splunk.rum.integration.webview.extension.webViewNativeBridge
 
 class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
 
-    override val titleRes: Int = R.string.webview_title
+    override val titleRes: Int = R.string.web_view_title
 
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentWebViewBinding
         get() = FragmentWebViewBinding::inflate

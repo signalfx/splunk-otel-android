@@ -49,7 +49,7 @@
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_okhttp_sample_calls"
+			android:text="@string/okhttp_sample_calls"
 			app:layout_constraintTop_toBottomOf="@id/network_request_title" />
 
 		<TextView
@@ -60,7 +60,7 @@
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_httpurlconnection_title"
+			android:text="@string/httpurlconnection_title"
 			app:layout_constraintTop_toBottomOf="@id/okhttp_sample_calls" />
 
 		<TextView
@@ -69,7 +69,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="30dp"
-			android:text="@string/menu_web_view_native_bridge_title"
+			android:text="@string/web_view_native_bridge_title"
 			android:textSize="18sp"
 			android:textStyle="bold"
 			app:layout_constraintTop_toBottomOf="@id/http_url_connection" />
@@ -82,7 +82,7 @@
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_web_view_latest"
+			android:text="@string/web_view_latest"
 			app:layout_constraintTop_toBottomOf="@id/web_view_native_bridge_title" />
 
 		<TextView
@@ -93,7 +93,7 @@
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_web_view_legacy"
+			android:text="@string/web_view_legacy"
 			app:layout_constraintTop_toBottomOf="@id/web_view_latest" />
 
 		<TextView
@@ -155,27 +155,16 @@
 			app:layout_constraintTop_toBottomOf="@+id/global_attributes" />
 
 		<TextView
-			android:id="@+id/slow_render"
+			android:id="@+id/slow_rendering"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/slow_render"
+			android:text="@string/slow_rendering_title"
 			app:layout_constraintTop_toBottomOf="@id/slow_rendering_title" />
 
-		<TextView
-			android:id="@+id/frozen_render"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/frozen_render"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintTop_toBottomOf="@id/slow_render" />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

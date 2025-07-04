@@ -41,6 +41,10 @@ fun Context.showDoneToast(
         ApiVariant.LEGACY -> getString(R.string.toast_legacy_action_done, label)
     }
 
+    showToast(message, duration)
+}
+
+fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
     runOnUiThread {
         Toast.makeText(this, message, duration).show()
     }
