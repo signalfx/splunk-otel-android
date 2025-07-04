@@ -30,7 +30,6 @@ import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.ui.webview.WebViewFragment
 import com.splunk.app.util.ApiVariant
-import com.splunk.app.util.CommonUtils
 import com.splunk.app.util.FragmentAnimation
 import com.splunk.app.util.SlowRenderingUtils
 import com.splunk.rum.integration.agent.api.SplunkRum

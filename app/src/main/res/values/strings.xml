@@ -44,25 +44,6 @@
     <string name="webview_title">WebView</string>
     <string name="customtracking_title">CustomTracking</string>
 
-    <!-- Fragment Okhttp -->
-    <string name="synchronous_get">Synchronous GET</string>
-    <string name="asynchronous_get">Asynchronous GET</string>
-    <string name="concurrent_asynchronous_get">Concurrent asynchronous GET</string>
-    <string name="parent_context_propagation_async_get">Parent Context Prop Async GET</string>
-    <string name="retry_request">Retry request</string>
-    <string name="multiple_headers">Multiple headers</string>
-    <string name="post_markdown">Post markdown</string>
-    <string name="post_streaming">Post streaming</string>
-    <string name="post_file">Post file</string>
-    <string name="post_form_parameters">Post form parameters</string>
-    <string name="post_mutlipart_request">Post mutlipart request</string>
-    <string name="network_error">Network Error</string>
-    <string name="response_caching">Response caching</string>
-    <string name="canceled_call">Canceled call</string>
-    <string name="http_toast">%s, Done!</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <!-- Done toast -->
     <string name="toast_action_done">%1$s: Done!</string>
     <string name="toast_legacy_action_done">%1$s (Legacy): Done!</string>
@@ -89,5 +70,21 @@
     <string name="sustained_connection">Sustained Connection</string>
     <string name="stalled_request">Stalled Request</string>
     <string name="server_timing_header_in_response">Server-Timing Header In Response</string>
+
+    <!-- Okhttp -->
+    <string name="synchronous_get">Synchronous GET</string>
+    <string name="asynchronous_get">Asynchronous GET</string>
+    <string name="concurrent_asynchronous_get">Concurrent asynchronous GET</string>
+    <string name="parent_context_propagation_async_get">Parent Context Prop Async GET</string>
+    <string name="retry_request">Retry request</string>
+    <string name="multiple_headers">Multiple headers</string>
+    <string name="post_markdown">Post markdown</string>
+    <string name="post_streaming">Post streaming</string>
+    <string name="post_file">Post file</string>
+    <string name="post_form_parameters">Post form parameters</string>
+    <string name="post_mutlipart_request">Post mutlipart request</string>
+    <string name="network_error">Network Error</string>
+    <string name="response_caching">Response caching</string>
+    <string name="canceled_call">Canceled call</string>
 
 </resources>

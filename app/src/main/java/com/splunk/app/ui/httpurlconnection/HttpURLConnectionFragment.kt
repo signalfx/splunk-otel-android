@@ -161,14 +161,13 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         runOnBackgroundThread {
             var connection: HttpURLConnection? = null
             try {
-                connection = (URL(inputUrl).openConnection() as HttpURLConnection).apply {
-                    setRequestProperty("Accept", "application/json")
-                }
+                connection = inputUrl.openHttpConnection()
+                connection.setRequestProperty("Accept", "application/json")
 
                 val responseCode = connection.responseCode
                 val responseMessage = connection.responseMessage
 
-                val responseBody = if (responseCode in 200..299 && getInputStream) {
+                val responseBody = if (responseCode.isSuccessful && getInputStream) {
                     connection.inputStream.bufferedReader().use { it.readText() }
                 } else {
                     connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
@@ -183,7 +182,9 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
-                if (disconnect) connection?.disconnect()
+                if (disconnect) {
+                    connection?.disconnect()
+                }
             }
         }
     }
@@ -195,7 +196,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         runOnBackgroundThread {
             var connection: HttpURLConnection? = null
             try {
-                connection = URL(inputUrl).openConnection() as HttpURLConnection
+                connection = inputUrl.openHttpConnection()
                 connection.requestMethod = "POST"
                 connection.doOutput = true
                 connection.setRequestProperty("Content-Type", "text/plain")
@@ -218,6 +219,12 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
             }
         }
     }
+
+    private fun String.openHttpConnection(): HttpURLConnection =
+        (URL(this).openConnection() as HttpURLConnection)
+
+    private val Int.isSuccessful: Boolean
+        get() = this in 200..299
 
     companion object {
         private const val TAG = "HttpURLConnection"
