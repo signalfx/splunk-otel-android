@@ -2,7 +2,7 @@
 	<item android:state_enabled="false">
 		<shape>
 			<corners android:radius="100dp" />
-			<gradient android:angle="315" android:endColor="@color/blue_light_transparent" android:startColor="@color/blue_transparent" />
+			<gradient android:angle="315" android:endColor="@color/splunk_flamingo" android:startColor="@color/splunk_lipstick" />
 			<padding android:bottom="8dp" android:left="20dp" android:right="20dp" android:top="8dp" />
 		</shape>
 	</item>
@@ -17,7 +17,7 @@
 			<item>
 				<shape>
 					<corners android:radius="100dp" />
-					<gradient android:angle="315" android:endColor="@color/blue_light" android:startColor="@color/blue" />
+					<gradient android:angle="315" android:endColor="@color/splunk_flamingo" android:startColor="@color/splunk_lipstick" />
 					<padding android:bottom="8dp" android:left="20dp" android:right="20dp" android:top="8dp" />
 				</shape>
 			</item>

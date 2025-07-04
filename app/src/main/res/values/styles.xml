@@ -1,13 +1,13 @@
 <resources>
 
 	<style name="ActivityTheme" parent="@style/Theme.MaterialComponents.Light.NoActionBar">
-		<item name="colorPrimary">@color/blue</item>
+		<item name="colorPrimary">@color/splunk_flamingo</item>
 		<item name="colorPrimaryDark">@color/black</item>
-		<item name="colorAccent">@color/blue</item>
+		<item name="colorAccent">@color/splunk_lipstick</item>
 	</style>
 
 	<style name="Header">
-		<item name="android:textColor">@color/blue</item>
+		<item name="android:textColor">@color/splunk_flamingo</item>
 		<item name="android:textSize">18sp</item>
 		<item name="android:textStyle">bold</item>
 	</style>
