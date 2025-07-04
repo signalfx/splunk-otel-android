@@ -70,6 +70,16 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- Custom tracking -->
+    <string name="toast_custom_event">Track Custom Event</string>
+    <string name="toast_workflow">Track Workflow</string>
+    <string name="toast_exception">Track Exception</string>
+    <string name="toast_exception_with_attributes">Track Exception with Attributes</string>
+    <string name="toast_custom_event_legacy">Track Custom Event (Legacy)</string>
+    <string name="toast_workflow_legacy">Track Workflow (Legacy)</string>
+    <string name="toast_exception_legacy">Track Exception (Legacy)</string>
+    <string name="toast_exception_with_attributes_legacy">Track Exception with Attributes (Legacy)</string>
+
     <!-- Fragment HttpURLConnection -->
     <string name="custom_url_section_title">Test with Custom URL</string>
     <string name="custom_url">URL</string>

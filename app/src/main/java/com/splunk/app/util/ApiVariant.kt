@@ -17,6 +17,6 @@
 package com.splunk.app.util
 
 enum class ApiVariant {
-    NEXTGEN,
+    LATEST,
     LEGACY
 }

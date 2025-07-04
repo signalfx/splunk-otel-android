@@ -43,7 +43,7 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
         val apiVariant = arguments?.getString("API_VARIANT")?.let { ApiVariant.valueOf(it) }
 
         when (apiVariant) {
-            ApiVariant.NEXTGEN -> {
+            ApiVariant.LATEST -> {
                 SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(viewBinding.webView)
                 Log.d(TAG, "Nextgen integrateWithBrowserRum API called")
             }

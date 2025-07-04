@@ -79,7 +79,7 @@ class App : Application() {
                     realm = realm,
                     rumAccessToken = rumAccessToken
                 ),
-                appName = "Android demo app",
+                appName = "InteractionsTest",
                 enableDebugLogging = true,
                 globalAttributes = globalAttributes,
                 deploymentEnvironment = "test",
@@ -128,5 +128,6 @@ class App : Application() {
 
         agent.sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
         agent.sessionReplay.start()
+        agent.sessionReplay.state.status
     }
 }

@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package com.splunk.app.util
+package com.splunk.app.extension
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
+import androidx.annotation.StringRes
 import com.cisco.android.common.utils.runOnUiThread
-import com.splunk.app.R
 
-object CommonUtils {
-    fun showDoneToast(context: Context?, message: String) {
-        if (context == null) {
-            Log.e("CommonUtils", "Context is null while attempting to show a toast.")
-            return
-        }
-        runOnUiThread {
-            Toast.makeText(context, context.getString(R.string.http_toast, message), Toast.LENGTH_SHORT).show()
-        }
-    }
-}
+fun Context.showToast(@StringRes resource: Int, duration: Int = Toast.LENGTH_SHORT) =
+    showToast(getString(resource))
+
+fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) =
+    runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }

@@ -134,7 +134,7 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
                 navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
             viewBinding.webViewNextgen.id -> {
                 val args = Bundle().apply {
-                    putString("API_VARIANT", ApiVariant.NEXTGEN.name)
+                    putString("API_VARIANT", ApiVariant.LATEST.name)
                 }
                 navigateTo(WebViewFragment(), FragmentAnimation.FADE, args)
             }
