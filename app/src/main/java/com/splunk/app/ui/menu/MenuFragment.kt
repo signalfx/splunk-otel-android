@@ -16,7 +16,6 @@
 
 package com.splunk.app.ui.menu
 
-import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,18 +24,15 @@ import android.view.ViewGroup
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentMenuBinding
 import com.splunk.app.ui.BaseFragment
+import com.splunk.app.ui.crashreports.CrashReportsFragment
 import com.splunk.app.ui.customtracking.CustomTrackingFragment
+import com.splunk.app.ui.globalattributes.GlobalAttributesFragment
 import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
 import com.splunk.app.ui.webview.WebViewFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.app.util.FragmentAnimation
 import com.splunk.app.util.SlowRenderingUtils
-import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.api.extension.splunkRumId
-import com.splunk.rum.integration.navigation.extension.navigation
-import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.Attributes
 
 class MenuFragment : BaseFragment<FragmentMenuBinding>() {
 
@@ -48,146 +44,63 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewBinding.crashReports.setOnClickListener(onClickListener)
-        viewBinding.okhttpSampleCalls.setOnClickListener(onClickListener)
-        viewBinding.httpurlconnection.setOnClickListener(onClickListener)
-        viewBinding.webViewNextgen.setOnClickListener(onClickListener)
-        viewBinding.webViewLegacy.setOnClickListener(onClickListener)
-        viewBinding.menuCustomTrackingButton.setOnClickListener(onClickListener)
-
-        viewBinding.slowRender.setOnClickListener(onClickListener)
-        viewBinding.frozenRender.setOnClickListener(onClickListener)
-        viewBinding.crashReportsIllegal.splunkRumId = "illegalButton"
-
-        SplunkRum.instance.navigation.track("Menu")
+        with(viewBinding) {
+            crashReports.setOnClickListener { openCrashReports() }
+            okhttpSampleCalls.setOnClickListener { openOkHttpSamples() }
+            httpUrlConnection.setOnClickListener { openHttpUrlConnection() }
+            webViewLatest.setOnClickListener { openWebViewLatest() }
+            webViewLegacy.setOnClickListener { openWebViewLegacy() }
+            menuCustomTracking.setOnClickListener { openCustomTracking() }
+            globalAttributes.setOnClickListener { openGlobalAttributes() }
+            slowRender.setOnClickListener { simulateSlowRender() }
+            frozenRender.setOnClickListener { simulateFrozenRender() }
+        }
     }
 
-    private val onClickListener = View.OnClickListener {
-        when (it.id) {
-            viewBinding.crashReportsIllegal.id ->
-                throw IllegalArgumentException("Illegal Argument Exception Thrown!")
-            viewBinding.okhttpSampleCalls.id ->
-                navigateTo(OkHttpFragment(), FragmentAnimation.FADE)
-            viewBinding.httpurlconnection.id ->
-                navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
-            viewBinding.webViewNextgen.id -> {
-                navigateTo(WebViewFragment.newInstance(ApiVariant.LATEST), FragmentAnimation.FADE)
-            }
-            viewBinding.webViewLegacy.id -> {
-                navigateTo(WebViewFragment.newInstance(ApiVariant.LEGACY), FragmentAnimation.FADE)
-            }
-            viewBinding.menuCustomTrackingButton.id -> {
-                navigateTo(CustomTrackingFragment(), FragmentAnimation.FADE)
-            }
-            viewBinding.setStringAttribute.id -> {
-                SplunkRum.instance.globalAttributes["stringKey"] = "String Value"
-                CommonUtils.showDoneToast(context, "Set String Global Attribute")
-            }
-            viewBinding.setLongAttribute.id -> {
-                SplunkRum.instance.globalAttributes["longKey"] = 12345L
-                CommonUtils.showDoneToast(context, "Set Long Global Attribute")
-            }
-            viewBinding.setDoubleAttribute.id -> {
-                SplunkRum.instance.globalAttributes["doubleKey"] = 123.45
-                CommonUtils.showDoneToast(context, "Set Double Global Attribute")
-            }
-            viewBinding.setBooleanAttribute.id -> {
-                SplunkRum.instance.globalAttributes["booleanKey"] = true
-                CommonUtils.showDoneToast(context, "Set Boolean Global Attribute")
-            }
-            viewBinding.setGenericAttribute.id -> {
-                val key = AttributeKey.stringKey("genericKey")
-                SplunkRum.instance.globalAttributes[key] = "Generic Value"
-                CommonUtils.showDoneToast(context, "Set Generic Global Attribute")
-            }
-            viewBinding.removeStringAttribute.id -> {
-                SplunkRum.instance.globalAttributes.remove("stringKey")
-                CommonUtils.showDoneToast(context, "Remove String Global Attribute")
-            }
-            viewBinding.removeGenericAttribute.id -> {
-                val key = AttributeKey.stringKey("genericKey")
-                SplunkRum.instance.globalAttributes.remove(key)
-                CommonUtils.showDoneToast(context, "Remove Generic Global Attribute")
-            }
-            viewBinding.getStringAttribute.id -> {
-                val value: String? = SplunkRum.instance.globalAttributes["stringKey"]
-                AlertDialog.Builder(context)
-                    .setTitle("Key: stringKey")
-                    .setMessage("Value: $value")
-                    .setPositiveButton("OK", null)
-                    .show()
-            }
-            viewBinding.getGenericAttribute.id -> {
-                val key = AttributeKey.stringKey("genericKey")
-                val value = SplunkRum.instance.globalAttributes[key]
-                AlertDialog.Builder(context)
-                    .setTitle("Key: genericKey")
-                    .setMessage("Value: $value")
-                    .setPositiveButton("OK", null)
-                    .show()
-            }
-            viewBinding.setAllGlobalAttributes.id -> {
-                @Suppress("ktlint:standard:argument-list-wrapping")
-                val globalAttributes = Attributes.of(
-                    AttributeKey.stringKey("setAllString"), "String Value",
-                    AttributeKey.booleanKey("setAllBoolean"), true,
-                    AttributeKey.doubleKey("setAllDouble"), 456.78,
-                    AttributeKey.longKey("setAllLong"), 9876L
-                )
-                SplunkRum.instance.globalAttributes.setAll(globalAttributes)
-                CommonUtils.showDoneToast(context, "Set All Global Attributes")
-            }
-            viewBinding.removeAllGlobalAttributes.id -> {
-                SplunkRum.instance.globalAttributes.removeAll()
-                CommonUtils.showDoneToast(context, "Remove All Global Attributes")
-            }
-            viewBinding.getAllGlobalAttributes.id -> {
-                val allAttributes = SplunkRum.instance.globalAttributes
-                val attributesText = StringBuilder()
-                allAttributes.forEach { key, value ->
-                    attributesText.append("${key.key}: $value\n")
-                }
+    private fun openCrashReports() {
+        navigateTo(CrashReportsFragment(), FragmentAnimation.FADE)
+    }
 
-                AlertDialog.Builder(context)
-                    .setTitle("All Global Attributes")
-                    .setMessage(attributesText.toString())
-                    .setPositiveButton("OK", null)
-                    .show()
-            }
+    private fun openOkHttpSamples() {
+        navigateTo(OkHttpFragment(), FragmentAnimation.FADE)
+    }
 
-            viewBinding.legacySetGlobalAttribute.id -> {
-                val key = AttributeKey.stringKey("legacyKey")
-                SplunkRum.instance.setGlobalAttribute(key, "LegacyVal")
-                CommonUtils.showDoneToast(context, "Set Global Attribute using legacy API")
-            }
+    private fun openHttpUrlConnection() {
+        navigateTo(HttpURLConnectionFragment(), FragmentAnimation.FADE)
+    }
 
-            viewBinding.legacyUpdateGlobalAttributes.id -> {
-                SplunkRum.instance.updateGlobalAttributes { builder ->
-                    builder.put(AttributeKey.stringKey("legacyUpdate1"), "Value1")
-                        .put(AttributeKey.longKey("legacyUpdate2"), 54321L)
-                        .put(AttributeKey.booleanKey("legacyUpdate3"), false)
-                }
-                CommonUtils.showDoneToast(context, "Updated Global Attributes using legacy API")
-            }
+    private fun openWebViewLatest() {
+        navigateTo(WebViewFragment.newInstance(ApiVariant.LATEST), FragmentAnimation.FADE)
+    }
 
-            viewBinding.slowRender.id -> {
-                SlowRenderingUtils.simulateSlowRendering(
-                    fragment = this,
-                    testName = "slow render",
-                    renderDelayMs = 30,
-                    color = Color.BLUE
-                )
-            }
+    private fun openWebViewLegacy() {
+        navigateTo(WebViewFragment.newInstance(ApiVariant.LEGACY), FragmentAnimation.FADE)
+    }
 
-            viewBinding.frozenRender.id -> {
-                SlowRenderingUtils.simulateSlowRendering(
-                    fragment = this,
-                    testName = "frozen render",
-                    renderDelayMs = 800,
-                    color = Color.RED,
-                    refreshInterval = 1000
-                )
-            }
-        }
+    private fun openCustomTracking() {
+        navigateTo(CustomTrackingFragment(), FragmentAnimation.FADE)
+    }
+
+    private fun openGlobalAttributes() {
+        navigateTo(GlobalAttributesFragment(), FragmentAnimation.FADE)
+    }
+
+    private fun simulateSlowRender() {
+        SlowRenderingUtils.simulateSlowRendering(
+            fragment = this,
+            testName = "slow render",
+            renderDelayMs = 30,
+            color = Color.BLUE
+        )
+    }
+
+    private fun simulateFrozenRender() {
+        SlowRenderingUtils.simulateSlowRendering(
+            fragment = this,
+            testName = "frozen render",
+            renderDelayMs = 800,
+            color = Color.RED,
+            refreshInterval = 1000
+        )
     }
 }

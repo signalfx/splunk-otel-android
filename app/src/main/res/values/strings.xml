@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name" translatable="false">Smartlook</string>
+    <string name="app_name" translatable="false">Splunk OTel Android</string>
 
     <string name="menu_title">Menu</string>
     <string name="menu_okhttp_sample_calls">Okhttp sample calls</string>
     <string name="menu_network_request_title">Network Requests</string>
     <string name="menu_httpurlconnection_title">HttpURLConnection</string>
     <string name="menu_web_view_native_bridge_title">Web View Native Bridge</string>
-    <string name="menu_web_view_nextgen">Get Session ID (Nextgen)</string>
+    <string name="menu_web_view_latest">Get Session ID (Latest)</string>
     <string name="menu_web_view_legacy">Get Session ID (Legacy)</string>
     <string name="slow_rendering_title">Slow Rendering</string>
     <string name="slow_render">Slow Render (30ms delay)</string>

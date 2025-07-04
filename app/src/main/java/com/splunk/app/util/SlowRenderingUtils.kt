@@ -26,7 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.splunk.app.util.CommonUtils.showDoneToast
+import com.splunk.app.extension.showDoneToast
 import java.util.Locale
 import java.util.Random
 
@@ -73,8 +73,7 @@ object SlowRenderingUtils {
         Handler(Looper.getMainLooper()).postDelayed({
             rootView.removeView(slowRenderView)
             slowRenderView.stopRendering()
-            showDoneToast(
-                fragment.context,
+            fragment.context?.showDoneToast(
                 testName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
             )
         }, durationMs)

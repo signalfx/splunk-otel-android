@@ -30,7 +30,6 @@
 			android:text="@string/crash_reports_title"
 			app:layout_constraintTop_toBottomOf="@id/crash_title" />
 
-
 		<TextView
 			android:id="@+id/network_request_title"
 			style="@style/Header"
@@ -76,14 +75,14 @@
 			app:layout_constraintTop_toBottomOf="@id/http_url_connection" />
 
 		<TextView
-			android:id="@+id/web_view_nextgen"
+			android:id="@+id/web_view_latest"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_web_view_nextgen"
+			android:text="@string/menu_web_view_latest"
 			app:layout_constraintTop_toBottomOf="@id/web_view_native_bridge_title" />
 
 		<TextView
@@ -95,7 +94,7 @@
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
 			android:text="@string/menu_web_view_legacy"
-			app:layout_constraintTop_toBottomOf="@id/web_view_nextgen" />
+			app:layout_constraintTop_toBottomOf="@id/web_view_latest" />
 
 		<TextView
 			android:id="@+id/menu_custom_tracking_title"
@@ -110,7 +109,7 @@
 
 
 		<TextView
-			android:id="@+id/menu_custom_tracking_button"
+			android:id="@+id/menu_custom_tracking"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -130,19 +129,19 @@
 			android:text="@string/global_attributes_title"
 			android:textSize="18sp"
 			android:textStyle="bold"
-			app:layout_constraintTop_toBottomOf="@+id/menu_custom_tracking_button" />
+			app:layout_constraintTop_toBottomOf="@+id/menu_custom_tracking" />
 
 
 		<TextView
-			android:id="@+id/legacy_set_global_attribute"
+			android:id="@+id/global_attributes"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/legacy_set_global_attribute"
-			app:layout_constraintTop_toBottomOf="@id/get_all_global_attributes" />
+			android:text="@string/global_attributes_title"
+			app:layout_constraintTop_toBottomOf="@id/global_attributes_title" />
 
 		<TextView
 			android:id="@+id/slow_rendering_title"
@@ -153,7 +152,7 @@
 			android:text="@string/slow_rendering_title"
 			android:textSize="18sp"
 			android:textStyle="bold"
-			app:layout_constraintTop_toBottomOf="@+id/legacy_update_global_attributes" />
+			app:layout_constraintTop_toBottomOf="@+id/global_attributes" />
 
 		<TextView
 			android:id="@+id/slow_render"
