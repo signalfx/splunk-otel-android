@@ -74,7 +74,6 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         with(viewBinding) {
-
             // Latest APIs
             trackCustomEvent.setOnClickListener { trackEvent(ApiVariant.LATEST) }
             trackWorkflow.setOnClickListener { trackWorkflow(ApiVariant.LATEST) }

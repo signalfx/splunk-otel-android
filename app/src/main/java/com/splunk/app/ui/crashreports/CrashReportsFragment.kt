@@ -36,7 +36,6 @@ class CrashReportsFragment : BaseFragment<FragmentCrashReportsBinding>() {
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentCrashReportsBinding
         get() = FragmentCrashReportsBinding::inflate
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -56,16 +55,13 @@ class CrashReportsFragment : BaseFragment<FragmentCrashReportsBinding>() {
     /**
      * Throws an [IllegalArgumentException] with a test message.
      */
-    private fun triggerIllegalArgumentCrash() {
+    private fun triggerIllegalArgumentCrash(): Unit =
         throw IllegalArgumentException("Illegal Argument Exception Thrown!")
-    }
 
     /**
      * Throws a [RuntimeException] directly on the main thread.
      */
-    private fun triggerMainThreadCrash() {
-        throw RuntimeException("Crashing on main thread")
-    }
+    private fun triggerMainThreadCrash(): Unit = throw RuntimeException("Crashing on main thread")
 
     /**
      * Starts a new background thread and throws a [RuntimeException] from it.
@@ -79,32 +75,26 @@ class CrashReportsFragment : BaseFragment<FragmentCrashReportsBinding>() {
     /**
      * Throws a [RuntimeException] with a stack trace that simulates a crash in non-app code.
      */
-    private fun triggerNoAppCodeCrash() {
-        throw RuntimeException("No Application Code").apply {
-            stackTrace = arrayOf(
-                StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
-                StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
-                StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
-            )
-        }
+    private fun triggerNoAppCodeCrash(): Unit = throw RuntimeException("No Application Code").apply {
+        stackTrace = arrayOf(
+            StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
+            StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
+            StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
+        )
     }
 
     /**
      * Throws a [RuntimeException] with an empty stack trace.
      */
-    private fun triggerNoStacktraceCrash() {
-        throw RuntimeException("NoStackTrace").apply {
-            stackTrace = arrayOfNulls(0)
-        }
+    private fun triggerNoStacktraceCrash(): Unit = throw RuntimeException("NoStackTrace").apply {
+        stackTrace = arrayOfNulls(0)
     }
 
     /**
      * Throws an [OutOfMemoryError] with an empty stack trace.
      */
-    private fun triggerOutOfMemoryCrash() {
-        throw OutOfMemoryError("Out of memory").apply {
-            stackTrace = arrayOfNulls(0)
-        }
+    private fun triggerOutOfMemoryCrash(): Unit = throw OutOfMemoryError("Out of memory").apply {
+        stackTrace = arrayOfNulls(0)
     }
 
     /**
@@ -121,9 +111,7 @@ class CrashReportsFragment : BaseFragment<FragmentCrashReportsBinding>() {
     /**
      * Throws a [NullPointerException] with a custom message.
      */
-    private fun triggerNullPointerCrash() {
-        throw NullPointerException("I am null!")
-    }
+    private fun triggerNullPointerCrash(): Unit = throw NullPointerException("I am null!")
 
     /**
      * Simulates an Application Not Responding (ANR) event by blocking the main thread

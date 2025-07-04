@@ -152,7 +152,6 @@ class App : Application() {
         configureAndStartSessionReplay(agent.sessionReplay)
     }
 
-
     private fun configureAndStartSessionReplay(sessionReplay: SessionReplay) {
         sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
         sessionReplay.start()

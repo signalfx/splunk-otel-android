@@ -22,10 +22,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.createBitmap
 import com.cisco.android.common.utils.extensions.safeSchedule
 import com.cisco.android.common.utils.runOnBackgroundThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentOkhttpBinding
+import com.splunk.app.extension.showDoneToast
 import com.splunk.app.ui.BaseFragment
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
@@ -53,8 +55,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.BufferedSink
-import androidx.core.graphics.createBitmap
-import com.splunk.app.extension.showDoneToast
 
 /**
  * A fragment demonstrating various OkHttp3 use cases and integrations with Splunk RUM instrumentation.
@@ -90,7 +90,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 //     private val cachedClient = instrumentedCallFactory(cachedClient())
 //     private val cachedClient = instrumentedCallFactoryLegacyAPI(cachedClient())
 
-
     private val retryInterceptor = Interceptor { chain: Interceptor.Chain ->
         val request = chain.request()
         var response = chain.proceed(request)
@@ -105,7 +104,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         }
         return@Interceptor response
     }
-
 
     private val executor = Executors.newScheduledThreadPool(1)
 
@@ -257,7 +255,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
     private fun unsuccessfulGet() {
         executeGetRequest("https://httpbin.org/status/404")
         context?.showDoneToast(R.string.unsuccessful_get)
-
     }
 
     /**

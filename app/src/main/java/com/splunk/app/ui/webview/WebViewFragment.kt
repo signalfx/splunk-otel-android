@@ -80,11 +80,9 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
         private const val TAG = "WebView"
         private const val ARG_API_VARIANT = "API_VARIANT"
 
-        fun newInstance(variant: ApiVariant): WebViewFragment {
-            return WebViewFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_API_VARIANT, variant.name)
-                }
+        fun newInstance(variant: ApiVariant): WebViewFragment = WebViewFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARG_API_VARIANT, variant.name)
             }
         }
     }

@@ -27,7 +27,6 @@ import com.splunk.app.extension.showDoneToast
 import com.splunk.app.ui.BaseFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 
@@ -140,10 +139,14 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
      */
     private fun setAllGlobalAttributes() {
         val attributes = Attributes.of(
-            AttributeKey.stringKey("setAllString"), "String Value",
-            AttributeKey.booleanKey("setAllBoolean"), true,
-            AttributeKey.doubleKey("setAllDouble"), 456.78,
-            AttributeKey.longKey("setAllLong"), 9876L
+            AttributeKey.stringKey("setAllString"),
+            "String Value",
+            AttributeKey.booleanKey("setAllBoolean"),
+            true,
+            AttributeKey.doubleKey("setAllDouble"),
+            456.78,
+            AttributeKey.longKey("setAllLong"),
+            9876L
         )
         globalAttributes.setAll(attributes)
         context?.showDoneToast(R.string.set_all_global_attributes)

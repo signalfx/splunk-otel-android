@@ -160,7 +160,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         inputUrl: String,
         getInputStream: Boolean = true,
         disconnect: Boolean = true,
-        stallRequest: Boolean = false,
+        stallRequest: Boolean = false
     ) {
         runOnBackgroundThread {
             var connection: HttpURLConnection? = null
@@ -181,8 +181,10 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                     Thread.sleep(STALL_DURATION_MS)
                 }
 
-                Log.v(TAG, "response code: $responseCode response message: $responseMessage response body: $responseBody")
-
+                Log.v(
+                    TAG,
+                    "response code: $responseCode response message: $responseMessage response body: $responseBody"
+                )
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -193,10 +195,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         }
     }
 
-    private fun executePost(
-        inputUrl: String,
-        requestBody: String
-    ) {
+    private fun executePost(inputUrl: String, requestBody: String) {
         runOnBackgroundThread {
             var connection: HttpURLConnection? = null
             try {
@@ -224,8 +223,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         }
     }
 
-    private fun String.openHttpConnection(): HttpURLConnection =
-        URL(this).openConnection() as HttpURLConnection
+    private fun String.openHttpConnection(): HttpURLConnection = URL(this).openConnection() as HttpURLConnection
 
     private val Int.isSuccessful: Boolean
         get() = this in 200..299

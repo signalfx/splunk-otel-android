@@ -62,21 +62,20 @@ class SlowRenderingFragment : BaseFragment<FragmentSlowRenderingBinding>() {
      * Starts a simulation of slow rendering with short frame delays.
      */
     private fun simulateSlowRender() = simulateSlowRendering(
-            testName = "slow render",
-            renderDelayMs = SLOW_RENDER_DELAY_MS,
-            color = Color.BLUE
-        )
+        testName = "slow render",
+        renderDelayMs = SLOW_RENDER_DELAY_MS,
+        color = Color.BLUE
+    )
 
     /**
      * Starts a simulation of frozen rendering with long frame delays.
      */
     private fun simulateFrozenRender() = simulateSlowRendering(
-            testName = "frozen render",
-            renderDelayMs = FROZEN_RENDER_DELAY_MS,
-            color = Color.RED,
-            refreshIntervalMs = FROZEN_REFRESH_INTERVAL_MS
-        )
-
+        testName = "frozen render",
+        renderDelayMs = FROZEN_RENDER_DELAY_MS,
+        color = Color.RED,
+        refreshIntervalMs = FROZEN_REFRESH_INTERVAL_MS
+    )
 
     /**
      * Creates and attaches a custom [SlowRenderView] to simulate poor rendering performance.
