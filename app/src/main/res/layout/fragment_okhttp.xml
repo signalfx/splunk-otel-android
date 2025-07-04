@@ -1,157 +1,200 @@
-<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroller"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="20dp">
 
-        <Button
-            android:id="@+id/synchronousGet"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/okhttp_title"
+            style="@style/Header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/synchronous_get"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:text="@string/okhttp_title"
+            android:textSize="25sp"
+            android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <TextView
+            android:id="@+id/synchronousGet"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/synchronous_get"
+            app:layout_constraintTop_toBottomOf="@id/okhttp_title" />
+
+        <TextView
             android:id="@+id/asynchronousGet"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/asynchronous_get"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/synchronousGet" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/synchronousGet" />
 
-        <Button
+        <TextView
             android:id="@+id/concurrentAsynchronousGet"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/concurrent_asynchronous_get"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/asynchronousGet" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/asynchronousGet" />
 
-        <Button
+        <TextView
             android:id="@+id/parentContextPropagationInAsyncGet"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/parent_context_propagation_async_get"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/concurrentAsynchronousGet" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/concurrentAsynchronousGet" />
 
-        <Button
+        <TextView
             android:id="@+id/unSuccessfulGet"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/unsuccessful_get"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/parentContextPropagationInAsyncGet" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/parentContextPropagationInAsyncGet" />
 
-        <Button
+        <TextView
             android:id="@+id/retryRequest"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/retry_request"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/unSuccessfulGet" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/unSuccessfulGet" />
 
-        <Button
+        <TextView
             android:id="@+id/multipleHeaders"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/multiple_headers"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/retryRequest" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/retryRequest" />
 
-        <Button
+        <TextView
             android:id="@+id/serverTimingHeaderInResponse"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/server_timing_header_in_response"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/multipleHeaders" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/multipleHeaders" />
 
-        <Button
+        <TextView
             android:id="@+id/postMarkdown"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/post_markdown"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/serverTimingHeaderInResponse" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/serverTimingHeaderInResponse" />
 
-        <Button
+        <TextView
             android:id="@+id/postStreaming"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/post_streaming"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postMarkdown" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/postMarkdown" />
 
-        <Button
+        <TextView
             android:id="@+id/postFile"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/post_file"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postStreaming" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/postStreaming" />
 
-        <Button
+        <TextView
             android:id="@+id/postFormParameters"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/post_form_parameters"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postFile" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/postFile" />
 
-        <Button
+        <TextView
             android:id="@+id/postMutlipartRequest"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/post_multipart_request"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postFormParameters" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/postFormParameters" />
 
-        <Button
+        <TextView
             android:id="@+id/networkError"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/network_error"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postMutlipartRequest" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/postMutlipartRequest" />
 
-        <Button
+        <TextView
             android:id="@+id/responseCaching"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/response_caching"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/networkError" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/networkError" />
 
-        <Button
+        <TextView
             android:id="@+id/canceledCall"
-            android:layout_width="wrap_content"
+            style="@style/Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/canceled_call"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/responseCaching" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            app:layout_constraintTop_toBottomOf="@id/responseCaching"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
