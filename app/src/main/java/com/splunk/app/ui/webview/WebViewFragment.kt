@@ -16,6 +16,7 @@
 
 package com.splunk.app.ui.webview
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -32,37 +33,41 @@ import com.splunk.rum.integration.webview.extension.webViewNativeBridge
 class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
 
     override val titleRes: Int = R.string.webview_title
+
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentWebViewBinding
         get() = FragmentWebViewBinding::inflate
 
+    private val splunkRum = SplunkRum.instance
+    private val webViewNativeBridge = splunkRum.webViewNativeBridge
+    private val webView = viewBinding.webView
+
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewBinding.webView.settings.javaScriptEnabled = true
+        val apiVariant = runCatching {
+            arguments?.getString("API_VARIANT")?.let { ApiVariant.valueOf(it) }
+        }.getOrNull()
 
-        val apiVariant = arguments?.getString("API_VARIANT")?.let { ApiVariant.valueOf(it) }
+        webView.settings.javaScriptEnabled = true
 
         when (apiVariant) {
             ApiVariant.LATEST -> {
-                SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(viewBinding.webView)
-                Log.d(TAG, "Nextgen integrateWithBrowserRum API called")
+                webViewNativeBridge.integrateWithBrowserRum(viewBinding.webView)
+                Log.d(TAG, "Latest integrateWithBrowserRum API called")
             }
-
             ApiVariant.LEGACY -> {
-                SplunkRum.instance.integrateWithBrowserRum(viewBinding.webView)
+                splunkRum.integrateWithBrowserRum(viewBinding.webView)
                 Log.d(TAG, "Legacy integrateWithBrowserRum API called")
             }
-
             null -> Log.e(TAG, "WebView not integrated with Browser RUM due to missing API_VARIANT argument.")
         }
 
         viewBinding.webView.loadUrl("file:///android_asset/webview_content.html")
-
-        SplunkRum.instance.navigation.track("WebView")
     }
 
     override fun onDestroyView() {
-        viewBinding.webView.destroy()
+        webView.destroy()
         super.onDestroyView()
     }
 
