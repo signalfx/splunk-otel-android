@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,28 @@ import android.content.Context
 import android.widget.Toast
 import androidx.annotation.StringRes
 import com.cisco.android.common.utils.runOnUiThread
+import com.splunk.app.R
+import com.splunk.app.util.ApiVariant
 
-fun Context.showToast(@StringRes resource: Int, duration: Int = Toast.LENGTH_SHORT) =
-    showToast(getString(resource))
+fun Context.showDoneToast(
+    @StringRes labelRes: Int,
+    apiVariant: ApiVariant = ApiVariant.LATEST,
+    duration: Int = Toast.LENGTH_SHORT
+) {
+    showDoneToast(getString(labelRes), apiVariant, duration)
+}
 
-fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) =
-    runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
+fun Context.showDoneToast(
+    label: String,
+    apiVariant: ApiVariant = ApiVariant.LATEST,
+    duration: Int = Toast.LENGTH_SHORT
+) {
+    val message = when (apiVariant) {
+        ApiVariant.LATEST -> getString(R.string.toast_action_done, label)
+        ApiVariant.LEGACY -> getString(R.string.toast_legacy_action_done, label)
+    }
+
+    runOnUiThread {
+        Toast.makeText(this, message, duration).show()
+    }
+}

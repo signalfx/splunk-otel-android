@@ -22,7 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentCustomTrackingBinding
-import com.splunk.app.extension.showToast
+import com.splunk.app.extension.showDoneToast
 import com.splunk.app.ui.BaseFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
@@ -30,8 +30,6 @@ import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.customtracking.extension.customTracking
 
 class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
-
-    override val navigationName = "CustomTracking"
 
     override val titleRes: Int = R.string.customtracking_title
 
@@ -60,32 +58,19 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Latest APIs
-        viewBinding.trackCustomEvent.setOnClickListener(onClickListener)
-        viewBinding.trackWorkflow.setOnClickListener(onClickListener)
-        viewBinding.trackException.setOnClickListener(onClickListener)
-        viewBinding.trackExceptionWithAttributes.setOnClickListener(onClickListener)
+        with(viewBinding) {
 
-        // Legacy APIs
-        viewBinding.trackCustomEventLegacy.setOnClickListener(onClickListener)
-        viewBinding.trackWorkflowLegacy.setOnClickListener(onClickListener)
-        viewBinding.trackExceptionLegacy.setOnClickListener(onClickListener)
-        viewBinding.trackExceptionWithAttributesLegacy.setOnClickListener(onClickListener)
-    }
-
-    private val onClickListener = View.OnClickListener { view ->
-        when (view.id) {
             // Latest APIs
-            viewBinding.trackCustomEvent.id -> trackEvent(ApiVariant.LATEST)
-            viewBinding.trackWorkflow.id -> trackWorkflow(ApiVariant.LATEST)
-            viewBinding.trackException.id -> trackException(ApiVariant.LATEST)
-            viewBinding.trackExceptionWithAttributes.id -> trackException(ApiVariant.LATEST, testAttributes)
+            trackCustomEvent.setOnClickListener { trackEvent(ApiVariant.LATEST) }
+            trackWorkflow.setOnClickListener { trackWorkflow(ApiVariant.LATEST) }
+            trackException.setOnClickListener { trackException(ApiVariant.LATEST) }
+            trackExceptionWithAttributes.setOnClickListener { trackException(ApiVariant.LATEST, testAttributes) }
 
             // Legacy APIs
-            viewBinding.trackCustomEventLegacy.id -> trackEvent(ApiVariant.LEGACY)
-            viewBinding.trackWorkflowLegacy.id -> trackWorkflow(ApiVariant.LEGACY)
-            viewBinding.trackExceptionLegacy.id -> trackException(ApiVariant.LEGACY)
-            viewBinding.trackExceptionWithAttributesLegacy.id -> trackException(ApiVariant.LEGACY, testAttributes)
+            trackCustomEventLegacy.setOnClickListener { trackEvent(ApiVariant.LEGACY) }
+            trackWorkflowLegacy.setOnClickListener { trackWorkflow(ApiVariant.LEGACY) }
+            trackExceptionLegacy.setOnClickListener { trackException(ApiVariant.LEGACY) }
+            trackExceptionWithAttributesLegacy.setOnClickListener { trackException(ApiVariant.LEGACY, testAttributes) }
         }
     }
 
@@ -95,7 +80,7 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             ApiVariant.LEGACY -> splunkRum.addRumEvent("TestEvent", testAttributes)
         }
 
-        context?.showToast(R.string.toast_custom_event)
+        context?.showDoneToast(R.string.track_custom_event, variant)
     }
 
     private fun trackWorkflow(variant: ApiVariant) {
@@ -111,7 +96,7 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             end()
         }
 
-        context?.showToast(R.string.toast_workflow)
+        context?.showDoneToast(R.string.track_workflow, variant)
     }
 
     private fun trackException(variant: ApiVariant, attributes: MutableAttributes? = null) {
@@ -132,6 +117,6 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             }
         }
 
-        context?.showToast(R.string.toast_exception)
+        context?.showDoneToast(R.string.track_exception, variant)
     }
 }

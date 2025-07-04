@@ -38,8 +38,6 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     protected val viewBinding: T
         get() = viewBindingInternal ?: error("Must be called after createView()")
 
-    abstract val navigationName: String
-
     abstract val titleRes: Int
 
     open val subtitleRes: Int? = null
@@ -52,7 +50,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        SplunkRum.instance.navigation.track(navigationName)
+        SplunkRum.instance.navigation.track(getString(titleRes))
     }
 
     override fun onDestroyView() {
