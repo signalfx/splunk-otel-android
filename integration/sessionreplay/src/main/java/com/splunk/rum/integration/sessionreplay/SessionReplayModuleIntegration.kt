@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.sessionreplay
 
 import android.content.Context
+import android.webkit.WebView
 import com.cisco.android.common.logger.Logger
 import com.cisco.android.instrumentation.recording.core.api.DataListener
 import com.cisco.android.instrumentation.recording.core.api.Metadata
@@ -59,7 +60,15 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
     ) {
         Logger.d(TAG, "onInstall()")
         timeIndex.put(1)
-        SessionReplay.instance.dataListeners += sessionReplayDataListener
+
+        with(SessionReplay.instance) {
+            dataListeners += sessionReplayDataListener
+
+            /**
+             * For MRUM agents, the WebView must not be sensitive by default.
+             */
+            sensitivity.setViewClassSensitivity(WebView::class.java, null)
+        }
     }
 
     override fun onSessionChange(sessionId: String) {
