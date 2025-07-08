@@ -57,7 +57,7 @@ class SplunkRum private constructor(
     val state: IState = State(agentConfiguration),
     val session: ISession = Session(SessionState(agentConfiguration.session, sessionManager)),
     val user: User = User(userManager),
-    val globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
+    val globalAttributes: MutableAttributes = MutableAttributes(agentConfiguration.globalAttributes)
 ) {
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))

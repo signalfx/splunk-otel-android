@@ -20,6 +20,7 @@ import com.splunk.rum.integration.agent.api.session.SessionConfiguration
 import com.splunk.rum.integration.agent.api.spaninterceptor.toMutableSpanData
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.trace.data.SpanData
 
 /**
@@ -52,7 +53,7 @@ data class AgentConfiguration @JvmOverloads constructor(
     val deploymentEnvironment: String,
     val appVersion: String? = null,
     val enableDebugLogging: Boolean = false,
-    val globalAttributes: MutableAttributes = MutableAttributes(),
+    val globalAttributes: Attributes = Attributes.empty(),
     val spanInterceptor: ((SpanData) -> SpanData?)? = null,
     val user: UserConfiguration = UserConfiguration(),
     val session: SessionConfiguration = SessionConfiguration(),
