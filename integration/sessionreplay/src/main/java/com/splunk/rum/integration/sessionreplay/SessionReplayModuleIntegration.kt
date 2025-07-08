@@ -65,7 +65,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             dataListeners += sessionReplayDataListener
 
             /**
-             * For MRUM agents, the WebView must not be sensitive by default.
+             * For Splunk agents, the WebView must not be sensitive by default.
              */
             sensitivity.setViewClassSensitivity(WebView::class.java, null)
         }
