@@ -76,7 +76,7 @@ public class JavaIntegration extends Application {
         userState.getTrackingMode();
 
         ISession session = agent.getSession();
-        session.getState().getSessionId();
+        session.getState().getId();
         session.getState().getSamplingRate();
 
         agent.getOpenTelemetry();

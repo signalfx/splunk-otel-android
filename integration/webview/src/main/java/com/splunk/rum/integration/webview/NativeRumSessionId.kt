@@ -25,5 +25,5 @@ import com.splunk.rum.integration.agent.api.SplunkRum
 internal class NativeRumSessionId {
     @get:JavascriptInterface
     val nativeSessionId: String
-        get() = SplunkRum.instance.session.state.sessionId
+        get() = SplunkRum.instance.session.state.id
 }

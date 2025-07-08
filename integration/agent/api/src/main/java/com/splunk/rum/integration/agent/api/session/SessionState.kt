@@ -22,7 +22,7 @@ class SessionState internal constructor(
     private val sessionConfiguration: SessionConfiguration,
     private val sessionManager: ISplunkSessionManager
 ) {
-    val sessionId: String
+    val id: String
         get() = sessionManager.sessionId
     val samplingRate: Double
         get() = sessionConfiguration.samplingRate
