@@ -27,7 +27,7 @@ dependencies {
 
     implementation(project(":integration:agent:api"))
     implementation(project(":integration:agent:internal"))
-    implementation(project(":integration:okhttp3:common"))
+    implementation(project(":integration:okhttp3-common"))
 
     implementation(Dependencies.Otel.androidInstrumentation)
     implementation(Dependencies.Otel.instrumentationOkHttp3Library)
