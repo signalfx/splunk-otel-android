@@ -7,6 +7,30 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.0.0-alpha.1
+
+This is the alpha version of the updated Splunk Unified Android Agent
+
+* a
+* b
+
+### Version 1.10.0 - 2025-05-22
+
+This is a regular maintenance release
+
+* Fixed duplicate span bug in Crash and ANR Reporting
+* Updated some attribute naming around build identifiers for stacktrace symbolication
+
+### Version 1.9.0 - 2025-02-03
+
+This is a regular maintenance release
+
+* Marked APIs, classes, and methods that will be deprecated down the line with the deprecation annotation
+
+### Version 1.8.1 - 2024-12-06
+
+Reducing the version of androidx libraries that enforce API level 35.
+
 ### Version 1.8.0 - 2024-12-04
 
 This is a regular maintenance release.
