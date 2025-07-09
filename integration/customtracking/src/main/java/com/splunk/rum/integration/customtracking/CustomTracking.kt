@@ -64,23 +64,10 @@ class CustomTracking internal constructor() {
      * auto-generated spans.
      *
      * @param throwable A [Throwable] associated with this event.
-     */
-    fun trackException(throwable: Throwable) {
-        trackException(throwable, null)
-    }
-
-    /**
-     * Add a custom exception to RUM monitoring. This can be useful for tracking custom error
-     * handling in your application.
-     *
-     *
-     * This event will be turned into a Span and sent to the RUM ingest along with other,
-     * auto-generated spans.
-     *
-     * @param throwable A [Throwable] associated with this event.
      * @param attributes Any [Attributes] to associate with the event.
      */
-    fun trackException(throwable: Throwable, attributes: Attributes?) {
+    @JvmOverloads
+    fun trackException(throwable: Throwable, attributes: Attributes? = null) {
         val tracer = getTracer() ?: return
         val spanBuilder = tracer.spanBuilder(throwable.javaClass.simpleName)
         attributes?.let {
