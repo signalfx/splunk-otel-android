@@ -10,127 +10,113 @@
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/custom_tracking_title"
+            android:id="@+id/crash_title"
             style="@style/Header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/custom_tracking_title"
-            android:textSize="25sp"
+            android:text="@string/crash_reports_title"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/custom_tracking_latest_api_title"
-            style="@style/Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/latest_api_title"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/custom_tracking_title"/>
-
-
-        <TextView
-            android:id="@+id/track_custom_event"
+            android:id="@+id/crash_reports_illegal"
             style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
-            android:text="@string/track_custom_event"
-            app:layout_constraintTop_toBottomOf="@id/custom_tracking_latest_api_title" />
+            android:text="@string/crash_reports_illegal"
+            app:layout_constraintTop_toBottomOf="@id/crash_title" />
 
         <TextView
-            android:id="@+id/track_workflow"
+            android:id="@+id/crash_reports_main_thread"
             style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/track_workflow"
-            app:layout_constraintTop_toBottomOf="@id/track_custom_event" />
+            android:text="@string/crash_on_main_thread"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_illegal" />
 
         <TextView
-            android:id="@+id/track_exception"
+            android:id="@+id/crash_reports_in_background"
             style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/track_exception"
-            app:layout_constraintTop_toBottomOf="@id/track_workflow" />
+            android:text="@string/crash_in_background"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_main_thread" />
 
         <TextView
-            android:id="@+id/track_exception_with_attributes"
+            android:id="@+id/crash_reports_no_app_code"
             style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/track_exception_with_attributes"
-            app:layout_constraintTop_toBottomOf="@id/track_exception" />
+            android:text="@string/crash_with_no_app_code"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_in_background" />
 
         <TextView
-            android:id="@+id/custom_tracking_legacy_api_title"
-            style="@style/Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/legacy_api_title"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/track_exception_with_attributes"/>
-
-
-        <TextView
-            android:id="@+id/track_custom_event_legacy"
-            style="@style/Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="20dp"
-            android:text="@string/track_custom_event"
-            app:layout_constraintTop_toBottomOf="@id/custom_tracking_legacy_api_title" />
-
-        <TextView
-            android:id="@+id/track_workflow_legacy"
+            android:id="@+id/crash_reports_no_stacktrace"
             style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/track_workflow"
-            app:layout_constraintTop_toBottomOf="@id/track_custom_event_legacy" />
+            android:text="@string/crash_with_no_stacktrace"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_no_app_code" />
 
         <TextView
-            android:id="@+id/track_exception_legacy"
+            android:id="@+id/crash_reports_out_of_memory_error"
             style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/track_exception"
-            app:layout_constraintTop_toBottomOf="@id/track_workflow_legacy" />
+            android:text="@string/crash_with_out_of_memory_error"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_no_stacktrace" />
 
         <TextView
-            android:id="@+id/track_exception_with_attributes_legacy"
+            android:id="@+id/crash_reports_with_chained_exceptions"
             style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
-            android:text="@string/track_exception_with_attributes"
-            app:layout_constraintTop_toBottomOf="@id/track_exception_legacy"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            android:text="@string/crash_with_chained_exceptions"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_out_of_memory_error" />
+
+        <TextView
+            android:id="@+id/crash_reports_null"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/crash_reports_null"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_with_chained_exceptions" />
+
+        <TextView
+            android:id="@+id/anr_event"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/trigger_anr"
+            app:layout_constraintTop_toBottomOf="@id/crash_reports_null" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

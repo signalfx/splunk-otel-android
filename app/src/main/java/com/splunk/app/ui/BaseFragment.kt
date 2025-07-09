@@ -23,6 +23,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.splunk.app.util.FragmentAnimation
+import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.navigation.extension.navigation
 
 abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
@@ -43,6 +45,12 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewBindingInternal = viewBindingCreator(inflater, container, false)
         return viewBindingInternal?.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        SplunkRum.instance.navigation.track(getString(titleRes))
     }
 
     override fun onDestroyView() {

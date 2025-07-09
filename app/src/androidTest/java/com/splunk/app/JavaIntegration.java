@@ -35,7 +35,6 @@ import com.splunk.rum.integration.crash.CrashModuleConfiguration;
 import com.splunk.rum.integration.customtracking.CustomTracking;
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration;
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration;
-import com.splunk.rum.integration.lifecycle.LifecycleModuleConfiguration;
 import com.splunk.rum.integration.navigation.Navigation;
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration;
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration;
@@ -124,7 +123,6 @@ public class JavaIntegration extends Application {
                         Arrays.asList("Date", "Content-Type", "Content-Length")
                 ),
                 new InteractionsModuleConfiguration(),
-                new LifecycleModuleConfiguration(),
                 new NavigationModuleConfiguration(true, true),
                 new NetworkMonitorModuleConfiguration(),
                 new OkHttp3AutoModuleConfiguration( true,

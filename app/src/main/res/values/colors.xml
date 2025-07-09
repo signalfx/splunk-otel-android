@@ -6,4 +6,8 @@
     <color name="blue_transparent">#88143188</color>
     <color name="blue_light">#266ba9</color>
     <color name="blue_light_transparent">#88266ba9</color>
+    <color name="splunk_lipstick">#CE006F</color>
+    <color name="splunk_flamingo">#EF4A37</color>
+
+
 </resources>

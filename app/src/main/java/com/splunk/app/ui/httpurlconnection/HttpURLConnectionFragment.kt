@@ -24,53 +24,60 @@ import android.view.ViewGroup
 import com.cisco.android.common.utils.runOnBackgroundThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentHttpUrlConnectionBinding
+import com.splunk.app.extension.showDoneToast
 import com.splunk.app.ui.BaseFragment
-import com.splunk.app.util.CommonUtils
-import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.navigation.extension.navigation
-import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
+/**
+ * A fragment that demonstrates various types of [HttpURLConnection] requests,
+ * such as GET, POST, concurrent requests, and responses with `Server-Timing` headers.
+ */
 class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>() {
 
     override val titleRes: Int = R.string.httpurlconnection_title
+
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentHttpUrlConnectionBinding
         get() = FragmentHttpUrlConnectionBinding::inflate
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewBinding.customUrlGet.setOnClickListener { customUrlGet() }
-        viewBinding.successfulGet.setOnClickListener { successfulGet() }
-        viewBinding.unSuccessfulGet.setOnClickListener { unSuccessfulGet() }
-        viewBinding.getWithoutInputStream.setOnClickListener { getWithoutInputStream() }
-        viewBinding.fourConcurrentGetRequests.setOnClickListener { fourConcurrentGetRequests() }
-        viewBinding.sustainedConnection.setOnClickListener { sustainedConnection() }
-        viewBinding.stalledRequest.setOnClickListener { stalledRequest() }
-        viewBinding.post.setOnClickListener { post() }
-        viewBinding.serverTimingHeaderInResponse.setOnClickListener { serverTimingHeaderInResponse() }
 
-        SplunkRum.instance.navigation.track("HttpUrlConnection")
+        with(viewBinding) {
+            customUrlGet.setOnClickListener { customUrlGet() }
+            successfulGet.setOnClickListener { successfulGet() }
+            unSuccessfulGet.setOnClickListener { unSuccessfulGet() }
+            getWithoutInputStream.setOnClickListener { getWithoutInputStream() }
+            fourConcurrentGetRequests.setOnClickListener { fourConcurrentGetRequests() }
+            sustainedConnection.setOnClickListener { sustainedConnection() }
+            stalledRequest.setOnClickListener { stalledRequest() }
+            post.setOnClickListener { post() }
+            serverTimingHeaderInResponse.setOnClickListener { serverTimingHeaderInResponse() }
+        }
     }
 
     /**
      * Demonstrates a custom url HttpURLConnection GET request
      */
-    fun customUrlGet() {
+    private fun customUrlGet() {
         executeGet(viewBinding.customUrl.text.toString())
-        CommonUtils.showDoneToast(context, "Custom Url Get")
+        context?.showDoneToast(R.string.custom_url_get)
     }
 
     /**
      * Demonstrates a successful HttpURLConnection GET request
      */
-    fun successfulGet() {
+    private fun successfulGet() {
         executeGet("https://httpbin.org/get")
-        CommonUtils.showDoneToast(context, "Successful Get")
+        context?.showDoneToast(R.string.successful_get)
+    }
+
+    /**
+     * Demonstrates an unsuccessful HttpURLConnection GET request
+     */
+    private fun unSuccessfulGet() {
+        executeGet("https://httpbin.org/status/404")
+        context?.showDoneToast(R.string.unsuccessful_get)
     }
 
     /**
@@ -78,46 +85,46 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      * and thereby requiring either the disconnect or the harvester thread (if disconnect is not called)
      * to end the span. This test covers OPTIONS and TRACE requests too.
      */
-    fun getWithoutInputStream() {
+    private fun getWithoutInputStream() {
         executeGet("https://httpbin.org/get", false)
-        CommonUtils.showDoneToast(context, "Get Without InputStream")
+        context?.showDoneToast(R.string.get_without_input_stream)
     }
 
     /**
      * Demonstrates four concurrent HttpURLConnection GET request (running on different threads in parallel)
      * Helps test proper synchronization is achieved in our callback APIs code.
      */
-    fun fourConcurrentGetRequests() {
+    private fun fourConcurrentGetRequests() {
         executeGet("https://httpbin.org/get")
         executeGet("https://google.com")
         executeGet("https://android.com")
         executeGet("https://httpbin.org/headers")
-        CommonUtils.showDoneToast(context, "Four Concurrent Get Requests")
+        context?.showDoneToast(R.string.four_concurrent_get_requests)
     }
 
     /**
      * Demonstrates a HttpURLConnection GET request with no call to getInputStream and disconnect
      * and thereby requiring the harvester thread to end the span.
      */
-    fun sustainedConnection() {
-        executeGet("https://httpbin.org/get", false, false)
-        CommonUtils.showDoneToast(context, "Sustained Connection")
+    private fun sustainedConnection() {
+        executeGet("https://httpbin.org/get", getInputStream = false, disconnect = false)
+        context?.showDoneToast(R.string.sustained_connection)
     }
 
     /**
      * Demonstrates a HttpURLConnection GET request with 20s wait after initial read
      * and thereby requiring the harvester thread to end the span.
      */
-    fun stalledRequest() {
-        executeGet("https://httpbin.org/get", false, true, true)
-        CommonUtils.showDoneToast(context, "Stalled Request")
+    private fun stalledRequest() {
+        executeGet("https://httpbin.org/get", getInputStream = false, disconnect = true, stallRequest = true)
+        context?.showDoneToast(R.string.stalled_request)
     }
 
     /**
      * Demonstrates addition of link.traceId and link.spanId attributes in span when
      * server-timing header is present in the response.
      */
-    fun serverTimingHeaderInResponse() {
+    private fun serverTimingHeaderInResponse() {
         // one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
         executeGet(
             "https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'"
@@ -134,7 +141,19 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
         )
 
-        CommonUtils.showDoneToast(context, "Server-Timing Header In Response")
+        context?.showDoneToast(R.string.server_timing_header_in_response)
+    }
+
+    /**
+     * Demonstrates a HttpURLConnection POST request
+     */
+    private fun post() {
+        executePost(
+            inputUrl = "https://httpbin.org/post",
+            requestBody = "Writing test content to output stream!"
+        )
+
+        context?.showDoneToast(R.string.post)
     }
 
     private fun executeGet(
@@ -146,90 +165,71 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         runOnBackgroundThread {
             var connection: HttpURLConnection? = null
             try {
-                val url = URL(inputUrl)
-                connection = url.openConnection() as HttpURLConnection
-
-                // Add request header
+                connection = inputUrl.openHttpConnection()
                 connection.setRequestProperty("Accept", "application/json")
 
                 val responseCode = connection.responseCode
                 val responseMessage = connection.responseMessage
-                val readInput = if (getInputStream) {
-                    connection.inputStream.bufferedReader().use {
-                        it.readText()
-                    }
+
+                val responseBody = if (responseCode.isSuccessful && getInputStream) {
+                    connection.inputStream.bufferedReader().use { it.readText() }
                 } else {
-                    ""
+                    connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
                 }
-                val readInputString = if (getInputStream) ("input Stream: " + readInput) else ""
 
-                stallRequest.takeIf { it }?.let { Thread.sleep(20000) }
+                if (stallRequest) {
+                    Thread.sleep(STALL_DURATION_MS)
+                }
 
-                Log.v(TAG, "response code: " + responseCode + " response message: " + responseMessage + readInputString)
+                Log.v(
+                    TAG,
+                    "response code: $responseCode response message: $responseMessage response body: $responseBody"
+                )
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
-                connection?.takeIf { disconnect }?.disconnect()
+                if (disconnect) {
+                    connection?.disconnect()
+                }
             }
         }
     }
 
-    /**
-     * Demonstrates an unsuccessful HttpURLConnection GET request
-     */
-    fun unSuccessfulGet() {
+    private fun executePost(inputUrl: String, requestBody: String) {
         runOnBackgroundThread {
-            val connection = URL("https://httpbin.org/status/404").openConnection() as HttpURLConnection
+            var connection: HttpURLConnection? = null
             try {
-                val responseCode = connection.responseCode
-                val responseMessage = connection.responseMessage
-                val errorStream = connection.errorStream
-                val readError = errorStream.bufferedReader().use { it.readText() }
-                Log.v(
-                    TAG,
-                    "response code: " + responseCode + " response message: " + responseMessage +
-                        " ErrorStream: " + readError
-                )
-                CommonUtils.showDoneToast(context, "UnSuccessful Get")
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } finally {
-                connection.disconnect()
-            }
-        }
-    }
+                connection = inputUrl.openHttpConnection()
+                connection.requestMethod = "POST"
+                connection.doOutput = true
+                connection.setRequestProperty("Content-Type", "text/plain")
+                connection.setRequestProperty("Accept", "application/json")
 
-    /**
-     * Demonstrates a HttpURLConnection POST request
-     */
-    fun post() {
-        runOnBackgroundThread {
-            val connection = URL("https://httpbin.org/post").openConnection() as HttpURLConnection
-            connection.doOutput = true
-            connection.requestMethod = "POST"
-            try {
-                val outputStream = connection.outputStream
-                outputStream.bufferedWriter().use { out -> out.write("Writing test content to output stream!") }
+                connection.outputStream.bufferedWriter().use { it.write(requestBody) }
 
                 val responseCode = connection.responseCode
                 val responseMessage = connection.responseMessage
-                val inputStream = connection.inputStream
-                val readInput = inputStream.bufferedReader().use { it.readText() }
+                val responseBody = connection.inputStream.bufferedReader().use { it.readText() }
+
                 Log.v(
                     TAG,
-                    "response code: " + responseCode + " response message: " + responseMessage +
-                        " InputStream: " + readInput
+                    "response code: $responseCode response message: $responseMessage response body: $responseBody"
                 )
-                CommonUtils.showDoneToast(context, "Post")
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
-                connection.disconnect()
+                connection?.disconnect()
             }
         }
     }
+
+    private fun String.openHttpConnection(): HttpURLConnection = URL(this).openConnection() as HttpURLConnection
+
+    private val Int.isSuccessful: Boolean
+        get() = this in 200..299
 
     companion object {
         private const val TAG = "HttpURLConnection"
+        private const val STALL_DURATION_MS = 20_000L
     }
 }
