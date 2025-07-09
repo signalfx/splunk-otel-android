@@ -61,7 +61,7 @@ class SplunkRum private constructor(
 ) {
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
-    fun getRumSessionId(): String = session.state.sessionId
+    fun getRumSessionId(): String = session.state.id
 
     /**
      * Set an attribute in the global attributes that will be appended to every span and event.
