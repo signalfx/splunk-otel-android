@@ -11,9 +11,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 This is the alpha version of the updated Splunk Unified Android Agent
 
-* a
-* b
-
 ### Version 1.10.0 - 2025-05-22
 
 This is a regular maintenance release
