@@ -99,7 +99,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
             val actionName = when (interaction) {
                 is Interaction.Focus ->
-                    "focus"
+                    return // TODO ignored for now - "focus"
                 is Interaction.Keyboard ->
                     "soft_keyboard"
                 is Interaction.Orientation ->
