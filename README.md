@@ -38,7 +38,14 @@ For official documentation on the Splunk OTel Instrumentation for Android, see [
 
 ## Sample Application
 
-This repository includes a sample application that demonstrates some features of the Android RUM agent.
+This repository includes a sample application in the 'app' module that demonstrates some features of the Android RUM agent.
+
+To use the sample app, configure the following Build Config properties:
+
+```properties
+SPLUNK_REALM=<realm>
+SPLUNK_RUM_ACCESS_TOKEN=<a valid Splunk RUM access token for the realm>
+```
 
 ## Troubleshooting
 
