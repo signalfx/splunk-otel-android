@@ -51,23 +51,20 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         override fun onScreenNameChanged(screenName: String) {
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
 
-            val tracer = SplunkOpenTelemetrySdk.instance
-                ?.sdkTracerProvider
-                ?.get("splunk-navigation-detection")
-                ?: throw IllegalStateException("Unable to report navigation")
+            val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: return
 
             SplunkInternalGlobalAttributeSpanProcessor.attributes[RumConstants.SCREEN_NAME_KEY] = screenName
 
             val timeNow = Instant.now()
 
-            val screenSpan = tracer
+            val screenSpan = provider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder("screen name change")
                 .setAttribute(RumConstants.COMPONENT_KEY, "ui")
                 .setStartTimestamp(timeNow)
                 .startSpan()
 
             screenSpan.setAttribute(RumConstants.SCREEN_NAME_KEY, screenName)
-                .setAttribute(RumConstants.LAST_SCREEN_NAME_KEY, "unknown")
+                .setAttribute(RumConstants.LAST_SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
 
             screenSpan.end(timeNow)
         }

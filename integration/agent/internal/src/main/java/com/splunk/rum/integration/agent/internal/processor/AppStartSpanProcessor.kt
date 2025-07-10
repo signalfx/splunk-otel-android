@@ -47,10 +47,9 @@ class AppStartSpanProcessor : SpanProcessor {
     override fun isEndRequired(): Boolean = true
 
     private fun reportInitialization(appStartSpan: Span) {
-        val tracer = SplunkOpenTelemetrySdk.instance
-            ?.sdkTracerProvider
-            ?.get("splunk-app-start")
-            ?: throw IllegalStateException("Unable to capture app startup span")
+        val provider =
+            SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
+                ?: throw IllegalStateException("Unable to report initialization")
 
         val modules = modules.values
 
@@ -60,14 +59,14 @@ class AppStartSpanProcessor : SpanProcessor {
         val startTimestamp =
             firstInitialization.startTimestamp + SystemClock.elapsedRealtime() - firstInitialization.startElapsed
 
-        val span = tracer
+        val span = provider.get(RumConstants.RUM_TRACER_NAME)
             .spanBuilder("SplunkRum.initialize")
             .setParent(Context.current().with(appStartSpan))
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
         span.setAttribute(RumConstants.COMPONENT_KEY, "appstart")
-            .setAttribute(RumConstants.SCREEN_NAME_KEY, "unknown")
+            .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
 
         val resources = modules.joinToString(",", "[", "]") {
             it.configuration?.toSplunkString()

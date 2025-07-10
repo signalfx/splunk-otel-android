@@ -79,19 +79,19 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
     }
 
     private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
-        val tracer = SplunkOpenTelemetrySdk.instance
-            ?.sdkTracerProvider
-            ?.get("splunk-app-start")
-            ?: throw IllegalStateException("Unable to capture app startup span")
+        val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: run {
+            cache += StartupData(startTimestamp, endTimestamp, name)
+            return
+        }
 
-        val span = tracer
+        val span = provider.get(RumConstants.RUM_TRACER_NAME)
             .spanBuilder("AppStart")
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
         span
             .setAttribute(RumConstants.COMPONENT_KEY, "appstart")
-            .setAttribute("screen.name", "unknown")
+            .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
             .setAttribute("start.type", name)
             .end(endTimestamp.toInstant())
     }
