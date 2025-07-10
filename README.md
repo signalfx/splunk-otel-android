@@ -55,7 +55,16 @@ For complete setup instructions with code examples and advanced configuration op
 
 #### 1. Enable Core Library Desugaring
 
-In your app module's `build.gradle` file, enable core library desugaring for Java 8+ compatibility.
+In your app module's `build.gradle` file, enable core library desugaring
+
+#### 2. Specify Java 8 Compatability
+
+In your app module's `build.gradle` file, specify Java 8 compatibility under the `android` `compileOptions` block
+
+```
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+```
 
 #### 2. Add Maven Central Repository
 
@@ -121,7 +130,7 @@ class AppTest: Application() {
 
 #### 5. Optional: Enable Automatic Network Instrumentation
 
-Add Gradle plugins for automatic network request tracking:
+Add the following Gradle Plugins for automatic network request tracking:
 - `com.splunk.rum-okhttp3-auto-plugin`
 - `com.splunk.rum-httpurlconnection-auto-plugin`
 
