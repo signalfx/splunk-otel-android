@@ -21,13 +21,11 @@ import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.toInstant
-import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import io.opentelemetry.android.instrumentation.InstallationContext
-import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfiguration>(
@@ -80,7 +78,6 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
     }
 
     private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
-
         val tracer = SplunkOpenTelemetrySdk.instance
             ?.sdkTracerProvider
             ?.get("splunk-app-start")

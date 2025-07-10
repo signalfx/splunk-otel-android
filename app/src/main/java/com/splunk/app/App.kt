@@ -126,7 +126,7 @@ class App : Application() {
         interval = Duration.ofMillis(500)
     )
 
-    private val navigationModuleConfiguration =  NavigationModuleConfiguration(
+    private val navigationModuleConfiguration = NavigationModuleConfiguration(
         isEnabled = true,
         isAutomatedTrackingEnabled = false
     )
@@ -139,7 +139,7 @@ class App : Application() {
             okHttp3AutoModuleConfiguration,
             okHttp3ManualModuleConfiguration,
             slowRenderingModuleConfiguration,
-            navigationModuleConfiguration,
+            navigationModuleConfiguration
         )
 
         val agentConfiguration = AgentConfiguration(
