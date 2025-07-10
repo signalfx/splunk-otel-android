@@ -45,7 +45,7 @@ For official documentation on the Splunk OTel Instrumentation for Android, see [
 
 ## Getting Started
 
-For full setup steps, please refer to the official documentation above
+For complete setup instructions with code examples and advanced configuration options, please refer to the [official documentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
 
 #### Requirements
 * Android API Level 24+ (Android 7.0)
@@ -53,15 +53,11 @@ For full setup steps, please refer to the official documentation above
 * compileSdk 35
 * Java 8+ compatibility with core library desugaring
 
-#### Setup Steps
-
-For complete setup instructions with code examples and advanced configuration options, please refer to the [official documentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
-
-##### 1. Enable Core Library Desugaring
+#### 1. Enable Core Library Desugaring
 
 In your app module's `build.gradle` file, enable core library desugaring for Java 8+ compatibility.
 
-##### 2. Add Maven Central Repository
+#### 2. Add Maven Central Repository
 
 In your project's root `build.gradle` file, inside the `allprojects` block, add `mavenCentral()` to the list of repositories, and also an additional URL to include Session Replay support:
 ```
@@ -77,15 +73,19 @@ allprojects {
 }
 ```
 
-##### 3. Add SDK Dependency
+#### 3. Add SDK Dependency
 
 Add the Splunk RUM agent library to your app module's `build.gradle` file dependencies:
-```implementation("com.splunk:splunk-otel-android:2.0.0-alpha1")```
+```
+implementation("com.splunk:splunk-otel-android:2.0.0-alpha1")
+```
 
 **Important:** Remove the following line from your dependencies if present, as the upstream OpenTelemetry Android repo is already linked in our SDK:
-```implementation("io.opentelemetry.android:instrumentation:2.0.0")```
+```
+implementation("io.opentelemetry.android:instrumentation:2.0.0")
+```
 
-##### 4. Initialize the Agent
+#### 4. Initialize the Agent
 
 Initialize the Splunk RUM agent in your Application class `onCreate()` method:
 ```
@@ -119,7 +119,7 @@ class AppTest: Application() {
 }
 ```
 
-##### 5. Optional: Enable Automatic Network Instrumentation
+#### 5. Optional: Enable Automatic Network Instrumentation
 
 Add Gradle plugins for automatic network request tracking:
 - `com.splunk.rum-okhttp3-auto-plugin`
