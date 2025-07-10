@@ -26,6 +26,7 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 class AppStartSpanProcessor : SpanProcessor {
@@ -46,8 +47,9 @@ class AppStartSpanProcessor : SpanProcessor {
     override fun isEndRequired(): Boolean = true
 
     private fun reportInitialization(appStartSpan: Span) {
-        val provider =
-            SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
+        val tracer = SplunkOpenTelemetrySdk.instance
+            ?.sdkTracerProvider
+            ?.get("splunk-app-start")
                 ?: throw IllegalStateException("unable to report initialization")
         val modules = modules.values
 
@@ -57,12 +59,14 @@ class AppStartSpanProcessor : SpanProcessor {
         val startTimestamp =
             firstInitialization.startTimestamp + SystemClock.elapsedRealtime() - firstInitialization.startElapsed
 
-        val span = provider.get(RumConstants.RUM_TRACER_NAME)
+        val span = tracer
             .spanBuilder("SplunkRum.initialize")
             .setParent(Context.current().with(appStartSpan))
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
-            .setAttribute("component", "appstart")
             .startSpan()
+
+        span.setAttribute("component", "appstart")
+            .setAttribute("screen.name","unknown")
 
         val resources = modules.joinToString(",", "[", "]") {
             it.configuration?.toSplunkString()
@@ -89,6 +93,6 @@ class AppStartSpanProcessor : SpanProcessor {
             )
         }
 
-        span.end()
+        span.end(Instant.now())
     }
 }

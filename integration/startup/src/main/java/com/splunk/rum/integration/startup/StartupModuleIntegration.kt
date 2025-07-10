@@ -27,6 +27,8 @@ import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import io.opentelemetry.android.instrumentation.InstallationContext
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfiguration>(
     defaultModuleConfiguration = StartupModuleConfiguration()
@@ -78,17 +80,21 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
     }
 
     private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
-        val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: run {
-            cache += StartupData(startTimestamp, endTimestamp, name)
-            return
-        }
 
-        provider.get(RumConstants.RUM_TRACER_NAME)
+        val tracer = SplunkOpenTelemetrySdk.instance
+            ?.sdkTracerProvider
+            ?.get("splunk-app-start")
+            ?: throw IllegalStateException("unable to report initialization")
+
+        val span = tracer
             .spanBuilder("AppStart")
-            .setStartTimestamp(startTimestamp.toInstant())
-            .setAttribute("component", "appstart")
-            .setAttribute("start.type", name)
+            .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
+
+        span
+            .setAttribute("component", "appstart")
+            .setAttribute("screen.name", "unknown")
+            .setAttribute("start.type", name)
             .end(endTimestamp.toInstant())
     }
 }

@@ -26,6 +26,7 @@ import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.navigation.screen.ScreenTrackerIntegration
 import io.opentelemetry.android.instrumentation.InstallationContext
+import java.time.Instant
 
 internal object NavigationModuleIntegration : ModuleIntegration<NavigationModuleConfiguration>(
     defaultModuleConfiguration = NavigationModuleConfiguration()
@@ -51,14 +52,25 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         override fun onScreenNameChanged(screenName: String) {
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
 
-            val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: return
+            val tracer = SplunkOpenTelemetrySdk.instance
+                ?.sdkTracerProvider
+                ?.get("splunk-navigation-detection")
+                ?: throw IllegalStateException("unable to report initialization")
 
             SplunkInternalGlobalAttributeSpanProcessor.attributes[RumConstants.SCREEN_NAME_KEY] = screenName
 
-            provider.get(RumConstants.RUM_TRACER_NAME)
-                .spanBuilder("Created")
+            val timeNow = Instant.now()
+
+            val screenSpan = tracer
+                .spanBuilder("screen name change")
                 .setAttribute("component", "ui")
-                .createZeroLengthSpan()
+                .setStartTimestamp(timeNow)
+                .startSpan()
+
+            screenSpan.setAttribute("screen.name", screenName)
+                .setAttribute("last.screen.name", "unknown")
+
+            screenSpan.end(timeNow)
         }
     }
 }
