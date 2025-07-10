@@ -19,7 +19,10 @@
 
 ---
 
-# Splunk OpenTelemetry Instrumentation for Android
+# Splunk Unified Android SDK
+
+The Splunk Unified Android SDK provides comprehensive Real User Monitoring capabilities for Android applications. 
+Built on OpenTelemetry, it features a modular architecture that allows you to include only the instrumentations and features that you need.
 
 For official documentation on the Splunk OTel Instrumentation for Android, see [Instrument Android applications for Splunk RUM](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
 
@@ -35,6 +38,10 @@ For official documentation on the Splunk OTel Instrumentation for Android, see [
 * APIs to redact any span from export, or change span attributes before export
 * Slow / frozen render detection
 * Offline buffering of telemetry via storage
+* Automatic network request instrumentation via Gradle plugins for OkHttp3 and HttpURLConnection
+* Session Replay
+* User interaction tracking
+* WebView integration with Browser RUM
 
 ## Sample Application
 
