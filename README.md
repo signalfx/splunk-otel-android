@@ -66,7 +66,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 ```
 
-#### 2. Add Maven Central Repository
+#### 3. Add Maven Central Repository
 
 In your project's root `build.gradle` file, inside the `allprojects` block, add `mavenCentral()` to the list of repositories, and also an additional URL to include Session Replay support:
 ```
@@ -82,7 +82,7 @@ allprojects {
 }
 ```
 
-#### 3. Add SDK Dependency
+#### 4. Add SDK Dependency
 
 Add the Splunk RUM agent library to your app module's `build.gradle` file dependencies:
 ```
@@ -94,7 +94,7 @@ implementation("com.splunk:splunk-otel-android:2.0.0-alpha1")
 implementation("io.opentelemetry.android:instrumentation:2.0.0")
 ```
 
-#### 4. Initialize the Agent
+#### 5. Initialize the Agent
 
 Initialize the Splunk RUM agent in your Application class `onCreate()` method:
 ```
@@ -128,7 +128,7 @@ class AppTest: Application() {
 }
 ```
 
-#### 5. Optional: Enable Automatic Network Instrumentation
+#### 6. Optional: Enable Automatic Network Instrumentation
 
 Add the following Gradle Plugins for automatic network request tracking:
 - `com.splunk.rum-okhttp3-auto-plugin`
