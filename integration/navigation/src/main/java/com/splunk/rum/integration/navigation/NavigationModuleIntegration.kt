@@ -54,7 +54,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             val tracer = SplunkOpenTelemetrySdk.instance
                 ?.sdkTracerProvider
                 ?.get("splunk-navigation-detection")
-                ?: throw IllegalStateException("unable to report initialization")
+                ?: throw IllegalStateException("Unable to report navigation")
 
             SplunkInternalGlobalAttributeSpanProcessor.attributes[RumConstants.SCREEN_NAME_KEY] = screenName
 
@@ -62,12 +62,12 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
             val screenSpan = tracer
                 .spanBuilder("screen name change")
-                .setAttribute("component", "ui")
+                .setAttribute(RumConstants.COMPONENT_KEY, "ui")
                 .setStartTimestamp(timeNow)
                 .startSpan()
 
-            screenSpan.setAttribute("screen.name", screenName)
-                .setAttribute("last.screen.name", "unknown")
+            screenSpan.setAttribute(RumConstants.SCREEN_NAME_KEY, screenName)
+                .setAttribute(RumConstants.LAST_SCREEN_NAME_KEY, "unknown")
 
             screenSpan.end(timeNow)
         }

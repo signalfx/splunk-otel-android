@@ -21,6 +21,7 @@ import com.cisco.android.common.logger.Logger
 import com.cisco.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.toInstant
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.startup.model.StartupData
@@ -81,7 +82,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         val tracer = SplunkOpenTelemetrySdk.instance
             ?.sdkTracerProvider
             ?.get("splunk-app-start")
-            ?: throw IllegalStateException("unable to report initialization")
+            ?: throw IllegalStateException("Unable to capture app startup span")
 
         val span = tracer
             .spanBuilder("AppStart")
@@ -89,7 +90,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             .startSpan()
 
         span
-            .setAttribute("component", "appstart")
+            .setAttribute(RumConstants.COMPONENT_KEY, "appstart")
             .setAttribute("screen.name", "unknown")
             .setAttribute("start.type", name)
             .end(endTimestamp.toInstant())

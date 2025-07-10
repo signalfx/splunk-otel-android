@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.internal.processor
 
 import android.os.SystemClock
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.toSplunkString
 import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modules
 import io.opentelemetry.api.trace.Span
@@ -49,7 +50,8 @@ class AppStartSpanProcessor : SpanProcessor {
         val tracer = SplunkOpenTelemetrySdk.instance
             ?.sdkTracerProvider
             ?.get("splunk-app-start")
-            ?: throw IllegalStateException("unable to report initialization")
+            ?: throw IllegalStateException("Unable to capture app startup span")
+
         val modules = modules.values
 
         val firstInitialization =
@@ -64,8 +66,8 @@ class AppStartSpanProcessor : SpanProcessor {
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
-        span.setAttribute("component", "appstart")
-            .setAttribute("screen.name", "unknown")
+        span.setAttribute(RumConstants.COMPONENT_KEY, "appstart")
+            .setAttribute(RumConstants.SCREEN_NAME_KEY, "unknown")
 
         val resources = modules.joinToString(",", "[", "]") {
             it.configuration?.toSplunkString()
