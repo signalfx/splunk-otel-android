@@ -21,7 +21,7 @@
 
 # Splunk Unified Android SDK
 
-The Splunk Unified Android SDK provides comprehensive Real User Monitoring capabilities for Android applications. 
+The Splunk Unified Android SDK provides comprehensive Real User Monitoring capabilities for Android applications.
 Built on OpenTelemetry, it features a modular architecture that allows you to include only the instrumentations and features that you need.
 
 For official documentation on the Splunk OTel Instrumentation for Android, see [Instrument Android applications for Splunk RUM](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
@@ -43,12 +43,93 @@ For official documentation on the Splunk OTel Instrumentation for Android, see [
 * User interaction tracking
 * WebView integration with Browser RUM
 
+## Getting Started
+
+For full setup steps, please refer to the official documentation above
+
+#### Requirements
+* Android API Level 24+ (Android 7.0)
+* Android Gradle Plugin 8.6.0+
+* compileSdk 35
+* Java 8+ compatibility with core library desugaring
+
+#### Setup Steps
+
+For complete setup instructions with code examples and advanced configuration options, please refer to the [official documentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
+
+##### 1. Enable Core Library Desugaring
+
+In your app module's `build.gradle` file, enable core library desugaring for Java 8+ compatibility.
+
+##### 2. Add Maven Central Repository
+
+In your project's root `build.gradle` file, inside the `allprojects` block, add `mavenCentral()` to the list of repositories, and also an additional URL to include Session Replay support:
+```
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+          setUrl("https://sdk.smartlook.com/android/release")
+        }
+        ...
+    }
+}
+```
+
+##### 3. Add SDK Dependency
+
+Add the Splunk RUM agent library to your app module's `build.gradle` file dependencies:
+```implementation("com.splunk:splunk-otel-android:2.0.0-alpha1")```
+
+**Important:** Remove the following line from your dependencies if present, as the upstream OpenTelemetry Android repo is already linked in our SDK:
+```implementation("io.opentelemetry.android:instrumentation:2.0.0")```
+
+##### 4. Initialize the Agent
+
+Initialize the Splunk RUM agent in your Application class `onCreate()` method:
+```
+import android.app.Application
+import com.splunk.rum.integration.agent.api.AgentConfiguration
+import com.splunk.rum.integration.agent.api.EndpointConfiguration
+import com.splunk.rum.integration.agent.api.SplunkRum
+
+class AppTest: Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+
+        val agentConfiguration = AgentConfiguration(
+            endpoint = EndpointConfiguration(
+                realm = SPLUNK_REALM,
+                rumAccessToken = SPLUNK_RUM_ACCESS_TOKEN
+            ),
+            appName = "<your-app-name>",
+            deploymentEnvironment = "<your-deployment-environment>",
+            appVersion = "<your-app-version>"
+        )
+
+        val splunkRum = SplunkRum.install(this, agentConfiguration)
+    }
+
+    companion object {
+        private const val SPLUNK_REALM = "<SPLUNK_REALM>"
+        private const val SPLUNK_RUM_ACCESS_TOKEN = "<YOUR_SPLUNK_ACCESS_TOKEN>"
+    }
+}
+```
+
+##### 5. Optional: Enable Automatic Network Instrumentation
+
+Add Gradle plugins for automatic network request tracking:
+- `com.splunk.rum-okhttp3-auto-plugin`
+- `com.splunk.rum-httpurlconnection-auto-plugin`
+
 ## Sample Application
 
 This repository includes a sample application in the 'app' module that demonstrates some features of the Android RUM agent.
 
 To use the sample app, configure the following Build Config properties:
-
 ```properties
 SPLUNK_REALM=<realm>
 SPLUNK_RUM_ACCESS_TOKEN=<a valid Splunk RUM access token for the realm>
