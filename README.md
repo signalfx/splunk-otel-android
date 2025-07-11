@@ -140,10 +140,10 @@ Add the following Gradle Plugins for automatic network request tracking:
 
 This repository includes a sample application ('app' module) that demonstrates most features of the Android RUM agent.
 
-To use the sample app, configure the following Build Config properties in your global `gradle.properties`:
+To use the sample app, configure the following properties in your global `gradle.properties`:
 ```properties
-SPLUNK_REALM=<realm>
-SPLUNK_RUM_ACCESS_TOKEN=<a valid Splunk RUM access token for the realm>
+splunkRealm=<realm>
+splunkRumAccessToken=<a valid Splunk RUM access token for the realm>
 ```
 
 ## Troubleshooting
