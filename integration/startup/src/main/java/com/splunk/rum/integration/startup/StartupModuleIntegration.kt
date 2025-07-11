@@ -89,6 +89,8 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
+        // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
+        // "unknown" to ensure App Start event doesn't show up under a screen on UI
         span
             .setAttribute(RumConstants.COMPONENT_KEY, "appstart")
             .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)

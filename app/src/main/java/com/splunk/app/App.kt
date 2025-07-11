@@ -126,10 +126,7 @@ class App : Application() {
         interval = Duration.ofMillis(500)
     )
 
-    private val navigationModuleConfiguration = NavigationModuleConfiguration(
-        isEnabled = true,
-        isAutomatedTrackingEnabled = false
-    )
+    private val navigationModuleConfiguration = NavigationModuleConfiguration()
 
     override fun onCreate() {
         super.onCreate()
