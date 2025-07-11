@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.internal.processor
 
 import android.os.SystemClock
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.extensions.toInstant
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.toSplunkString
 import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modules
@@ -26,6 +27,7 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 class AppStartSpanProcessor : SpanProcessor {
@@ -48,7 +50,8 @@ class AppStartSpanProcessor : SpanProcessor {
     private fun reportInitialization(appStartSpan: Span) {
         val provider =
             SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
-                ?: throw IllegalStateException("unable to report initialization")
+                ?: throw IllegalStateException("Unable to report initialization")
+
         val modules = modules.values
 
         val firstInitialization =
@@ -60,9 +63,13 @@ class AppStartSpanProcessor : SpanProcessor {
         val span = provider.get(RumConstants.RUM_TRACER_NAME)
             .spanBuilder("SplunkRum.initialize")
             .setParent(Context.current().with(appStartSpan))
-            .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
-            .setAttribute("component", "appstart")
+            .setStartTimestamp(startTimestamp.toInstant())
             .startSpan()
+
+        // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
+        // "unknown" to ensure App Start event doesn't show up under a screen on UI
+        span.setAttribute(RumConstants.COMPONENT_KEY, "appstart")
+            .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
 
         val resources = modules.joinToString(",", "[", "]") {
             it.configuration?.toSplunkString()
@@ -89,6 +96,6 @@ class AppStartSpanProcessor : SpanProcessor {
             )
         }
 
-        span.end()
+        span.end(Instant.now())
     }
 }
