@@ -56,6 +56,7 @@ For complete setup instructions with code examples and advanced configuration op
 #### 1. Enable Core Library Desugaring
 
 API levels 24 to 25 require core library desugaring activated
+
 See [Activate desugaring in your application](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications/install-the-android-rum-agent#dce84133fa87f4b1089e140d36b1fee4e__enable-desugaring)
 
 #### 2. Specify Java 8 Compatability
