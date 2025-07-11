@@ -19,9 +19,9 @@
 
 ---
 
-# Splunk Unified Android SDK
+# Splunk Android SDK
 
-The Splunk Unified Android SDK provides comprehensive Real User Monitoring capabilities for Android applications.
+The Splunk Android SDK provides comprehensive Real User Monitoring capabilities for Android applications.
 Built on OpenTelemetry, it features a modular architecture that allows you to include only the instrumentations and features that you need.
 
 For official documentation on the Splunk OTel Instrumentation for Android, see [Instrument Android applications for Splunk RUM](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).

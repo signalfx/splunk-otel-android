@@ -9,7 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Version 2.0.0-alpha.1 - 2025-07-14
 
-This is the alpha version of the updated Splunk Unified Android SDK
+This is the alpha version of the updated Splunk Android SDK
 
 The SDK has been redesigned to have a modular architecture, where instrumentations can be included based on need
 
@@ -32,8 +32,8 @@ The SDK has been redesigned to have a modular architecture, where instrumentatio
 * `enableReactNativeSupport()`
 * `VolleyTracing` and `VolleyTracingBuilder`
 * `updateLocation(@Nullable Location location)`
-* `experimentalSetScreenName()` - see migration guide for replacement
-* `Call.Factory createRumOkHttpCallFactory()` - see migration guide for replacement
+* `experimentalSetScreenName()`
+* `Call.Factory createRumOkHttpCallFactory()`
 
 ##### Deprecated APIs
 The following APIs remain functional but are deprecated with recommended replacements:
