@@ -55,7 +55,8 @@ For complete setup instructions with code examples and advanced configuration op
 
 #### 1. Enable Core Library Desugaring
 
-In your app module's `build.gradle` file, enable core library desugaring
+API levels 24 to 25 require core library desugaring activated
+See [Activate desugaring in your application](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications/install-the-android-rum-agent#dce84133fa87f4b1089e140d36b1fee4e__enable-desugaring)
 
 #### 2. Specify Java 8 Compatability
 
@@ -128,7 +129,7 @@ class AppTest: Application() {
 }
 ```
 
-#### 6. Optional: Enable Automatic Network Instrumentation
+#### 6. Optional: Enable Automatic Network Request Instrumentation
 
 Add the following Gradle Plugins for automatic network request tracking:
 - `com.splunk.rum-okhttp3-auto-plugin`
@@ -136,9 +137,9 @@ Add the following Gradle Plugins for automatic network request tracking:
 
 ## Sample Application
 
-This repository includes a sample application in the 'app' module that demonstrates some features of the Android RUM agent.
+This repository includes a sample application ('app' module) that demonstrates most features of the Android RUM agent.
 
-To use the sample app, configure the following Build Config properties:
+To use the sample app, configure the following Build Config properties in your `global gradle.properties`:
 ```properties
 SPLUNK_REALM=<realm>
 SPLUNK_RUM_ACCESS_TOKEN=<a valid Splunk RUM access token for the realm>
