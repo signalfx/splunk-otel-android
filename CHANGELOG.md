@@ -7,6 +7,59 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.0.0-alpha.1 - 2025-07-14
+
+This is the alpha version of the updated Splunk Android SDK
+
+The SDK has been redesigned to have a modular architecture, where instrumentations can be included based on need
+
+##### New features:
+* Automatic network request instrumentation via Gradle plugins:
+  - `com.splunk.rum-okhttp3-auto-plugin`
+  - `com.splunk.rum-httpurlconnection-auto-plugin`
+* Session Replay module integration
+* Interaction monitoring
+* Enhanced span interception
+
+##### Breaking changes:
+* **Minimum requirements updated**: minSDK 21→24, compileSdk 35 required, AGP 8.6.0+ required
+* **Package restructure**: Main API classes moved from `com.splunk.rum` to `com.splunk.rum.integration.agent.api` - update your imports
+* **Dependency change**: Remove `io.opentelemetry.android:instrumentation` from your project (causes build errors if present)
+* **Export protocol**: Zipkin support removed, now uses OTLP (HTTP/protobuf)
+
+##### Removed APIs:
+* `enableDiskBuffering()`
+* `enableReactNativeSupport()`
+* `VolleyTracing` and `VolleyTracingBuilder`
+* `updateLocation(@Nullable Location location)`
+* `experimentalSetScreenName()`
+* `Call.Factory createRumOkHttpCallFactory()`
+
+##### Deprecated APIs
+The following APIs remain functional but are deprecated with recommended replacements:
+* `SplunkRum.builder()` and `SplunkRumBuilder` APIs
+* `StandardAttributes` (moved to new package)
+* Legacy global attributes APIs
+* Legacy ANR, crash, network monitor and slow rendering configurations
+* Legacy custom tracking APIs: `addRumEvent`, `startWorkflow`, `addRumException`
+
+### Version 1.10.0 - 2025-05-22
+
+This is a regular maintenance release
+
+* Fixed duplicate span bug in Crash and ANR Reporting
+* Updated some attribute naming around build identifiers for stacktrace symbolication
+
+### Version 1.9.0 - 2025-02-03
+
+This is a regular maintenance release
+
+* Marked APIs, classes, and methods that will be deprecated down the line with the deprecation annotation
+
+### Version 1.8.1 - 2024-12-06
+
+Reducing the version of androidx libraries that enforce API level 35.
+
 ### Version 1.8.0 - 2024-12-04
 
 This is a regular maintenance release.
