@@ -4,6 +4,10 @@
     <title>Session ID</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        :root {
+            --splunk-flamingo: #FF6F61;
+            --splunk-lipstick: #FF4081;
+        }
         body {
             display: flex;
             justify-content: center;
@@ -14,19 +18,34 @@
             font-family: Arial, sans-serif;
             font-size: 20px;
         }
+
         button {
             width: calc(100% - 40px);
-            margin-left: 20px;
-            margin-right: 20px;
             margin-top: 5px;
-            padding: 10px 20px;
-            background-color: #0056b3;
-            color: white;
+            padding: 8px 20px;
+            background: linear-gradient(315deg, var(--splunk-lipstick), var(--splunk-flamingo));
+            color: #fff;
             border: none;
-            border-radius: 4px;
-            font-size: 20px;
-            text-align: center;
+            border-radius: 100px;
+            font-size: 16px;
+            font-weight: bold;
+            text-color: #EF4A37
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s ease;
+            min-height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        button:active::after {
+          opacity: 0.3;
+          transform: translate(-50%, -50%) scale(1);
+          transition: 0s;
+        }
+
         #sessionId {
             margin-top: 40px;
         }

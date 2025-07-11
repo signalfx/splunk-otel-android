@@ -42,10 +42,6 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentWebViewBinding
         get() = FragmentWebViewBinding::inflate
 
-    private val splunkRum = SplunkRum.instance
-    private val webViewNativeBridge = splunkRum.webViewNativeBridge
-    private val webView = viewBinding.webView
-
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,15 +50,15 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
             arguments?.getString(ARG_API_VARIANT)?.let { ApiVariant.valueOf(it) }
         }.getOrNull()
 
-        webView.settings.javaScriptEnabled = true
+        viewBinding.webView.settings.javaScriptEnabled = true
 
         when (apiVariant) {
             ApiVariant.LATEST -> {
-                webViewNativeBridge.integrateWithBrowserRum(viewBinding.webView)
+                SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(viewBinding.webView)
                 Log.d(TAG, "Latest integrateWithBrowserRum API called")
             }
             ApiVariant.LEGACY -> {
-                splunkRum.integrateWithBrowserRum(viewBinding.webView)
+                SplunkRum.instance.integrateWithBrowserRum(viewBinding.webView)
                 Log.d(TAG, "Legacy integrateWithBrowserRum API called")
             }
             null -> Log.e(TAG, "WebView not integrated with Browser RUM due to missing API_VARIANT argument.")
@@ -72,7 +68,7 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
     }
 
     override fun onDestroyView() {
-        webView.destroy()
+        viewBinding.webView.destroy()
         super.onDestroyView()
     }
 
