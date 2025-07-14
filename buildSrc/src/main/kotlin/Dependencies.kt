@@ -108,7 +108,8 @@ object Dependencies {
     }
 
     object Otel {
-        private const val oTelInstrumentationVersion = "2.15.0-alpha"
+        private const val oTelInstrumentationAlphaVersion = "2.15.0-alpha"
+        private const val oTelInstrumentationVersion = "2.15.0"
         const val otelAndroidVersion = "0.11.0-alpha"
         const val otelSemConvAlphaVersion = "1.32.0-alpha"
         const val otelSemConvVersion = "1.32.0"
@@ -122,7 +123,7 @@ object Dependencies {
         const val semConvIncubating = "io.opentelemetry.semconv:opentelemetry-semconv-incubating:$otelSemConvAlphaVersion"
 
         const val instrumentationApi = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:$oTelInstrumentationVersion"
-        const val instrumentationOkHttp3Library = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:$oTelInstrumentationVersion"
+        const val instrumentationOkHttp3Library = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:$oTelInstrumentationAlphaVersion"
 
         const val androidCore = "io.opentelemetry.android:core:$otelAndroidVersion"
         const val androidSession = "io.opentelemetry.android:session:$otelAndroidVersion"
