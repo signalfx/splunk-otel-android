@@ -25,25 +25,25 @@ fun String.toBoxString(): String {
 
 fun Any?.wrapAsBuildConfigField(): String = this?.run { "\"" + this.toString() + "\"" } ?: "\"\""
 
-fun Node.addCiscoInfo() {
+fun Node.addSplunkInfo() {
     if ((get("name") as NodeList).size == 0) {
-        appendNode("name", "Cisco RUM Agent for Android")
+        appendNode("name", "Splunk RUM Agent for Android")
     }
-    appendNode("description", "Cisco's Real User Monitoring Agent for your Android application.")
-    appendNode("url", "http://cisco.com")
+    appendNode("description", "Splunk's Real User Monitoring Agent for your Android application.")
+    appendNode("url", "https://www.splunk.com")
     appendNode("licenses")
         .appendNode("license")
-        .appendNode("url", "https://www.cisco.com/c/dam/en_us/about/doing_business/legal/eula/cisco_end_user_license_agreement-eng.pdf")
+        .appendNode("url", "http://www.apache.org/licenses/LICENSE-2.0.txt")
 
     val developerNode = appendNode("developers")
         .appendNode("developer")
-    developerNode.appendNode("id", "ad")
-    developerNode.appendNode("name", "AppDynamics Inc.")
-    developerNode.appendNode("email", "info@appdynamics.com")
-    developerNode.appendNode("organization", "AppDynamics Inc.")
-    developerNode.appendNode("organizationUrl", "https://www.appdynamics.com/")
+    developerNode.appendNode("id", "splunk")
+    developerNode.appendNode("name", "Splunk Instrumentation Authors")
+    developerNode.appendNode("email", "support+java@signalfx.com")
+    developerNode.appendNode("organization", "Splunk Inc.")
+    developerNode.appendNode("organizationUrl", "https://splunk.com/")
 
     val scmNode = appendNode("scm")
-    scmNode.appendNode("connection", "scm:git:git@github.com:Appdynamics/android_agent.git")
-    scmNode.appendNode("url", "git:git@github.com:Appdynamics/android_agent.git")
+    scmNode.appendNode("connection", "https://github.com/signalfx/splunk-otel-android.git")
+    scmNode.appendNode("url", "https://github.com/signalfx/splunk-otel-android")
 }

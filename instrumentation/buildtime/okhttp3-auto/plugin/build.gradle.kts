@@ -73,7 +73,7 @@ signing {
 publishing {
     publications {
         withType(MavenPublication::class.java) {
-            pom.withXml { asNode().addCiscoInfo() }
+            pom.withXml { asNode().addSplunkInfo() }
 
             artifactId = "${artifactPrefix}okhttp3-auto-plugin"
 
