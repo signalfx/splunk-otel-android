@@ -72,8 +72,6 @@ android {
 }
 
 dependencies {
-    api(platform(Dependencies.Otel.instrumentationBomAlpha))
-
     implementation(kotlinStdlibJdk8)
 
     //implementation("com.cisco.android:rum-agent:24.4.10-2246")

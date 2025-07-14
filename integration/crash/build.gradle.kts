@@ -23,8 +23,6 @@ android {
 }
 
 dependencies {
-    api(platform(Dependencies.Otel.androidBom))
-
     implementation(project(":integration:agent:internal"))
 
     implementation(Dependencies.Otel.androidCrashInstrumentation)
