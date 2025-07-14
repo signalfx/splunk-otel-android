@@ -30,20 +30,20 @@ fun Node.addSplunkInfo() {
         appendNode("name", "Splunk RUM Agent for Android")
     }
     appendNode("description", "Splunk's Real User Monitoring Agent for your Android application.")
-    appendNode("url", "http://splunk.com")
+    appendNode("url", "https://www.splunk.com")
     appendNode("licenses")
         .appendNode("license")
-        .appendNode("url", "https://www.cisco.com/c/dam/en_us/about/doing_business/legal/eula/cisco_end_user_license_agreement-eng.pdf")
+        .appendNode("url", "http://www.apache.org/licenses/LICENSE-2.0.txt")
 
     val developerNode = appendNode("developers")
         .appendNode("developer")
     developerNode.appendNode("id", "splunk")
-    developerNode.appendNode("name", "Splunk Inc.")
-    developerNode.appendNode("email", "info@splunk.com")
+    developerNode.appendNode("name", "Splunk Instrumentation Authors")
+    developerNode.appendNode("email", "support+java@signalfx.com")
     developerNode.appendNode("organization", "Splunk Inc.")
     developerNode.appendNode("organizationUrl", "https://splunk.com/")
 
     val scmNode = appendNode("scm")
-    scmNode.appendNode("connection", "scm:git@github.com:signalfx/splunk-otel-android.git")
-    scmNode.appendNode("url", "git@github.com:signalfx/splunk-otel-android.git")
+    scmNode.appendNode("connection", "https://github.com/signalfx/splunk-otel-android.git")
+    scmNode.appendNode("url", "https://github.com/signalfx/splunk-otel-android")
 }
