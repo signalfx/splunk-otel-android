@@ -1,6 +1,6 @@
 package plugins
 
-import addCiscoInfo
+import addSplunkInfo
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -71,7 +71,7 @@ class ConfigPublish : Plugin<Project> by local plugin {
 
                     artifact(sourcesJar)
                     artifact(androidJavadocsJar)
-                    pom.withXml { asNode().addCiscoInfo() }
+                    pom.withXml { asNode().addSplunkInfo() }
                 }
             }
             repositories {
