@@ -161,7 +161,7 @@ version 2.0. See [the license file](./LICENSE) for more details.
 [otel-image]: https://img.shields.io/badge/otel-1.33.5-blueviolet?style=for-the-badge
 [otel-link]: https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.33.5
 [android-image]: https://img.shields.io/github/v/release/signalfx/splunk-otel-android?include_prereleases&style=for-the-badge
-[android-link]: https://github.com/signalfx/splunk-otel-android/releases
+[android-link]: https://github.com/signalfx/splunk-otel-android/releases/tag/v2.0.0-alpha.1
 [gdi-image]: https://img.shields.io/badge/GDI-1.4.0-blueviolet?style=for-the-badge
 [gdi-link]: https://github.com/signalfx/gdi-specification/releases/tag/v1.4.0
 [maven-image]: https://img.shields.io/maven-central/v/com.splunk/splunk-otel-android?style=for-the-badge
