@@ -23,7 +23,6 @@ android {
 }
 
 dependencies {
-    api(platform(Dependencies.Otel.instrumentationBomAlpha))
     api(Dependencies.Otel.api)
 
     implementation(Dependencies.SessionReplay.commonUtils)

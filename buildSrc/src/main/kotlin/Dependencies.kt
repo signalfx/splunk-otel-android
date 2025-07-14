@@ -108,33 +108,33 @@ object Dependencies {
     }
 
     object Otel {
-        private const val oTelInstrumentationBomAlpha = "2.15.0-alpha"
-        const val otelAndroidBomVersion = "0.11.0-alpha"
+        private const val oTelInstrumentationVersion = "2.15.0-alpha"
+        const val otelAndroidVersion = "0.11.0-alpha"
+        const val otelSemConvAlphaVersion = "1.32.0-alpha"
+        const val otelSemConvVersion = "1.32.0"
+        const val otelSdkVersion = "1.49.0"
 
-        const val instrumentationBomAlpha = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$oTelInstrumentationBomAlpha"
-        const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
+        const val api = "io.opentelemetry:opentelemetry-api:$otelSdkVersion"
+        const val sdk = "io.opentelemetry:opentelemetry-sdk:$otelSdkVersion"
+        const val exporterOtlpCommon = "io.opentelemetry:opentelemetry-exporter-otlp-common:$otelSdkVersion"
+        const val exporterOtlp = "io.opentelemetry:opentelemetry-exporter-otlp:$otelSdkVersion"
+        const val semConv = "io.opentelemetry.semconv:opentelemetry-semconv:$otelSemConvVersion"
+        const val semConvIncubating = "io.opentelemetry.semconv:opentelemetry-semconv-incubating:$otelSemConvAlphaVersion"
 
-        const val api = "io.opentelemetry:opentelemetry-api"
-        const val sdk = "io.opentelemetry:opentelemetry-sdk"
-        const val exporterOtlpCommon = "io.opentelemetry:opentelemetry-exporter-otlp-common"
-        const val exporterOtlp = "io.opentelemetry:opentelemetry-exporter-otlp"
-        const val semConv = "io.opentelemetry.semconv:opentelemetry-semconv"
-        const val semConvIncubating = "io.opentelemetry.semconv:opentelemetry-semconv-incubating"
+        const val instrumentationApi = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:$oTelInstrumentationVersion"
+        const val instrumentationOkHttp3Library = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:$oTelInstrumentationVersion"
 
-        const val instrumentationApi = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api"
-        const val instrumentationOkHttp3Library = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0"
-
-        const val androidCore = "io.opentelemetry.android:core"
-        const val androidSession = "io.opentelemetry.android:session"
-        const val androidServices = "io.opentelemetry.android:services"
-        const val androidCommon = "io.opentelemetry.android:common"
-        const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation"
-        const val androidHttpUrlLibrary = "io.opentelemetry.android.instrumentation:httpurlconnection-library"
-        const val androidOkHttp3Library = "io.opentelemetry.android.instrumentation:okhttp3-library"
-        const val androidNetworkMonitorInstrumentation = "io.opentelemetry.android.instrumentation:network"
-        const val androidCrashInstrumentation = "io.opentelemetry.android.instrumentation:crash"
-        const val androidANRInstrumentation = "io.opentelemetry.android.instrumentation:anr"
-        const val androidSlowRenderingInstrumentation = "io.opentelemetry.android.instrumentation:slowrendering"
+        const val androidCore = "io.opentelemetry.android:core:$otelAndroidVersion"
+        const val androidSession = "io.opentelemetry.android:session:$otelAndroidVersion"
+        const val androidServices = "io.opentelemetry.android:services:$otelAndroidVersion"
+        const val androidCommon = "io.opentelemetry.android:common:$otelAndroidVersion"
+        const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation:$otelAndroidVersion"
+        const val androidHttpUrlLibrary = "io.opentelemetry.android.instrumentation:httpurlconnection-library:$otelAndroidVersion"
+        const val androidOkHttp3Library = "io.opentelemetry.android.instrumentation:okhttp3-library:$otelAndroidVersion"
+        const val androidNetworkMonitorInstrumentation = "io.opentelemetry.android.instrumentation:network:$otelAndroidVersion"
+        const val androidCrashInstrumentation = "io.opentelemetry.android.instrumentation:crash:$otelAndroidVersion"
+        const val androidANRInstrumentation = "io.opentelemetry.android.instrumentation:anr:$otelAndroidVersion"
+        const val androidSlowRenderingInstrumentation = "io.opentelemetry.android.instrumentation:slowrendering:$otelAndroidVersion"
     }
 
     object AndroidTest {
