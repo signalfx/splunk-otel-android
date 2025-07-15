@@ -99,7 +99,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
             val actionName = when (interaction) {
                 is Interaction.Focus ->
-                    return // TODO ignored for now - "focus"
+                    "focus"
                 is Interaction.Keyboard ->
                     "soft_keyboard"
                 is Interaction.Orientation ->
@@ -124,13 +124,13 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                     return
             }
 
-            Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
-
             val targetType = if (interaction is Interaction.Targetable) {
                 interaction.targetElementPath?.lastOrNull()?.view?.id
             } else {
                 null
             }
+
+            Logger.d(TAG, "onInteraction(actionName: $actionName, targetType: $targetType, interaction: $interaction)")
 
             logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
