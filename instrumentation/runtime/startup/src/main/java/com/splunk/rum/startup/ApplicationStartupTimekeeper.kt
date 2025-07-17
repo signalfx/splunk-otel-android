@@ -84,7 +84,7 @@ object ApplicationStartupTimekeeper {
         override fun onActivityPreStarted(activity: Activity) {
             startedActivityCount++
 
-            if (isColdStartCompleted && !isWarmStartPending && !isHotStartPending) {
+            if (isColdStartCompleted && !isWarmStartPending && !isHotStartPending && startedActivityCount == 1) {
                 firstActivityStartTimestamp = System.currentTimeMillis()
                 firstActivityStartElapsed = SystemClock.elapsedRealtime()
                 isHotStartPending = true
