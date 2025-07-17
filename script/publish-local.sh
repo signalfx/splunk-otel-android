@@ -7,7 +7,7 @@ for ((i = 0; i < n; ++i)); do
     str+=${chars:RANDOM%${#chars}:1}
 done
 
-./gradlew publishReleasePublicationToMavenLocal
+./gradlew publishMavenPublicationToMavenLocal
 
 echo "Done. Press any key to exit."
 read  -n 1
