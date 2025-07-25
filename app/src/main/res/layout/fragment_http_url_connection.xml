@@ -12,14 +12,13 @@
 
         <TextView
             android:id="@+id/customUrlSectionTitle"
-            style="@style/Header"
+            style="@style/Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:text="@string/custom_url_section_title"
-            android:textSize="25sp"
-            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"  />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
@@ -56,12 +55,10 @@
 
         <TextView
             android:id="@+id/othersSectionTitle"
-            style="@style/Header"
+            style="@style/Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/others_section_title"
-            android:textSize="25sp"
-            android:textStyle="bold"
             android:layout_marginTop="20dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/customUrlGet" />

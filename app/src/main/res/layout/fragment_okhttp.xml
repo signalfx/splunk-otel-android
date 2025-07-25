@@ -10,14 +10,46 @@
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/okhttp_title"
-            style="@style/Header"
+            android:id="@+id/manual_instrumentation_api_selection"
+            style="@style/Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/okhttp_title"
-            android:textSize="25sp"
-            android:textStyle="bold"
+            android:text="@string/manual_instrumentation_api_selection_title"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/apiVariantRadioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/manual_instrumentation_api_selection">
+
+        <RadioButton
+            android:id="@+id/latestApi"
+            style="@style/RadioOptionsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/latest_api_option"
+            android:layout_marginEnd="20dp" />
+
+        <RadioButton
+            android:id="@+id/legacyApi"
+            style="@style/RadioOptionsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/legacy_api_option"/>
+
+    </RadioGroup>
 
         <TextView
             android:id="@+id/synchronousGet"
@@ -28,7 +60,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
             android:text="@string/synchronous_get"
-            app:layout_constraintTop_toBottomOf="@id/okhttp_title" />
+            app:layout_constraintTop_toBottomOf="@id/apiVariantRadioGroup" />
 
         <TextView
             android:id="@+id/asynchronousGet"

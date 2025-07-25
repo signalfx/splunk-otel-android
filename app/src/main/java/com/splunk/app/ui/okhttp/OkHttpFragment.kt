@@ -29,6 +29,7 @@ import com.splunk.app.R
 import com.splunk.app.databinding.FragmentOkhttpBinding
 import com.splunk.app.extension.showDoneToast
 import com.splunk.app.ui.BaseFragment
+import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
 import com.splunk.rum.integration.okhttp3.manual.extension.createRumOkHttpCallFactory
@@ -70,26 +71,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentOkhttpBinding
         get() = FragmentOkhttpBinding::inflate
 
-    // Latest API clients.
-    private val client: OkHttpClient by lazy { OkHttpClient() }
-    private val retryClient: OkHttpClient by lazy { retryClient() }
-    private val cachedClient by lazy { cachedClient() }
-
-    // Latest API clients.
-
-//    private val client: Call.Factory by lazy {
-//        instrumentedCallFactory(OkHttpClient())
-//        //instrumentedCallFactoryLegacyAPI(OkHttpClient())
-//    }
-//
-//   private val retryClient: Call.Factory by lazy {
-//        instrumentedCallFactory(retryClient())
-//        //instrumentedCallFactoryLegacyAPI(retryClient())
-//    }
-//
-//     private val cachedClient = instrumentedCallFactory(cachedClient())
-//     private val cachedClient = instrumentedCallFactoryLegacyAPI(cachedClient())
-
     private val retryInterceptor = Interceptor { chain: Interceptor.Chain ->
         val request = chain.request()
         var response = chain.proceed(request)
@@ -105,10 +86,67 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         return@Interceptor response
     }
 
+    private var client: Call.Factory = OkHttpClient()
+    private var retryClient: Call.Factory = retryClient()
+    private var cachedClient: Call.Factory = cachedClient()
+    private var manualInstrumentationApiType: ApiVariant? = null
+
+    private fun retryClient(): OkHttpClient = OkHttpClient.Builder()
+        .retryOnConnectionFailure(true)
+        .addInterceptor(
+            retryInterceptor
+        )
+        .build()
+
+    private fun cachedClient(): OkHttpClient = OkHttpClient.Builder()
+        .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
+        .build()
+
+    /**
+     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation using the Latest API.
+     */
+    private fun instrumentedCallFactoryLatestAPI(client: OkHttpClient): Call.Factory =
+        SplunkRum.instance.okHttpManualInstrumentation.buildOkHttpCallFactory(client)
+
+    /**
+     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation using the Legacy API.
+     */
+    private fun instrumentedCallFactoryLegacyAPI(client: OkHttpClient): Call.Factory =
+        SplunkRum.instance.createRumOkHttpCallFactory(client)
+
     private val executor = Executors.newScheduledThreadPool(1)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val manualInstrumentationOptionsVisibility =
+            if ((client as? OkHttpClient)?.networkInterceptors?.isEmpty() == true) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+
+        with(viewBinding) {
+            manualInstrumentationApiSelection.visibility = manualInstrumentationOptionsVisibility
+            apiVariantRadioGroup.visibility = manualInstrumentationOptionsVisibility
+
+            apiVariantRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+                when (checkedId) {
+                    R.id.latestApi -> {
+                        manualInstrumentationApiType = ApiVariant.LATEST
+                        client = instrumentedCallFactoryLatestAPI(OkHttpClient())
+                        retryClient = instrumentedCallFactoryLatestAPI(retryClient())
+                        cachedClient = instrumentedCallFactoryLatestAPI(cachedClient())
+                    }
+                    R.id.legacyApi -> {
+                        manualInstrumentationApiType = ApiVariant.LEGACY
+                        client = instrumentedCallFactoryLegacyAPI(OkHttpClient())
+                        retryClient = instrumentedCallFactoryLegacyAPI(retryClient())
+                        cachedClient = instrumentedCallFactoryLegacyAPI(cachedClient())
+                    }
+                }
+            }
+        }
 
         viewBinding.synchronousGet.setOnClickListener { synchronousGet() }
         viewBinding.asynchronousGet.setOnClickListener { asynchronousGet() }
@@ -129,29 +167,6 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
         SplunkRum.instance.navigation.track("OkHttp")
     }
-
-    private fun retryClient(): OkHttpClient = OkHttpClient.Builder()
-        .retryOnConnectionFailure(true)
-        .addInterceptor(
-            retryInterceptor
-        )
-        .build()
-
-    private fun cachedClient(): OkHttpClient = OkHttpClient.Builder()
-        .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
-        .build()
-
-    /**
-     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation.
-     */
-    private fun instrumentedCallFactory(client: OkHttpClient): Call.Factory =
-        SplunkRum.instance.okHttpManualInstrumentation.buildOkHttpCallFactory(client)
-
-    /**
-     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation using the Legacy API.
-     */
-    private fun instrumentedCallFactoryLegacyAPI(client: OkHttpClient): Call.Factory =
-        SplunkRum.instance.createRumOkHttpCallFactory(client)
 
     /**
      * Demonstrates a synchronous successful okhttp GET - Download a file, print its headers, and print its response body as a string.
@@ -196,9 +211,11 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
         span!!.makeCurrent().use { _ ->
 
-            val client: OkHttpClient = contextPropagationClient(span)
-            // val client: Call.Factory = instrumentedCallFactory(contextPropagationClient(span))
-            // val client: Call.Factory = instrumentedCallFactoryLegacyAPI(contextPropagationClient(span))
+            val client: Call.Factory = when (manualInstrumentationApiType) {
+                ApiVariant.LATEST -> instrumentedCallFactoryLatestAPI(contextPropagationClient(span))
+                ApiVariant.LEGACY -> instrumentedCallFactoryLegacyAPI(contextPropagationClient(span))
+                null -> contextPropagationClient(span)
+            }
 
             val request = Request.Builder()
                 .url("https://publicobject.com/helloworld.txt")
