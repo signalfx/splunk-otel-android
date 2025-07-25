@@ -47,7 +47,7 @@
 
     <!-- HttpURLConnection -->
     <string name="httpurlconnection_title">HttpURLConnection</string>
-    <string name="custom_url_section_title">Test with Custom URL</string>
+    <string name="custom_url_section_title">Custom URL Test</string>
     <string name="custom_url">URL</string>
     <string name="custom_url_get">GET</string>
     <string name="others_section_title">Other Tests</string>
@@ -63,6 +63,9 @@
     <!-- Okhttp -->
     <string name="okhttp_sample_calls">Okhttp sample calls</string>
     <string name="okhttp_title">OkHttp</string>
+    <string name="manual_instrumentation_api_selection_title">Manual Instrumentation API type</string>
+    <string name="latest_api_option">Latest APIs</string>
+    <string name="legacy_api_option">Legacy APIs</string>
     <string name="synchronous_get">Synchronous GET</string>
     <string name="asynchronous_get">Asynchronous GET</string>
     <string name="concurrent_asynchronous_get">Concurrent asynchronous GET</string>

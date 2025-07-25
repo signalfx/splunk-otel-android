@@ -15,19 +15,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/global_attributes_title"
-            android:textSize="25sp"
-            android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/global_attributes_latest_api_title"
-            style="@style/Header"
+            style="@style/SubHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/latest_api_title"
-            android:textSize="20sp"
-            android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/global_attributes_title"/>
 
 
@@ -165,13 +161,11 @@
 
         <TextView
             android:id="@+id/global_attributes_legacy_api_title"
-            style="@style/Header"
+            style="@style/SubHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/legacy_api_title"
-            android:textSize="20sp"
-            android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/get_all_global_attributes"/>
 
         <TextView
@@ -180,7 +174,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
             android:text="@string/set_string_global_attribute"
             app:layout_constraintTop_toBottomOf="@id/global_attributes_legacy_api_title" />

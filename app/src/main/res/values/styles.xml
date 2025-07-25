@@ -8,6 +8,18 @@
 
 	<style name="Header">
 		<item name="android:textColor">@color/splunk_flamingo</item>
+		<item name="android:textSize">25sp</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+
+	<style name="SubHeading">
+		<item name="android:textColor">@color/splunk_flamingo</item>
+		<item name="android:textSize">20sp</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+
+	<style name="RadioOptionsText">
+		<item name="android:textColor">@color/splunk_flamingo</item>
 		<item name="android:textSize">18sp</item>
 		<item name="android:textStyle">bold</item>
 	</style>
