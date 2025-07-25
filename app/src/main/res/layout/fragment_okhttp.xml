@@ -10,16 +10,8 @@
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/okhttp_title"
-            style="@style/Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/okhttp_title"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/manual_instrumentation_api_selection"
-            style="@style/SubHeading"
+            style="@style/Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/manual_instrumentation_api_selection_title"
@@ -28,7 +20,7 @@
             android:layout_marginRight="20dp"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/okhttp_title" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <RadioGroup
             android:id="@+id/apiVariantRadioGroup"

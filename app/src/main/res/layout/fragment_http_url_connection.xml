@@ -11,23 +11,14 @@
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/httpurlconnection_title"
-            style="@style/Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/httpurlconnection_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/customUrlSectionTitle"
-            style="@style/SubHeading"
+            style="@style/Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/custom_url_section_title"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/httpurlconnection_title"  />
+            app:layout_constraintTop_toTopOf="parent"  />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
@@ -64,7 +55,7 @@
 
         <TextView
             android:id="@+id/othersSectionTitle"
-            style="@style/SubHeading"
+            style="@style/Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/others_section_title"

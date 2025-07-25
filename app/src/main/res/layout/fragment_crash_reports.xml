@@ -10,14 +10,6 @@
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/crash_title"
-            style="@style/Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/crash_reports_title"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/crash_reports_illegal"
             style="@style/Button"
             android:layout_width="match_parent"
@@ -26,7 +18,8 @@
             android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
             android:text="@string/crash_reports_illegal"
-            app:layout_constraintTop_toBottomOf="@id/crash_title" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/crash_reports_main_thread"

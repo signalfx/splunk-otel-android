@@ -10,14 +10,6 @@
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/slow_rendering_title"
-            style="@style/Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/slow_rendering_title"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/slow_render"
             style="@style/Button"
             android:layout_width="match_parent"
@@ -26,7 +18,8 @@
             android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
             android:text="@string/slow_render"
-            app:layout_constraintTop_toBottomOf="@id/slow_rendering_title" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/frozen_render"

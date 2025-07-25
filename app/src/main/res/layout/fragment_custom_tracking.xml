@@ -10,22 +10,14 @@
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/custom_tracking_title"
-            style="@style/Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/custom_tracking_title"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/custom_tracking_latest_api_title"
-            style="@style/SubHeading"
+            style="@style/Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/latest_api_title"
-            app:layout_constraintTop_toBottomOf="@id/custom_tracking_title"/>
-
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/track_custom_event"
@@ -73,7 +65,7 @@
 
         <TextView
             android:id="@+id/custom_tracking_legacy_api_title"
-            style="@style/SubHeading"
+            style="@style/Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
