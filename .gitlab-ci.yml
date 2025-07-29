@@ -67,6 +67,7 @@ oss-scan:
     - touch local.properties
   rules:
     - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
+    - if: '$CI_COMMIT_REF_NAME == "fixFOSSAscan"'
 
 releaseTest:
   stage: release
