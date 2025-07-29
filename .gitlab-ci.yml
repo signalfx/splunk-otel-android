@@ -3,7 +3,7 @@ include:
     ref: latest
     file: '/templates/.sast_scan.yml'
   - project: 'ci-cd/templates'
-    ref: main
+    ref: master
     file: '/prodsec/.oss-scan.yml'
 
 image:
@@ -68,18 +68,6 @@ oss-scan:
   rules:
     - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
     - if: '$CI_COMMIT_REF_NAME == "fixFOSSAscan"'
-
-releaseTest:
-  stage: release
-  rules:
-    manual
-  extends: .prepare-android-environment
-  variables:
-  script:
-    - touch local.properties
-    - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
-    - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
-    - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype closeSonatypeStagingRepository
 
 release:
   stage: release
