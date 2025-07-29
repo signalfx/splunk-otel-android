@@ -1,3 +1,7 @@
+# Global Owners:
+# All files in the repository require review by the MRUM Android maintainers.
 * @signalfx/mrum-android-maintainers
 
-CODEOWNERS @signalfx/mrum-android-admins
+# CODEOWNERS File:
+# Changes to this CODEOWNERS file specifically require approval from MRUM Android admins.
+.github/CODEOWNERS @signalfx/mrum-android-admins
