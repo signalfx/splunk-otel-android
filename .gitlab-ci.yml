@@ -3,7 +3,7 @@ include:
     ref: latest
     file: '/templates/.sast_scan.yml'
   - project: 'ci-cd/templates'
-    ref: master
+    ref: main
     file: '/prodsec/.oss-scan.yml'
 
 image:
@@ -62,9 +62,23 @@ oss-scan:
   before_script:
     - JAVA_HOME=/usr/lib/jvm/java-17-openjdk
     - PATH=$JAVA_HOME/bin:$PATH
+    - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
+    - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
     - touch local.properties
   rules:
     - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
+
+releaseTest:
+  stage: release
+  rules:
+    manual
+  extends: .prepare-android-environment
+  variables:
+  script:
+    - touch local.properties
+    - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
+    - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
+    - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype closeSonatypeStagingRepository
 
 release:
   stage: release
