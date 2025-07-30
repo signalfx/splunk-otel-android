@@ -23,10 +23,12 @@ android {
 }
 
 dependencies {
-    api(project(":integration:agent:common"))
+    api(platform(Dependencies.Otel.androidBom))
 
+    api(project(":integration:agent:common"))
     implementation(project(":common:otel"))
     implementation(project(":common:storage"))
+    implementation(project(":common:utils"))
 
     implementation(Dependencies.Otel.androidSession)
     implementation(Dependencies.Otel.androidInstrumentation)
@@ -36,7 +38,6 @@ dependencies {
     implementation(Dependencies.SessionReplay.commonHttp)
     implementation(Dependencies.SessionReplay.commonStorage)
     implementation(Dependencies.SessionReplay.commonUtils)
-    implementation(project(":common:utils"))
 
     compileOnly(Dependencies.Android.Compose.ui)
 

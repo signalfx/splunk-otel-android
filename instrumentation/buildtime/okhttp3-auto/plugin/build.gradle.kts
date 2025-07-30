@@ -30,7 +30,7 @@ val sourcesJar by tasks.creating(Jar::class) {
 tasks.jar {
     manifest {
         attributes(
-            "Implementation-Version" to Dependencies.Otel.otelAndroidVersion
+            "Implementation-Version" to Dependencies.Otel.otelAndroidBomVersion
         )
     }
     metaInf {

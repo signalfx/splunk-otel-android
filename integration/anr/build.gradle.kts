@@ -23,13 +23,17 @@ android {
 }
 
 dependencies {
+    api(platform(Dependencies.Otel.androidBom))
+    api(platform(Dependencies.Otel.instrumentationBomAlpha))
+
     implementation(project(":integration:agent:internal"))
+    implementation(project(":common:otel"))
 
     implementation(Dependencies.Otel.androidANRInstrumentation)
+
     implementation(Dependencies.Otel.instrumentationApi)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
-    implementation(project(":common:otel"))
 }
 

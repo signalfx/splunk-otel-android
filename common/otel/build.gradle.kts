@@ -24,6 +24,7 @@ android {
 }
 
 dependencies {
+    api(platform(Dependencies.Otel.instrumentationBomAlpha))
     compileOnly(Dependencies.Android.annotation)
 
     implementation(project(":common:storage"))
