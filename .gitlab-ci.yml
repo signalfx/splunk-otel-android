@@ -39,7 +39,6 @@ build:
   stage: build
   rules:
     - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
-    - if: '$CI_COMMIT_REF_NAME == "feature/fix-bom"'
   extends: .prepare-android-environment
   script:
     - touch local.properties
@@ -51,7 +50,6 @@ sast-scan:
   stage: verify
   rules:
     - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
-    - if: '$CI_COMMIT_REF_NAME == "feature/fix-bom"'
   extends: .sast_scan
   variables:
     SAST_SCANNER: "Semgrep"
@@ -67,7 +65,6 @@ oss-scan:
     - touch local.properties
   rules:
     - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
-    - if: '$CI_COMMIT_REF_NAME == "feature/fix-bom"'
 
 release:
   stage: release
@@ -80,14 +77,3 @@ release:
     - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
     - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
     - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype closeAndReleaseSonatypeStagingRepository
-
-test-release:
-  stage: release
-  extends: .prepare-android-environment
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "feature/fix-bom"'
-  script:
-    - touch local.properties
-    - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
-    - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
-    - ./gradlew -Prelease=true --no-build-cache --no-daemon --rerun-tasks build signMavenPublication publishToSonatype closeSonatypeStagingRepository
