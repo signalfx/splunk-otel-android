@@ -27,6 +27,7 @@ import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.context.Context
 import io.opentelemetry.exporter.internal.otlp.logs.LogsRequestMarshaler
+import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.data.internal.ExtendedLogRecordData
@@ -116,11 +117,24 @@ internal class AndroidLogRecordExporter(
             } finally {
                 val effectiveTimestamp = log.timestampEpochNanos.takeIf { it != 0L }
                     ?: log.observedTimestampEpochNanos
-                spanBuilder.createZeroLengthSpan(effectiveTimestamp, TimeUnit.NANOSECONDS)
 
                 if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
-                    SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.forceFlush()
-                        ?.join(5, TimeUnit.SECONDS)
+                    val span = spanBuilder.setStartTimestamp(effectiveTimestamp, TimeUnit.NANOSECONDS).startSpan()
+                    val spanData = (span as? io.opentelemetry.sdk.trace.ReadableSpan)?.toSpanData()
+                    span.end(effectiveTimestamp, TimeUnit.NANOSECONDS)
+
+                    if (spanData != null) {
+                        val crashSpanId = UUID.randomUUID().toString()
+                        val exportRequest = TraceRequestMarshaler.create(listOf(spanData))
+
+                        ByteArrayOutputStream().use {
+                            exportRequest.writeBinaryTo(it)
+                            val success = agentStorage.writeOtelSpanData(crashSpanId, it.toByteArray())
+                        }
+                        agentStorage.addBufferedSpanId(crashSpanId)
+                    }
+                } else {
+                    spanBuilder.createZeroLengthSpan(effectiveTimestamp, TimeUnit.NANOSECONDS)
                 }
             }
         }
