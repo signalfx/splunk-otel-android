@@ -130,8 +130,13 @@ internal class AndroidLogRecordExporter(
                         ByteArrayOutputStream().use {
                             exportRequest.writeBinaryTo(it)
                             val success = agentStorage.writeOtelSpanData(crashSpanId, it.toByteArray())
+                            if (success) {
+                                agentStorage.addBufferedSpanId(crashSpanId)
+                            } else {
+                                SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.forceFlush()
+                                    ?.join(5, TimeUnit.SECONDS)
+                            }
                         }
-                        agentStorage.addBufferedSpanId(crashSpanId)
                     }
                 } else {
                     spanBuilder.createZeroLengthSpan(effectiveTimestamp, TimeUnit.NANOSECONDS)
