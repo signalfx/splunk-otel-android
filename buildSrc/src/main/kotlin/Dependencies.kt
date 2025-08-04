@@ -87,7 +87,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.16"
+        private const val version = "1.0.17"
 
         const val bridge = "com.cisco.android:sr-bridge:$version"
         const val commonEncoder = "com.cisco.android:sr-common-encoder:$version"
