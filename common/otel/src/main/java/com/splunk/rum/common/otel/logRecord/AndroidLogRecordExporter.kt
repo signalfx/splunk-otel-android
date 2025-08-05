@@ -32,10 +32,10 @@ import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.data.internal.ExtendedLogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
+import io.opentelemetry.sdk.trace.ReadableSpan
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-
 /**
  * This Exporter is added to Otel by default, it handles the offline/persistance.
  */
@@ -120,7 +120,7 @@ internal class AndroidLogRecordExporter(
 
                 if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
                     val span = spanBuilder.setStartTimestamp(effectiveTimestamp, TimeUnit.NANOSECONDS).startSpan()
-                    val spanData = (span as? io.opentelemetry.sdk.trace.ReadableSpan)?.toSpanData()
+                    val spanData = (span as? ReadableSpan)?.toSpanData()
                     span.end(effectiveTimestamp, TimeUnit.NANOSECONDS)
 
                     if (spanData != null) {
