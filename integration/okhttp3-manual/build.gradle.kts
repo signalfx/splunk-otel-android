@@ -31,6 +31,7 @@ dependencies {
     implementation(Dependencies.Otel.instrumentationOkHttp3Library)
 
     implementation(Dependencies.okhttp)
+    implementation(Dependencies.okio)
 
     implementation(Dependencies.SessionReplay.commonLogger)
 }

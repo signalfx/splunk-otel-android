@@ -123,6 +123,7 @@ dependencies {
     androidTestImplementation(Dependencies.AndroidTest.Espresso.web)
 
     androidTestImplementation(Dependencies.okhttp)
+    androidTestImplementation(Dependencies.okio)
     androidTestImplementation(Dependencies.AndroidTest.okhttpLogging)
     
     androidTestImplementation(Dependencies.Test.jsonassert)

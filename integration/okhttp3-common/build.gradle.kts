@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":common:otel"))
 
     implementation(Dependencies.okhttp)
+    implementation(Dependencies.okio)
 
     implementation(Dependencies.Otel.instrumentationApi)
 }
