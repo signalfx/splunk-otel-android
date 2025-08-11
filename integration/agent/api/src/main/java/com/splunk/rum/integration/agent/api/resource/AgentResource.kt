@@ -19,7 +19,6 @@ internal object AgentResource {
 
     private const val OS_DESCRIPTION_TEMPLATE = "Android Version %s (Build %s API level %s)"
     private const val FALLBACK_VERSION = "0.0.0"
-    private const val SCRIPT_ID_LENGTH = 16
 
     /**
      * Builds a complete Resource by combining:
@@ -27,12 +26,12 @@ internal object AgentResource {
      * - AgentConfiguration-specific attributes
      * - Device and OS-specific attributes
      */
-    internal fun allResource(context: Context, agentConfiguration: AgentConfiguration, sessionId: String): Resource =
+    internal fun allResource(context: Context, agentConfiguration: AgentConfiguration): Resource =
         Resource
             .getDefault()
             .merge(agentConfigResource(context, agentConfiguration))
             .merge(buildResource())
-            .merge(sessionReplayResource(sessionId))
+            .merge(sessionReplayResource())
 
     private fun agentConfigResource(context: Context, agentConfiguration: AgentConfiguration): Resource =
         Resource.empty().toBuilder()
@@ -52,14 +51,9 @@ internal object AgentResource {
         .put(OS_DESCRIPTION, OS_DESCRIPTION_TEMPLATE.format(Build.VERSION.RELEASE, Build.ID, Build.VERSION.SDK_INT))
         .build()
 
-    /**
-     * This is WIP currently
-     */
-    private fun sessionReplayResource(sessionId: String): Resource = Resource.empty().toBuilder()
-        .put("splunk.scriptInstance", SimpleId.generate(SCRIPT_ID_LENGTH))
+    private fun sessionReplayResource(): Resource = Resource.empty().toBuilder()
         .put("splunk.rumVersion", BuildConfig.VERSION_NAME)
         .put("process.runtime.name", "mobile")
         .put("service.name", "unknown_service")
-        .put("splunk.rumSessionId", sessionId)
         .build()
 }
