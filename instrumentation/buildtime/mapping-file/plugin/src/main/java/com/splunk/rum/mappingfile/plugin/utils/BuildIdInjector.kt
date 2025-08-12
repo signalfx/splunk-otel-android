@@ -17,14 +17,13 @@
 package com.splunk.rum.mappingfile.plugin.utils
 
 import com.android.build.gradle.api.ApplicationVariant
-import com.splunk.rum.mappingfile.plugin.SplunkRumExtension
 import java.io.File
 import java.util.*
 import org.gradle.api.Project
 
 class BuildIdInjector(private val project: Project) {
 
-    fun injectBuildId(variant: ApplicationVariant, buildId: String, extension: SplunkRumExtension) {
+    fun injectBuildId(variant: ApplicationVariant, buildId: String) {
         project.logger.info("Splunk RUM: Setting up build ID injection for variant '${variant.name}'")
 
         variant.outputs.forEach { output ->
@@ -34,7 +33,7 @@ class BuildIdInjector(private val project: Project) {
 
                 processManifestTask.doLast {
                     project.logger.info("Splunk RUM: Executing injection after processManifest")
-                    injectMetadataIntoMergedManifest(variant, buildId, extension)
+                    injectMetadataIntoMergedManifest(variant, buildId)
                 }
                 project.logger.info("Splunk RUM: Hooked into ${processManifestTask.name}")
             } catch (e: Exception) {
@@ -44,7 +43,7 @@ class BuildIdInjector(private val project: Project) {
                 project.tasks.named(packageTaskName).configure { task ->
                     task.doFirst {
                         project.logger.info("Splunk RUM: Executing injection via package task fallback")
-                        injectMetadataIntoMergedManifest(variant, buildId, extension)
+                        injectMetadataIntoMergedManifest(variant, buildId)
                     }
                 }
                 project.logger.info("Splunk RUM: Used fallback hook into $packageTaskName")
@@ -54,8 +53,7 @@ class BuildIdInjector(private val project: Project) {
 
     private fun injectMetadataIntoMergedManifest(
         variant: ApplicationVariant,
-        buildId: String,
-        extension: SplunkRumExtension
+        buildId: String
     ) {
         project.logger.info("Splunk RUM: Searching for manifest files for variant '${variant.name}'")
 
@@ -77,7 +75,7 @@ class BuildIdInjector(private val project: Project) {
             manifestFiles.forEach { manifestFile ->
                 project.logger.debug("Splunk RUM: Processing manifest file: ${manifestFile.name}")
                 try {
-                    val wasModified = addMetadataToManifest(manifestFile, buildId, extension)
+                    val wasModified = addMetadataToManifest(manifestFile, buildId)
                     if (wasModified) {
                         successCount++
                         project.logger.info("Splunk RUM: Modified: ${manifestFile.name}")
@@ -93,7 +91,7 @@ class BuildIdInjector(private val project: Project) {
         }
     }
 
-    private fun addMetadataToManifest(manifestFile: File, buildId: String, extension: SplunkRumExtension): Boolean {
+    private fun addMetadataToManifest(manifestFile: File, buildId: String): Boolean {
         project.logger.debug("Splunk RUM: Reading manifest file: ${manifestFile.absolutePath}")
 
         try {

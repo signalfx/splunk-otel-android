@@ -17,6 +17,7 @@
 package com.splunk.rum.mappingfile.plugin
 
 import com.android.build.gradle.AppExtension
+import com.android.build.gradle.api.ApplicationVariant
 import com.splunk.rum.mappingfile.plugin.utils.BuildIdInjector
 import com.splunk.rum.mappingfile.plugin.utils.MappingFileUploader
 import java.util.*
@@ -72,7 +73,7 @@ class MappingFilePlugin : Plugin<Project> {
         }
     }
 
-    private fun processVariant(variant: com.android.build.gradle.api.ApplicationVariant) {
+    private fun processVariant(variant: ApplicationVariant) {
         project.logger.debug("Splunk RUM: Starting processing for variant '${variant.name}'")
 
         val buildId = UUID.randomUUID().toString()
@@ -87,7 +88,7 @@ class MappingFilePlugin : Plugin<Project> {
 
         // Inject build ID into manifest
         project.logger.debug("Splunk RUM: Initiating build ID injection for variant '${variant.name}'")
-        buildIdInjector.injectBuildId(variant, buildId, extension)
+        buildIdInjector.injectBuildId(variant, buildId)
 
         // Set up upload task
         if (extension.uploadEnabled.get()) {
@@ -98,7 +99,7 @@ class MappingFilePlugin : Plugin<Project> {
         }
     }
 
-    private fun setupUploadTask(variant: com.android.build.gradle.api.ApplicationVariant, buildId: String) {
+    private fun setupUploadTask(variant: ApplicationVariant, buildId: String) {
         // Hook into the assemble task to upload after build completes
         val assembleTaskName = "assemble${variant.name.capitalize(Locale.ROOT)}"
         project.logger.debug("Splunk RUM: Hooking into task '$assembleTaskName' for upload")

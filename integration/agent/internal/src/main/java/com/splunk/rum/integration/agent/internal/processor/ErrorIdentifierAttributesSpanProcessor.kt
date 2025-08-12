@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.internal.processor
 
 import android.app.Application
-import android.util.Log
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.utils.extensions.applicationId
 import com.splunk.rum.utils.extensions.splunkBuildId
@@ -34,8 +33,6 @@ class ErrorIdentifierAttributesSpanProcessor(application: Application) : SpanPro
     private var splunkBuildId: String? = application.splunkBuildId
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        Log.e("TONY", "SPLUNKBUILDID: $splunkBuildId")
-
         if (span.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_ERROR ||
             span.getAttribute(RumConstants.COMPONENT_KEY) == RumConstants.COMPONENT_CRASH
         ) {
