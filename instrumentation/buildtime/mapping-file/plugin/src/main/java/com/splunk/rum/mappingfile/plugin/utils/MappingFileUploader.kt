@@ -16,8 +16,8 @@
 
 package com.splunk.rum.mappingfile.plugin.utils
 
-import com.splunk.rum.mappingfile.plugin.SplunkRumExtension
 import com.android.build.gradle.api.ApplicationVariant
+import com.splunk.rum.mappingfile.plugin.SplunkRumExtension
 import java.io.File
 import org.gradle.api.Project
 
@@ -25,10 +25,7 @@ class MappingFileUploader(private val project: Project) {
 
     private val httpClient = MappingFileUploadClient(project.logger)
 
-    fun uploadAfterBuild(variant: ApplicationVariant,
-                         buildId: String,
-                         extension: SplunkRumExtension
-    ) {
+    fun uploadAfterBuild(variant: ApplicationVariant, buildId: String, extension: SplunkRumExtension) {
         project.logger.info("Splunk RUM: Starting upload process for variant '${variant.name}'")
 
         val accessToken = resolveAccessToken(extension)
@@ -42,21 +39,26 @@ class MappingFileUploader(private val project: Project) {
         if (missingConfigs.isNotEmpty()) {
             project.logger.warn("Splunk RUM: Missing required configuration: ${missingConfigs.joinToString(", ")}")
             project.logger.info("Splunk RUM: Configure in your build.gradle:")
-            project.logger.info("""
+            project.logger.info(
+                """
         splunkRum {
             ${if ("accessToken" in missingConfigs) "accessToken = \"your-token-here\"" else ""}
             ${if ("realm" in missingConfigs) "realm = \"your-realm-here\"" else ""}
         }
-    """.trimIndent())
+                """.trimIndent()
+            )
             project.logger.info("Splunk RUM: Or use environment variables: SPLUNK_ACCESS_TOKEN, SPLUNK_REALM")
             return
         }
 
-        project.logger.debug("Splunk RUM: Configuration resolved - realm: '$realm', token configured: ${accessToken.isNotBlank()}")
+        project.logger.debug(
+            "Splunk RUM: Configuration resolved - realm: '$realm', token configured: ${accessToken.isNotBlank()}"
+        )
 
         val mappingFile = findMappingFile(variant)
         if (mappingFile == null) {
-            project.logger.error("""
+            project.logger.error(
+                """
                 Splunk RUM: Mapping file not found for variant '${variant.name}'
                 
                 Searched locations:
@@ -69,11 +71,14 @@ class MappingFileUploader(private val project: Project) {
                                 
                 Please verify that minification is enabled and the build completed without errors.
                 If the mapping file is in a custom location, please disable the uploadEnabled and upload it manually.
-            """.trimIndent())
+                """.trimIndent()
+            )
             return
         }
 
-        project.logger.info("Splunk RUM: Found mapping file (${mappingFile.length()} bytes) at: ${mappingFile.absolutePath}")
+        project.logger.info(
+            "Splunk RUM: Found mapping file (${mappingFile.length()} bytes) at: ${mappingFile.absolutePath}"
+        )
 
         project.logger.lifecycle("Splunk RUM: Uploading mapping file for variant ${variant.name}")
         project.logger.info("Splunk RUM: Upload details:")
@@ -148,5 +153,4 @@ class MappingFileUploader(private val project: Project) {
             File(buildDir, "outputs/mapping/${variant.buildType.name}/mapping.txt")
         )
     }
-
 }

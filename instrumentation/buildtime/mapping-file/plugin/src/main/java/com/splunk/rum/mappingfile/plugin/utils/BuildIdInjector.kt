@@ -16,18 +16,15 @@
 
 package com.splunk.rum.mappingfile.plugin.utils
 
-import com.splunk.rum.mappingfile.plugin.SplunkRumExtension
 import com.android.build.gradle.api.ApplicationVariant
+import com.splunk.rum.mappingfile.plugin.SplunkRumExtension
 import java.io.File
 import java.util.*
 import org.gradle.api.Project
 
 class BuildIdInjector(private val project: Project) {
 
-    fun injectBuildId(variant: ApplicationVariant,
-                      buildId: String,
-                      extension: SplunkRumExtension
-    ) {
+    fun injectBuildId(variant: ApplicationVariant, buildId: String, extension: SplunkRumExtension) {
         project.logger.info("Splunk RUM: Setting up build ID injection for variant '${variant.name}'")
 
         variant.outputs.forEach { output ->
@@ -96,9 +93,7 @@ class BuildIdInjector(private val project: Project) {
         }
     }
 
-    private fun addMetadataToManifest(manifestFile: File,
-                                      buildId: String,
-                                      extension: SplunkRumExtension): Boolean {
+    private fun addMetadataToManifest(manifestFile: File, buildId: String, extension: SplunkRumExtension): Boolean {
         project.logger.debug("Splunk RUM: Reading manifest file: ${manifestFile.absolutePath}")
 
         try {
@@ -134,7 +129,9 @@ class BuildIdInjector(private val project: Project) {
 
                 content = content.replace(fullMatch, replacement)
                 manifestFile.writeText(content)
-                project.logger.lifecycle("Splunk RUM: Successfully injected build ID metadata into: ${manifestFile.name}")
+                project.logger.lifecycle(
+                    "Splunk RUM: Successfully injected build ID metadata into: ${manifestFile.name}"
+                )
                 return true
             } else {
                 project.logger.error("Splunk RUM: Could not find <application> tag in: ${manifestFile.name}")
