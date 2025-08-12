@@ -19,8 +19,9 @@ package com.splunk.rum.mappingfile.plugin.utils
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import org.gradle.api.logging.Logger
 
-class SplunkHttpClient {
+class MappingFileUploadClient(private val logger: Logger) {
 
     fun uploadMappingFile(
         mappingFile: File,
@@ -30,26 +31,41 @@ class SplunkHttpClient {
         accessToken: String,
         realm: String
     ) {
+        logger.info("Splunk RUM: Initiating HTTP upload")
         val url = buildUploadUrl(realm, applicationId, versionCode, buildId)
-        println("Splunk RUM: Upload URL: $url")
-        println("Splunk RUM: Using PUT method")
-        println("Splunk RUM: File size: ${mappingFile.length()} bytes")
+        logger.info("Splunk RUM: Upload URL: $url")
+        logger.info("Splunk RUM: Using PUT method")
+        logger.info("Splunk RUM: File size: ${mappingFile.length()} bytes")
+        logger.debug("Splunk RUM: Application ID: $applicationId")
+        logger.debug("Splunk RUM: Version Code: $versionCode")
+        logger.debug("Splunk RUM: Build ID: $buildId")
 
         val connection = URL(url).openConnection() as HttpURLConnection
+        logger.debug("Splunk RUM: Created HTTP connection")
 
         try {
             setupConnection(connection, accessToken)
             sendMultipartData(connection, mappingFile)
             handleResponse(connection)
+        } catch (e: Exception) {
+            logger.error("Splunk RUM: HTTP operation failed: ${e.message}")
+            logger.debug("Splunk RUM: HTTP error details: ${e.stackTraceToString()}")
+            throw e
         } finally {
+            logger.debug("Splunk RUM: HTTP connection closed")
             connection.disconnect()
         }
     }
 
-    private fun buildUploadUrl(realm: String, applicationId: String, versionCode: Int, buildId: String): String =
-        "https://api.$realm.signalfx.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId"
+    private fun buildUploadUrl(realm: String, applicationId: String, versionCode: Int, buildId: String): String {
+        val url = "https://api.$realm.signalfx.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId"
+        logger.debug("Splunk RUM: Constructed upload URL for realm '$realm'")
+        return url
+    }
 
     private fun setupConnection(connection: HttpURLConnection, accessToken: String) {
+        logger.debug("Splunk RUM: Configuring HTTP connection")
+
         connection.requestMethod = "PUT"
         connection.doOutput = true
         connection.doInput = true
@@ -61,6 +77,7 @@ class SplunkHttpClient {
     }
 
     private fun sendMultipartData(connection: HttpURLConnection, mappingFile: File) {
+        logger.info("Splunk RUM: Sending multipart data")
         val boundary = connection.getRequestProperty("X-Boundary")
 
         connection.outputStream.use { outputStream ->
@@ -91,24 +108,31 @@ class SplunkHttpClient {
     }
 
     private fun handleResponse(connection: HttpURLConnection) {
+        logger.debug("Splunk RUM: Reading HTTP response")
+
         val responseCode = connection.responseCode
-        println("Splunk RUM: Response code: $responseCode")
-        println("Splunk RUM: Response message: ${connection.responseMessage}")
+        logger.info("Splunk RUM: Response code: $responseCode")
+        logger.info("Splunk RUM: Response message: ${connection.responseMessage}")
 
         if (responseCode in 200..299) {
+            logger.debug("Splunk RUM: Success response received")
             val response = connection.inputStream?.bufferedReader()?.use { it.readText() } ?: ""
-            println("Splunk RUM: Upload successful (HTTP $responseCode)")
+            logger.lifecycle("Splunk RUM: Upload successful (HTTP $responseCode)")
             if (response.isNotEmpty()) {
-                println("Splunk RUM: Response body: $response")
+                logger.info("Splunk RUM: Response body: $response")
+            } else {
+                logger.debug("Splunk RUM: Empty response body")
             }
         } else {
+            logger.warn("Splunk RUM: Error response received (HTTP $responseCode)")
             val errorResponse =
                 connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "No error details"
-            println("Splunk RUM: Error response body: $errorResponse")
+            logger.error("Splunk RUM: Error response body: $errorResponse")
 
             // Print response headers for debugging
+            logger.debug("Splunk RUM: Response headers:")
             connection.headerFields.forEach { (key, values) ->
-                println("Splunk RUM: Response header $key: ${values.joinToString(", ")}")
+                logger.debug("Splunk RUM: Response header $key: ${values.joinToString(", ")}")
             }
 
             throw Exception("HTTP $responseCode: $errorResponse")

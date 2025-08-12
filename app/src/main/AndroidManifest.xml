@@ -15,7 +15,13 @@
 		android:roundIcon="@drawable/app_icon"
 		android:supportsRtl="true"
 		android:theme="@style/ActivityTheme">
+<!--		<meta-data-->
+<!--			android:name="splunk.build_id"-->
+<!--			android:value="${splunkBuildId}" />-->
 
+<!--		<meta-data-->
+<!--			android:name="splunk.build_id"-->
+<!--			android:value="abc123" />-->
 		<activity
 			android:name=".ui.MainActivity"
 			android:exported="true"

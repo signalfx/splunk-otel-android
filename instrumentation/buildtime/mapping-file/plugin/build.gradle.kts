@@ -1,6 +1,8 @@
 import utils.artifactPrefix
 import utils.defaultGroupId
 
+private val pluginName = "mapping-file-plugin"
+
 plugins {
     id("java-gradle-plugin")
     kotlin("jvm")
@@ -38,10 +40,14 @@ tasks.jar {
     }
 }
 
+tasks.withType<PublishToMavenRepository>().configureEach {
+    dependsOn(tasks.withType<Sign>())
+}
+
 gradlePlugin {
     plugins {
         create("androidInstrumentationPlugin") {
-            id = "$defaultGroupId.${artifactPrefix}mapping-file-plugin"
+            id = "$defaultGroupId.${artifactPrefix}$pluginName"
             implementationClass = "com.splunk.rum.mappingfile.plugin.MappingFilePlugin"
             displayName = "Splunk Android Mapping File Plugin"
         }
@@ -54,36 +60,28 @@ dependencies {
 }
 
 signing {
-    val secretKey: String? = System.getenv("SECRET_KEY")
-    val signingPassword: String? = System.getenv("SIGNING_PASSWORD")
+    val signingKey: String? = project.findProperty("signingKey") as String?
+    val signingPassword: String? = project.findProperty("signingPassword") as String?
 
-    if (secretKey != null && signingPassword != null) {
-        useInMemoryPgpKeys(secretKey, signingPassword)
+    if (signingKey != null && signingPassword != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
         sign(publishing.publications)
     } else {
-        println("WARNING: Environment variables SECRET_KEY and/or SIGNING_PASSWORD not set. Skipping signing of artifacts.")
+        println("WARNING: Environment variables signingKey and/or signingPassword not set. Skipping signing of artifacts.")
     }
 }
 
 publishing {
     publications {
         withType(MavenPublication::class.java) {
-            pom.withXml { asNode().addCiscoInfo() }
+            pom.withXml { asNode().addSplunkInfo() }
 
-            artifactId = "${artifactPrefix}mapping-file-plugin"
+            artifactId = "${artifactPrefix}$pluginName"
 
             artifact(javadocJar)
             artifact(sourcesJar)
         }
         repositories {
-            maven {
-                name = "maven"
-                url = uri(Configurations.Artifactory.bareRepositoryURL)
-                credentials {
-                    username = System.getenv("ARTIFACT_REPO_USERNAME")
-                    password = System.getenv("ARTIFACT_REPO_PASSWORD")
-                }
-            }
             maven {
                 name = "local"
                 url = uri("$projectDir/repo")
