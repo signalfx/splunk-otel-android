@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.navigation.tracer.activity
 
 import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.navigation.tracer.ActiveSpan
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
@@ -76,12 +77,13 @@ internal class ActivityTracer(
     }
 
     private fun createSpan(spanName: String): Span {
+        ScreenNameTracker.screenName = screenName
+
         val spanBuilder = tracer.spanBuilder(spanName)
             .setAttribute(ACTIVITY_NAME_KEY, activityName)
             .setAttribute(RumConstants.COMPONENT_KEY, "ui")
 
         return spanBuilder.startSpan()
-            .setAttribute(RumConstants.SCREEN_NAME_KEY, screenName)
     }
 
     private companion object {

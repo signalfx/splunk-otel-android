@@ -39,9 +39,6 @@ internal class VisibleScreenTracker(application: Application) {
         observeFragments(application)
     }
 
-    val previouslyVisibleScreen: String?
-        get() = previouslyLastResumedFragment ?: previouslyLastResumedActivity
-
     fun onActivityResumed(activity: Activity) {
         lastResumedActivity = activity.javaClass.simpleName
     }

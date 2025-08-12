@@ -18,15 +18,10 @@ package com.splunk.rum.integration.navigation.tracer.activity
 
 import android.app.Activity
 import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
-import com.splunk.rum.integration.navigation.screen.VisibleScreenTracker
 import com.splunk.rum.integration.navigation.tracer.ActiveSpan
 import io.opentelemetry.api.trace.Tracer
 
-internal class ActivityTracerManager(
-    private val tracer: Tracer,
-    private val visibleScreenTracker: VisibleScreenTracker,
-    private val initialAppActivity: String?
-) {
+internal class ActivityTracerManager(private val tracer: Tracer, private val initialAppActivity: String?) {
 
     private val tracers = HashMap<String, ActivityTracer>()
 
@@ -50,7 +45,7 @@ internal class ActivityTracerManager(
                 tracer = tracer,
                 activityName = activity::class.java.simpleName,
                 screenName = ScreenNameDescriptor.getName(activity),
-                activeSpan = ActiveSpan(visibleScreenTracker::previouslyVisibleScreen)
+                activeSpan = ActiveSpan()
             )
 
             tracers[className] = activityTracer

@@ -21,8 +21,8 @@ import com.cisco.android.common.logger.Logger
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.navigation.screen.ScreenTrackerIntegration
 import io.opentelemetry.android.instrumentation.InstallationContext
 import java.time.Instant
@@ -53,7 +53,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
             val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: return
 
-            SplunkInternalGlobalAttributeSpanProcessor.attributes[RumConstants.SCREEN_NAME_KEY] = screenName
+            ScreenNameTracker.screenName = screenName
 
             val timeNow = Instant.now()
 
@@ -62,9 +62,6 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
                 .setAttribute(RumConstants.COMPONENT_KEY, "ui")
                 .setStartTimestamp(timeNow)
                 .startSpan()
-
-            screenSpan.setAttribute(RumConstants.SCREEN_NAME_KEY, screenName)
-                .setAttribute(RumConstants.LAST_SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
 
             screenSpan.end(timeNow)
         }

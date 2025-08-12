@@ -16,11 +16,10 @@
 
 package com.splunk.rum.integration.navigation.tracer
 
-import com.splunk.rum.common.otel.internal.RumConstants
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.context.Scope
 
-internal class ActiveSpan(private val lastVisibleScreenProvider: () -> String?) {
+internal class ActiveSpan {
 
     private var span: Span? = null
     private var scope: Scope? = null
@@ -46,14 +45,5 @@ internal class ActiveSpan(private val lastVisibleScreenProvider: () -> String?) 
 
     fun addEvent(eventName: String) {
         span?.addEvent(eventName)
-    }
-
-    fun addPreviousScreenAttribute(screenName: String) {
-        val span = span ?: return
-
-        val previouslyVisibleScreen = lastVisibleScreenProvider()
-        if (previouslyVisibleScreen != null && screenName != previouslyVisibleScreen) {
-            span.setAttribute(RumConstants.LAST_SCREEN_NAME_KEY, previouslyVisibleScreen)
-        }
     }
 }
