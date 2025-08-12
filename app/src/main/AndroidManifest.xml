@@ -15,7 +15,7 @@
 		android:roundIcon="@drawable/app_icon"
 		android:supportsRtl="true"
 		android:theme="@style/ActivityTheme">
-		
+
 		<activity
 			android:name=".ui.MainActivity"
 			android:exported="true"
