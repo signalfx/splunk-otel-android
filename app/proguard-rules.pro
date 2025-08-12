@@ -7,4 +7,3 @@
 #compile-time dependency in io.opentelemetry.exporter
 -dontwarn com.fasterxml.jackson.core.JsonGenerator
 -dontwarn com.fasterxml.jackson.core.JsonFactory
-
