@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.BuildConfig
-import com.splunk.rum.integration.agent.internal.id.SimpleId
 import com.splunk.rum.utils.extensions.appVersion
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MANUFACTURER
@@ -26,12 +25,11 @@ internal object AgentResource {
      * - AgentConfiguration-specific attributes
      * - Device and OS-specific attributes
      */
-    internal fun allResource(context: Context, agentConfiguration: AgentConfiguration): Resource =
-        Resource
-            .getDefault()
-            .merge(agentConfigResource(context, agentConfiguration))
-            .merge(buildResource())
-            .merge(sessionReplayResource())
+    internal fun allResource(context: Context, agentConfiguration: AgentConfiguration): Resource = Resource
+        .getDefault()
+        .merge(agentConfigResource(context, agentConfiguration))
+        .merge(buildResource())
+        .merge(sessionReplayResource())
 
     private fun agentConfigResource(context: Context, agentConfiguration: AgentConfiguration): Resource =
         Resource.empty().toBuilder()

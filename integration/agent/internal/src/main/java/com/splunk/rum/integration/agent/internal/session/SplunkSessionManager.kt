@@ -118,9 +118,9 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         }
 
         val isCurrentSessionIdValid = savedSessionId != null &&
-                backgroundValidity &&
-                sessionValidUntil != null &&
-                sessionValidUntil > now
+            backgroundValidity &&
+            sessionValidUntil != null &&
+            sessionValidUntil > now
 
         if (isCurrentSessionIdValid) {
             return requireNotNull(savedSessionId)
