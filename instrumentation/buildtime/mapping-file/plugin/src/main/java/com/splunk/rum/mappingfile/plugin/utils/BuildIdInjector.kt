@@ -109,7 +109,7 @@ class BuildIdInjector(private val project: Project) {
                 project.logger.debug("Splunk RUM: Removed existing metadata, new size: ${content.length} characters")
             }
 
-            // Enhanced regex that handles both opening tags and self-closing tags
+            // Regex that handles both opening tags and self-closing tags
             val applicationPattern = Regex("<application([^>]*?)(?:/>|>)", RegexOption.DOT_MATCHES_ALL)
             val match = applicationPattern.find(content)
 

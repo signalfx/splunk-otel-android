@@ -73,7 +73,7 @@ class MappingFileUploadClient(private val logger: Logger) {
 
         val boundary = "----Boundary${System.currentTimeMillis()}"
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
-        connection.setRequestProperty("X-Boundary", boundary) // Store for later use
+        connection.setRequestProperty("X-Boundary", boundary)
     }
 
     private fun sendMultipartData(connection: HttpURLConnection, mappingFile: File) {
@@ -129,7 +129,6 @@ class MappingFileUploadClient(private val logger: Logger) {
                 connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "No error details"
             logger.error("Splunk RUM: Error response body: $errorResponse")
 
-            // Print response headers for debugging
             logger.debug("Splunk RUM: Response headers:")
             connection.headerFields.forEach { (key, values) ->
                 logger.debug("Splunk RUM: Response header $key: ${values.joinToString(", ")}")

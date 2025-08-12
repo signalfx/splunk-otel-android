@@ -149,7 +149,7 @@ class MappingFileUploader(private val project: Project) {
             // Standard mapping file location (AGP 7+ standard with R8)
             File(buildDir, "outputs/mapping/$variantName/mapping.txt"),
 
-            // Alternative: build-type specific (some custom configurations)
+            // Fallback: build-type specific (some custom configurations)
             File(buildDir, "outputs/mapping/${variant.buildType.name}/mapping.txt")
         )
     }
