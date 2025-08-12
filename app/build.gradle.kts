@@ -9,18 +9,18 @@ plugins {
     //id("com.splunk.rum-okhttp3-auto-plugin") version "2.0.0-alpha.1-SNAPSHOT"
     //id("com.splunk.rum-httpurlconnection-auto-plugin") version "2.0.0-alpha.1-SNAPSHOT"
     // Uncomment this to test mapping file plugin
-    id("com.splunk.rum-mapping-file-plugin") version "2.0.0-alpha.1-SNAPSHOT"
+//    id("com.splunk.rum-mapping-file-plugin") version "2.0.0-alpha.1-SNAPSHOT"
 }
 
 apply<ConfigAndroidApp>()
 
 // Uncomment this to test the mapping file plugin with custom configuration
-splunkRum {
-    enabled = true
-    uploadEnabled = true
-    apiAccessToken = "abcde"
-    realm = "us02"
-}
+//splunkRum {
+//    enabled = true
+//    uploadEnabled = true
+//    apiAccessToken = "abcde"
+//    realm = "us02"
+//}
 
 android {
     namespace = "com.splunk.app"
