@@ -18,10 +18,6 @@ object Configurations {
         val targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    object Artifactory {
-        const val bareRepositoryURL = "https://artifactory.bare.appdynamics.com/artifactory/maven-releases/"
-    }
-
     const val sdkVersionCode = 1
-    val sdkVersionName = "2.0.0-beta"
+    val sdkVersionName = "2.0.0-alpha.1"
 }

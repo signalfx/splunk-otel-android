@@ -6,10 +6,10 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     // Uncomment this to test HttpURLConnection instrumentation
-    //id("com.splunk.android.rum-okhttp3-auto-plugin") version "24.4.1"
-    //id("com.splunk.android.rum-httpurlconnection-auto-plugin") version "24.4.1"
     // Uncomment this to test mapping file plugin
     //id("com.splunk.rum-mapping-file-plugin") version "2.0.0-beta"
+    //id("com.splunk.rum-okhttp3-auto-plugin") version "2.0.0-alpha.1-SNAPSHOT"
+    //id("com.splunk.rum-httpurlconnection-auto-plugin") version "2.0.0-alpha.1-SNAPSHOT"
 }
 
 apply<ConfigAndroidApp>()
@@ -74,13 +74,7 @@ android {
 }
 
 dependencies {
-    api(platform(Dependencies.Otel.instrumentationBomAlpha))
-
     implementation(kotlinStdlibJdk8)
-
-    //implementation("com.cisco.android:rum-agent:24.4.10-2246")
-    // TODO: this is here just so we do not have duplicate logic, it is not publicly available
-    //implementation("com.cisco.android:rum-common-utils:24.4.10-2246")
 
     implementation(project(":agent"))
 

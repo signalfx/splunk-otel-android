@@ -20,28 +20,42 @@ import android.app.Application
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.session.SessionConfiguration
 import com.splunk.rum.integration.agent.api.spaninterceptor.toMutableSpanData
+import com.splunk.rum.integration.agent.api.user.UserConfiguration
+import com.splunk.rum.integration.agent.api.user.UserTrackingMode
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
-import com.splunk.rum.integration.anr.AnrModuleConfiguration
-import com.splunk.rum.integration.crash.CrashModuleConfiguration
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
-import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
-import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration
 import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.api.RenderingMode
+import com.splunk.rum.integration.sessionreplay.api.SessionReplay
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration
+import io.opentelemetry.sdk.trace.data.SpanData
 import java.time.Duration
 
+/**
+ * Application class responsible for initializing and configuring the Splunk RUM agent
+ * and associated monitoring modules.
+ */
 class App : Application() {
 
     /**
-     * BuildConfig.SPLUNK_REALM and BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
+     * Agent configurations
+     */
+
+    /**
      *
-     * These values are injected at build time from your personal Gradle global properties.
-     * This allows sensitive data (like tokens and keys) to be kept *out* of the codebase.
+     * Configuration of the RUM backend endpoint.
+     *
+     * Realm and access token are injected at build time via Gradle properties:
+     * - `splunkRealm`
+     * - `splunkRumAccessToken`
+     *
+     * These should be defined in your global Gradle properties file (`~/.gradle/gradle.properties`)
+     * to keep sensitive data out of the codebase.
      *
      * To configure:
      * 1. Open (or create) the global properties file:
@@ -55,79 +69,102 @@ class App : Application() {
      *
      * ❗️If these properties are missing, empty String will be used for both realm and accessToken. ❗️
      */
-    private val realm = BuildConfig.SPLUNK_REALM
-    private val rumAccessToken = BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
+    private val endpointConfiguration = EndpointConfiguration(
+        realm = BuildConfig.SPLUNK_REALM,
+        rumAccessToken = BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
+    )
+
+    private val globalAttributes = MutableAttributes().also { attributes ->
+        attributes["test.user.email"] = "test.user@example.com"
+        attributes["test.user.name"] = "Test User"
+        attributes["test.user.plan"] = "premium"
+        attributes["test.user.age"] = 29L
+        attributes["test.user.is_verified"] = true
+        attributes["test.user.signup_source"] = "referral"
+        attributes["test.user.last_login_method"] = "google_oauth"
+    }
+
+    private val spanInterceptor: ((SpanData) -> SpanData?) = { spanData ->
+        val mutableSpanData = spanData.toMutableSpanData()
+
+        // Span filtering and modification can be done here using [mutableSpanData]
+
+        mutableSpanData
+    }
+
+    private val userConfiguration = UserConfiguration(
+        trackingMode = UserTrackingMode.NO_TRACKING
+    )
+
+    private val sessionConfiguration = SessionConfiguration(
+        samplingRate = 1.0
+    )
+
+    /**
+     * Module configurations
+     */
+
+    private val httpURLModuleConfiguration = HttpURLModuleConfiguration(
+        isEnabled = true,
+        capturedRequestHeaders = listOf("Host", "Accept"),
+        capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
+    )
+
+    private val okHttp3AutoModuleConfiguration = OkHttp3AutoModuleConfiguration(
+        isEnabled = true,
+        capturedRequestHeaders = listOf("User-Agent", "Accept"),
+        capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
+    )
+
+    private val okHttp3ManualModuleConfiguration = OkHttp3ManualModuleConfiguration(
+        capturedRequestHeaders = listOf("Content-Type", "Accept"),
+        capturedResponseHeaders = listOf("Server", "Content-Type", "Content-Length")
+    )
+
+    private val slowRenderingModuleConfiguration = SlowRenderingModuleConfiguration(
+        isEnabled = true,
+        interval = Duration.ofMillis(500)
+    )
+
+    private val navigationModuleConfiguration = NavigationModuleConfiguration()
 
     override fun onCreate() {
         super.onCreate()
 
-        // TODO: Reenable with the bridge support
-        // BridgeManager.bridgeInterfaces += TomasBridgeInterface()
-
-        val globalAttributes = MutableAttributes()
-        // Uncomment the following to test global attributes
-        // globalAttributes["session.id"] = "wrong"
-        // globalAttributes["name"] = "John Doe"
-        // globalAttributes["age"] = 32
-        // globalAttributes["email"] = "john.doe@example.com"
-        // globalAttributes["isValid"] = true
-
-        val agent = SplunkRum.install(
-            application = this,
-            agentConfiguration = AgentConfiguration(
-                endpoint = EndpointConfiguration(
-                    realm = realm,
-                    rumAccessToken = rumAccessToken
-                ),
-                appName = "Android demo app",
-                enableDebugLogging = true,
-                globalAttributes = globalAttributes,
-                deploymentEnvironment = "test",
-                deferredUntilForeground = true,
-                spanInterceptor = { spanData ->
-                    spanData.toMutableSpanData()
-                }
-            ),
-            moduleConfigurations = arrayOf(
-                InteractionsModuleConfiguration(
-                    isEnabled = true
-                ),
-                NavigationModuleConfiguration(
-                    isEnabled = true,
-                    isFragmentTrackingEnabled = false,
-                    isActivityTrackingEnabled = false
-                ),
-                CrashModuleConfiguration(
-                    isEnabled = true
-                ),
-                AnrModuleConfiguration(
-                    isEnabled = true
-                ),
-                HttpURLModuleConfiguration(
-                    isEnabled = true,
-                    capturedRequestHeaders = listOf("Host", "Accept"),
-                    capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
-                ),
-                OkHttp3AutoModuleConfiguration(
-                    isEnabled = true,
-                    capturedRequestHeaders = listOf("User-Agent", "Accept"),
-                    capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
-                ),
-                OkHttp3ManualModuleConfiguration(
-                    capturedRequestHeaders = listOf("Content-Type", "Accept"),
-                    capturedResponseHeaders = listOf("Server", "Content-Type", "Content-Length")
-                ),
-                NetworkMonitorModuleConfiguration(
-                    isEnabled = true
-                ),
-                SlowRenderingModuleConfiguration(
-                    isEnabled = true,
-                    interval = Duration.ofMillis(500)
-                )
-            )
+        val moduleConfigurations = arrayOf(
+            httpURLModuleConfiguration,
+            okHttp3AutoModuleConfiguration,
+            okHttp3ManualModuleConfiguration,
+            slowRenderingModuleConfiguration,
+            navigationModuleConfiguration
         )
 
-        agent.sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
-        agent.sessionReplay.start()
+        val agentConfiguration = AgentConfiguration(
+            endpoint = endpointConfiguration,
+            appName = APP_NAME,
+            appVersion = APP_VERSION,
+            deploymentEnvironment = DEPLOYMENT_ENVIRONMENT,
+            enableDebugLogging = ENABLE_DEBUG_LOGGING,
+            globalAttributes = globalAttributes,
+            spanInterceptor = spanInterceptor,
+            user = userConfiguration,
+            session = sessionConfiguration
+        )
+
+        val agent = SplunkRum.install(this, agentConfiguration, *moduleConfigurations)
+
+        configureAndStartSessionReplay(agent.sessionReplay)
+    }
+
+    private fun configureAndStartSessionReplay(sessionReplay: SessionReplay) {
+        sessionReplay.preferences.renderingMode = RenderingMode.NATIVE
+        sessionReplay.start()
+    }
+
+    companion object {
+        private const val APP_NAME = "Splunk OTel Android"
+        private const val APP_VERSION = "1.0.0-test"
+        private const val DEPLOYMENT_ENVIRONMENT = "test"
+        private const val ENABLE_DEBUG_LOGGING = true
     }
 }

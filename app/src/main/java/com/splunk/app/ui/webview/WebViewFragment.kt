@@ -16,6 +16,7 @@
 
 package com.splunk.app.ui.webview
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,40 +27,44 @@ import com.splunk.app.databinding.FragmentWebViewBinding
 import com.splunk.app.ui.BaseFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
-import com.splunk.rum.integration.navigation.extension.navigation
-import com.splunk.rum.integration.webview.extension.integrateWithBrowserRum
 import com.splunk.rum.integration.webview.extension.webViewNativeBridge
 
+/**
+ * A fragment that demonstrates how to instrument a WebView with Splunk RUM's Browser RUM integration.
+ *
+ * This fragment loads a local HTML file from `assets/` and integrates with Splunk RUM using one of two
+ * supported integration APIs: `LEGACY` or `LATEST`, based on the passed-in [ApiVariant] argument.
+ */
 class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
 
-    override val titleRes: Int = R.string.webview_title
+    override val titleRes: Int = R.string.web_view_title
+
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentWebViewBinding
         get() = FragmentWebViewBinding::inflate
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val apiVariant = runCatching {
+            arguments?.getString(ARG_API_VARIANT)?.let { ApiVariant.valueOf(it) }
+        }.getOrNull()
+
         viewBinding.webView.settings.javaScriptEnabled = true
 
-        val apiVariant = arguments?.getString("API_VARIANT")?.let { ApiVariant.valueOf(it) }
-
         when (apiVariant) {
-            ApiVariant.NEXTGEN -> {
+            ApiVariant.LATEST -> {
                 SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(viewBinding.webView)
-                Log.d(TAG, "Nextgen integrateWithBrowserRum API called")
+                Log.d(TAG, "Latest integrateWithBrowserRum API called")
             }
-
             ApiVariant.LEGACY -> {
                 SplunkRum.instance.integrateWithBrowserRum(viewBinding.webView)
                 Log.d(TAG, "Legacy integrateWithBrowserRum API called")
             }
-
             null -> Log.e(TAG, "WebView not integrated with Browser RUM due to missing API_VARIANT argument.")
         }
 
         viewBinding.webView.loadUrl("file:///android_asset/webview_content.html")
-
-        SplunkRum.instance.navigation.track("WebView")
     }
 
     override fun onDestroyView() {
@@ -69,5 +74,12 @@ class WebViewFragment : BaseFragment<FragmentWebViewBinding>() {
 
     companion object {
         private const val TAG = "WebView"
+        private const val ARG_API_VARIANT = "API_VARIANT"
+
+        fun newInstance(variant: ApiVariant): WebViewFragment = WebViewFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARG_API_VARIANT, variant.name)
+            }
+        }
     }
 }

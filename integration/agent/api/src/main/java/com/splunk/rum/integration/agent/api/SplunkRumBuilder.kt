@@ -58,16 +58,16 @@ class SplunkRumBuilder {
     /**
      * Sets the RUM auth token to be used by the RUM library.
      */
-    fun setRumAccessToken(token: String): SplunkRumBuilder {
-        accessToken = token
+    fun setRumAccessToken(rumAuthToken: String): SplunkRumBuilder {
+        accessToken = rumAuthToken
         return this
     }
 
     /**
      * Sets the application name that will be used to identify your application in the Splunk RUM UI.
      */
-    fun setApplicationName(name: String): SplunkRumBuilder {
-        appName = name
+    fun setApplicationName(applicationName: String): SplunkRumBuilder {
+        appName = applicationName
         return this
     }
 
@@ -102,12 +102,12 @@ class SplunkRumBuilder {
      * Note that if you are using standard Splunk ingest, it is simpler to just use [setRealm]
      * and let this configuration set the full endpoint URL for you.
      */
-    fun setBeaconEndpoint(endpoint: String): SplunkRumBuilder {
-        if (beaconEndpoint != null) {
+    fun setBeaconEndpoint(beaconEndpoint: String): SplunkRumBuilder {
+        if (this.beaconEndpoint != null) {
             throw IllegalStateException("setBeaconEndpoint can not be set when setRealm was called")
         }
 
-        beaconEndpoint = endpoint
+        this.beaconEndpoint = beaconEndpoint
         return this
     }
 

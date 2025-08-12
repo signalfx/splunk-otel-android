@@ -26,14 +26,6 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 
 class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
 
-    init {
-        /**
-         * Having a value for the screen.name attribute is mandatory for metrics to be derived on the platform.
-         * Using [RumConstants.DEFAULT_SCREEN_NAME] ensures that a screen.name is always present.
-         */
-        attributes[RumConstants.SCREEN_NAME_KEY] = RumConstants.DEFAULT_SCREEN_NAME
-    }
-
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         attributes.forEach { key, value ->
             @Suppress("UNCHECKED_CAST")
@@ -49,6 +41,8 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
     override fun isEndRequired(): Boolean = true
 
     companion object {
-        val attributes = MutableAttributes()
+        val attributes = MutableAttributes().apply {
+            this[RumConstants.SCREEN_NAME_KEY] = RumConstants.DEFAULT_SCREEN_NAME
+        }
     }
 }

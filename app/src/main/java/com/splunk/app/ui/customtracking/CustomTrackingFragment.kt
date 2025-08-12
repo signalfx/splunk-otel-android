@@ -22,121 +22,131 @@ import android.view.View
 import android.view.ViewGroup
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentCustomTrackingBinding
+import com.splunk.app.extension.showDoneToast
 import com.splunk.app.ui.BaseFragment
 import com.splunk.app.util.ApiVariant
-import com.splunk.app.util.CommonUtils
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
-import com.splunk.rum.integration.customtracking.extension.addRumEvent
-import com.splunk.rum.integration.customtracking.extension.addRumException
 import com.splunk.rum.integration.customtracking.extension.customTracking
-import com.splunk.rum.integration.customtracking.extension.startWorkflow
-import com.splunk.rum.integration.navigation.extension.navigation
 
+/**
+ * Fragment for demonstrating usage of the Splunk RUM Custom Tracking API.
+ *
+ * This fragment provides buttons to test both the latest and legacy APIs for:
+ * - Tracking custom events
+ * - Tracking workflows (spans)
+ * - Reporting exceptions (with and without attributes)
+ *
+ */
 class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
 
-    override val titleRes: Int = R.string.customtracking_title
+    override val titleRes: Int = R.string.custom_tracking_title
+
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentCustomTrackingBinding
         get() = FragmentCustomTrackingBinding::inflate
+
+    /**
+     * A set of test attributes used when sending events, spans, and exceptions.
+     */
+    private val testAttributes = MutableAttributes().apply {
+        this["user.id"] = "user-123"
+        this["user.email"] = "test.user@example.com"
+        this["screen.name"] = "CustomTracking"
+        this["experiment.group"] = "A"
+    }
+
+    /**
+     * A simulated test exception with a synthetic stack trace.
+     */
+    private val testException: Exception
+        get() = Exception("TestException").apply {
+            stackTrace = arrayOf(
+                StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
+                StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
+                StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
+            )
+        }
+
+    private val splunkRum = SplunkRum.instance
+    private val customTracking = splunkRum.customTracking
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Latest APIs
-        viewBinding.trackCustomEvent.setOnClickListener(onClickListener)
-        viewBinding.trackWorkflow.setOnClickListener(onClickListener)
-        viewBinding.trackException.setOnClickListener(onClickListener)
-        viewBinding.trackExceptionWithAttributes.setOnClickListener(onClickListener)
-
-        // Legacy APIs
-        viewBinding.trackCustomEventLegacy.setOnClickListener(onClickListener)
-        viewBinding.trackWorkflowLegacy.setOnClickListener(onClickListener)
-        viewBinding.trackExceptionLegacy.setOnClickListener(onClickListener)
-        viewBinding.trackExceptionWithAttributesLegacy.setOnClickListener(onClickListener)
-
-        SplunkRum.instance.navigation.track("CustomTracking")
-    }
-
-    private val onClickListener = View.OnClickListener {
-        when (it.id) {
+        with(viewBinding) {
             // Latest APIs
-            viewBinding.trackCustomEvent.id -> {
-                SplunkRum.instance.customTracking.trackCustomEvent("TestEvent", getTestAttributes())
-                CommonUtils.showDoneToast(context, "Track Custom Event")
-            }
-
-            viewBinding.trackWorkflow.id -> {
-                simulateWorkflow(ApiVariant.NEXTGEN)
-                CommonUtils.showDoneToast(context, "Track Workflow")
-            }
-
-            viewBinding.trackException.id -> {
-                SplunkRum.instance.customTracking.trackException(getTestException("Custom Exception To Be Tracked"))
-                CommonUtils.showDoneToast(context, "Track Exception")
-            }
-
-            viewBinding.trackExceptionWithAttributes.id -> {
-                SplunkRum.instance.customTracking.trackException(
-                    getTestException("Custom Exception (with attributes) To Be Tracked"),
-                    getTestAttributes()
-                )
-
-                CommonUtils.showDoneToast(context, "Track Exception with Attributes")
-            }
+            trackCustomEvent.setOnClickListener { trackEvent(ApiVariant.LATEST) }
+            trackWorkflow.setOnClickListener { trackWorkflow(ApiVariant.LATEST) }
+            trackException.setOnClickListener { trackException(ApiVariant.LATEST) }
+            trackExceptionWithAttributes.setOnClickListener { trackException(ApiVariant.LATEST, testAttributes) }
 
             // Legacy APIs
-            viewBinding.trackCustomEventLegacy.id -> {
-                SplunkRum.instance.addRumEvent("TestEvent", getTestAttributes())
-                CommonUtils.showDoneToast(context, "Track Custom Event (Legacy)")
-            }
-
-            viewBinding.trackWorkflowLegacy.id -> {
-                simulateWorkflow(ApiVariant.LEGACY)
-                CommonUtils.showDoneToast(context, "Track Workflow (Legacy)")
-            }
-
-            viewBinding.trackExceptionLegacy.id -> {
-                SplunkRum.instance.addRumException(getTestException("Custom Exception To Be Tracked"))
-                CommonUtils.showDoneToast(context, "Track Exception (Legacy)")
-            }
-
-            viewBinding.trackExceptionWithAttributesLegacy.id -> {
-                SplunkRum.instance.addRumException(
-                    getTestException("Custom Exception (with attributes) To Be Tracked"),
-                    getTestAttributes()
-                )
-
-                CommonUtils.showDoneToast(context, "Track Exception with Attributes (Legacy)")
-            }
+            trackCustomEventLegacy.setOnClickListener { trackEvent(ApiVariant.LEGACY) }
+            trackWorkflowLegacy.setOnClickListener { trackWorkflow(ApiVariant.LEGACY) }
+            trackExceptionLegacy.setOnClickListener { trackException(ApiVariant.LEGACY) }
+            trackExceptionWithAttributesLegacy.setOnClickListener { trackException(ApiVariant.LEGACY, testAttributes) }
         }
     }
 
-    private fun simulateWorkflow(implementationType: ApiVariant) {
-        val workflowSpan = when (implementationType) {
-            ApiVariant.NEXTGEN -> SplunkRum.instance.customTracking.trackWorkflow("Test Workflow")
-            ApiVariant.LEGACY -> SplunkRum.instance.startWorkflow("Test Workflow")
+    /**
+     * Tracks a custom event with optional attributes using the specified API variant.
+     *
+     * @param variant The API variant to use: [ApiVariant.LATEST] or [ApiVariant.LEGACY].
+     */
+    private fun trackEvent(variant: ApiVariant) {
+        when (variant) {
+            ApiVariant.LATEST -> customTracking.trackCustomEvent("TestEvent", testAttributes)
+            ApiVariant.LEGACY -> splunkRum.addRumEvent("TestEvent", testAttributes)
+        }
+
+        context?.showDoneToast(R.string.track_custom_event, variant)
+    }
+
+    /**
+     * Tracks a workflow span and ends it immediately.
+     *
+     * @param variant The API variant to use for tracking the workflow.
+     */
+    private fun trackWorkflow(variant: ApiVariant) {
+        val workflowSpan = when (variant) {
+            ApiVariant.LATEST -> customTracking.trackWorkflow("TestWorkflow")
+            ApiVariant.LEGACY -> splunkRum.startWorkflow("TestWorkflow")
         }
 
         workflowSpan?.apply {
             val startTime = System.currentTimeMillis()
             setAttribute("workflow.start.time", startTime)
-            setAttribute("workflow.end.time", startTime + 125) // Added 125ms processing time in end time.
+            setAttribute("workflow.end.time", startTime + 125)
             end()
         }
+
+        context?.showDoneToast(R.string.track_workflow, variant)
     }
 
-    private fun getTestAttributes(): MutableAttributes = MutableAttributes().also { attributes ->
-        attributes["attribute.one"] = "value1"
-        attributes["attribute.two"] = "12345"
-    }
+    /**
+     * Tracks an exception with optional attributes using the selected API variant.
+     *
+     * @param variant The API variant to use.
+     * @param attributes Optional set of attributes to include with the exception.
+     */
+    private fun trackException(variant: ApiVariant, attributes: MutableAttributes? = null) {
+        when (variant) {
+            ApiVariant.LATEST -> {
+                if (attributes == null) {
+                    customTracking.trackException(testException)
+                } else {
+                    customTracking.trackException(testException, attributes)
+                }
+            }
+            ApiVariant.LEGACY -> {
+                if (attributes == null) {
+                    splunkRum.addRumException(testException)
+                } else {
+                    splunkRum.addRumException(testException, attributes)
+                }
+            }
+        }
 
-    private fun getTestException(message: String): Exception {
-        val e = Exception(message)
-        e.stackTrace = arrayOf(
-            StackTraceElement("android.fake.Crash", "crashMe", "NotARealFile.kt", 12),
-            StackTraceElement("android.fake.Class", "foo", "NotARealFile.kt", 34),
-            StackTraceElement("android.fake.Main", "main", "NotARealFile.kt", 56)
-        )
-        return e
+        context?.showDoneToast(R.string.track_exception, variant)
     }
 }

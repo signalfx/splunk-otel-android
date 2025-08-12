@@ -66,22 +66,17 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     private fun setupComposeIdentification() {
         runIfComposeUiExists {
-            ComposeElementIdentification.insertModifierIfNeeded(SessionReplayDrawModifier::class, OrderPriority.HIGH) {
-                    id,
-                    isSensitive,
-                    _
-                ->
+            ComposeElementIdentification.insertModifierIfNeeded(
+                SessionReplayDrawModifier::class,
+                OrderPriority.HIGH
+            ) { id, isSensitive, _ ->
                 SessionReplayDrawModifier(id, isSensitive)
             }
 
             ComposeElementIdentification.insertModifierIfNeeded(
                 PointerInputObserverInjectorModifier::class,
                 OrderPriority.LOW
-            ) {
-                    id,
-                    _,
-                    positionInList
-                ->
+            ) { id, _, positionInList ->
                 id?.let { PointerInputObserverInjectorModifier(id, positionInList) }
             }
         }
@@ -93,7 +88,12 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 return
             }
 
-            Logger.d(TAG, "onInteraction(interaction: $interaction, legacyData: $legacyData)")
+            if (interaction is Interaction.Touch.Pointer ||
+                interaction is Interaction.Touch.Continuous &&
+                !interaction.isLast
+            ) {
+                return
+            }
 
             val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider ?: return
 
@@ -129,6 +129,8 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             } else {
                 null
             }
+
+            Logger.d(TAG, "onInteraction(actionName: $actionName, targetType: $targetType, interaction: $interaction)")
 
             logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()

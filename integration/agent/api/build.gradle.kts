@@ -25,7 +25,8 @@ android {
 
 dependencies {
     api(platform(Dependencies.Otel.instrumentationBomAlpha))
-    implementation(platform(Dependencies.Otel.androidBom))
+    api(platform(Dependencies.Otel.androidBom))
+
     implementation(Dependencies.Otel.androidCore)
 
     api(project(":common:otel"))
@@ -33,13 +34,13 @@ dependencies {
 
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:storage"))
+    implementation(project(":common:utils"))
 
     implementation(Dependencies.Otel.semConv)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonStorage)
     implementation(Dependencies.SessionReplay.commonUtils)
-    implementation(project(":common:utils"))
 
     compileOnly(Dependencies.Android.Compose.ui)
 }

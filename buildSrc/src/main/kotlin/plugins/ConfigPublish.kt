@@ -1,7 +1,6 @@
 package plugins
 
-import addCiscoInfo
-import getVersionPostfix
+import addSplunkInfo
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -12,6 +11,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
@@ -44,50 +44,49 @@ class ConfigPublish : Plugin<Project> by local plugin {
         }
 
         configure<SigningExtension> {
-            val secretKey: String? = System.getenv("SECRET_KEY")
-            val signingPassword: String? = System.getenv("SIGNING_PASSWORD")
+            val signingKey: String? = project.findProperty("signingKey") as String?
+            val signingPassword: String? = project.findProperty("signingPassword") as String?
 
-            if (secretKey != null && signingPassword != null) {
-                useInMemoryPgpKeys(secretKey, signingPassword)
+            if (signingKey != null && signingPassword != null) {
+                useInMemoryPgpKeys(signingKey, signingPassword)
                 sign(project.extensions.getByType(PublishingExtension::class.java).publications)
             } else {
-                println("WARNING: Environment variables SECRET_KEY and/or SIGNING_PASSWORD not set. Skipping signing of artifacts.")
+                println("WARNING: Environment variables signingKey and/or signingPassword not set. Skipping signing of artifacts.")
             }
         }
 
         configure<PublishingExtension> {
             publications {
-                register("release", MavenPublication::class) {
+                register("maven", MavenPublication::class) {
                     from(components["release"])
                     groupId = defaultGroupId
                     artifactId = project.properties[artifactIdProperty].toString()
-                    version = "${project.properties[versionProperty]}${project.getVersionPostfix()}"
+
+                    val baseVersion = project.properties[versionProperty].toString()
+                    version = if (project.findProperty("release") != "true") {
+                        "$baseVersion-SNAPSHOT"
+                    } else {
+                        baseVersion
+                    }
 
                     artifact(sourcesJar)
                     artifact(androidJavadocsJar)
-                    pom.withXml { asNode().addCiscoInfo() }
+                    pom.withXml { asNode().addSplunkInfo() }
                 }
             }
             repositories {
-                maven {
-                    name = "artifactory"
-                    url = uri(Configurations.Artifactory.bareRepositoryURL)
-                    credentials {
-                        username = System.getenv("ARTIFACT_REPO_USERNAME")
-                        password = System.getenv("ARTIFACT_REPO_PASSWORD")
-                    }
-                }
-                maven {
-                    name = "local"
-                    url = uri("$projectDir/repo")
-                }
+                mavenLocal()
             }
         }
     }
 
     tasks.withType(AbstractPublishToMaven::class.java) {
         doLast {
-            val artifact = "$defaultGroupId:${project.properties[artifactIdProperty]}:${project.properties[versionProperty]}${getVersionPostfix()}"
+            // Using actual publication version instead of the property to include potential -SNAPSHOT suffix
+            val publication = project.extensions.getByType<PublishingExtension>()
+                .publications.getByName("maven") as MavenPublication
+            val artifact = "$defaultGroupId:${project.properties[artifactIdProperty]}:${publication.version}"
+
             println("╔══════════════════════════════════════════════════════════════════════════════════════════════════╗")
             println("published".toBoxString())
             println(artifact.toBoxString())

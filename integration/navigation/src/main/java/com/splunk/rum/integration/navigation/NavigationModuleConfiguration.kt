@@ -22,20 +22,17 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
  * Configuration for the navigation module.
  *
  * @property isEnabled Whether the navigation module is enabled.
- * @property isFragmentTrackingEnabled Whether fragment tracking is enabled.
- * @property isActivityTrackingEnabled Whether activity tracking is enabled.
+ * @property isAutomatedTrackingEnabled Whether Fragment and Activity lifecycle tracking is enabled.
  */
 data class NavigationModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
-    val isFragmentTrackingEnabled: Boolean = false,
-    val isActivityTrackingEnabled: Boolean = false
+    val isAutomatedTrackingEnabled: Boolean = false
 ) : ModuleConfiguration {
 
     override val name: String = "navigation"
 
     override val attributes: List<Pair<String, String>> = listOf(
         "enabled" to isEnabled.toString(),
-        "isActivityTrackingEnabled" to isActivityTrackingEnabled.toString(),
-        "isFragmentTrackingEnabled" to isFragmentTrackingEnabled.toString()
+        "isAutomatedTrackingEnabled" to isAutomatedTrackingEnabled.toString()
     )
 }

@@ -22,12 +22,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.createBitmap
 import com.cisco.android.common.utils.extensions.safeSchedule
 import com.cisco.android.common.utils.runOnBackgroundThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentOkhttpBinding
+import com.splunk.app.extension.showDoneToast
 import com.splunk.app.ui.BaseFragment
-import com.splunk.app.util.CommonUtils
+import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
 import com.splunk.rum.integration.okhttp3.manual.extension.createRumOkHttpCallFactory
@@ -55,18 +57,21 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.BufferedSink
 
+/**
+ * A fragment demonstrating various OkHttp3 use cases and integrations with Splunk RUM instrumentation.
+ *
+ * This fragment provides buttons in the UI that allow users to trigger different types of HTTP requests
+ * using OkHttp. It showcases a wide range of real-world scenarios.
+ *
+ */
 class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
-    private val client: OkHttpClient by lazy {
-        OkHttpClient()
-    }
+    override val titleRes: Int = R.string.okhttp_title
 
-    /*private val client: Call.Factory by lazy {
-        instrumentedCallFactory(OkHttpClient())
-        //instrumentedCallFactoryLegacyAPI(OkHttpClient())
-    }*/
+    override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentOkhttpBinding
+        get() = FragmentOkhttpBinding::inflate
 
-    val retryInterceptor = Interceptor { chain: Interceptor.Chain ->
+    private val retryInterceptor = Interceptor { chain: Interceptor.Chain ->
         val request = chain.request()
         var response = chain.proceed(request)
 
@@ -81,28 +86,67 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         return@Interceptor response
     }
 
-    private val retryClient: OkHttpClient by lazy {
-        retryClient()
-    }
+    private var client: Call.Factory = OkHttpClient()
+    private var retryClient: Call.Factory = retryClient()
+    private var cachedClient: Call.Factory = cachedClient()
+    private var manualInstrumentationApiType: ApiVariant? = null
 
-   /* private val retryClient: Call.Factory by lazy {
-        instrumentedCallFactory(retryClient())
-        //instrumentedCallFactoryLegacyAPI(retryClient())
-    }*/
+    private fun retryClient(): OkHttpClient = OkHttpClient.Builder()
+        .retryOnConnectionFailure(true)
+        .addInterceptor(
+            retryInterceptor
+        )
+        .build()
 
-    private val cachedClient = cachedClient()
-    // private val cachedClient = instrumentedCallFactory(cachedClient())
-    // private val cachedClient = instrumentedCallFactoryLegacyAPI(cachedClient())
+    private fun cachedClient(): OkHttpClient = OkHttpClient.Builder()
+        .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
+        .build()
+
+    /**
+     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation using the Latest API.
+     */
+    private fun instrumentedCallFactoryLatestAPI(client: OkHttpClient): Call.Factory =
+        SplunkRum.instance.okHttpManualInstrumentation.buildOkHttpCallFactory(client)
+
+    /**
+     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation using the Legacy API.
+     */
+    private fun instrumentedCallFactoryLegacyAPI(client: OkHttpClient): Call.Factory =
+        SplunkRum.instance.createRumOkHttpCallFactory(client)
 
     private val executor = Executors.newScheduledThreadPool(1)
 
-    override val titleRes: Int = R.string.okhttp_title
-
-    override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentOkhttpBinding
-        get() = FragmentOkhttpBinding::inflate
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val manualInstrumentationOptionsVisibility =
+            if ((client as? OkHttpClient)?.networkInterceptors?.isEmpty() == true) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+
+        with(viewBinding) {
+            manualInstrumentationApiSelection.visibility = manualInstrumentationOptionsVisibility
+            apiVariantRadioGroup.visibility = manualInstrumentationOptionsVisibility
+
+            apiVariantRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+                when (checkedId) {
+                    R.id.latestApi -> {
+                        manualInstrumentationApiType = ApiVariant.LATEST
+                        client = instrumentedCallFactoryLatestAPI(OkHttpClient())
+                        retryClient = instrumentedCallFactoryLatestAPI(retryClient())
+                        cachedClient = instrumentedCallFactoryLatestAPI(cachedClient())
+                    }
+                    R.id.legacyApi -> {
+                        manualInstrumentationApiType = ApiVariant.LEGACY
+                        client = instrumentedCallFactoryLegacyAPI(OkHttpClient())
+                        retryClient = instrumentedCallFactoryLegacyAPI(retryClient())
+                        cachedClient = instrumentedCallFactoryLegacyAPI(cachedClient())
+                    }
+                }
+            }
+        }
 
         viewBinding.synchronousGet.setOnClickListener { synchronousGet() }
         viewBinding.asynchronousGet.setOnClickListener { asynchronousGet() }
@@ -124,35 +168,12 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         SplunkRum.instance.navigation.track("OkHttp")
     }
 
-    private fun retryClient(): OkHttpClient = OkHttpClient.Builder()
-        .retryOnConnectionFailure(true)
-        .addInterceptor(
-            retryInterceptor
-        )
-        .build()
-
-    private fun cachedClient(): OkHttpClient = OkHttpClient.Builder()
-        .cache(Cache(File(activity?.cacheDir, DISK_CACHE_FOLDER), DISK_CACHE_SIZE))
-        .build()
-
-    /**
-     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation.
-     */
-    private fun instrumentedCallFactory(client: OkHttpClient): Call.Factory =
-        SplunkRum.instance.okHttpManualInstrumentation.buildOkHttpCallFactory(client)
-
-    /**
-     * Returns an instrumented [Call.Factory] for manual OkHttp instrumentation using the Legacy API.
-     */
-    private fun instrumentedCallFactoryLegacyAPI(client: OkHttpClient): Call.Factory =
-        SplunkRum.instance.createRumOkHttpCallFactory(client)
-
     /**
      * Demonstrates a synchronous successful okhttp GET - Download a file, print its headers, and print its response body as a string.
      */
-    fun synchronousGet() {
+    private fun synchronousGet() {
         executeGetRequest("https://publicobject.com/helloworld.txt")
-        CommonUtils.showDoneToast(context, "Synchronous Get")
+        context?.showDoneToast(R.string.synchronous_get)
     }
 
     /**
@@ -160,26 +181,26 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * Download a file on a worker thread, and get called back when the response is readable.
      * The callback is made after the response headers are ready.
      */
-    fun asynchronousGet() {
+    private fun asynchronousGet() {
         executeAsynchronousGet("https://httpbin.org/robots.txt")
-        CommonUtils.showDoneToast(context, "Asynchronous Get")
+        context?.showDoneToast(R.string.asynchronous_get)
     }
 
     /**
      * Demonstrates multiple successful asynchronous okhttp GET operations to the same url in parallel.
      */
-    fun concurrentAsynchronousGet() {
+    private fun concurrentAsynchronousGet() {
         val url = "https://httpbin.org/headers"
         executeAsynchronousGet(url)
         executeAsynchronousGet(url)
-        CommonUtils.showDoneToast(context, "Concurrent Asynchronous Get")
+        context?.showDoneToast(R.string.concurrent_asynchronous_get)
     }
 
     /**
      * Demonstrates correct context propagation for asynchronous requests when parent context exists.
      */
 
-    fun parentContextPropagationInAsyncGet() {
+    private fun parentContextPropagationInAsyncGet() {
         val lock = CountDownLatch(1)
 
         val openTelemetry = OpenTelemetrySdk.builder()
@@ -188,11 +209,13 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
         val span = openTelemetry.getTracer("Test Tracer").spanBuilder("A Span").startSpan()
 
-        span!!.makeCurrent().use { ignored ->
+        span!!.makeCurrent().use { _ ->
 
-            val client: OkHttpClient = contextPropagationClient(span)
-            // val client: Call.Factory = instrumentedCallFactory(contextPropagationClient(span))
-            // val client: Call.Factory = instrumentedCallFactoryLegacyAPI(contextPropagationClient(span))
+            val client: Call.Factory = when (manualInstrumentationApiType) {
+                ApiVariant.LATEST -> instrumentedCallFactoryLatestAPI(contextPropagationClient(span))
+                ApiVariant.LEGACY -> instrumentedCallFactoryLegacyAPI(contextPropagationClient(span))
+                null -> contextPropagationClient(span)
+            }
 
             val request = Request.Builder()
                 .url("https://publicobject.com/helloworld.txt")
@@ -221,7 +244,8 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         }
         lock.await()
         span.end()
-        CommonUtils.showDoneToast(context, "Parent Context Propagation In Async Get")
+
+        context?.showDoneToast(R.string.parent_context_propagation_async_get)
     }
 
     private fun contextPropagationClient(span: Span): OkHttpClient = OkHttpClient.Builder()
@@ -245,18 +269,18 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
     /**
      * Demonstrates an unsuccessful okhttp GET.
      */
-    fun unsuccessfulGet() {
+    private fun unsuccessfulGet() {
         executeGetRequest("https://httpbin.org/status/404")
-        CommonUtils.showDoneToast(context, "Unsuccessful Get")
+        context?.showDoneToast(R.string.unsuccessful_get)
     }
 
     /**
      * Demonstrates a request i.e being retried two additional times.
      * http.request.resend_count is being set on each retried request.
      */
-    fun retryRequest() {
+    private fun retryRequest() {
         executeGetRequest("https://httpbin.org/status/503", true)
-        CommonUtils.showDoneToast(context, "Retry Request")
+        context?.showDoneToast(R.string.retry_request)
     }
 
     /**
@@ -264,7 +288,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * But some headers permit multiple values, like Guava’s Multimap.
      * For example, it’s legal and common for an HTTP response to supply multiple Vary headers.
      */
-    fun multipleHeaders() {
+    private fun multipleHeaders() {
         val request = Request.Builder()
             .url("https://api.github.com/repos/square/okhttp/issues")
             .header("User-Agent", "OkHttp Headers.java")
@@ -282,14 +306,14 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             }
         }
 
-        CommonUtils.showDoneToast(context, "Multiple Headers")
+        context?.showDoneToast(R.string.multiple_headers)
     }
 
     /**
      * Demonstrates addition of link.traceId and link.spanId attributes in span when
      * server-timing header is present in the response.
      */
-    fun serverTimingHeaderInResponse() {
+    private fun serverTimingHeaderInResponse() {
         // one valid Server-Timing header, link.traceId and link.spanId attributes will be populated correctly
         executeGetRequest(
             "https://httpbin.org/response-headers?Server-Timing=traceparent;desc='00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01'"
@@ -308,14 +332,14 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                 "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
         )
 
-        CommonUtils.showDoneToast(context, "Server-Timing Header In Response")
+        context?.showDoneToast(R.string.server_timing_header_in_response)
     }
 
     /**
      * Use an HTTP POST to send a request body to a service.
      * This example posts a markdown document to a web service that renders markdown as HTML.
      */
-    fun postMarkdown() {
+    private fun postMarkdown() {
         val postBody = """
         |Releases
         |--------
@@ -327,14 +351,14 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         """.trimMargin()
 
         executePostRequest("https://api.github.com/markdown/raw", postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
-        CommonUtils.showDoneToast(context, "Post Markdown")
+        context?.showDoneToast(R.string.post_markdown)
     }
 
     /**
      * Here we POST a request body as a stream. The content of this request body is being generated
      * as it’s being written. This example streams directly into the Okio buffered sink.
      */
-    fun postStreaming() {
+    private fun postStreaming() {
         val requestBody = object : RequestBody() {
             override fun contentType() = MEDIA_TYPE_MARKDOWN
 
@@ -356,13 +380,13 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         }
 
         executePostRequest("https://api.github.com/markdown/raw", requestBody)
-        CommonUtils.showDoneToast(context, "Post Streaming")
+        context?.showDoneToast(R.string.post_streaming)
     }
 
     /**
      * It’s easy to use a file as a request body.
      */
-    fun postFile() {
+    private fun postFile() {
         val file = File(activity?.filesDir, "README.md")
 
         file.writeText(
@@ -378,20 +402,20 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         )
 
         executePostRequest("https://api.github.com/markdown/raw", file.asRequestBody(MEDIA_TYPE_MARKDOWN))
-        CommonUtils.showDoneToast(context, "Post File")
+        context?.showDoneToast(R.string.post_file)
     }
 
     /**
      * Use FormBody.Builder to build a request body that works like an HTML <form> tag.
      * Names and values will be encoded using an HTML-compatible form URL encoding.
      */
-    fun postFormParameters() {
+    private fun postFormParameters() {
         val formBody = FormBody.Builder()
             .add("search", "Jurassic Park")
             .build()
 
         executePostRequest("https://en.wikipedia.org/w/index.php", formBody)
-        CommonUtils.showDoneToast(context, "Post Form Parameters")
+        context?.showDoneToast(R.string.post_form_parameters)
     }
 
     /**
@@ -400,7 +424,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * If present, these headers should describe the part body, such as its Content-Disposition.
      * The Content-Length and Content-Type headers are added automatically if they’re available.
      */
-    fun postMutlipartRequest() {
+    private fun postMutlipartRequest() {
         // Use the imgur image upload API as documented at https://api.imgur.com/endpoints/image
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
@@ -414,13 +438,13 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
         val headers = mapOf("Authorization" to "Client-ID $IMGUR_CLIENT_ID")
         executePostRequest("https://api.imgur.com/3/image", requestBody, headers)
-        CommonUtils.showDoneToast(context, "Post Mutlipart Request")
+        context?.showDoneToast(R.string.post_multipart_request)
     }
 
     /**
      * Demonstrates a connection error which results in an exception. Span status is set to ERROR
      */
-    fun networkError() {
+    private fun networkError() {
         val request = Request.Builder()
             .url("https://www.example.invalid")
             .build()
@@ -428,7 +452,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         runOnBackgroundThread {
             try {
                 client.newCall(request).execute()
-                CommonUtils.showDoneToast(context, "Network Error")
+                context?.showDoneToast(R.string.network_error)
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -450,7 +474,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * like Cache-Control: max-age=9600. There are cache headers to force a cached response,
      * force a network response, or force the network response to be validated with a conditional GET.
      */
-    fun responseCaching() {
+    private fun responseCaching() {
         val request = Request.Builder()
             .url("https://publicobject.com/helloworld.txt")
             .build()
@@ -475,7 +499,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             }
 
             Log.v(TAG, "Response 2 equals Response 1? " + (response1Body == response2Body))
-            CommonUtils.showDoneToast(context, "Response Caching")
+            context?.showDoneToast(R.string.response_caching)
         }
     }
 
@@ -485,7 +509,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      * Use this to conserve the network when a call is no longer necessary; for example when your
      * user navigates away from an application. Both synchronous and asynchronous calls can be canceled.
      */
-    fun canceledCall() {
+    private fun canceledCall() {
         val request = Request.Builder()
             .url("https://httpbin.org/delay/2") // This URL is served with a 2 second delay.
             .build()
@@ -522,7 +546,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                         e
                     )
                 )
-                CommonUtils.showDoneToast(context, "Canceled Call")
+                context?.showDoneToast(R.string.canceled_call)
             }
         }
     }
@@ -608,7 +632,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
     }
 
     private fun writeOutBitmapIntoFile(file: File): File {
-        val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(100, 100)
 
         try {
             FileOutputStream(file).use { out ->

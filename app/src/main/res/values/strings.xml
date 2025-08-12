@@ -1,77 +1,53 @@
 <resources>
-    <string name="app_name" translatable="false">Smartlook</string>
+    <string name="app_name" translatable="false">Splunk OTel Android</string>
 
     <string name="menu_title">Menu</string>
-    <string name="menu_crash_reports_title">Crash Reports</string>
-    <string name="menu_crash_reports_illegal">IllegalArgumentException</string>
-    <string name="menu_crash_on_main_thread">Crash on Main Thread</string>
-    <string name="menu_crash_in_background">Crash in Background</string>
-    <string name="menu_crash_with_no_app_code">Crash with no App Code</string>
-    <string name="menu_crash_with_no_stacktrace">Crash with no Stacktrace</string>
-    <string name="menu_crash_with_out_of_memory_error">Crash with Out of Memory Error</string>
-    <string name="menu_crash_with_chained_exceptions">Crash with Chained Exceptions</string>
-    <string name="menu_crash_reports_null">NullPointerException</string>
-    <string name="menu_trigger_anr">Trigger ANR</string>
-    <string name="menu_okhttp_sample_calls">Okhttp sample calls</string>
     <string name="menu_network_request_title">Network Requests</string>
-    <string name="menu_httpurlconnection_title">HttpURLConnection</string>
-    <string name="menu_web_view_native_bridge_title">Web View Native Bridge</string>
-    <string name="menu_web_view_nextgen">Get Session ID (Nextgen)</string>
-    <string name="menu_web_view_legacy">Get Session ID (Legacy)</string>
+    <string name="latest_api_title">Latest APIs</string>
+    <string name="legacy_api_title">Legacy APIs</string>
+
+    <!-- Done toast -->
+    <string name="toast_action_done">%1$s: Done!</string>
+    <string name="toast_legacy_action_done">%1$s (Legacy): Done!</string>
+
+    <!-- Crash Reports -->
+    <string name="crash_reports_title">Crash Reports</string>
+    <string name="crash_reports_illegal">IllegalArgumentException</string>
+    <string name="crash_on_main_thread">Crash on Main Thread</string>
+    <string name="crash_in_background">Crash in Background</string>
+    <string name="crash_with_no_app_code">Crash with no App Code</string>
+    <string name="crash_with_no_stacktrace">Crash with no Stacktrace</string>
+    <string name="crash_with_out_of_memory_error">Crash with Out of Memory Error</string>
+    <string name="crash_with_chained_exceptions">Crash with Chained Exceptions</string>
+    <string name="crash_reports_null">NullPointerException</string>
+    <string name="trigger_anr">Trigger ANR</string>
+
+    <!-- Custom tracking -->
     <string name="custom_tracking_title">Custom Tracking</string>
-    <string name="custom_tracking_latest_api_title">Latest APIs</string>
-    <string name="custom_tracking_legacy_api_title">Legacy APIs</string>
     <string name="track_custom_event">Track Custom Event</string>
     <string name="track_workflow">Track Workflow</string>
     <string name="track_exception">Track Exception</string>
     <string name="track_exception_with_attributes">Track Exception With Attributes</string>
-    <string name="slow_rendering_title">Slow Rendering</string>
-    <string name="slow_render">Slow Render (30ms delay)</string>
-    <string name="frozen_render">Frozen Render (800ms delay)</string>
 
     <!-- Global Attributes -->
-    <string name="menu_global_attributes_title">Global Attributes</string>
-    <string name="menu_set_string_attribute">Set String Attribute</string>
-    <string name="menu_set_long_attribute">Set Long Attribute</string>
-    <string name="menu_set_double_attribute">Set Double Attribute</string>
-    <string name="menu_set_boolean_attribute">Set Boolean Attribute</string>
-    <string name="menu_set_generic_attribute">Set Generic Attribute (AttributeKey)</string>
-    <string name="menu_remove_string_attribute">Remove String Attribute</string>
-    <string name="menu_remove_generic_attribute">Remove Generic Attribute (AttributeKey)</string>
-    <string name="menu_get_string_attribute">Get String Attribute</string>
-    <string name="menu_get_generic_attribute">Get Generic Attribute (AttributeKey)</string>
-    <string name="menu_set_all_global_attributes">Set All Global Attributes</string>
-    <string name="menu_remove_all_global_attributes">Remove All Global Attributes</string>
-    <string name="menu_get_all_global_attributes">Get All Global Attributes</string>
-    <string name="menu_legacy_set_global_attribute">Set Global Attribute (Legacy API) </string>
-    <string name="menu_legacy_update_global_attributes">Update Global Attributes (Legacy API)</string>
+    <string name="global_attributes_title">Global Attributes</string>
+    <string name="set_string_global_attribute">Set String Global Attribute</string>
+    <string name="set_long_global_attribute">Set Long Global Attribute</string>
+    <string name="set_double_global_attribute">Set Double Global Attribute</string>
+    <string name="set_boolean_global_attribute">Set Boolean Global Attribute</string>
+    <string name="set_generic_global_attribute">Set Generic Global Attribute (AttributeKey)</string>
+    <string name="remove_string_global_attribute">Remove String Global Attribute</string>
+    <string name="remove_generic_global_attribute">Remove Generic Global Attribute (AttributeKey)</string>
+    <string name="get_string_global_attribute">Get String Global Attribute</string>
+    <string name="get_generic_global_attribute">Get Generic Global Attribute (AttributeKey)</string>
+    <string name="set_all_global_attributes">Set All Global Attributes</string>
+    <string name="remove_all_global_attributes">Remove All Global Attributes</string>
+    <string name="get_all_global_attributes">Get All Global Attributes</string>
+    <string name="update_global_attributes">Update Global Attributes</string>
 
-    <string name="okhttp_title">OkHttp</string>
+    <!-- HttpURLConnection -->
     <string name="httpurlconnection_title">HttpURLConnection</string>
-    <string name="webview_title">WebView</string>
-    <string name="customtracking_title">CustomTracking</string>
-
-    <!-- Fragment Okhttp -->
-    <string name="synchronous_get">Synchronous GET</string>
-    <string name="asynchronous_get">Asynchronous GET</string>
-    <string name="concurrent_asynchronous_get">Concurrent asynchronous GET</string>
-    <string name="parent_context_propagation_async_get">Parent Context Prop Async GET</string>
-    <string name="retry_request">Retry request</string>
-    <string name="multiple_headers">Multiple headers</string>
-    <string name="post_markdown">Post markdown</string>
-    <string name="post_streaming">Post streaming</string>
-    <string name="post_file">Post file</string>
-    <string name="post_form_parameters">Post form parameters</string>
-    <string name="post_mutlipart_request">Post mutlipart request</string>
-    <string name="network_error">Network Error</string>
-    <string name="response_caching">Response caching</string>
-    <string name="canceled_call">Canceled call</string>
-    <string name="http_toast">%s, Done!</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <!-- Fragment HttpURLConnection -->
-    <string name="custom_url_section_title">Test with Custom URL</string>
+    <string name="custom_url_section_title">Custom URL Test</string>
     <string name="custom_url">URL</string>
     <string name="custom_url_get">GET</string>
     <string name="others_section_title">Other Tests</string>
@@ -83,5 +59,38 @@
     <string name="sustained_connection">Sustained Connection</string>
     <string name="stalled_request">Stalled Request</string>
     <string name="server_timing_header_in_response">Server-Timing Header In Response</string>
+
+    <!-- Okhttp -->
+    <string name="okhttp_sample_calls">Okhttp sample calls</string>
+    <string name="okhttp_title">OkHttp</string>
+    <string name="manual_instrumentation_api_selection_title">Manual Instrumentation API type</string>
+    <string name="latest_api_option">Latest APIs</string>
+    <string name="legacy_api_option">Legacy APIs</string>
+    <string name="synchronous_get">Synchronous GET</string>
+    <string name="asynchronous_get">Asynchronous GET</string>
+    <string name="concurrent_asynchronous_get">Concurrent asynchronous GET</string>
+    <string name="parent_context_propagation_async_get">Parent Context Prop Async GET</string>
+    <string name="retry_request">Retry request</string>
+    <string name="multiple_headers">Multiple headers</string>
+    <string name="post_markdown">Post markdown</string>
+    <string name="post_streaming">Post streaming</string>
+    <string name="post_file">Post file</string>
+    <string name="post_form_parameters">Post form parameters</string>
+    <string name="post_multipart_request">Post multipart request</string>
+    <string name="network_error">Network Error</string>
+    <string name="response_caching">Response caching</string>
+    <string name="canceled_call">Canceled call</string>
+
+    <!-- Slow rendering -->
+    <string name="slow_rendering_title">Slow Rendering</string>
+    <string name="slow_render">Slow Render (30ms delay)</string>
+    <string name="frozen_render">Frozen Render (800ms delay)</string>
+
+    <!-- WebView -->
+    <string name="web_view_title">WebView</string>
+    <string name="web_view_native_bridge_title">Web View Native Bridge</string>
+    <string name="web_view_latest">Get Session ID (Latest)</string>
+    <string name="web_view_legacy">Get Session ID (Legacy)</string>
+
 
 </resources>

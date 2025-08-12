@@ -10,6 +10,10 @@ buildscript {
     }
 }
 
+plugins {
+    id(Dependencies.nexusPublishPluginId) version Dependencies.nexusPublishPluginVersion
+}
+
 allprojects {
     apply<plugins.ConfigKtLint>()
 
@@ -32,4 +36,26 @@ allprojects {
             setUrl("https://sdk.smartlook.com/android/release")
         }
     }
+
+    afterEvaluate {
+        if (!isReleaseBuild()) {
+            version = "$version-SNAPSHOT"
+        }
+    }
+}
+
+nexusPublishing {
+    packageGroup.set("com.splunk")
+    repositories {
+        sonatype {
+            username.set(System.getenv("SONATYPE_USER"))
+            password.set(System.getenv("SONATYPE_KEY"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+        }
+    }
+}
+
+fun Project.isReleaseBuild(): Boolean {
+    return findProperty("release") == "true"
 }

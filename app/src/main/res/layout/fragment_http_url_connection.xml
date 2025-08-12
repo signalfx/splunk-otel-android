@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroller"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,123 +12,152 @@
 
         <TextView
             android:id="@+id/customUrlSectionTitle"
-            style="@style/Header"
-            android:layout_width="wrap_content"
+            style="@style/Heading"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:text="@string/custom_url_section_title"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"  />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
-            style = "@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/customUrlSectionTitle">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/customUrlSectionTitle">
 
             <EditText
                 android:id="@+id/customUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/custom_url"
-                android:inputType="textUri"/>
+                android:inputType="textUri" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
+        <TextView
             android:id="@+id/customUrlGet"
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:text="@string/custom_url_get"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"/>
+            app:layout_constraintTop_toBottomOf="@id/textInputLayout" />
 
         <TextView
             android:id="@+id/othersSectionTitle"
-            style="@style/Header"
-            android:layout_width="wrap_content"
+            style="@style/Heading"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:text="@string/others_section_title"
+            android:layout_marginTop="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/customUrlGet" />
+            app:layout_constraintTop_toBottomOf="@id/customUrlGet" />
 
-        <Button
+        <TextView
             android:id="@+id/successfulGet"
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:text="@string/successful_get"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/othersSectionTitle"
-             />
+            app:layout_constraintTop_toBottomOf="@id/othersSectionTitle" />
 
-        <Button
+        <TextView
             android:id="@+id/unSuccessfulGet"
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:text="@string/unsuccessful_get"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/successfulGet" />
+            app:layout_constraintTop_toBottomOf="@id/successfulGet" />
 
-        <Button
+        <TextView
             android:id="@+id/getWithoutInputStream"
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:text="@string/get_without_input_stream"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/unSuccessfulGet" />
+            app:layout_constraintTop_toBottomOf="@id/unSuccessfulGet" />
 
-        <Button
+        <TextView
             android:id="@+id/fourConcurrentGetRequests"
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:text="@string/four_concurrent_get_requests"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/getWithoutInputStream" />
+            app:layout_constraintTop_toBottomOf="@id/getWithoutInputStream" />
 
-        <Button
+        <TextView
             android:id="@+id/post"
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:text="@string/post"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fourConcurrentGetRequests" />
+            app:layout_constraintTop_toBottomOf="@id/fourConcurrentGetRequests" />
 
-        <Button
+        <TextView
             android:id="@+id/sustainedConnection"
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:text="@string/sustained_connection"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/post" />
+            app:layout_constraintTop_toBottomOf="@id/post" />
 
-        <Button
+        <TextView
             android:id="@+id/stalledRequest"
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:text="@string/stalled_request"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sustainedConnection" />
+            app:layout_constraintTop_toBottomOf="@id/sustainedConnection" />
 
-        <Button
+        <TextView
             android:id="@+id/serverTimingHeaderInResponse"
+            style="@style/Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:text="@string/server_timing_header_in_response"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/stalledRequest" />
+            app:layout_constraintTop_toBottomOf="@id/stalledRequest" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

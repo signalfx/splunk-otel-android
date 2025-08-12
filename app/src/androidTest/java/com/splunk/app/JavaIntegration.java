@@ -17,6 +17,7 @@
 package com.splunk.app;
 
 import android.app.Application;
+import android.webkit.WebView;
 
 import com.splunk.rum.integration.agent.api.AgentConfiguration;
 import com.splunk.rum.integration.agent.api.EndpointConfiguration;
@@ -34,7 +35,6 @@ import com.splunk.rum.integration.crash.CrashModuleConfiguration;
 import com.splunk.rum.integration.customtracking.CustomTracking;
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration;
 import com.splunk.rum.integration.interactions.InteractionsModuleConfiguration;
-import com.splunk.rum.integration.lifecycle.LifecycleModuleConfiguration;
 import com.splunk.rum.integration.navigation.Navigation;
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration;
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration;
@@ -49,6 +49,7 @@ import java.util.Arrays;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.Span;
 
 public class JavaIntegration extends Application {
 
@@ -74,7 +75,7 @@ public class JavaIntegration extends Application {
         userState.getTrackingMode();
 
         ISession session = agent.getSession();
-        session.getState().getSessionId();
+        session.getState().getId();
         session.getState().getSamplingRate();
 
         agent.getOpenTelemetry();
@@ -85,6 +86,13 @@ public class JavaIntegration extends Application {
 
         Navigation navigation = Navigation.getInstance();
         navigation.track("sample_screen_name");
+
+        agent.addRumEvent("event", Attributes.of(AttributeKey.stringKey("key"), "value"));
+        agent.addRumException(new Throwable());
+        agent.addRumException(new Throwable(), Attributes.of(AttributeKey.stringKey("key"), "value"));
+        Span workflow = agent.startWorkflow("workflow");
+
+        agent.integrateWithBrowserRum(new WebView(this));
     }
 
     private SplunkRum install() {
@@ -115,7 +123,6 @@ public class JavaIntegration extends Application {
                         Arrays.asList("Date", "Content-Type", "Content-Length")
                 ),
                 new InteractionsModuleConfiguration(),
-                new LifecycleModuleConfiguration(),
                 new NavigationModuleConfiguration(true, true),
                 new NetworkMonitorModuleConfiguration(),
                 new OkHttp3AutoModuleConfiguration( true,

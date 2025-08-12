@@ -14,6 +14,10 @@ object Dependencies {
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
     const val desugar = "com.android.tools:desugar_jdk_libs:$desugarVersion"
 
+    // Nexus publish plugin
+    const val nexusPublishPluginId = "io.github.gradle-nexus.publish-plugin"
+    const val nexusPublishPluginVersion = "2.0.0"
+
     // SDK module level dependencies
 
     /**
@@ -83,7 +87,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.14"
+        private const val version = "1.0.17"
 
         const val bridge = "com.cisco.android:sr-bridge:$version"
         const val commonEncoder = "com.cisco.android:sr-common-encoder:$version"
@@ -106,7 +110,6 @@ object Dependencies {
     object Otel {
         private const val oTelInstrumentationBomAlpha = "2.15.0-alpha"
         const val otelAndroidBomVersion = "0.11.0-alpha"
-
         const val instrumentationBomAlpha = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$oTelInstrumentationBomAlpha"
         const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
 

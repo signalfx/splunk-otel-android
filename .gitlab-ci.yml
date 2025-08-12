@@ -38,16 +38,18 @@ stages:
 build:
   stage: build
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
   extends: .prepare-android-environment
   script:
     - touch local.properties
+    - export ORG_GRADLE_PROJECT_signingKey=$GPG_SECRET_KEY
+    - export ORG_GRADLE_PROJECT_signingPassword=$GPG_PASSWORD
     - ./gradlew build publish
 
 sast-scan:
   stage: verify
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
   extends: .sast_scan
   variables:
     SAST_SCANNER: "Semgrep"
@@ -62,7 +64,7 @@ oss-scan:
     - PATH=$JAVA_HOME/bin:$PATH
     - touch local.properties
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
 
 release:
   stage: release

@@ -20,15 +20,8 @@ class Navigation internal constructor() {
 
     internal var listener: Listener? = null
 
-    val preferences = Preferences()
-
     fun track(screenName: String) {
         listener?.onScreenNameChanged(screenName)
-    }
-
-    class Preferences {
-        var isFragmentTrackingEnabled = false // TODO implementation
-        var isActivityTrackingEnabled = false // TODO implementation
     }
 
     internal interface Listener {

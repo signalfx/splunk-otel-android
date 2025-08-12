@@ -11,123 +11,33 @@
 
 		<TextView
 			android:id="@+id/crash_title"
-			style="@style/Header"
+			style="@style/Heading"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/menu_crash_reports_title"
-			android:textSize="18sp"
-			android:textStyle="bold"
-			app:layout_constraintTop_toTopOf="parent" />
+			android:layout_marginTop="30dp"
+			android:text="@string/crash_reports_title"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"  />
 
 		<TextView
-			android:id="@+id/crash_reports_illegal"
+			android:id="@+id/crash_reports"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_reports_illegal"
+			android:text="@string/crash_reports_title"
 			app:layout_constraintTop_toBottomOf="@id/crash_title" />
 
 		<TextView
-			android:id="@+id/crash_reports_main_thread"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_on_main_thread"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_illegal" />
-
-		<TextView
-			android:id="@+id/crash_reports_in_background"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_in_background"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_main_thread" />
-
-		<TextView
-			android:id="@+id/crash_reports_no_app_code"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_with_no_app_code"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_in_background" />
-
-		<TextView
-			android:id="@+id/crash_reports_no_stacktrace"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_with_no_stacktrace"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_no_app_code" />
-
-		<TextView
-			android:id="@+id/crash_reports_out_of_memory_error"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_with_out_of_memory_error"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_no_stacktrace" />
-
-		<TextView
-			android:id="@+id/crash_reports_with_chained_exceptions"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_with_chained_exceptions"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_out_of_memory_error" />
-
-		<TextView
-			android:id="@+id/crash_reports_null"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_crash_reports_null"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_with_chained_exceptions" />
-
-		<TextView
-			android:id="@+id/anr_event"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_trigger_anr"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports_null" />
-
-		<TextView
 			android:id="@+id/network_request_title"
-			style="@style/Header"
+			style="@style/Heading"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="30dp"
 			android:text="@string/menu_network_request_title"
-			android:textSize="18sp"
-			android:textStyle="bold"
-			app:layout_constraintTop_toBottomOf="@id/anr_event" />
+			app:layout_constraintTop_toBottomOf="@id/crash_reports" />
 
 		<TextView
 			android:id="@+id/okhttp_sample_calls"
@@ -137,40 +47,38 @@
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_okhttp_sample_calls"
+			android:text="@string/okhttp_sample_calls"
 			app:layout_constraintTop_toBottomOf="@id/network_request_title" />
 
 		<TextView
-			android:id="@+id/httpurlconnection"
+			android:id="@+id/http_url_connection"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_httpurlconnection_title"
+			android:text="@string/httpurlconnection_title"
 			app:layout_constraintTop_toBottomOf="@id/okhttp_sample_calls" />
 
 		<TextView
 			android:id="@+id/web_view_native_bridge_title"
-			style="@style/Header"
+			style="@style/Heading"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="30dp"
-			android:text="@string/menu_web_view_native_bridge_title"
-			android:textSize="18sp"
-			android:textStyle="bold"
-			app:layout_constraintTop_toBottomOf="@id/httpurlconnection" />
+			android:text="@string/web_view_native_bridge_title"
+			app:layout_constraintTop_toBottomOf="@id/http_url_connection" />
 
 		<TextView
-			android:id="@+id/web_view_nextgen"
+			android:id="@+id/web_view_latest"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_web_view_nextgen"
+			android:text="@string/web_view_latest"
 			app:layout_constraintTop_toBottomOf="@id/web_view_native_bridge_title" />
 
 		<TextView
@@ -181,23 +89,21 @@
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_web_view_legacy"
-			app:layout_constraintTop_toBottomOf="@id/web_view_nextgen" />
+			android:text="@string/web_view_legacy"
+			app:layout_constraintTop_toBottomOf="@id/web_view_latest" />
 
 		<TextView
 			android:id="@+id/menu_custom_tracking_title"
-			style="@style/Header"
+			style="@style/Heading"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="30dp"
 			android:text="@string/custom_tracking_title"
-			android:textSize="18sp"
-			android:textStyle="bold"
 			app:layout_constraintTop_toBottomOf="@+id/web_view_legacy" />
 
 
 		<TextView
-			android:id="@+id/menu_custom_tracking_button"
+			android:id="@+id/menu_custom_tracking"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -210,202 +116,45 @@
 
 		<TextView
 			android:id="@+id/global_attributes_title"
-			style="@style/Header"
+			style="@style/Heading"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="30dp"
-			android:text="@string/menu_global_attributes_title"
-			android:textSize="18sp"
-			android:textStyle="bold"
-			app:layout_constraintTop_toBottomOf="@+id/menu_custom_tracking_button" />
+			android:text="@string/global_attributes_title"
+			app:layout_constraintTop_toBottomOf="@+id/menu_custom_tracking" />
+
 
 		<TextView
-			android:id="@+id/set_string_attribute"
+			android:id="@+id/global_attributes"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
-			android:layout_marginTop="20dp"
+			android:layout_marginTop="5dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_string_attribute"
+			android:text="@string/global_attributes_title"
 			app:layout_constraintTop_toBottomOf="@id/global_attributes_title" />
 
 		<TextView
-			android:id="@+id/set_long_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_long_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_string_attribute" />
-
-		<TextView
-			android:id="@+id/set_double_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_double_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_long_attribute" />
-
-		<TextView
-			android:id="@+id/set_boolean_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_boolean_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_double_attribute" />
-
-		<TextView
-			android:id="@+id/set_generic_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_generic_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_boolean_attribute" />
-
-		<TextView
-			android:id="@+id/remove_string_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_remove_string_attribute"
-			app:layout_constraintTop_toBottomOf="@id/set_generic_attribute" />
-
-		<TextView
-			android:id="@+id/remove_generic_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_remove_generic_attribute"
-			app:layout_constraintTop_toBottomOf="@id/remove_string_attribute" />
-
-		<TextView
-			android:id="@+id/get_string_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_get_string_attribute"
-			app:layout_constraintTop_toBottomOf="@id/remove_generic_attribute" />
-
-		<TextView
-			android:id="@+id/get_generic_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_get_generic_attribute"
-			app:layout_constraintTop_toBottomOf="@id/get_string_attribute" />
-
-		<TextView
-			android:id="@+id/set_all_global_attributes"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_set_all_global_attributes"
-			app:layout_constraintTop_toBottomOf="@id/get_generic_attribute" />
-
-		<TextView
-			android:id="@+id/remove_all_global_attributes"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_remove_all_global_attributes"
-			app:layout_constraintTop_toBottomOf="@id/set_all_global_attributes" />
-
-		<TextView
-			android:id="@+id/get_all_global_attributes"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_get_all_global_attributes"
-			app:layout_constraintTop_toBottomOf="@id/remove_all_global_attributes" />
-
-		<TextView
-			android:id="@+id/legacy_set_global_attribute"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_legacy_set_global_attribute"
-			app:layout_constraintTop_toBottomOf="@id/get_all_global_attributes" />
-
-		<TextView
-			android:id="@+id/legacy_update_global_attributes"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/menu_legacy_update_global_attributes"
-			app:layout_constraintTop_toBottomOf="@id/legacy_set_global_attribute" />
-
-		<TextView
 			android:id="@+id/slow_rendering_title"
-			style="@style/Header"
+			style="@style/Heading"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="30dp"
 			android:text="@string/slow_rendering_title"
-			android:textSize="18sp"
-			android:textStyle="bold"
-			app:layout_constraintTop_toBottomOf="@+id/legacy_update_global_attributes" />
+			app:layout_constraintTop_toBottomOf="@+id/global_attributes" />
 
 		<TextView
-			android:id="@+id/slow_render"
+			android:id="@+id/slow_rendering"
 			style="@style/Button"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginTop="20dp"
 			android:layout_marginRight="20dp"
-			android:text="@string/slow_render"
+			android:text="@string/slow_rendering_title"
 			app:layout_constraintTop_toBottomOf="@id/slow_rendering_title" />
 
-		<TextView
-			android:id="@+id/frozen_render"
-			style="@style/Button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="20dp"
-			android:text="@string/frozen_render"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintTop_toBottomOf="@id/slow_render" />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

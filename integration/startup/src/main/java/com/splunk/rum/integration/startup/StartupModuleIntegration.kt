@@ -27,6 +27,7 @@ import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import io.opentelemetry.android.instrumentation.InstallationContext
+import java.util.concurrent.TimeUnit
 
 internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfiguration>(
     defaultModuleConfiguration = StartupModuleConfiguration()
@@ -83,12 +84,17 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             return
         }
 
-        provider.get(RumConstants.RUM_TRACER_NAME)
+        val span = provider.get(RumConstants.RUM_TRACER_NAME)
             .spanBuilder("AppStart")
-            .setStartTimestamp(startTimestamp.toInstant())
-            .setAttribute("component", "appstart")
-            .setAttribute("start.type", name)
+            .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
+
+        // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
+        // "unknown" to ensure App Start event doesn't show up under a screen on UI
+        span
+            .setAttribute(RumConstants.COMPONENT_KEY, "appstart")
+            .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
+            .setAttribute("start.type", name)
             .end(endTimestamp.toInstant())
     }
 }
