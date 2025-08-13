@@ -57,6 +57,7 @@ class BuildIdInjector(private val project: Project) {
             }
         }
     }
+    
     private fun injectMetadataIntoMergedManifest(variant: ApplicationVariant, buildId: String) {
         variant.outputs.forEach { output ->
             try {
