@@ -66,11 +66,6 @@ internal class ActivityTracer(
         activeSpan.endActiveSpan()
     }
 
-    fun addPreviousScreenAttribute(): ActivityTracer {
-        activeSpan.addPreviousScreenAttribute(activityName)
-        return this
-    }
-
     fun addEvent(eventName: String): ActivityTracer {
         activeSpan.addEvent(eventName)
         return this

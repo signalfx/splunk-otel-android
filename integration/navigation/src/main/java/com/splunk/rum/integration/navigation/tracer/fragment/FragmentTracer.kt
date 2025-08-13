@@ -48,11 +48,6 @@ internal class FragmentTracer(
         activeSpan.endActiveSpan()
     }
 
-    fun addPreviousScreenAttribute(): FragmentTracer {
-        activeSpan.addPreviousScreenAttribute(fragmentName)
-        return this
-    }
-
     fun addEvent(eventName: String): FragmentTracer {
         activeSpan.addEvent(eventName)
         return this

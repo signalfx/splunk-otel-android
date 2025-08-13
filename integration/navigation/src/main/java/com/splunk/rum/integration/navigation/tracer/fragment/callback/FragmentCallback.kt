@@ -58,7 +58,6 @@ internal class FragmentCallback(private val manager: FragmentTracerManager) :
         manager.getTracer(f)
             .startSpanIfNoneInProgress("Resumed")
             .addEvent("onFragmentResumed")
-            .addPreviousScreenAttribute()
             .endActiveSpan()
     }
 

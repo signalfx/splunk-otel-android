@@ -35,7 +35,6 @@ internal class ActivityCallback21(override val tracer: ActivityTracerManager) : 
     override fun onActivityResumed(activity: Activity) {
         tracer.startSpanIfNoneInProgress(activity, "Resumed")
             .addEvent("onActivityResumed")
-            .addPreviousScreenAttribute()
             .endSpanForActivityResumed()
     }
 
