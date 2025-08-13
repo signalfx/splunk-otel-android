@@ -40,6 +40,8 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.api.trace.Span
+import okhttp3.Call
+import okhttp3.OkHttpClient
 import java.util.function.Consumer
 
 /**
@@ -183,6 +185,27 @@ class SplunkRum private constructor(
             parameterTypes = arrayOf(Throwable::class.java, Attributes::class.java),
             args = arrayOf(throwable, attributes)
         )
+    }
+
+    /**
+     * Wrap the provided [OkHttpClient] with OpenTelemetry and RUM instrumentation. Since
+     * [Call.Factory] is the primary useful interface implemented by the OkHttpClient, this
+     * should be a drop-in replacement for any usages of OkHttpClient.
+     *
+     * @param client The [OkHttpClient] to wrap with OpenTelemetry and RUM instrumentation.
+     * @return A [Call.Factory] implementation.
+     */
+    @Deprecated(
+        "Use SplunkRum.buildOkHttpCallFactory(client)",
+        ReplaceWith("SplunkRum.buildOkHttpCallFactory(client)")
+    )
+    fun createRumOkHttpCallFactory(client: OkHttpClient): Call.Factory {
+        return LegacyAPIReflectionUtils.invokeOnCompanionInstance<Call.Factory>(
+            className = "com.splunk.rum.integration.okhttp3.manual.OkHttpManualInstrumentation",
+            methodName = "buildOkHttpCallFactory",
+            parameterTypes = arrayOf(OkHttpClient::class.java),
+            args = arrayOf(client)
+        ) ?: throw IllegalStateException()
     }
 
     companion object {

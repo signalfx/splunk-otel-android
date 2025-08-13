@@ -40,6 +40,7 @@ import com.splunk.rum.integration.navigation.NavigationModuleConfiguration;
 import com.splunk.rum.integration.networkmonitor.NetworkMonitorModuleConfiguration;
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration;
 import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration;
+import com.splunk.rum.integration.okhttp3.manual.OkHttpManualInstrumentation;
 import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration;
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration;
 import com.splunk.rum.integration.startup.StartupModuleConfiguration;
@@ -50,6 +51,7 @@ import java.util.Arrays;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
+import okhttp3.OkHttpClient;
 
 public class JavaIntegration extends Application {
 
@@ -93,6 +95,10 @@ public class JavaIntegration extends Application {
         Span workflow = agent.startWorkflow("workflow");
 
         agent.integrateWithBrowserRum(new WebView(this));
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
+        agent.createRumOkHttpCallFactory(okHttpClient);
+        OkHttpManualInstrumentation.getInstance().buildOkHttpCallFactory(okHttpClient);
     }
 
     private SplunkRum install() {

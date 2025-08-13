@@ -43,4 +43,13 @@ dependencies {
     implementation(Dependencies.SessionReplay.commonUtils)
 
     compileOnly(Dependencies.Android.Compose.ui)
+
+    /**
+     * Needed for the legacy API mapping. To be removed.
+     *
+     * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
+     */
+    implementation(Dependencies.okhttp)
+    implementation(Dependencies.okio)
+
 }

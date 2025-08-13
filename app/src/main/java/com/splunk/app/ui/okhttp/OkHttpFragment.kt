@@ -32,7 +32,6 @@ import com.splunk.app.ui.BaseFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
-import com.splunk.rum.integration.okhttp3.manual.extension.createRumOkHttpCallFactory
 import com.splunk.rum.integration.okhttp3.manual.extension.okHttpManualInstrumentation
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.OpenTelemetrySdk
