@@ -19,7 +19,13 @@ package com.splunk.rum.mappingfile.plugin.utils
 import com.android.build.gradle.api.ApplicationVariant
 import java.io.File
 import java.util.*
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 import org.gradle.api.Project
+import org.w3c.dom.Element
 
 class BuildIdInjector(private val project: Project) {
 
@@ -28,7 +34,8 @@ class BuildIdInjector(private val project: Project) {
 
         variant.outputs.forEach { output ->
             try {
-                val processManifestTask = output.processManifest
+                val processManifestTaskProvider = output.processManifestProvider
+                val processManifestTask = processManifestTaskProvider.get()
                 project.logger.debug("Splunk RUM: Hooking into processManifest task: ${processManifestTask.name}")
 
                 processManifestTask.doLast {
@@ -50,91 +57,116 @@ class BuildIdInjector(private val project: Project) {
             }
         }
     }
+    private fun injectMetadataIntoMergedManifest(variant: ApplicationVariant, buildId: String) {
+        variant.outputs.forEach { output ->
+            try {
+                val processManifestTaskProvider = output.processManifestProvider
+                val processManifestTask = processManifestTaskProvider.get()
+                val outputFiles = processManifestTask.outputs.files.files
 
-    private fun injectMetadataIntoMergedManifest(
-        variant: ApplicationVariant,
-        buildId: String
-    ) {
-        project.logger.info("Splunk RUM: Searching for manifest files for variant '${variant.name}'")
+                println("Splunk RUM: processManifest task outputs for variant '${variant.name}':")
+                println("Splunk RUM: Found ${outputFiles.size} output files:")
+                outputFiles.forEach { file ->
+                    println("  - ${file.absolutePath} (exists: ${file.exists()}, isFile: ${file.isFile})")
 
-        val buildDir = project.layout.buildDirectory.get().asFile
-        project.logger.debug("Splunk RUM: Build directory: ${buildDir.absolutePath}")
+                    // If it's a directory, look for AndroidManifest.xml inside it
+                    if (file.isDirectory) {
+                        val manifestInDir = File(file, "AndroidManifest.xml")
+                        println(
+                            "    → Looking for AndroidManifest.xml: ${manifestInDir.absolutePath} (exists: ${manifestInDir.exists()})"
+                        )
+                    }
+                }
 
-        val manifestFiles = buildDir.walkTopDown()
-            .filter { it.name == "AndroidManifest.xml" && it.absolutePath.contains(variant.name) }
-            .filter { it.exists() }
-            .toList()
+                // Updated logic to find the manifest - check both files and directories
+                val manifestFile = outputFiles.firstNotNullOfOrNull { file ->
+                    when {
+                        file.isFile && file.name == "AndroidManifest.xml" && file.exists() -> file
+                        file.isDirectory -> {
+                            val manifestInDir = File(file, "AndroidManifest.xml")
+                            if (manifestInDir.exists()) manifestInDir else null
+                        }
+                        else -> null
+                    }
+                }
 
-        if (manifestFiles.isNotEmpty()) {
-            project.logger.info("Splunk RUM: Found ${manifestFiles.size} manifest files:")
-            manifestFiles.forEach { file ->
-                project.logger.info("  - ${file.absolutePath}")
-            }
-
-            var successCount = 0
-            manifestFiles.forEach { manifestFile ->
-                project.logger.debug("Splunk RUM: Processing manifest file: ${manifestFile.name}")
-                try {
+                if (manifestFile != null) {
+                    project.logger.info("Splunk RUM: Found merged manifest: ${manifestFile.absolutePath}")
                     val wasModified = addMetadataToManifest(manifestFile, buildId)
                     if (wasModified) {
-                        successCount++
-                        project.logger.info("Splunk RUM: Modified: ${manifestFile.name}")
+                        project.logger.info("Splunk RUM: Successfully modified manifest")
                     }
-                } catch (e: Exception) {
-                    project.logger.error("Splunk RUM: Failed: ${manifestFile.name} - ${e.message}")
-                    project.logger.debug("Splunk RUM: Error details: ${e.stackTraceToString()}")
+                } else {
+                    project.logger.warn("Splunk RUM: No AndroidManifest.xml found in task outputs")
                 }
+            } catch (e: Exception) {
+                project.logger.warn("Splunk RUM: Could not access manifest via task outputs: ${e.message}")
             }
-            project.logger.lifecycle("Splunk RUM: Successfully modified $successCount/${manifestFiles.size} files")
-        } else {
-            project.logger.warn("Splunk RUM: No manifest files found for variant ${variant.name}")
         }
     }
 
     private fun addMetadataToManifest(manifestFile: File, buildId: String): Boolean {
         project.logger.debug("Splunk RUM: Reading manifest file: ${manifestFile.absolutePath}")
+        if (!manifestFile.canWrite()) {
+            project.logger.warn("Splunk RUM: Manifest file is not writable: ${manifestFile.absolutePath}")
+            return false
+        }
 
         try {
-            var content = manifestFile.readText()
+            val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+            val document = documentBuilder.parse(manifestFile)
+            project.logger.debug("Splunk RUM: Successfully parsed XML document")
 
-            val existingMetadataPattern = Regex(
-                "<meta-data\\s+android:name=\"splunk\\.build_id\"[^>]*(?:/>|>[^<]*</meta-data>)",
-                RegexOption.DOT_MATCHES_ALL
-            )
-            if (existingMetadataPattern.containsMatchIn(content)) {
-                project.logger.info("Splunk RUM: Removing existing build ID metadata from: ${manifestFile.name}")
-                content = content.replace(existingMetadataPattern, "")
-                project.logger.debug("Splunk RUM: Removed existing metadata, new size: ${content.length} characters")
-            }
-
-            // Regex that handles both opening tags and self-closing tags
-            val applicationPattern = Regex("<application([^>]*?)(?:/>|>)", RegexOption.DOT_MATCHES_ALL)
-            val match = applicationPattern.find(content)
-
-            if (match != null) {
-                project.logger.debug("Splunk RUM: Found <application> tag in manifest")
-                val fullMatch = match.value
-                val metadataTag = "\n        <meta-data android:name=\"splunk.build_id\" android:value=\"$buildId\" />"
-
-                val replacement = if (fullMatch.endsWith("/>")) {
-                    project.logger.debug("Splunk RUM: Converting self-closing <application/> tag")
-                    val attributes = match.groupValues[1]
-                    "<application$attributes>$metadataTag\n    </application>"
-                } else {
-                    project.logger.debug("Splunk RUM: Adding metadata to existing <application> tag")
-                    "$fullMatch$metadataTag"
-                }
-
-                content = content.replace(fullMatch, replacement)
-                manifestFile.writeText(content)
-                project.logger.lifecycle(
-                    "Splunk RUM: Successfully injected build ID metadata into: ${manifestFile.name}"
-                )
-                return true
-            } else {
+            val applicationNodes = document.getElementsByTagName("application")
+            if (applicationNodes.length == 0) {
                 project.logger.error("Splunk RUM: Could not find <application> tag in: ${manifestFile.name}")
                 return false
             }
+
+            project.logger.debug("Splunk RUM: Found <application> tag in manifest")
+            val applicationElement = applicationNodes.item(0) as Element
+
+            // Collect potentially existing splunk.build_id to remove (from manual setup or previous runs)
+            val toRemove = mutableListOf<Element>()
+            val existingMetadata = applicationElement.getElementsByTagName("meta-data")
+            for (i in 0 until existingMetadata.length) {
+                val metaData = existingMetadata.item(i) as Element
+                if (metaData.getAttribute("android:name") == "splunk.build_id") {
+                    toRemove.add(metaData)
+                }
+            }
+
+            // Remove all existing splunk.build_id metadata
+            if (toRemove.isNotEmpty()) {
+                project.logger.info(
+                    "Splunk RUM: Removing ${toRemove.size} existing build ID metadata from: ${manifestFile.name}"
+                )
+                toRemove.forEach { applicationElement.removeChild(it) }
+                project.logger.debug("Splunk RUM: Removed existing metadata entries")
+            }
+
+            // Add newly generated splunk.build_id metadata
+            project.logger.debug("Splunk RUM: Adding metadata to <application> tag")
+            val metaDataElement = document.createElement("meta-data")
+            metaDataElement.setAttribute("android:name", "splunk.build_id")
+            metaDataElement.setAttribute("android:value", buildId)
+            applicationElement.appendChild(metaDataElement)
+
+            // Write back to file without reformatting
+            project.logger.debug("Splunk RUM: Writing modified XML back to file")
+            val transformer = TransformerFactory.newInstance().newTransformer()
+            transformer.setOutputProperty(OutputKeys.INDENT, "no")
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no")
+
+            val result = DOMSource(document)
+            val streamResult = StreamResult(manifestFile)
+            transformer.transform(result, streamResult)
+
+            project.logger.lifecycle(
+                "Splunk RUM: Successfully injected build ID metadata into: ${manifestFile.name}"
+            )
+
+            return true
         } catch (e: Exception) {
             project.logger.error("Splunk RUM: Error modifying ${manifestFile.name}: ${e.message}")
             project.logger.debug("Splunk RUM: Modification error details: ${e.stackTraceToString()}")

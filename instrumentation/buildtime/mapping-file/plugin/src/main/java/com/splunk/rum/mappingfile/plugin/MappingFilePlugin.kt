@@ -80,8 +80,8 @@ class MappingFilePlugin : Plugin<Project> {
         project.logger.lifecycle("Splunk RUM: Generated build ID for variant '${variant.name}': $buildId")
         project.logger.debug("Splunk RUM: Build ID length: ${buildId.length} characters")
 
-        val processManifestTask = variant.outputs.first().processManifest
-        project.tasks.named(processManifestTask.name).configure { task ->
+        val processManifestTaskProvider = variant.outputs.first().processManifestProvider
+        processManifestTaskProvider.configure { task ->
             task.outputs.upToDateWhen { false }
         }
         project.logger.debug("Splunk RUM: Configured processManifest task to always run")
