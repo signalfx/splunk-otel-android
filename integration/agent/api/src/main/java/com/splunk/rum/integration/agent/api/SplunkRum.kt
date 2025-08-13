@@ -40,9 +40,9 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.api.trace.Span
+import java.util.function.Consumer
 import okhttp3.Call
 import okhttp3.OkHttpClient
-import java.util.function.Consumer
 
 /**
  * The [SplunkRum] class is responsible for initializing and providing access to the RUM agent.
@@ -199,14 +199,13 @@ class SplunkRum private constructor(
         "Use SplunkRum.buildOkHttpCallFactory(client)",
         ReplaceWith("SplunkRum.buildOkHttpCallFactory(client)")
     )
-    fun createRumOkHttpCallFactory(client: OkHttpClient): Call.Factory {
-        return LegacyAPIReflectionUtils.invokeOnCompanionInstance<Call.Factory>(
+    fun createRumOkHttpCallFactory(client: OkHttpClient): Call.Factory =
+        LegacyAPIReflectionUtils.invokeOnCompanionInstance<Call.Factory>(
             className = "com.splunk.rum.integration.okhttp3.manual.OkHttpManualInstrumentation",
             methodName = "buildOkHttpCallFactory",
             parameterTypes = arrayOf(OkHttpClient::class.java),
             args = arrayOf(client)
         ) ?: throw IllegalStateException()
-    }
 
     companion object {
         private val noop = SplunkRum(

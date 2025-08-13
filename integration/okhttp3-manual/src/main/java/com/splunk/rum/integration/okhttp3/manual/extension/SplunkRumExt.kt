@@ -18,8 +18,6 @@ package com.splunk.rum.integration.okhttp3.manual.extension
 
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.okhttp3.manual.OkHttpManualInstrumentation
-import okhttp3.Call
-import okhttp3.OkHttpClient
 
 /**
  * Extension property to access the [OkHttpManualInstrumentation] instance via [SplunkRum].
