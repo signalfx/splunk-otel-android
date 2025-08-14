@@ -17,7 +17,9 @@
 package com.splunk.rum.integration.agent.internal.processor
 
 import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SCRIPT_INSTANCE_KEY
 import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
+import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_RUM_ID_KEY
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
@@ -28,6 +30,8 @@ class SessionReplaySessionIdLogProcessor(private val sessionManager: ISplunkSess
         val logRecordData = logRecord.toLogRecordData()
         if (logRecordData.instrumentationScopeInfo.name == RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
             logRecord.setAttribute(SESSION_ID_KEY, sessionManager.sessionId(logRecordData.timestampEpochNanos))
+                .setAttribute(SESSION_RUM_ID_KEY, sessionManager.sessionId(logRecordData.timestampEpochNanos))
+                .setAttribute(SCRIPT_INSTANCE_KEY, sessionManager.scriptId())
         }
     }
 }
