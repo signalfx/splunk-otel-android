@@ -19,18 +19,12 @@ internal object ScreenTrackerIntegration {
         val tracer = SplunkOpenTelemetrySdk.instance?.getTracer("io.opentelemetry.lifecycle") ?: return
         val application = context.applicationContext as Application
 
-        val visibleScreenTracker = VisibleScreenTracker(application)
-
-        registerActivityLifecycle(application, tracer, visibleScreenTracker)
-        registerFragmentLifecycle(application, tracer, visibleScreenTracker)
+        registerActivityLifecycle(application, tracer)
+        registerFragmentLifecycle(application, tracer)
     }
 
-    private fun registerActivityLifecycle(
-        application: Application,
-        tracer: Tracer,
-        visibleScreenTracker: VisibleScreenTracker
-    ) {
-        val tracerManager = ActivityTracerManager(tracer, visibleScreenTracker, null)
+    private fun registerActivityLifecycle(application: Application, tracer: Tracer) {
+        val tracerManager = ActivityTracerManager(tracer, null)
 
         val activityCallback = if (Build.VERSION.SDK_INT >= 29) {
             ActivityCallback29(tracerManager)
@@ -41,12 +35,8 @@ internal object ScreenTrackerIntegration {
         application.registerActivityLifecycleCallbacks(activityCallback)
     }
 
-    private fun registerFragmentLifecycle(
-        application: Application,
-        tracer: Tracer,
-        visibleScreenTracker: VisibleScreenTracker
-    ) {
-        val tracerManager = FragmentTracerManager(tracer, visibleScreenTracker)
+    private fun registerFragmentLifecycle(application: Application, tracer: Tracer) {
+        val tracerManager = FragmentTracerManager(tracer)
         val callback = FragmentCallback(tracerManager)
 
         val fragmentObserver = if (Build.VERSION.SDK_INT >= 29) {
