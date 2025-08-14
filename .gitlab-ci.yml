@@ -39,7 +39,6 @@ build:
   stage: build
   rules:
     - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
-    - if: '$CI_COMMIT_REF_NAME == "fixFOSSAscan"'
   extends: .prepare-android-environment
   script:
     - touch local.properties
@@ -51,7 +50,6 @@ sast-scan:
   stage: verify
   rules:
     - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
-    - if: '$CI_COMMIT_REF_NAME == "fixFOSSAscan"'
   extends: .sast_scan
   variables:
     SAST_SCANNER: "Semgrep"
@@ -69,7 +67,6 @@ oss-scan:
     - touch local.properties
   rules:
     - if: '$CI_COMMIT_REF_NAME == "feature/next-gen"'
-    - if: '$CI_COMMIT_REF_NAME == "fixFOSSAscan"'
 
 release:
   stage: release
