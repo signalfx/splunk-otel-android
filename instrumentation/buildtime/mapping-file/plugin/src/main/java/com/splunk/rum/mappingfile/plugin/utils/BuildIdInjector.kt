@@ -38,6 +38,7 @@ class BuildIdInjector(private val project: Project) {
                 val processManifestTask = processManifestTaskProvider.get()
                 project.logger.debug("Splunk RUM: Hooking into processManifest task: ${processManifestTask.name}")
 
+                processManifestTask.outputs.upToDateWhen { false }
                 processManifestTask.doLast {
                     project.logger.info("Splunk RUM: Executing injection after processManifest")
                     injectMetadataIntoMergedManifest(variant, buildId)

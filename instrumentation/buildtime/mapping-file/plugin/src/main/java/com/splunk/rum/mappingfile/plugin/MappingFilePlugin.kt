@@ -80,12 +80,6 @@ class MappingFilePlugin : Plugin<Project> {
         project.logger.lifecycle("Splunk RUM: Generated build ID for variant '${variant.name}': $buildId")
         project.logger.debug("Splunk RUM: Build ID length: ${buildId.length} characters")
 
-        val processManifestTaskProvider = variant.outputs.first().processManifestProvider
-        processManifestTaskProvider.configure { task ->
-            task.outputs.upToDateWhen { false }
-        }
-        project.logger.debug("Splunk RUM: Configured processManifest task to always run")
-
         // Inject build ID into manifest
         project.logger.debug("Splunk RUM: Initiating build ID injection for variant '${variant.name}'")
         buildIdInjector.injectBuildId(variant, buildId)
