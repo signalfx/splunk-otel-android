@@ -85,7 +85,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         }
 
         val span = provider.get(RumConstants.RUM_TRACER_NAME)
-            .spanBuilder("AppStart")
+            .spanBuilder(RumConstants.APP_START_NAME)
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 

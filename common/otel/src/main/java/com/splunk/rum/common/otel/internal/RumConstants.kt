@@ -19,6 +19,9 @@ package com.splunk.rum.common.otel.internal
 import io.opentelemetry.api.common.AttributeKey
 
 object RumConstants {
+    const val NAVIGATION_NAME = "Created"
+    const val APP_START_NAME = "AppStart"
+
     const val RUM_TRACER_NAME: String = "SplunkRum"
     const val COMPONENT_ERROR: String = "error"
     const val COMPONENT_CRASH: String = "crash"

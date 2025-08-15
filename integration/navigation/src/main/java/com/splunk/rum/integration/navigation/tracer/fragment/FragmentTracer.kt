@@ -40,7 +40,7 @@ internal class FragmentTracer(
     }
 
     fun startFragmentCreation(): FragmentTracer {
-        activeSpan.startSpan { createSpan("Created") }
+        activeSpan.startSpan { createSpan(RumConstants.NAVIGATION_NAME) }
         return this
     }
 
