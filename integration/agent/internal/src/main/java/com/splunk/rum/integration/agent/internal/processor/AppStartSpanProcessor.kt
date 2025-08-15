@@ -35,7 +35,8 @@ class AppStartSpanProcessor : SpanProcessor {
     private var isInitializationReported = false
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        if (!isInitializationReported && span.name == RumConstants.APP_START_NAME) { // Hardcoded, temporary solution (hopefully)
+        // Hardcoded, temporary solution (hopefully)
+        if (!isInitializationReported && span.name == RumConstants.APP_START_NAME) {
             isInitializationReported = true
             reportInitialization(span)
         }
