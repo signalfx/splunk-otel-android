@@ -41,7 +41,7 @@ internal class ActivityTracer(
     }
 
     fun startActivityCreation(): ActivityTracer {
-        activeSpan.startSpan { createSpan("Created") }
+        activeSpan.startSpan { createSpan(RumConstants.NAVIGATION_NAME) }
         return this
     }
 
