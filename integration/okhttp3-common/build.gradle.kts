@@ -26,6 +26,9 @@ dependencies {
     implementation(project(":common:utils"))
     implementation(project(":common:otel"))
 
+    /**
+     * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
+     */
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okio)
 

@@ -30,6 +30,9 @@ dependencies {
     implementation(Dependencies.Otel.androidInstrumentation)
     implementation(Dependencies.Otel.instrumentationOkHttp3Library)
 
+    /**
+     * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
+     */
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okio)
 
