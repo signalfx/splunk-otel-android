@@ -20,6 +20,7 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.api.ApplicationVariant
 import com.splunk.rum.mappingfile.plugin.utils.BuildIdInjector
 import com.splunk.rum.mappingfile.plugin.utils.MappingFileUploader
+import com.splunk.rum.mappingfile.plugin.utils.SplunkLogger
 import java.util.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -27,83 +28,86 @@ import org.gradle.api.Project
 class MappingFilePlugin : Plugin<Project> {
 
     private lateinit var project: Project
+    private lateinit var logger: SplunkLogger
     private lateinit var buildIdInjector: BuildIdInjector
     private lateinit var mappingFileUploader: MappingFileUploader
     private lateinit var extension: SplunkRumExtension
 
     override fun apply(project: Project) {
         this.project = project
-        project.logger.lifecycle("Splunk RUM: Mapping File Plugin applied")
+        this.logger = SplunkLogger(project.logger)
+
+        logger.lifecycle("Setup", "Mapping File Plugin applied")
 
         extension = project.extensions.create("splunkRum", SplunkRumExtension::class.java)
-        project.logger.debug("Splunk RUM: Created splunkRum extension")
+        logger.debug("Setup", "Created splunkRum extension")
 
         buildIdInjector = BuildIdInjector(project)
         mappingFileUploader = MappingFileUploader(project)
-        project.logger.debug("Splunk RUM: Initialized BuildIdInjector and MappingFileUploader")
+        logger.debug("Setup", "Initialized BuildIdInjector and MappingFileUploader")
 
         project.afterEvaluate {
-            project.logger.debug("Splunk RUM: Evaluating plugin configuration")
+            logger.debug("Setup", "Evaluating plugin configuration")
             if (extension.enabled.get()) {
-                project.logger.info("Splunk RUM: Plugin is enabled, proceeding with setup")
+                logger.info("Setup", "Plugin is enabled, proceeding with setup")
                 setupBuildIdInjection()
             } else {
-                project.logger.lifecycle("Splunk RUM: Plugin is disabled via configuration")
+                logger.lifecycle("Setup", "Plugin is disabled via configuration")
             }
         }
     }
 
     private fun setupBuildIdInjection() {
-        project.logger.debug("Splunk RUM: Looking for Android application plugin")
+        logger.debug("Setup", "Looking for Android application plugin")
         val android = project.extensions.findByType(AppExtension::class.java)
         if (android == null) {
-            project.logger.warn("Splunk RUM: Android application plugin not found, skipping setup")
+            logger.warn("Setup", "Android application plugin not found, skipping setup")
             return
         }
 
-        project.logger.info("Splunk RUM: Found Android application plugin, configuring variants")
+        logger.info("Setup", "Found Android application plugin, configuring variants")
         android.applicationVariants.configureEach { variant ->
-            project.logger.debug("Splunk RUM: Evaluating variant '${variant.name}'")
+            logger.debug("Setup", "Evaluating variant '${variant.name}'")
             if (variant.buildType.isMinifyEnabled) {
-                project.logger.info("Splunk RUM: Processing variant '${variant.name}' (minification enabled)")
+                logger.info("Setup", "Processing variant '${variant.name}' (minification enabled)")
                 processVariant(variant)
             } else {
-                project.logger.info("Splunk RUM: Skipping variant '${variant.name}' as minification not enabled")
+                logger.info("Setup", "Skipping variant '${variant.name}' as minification not enabled")
             }
         }
     }
 
     private fun processVariant(variant: ApplicationVariant) {
-        project.logger.debug("Splunk RUM: Starting processing for variant '${variant.name}'")
+        logger.debug("Setup", "Starting processing for variant '${variant.name}'")
 
         val buildId = UUID.randomUUID().toString()
-        project.logger.lifecycle("Splunk RUM: Generated build ID for variant '${variant.name}': $buildId")
-        project.logger.debug("Splunk RUM: Build ID length: ${buildId.length} characters")
+        logger.lifecycle("BuildId", "Generated build ID for variant '${variant.name}': $buildId")
+        logger.debug("BuildId", "Build ID length: ${buildId.length} characters")
 
         // Inject build ID into manifest
-        project.logger.debug("Splunk RUM: Initiating build ID injection for variant '${variant.name}'")
+        logger.debug("BuildId", "Initiating build ID injection for variant '${variant.name}'")
         buildIdInjector.injectBuildId(variant, buildId)
 
         // Set up upload task
         if (extension.uploadEnabled.get()) {
-            project.logger.info("Splunk RUM: Upload is enabled, setting up upload task for variant '${variant.name}'")
+            logger.info("Upload", "Upload is enabled, setting up upload task for variant '${variant.name}'")
             setupUploadTask(variant, buildId)
         } else {
-            project.logger.lifecycle("Splunk RUM: Mapping file upload disabled via configuration")
+            logger.lifecycle("Upload", "Mapping file upload disabled via configuration")
         }
     }
 
     private fun setupUploadTask(variant: ApplicationVariant, buildId: String) {
         // Hook into the assemble task to upload after build completes
         val assembleTaskName = "assemble${variant.name.capitalize(Locale.ROOT)}"
-        project.logger.debug("Splunk RUM: Hooking into task '$assembleTaskName' for upload")
+        logger.debug("Upload", "Hooking into task '$assembleTaskName' for upload")
 
         project.tasks.named(assembleTaskName).configure { assembleTask ->
             assembleTask.doLast {
-                project.logger.debug("Splunk RUM: Assemble task completed, starting upload process")
+                logger.debug("Upload", "Assemble task completed, starting upload process")
                 mappingFileUploader.uploadAfterBuild(variant, buildId, extension)
             }
         }
-        project.logger.info("Splunk RUM: Successfully configured upload task for variant '${variant.name}'")
+        logger.info("Upload", "Successfully configured upload task for variant '${variant.name}'")
     }
 }

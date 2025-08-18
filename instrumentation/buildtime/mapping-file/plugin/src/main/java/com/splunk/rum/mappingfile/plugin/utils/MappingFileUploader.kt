@@ -23,10 +23,11 @@ import org.gradle.api.Project
 
 class MappingFileUploader(private val project: Project) {
 
-    private val httpClient = MappingFileUploadClient(project.logger)
+    private val logger = SplunkLogger(project.logger)
+    private val httpClient = MappingFileUploadClient(logger)
 
     fun uploadAfterBuild(variant: ApplicationVariant, buildId: String, extension: SplunkRumExtension) {
-        project.logger.info("Splunk RUM: Starting upload process for variant '${variant.name}'")
+        logger.info("Upload", "Starting upload process for variant '${variant.name}'")
 
         val accessToken = resolveAccessToken(extension)
         val realm = resolveRealm(extension)
@@ -37,9 +38,10 @@ class MappingFileUploader(private val project: Project) {
         }
 
         if (missingConfigs.isNotEmpty()) {
-            project.logger.warn("Splunk RUM: Missing required configuration: ${missingConfigs.joinToString(", ")}")
-            project.logger.info("Splunk RUM: Configure in your build.gradle:")
-            project.logger.info(
+            logger.warn("Config", "Missing required configuration: ${missingConfigs.joinToString(", ")}")
+            logger.info("Config", "Configure in your build.gradle:")
+            logger.info(
+                "Config",
                 """
         splunkRum {
             ${if ("accessToken" in missingConfigs) "accessToken = \"your-token-here\"" else ""}
@@ -47,19 +49,21 @@ class MappingFileUploader(private val project: Project) {
         }
                 """.trimIndent()
             )
-            project.logger.info("Splunk RUM: Or use environment variables: SPLUNK_ACCESS_TOKEN, SPLUNK_REALM")
+            logger.info("Config", "Or use environment variables: SPLUNK_ACCESS_TOKEN, SPLUNK_REALM")
             return
         }
 
-        project.logger.debug(
-            "Splunk RUM: Configuration resolved - realm: '$realm', token configured: ${!accessToken.isNullOrBlank()}"
+        logger.debug(
+            "Config",
+            "Configuration resolved - realm: '$realm', token configured: ${!accessToken.isNullOrBlank()}"
         )
 
         val mappingFile = findMappingFile(variant)
         if (mappingFile == null) {
-            project.logger.error(
+            logger.error(
+                "File",
                 """
-                Splunk RUM: Mapping file not found for variant '${variant.name}'
+                Mapping file not found for variant '${variant.name}'
                 
                 Searched locations:
                 ${getMappingFileLocations(variant).joinToString("\n") { "  - ${it.absolutePath}" }}
@@ -76,13 +80,12 @@ class MappingFileUploader(private val project: Project) {
             return
         }
 
-        project.logger.info(
-            "Splunk RUM: Found mapping file (${mappingFile.length()} bytes) at: ${mappingFile.absolutePath}"
-        )
+        logger.info("File", "Found mapping file (${mappingFile.length()} bytes) at: ${mappingFile.absolutePath}")
 
-        project.logger.lifecycle(
+        logger.lifecycle(
+            "Upload",
             """
-            Splunk RUM: Uploading mapping file for variant ${variant.name}
+            Uploading mapping file for variant ${variant.name}
             Upload details:
                 File: ${mappingFile.absolutePath}
                 App ID: ${variant.applicationId}
@@ -90,8 +93,9 @@ class MappingFileUploader(private val project: Project) {
                 Build ID: $buildId
             """.trimIndent()
         )
-        project.logger.debug("  Realm: $realm")
-        project.logger.debug("  File size: ${mappingFile.length()} bytes")
+        logger.debug("Upload", "Realm: $realm")
+        logger.debug("Upload", "File size: ${mappingFile.length()} bytes")
+
         try {
             httpClient.uploadMappingFile(
                 mappingFile = mappingFile,
@@ -101,23 +105,23 @@ class MappingFileUploader(private val project: Project) {
                 accessToken = accessToken!!,
                 realm = realm!!
             )
-            project.logger.lifecycle("Splunk RUM: Successfully uploaded mapping file")
+            logger.lifecycle("Upload", "Successfully uploaded mapping file")
         } catch (e: Exception) {
-            project.logger.error("Splunk RUM: Upload failed: ${e.message}")
-            project.logger.debug("Splunk RUM: Full error stacktrace: ${e.stackTraceToString()}")
+            logger.error("Upload", "Upload failed: ${e.message}")
+            logger.debug("Upload", "Full error stacktrace: ${e.stackTraceToString()}")
             // Don't fail the build, let app build finish
         }
     }
 
     private fun resolveAccessToken(extension: SplunkRumExtension): String? {
-        project.logger.debug("Splunk RUM: Resolving access token")
+        logger.debug("Config", "Resolving access token")
         return extension.apiAccessToken.orNull
             ?: project.findProperty("splunk.accessToken") as String?
             ?: System.getenv("SPLUNK_ACCESS_TOKEN")
     }
 
     private fun resolveRealm(extension: SplunkRumExtension): String? {
-        project.logger.debug("Splunk RUM: Resolving realm from multiple sources")
+        logger.debug("Config", "Resolving realm from multiple sources")
         return extension.realm.orNull
             ?: project.findProperty("splunk.realm") as String?
             ?: System.getenv("SPLUNK_REALM")
@@ -127,18 +131,18 @@ class MappingFileUploader(private val project: Project) {
         val locations = getMappingFileLocations(variant)
 
         for ((index, location) in locations.withIndex()) {
-            project.logger.debug("Splunk RUM: Checking location ${index + 1}: ${location.absolutePath}")
+            logger.debug("File", "Checking location ${index + 1}: ${location.absolutePath}")
             if (location.exists() && location.isFile) {
                 if (index == 0) {
-                    project.logger.debug("Splunk RUM: Found mapping file at primary location")
+                    logger.debug("File", "Found mapping file at primary location")
                 } else {
-                    project.logger.info("Splunk RUM: Found mapping file at fallback location: ${location.absolutePath}")
+                    logger.info("File", "Found mapping file at fallback location: ${location.absolutePath}")
                 }
                 return location
             }
         }
 
-        project.logger.debug("Splunk RUM: No mapping file found in any expected location")
+        logger.debug("File", "No mapping file found in any expected location")
         return null
     }
 

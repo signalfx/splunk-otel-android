@@ -19,9 +19,8 @@ package com.splunk.rum.mappingfile.plugin.utils
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
-import org.gradle.api.logging.Logger
 
-class MappingFileUploadClient(private val logger: Logger) {
+class MappingFileUploadClient(private val logger: SplunkLogger) {
 
     companion object {
         private const val CRLF = "\r\n"
@@ -35,40 +34,40 @@ class MappingFileUploadClient(private val logger: Logger) {
         accessToken: String,
         realm: String
     ) {
-        logger.info("Splunk RUM: Initiating HTTP upload")
+        logger.info("Upload", "Initiating HTTP upload")
         val url = buildUploadUrl(realm, applicationId, versionCode, buildId)
-        logger.info("Splunk RUM: Upload URL: $url")
-        logger.info("Splunk RUM: Using PUT method")
-        logger.info("Splunk RUM: File size: ${mappingFile.length()} bytes")
-        logger.debug("Splunk RUM: Application ID: $applicationId")
-        logger.debug("Splunk RUM: Version Code: $versionCode")
-        logger.debug("Splunk RUM: Build ID: $buildId")
+        logger.info("Upload", "Upload URL: $url")
+        logger.info("Upload", "Using PUT method")
+        logger.info("Upload", "File size: ${mappingFile.length()} bytes")
+        logger.debug("Upload", "Application ID: $applicationId")
+        logger.debug("Upload", "Version Code: $versionCode")
+        logger.debug("Upload", "Build ID: $buildId")
 
         val connection = URL(url).openConnection() as HttpURLConnection
-        logger.debug("Splunk RUM: Created HTTP connection")
+        logger.debug("Upload", "Created HTTP connection")
 
         try {
             setupConnection(connection, accessToken)
             sendMultipartData(connection, mappingFile)
             handleResponse(connection)
         } catch (e: Exception) {
-            logger.error("Splunk RUM: HTTP operation failed: ${e.message}")
-            logger.debug("Splunk RUM: HTTP error details: ${e.stackTraceToString()}")
+            logger.error("Upload", "HTTP operation failed: ${e.message}")
+            logger.debug("Upload", "HTTP error details: ${e.stackTraceToString()}")
             throw e
         } finally {
-            logger.debug("Splunk RUM: HTTP connection closed")
+            logger.debug("Upload", "HTTP connection closed")
             connection.disconnect()
         }
     }
 
     private fun buildUploadUrl(realm: String, applicationId: String, versionCode: Int, buildId: String): String {
         val url = "https://api.$realm.signalfx.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId"
-        logger.debug("Splunk RUM: Constructed upload URL for realm '$realm'")
+        logger.debug("Upload", "Constructed upload URL for realm '$realm'")
         return url
     }
 
     private fun setupConnection(connection: HttpURLConnection, accessToken: String) {
-        logger.debug("Splunk RUM: Configuring HTTP connection")
+        logger.debug("Upload", "Configuring HTTP connection")
 
         connection.requestMethod = "PUT"
         connection.doOutput = true
@@ -81,7 +80,7 @@ class MappingFileUploadClient(private val logger: Logger) {
     }
 
     private fun sendMultipartData(connection: HttpURLConnection, mappingFile: File) {
-        logger.info("Splunk RUM: Sending multipart data")
+        logger.info("Upload", "Sending multipart data")
         val boundary = connection.getRequestProperty("X-Boundary")
 
         connection.outputStream.use { outputStream ->
@@ -89,17 +88,15 @@ class MappingFileUploadClient(private val logger: Logger) {
 
             // Add filename parameter
             writer.append("--$boundary$CRLF")
-            writer.append("Content-Disposition: form-data; name=\"filename\"").append(CRLF)
+            writer.append("Content-Disposition: form-data; name=\"filename\"$CRLF")
             writer.append(CRLF)
-            writer.append(mappingFile.name).append(CRLF)
+            writer.append("${mappingFile.name}$CRLF")
             writer.flush()
 
             // Add file
             writer.append("--$boundary$CRLF")
-            writer.append(
-                "Content-Disposition: form-data; name=\"file\"; filename=\"${mappingFile.name}\"$CRLF"
-            )
-            writer.append("Content-Type: application/octet-stream").append(CRLF)
+            writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"${mappingFile.name}\"$CRLF")
+            writer.append("Content-Type: application/octet-stream$CRLF")
             writer.append(CRLF)
             writer.flush()
 
@@ -112,30 +109,30 @@ class MappingFileUploadClient(private val logger: Logger) {
     }
 
     private fun handleResponse(connection: HttpURLConnection) {
-        logger.debug("Splunk RUM: Reading HTTP response")
+        logger.debug("Upload", "Reading HTTP response")
 
         val responseCode = connection.responseCode
-        logger.info("Splunk RUM: Response code: $responseCode")
-        logger.info("Splunk RUM: Response message: ${connection.responseMessage}")
+        logger.info("Upload", "Response code: $responseCode")
+        logger.info("Upload", "Response message: ${connection.responseMessage}")
 
         if (responseCode.isSuccessfulHttpCode()) {
-            logger.debug("Splunk RUM: Success response received")
+            logger.debug("Upload", "Success response received")
             val response = connection.inputStream?.bufferedReader()?.use { it.readText() } ?: ""
-            logger.lifecycle("Splunk RUM: Upload successful (HTTP $responseCode)")
+            logger.lifecycle("Upload", "Upload successful (HTTP $responseCode)")
             if (response.isNotEmpty()) {
-                logger.info("Splunk RUM: Response body: $response")
+                logger.info("Upload", "Response body: $response")
             } else {
-                logger.debug("Splunk RUM: Empty response body")
+                logger.debug("Upload", "Empty response body")
             }
         } else {
-            logger.warn("Splunk RUM: Error response received (HTTP $responseCode)")
+            logger.warn("Upload", "Error response received (HTTP $responseCode)")
             val errorResponse =
                 connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "No error details"
-            logger.error("Splunk RUM: Error response body: $errorResponse")
+            logger.error("Upload", "Error response body: $errorResponse")
 
-            logger.debug("Splunk RUM: Response headers:")
+            logger.debug("Upload", "Response headers:")
             connection.headerFields.forEach { (key, values) ->
-                logger.debug("Splunk RUM: Response header $key: ${values.joinToString(", ")}")
+                logger.debug("Upload", "Response header $key: ${values.joinToString(", ")}")
             }
 
             throw Exception("HTTP $responseCode: $errorResponse")

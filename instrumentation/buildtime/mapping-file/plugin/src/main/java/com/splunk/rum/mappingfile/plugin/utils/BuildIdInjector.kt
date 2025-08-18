@@ -29,32 +29,34 @@ import org.w3c.dom.Element
 
 class BuildIdInjector(private val project: Project) {
 
+    private val logger = SplunkLogger(project.logger)
+
     fun injectBuildId(variant: ApplicationVariant, buildId: String) {
-        project.logger.info("Splunk RUM: Setting up build ID injection for variant '${variant.name}'")
+        logger.info("BuildId", "Setting up build ID injection for variant '${variant.name}'")
 
         variant.outputs.forEach { output ->
             try {
                 val processManifestTaskProvider = output.processManifestProvider
                 val processManifestTask = processManifestTaskProvider.get()
-                project.logger.debug("Splunk RUM: Hooking into processManifest task: ${processManifestTask.name}")
+                logger.debug("BuildId", "Hooking into processManifest task: ${processManifestTask.name}")
 
                 processManifestTask.outputs.upToDateWhen { false }
                 processManifestTask.doLast {
-                    project.logger.info("Splunk RUM: Executing injection after processManifest")
+                    logger.info("BuildId", "Executing injection after processManifest")
                     injectMetadataIntoMergedManifest(variant, buildId)
                 }
-                project.logger.info("Splunk RUM: Hooked into ${processManifestTask.name}")
+                logger.info("BuildId", "Hooked into ${processManifestTask.name}")
             } catch (e: Exception) {
-                project.logger.warn("Splunk RUM: Could not hook processManifest: ${e.message}")
-                project.logger.debug("Splunk RUM: Falling back to package task hook")
+                logger.warn("BuildId", "Could not hook processManifest: ${e.message}")
+                logger.debug("BuildId", "Falling back to package task hook")
                 val packageTaskName = "package${variant.name.capitalize(Locale.ROOT)}"
                 project.tasks.named(packageTaskName).configure { task ->
                     task.doFirst {
-                        project.logger.info("Splunk RUM: Executing injection via package task fallback")
+                        logger.info("BuildId", "Executing injection via package task fallback")
                         injectMetadataIntoMergedManifest(variant, buildId)
                     }
                 }
-                project.logger.info("Splunk RUM: Used fallback hook into $packageTaskName")
+                logger.info("BuildId", "Used fallback hook into $packageTaskName")
             }
         }
     }
@@ -66,15 +68,19 @@ class BuildIdInjector(private val project: Project) {
                 val processManifestTask = processManifestTaskProvider.get()
                 val outputFiles = processManifestTask.outputs.files.files
 
-                project.logger.info("Splunk RUM: processManifest task outputs for variant '${variant.name}':")
-                project.logger.info("Splunk RUM: Found ${outputFiles.size} output files:")
+                logger.info("BuildId", "processManifest task outputs for variant '${variant.name}':")
+                logger.info("BuildId", "Found ${outputFiles.size} output files:")
                 outputFiles.forEach { file ->
-                    project.logger.info("  - ${file.absolutePath} (exists: ${file.exists()}, isFile: ${file.isFile})")
+                    logger.info(
+                        "BuildId",
+                        "  - ${file.absolutePath} (exists: ${file.exists()}, isFile: ${file.isFile})"
+                    )
 
                     // If it's a directory, look for AndroidManifest.xml inside it
                     if (file.isDirectory) {
                         val manifestInDir = File(file, "AndroidManifest.xml")
-                        project.logger.info(
+                        logger.info(
+                            "BuildId",
                             "    → Looking for AndroidManifest.xml: ${manifestInDir.absolutePath} (exists: ${manifestInDir.exists()})"
                         )
                     }
@@ -93,39 +99,39 @@ class BuildIdInjector(private val project: Project) {
                 }
 
                 if (manifestFile != null) {
-                    project.logger.info("Splunk RUM: Found merged manifest: ${manifestFile.absolutePath}")
+                    logger.info("BuildId", "Found merged manifest: ${manifestFile.absolutePath}")
                     val wasModified = addMetadataToManifest(manifestFile, buildId)
                     if (wasModified) {
-                        project.logger.info("Splunk RUM: Successfully modified manifest")
+                        logger.info("BuildId", "Successfully modified manifest")
                     }
                 } else {
-                    project.logger.warn("Splunk RUM: No AndroidManifest.xml found in task outputs")
+                    logger.warn("BuildId", "No AndroidManifest.xml found in task outputs")
                 }
             } catch (e: Exception) {
-                project.logger.warn("Splunk RUM: Could not access manifest via task outputs: ${e.message}")
+                logger.warn("BuildId", "Could not access manifest via task outputs: ${e.message}")
             }
         }
     }
 
     private fun addMetadataToManifest(manifestFile: File, buildId: String): Boolean {
-        project.logger.debug("Splunk RUM: Reading manifest file: ${manifestFile.absolutePath}")
+        logger.debug("BuildId", "Reading manifest file: ${manifestFile.absolutePath}")
         if (!manifestFile.canWrite()) {
-            project.logger.warn("Splunk RUM: Manifest file is not writable: ${manifestFile.absolutePath}")
+            logger.warn("BuildId", "Manifest file is not writable: ${manifestFile.absolutePath}")
             return false
         }
 
         try {
             val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
             val document = documentBuilder.parse(manifestFile)
-            project.logger.debug("Splunk RUM: Successfully parsed XML document")
+            logger.debug("BuildId", "Successfully parsed XML document")
 
             val applicationNodes = document.getElementsByTagName("application")
             if (applicationNodes.length == 0) {
-                project.logger.error("Splunk RUM: Could not find <application> tag in: ${manifestFile.name}")
+                logger.error("BuildId", "Could not find <application> tag in: ${manifestFile.name}")
                 return false
             }
 
-            project.logger.debug("Splunk RUM: Found <application> tag in manifest")
+            logger.debug("BuildId", "Found <application> tag in manifest")
             val applicationElement = applicationNodes.item(0) as Element
 
             // Collect potentially existing splunk.build_id to remove (from manual setup or previous runs)
@@ -140,22 +146,23 @@ class BuildIdInjector(private val project: Project) {
 
             // Remove all existing splunk.build_id metadata
             if (toRemove.isNotEmpty()) {
-                project.logger.info(
-                    "Splunk RUM: Removing ${toRemove.size} existing build ID metadata from: ${manifestFile.name}"
+                logger.info(
+                    "BuildId",
+                    "Removing ${toRemove.size} existing build ID metadata from: ${manifestFile.name}"
                 )
                 toRemove.forEach { applicationElement.removeChild(it) }
-                project.logger.debug("Splunk RUM: Removed existing metadata entries")
+                logger.debug("BuildId", "Removed existing metadata entries")
             }
 
             // Add newly generated splunk.build_id metadata
-            project.logger.debug("Splunk RUM: Adding metadata to <application> tag")
+            logger.debug("BuildId", "Adding metadata to <application> tag")
             val metaDataElement = document.createElement("meta-data")
             metaDataElement.setAttribute("android:name", "splunk.build_id")
             metaDataElement.setAttribute("android:value", buildId)
             applicationElement.appendChild(metaDataElement)
 
             // Write back to file without reformatting
-            project.logger.debug("Splunk RUM: Writing modified XML back to file")
+            logger.debug("BuildId", "Writing modified XML back to file")
             val transformer = TransformerFactory.newInstance().newTransformer()
             transformer.setOutputProperty(OutputKeys.INDENT, "no")
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no")
@@ -164,14 +171,12 @@ class BuildIdInjector(private val project: Project) {
             val streamResult = StreamResult(manifestFile)
             transformer.transform(result, streamResult)
 
-            project.logger.lifecycle(
-                "Splunk RUM: Successfully injected build ID metadata into: ${manifestFile.name}"
-            )
+            logger.lifecycle("BuildId", "Successfully injected build ID metadata into: ${manifestFile.name}")
 
             return true
         } catch (e: Exception) {
-            project.logger.error("Splunk RUM: Error modifying ${manifestFile.name}: ${e.message}")
-            project.logger.debug("Splunk RUM: Modification error details: ${e.stackTraceToString()}")
+            logger.error("BuildId", "Error modifying ${manifestFile.name}: ${e.message}")
+            logger.debug("BuildId", "Modification error details: ${e.stackTraceToString()}")
             return false
         }
     }
