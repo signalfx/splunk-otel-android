@@ -28,7 +28,6 @@ open class SplunkRumExtension @Inject constructor(objectFactory: ObjectFactory) 
      * AndroidManifest.xml files of your app during the build process, and also uploaded with each mapping file
      * Default: true
      */
-
     val enabled: Property<Boolean> = objectFactory.property(Boolean::class.java).convention(true)
 
     /**

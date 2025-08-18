@@ -23,6 +23,10 @@ import org.gradle.api.logging.Logger
 
 class MappingFileUploadClient(private val logger: Logger) {
 
+    companion object {
+        private const val CRLF = "\r\n"
+    }
+
     fun uploadMappingFile(
         mappingFile: File,
         buildId: String,
@@ -84,25 +88,25 @@ class MappingFileUploadClient(private val logger: Logger) {
             val writer = java.io.PrintWriter(java.io.OutputStreamWriter(outputStream, "UTF-8"), true)
 
             // Add filename parameter
-            writer.append("--$boundary").append("\r\n")
-            writer.append("Content-Disposition: form-data; name=\"filename\"").append("\r\n")
-            writer.append("\r\n")
-            writer.append(mappingFile.name).append("\r\n")
+            writer.append("--$boundary$CRLF")
+            writer.append("Content-Disposition: form-data; name=\"filename\"").append(CRLF)
+            writer.append(CRLF)
+            writer.append(mappingFile.name).append(CRLF)
             writer.flush()
 
             // Add file
-            writer.append("--$boundary").append("\r\n")
+            writer.append("--$boundary$CRLF")
             writer.append(
-                "Content-Disposition: form-data; name=\"file\"; filename=\"${mappingFile.name}\""
-            ).append("\r\n")
-            writer.append("Content-Type: application/octet-stream").append("\r\n")
-            writer.append("\r\n")
+                "Content-Disposition: form-data; name=\"file\"; filename=\"${mappingFile.name}\"$CRLF"
+            )
+            writer.append("Content-Type: application/octet-stream").append(CRLF)
+            writer.append(CRLF)
             writer.flush()
 
             mappingFile.inputStream().use { it.copyTo(outputStream) }
             outputStream.flush()
 
-            writer.append("\r\n--$boundary--\r\n")
+            writer.append("$CRLF--$boundary--$CRLF")
             writer.close()
         }
     }
@@ -114,7 +118,7 @@ class MappingFileUploadClient(private val logger: Logger) {
         logger.info("Splunk RUM: Response code: $responseCode")
         logger.info("Splunk RUM: Response message: ${connection.responseMessage}")
 
-        if (responseCode in 200..299) {
+        if (responseCode.isSuccessfulHttpCode()) {
             logger.debug("Splunk RUM: Success response received")
             val response = connection.inputStream?.bufferedReader()?.use { it.readText() } ?: ""
             logger.lifecycle("Splunk RUM: Upload successful (HTTP $responseCode)")
@@ -137,4 +141,6 @@ class MappingFileUploadClient(private val logger: Logger) {
             throw Exception("HTTP $responseCode: $errorResponse")
         }
     }
+
+    private fun Int.isSuccessfulHttpCode(): Boolean = this in 200..299
 }

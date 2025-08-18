@@ -32,8 +32,8 @@ class MappingFileUploader(private val project: Project) {
         val realm = resolveRealm(extension)
 
         val missingConfigs = buildList {
-            if (accessToken.isBlank()) add("accessToken")
-            if (realm.isBlank()) add("realm")
+            if (accessToken.isNullOrBlank()) add("accessToken")
+            if (realm.isNullOrBlank()) add("realm")
         }
 
         if (missingConfigs.isNotEmpty()) {
@@ -52,7 +52,7 @@ class MappingFileUploader(private val project: Project) {
         }
 
         project.logger.debug(
-            "Splunk RUM: Configuration resolved - realm: '$realm', token configured: ${accessToken.isNotBlank()}"
+            "Splunk RUM: Configuration resolved - realm: '$realm', token configured: ${!accessToken.isNullOrBlank()}"
         )
 
         val mappingFile = findMappingFile(variant)
@@ -80,23 +80,26 @@ class MappingFileUploader(private val project: Project) {
             "Splunk RUM: Found mapping file (${mappingFile.length()} bytes) at: ${mappingFile.absolutePath}"
         )
 
-        project.logger.lifecycle("Splunk RUM: Uploading mapping file for variant ${variant.name}")
-        project.logger.info("Splunk RUM: Upload details:")
-        project.logger.info("  File: ${mappingFile.absolutePath}")
-        project.logger.info("  App ID: ${variant.applicationId}")
-        project.logger.info("  Version Code: ${variant.versionCode}")
-        project.logger.info("  Build ID: $buildId")
+        project.logger.lifecycle(
+            """
+            Splunk RUM: Uploading mapping file for variant ${variant.name}
+            Upload details:
+                File: ${mappingFile.absolutePath}
+                App ID: ${variant.applicationId}
+                Version Code: ${variant.versionCode}
+                Build ID: $buildId
+            """.trimIndent()
+        )
         project.logger.debug("  Realm: $realm")
         project.logger.debug("  File size: ${mappingFile.length()} bytes")
-
         try {
             httpClient.uploadMappingFile(
                 mappingFile = mappingFile,
                 buildId = buildId,
                 applicationId = variant.applicationId,
                 versionCode = variant.versionCode,
-                accessToken = accessToken,
-                realm = realm
+                accessToken = accessToken!!,
+                realm = realm!!
             )
             project.logger.lifecycle("Splunk RUM: Successfully uploaded mapping file")
         } catch (e: Exception) {
@@ -106,20 +109,18 @@ class MappingFileUploader(private val project: Project) {
         }
     }
 
-    private fun resolveAccessToken(extension: SplunkRumExtension): String {
+    private fun resolveAccessToken(extension: SplunkRumExtension): String? {
         project.logger.debug("Splunk RUM: Resolving access token")
         return extension.apiAccessToken.orNull
             ?: project.findProperty("splunk.accessToken") as String?
             ?: System.getenv("SPLUNK_ACCESS_TOKEN")
-            ?: ""
     }
 
-    private fun resolveRealm(extension: SplunkRumExtension): String {
+    private fun resolveRealm(extension: SplunkRumExtension): String? {
         project.logger.debug("Splunk RUM: Resolving realm from multiple sources")
         return extension.realm.orNull
             ?: project.findProperty("splunk.realm") as String?
             ?: System.getenv("SPLUNK_REALM")
-            ?: ""
     }
 
     private fun findMappingFile(variant: ApplicationVariant): File? {

@@ -66,15 +66,15 @@ class BuildIdInjector(private val project: Project) {
                 val processManifestTask = processManifestTaskProvider.get()
                 val outputFiles = processManifestTask.outputs.files.files
 
-                println("Splunk RUM: processManifest task outputs for variant '${variant.name}':")
-                println("Splunk RUM: Found ${outputFiles.size} output files:")
+                project.logger.info("Splunk RUM: processManifest task outputs for variant '${variant.name}':")
+                project.logger.info("Splunk RUM: Found ${outputFiles.size} output files:")
                 outputFiles.forEach { file ->
-                    println("  - ${file.absolutePath} (exists: ${file.exists()}, isFile: ${file.isFile})")
+                    project.logger.info("  - ${file.absolutePath} (exists: ${file.exists()}, isFile: ${file.isFile})")
 
                     // If it's a directory, look for AndroidManifest.xml inside it
                     if (file.isDirectory) {
                         val manifestInDir = File(file, "AndroidManifest.xml")
-                        println(
+                        project.logger.info(
                             "    → Looking for AndroidManifest.xml: ${manifestInDir.absolutePath} (exists: ${manifestInDir.exists()})"
                         )
                     }

@@ -16,17 +16,11 @@ version = Configurations.sdkVersionName
 val javadocJar by tasks.creating(Jar::class) {
     archiveClassifier.set("javadoc")
     from(tasks.named("javadoc"))
-    metaInf {
-        from("$projectDir/src/main/assets/LICENSE.txt")
-    }
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
     archiveClassifier.set("sources")
     from(sourceSets["main"].allSource)
-    metaInf {
-        from("$projectDir/src/main/assets/LICENSE.txt")
-    }
 }
 
 tasks.jar {
@@ -34,9 +28,6 @@ tasks.jar {
         attributes(
             "Implementation-Version" to Dependencies.Otel.otelAndroidBomVersion
         )
-    }
-    metaInf {
-        from("$projectDir/src/main/assets/LICENSE.txt")
     }
 }
 
