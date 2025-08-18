@@ -23,8 +23,8 @@ android {
 }
 
 dependencies {
-    api(platform(Dependencies.Otel.androidBom))
-    api(platform(Dependencies.Otel.instrumentationBomAlpha))
+    implementation(platform(Dependencies.Otel.androidBom))
+    implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
     
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:otel"))
