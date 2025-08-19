@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.common.attributes
 
-import com.cisco.android.common.utils.extensions.forEachFast
+import com.splunk.android.common.utils.extensions.forEachFast
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
