@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.sessionreplay.api.mapping
 
-import com.cisco.android.instrumentation.recording.core.api.RecordingMask as CommonRecordingMask
+import com.splunk.android.instrumentation.recording.core.api.RecordingMask as CommonRecordingMask
 import com.splunk.rum.integration.sessionreplay.api.RecordingMask
 
 internal fun RecordingMask.toCommon(): CommonRecordingMask {

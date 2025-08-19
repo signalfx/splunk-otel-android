@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.api.exporter
 
-import com.cisco.android.common.logger.Logger
+import com.splunk.android.common.logger.Logger
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData

@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.navigation.screen.activity
 
-import com.cisco.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.integration.navigation.screen.VisibleScreenTracker
 
 internal interface ActivityCallback : ActivityLifecycleCallbacksAdapter {

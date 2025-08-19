@@ -22,8 +22,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import com.cisco.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
-import com.cisco.android.common.utils.extensions.forEachFast
+import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.android.common.utils.extensions.forEachFast
 
 object ApplicationStartupTimekeeper {
 

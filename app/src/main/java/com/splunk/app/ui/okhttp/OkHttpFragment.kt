@@ -23,8 +23,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.graphics.createBitmap
-import com.cisco.android.common.utils.extensions.safeSchedule
-import com.cisco.android.common.utils.runOnBackgroundThread
+import com.splunk.android.common.utils.extensions.safeSchedule
+import com.splunk.android.common.utils.runOnBackgroundThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentOkhttpBinding
 import com.splunk.app.extension.showDoneToast

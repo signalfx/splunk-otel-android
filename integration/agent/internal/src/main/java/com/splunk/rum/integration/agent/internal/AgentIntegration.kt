@@ -19,7 +19,7 @@ package com.splunk.rum.integration.agent.internal
 import android.app.Application
 import android.content.Context
 import android.os.SystemClock
-import com.cisco.android.common.utils.extensions.forEachFast
+import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.model.Module

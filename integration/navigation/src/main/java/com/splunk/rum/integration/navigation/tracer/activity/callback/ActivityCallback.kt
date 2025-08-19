@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.navigation.tracer.activity.callback
 
-import com.cisco.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.integration.navigation.tracer.activity.ActivityTracerManager
 
 internal interface ActivityCallback : ActivityLifecycleCallbacksAdapter {

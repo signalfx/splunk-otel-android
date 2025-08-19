@@ -18,9 +18,9 @@ package com.splunk.rum.integration.sessionreplay.api
 
 import android.view.View
 import androidx.compose.ui.Modifier
-import com.cisco.android.instrumentation.recording.core.api.isSensitive
-import com.cisco.android.instrumentation.recording.interactions.compose.PointerInputObserverInjectorModifier
-import com.cisco.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
+import com.splunk.android.instrumentation.recording.core.api.isSensitive
+import com.splunk.android.instrumentation.recording.interactions.compose.PointerInputObserverInjectorModifier
+import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import kotlin.reflect.KClass
 
 /**

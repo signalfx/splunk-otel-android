@@ -18,7 +18,7 @@ package com.splunk.app.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.cisco.android.common.utils.extensions.contentView
+import com.splunk.android.common.utils.extensions.contentView
 import com.splunk.app.databinding.ActivityMainBinding
 import com.splunk.app.extension.setCustomAnimations
 import com.splunk.app.extension.setSubtitle

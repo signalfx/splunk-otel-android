@@ -17,16 +17,16 @@
 package com.splunk.rum.common.storage
 
 import android.content.Context
-import com.cisco.android.common.logger.Logger
-import com.cisco.android.common.storage.Storage
-import com.cisco.android.common.storage.cache.FilePermanentCache
-import com.cisco.android.common.storage.cache.FileSimplePermanentCache
-import com.cisco.android.common.storage.extensions.noBackupFilesDirCompat
-import com.cisco.android.common.storage.filemanager.EncryptedFileManager
-import com.cisco.android.common.storage.filemanager.FileManagerFactory
-import com.cisco.android.common.storage.preferences.Preferences
-import com.cisco.android.common.utils.extensions.toJSONArray
-import com.cisco.android.common.utils.runOnBackgroundThread
+import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.storage.Storage
+import com.splunk.android.common.storage.cache.FilePermanentCache
+import com.splunk.android.common.storage.cache.FileSimplePermanentCache
+import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
+import com.splunk.android.common.storage.filemanager.EncryptedFileManager
+import com.splunk.android.common.storage.filemanager.FileManagerFactory
+import com.splunk.android.common.storage.preferences.Preferences
+import com.splunk.android.common.utils.extensions.toJSONArray
+import com.splunk.android.common.utils.runOnBackgroundThread
 import com.splunk.rum.common.storage.extensions.MB
 import com.splunk.rum.common.storage.extensions.statFsFreeSpace
 import com.splunk.rum.common.storage.policy.StoragePolicy

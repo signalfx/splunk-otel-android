@@ -18,7 +18,7 @@ package com.splunk.rum.common.storage.extensions
 
 import android.os.Build
 import android.os.StatFs
-import com.cisco.android.common.utils.runOnAndroidAtLeast
+import com.splunk.android.common.utils.runOnAndroidAtLeast
 
 internal val StatFs.blockSizeCompat: Long
     get() = runOnAndroidAtLeast(Build.VERSION_CODES.JELLY_BEAN_MR2) { blockSizeLong } ?: blockSizeDeprecated

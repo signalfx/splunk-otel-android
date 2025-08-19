@@ -17,8 +17,8 @@
 package com.splunk.rum.integration.startup
 
 import android.content.Context
-import com.cisco.android.common.logger.Logger
-import com.cisco.android.common.utils.extensions.forEachFast
+import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.toInstant
 import com.splunk.rum.common.otel.internal.RumConstants

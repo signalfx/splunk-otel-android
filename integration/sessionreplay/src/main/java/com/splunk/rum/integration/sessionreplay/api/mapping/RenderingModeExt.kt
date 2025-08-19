@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.sessionreplay.api.mapping
 
-import com.cisco.android.instrumentation.recording.core.api.RenderingMode as CommonRenderingMode
+import com.splunk.android.instrumentation.recording.core.api.RenderingMode as CommonRenderingMode
 import com.splunk.rum.integration.sessionreplay.api.RenderingMode
 
 internal fun RenderingMode.toCommon(): CommonRenderingMode = when (this) {

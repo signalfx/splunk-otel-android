@@ -87,24 +87,24 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.17"
+        private const val version = "1.0.19"
 
-        const val bridge = "com.cisco.android:sr-bridge:$version"
-        const val commonEncoder = "com.cisco.android:sr-common-encoder:$version"
-        const val commonHttp = "com.cisco.android:sr-common-http:$version"
-        const val commonId = "com.cisco.android:sr-common-id:$version"
-        const val commonJob = "com.cisco.android:sr-common-job:$version"
-        const val commonStorage = "com.cisco.android:sr-common-storage:$version"
-        const val commonUtils = "com.cisco.android:sr-common-utils:$version"
-        const val commonLogger = "com.cisco.android:sr-common-logger:$version"
+        const val bridge = "com.splunk.android:sr-bridge:$version"
+        const val commonEncoder = "com.splunk.android:sr-common-encoder:$version"
+        const val commonHttp = "com.splunk.android:sr-common-http:$version"
+        const val commonId = "com.splunk.android:sr-common-id:$version"
+        const val commonJob = "com.splunk.android:sr-common-job:$version"
+        const val commonStorage = "com.splunk.android:sr-common-storage:$version"
+        const val commonUtils = "com.splunk.android:sr-common-utils:$version"
+        const val commonLogger = "com.splunk.android:sr-common-logger:$version"
 
-        const val instrumentationSessionRecordingCore = "com.cisco.android:sr-instrumentation-session-recording-core:$version"
-        const val instrumentationSessionRecordingFrameCapturer = "com.cisco.android:sr-instrumentation-session-recording-frame-capturer:$version"
-        const val instrumentationSessionRecordingInteractions = "com.cisco.android:sr-instrumentation-session-recording-interactions:$version"
-        const val instrumentationSessionRecordingScreenshot = "com.cisco.android:sr-instrumentation-session-recording-screenshot:$version"
-        const val instrumentationSessionRecordingWireframe = "com.cisco.android:sr-instrumentation-session-recording-wireframe:$version"
+        const val instrumentationSessionRecordingCore = "com.splunk.android:sr-instrumentation-session-recording-core:$version"
+        const val instrumentationSessionRecordingFrameCapturer = "com.splunk.android:sr-instrumentation-session-recording-frame-capturer:$version"
+        const val instrumentationSessionRecordingInteractions = "com.splunk.android:sr-instrumentation-session-recording-interactions:$version"
+        const val instrumentationSessionRecordingScreenshot = "com.splunk.android:sr-instrumentation-session-recording-screenshot:$version"
+        const val instrumentationSessionRecordingWireframe = "com.splunk.android:sr-instrumentation-session-recording-wireframe:$version"
 
-        const val debugger = "com.cisco.android:sr-debugger:$version"
+        const val debugger = "com.splunk.android:sr-debugger:$version"
     }
 
     object Otel {

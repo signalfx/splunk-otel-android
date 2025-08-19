@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.sessionreplay.api
 
-import com.cisco.android.instrumentation.recording.core.api.SessionReplay
+import com.splunk.android.instrumentation.recording.core.api.SessionReplay
 import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
 
 class State internal constructor() {

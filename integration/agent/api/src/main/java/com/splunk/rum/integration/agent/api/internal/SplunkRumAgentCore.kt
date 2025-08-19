@@ -17,8 +17,8 @@
 package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
-import com.cisco.android.common.logger.Logger
-import com.cisco.android.common.logger.consumers.AndroidLogConsumer
+import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration

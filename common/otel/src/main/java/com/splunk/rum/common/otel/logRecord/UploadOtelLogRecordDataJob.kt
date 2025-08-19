@@ -23,11 +23,11 @@ import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
 import android.os.PersistableBundle
-import com.cisco.android.common.http.HttpClient
-import com.cisco.android.common.http.model.Header
-import com.cisco.android.common.http.model.Response
-import com.cisco.android.common.job.JobIdStorage
-import com.cisco.android.common.logger.Logger
+import com.splunk.android.common.http.HttpClient
+import com.splunk.android.common.http.model.Header
+import com.splunk.android.common.http.model.Response
+import com.splunk.android.common.job.JobIdStorage
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 

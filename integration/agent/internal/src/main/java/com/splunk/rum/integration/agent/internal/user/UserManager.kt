@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.user
 
-import com.cisco.android.common.id.NanoId
+import com.splunk.android.common.id.NanoId
 
 interface IUserManager {
     var trackingMode: InternalUserTrackingMode

@@ -17,8 +17,8 @@
 package com.splunk.rum.integration.agent.api.extension
 
 import android.view.View
-import com.cisco.android.common.logger.Logger
-import com.cisco.android.common.utils.extensions.ciscoId as internalCiscoId
+import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.ciscoId as internalCiscoId
 
 private const val TAG = "ViewExt"
 

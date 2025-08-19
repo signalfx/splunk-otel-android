@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.api.session
 
-import com.cisco.android.common.logger.Logger
+import com.splunk.android.common.logger.Logger
 
 data class SessionConfiguration @JvmOverloads constructor(val samplingRate: Double = 1.0) {
     init {

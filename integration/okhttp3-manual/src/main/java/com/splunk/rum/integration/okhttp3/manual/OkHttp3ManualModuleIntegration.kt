@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.okhttp3.manual
 
 import android.content.Context
-import com.cisco.android.common.logger.Logger
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.okhttp3.common.OkHttp3AdditionalAttributesExtractor

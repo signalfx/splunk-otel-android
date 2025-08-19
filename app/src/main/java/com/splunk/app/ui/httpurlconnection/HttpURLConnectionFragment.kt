@@ -21,7 +21,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.cisco.android.common.utils.runOnBackgroundThread
+import com.splunk.android.common.utils.runOnBackgroundThread
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentHttpUrlConnectionBinding
 import com.splunk.app.extension.showDoneToast
