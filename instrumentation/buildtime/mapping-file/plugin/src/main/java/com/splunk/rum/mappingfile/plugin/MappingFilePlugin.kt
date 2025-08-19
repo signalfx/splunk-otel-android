@@ -89,12 +89,8 @@ class MappingFilePlugin : Plugin<Project> {
         buildIdInjector.injectBuildId(variant, buildId)
 
         // Set up upload task
-        if (extension.uploadEnabled.get()) {
-            logger.info("Upload", "Upload is enabled, setting up upload task for variant '${variant.name}'")
-            setupUploadTask(variant, buildId)
-        } else {
-            logger.lifecycle("Upload", "Mapping file upload disabled via configuration")
-        }
+        logger.info("Upload", "Setting up upload task for variant '${variant.name}'")
+        setupUploadTask(variant, buildId)
     }
 
     private fun setupUploadTask(variant: ApplicationVariant, buildId: String) {

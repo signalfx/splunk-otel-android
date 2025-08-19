@@ -23,9 +23,9 @@ import org.gradle.api.provider.Property
 open class SplunkRumExtension @Inject constructor(objectFactory: ObjectFactory) {
 
     /**
-     * Enable or disable the mapping file plugin functionality. Will generate an unique Splunk Build ID for each variant
-     * to accurately correlate stacktraces with mapping files. The gradle plugin will also inject it into the intermediate
-     * AndroidManifest.xml files of your app during the build process, and also uploaded with each mapping file
+     * Enable or disable the mapping file plugin functionality.
+     * When enabled, generates unique build IDs for each variant, injects the build ID into the intermediate
+     * AndroidManifest.XML files of your app, and then uploads mapping files.
      * Default: true
      */
     val enabled: Property<Boolean> = objectFactory.property(Boolean::class.java).convention(true)
@@ -45,8 +45,9 @@ open class SplunkRumExtension @Inject constructor(objectFactory: ObjectFactory) 
     val realm: Property<String> = objectFactory.property(String::class.java)
 
     /**
-     * Enable or disable automatic mapping file upload. Will not work if enabled flag is set to false.
-     * Default: true
+     * Whether to fail the build if mapping file cannot be found, or mapping file upload fails.
+     * When false, upload failures are logged but don't stop the build.
+     * Default: false
      */
-    val uploadEnabled: Property<Boolean> = objectFactory.property(Boolean::class.java).convention(true)
+    val failBuildOnUploadFailure: Property<Boolean> = objectFactory.property(Boolean::class.java).convention(false)
 }

@@ -17,9 +17,9 @@ apply<ConfigAndroidApp>()
 // Uncomment this to test the mapping file plugin with custom configuration
 //splunkRum {
 //    enabled = true
-//    uploadEnabled = true
-//    apiAccessToken = "abcde"
-//    realm = "us02"
+//    failBuildOnUploadFailure = false
+//    apiAccessToken = "your-api-access-token"
+//    realm = "us0"
 //}
 
 android {

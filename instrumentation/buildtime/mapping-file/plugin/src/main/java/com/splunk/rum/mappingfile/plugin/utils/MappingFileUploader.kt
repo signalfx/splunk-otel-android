@@ -19,6 +19,7 @@ package com.splunk.rum.mappingfile.plugin.utils
 import com.android.build.gradle.api.ApplicationVariant
 import com.splunk.rum.mappingfile.plugin.SplunkRumExtension
 import java.io.File
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 
 class MappingFileUploader(private val project: Project) {
@@ -38,19 +39,26 @@ class MappingFileUploader(private val project: Project) {
         }
 
         if (missingConfigs.isNotEmpty()) {
-            logger.warn("Config", "Missing required configuration: ${missingConfigs.joinToString(", ")}")
-            logger.info("Config", "Configure in your build.gradle:")
-            logger.info(
-                "Config",
-                """
-        splunkRum {
-            ${if ("accessToken" in missingConfigs) "accessToken = \"your-token-here\"" else ""}
-            ${if ("realm" in missingConfigs) "realm = \"your-realm-here\"" else ""}
-        }
-                """.trimIndent()
-            )
-            logger.info("Config", "Or use environment variables: SPLUNK_ACCESS_TOKEN, SPLUNK_REALM")
-            return
+            val errorMessage = "Missing required configuration: ${missingConfigs.joinToString(", ")}"
+            val helpfulMessage = """
+                Missing required configuration: ${missingConfigs.joinToString(", ")}
+        
+                Configure in your build.gradle:
+                splunkRum {
+                    ${if ("accessToken" in missingConfigs) "accessToken = \"your-token-here\"" else ""}
+                    ${if ("realm" in missingConfigs) "realm = \"your-realm-here\"" else ""}
+                }
+        
+                Or use environment variables: SPLUNK_ACCESS_TOKEN, SPLUNK_REALM
+            """.trimIndent()
+
+            if (extension.failBuildOnUploadFailure.get()) {
+                logger.error("Config", helpfulMessage)
+                throw GradleException("Mapping file upload failed for variant '${variant.name}': $errorMessage")
+            } else {
+                logger.warn("Config", "$helpfulMessage (build continuing due to failBuildOnUploadFailure=false)")
+                return
+            }
         }
 
         logger.debug(
@@ -60,24 +68,30 @@ class MappingFileUploader(private val project: Project) {
 
         val mappingFile = findMappingFile(variant)
         if (mappingFile == null) {
-            logger.error(
-                "File",
-                """
+            val errorMessage = "Mapping file not found for variant '${variant.name}'"
+            val detailedMessage = """
                 Mapping file not found for variant '${variant.name}'
-                
+        
                 Searched locations:
                 ${getMappingFileLocations(variant).joinToString("\n") { "  - ${it.absolutePath}" }}
-                
+        
                 This usually means:
                 1. ProGuard/R8 minification is not properly configured
                 2. The build did not complete successfully
                 3. The mapping file is in a custom location
-                                
+                        
                 Please verify that minification is enabled and the build completed without errors.
-                If the mapping file is in a custom location, please disable the uploadEnabled and upload it manually.
-                """.trimIndent()
-            )
-            return
+                If the mapping file is in a custom location, please disable the plugin and upload the mapping file 
+                using the Splunk O11Y Web UI or the Splunk RUM CLI tool.
+            """.trimIndent()
+
+            if (extension.failBuildOnUploadFailure.get()) {
+                logger.error("File", detailedMessage)
+                throw GradleException("Mapping file upload failed for variant '${variant.name}': $errorMessage")
+            } else {
+                logger.error("File", "$detailedMessage (build continuing due to failBuildOnUploadFailure=false)")
+                return
+            }
         }
 
         logger.info("File", "Found mapping file (${mappingFile.length()} bytes) at: ${mappingFile.absolutePath}")
@@ -108,8 +122,17 @@ class MappingFileUploader(private val project: Project) {
             logger.lifecycle("Upload", "Successfully uploaded mapping file")
         } catch (e: Exception) {
             logger.error("Upload", "Upload failed: ${e.message}")
-            logger.debug("Upload", "Full error stacktrace: ${e.stackTraceToString()}")
-            // Don't fail the build, let app build finish
+
+            val errorMessage = "Upload failed: ${e.message}"
+
+            if (extension.failBuildOnUploadFailure.get()) {
+                logger.error("Upload", errorMessage)
+                logger.debug("Upload", "Full error stacktrace: ${e.stackTraceToString()}")
+                throw GradleException("Mapping file upload failed for variant '${variant.name}': ${e.message}")
+            } else {
+                logger.error("Upload", "$errorMessage (build continuing due to failBuildOnUploadFailure=false)")
+                logger.debug("Upload", "Full error stacktrace: ${e.stackTraceToString()}")
+            }
         }
     }
 
