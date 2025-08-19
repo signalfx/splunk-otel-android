@@ -45,7 +45,7 @@ open class SplunkRumExtension @Inject constructor(objectFactory: ObjectFactory) 
     val realm: Property<String> = objectFactory.property(String::class.java)
 
     /**
-     * Whether to fail the build if mapping file cannot be found, or mapping file upload fails.
+     * Whether to fail the build if mapping file cannot be found, missing configuration, or mapping file upload fails.
      * When false, upload failures are logged but don't stop the build.
      * Default: false
      */
