@@ -150,7 +150,7 @@ public class JavaIntegration extends Application {
     private SplunkRum legacyBuilder() {
         return SplunkRum.builder()
                 .setRealm("lab0")
-                .setRumAccessToken("1CucSUVwF5f2hNyuHwKNfw")
+                .setRumAccessToken("<YOUR_ACCESS_TOKEN>")
                 .setApplicationName("Android demo app")
                 .setDeploymentEnvironment("test")
                 .setGlobalAttributes(Attributes.of(AttributeKey.stringKey("legacyGlobalAttributesKey"), "legacyGlobalAttributesVal"))
