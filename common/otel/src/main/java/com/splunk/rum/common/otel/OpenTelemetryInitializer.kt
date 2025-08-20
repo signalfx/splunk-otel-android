@@ -17,8 +17,8 @@
 package com.splunk.rum.common.otel
 
 import android.app.Application
-import com.cisco.android.common.job.JobIdStorage
-import com.cisco.android.common.job.JobManager
+import com.splunk.android.common.job.JobIdStorage
+import com.splunk.android.common.job.JobManager
 import com.splunk.rum.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.rum.common.otel.span.AndroidSpanExporter
 import com.splunk.rum.common.otel.span.SpanInterceptorExporter

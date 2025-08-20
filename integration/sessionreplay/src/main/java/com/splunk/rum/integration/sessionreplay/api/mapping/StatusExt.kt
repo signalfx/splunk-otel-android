@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.sessionreplay.api.mapping
 
-import com.cisco.android.instrumentation.recording.core.api.Status as CommonStatus
+import com.splunk.android.instrumentation.recording.core.api.Status as CommonStatus
 import com.splunk.rum.integration.sessionreplay.api.Status
 
 internal fun CommonStatus.toSplunk(): Status = when (val status = this) {

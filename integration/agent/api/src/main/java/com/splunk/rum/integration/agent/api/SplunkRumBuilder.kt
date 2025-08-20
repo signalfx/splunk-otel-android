@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
-import com.cisco.android.common.logger.Logger
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.session.SessionConfiguration
 import com.splunk.rum.integration.agent.api.spanfilter.SpanFilterBuilder

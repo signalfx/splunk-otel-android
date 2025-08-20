@@ -19,7 +19,7 @@ package com.splunk.app.extension
 import android.content.Context
 import android.widget.Toast
 import androidx.annotation.StringRes
-import com.cisco.android.common.utils.runOnUiThread
+import com.splunk.android.common.utils.runOnUiThread
 import com.splunk.app.R
 import com.splunk.app.util.ApiVariant
 

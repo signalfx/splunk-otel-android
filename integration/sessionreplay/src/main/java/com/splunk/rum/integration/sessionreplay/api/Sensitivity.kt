@@ -18,7 +18,7 @@ package com.splunk.rum.integration.sessionreplay.api
 
 import android.view.View
 import android.widget.EditText
-import com.cisco.android.instrumentation.recording.core.api.SessionReplay
+import com.splunk.android.instrumentation.recording.core.api.SessionReplay
 
 class Sensitivity internal constructor() {
     /**

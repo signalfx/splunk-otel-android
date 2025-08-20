@@ -18,8 +18,8 @@ package com.splunk.rum.common.otel.span
 
 import android.app.job.JobInfo
 import android.content.Context
-import com.cisco.android.common.job.JobIdStorage
-import com.cisco.android.common.job.JobType
+import com.splunk.android.common.job.JobIdStorage
+import com.splunk.android.common.job.JobType
 
 internal data class UploadOtelSpanData(val id: String, val jobIdStorage: JobIdStorage) : JobType {
 

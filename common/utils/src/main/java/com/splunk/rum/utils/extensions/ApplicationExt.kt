@@ -2,7 +2,7 @@ package com.splunk.rum.utils.extensions
 
 import android.app.Application
 import android.content.pm.PackageManager
-import com.cisco.android.common.logger.Logger
+import com.splunk.android.common.logger.Logger
 
 private const val TAG = "ApplicationExt"
 private const val SPLUNK_BUILD_ID = "splunk.build_id"

@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.agent.api.configuration
 
 import android.content.Context
-import com.cisco.android.common.logger.Logger
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 

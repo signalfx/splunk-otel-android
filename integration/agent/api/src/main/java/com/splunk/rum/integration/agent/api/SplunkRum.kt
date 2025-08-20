@@ -18,7 +18,7 @@ package com.splunk.rum.integration.agent.api
 
 import android.app.Application
 import android.webkit.WebView
-import com.cisco.android.common.logger.Logger
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.api.session.ISession
 import com.splunk.rum.integration.agent.api.session.Session
