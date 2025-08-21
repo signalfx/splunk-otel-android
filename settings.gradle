@@ -3,7 +3,8 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         //uncomment to look for plugins in local maven (.m2) folder
-        //mavenLocal()
+        mavenLocal()
+        google() // needed for Android Gradle Plugin
     }
 }
 
@@ -15,7 +16,8 @@ include ':common:otel',
 // Instrumentation modules
 include ':instrumentation:runtime:startup',
         ':instrumentation:buildtime:httpurlconnection-auto:plugin',
-        ':instrumentation:buildtime:okhttp3-auto:plugin'
+        ':instrumentation:buildtime:okhttp3-auto:plugin',
+        ':instrumentation:buildtime:mapping-file:plugin'
 
 // Integration
 include ':integration:agent:api',
