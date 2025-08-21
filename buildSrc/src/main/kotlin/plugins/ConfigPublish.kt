@@ -38,9 +38,6 @@ class ConfigPublish : Plugin<Project> by local plugin {
 //            from(File(buildDir, "dokka/javadoc"))
             from("$rootDir/README.md")
             archiveClassifier.set("javadoc")
-            metaInf {
-                from("$projectDir/src/main/assets/LICENSE.txt")
-            }
         }
 
         configure<SigningExtension> {
