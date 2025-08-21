@@ -31,10 +31,6 @@ allprojects {
         mavenLocal()
         mavenCentral()
         google()
-
-        maven {
-            setUrl("https://sdk.smartlook.com/android/release")
-        }
     }
 
     afterEvaluate {
