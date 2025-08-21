@@ -87,7 +87,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.19"
+        private const val version = "1.0.21"
 
         const val bridge = "com.splunk.android:sr-bridge:$version"
         const val commonEncoder = "com.splunk.android:sr-common-encoder:$version"
