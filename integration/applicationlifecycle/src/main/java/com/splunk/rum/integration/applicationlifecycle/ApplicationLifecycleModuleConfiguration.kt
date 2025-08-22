@@ -26,7 +26,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 data class ApplicationLifecycleModuleConfiguration @JvmOverloads constructor(val isEnabled: Boolean = true) :
     ModuleConfiguration {
 
-    override val name: String = "applicationlifecycle"
+    override val name: String = "applicationLifecycle"
 
     override val attributes: List<Pair<String, String>> = listOf(
         "enabled" to isEnabled.toString()
