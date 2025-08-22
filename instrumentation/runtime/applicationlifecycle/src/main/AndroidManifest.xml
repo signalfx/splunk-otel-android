@@ -2,7 +2,7 @@
 
     <application>
         <provider
-            android:name="com.splunk.rum.applicationlifecycle.ApplicationLifecycleInstaller"
+            android:name="com.splunk.rum.applicationlifecycle.com.splunk.rum.instrumentation.runtime.applicationlifecycle.ApplicationLifecycleInstaller"
             android:authorities="${applicationId}.startup-installer"
             android:enabled="true"
             android:exported="false" />

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.applicationlifecycle
+package com.splunk.rum.instrumentation.runtime.applicationlifecycle
 
 import android.app.Application
 import android.content.ContentProvider

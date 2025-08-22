@@ -18,9 +18,16 @@ package com.splunk.rum.integration.applicationlifecycle
 
 import android.content.Context
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
+import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.instrumentation.runtime.applicationlifecycle.ApplicationLifecycleTracker
+import com.splunk.rum.instrumentation.runtime.applicationlifecycle.model.ApplicationLifecycleData
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import io.opentelemetry.android.instrumentation.InstallationContext
+import java.util.concurrent.TimeUnit
 
 internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<ApplicationLifecycleModuleConfiguration>(
     defaultModuleConfiguration = ApplicationLifecycleModuleConfiguration()
@@ -28,8 +35,10 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
 
     private const val TAG = "ApplicationLifecycle"
 
-    override fun onAttach(context: Context) {
+    private val cache: MutableList<ApplicationLifecycleData> = mutableListOf()
 
+    override fun onAttach(context: Context) {
+        ApplicationLifecycleTracker.listeners += applicationLifecycleTrackerListener
     }
 
     override fun onInstall(
@@ -39,25 +48,26 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     ) {
         Logger.d(TAG, "onInstall()")
 
+        cache.forEachFast { reportEvent(it) }
+        cache.clear()
     }
 
-//    private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
-//        val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: run {
-//            cache += StartupData(startTimestamp, endTimestamp, name)
-//            return
-//        }
-//
-//        val span = provider.get(RumConstants.RUM_TRACER_NAME)
-//            .spanBuilder(RumConstants.APP_START_NAME)
-//            .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
-//            .startSpan()
-//
-//        // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
-//        // "unknown" to ensure App Start event doesn't show up under a screen on UI
-//        span
-//            .setAttribute(RumConstants.COMPONENT_KEY, "appstart")
-//            .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
-//            .setAttribute("start.type", name)
-//            .end(endTimestamp.toInstant())
-//    }
+    private val applicationLifecycleTrackerListener = object : ApplicationLifecycleTracker.Listener {
+        override fun onApplicationLifecycleChange(applicationLifecycleData: ApplicationLifecycleData) {
+            reportEvent(applicationLifecycleData)
+        }
+    }
+
+    private fun reportEvent(applicationLifecycleData: ApplicationLifecycleData) {
+        val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: run {
+            cache += applicationLifecycleData
+            return
+        }
+
+        provider.get(RumConstants.RUM_TRACER_NAME)
+            .spanBuilder(RumConstants.APP_START_NAME)
+            .setAttribute(RumConstants.COMPONENT_KEY, "app-lifecycle")
+            .setAttribute(RumConstants.APP_STATE_KEY, applicationLifecycleData.appState.toString())
+            .createZeroLengthSpan(applicationLifecycleData.startTimestamp, TimeUnit.MILLISECONDS)
+    }
 }

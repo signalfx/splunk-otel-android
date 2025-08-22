@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.applicationlifecycle
+package com.splunk.rum.instrumentation.runtime.applicationlifecycle
 
 import android.app.Activity
 import android.app.Application
@@ -24,8 +24,11 @@ import android.os.Looper
 import android.os.SystemClock
 import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.rum.instrumentation.runtime.applicationlifecycle.model.ApplicationLifecycleData
 
 object ApplicationLifecycleTracker {
+
+    val listeners: MutableList<Listener> = arrayListOf()
 
     internal fun onInit() {
 
@@ -60,5 +63,9 @@ object ApplicationLifecycleTracker {
         override fun onActivityDestroyed(activity: Activity) {
 
         }
+    }
+
+    interface Listener {
+        fun onApplicationLifecycleChange(applicationLifecycleData: ApplicationLifecycleData)
     }
 }

@@ -50,4 +50,6 @@ object RumConstants {
     val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
     const val DEFAULT_SCREEN_NAME = "unknown"
+
+    val APP_STATE_KEY: AttributeKey<String> = AttributeKey.stringKey("android.app.state")
 }
