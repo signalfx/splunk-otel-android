@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 
-internal class ApplicationLifecycleInstaller : ContentProvider() {
+internal class ApplicationLifecycleInstrumentationInstaller : ContentProvider() {
 
     override fun onCreate(): Boolean {
         ApplicationLifecycleTracker.onCreate(context as Application)
@@ -45,11 +45,4 @@ internal class ApplicationLifecycleInstaller : ContentProvider() {
 
     override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int =
         0
-
-    private companion object {
-
-        init {
-            ApplicationLifecycleTracker.onInit()
-        }
-    }
 }

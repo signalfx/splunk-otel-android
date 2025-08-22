@@ -2,8 +2,8 @@
 
     <application>
         <provider
-            android:name=".ApplicationLifecycleModuleInstaller"
-            android:authorities="${applicationId}.ApplicationLifecycleModuleInstaller"
+            android:name=".ApplicationLifecycleIntegrationInstaller"
+            android:authorities="${applicationId}.ApplicationLifecycleIntegrationInstaller"
             android:enabled="true"
             android:exported="false" />
     </application>

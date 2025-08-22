@@ -51,5 +51,8 @@ object RumConstants {
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
     const val DEFAULT_SCREEN_NAME = "unknown"
 
+    // Application lifecycle instrumentation
+    const val APP_LIFECYCLE_NAME = "device.app.lifecycle"
+    const val APP_LIFECYCLE_COMPONENT = "app-lifecycle"
     val APP_STATE_KEY: AttributeKey<String> = AttributeKey.stringKey("android.app.state")
 }

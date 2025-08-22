@@ -33,11 +33,13 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     defaultModuleConfiguration = ApplicationLifecycleModuleConfiguration()
 ) {
 
-    private const val TAG = "ApplicationLifecycle"
+    private const val TAG = "ApplicationLifecycleModuleIntegration"
 
+    private var canReport: Boolean? = null
     private val cache: MutableList<ApplicationLifecycleData> = mutableListOf()
 
     override fun onAttach(context: Context) {
+        Logger.d(TAG, "onAttach() called")
         ApplicationLifecycleTracker.listeners += applicationLifecycleTrackerListener
     }
 
@@ -48,26 +50,44 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     ) {
         Logger.d(TAG, "onInstall()")
 
-        cache.forEachFast { reportEvent(it) }
+        if (moduleConfiguration.isEnabled) {
+            Logger.d(TAG, "Module is enabled. Reporting events.")
+            canReport = true
+            cache.forEachFast { reportEvent(it) }
+        } else {
+            Logger.w(TAG, "Module is disabled.")
+            canReport = false
+        }
+
         cache.clear()
     }
 
     private val applicationLifecycleTrackerListener = object : ApplicationLifecycleTracker.Listener {
         override fun onApplicationLifecycleChange(applicationLifecycleData: ApplicationLifecycleData) {
+            Logger.d(TAG, "Application lifecycle changed: $applicationLifecycleData")
             reportEvent(applicationLifecycleData)
         }
     }
 
     private fun reportEvent(applicationLifecycleData: ApplicationLifecycleData) {
-        val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: run {
+        if (canReport == false) {
+            Logger.i(TAG, "Cannot report event, module disabled.")
+            return
+        }
+
+        val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
+
+        if (provider == null || canReport == null) {
+            Logger.i(TAG, "Tracer provider not ready or reporting status unknown. Caching event")
             cache += applicationLifecycleData
             return
         }
 
+        Logger.d(TAG, "Creating span for app lifecycle event: $applicationLifecycleData")
         provider.get(RumConstants.RUM_TRACER_NAME)
-            .spanBuilder(RumConstants.APP_START_NAME)
-            .setAttribute(RumConstants.COMPONENT_KEY, "app-lifecycle")
+            .spanBuilder(RumConstants.APP_LIFECYCLE_NAME)
+            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.APP_LIFECYCLE_COMPONENT)
             .setAttribute(RumConstants.APP_STATE_KEY, applicationLifecycleData.appState.toString())
-            .createZeroLengthSpan(applicationLifecycleData.startTimestamp, TimeUnit.MILLISECONDS)
+            .createZeroLengthSpan(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)
     }
 }

@@ -19,7 +19,7 @@ package com.splunk.rum.integration.applicationlifecycle
 import android.content.Context
 import com.splunk.rum.integration.agent.internal.module.ModuleInstaller
 
-internal class ApplicationLifecycleModuleInstaller : ModuleInstaller() {
+internal class ApplicationLifecycleIntegrationInstaller : ModuleInstaller() {
 
     override fun onInstall(context: Context) {
         ApplicationLifecycleModuleIntegration.attach(context)

@@ -20,9 +20,10 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.rum.applicationlifecycle"
+    namespace = "com.splunk.rum.instrumentation.runtime.applicationlifecycle"
 }
 
 dependencies {
     api(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.SessionReplay.commonLogger)
 }

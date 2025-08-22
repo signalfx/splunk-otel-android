@@ -34,4 +34,5 @@ dependencies {
     api(project(":integration:webview"))
     api(project(":integration:sessionreplay"))
     api(project(":integration:navigation"))
+    api(project(":integration:applicationlifecycle"))
 }
