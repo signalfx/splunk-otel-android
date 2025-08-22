@@ -15,7 +15,6 @@ include ':common:otel',
 
 // Instrumentation modules
 include ':instrumentation:runtime:startup',
-        ':instrumentation:runtime:applicationlifecycle',
         ':instrumentation:buildtime:httpurlconnection-auto:plugin',
         ':instrumentation:buildtime:okhttp3-auto:plugin',
         ':instrumentation:buildtime:mapping-file:plugin'

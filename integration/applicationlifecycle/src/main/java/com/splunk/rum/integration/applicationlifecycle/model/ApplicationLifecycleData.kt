@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.instrumentation.runtime.applicationlifecycle.model
+package com.splunk.rum.integration.applicationlifecycle.model
 
-data class ApplicationLifecycleData(val timestamp: Long, val appState: AppState)
+internal data class ApplicationLifecycleData(val timestamp: Long, val appState: AppState)

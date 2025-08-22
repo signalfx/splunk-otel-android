@@ -16,16 +16,18 @@
 
 package com.splunk.rum.integration.applicationlifecycle
 
+import android.app.Application
 import android.content.Context
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.common.otel.internal.RumConstants
-import com.splunk.rum.instrumentation.runtime.applicationlifecycle.ApplicationLifecycleTracker
-import com.splunk.rum.instrumentation.runtime.applicationlifecycle.model.ApplicationLifecycleData
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
+import com.splunk.rum.integration.applicationlifecycle.model.AppState
+import com.splunk.rum.integration.applicationlifecycle.model.ApplicationLifecycleData
 import io.opentelemetry.android.instrumentation.InstallationContext
 import java.util.concurrent.TimeUnit
 
@@ -35,12 +37,14 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
 
     private const val TAG = "ApplicationLifecycleModuleIntegration"
 
+    private val appStateObserver = AppStateObserver()
     private var canReport: Boolean? = null
     private val cache: MutableList<ApplicationLifecycleData> = mutableListOf()
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach() called")
-        ApplicationLifecycleTracker.listeners += applicationLifecycleTrackerListener
+        appStateObserver.listener = appStateListener
+        appStateObserver.attach(context as Application)
     }
 
     override fun onInstall(
@@ -62,10 +66,18 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         cache.clear()
     }
 
-    private val applicationLifecycleTrackerListener = object : ApplicationLifecycleTracker.Listener {
-        override fun onApplicationLifecycleChange(applicationLifecycleData: ApplicationLifecycleData) {
-            Logger.d(TAG, "Application lifecycle changed: $applicationLifecycleData")
-            reportEvent(applicationLifecycleData)
+    private val appStateListener = object : AppStateObserver.Listener {
+
+        override fun onAppStarted() {
+            reportEvent(ApplicationLifecycleData(System.currentTimeMillis(), AppState.CREATED))
+        }
+
+        override fun onAppForegrounded() {
+            reportEvent(ApplicationLifecycleData(System.currentTimeMillis(), AppState.FOREGROUND))
+        }
+
+        override fun onAppBackgrounded() {
+            reportEvent(ApplicationLifecycleData(System.currentTimeMillis(), AppState.BACKGROUND))
         }
     }
 
@@ -87,7 +99,14 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         provider.get(RumConstants.RUM_TRACER_NAME)
             .spanBuilder(RumConstants.APP_LIFECYCLE_NAME)
             .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.APP_LIFECYCLE_COMPONENT)
-            .setAttribute(RumConstants.APP_STATE_KEY, applicationLifecycleData.appState.toString())
+            .setAttribute(RumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
             .createZeroLengthSpan(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)
     }
+
+    private val AppState.attributeValue: String
+        get() = when (this) {
+            AppState.CREATED -> "created"
+            AppState.FOREGROUND -> "foreground"
+            AppState.BACKGROUND -> "background"
+        }
 }
