@@ -25,6 +25,7 @@ import com.splunk.rum.integration.agent.api.spanfilter.toSpanInterceptor
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.legacy.LegacyAnrModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
+import com.splunk.rum.integration.agent.internal.legacy.LegacyNavigationModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacyNetworkMonitorModuleConfiguration
 import com.splunk.rum.integration.agent.internal.legacy.LegacySlowRenderingModuleConfiguration
 import io.opentelemetry.api.common.Attributes
@@ -296,6 +297,9 @@ class SplunkRumBuilder {
                 ),
                 LegacyNetworkMonitorModuleConfiguration(
                     isEnabled = networkMonitorEnabled
+                ),
+                LegacyNavigationModuleConfiguration(
+                    isAutomatedTrackingEnabled = true
                 )
             )
         )

@@ -22,7 +22,9 @@ import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.common.otel.internal.RumConstants.NAVIGATION_NAME
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
+import com.splunk.rum.integration.agent.internal.legacy.LegacyNavigationModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.navigation.screen.ScreenTrackerIntegration
 import io.opentelemetry.android.instrumentation.InstallationContext
@@ -39,11 +41,15 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
-        if (moduleConfiguration.isEnabled) {
+        if (moduleConfigurations.find<LegacyNavigationModuleConfiguration>()?.isEnabled
+                ?: moduleConfiguration.isEnabled
+        ) {
             Navigation.instance.listener = navigationListener
         }
 
-        if (moduleConfiguration.isAutomatedTrackingEnabled) {
+        if (moduleConfigurations.find<LegacyNavigationModuleConfiguration>()?.isAutomatedTrackingEnabled
+                ?: moduleConfiguration.isAutomatedTrackingEnabled
+        ) {
             ScreenTrackerIntegration.attach(context)
         }
     }
