@@ -26,19 +26,19 @@ For official documentation on the Splunk OTel Instrumentation for Android, see [
 
 The agent is composed of several modules, each responsible for a specific type of instrumentation.
 
-| Module | Summary | Enabled by Default? |
-|---|---|---|
-| **App Startup Tracking** | Measures cold, warm, and hot application start times. | Yes |
-| **Crash Reporting** | Captures and reports application crashes with full stack traces. | Yes |
-| **ANR Detection** | Detects and reports Application Not Responding (ANR) events. | Yes |
-| **Custom Tracking** | Manually track custom events, errors, and workflows. | Yes |
-| **Activity & Fragment Lifecycle** | Automatically tracks Android Activity and Fragment lifecycle events and screen transitions. | Yes |
+| Module                              | Summary | Enabled by Default? |
+|-------------------------------------|---|---|
+| **App Startup Tracking**            | Measures cold, warm, and hot application start times. | Yes |
+| **Crash Reporting**                 | Captures and reports application crashes with full stack traces. | Yes |
+| **ANR Detection**                   | Detects and reports Application Not Responding (ANR) events. | Yes |
+| **Custom Tracking**                 | Manually track custom events, errors, and workflows. | Yes |
+| **Navigation Tracking**             | Automatically tracks Android Activity and Fragment lifecycle events and screen transitions. | Yes |
 | **Network Request Instrumentation** | Automatically instruments HTTP requests via OkHttp3 and HttpURLConnection. | Yes |
-| **Network Change Detection** | Monitors and reports network connectivity status changes. | Yes |
-| **Session Replay** | Provides a visual replay of user sessions. | No |
-| **Slow & Frozen Render Detection** | Detects and reports UI frames that are slow or frozen during rendering. | Yes |
-| **User Interaction Tracking** | Automatically captures user taps, clicks, and other UI interactions. | Yes |
-| **WebView Instrumentation** | Links native RUM sessions with Browser RUM in WebView components. | Yes |
+| **Network Change Detection**        | Monitors and reports network connectivity status changes. | Yes |
+| **Session Replay**                  | Provides a visual replay of user sessions. | No |
+| **Slow & Frozen Render Detection**  | Detects and reports UI frames that are slow or frozen during rendering. | Yes |
+| **User Interaction Tracking**       | Automatically captures user taps, clicks, and other UI interactions. | Yes |
+| **WebView Instrumentation**         | Links native RUM sessions with Browser RUM in WebView components. | Yes |
 
 ## Getting Started
 
