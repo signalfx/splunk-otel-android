@@ -36,7 +36,8 @@ include ':integration:agent:api',
         ':integration:navigation',
         ':integration:customtracking',
         ':integration:networkmonitor',
-        ':integration:webview'
+        ':integration:webview',
+        ':integration:applicationlifecycle'
 
 // Test App
 include ':app'

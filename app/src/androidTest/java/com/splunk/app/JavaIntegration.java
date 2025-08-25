@@ -31,6 +31,7 @@ import com.splunk.rum.integration.agent.api.user.UserTrackingMode;
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes;
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration;
 import com.splunk.rum.integration.anr.AnrModuleConfiguration;
+import com.splunk.rum.integration.applicationlifecycle.ApplicationLifecycleModuleConfiguration;
 import com.splunk.rum.integration.crash.CrashModuleConfiguration;
 import com.splunk.rum.integration.customtracking.CustomTracking;
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration;
@@ -141,7 +142,8 @@ public class JavaIntegration extends Application {
                 ),
                 new SessionReplayModuleConfiguration(),
                 new SlowRenderingModuleConfiguration(true),
-                new StartupModuleConfiguration()
+                new StartupModuleConfiguration(),
+                new ApplicationLifecycleModuleConfiguration(true)
         };
 
         return SplunkRum.install(this, configuration, moduleConfigurations);
