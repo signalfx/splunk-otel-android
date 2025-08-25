@@ -42,13 +42,13 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         if (moduleConfigurations.find<LegacyNavigationModuleConfiguration>()?.isEnabled
-                ?: moduleConfiguration.isEnabled
+            ?: moduleConfiguration.isEnabled
         ) {
             Navigation.instance.listener = navigationListener
         }
 
         if (moduleConfigurations.find<LegacyNavigationModuleConfiguration>()?.isAutomatedTrackingEnabled
-                ?: moduleConfiguration.isAutomatedTrackingEnabled
+            ?: moduleConfiguration.isAutomatedTrackingEnabled
         ) {
             ScreenTrackerIntegration.attach(context)
         }
