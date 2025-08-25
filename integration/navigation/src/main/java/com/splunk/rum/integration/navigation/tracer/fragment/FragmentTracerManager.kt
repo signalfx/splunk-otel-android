@@ -35,7 +35,7 @@ internal class FragmentTracerManager(private val tracer: Tracer) {
 
         if (activityTracer == null) {
             activityTracer = FragmentTracer(
-                fragmentName = fragment::class.java.name,
+                fragmentName = fragment::class.java.simpleName,
                 screenName = ScreenNameDescriptor.getName(fragment),
                 tracer = tracer,
                 activeSpan = ActiveSpan()
