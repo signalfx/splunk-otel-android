@@ -7,6 +7,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.0.0-1 - 2025-08-26
+
+This is the GA version of the updated Splunk Android SDK
+
+The SDK has been redesigned to have a modular architecture, where instrumentations can be included based on need
+
+##### New features:
+* Automatic mapping file upload via Gradle plugin:
+  - `com.splunk.rum-mapping-file-plugin`
+
 ### Version 2.0.0-alpha.1 - 2025-07-14
 
 This is the alpha version of the updated Splunk Android SDK
