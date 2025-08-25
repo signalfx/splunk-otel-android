@@ -102,7 +102,7 @@ internal class AndroidLogRecordExporter(
                 }
 
                 log.attributes.asMap().forEach attrs@{ (key, value) ->
-                    if (key.key == "event.name") {
+                    if (key.key == RumConstants.EVENT_NAME) {
                         return@attrs
                     }
 
