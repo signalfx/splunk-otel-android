@@ -7,7 +7,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
-### Version 2.0.0-1 - 2025-08-26
+### Version 2.0.0 - 2025-08-26
 
 This is the GA version of the updated Splunk Android SDK
 
