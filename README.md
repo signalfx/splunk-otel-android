@@ -22,23 +22,6 @@ Built on OpenTelemetry, it features a modular architecture that allows you to in
 
 For official documentation on the Splunk OTel Instrumentation for Android, see [Instrument Android applications for Splunk RUM](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
 
-## Features
-
-* Crash reporting
-* ANR detection
-* Network change detection
-* Full Android Activity and Fragment lifecycle monitoring
-* Access to the OpenTelemetry APIs for manual instrumentation
-* SplunkRum APIs for creating custom RUM events and reporting exceptions
-* Access to an OkHttp3 Call.Factory implementation for monitoring http client requests
-* APIs to redact any span from export, or change span attributes before export
-* Slow / frozen render detection
-* Offline buffering of telemetry via storage
-* Automatic network request instrumentation via Gradle plugins for OkHttp3 and HttpURLConnection
-* Session Replay
-* User interaction tracking
-* WebView integration with Browser RUM
-
 ## Modules Overview
 
 The agent is composed of several modules, each responsible for a specific type of instrumentation.
