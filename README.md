@@ -28,13 +28,13 @@ The agent is composed of several modules, each responsible for a specific type o
 
 | Module                              | Summary                                                                                     | Enabled by Default? |
 |-------------------------------------|---------------------------------------------------------------------------------------------|---------------------|
+| **ANR Detection**                   | Detects and reports Application Not Responding (ANR) events.                                | Yes                 |
 | **App Startup Tracking**            | Measures cold, warm, and hot application start times.                                       | Yes                 |
 | **Crash Reporting**                 | Captures and reports application crashes with full stack traces.                            | Yes                 |
-| **ANR Detection**                   | Detects and reports Application Not Responding (ANR) events.                                | Yes                 |
 | **Custom Tracking**                 | Manually track custom events, errors, and workflows.                                        | Yes                 |
 | **Navigation Tracking**             | Automatically tracks Android Activity and Fragment lifecycle events and screen transitions. | No                  |
-| **Network Request Instrumentation** | Manually track HTTP requests made via OkHttp3 or use gradle plugins to automatically instrument and track OkHttp3 and HttpURLConnection requests                  | Yes (for manual OkHttp3 tracking); No (for automatic tracking, which requires adding Gradle plugins)                 |
 | **Network Change Detection**        | Monitors and reports network connectivity status changes.                                   | Yes                 |
+| **Network Request Instrumentation** | Manually track HTTP requests made via OkHttp3 or use gradle plugins to automatically instrument and track OkHttp3 and HttpURLConnection requests                  | Yes (for manual OkHttp3 tracking); No (for automatic tracking, which requires adding Gradle plugins)                 |
 | **Session Replay**                  | Provides a visual replay of user sessions.                                                  | No                  |
 | **Slow & Frozen Render Detection**  | Detects and reports UI frames that are slow or frozen during rendering.                     | Yes                 |
 | **User Interaction Tracking**       | Automatically captures user taps, focus, and other UI interactions.                         | Yes                 |
