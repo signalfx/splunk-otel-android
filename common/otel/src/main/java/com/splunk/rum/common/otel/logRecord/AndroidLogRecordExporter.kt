@@ -101,7 +101,11 @@ internal class AndroidLogRecordExporter(
                     spanBuilder.setAttribute("body", log.bodyValue.toString())
                 }
 
-                log.attributes.asMap().forEach { (key, value) ->
+                log.attributes.asMap().forEach attrs@{ (key, value) ->
+                    if (key.key == RumConstants.EVENT_NAME) {
+                        return@attrs
+                    }
+
                     when (value) {
                         is String -> spanBuilder.setAttribute(key.key, value)
                         is Long -> spanBuilder.setAttribute(key.key, value)

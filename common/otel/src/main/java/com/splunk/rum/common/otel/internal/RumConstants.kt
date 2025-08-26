@@ -29,6 +29,7 @@ object RumConstants {
     const val SERVER_TIMING_HEADER = "server-timing"
     const val CRASH_INSTRUMENTATION_SCOPE_NAME = "io.opentelemetry.crash"
     const val SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME = "SessionReplayDataScopeName"
+    const val EVENT_NAME = "event.name"
 
     val WORKFLOW_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("workflow.name")
     val COMPONENT_KEY: AttributeKey<String> = AttributeKey.stringKey("component")
@@ -44,7 +45,7 @@ object RumConstants {
 
     val SPLUNK_BUILD_ID: AttributeKey<String> = AttributeKey.stringKey("splunk.build_id")
 
-    val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
+    val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey(EVENT_NAME)
     const val DEFAULT_LOG_EVENT_NAME = "splunk.log"
 
     val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
