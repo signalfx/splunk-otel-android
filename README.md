@@ -22,22 +22,23 @@ Built on OpenTelemetry, it features a modular architecture that allows you to in
 
 For official documentation on the Splunk OTel Instrumentation for Android, see [Instrument Android applications for Splunk RUM](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
 
-## Features
+## Modules Overview
 
-* Crash reporting
-* ANR detection
-* Network change detection
-* Full Android Activity and Fragment lifecycle monitoring
-* Access to the OpenTelemetry APIs for manual instrumentation
-* SplunkRum APIs for creating custom RUM events and reporting exceptions
-* Access to an OkHttp3 Call.Factory implementation for monitoring http client requests
-* APIs to redact any span from export, or change span attributes before export
-* Slow / frozen render detection
-* Offline buffering of telemetry via storage
-* Automatic network request instrumentation via Gradle plugins for OkHttp3 and HttpURLConnection
-* Session Replay
-* User interaction tracking
-* WebView integration with Browser RUM
+The agent is composed of several modules, each responsible for a specific type of instrumentation.
+
+| Module                              | Summary                                                                                     | Enabled by Default? |
+|-------------------------------------|---------------------------------------------------------------------------------------------|---------------------|
+| **ANR Detection**                   | Detects and reports Application Not Responding (ANR) events.                                | Yes                 |
+| **App Startup Tracking**            | Measures cold, warm, and hot application start times.                                       | Yes                 |
+| **Crash Reporting**                 | Captures and reports application crashes with full stack traces.                            | Yes                 |
+| **Custom Tracking**                 | Manually track custom events, errors, and workflows.                                        | Yes                 |
+| **Navigation Tracking**             | Automatically tracks Android Activity and Fragment lifecycle events and screen transitions. | No                  |
+| **Network Change Detection**        | Monitors and reports network connectivity status changes.                                   | Yes                 |
+| **Network Request Instrumentation** | Manually track HTTP requests made via OkHttp3 or use gradle plugins to automatically instrument and track OkHttp3 and HttpURLConnection requests                  | Yes (for manual OkHttp3 tracking); No (for automatic tracking, which requires adding Gradle plugins)                 |
+| **Session Replay**                  | Provides a visual replay of user sessions.                                                  | No                  |
+| **Slow & Frozen Render Detection**  | Detects and reports UI frames that are slow or frozen during rendering.                     | Yes                 |
+| **User Interaction Tracking**       | Automatically captures user taps, focus, and other UI interactions.                         | Yes                 |
+| **WebView Instrumentation**         | Links native RUM sessions with Browser RUM in WebView components.                           | Yes                 |
 
 ## Getting Started
 
@@ -46,7 +47,6 @@ For complete setup instructions with code examples and advanced configuration op
 #### Requirements
 * Android API Level 24+ (Android 7.0)
 * Android Gradle Plugin 8.6.0+
-* compileSdk 35
 * Java 8+ compatibility with core library desugaring
 
 #### 1. Enable Core Library Desugaring
@@ -66,15 +66,12 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 #### 3. Add Maven Central Repository
 
-In your project's root `build.gradle` file, inside the `allprojects` block, add `mavenCentral()` to the list of repositories, and also an additional URL to include Session Replay support:
+In your project's root `build.gradle` file, inside the `allprojects` block, add `mavenCentral()` to the list of repositories:
 ```
 allprojects {
     repositories {
         google()
         mavenCentral()
-        maven {
-          setUrl("https://sdk.smartlook.com/android/release")
-        }
         ...
     }
 }
@@ -84,7 +81,7 @@ allprojects {
 
 Add the Splunk RUM agent library to your app module's `build.gradle` file dependencies:
 ```
-implementation("com.splunk:splunk-otel-android:2.0.0-alpha.1")
+implementation("com.splunk:splunk-otel-android:2.0.0")
 ```
 
 **Important:** Remove the following line from your dependencies if present, as the upstream OpenTelemetry Android repo is already linked in our SDK:
