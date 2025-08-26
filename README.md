@@ -47,7 +47,6 @@ For complete setup instructions with code examples and advanced configuration op
 #### Requirements
 * Android API Level 24+ (Android 7.0)
 * Android Gradle Plugin 8.6.0+
-* compileSdk 35
 * Java 8+ compatibility with core library desugaring
 
 #### 1. Enable Core Library Desugaring
@@ -67,15 +66,12 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 #### 3. Add Maven Central Repository
 
-In your project's root `build.gradle` file, inside the `allprojects` block, add `mavenCentral()` to the list of repositories, and also an additional URL to include Session Replay support:
+In your project's root `build.gradle` file, inside the `allprojects` block, add `mavenCentral()` to the list of repositories:
 ```
 allprojects {
     repositories {
         google()
         mavenCentral()
-        maven {
-          setUrl("https://sdk.smartlook.com/android/release")
-        }
         ...
     }
 }
