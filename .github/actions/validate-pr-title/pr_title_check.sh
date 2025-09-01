@@ -4,8 +4,6 @@ set -e
 # List of authors to skip
 SKIP_AUTHORS=("app/renovate")
 
-PR_AUTHOR="${GITHUB_ACTOR}"
-
 for author in "${SKIP_AUTHORS[@]}"; do
   if [[ "$PR_AUTHOR" == "$author" ]]; then
     echo "PR authored by $PR_AUTHOR, skipping validation."
@@ -13,7 +11,6 @@ for author in "${SKIP_AUTHORS[@]}"; do
   fi
 done
 
-PR_TITLE="${GITHUB_EVENT_PULL_REQUEST_TITLE}"
 echo "Validating PR title: \"$PR_TITLE\""
 
 REGEX='^\[?(WIP|wip)?\]?\s*(DEMRUM-[0-9]+(,\s?DEMRUM-[0-9]+)*|NO-TICKET):\s.+$'
