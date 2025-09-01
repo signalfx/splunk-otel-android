@@ -1,0 +1,13 @@
+name: "Validate PR Title"
+description: "Ensures PR titles follow the DEMRUM ticket format"
+author: "Frantisek Spurny (fspurny@splunk.com)"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate PR Title
+      shell: bash
+      env:
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+      run: bash ./.github/actions/validate-pr-title/pr_title_check.sh
