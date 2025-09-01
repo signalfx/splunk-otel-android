@@ -2,7 +2,7 @@
 set -e
 
 # List of authors to skip
-SKIP_AUTHORS=("app/renovate)
+SKIP_AUTHORS=("app/renovate")
 
 PR_AUTHOR="${GITHUB_ACTOR}"
 
