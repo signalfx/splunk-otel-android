@@ -7,4 +7,4 @@ runs:
   steps:
     - name: Validate PR title
       shell: bash
-      run: ./.github/actions/validate-pr-title/pr_title_check.sh
+      run: bash ./.github/actions/validate-pr-title/pr_title_check.sh
