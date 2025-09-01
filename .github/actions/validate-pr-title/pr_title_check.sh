@@ -1,8 +1,12 @@
 #!/bin/bash
 set -e
 
+# Debug logging
+echo "DEBUG: PR_AUTHOR='$PR_AUTHOR'"
+echo "DEBUG: PR_TITLE='$PR_TITLE'"
+
 # List of authors to skip
-SKIP_AUTHORS=("app/renovate")
+SKIP_AUTHORS=("renovate[bot]" "renovate-bot")
 
 for author in "${SKIP_AUTHORS[@]}"; do
   if [[ "$PR_AUTHOR" == "$author" ]]; then
