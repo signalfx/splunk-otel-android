@@ -6,13 +6,6 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.BuildConfig
 import com.splunk.rum.utils.extensions.appVersion
 import io.opentelemetry.sdk.resources.Resource
-import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MANUFACTURER
-import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER
-import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_NAME
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_DESCRIPTION
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_NAME
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_TYPE
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_VERSION
 
 internal object AgentResource {
 
@@ -40,13 +33,13 @@ internal object AgentResource {
 
     private fun buildResource(): Resource = Resource.empty().toBuilder()
         .put("rum.sdk.version", BuildConfig.VERSION_NAME)
-        .put(DEVICE_MODEL_IDENTIFIER, Build.MODEL)
-        .put(DEVICE_MODEL_NAME, Build.MODEL)
-        .put(DEVICE_MANUFACTURER, Build.MANUFACTURER)
-        .put(OS_NAME, "Android")
-        .put(OS_TYPE, "linux")
-        .put(OS_VERSION, Build.VERSION.RELEASE)
-        .put(OS_DESCRIPTION, OS_DESCRIPTION_TEMPLATE.format(Build.VERSION.RELEASE, Build.ID, Build.VERSION.SDK_INT))
+        .put("device.id", Build.MODEL)
+        .put("device.model.name", Build.MODEL)
+        .put("device.manufacturer", Build.MANUFACTURER)
+        .put("os.name", "Android")
+        .put("os.type", "linux")
+        .put("os.version", Build.VERSION.RELEASE)
+        .put("os.description", OS_DESCRIPTION_TEMPLATE.format(Build.VERSION.RELEASE, Build.ID, Build.VERSION.SDK_INT))
         .build()
 
     private fun sessionReplayResource(): Resource = Resource.empty().toBuilder()
