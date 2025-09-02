@@ -2,7 +2,7 @@ object Dependencies {
 
     // Project level dependencies
 
-    private const val gradleVersion = "8.6.0"
+    private const val gradleVersion = "8.13.0"
     private const val kotlinVersion = "1.8.0"
     private const val ktlintVersion = "1.5.0"
     private const val desugarVersion = "2.1.3"
