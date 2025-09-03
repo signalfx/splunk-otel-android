@@ -1,14 +1,11 @@
 import org.gradle.api.JavaVersion
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
 
 object Configurations {
 
     object Android {
         const val appCompileVersion = 34
         const val compileVersion = 34
-        const val minVersion = 24
+        const val minVersion = 21
         const val targetVersion = 34
     }
 
