@@ -6,18 +6,26 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.BuildConfig
 import com.splunk.rum.utils.extensions.appVersion
 import io.opentelemetry.sdk.resources.Resource
-import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MANUFACTURER
-import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_IDENTIFIER
-import io.opentelemetry.semconv.incubating.DeviceIncubatingAttributes.DEVICE_MODEL_NAME
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_DESCRIPTION
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_NAME
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_TYPE
-import io.opentelemetry.semconv.incubating.OsIncubatingAttributes.OS_VERSION
 
 internal object AgentResource {
 
     private const val OS_DESCRIPTION_TEMPLATE = "Android Version %s (Build %s API level %s)"
     private const val FALLBACK_VERSION = "0.0.0"
+
+    private const val KEY_APP = "app"
+    private const val KEY_APP_VERSION = "app.version"
+    private const val KEY_DEPLOYMENT_ENVIRONMENT = "deployment.environment"
+    private const val KEY_RUM_SDK_VERSION = "rum.sdk.version"
+    private const val KEY_DEVICE_ID = "device.id"
+    private const val KEY_DEVICE_MODEL_NAME = "device.model.name"
+    private const val KEY_DEVICE_MANUFACTURER = "device.manufacturer"
+    private const val KEY_OD_NAME = "os.name"
+    private const val KEY_OS_TYPE = "os.type"
+    private const val KEY_OS_VERSION = "os.version"
+    private const val KEY_OS_DESCRIPTION = "os.description"
+    private const val KEY_SPLUNK_RUM_VERSION = "splunk.rumVersion"
+    private const val KEY_PROCESS_RUNTIME_NAME = "process.runtime.name"
+    private const val KEY_SERVICE_NAME = "service.name"
 
     /**
      * Builds a complete Resource by combining:
@@ -33,25 +41,25 @@ internal object AgentResource {
 
     private fun agentConfigResource(context: Context, agentConfiguration: AgentConfiguration): Resource =
         Resource.empty().toBuilder()
-            .put("app", agentConfiguration.appName)
-            .put("app.version", agentConfiguration.appVersion ?: context.appVersion ?: FALLBACK_VERSION)
-            .put("deployment.environment", agentConfiguration.deploymentEnvironment)
+            .put(KEY_APP, agentConfiguration.appName)
+            .put(KEY_APP_VERSION, agentConfiguration.appVersion ?: context.appVersion ?: FALLBACK_VERSION)
+            .put(KEY_DEPLOYMENT_ENVIRONMENT, agentConfiguration.deploymentEnvironment)
             .build()
 
     private fun buildResource(): Resource = Resource.empty().toBuilder()
-        .put("rum.sdk.version", BuildConfig.VERSION_NAME)
-        .put(DEVICE_MODEL_IDENTIFIER, Build.MODEL)
-        .put(DEVICE_MODEL_NAME, Build.MODEL)
-        .put(DEVICE_MANUFACTURER, Build.MANUFACTURER)
-        .put(OS_NAME, "Android")
-        .put(OS_TYPE, "linux")
-        .put(OS_VERSION, Build.VERSION.RELEASE)
-        .put(OS_DESCRIPTION, OS_DESCRIPTION_TEMPLATE.format(Build.VERSION.RELEASE, Build.ID, Build.VERSION.SDK_INT))
+        .put(KEY_RUM_SDK_VERSION, BuildConfig.VERSION_NAME)
+        .put(KEY_DEVICE_ID, Build.MODEL)
+        .put(KEY_DEVICE_MODEL_NAME, Build.MODEL)
+        .put(KEY_DEVICE_MANUFACTURER, Build.MANUFACTURER)
+        .put(KEY_OD_NAME, "Android")
+        .put(KEY_OS_TYPE, "linux")
+        .put(KEY_OS_VERSION, Build.VERSION.RELEASE)
+        .put(KEY_OS_DESCRIPTION, OS_DESCRIPTION_TEMPLATE.format(Build.VERSION.RELEASE, Build.ID, Build.VERSION.SDK_INT))
         .build()
 
     private fun sessionReplayResource(): Resource = Resource.empty().toBuilder()
-        .put("splunk.rumVersion", BuildConfig.VERSION_NAME)
-        .put("process.runtime.name", "mobile")
-        .put("service.name", "unknown_service")
+        .put(KEY_SPLUNK_RUM_VERSION, BuildConfig.VERSION_NAME)
+        .put(KEY_PROCESS_RUNTIME_NAME, "mobile")
+        .put(KEY_SERVICE_NAME, "unknown_service")
         .build()
 }

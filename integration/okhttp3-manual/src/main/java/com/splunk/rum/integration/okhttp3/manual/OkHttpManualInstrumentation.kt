@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.okhttp3.manual
 
+import com.splunk.android.common.logger.Logger
 import okhttp3.Call
 import okhttp3.Call.Factory
 import okhttp3.OkHttpClient
@@ -30,12 +31,21 @@ class OkHttpManualInstrumentation internal constructor() {
      * @param client The [OkHttpClient] to wrap with Splunk RUM instrumentation.
      * @return A [Call.Factory] implementation.
      */
-    fun buildOkHttpCallFactory(client: OkHttpClient): Factory =
-        OkHttp3ManualModuleIntegration.okHttpTelemetry?.let { okHttpTelemetry ->
-            okHttpTelemetry.newCallFactory(client)
-        } ?: throw IllegalStateException("OkHttp3 manual instrumentation is not initialized")
+    fun buildOkHttpCallFactory(client: OkHttpClient): Factory {
+        val okHttpTelemetry = OkHttp3ManualModuleIntegration.okHttpTelemetry
+
+        if (okHttpTelemetry == null) {
+            Logger.w(TAG, "OkHttp3 manual instrumentation is not initialized. Check 'SplunkRum.instance.state.status'.")
+            return client
+        }
+
+        return okHttpTelemetry.newCallFactory(client)
+    }
 
     companion object {
+
+        private const val TAG = "OkHttpManualInstrumentation"
+
         /**
          * The instance of [OkHttpManualInstrumentation].
          */

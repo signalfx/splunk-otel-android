@@ -17,8 +17,11 @@
 package com.splunk.rum.integration.agent.api
 
 import android.app.Application
+import android.os.Build
 import android.webkit.WebView
 import com.splunk.android.common.logger.Logger
+import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
+import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.api.session.ISession
 import com.splunk.rum.integration.agent.api.session.Session
@@ -249,6 +252,20 @@ class SplunkRum private constructor(
                 return instance
             }
 
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                Logger.w(TAG, "install() - Unsupported Android version")
+
+                return SplunkRum(
+                    openTelemetry = OpenTelemetry.noop(),
+                    agentConfiguration = AgentConfiguration.noop,
+                    state = Noop(
+                        notRunningCause = Status.NotRunning.UnsupportedOsVersion
+                    ),
+                    userManager = NoOpUserManager,
+                    sessionManager = NoOpSplunkSessionManager
+                )
+            }
+
             val isSubprocess = SubprocessDetector.isSubprocess(
                 applicationId = agentConfiguration.instrumentedProcessName
             )
@@ -260,7 +277,7 @@ class SplunkRum private constructor(
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
-                        Status.NotRunning.Subprocess
+                        notRunningCause = Status.NotRunning.Subprocess
                     ),
                     userManager = NoOpUserManager,
                     sessionManager = NoOpSplunkSessionManager
