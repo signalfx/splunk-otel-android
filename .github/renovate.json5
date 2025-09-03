@@ -3,60 +3,12 @@
   "extends": [
     "config:base"
   ],
-  "baseBranches": ["main", "v1.7.x"],
+  "baseBranches": ["develop"],
   "packageRules": [
+    // Exclude updates for gradle.
     {
-      "matchPackageNames": [
-        "io.opentelemetry:opentelemetry-api-incubator",
-        "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha",
-        "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-semconv",
-        "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0"
-      ],
-      // Renovate's default behavior is only to update from unstable -> unstable if it's for the
-      // major.minor.patch, under the assumption that you would want to update to the stable version
-      // of that release instead of the unstable version for a future release (but there's never any
-      // stable version of opentelemetry-instrumentation-bom-alpha so this logic doesn't apply
-      "ignoreUnstable": false
-    },
-    {
-      // Don't bump to 2.x in the 1.x line
-      "matchUpdateTypes": ["major"],
-      "matchPackagePatterns": [
-        "^io.opentelemetry.instrumentation"
-      ],
-      "matchBaseBranches": ["v1.7.x"],
+      "matchPackageNames": ["com.android.tools.build:gradle", "com.android.tools.build:gradle-api"],
       "enabled": false
-    },
-    {
-      // navigation-fragment 2.7.0 and above require android api 34+, which we are not ready for
-      // yet due to android gradle plugin only supporting min 33.
-      "matchPackagePrefixes": ["androidx.navigation"],
-      "matchUpdateTypes": ["major", "minor"],
-      "groupName": "androidx.navigation",
-      "enabled": false
-    },
-    {
-      // navigation-browser 1.7.0 and above require android api 34+, which we are not ready for
-      // yet due to android gradle plugin only supporting min 33.
-      "matchPackageNames": ["androidx.browser:browser"],
-      "matchUpdateTypes": ["major", "minor"],
-      "enabled": false
-    },
-    {
-      // some strings that are picked up that should be ignored
-      "matchPackageNames": [
-        "string:rum.version",
-        "docker-hub.repo.splunkdev.net/eclipse-temurin"
-      ],
-      "enabled": false
-    },
-    {
-      "matchPackagePrefixes": ["com.diffplug.spotless"],
-      "groupName": "spotless packages"
-    },
-    {
-      "matchPackagePrefixes": ["io.opentelemetry.instrumentation"],
-      "groupName": "upstream otel instrumentation"
     }
   ]
 }
