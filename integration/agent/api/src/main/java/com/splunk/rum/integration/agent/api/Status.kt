@@ -27,5 +27,7 @@ sealed interface Status {
         object Subprocess : NotRunning
 
         object SampledOut : NotRunning
+
+        object UnsupportedOsVersion : NotRunning
     }
 }
