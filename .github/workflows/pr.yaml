@@ -26,7 +26,7 @@ jobs:
       - name: Build and test
         run: touch ./local.properties; ./gradlew check javadoc assemble
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5.0.7
+        uses: codecov/codecov-action@v5.5.1
   check_codestyle:
     runs-on: ubuntu-latest
     steps:
