@@ -22,7 +22,7 @@ allprojects {
     configurations.all {
         resolutionStrategy {
             force("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
-            force("androidx.core:core:1.13.1")
+            force("androidx.core:core:1.17.0")
             force("androidx.core:core-ktx:1.13.1")
         }
     }
