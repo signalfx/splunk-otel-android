@@ -7,12 +7,14 @@ object Dependencies {
     private const val ktlintVersion = "1.5.0"
     private const val desugarVersion = "2.1.3"
     private const val bytebuddyVersion = "1.17.2"
+    const val jacocoVersion = "0.8.12"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
     const val gradleApi = "com.android.tools.build:gradle-api:$gradleVersion"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
     const val desugar = "com.android.tools:desugar_jdk_libs:$desugarVersion"
+    const val jacoco = "org.jacoco:org.jacoco.core:$jacocoVersion"
 
     // Nexus publish plugin
     const val nexusPublishPluginId = "io.github.gradle-nexus.publish-plugin"
