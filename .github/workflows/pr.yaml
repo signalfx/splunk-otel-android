@@ -36,8 +36,6 @@ jobs:
           java-version: 17
       - name: Build and test
         run: touch ./local.properties; ./gradlew check javadoc assemble
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5.0.7
   jacoco_test_coverage:
     runs-on: ubuntu-latest
     steps:
@@ -49,6 +47,10 @@ jobs:
           java-version: 17
       - name: Run Jacoco
         run: ./gradlew jacocoTestReport
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
   check_links:
     runs-on: ubuntu-latest
     steps:
