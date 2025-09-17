@@ -13,6 +13,7 @@ class ConfigJacoco : Plugin<Project> by local plugin {
     tasks.register<JacocoReport>("jacocoTestReport") {
         dependsOn("testDebugUnitTest")
         group = TaskGroups.VERIFICATION
+        setOnlyIf { true }
 
         reports {
             xml.required.set(true)
