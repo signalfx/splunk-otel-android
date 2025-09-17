@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath(Dependencies.gradle)
         classpath(Dependencies.kotlin)
+        classpath(Dependencies.jacoco)
     }
 }
 
