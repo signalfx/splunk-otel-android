@@ -51,7 +51,7 @@ object Dependencies {
 
     object Test {
         private const val junitVersion = "4.13.2"
-        private const val jsonassertVersion = "1.5.0"
+        private const val jsonassertVersion = "1.5.3"
         private const val mockkVersion = "1.12.4"
         private const val mockWebServerVersion = "4.10.0"
 
@@ -73,7 +73,7 @@ object Dependencies {
 
         // Test application
 
-        private const val constraintLayoutVersion = "2.1.4"
+        private const val constraintLayoutVersion = "2.2.1"
         private const val activityKtxVersion = "1.2.2"
         private const val fragmentKtxVersion = "1.3.3"
 
