@@ -82,7 +82,7 @@ object Dependencies {
         const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 
         object Compose {
-            private const val version = "1.2.1" // No need to update
+            private const val version = "1.9.2" // No need to update
 
             const val ui = "androidx.compose.ui:ui:$version"
         }
