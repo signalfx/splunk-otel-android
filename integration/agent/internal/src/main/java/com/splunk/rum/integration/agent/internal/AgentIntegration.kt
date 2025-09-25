@@ -58,6 +58,7 @@ class AgentIntegration private constructor(context: Context) {
     fun install(context: Context, openTelemetry: OpenTelemetrySdk, moduleConfigurations: List<ModuleConfiguration>) {
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                // TODO
                 openTelemetry.sdkLoggerProvider.get("TODO")
                     .logRecordBuilder()
                     .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
