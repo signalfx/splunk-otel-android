@@ -8,9 +8,9 @@ import org.gradle.kotlin.dsl.dependencies
 
 class ConfigAndroidLibrary : Plugin<Project> by local plugin {
     apply<ConfigLint>()
+    apply<ConfigJacoco>()
 
     android {
-
         buildFeatures {
             buildConfig = true
         }
@@ -41,6 +41,13 @@ class ConfigAndroidLibrary : Plugin<Project> by local plugin {
 
         testOptions {
             unitTests.isIncludeAndroidResources = true
+        }
+
+        buildTypes {
+            debug {
+                enableAndroidTestCoverage = true
+                enableUnitTestCoverage = true
+            }
         }
     }
 

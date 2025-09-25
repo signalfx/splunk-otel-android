@@ -7,12 +7,14 @@ object Dependencies {
     private const val ktlintVersion = "1.5.0"
     private const val desugarVersion = "2.1.3"
     private const val bytebuddyVersion = "1.17.2"
+    const val jacocoVersion = "0.8.13"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
     const val gradleApi = "com.android.tools.build:gradle-api:$gradleVersion"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
     const val desugar = "com.android.tools:desugar_jdk_libs:$desugarVersion"
+    const val jacoco = "org.jacoco:org.jacoco.core:$jacocoVersion"
 
     // Nexus publish plugin
     const val nexusPublishPluginId = "io.github.gradle-nexus.publish-plugin"
@@ -49,7 +51,7 @@ object Dependencies {
 
     object Test {
         private const val junitVersion = "4.13.2"
-        private const val jsonassertVersion = "1.5.0"
+        private const val jsonassertVersion = "1.5.3"
         private const val mockkVersion = "1.12.4"
         private const val mockWebServerVersion = "4.10.0"
 
@@ -61,8 +63,8 @@ object Dependencies {
 
     object Android {
 
-        private const val annotationVersion = "1.6.0"
-        private const val appcompatVersion = "1.6.1"
+        private const val annotationVersion = "1.9.1"
+        private const val appcompatVersion = "1.7.1"
         private const val materialVersion = "1.9.0"
 
         const val annotation = "androidx.annotation:annotation:$annotationVersion"
@@ -71,7 +73,7 @@ object Dependencies {
 
         // Test application
 
-        private const val constraintLayoutVersion = "2.1.4"
+        private const val constraintLayoutVersion = "2.2.1"
         private const val activityKtxVersion = "1.2.2"
         private const val fragmentKtxVersion = "1.3.3"
 
@@ -87,7 +89,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.21"
+        private const val version = "1.0.23"
 
         const val bridge = "com.splunk.android:sr-bridge:$version"
         const val commonEncoder = "com.splunk.android:sr-common-encoder:$version"
@@ -141,8 +143,8 @@ object Dependencies {
         private const val okhttpLoggingVersion = "4.12.0"
         private const val serializationVersion = "1.5.0"
         private const val testExtTruthVersion = "1.6.0-alpha03"
-        private const val testOrchestratorVersion = "1.4.2"
-        private const val testRulesVersion = "1.4.0"
+        private const val testOrchestratorVersion = "1.6.1"
+        private const val testRulesVersion = "1.7.0"
         private const val testRunnerVersion = "1.5.2"
         private const val uiAutomatorVersion = "2.2.0"
         private const val mockkVersion = "1.12.4"
