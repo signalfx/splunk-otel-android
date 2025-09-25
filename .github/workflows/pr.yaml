@@ -11,13 +11,13 @@ jobs:
   validate_pr_title:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.3.0
       - name: Validate PR Title
         uses: ./.github/actions/validate-pr-title
   check_codestyle:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.3.0
       - name: Set up JDK 17 for running Gradle
         uses: actions/setup-java@v4.7.1
         with:
@@ -28,7 +28,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.3.0
       - name: Set up JDK 17 for running Gradle
         uses: actions/setup-java@v4.7.1
         with:
@@ -39,7 +39,7 @@ jobs:
   jacoco_test_coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.3.0
       - name: Set up JDK 17 for running Gradle
         uses: actions/setup-java@v4.7.1
         with:
@@ -54,7 +54,7 @@ jobs:
   check_links:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4.3.0
       - name: Link Checker
         uses: lycheeverse/lychee-action@v2.4.1
         with:
