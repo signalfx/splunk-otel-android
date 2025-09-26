@@ -16,104 +16,122 @@
 
 package com.splunk.rum.mappingfile.plugin.utils
 
-import com.android.build.gradle.api.ApplicationVariant
 import java.io.File
-import java.util.*
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
-import org.gradle.api.Project
 import org.w3c.dom.Element
 
-class BuildIdInjector(private val project: Project) {
+object BuildIdInjector {
 
-    private val logger = SplunkLogger(project.logger)
+    fun writeBuildIdToFile(buildDir: File, variantName: String, buildId: String) {
+        val buildIdFile = File(buildDir, "tmp/splunk-build-id-$variantName.txt")
+        buildIdFile.parentFile.mkdirs()
+        buildIdFile.writeText(buildId)
+    }
 
-    fun injectBuildId(variant: ApplicationVariant, buildId: String) {
-        logger.info("BuildId", "Setting up build ID injection for variant '${variant.name}'")
-
-        variant.outputs.forEach { output ->
-            try {
-                val processManifestTaskProvider = output.processManifestProvider
-                val processManifestTask = processManifestTaskProvider.get()
-                logger.debug("BuildId", "Hooking into processManifest task: ${processManifestTask.name}")
-
-                processManifestTask.outputs.upToDateWhen { false }
-                processManifestTask.doLast {
-                    logger.info("BuildId", "Executing injection after processManifest")
-                    injectMetadataIntoMergedManifest(variant, buildId)
-                }
-                logger.info("BuildId", "Hooked into ${processManifestTask.name}")
-            } catch (e: Exception) {
-                logger.warn("BuildId", "Could not hook processManifest: ${e.message}")
-                logger.debug("BuildId", "Falling back to package task hook")
-                val packageTaskName = "package${variant.name.capitalize(Locale.ROOT)}"
-                project.tasks.named(packageTaskName).configure { task ->
-                    task.doFirst {
-                        logger.info("BuildId", "Executing injection via package task fallback")
-                        injectMetadataIntoMergedManifest(variant, buildId)
-                    }
-                }
-                logger.info("BuildId", "Used fallback hook into $packageTaskName")
-            }
+    fun readBuildIdFromFile(buildDir: File, variantName: String): String? {
+        val buildIdFile = File(buildDir, "tmp/splunk-build-id-$variantName.txt")
+        return if (buildIdFile.exists()) {
+            buildIdFile.readText().trim()
+        } else {
+            null
         }
     }
 
-    private fun injectMetadataIntoMergedManifest(variant: ApplicationVariant, buildId: String) {
-        variant.outputs.forEach { output ->
-            try {
-                val processManifestTaskProvider = output.processManifestProvider
-                val processManifestTask = processManifestTaskProvider.get()
-                val outputFiles = processManifestTask.outputs.files.files
+    fun injectMetadataIntoMergedManifest(
+        variantName: String,
+        manifestOutputFiles: Set<File>,
+        buildId: String,
+        logger: SplunkLogger
+    ) {
+        try {
+            logger.info("BuildId", "processManifest task outputs for variant '$variantName':")
+            logger.info("BuildId", "Found ${manifestOutputFiles.size} output files:")
+            manifestOutputFiles.forEach { file ->
+                logger.info(
+                    "BuildId",
+                    "  - ${file.absolutePath} (exists: ${file.exists()}, isFile: ${file.isFile})"
+                )
 
-                logger.info("BuildId", "processManifest task outputs for variant '${variant.name}':")
-                logger.info("BuildId", "Found ${outputFiles.size} output files:")
-                outputFiles.forEach { file ->
+                // If it's a directory, look for AndroidManifest.xml inside it
+                if (file.isDirectory) {
+                    val manifestInDir = File(file, "AndroidManifest.xml")
                     logger.info(
                         "BuildId",
-                        "  - ${file.absolutePath} (exists: ${file.exists()}, isFile: ${file.isFile})"
+                        "    → Looking for AndroidManifest.xml: ${manifestInDir.absolutePath} (exists: ${manifestInDir.exists()})"
                     )
+                }
+            }
 
-                    // If it's a directory, look for AndroidManifest.xml inside it
-                    if (file.isDirectory) {
+            // Updated logic to find the manifest - check both files and directories
+            val manifestFile = manifestOutputFiles.firstNotNullOfOrNull { file ->
+                when {
+                    file.isFile && file.name == "AndroidManifest.xml" && file.exists() -> file
+                    file.isDirectory -> {
                         val manifestInDir = File(file, "AndroidManifest.xml")
-                        logger.info(
-                            "BuildId",
-                            "    → Looking for AndroidManifest.xml: ${manifestInDir.absolutePath} (exists: ${manifestInDir.exists()})"
-                        )
+                        if (manifestInDir.exists()) manifestInDir else null
                     }
+                    else -> null
                 }
+            }
 
-                // Updated logic to find the manifest - check both files and directories
-                val manifestFile = outputFiles.firstNotNullOfOrNull { file ->
-                    when {
-                        file.isFile && file.name == "AndroidManifest.xml" && file.exists() -> file
-                        file.isDirectory -> {
-                            val manifestInDir = File(file, "AndroidManifest.xml")
-                            if (manifestInDir.exists()) manifestInDir else null
-                        }
-                        else -> null
-                    }
+            if (manifestFile != null) {
+                logger.info("BuildId", "Found merged manifest: ${manifestFile.absolutePath}")
+                val wasModified = addMetadataToManifest(manifestFile, buildId, logger)
+                if (wasModified) {
+                    logger.info("BuildId", "Successfully modified manifest")
                 }
+            } else {
+                logger.warn("BuildId", "No AndroidManifest.xml found in task outputs")
+            }
+        } catch (e: Exception) {
+            logger.warn("BuildId", "Could not access manifest via task outputs: ${e.message}")
+        }
+    }
 
-                if (manifestFile != null) {
-                    logger.info("BuildId", "Found merged manifest: ${manifestFile.absolutePath}")
-                    val wasModified = addMetadataToManifest(manifestFile, buildId)
-                    if (wasModified) {
-                        logger.info("BuildId", "Successfully modified manifest")
-                    }
-                } else {
-                    logger.warn("BuildId", "No AndroidManifest.xml found in task outputs")
+    fun findManifestFiles(buildDir: File, variantName: String): Collection<File> {
+        val manifestFiles = mutableListOf<File>()
+
+        val possiblePaths = listOf(
+            "intermediates/merged_manifests/$variantName/AndroidManifest.xml",
+            "intermediates/merged_manifest/$variantName/AndroidManifest.xml",
+            "intermediates/packaged_manifests/$variantName/AndroidManifest.xml",
+            "outputs/apk/$variantName/AndroidManifest.xml"
+        )
+
+        possiblePaths.forEach { relativePath ->
+            val manifestFile = File(buildDir, relativePath)
+            if (manifestFile.exists()) {
+                manifestFiles.add(manifestFile)
+            }
+        }
+
+        return manifestFiles
+    }
+
+    fun injectMetadataIntoManifestFiles(
+        variantName: String,
+        manifestFiles: Collection<File>,
+        buildId: String,
+        logger: SplunkLogger
+    ) {
+        logger.info("BuildId", "Processing ${manifestFiles.size} manifest files for variant '$variantName'")
+
+        manifestFiles.forEach { manifestFile ->
+            if (manifestFile.exists() && manifestFile.name == "AndroidManifest.xml") {
+                logger.info("BuildId", "Found manifest file: ${manifestFile.absolutePath}")
+                val wasModified = addMetadataToManifest(manifestFile, buildId, logger)
+                if (wasModified) {
+                    logger.info("BuildId", "Successfully modified manifest")
                 }
-            } catch (e: Exception) {
-                logger.warn("BuildId", "Could not access manifest via task outputs: ${e.message}")
             }
         }
     }
 
-    private fun addMetadataToManifest(manifestFile: File, buildId: String): Boolean {
+    private fun addMetadataToManifest(manifestFile: File, buildId: String, logger: SplunkLogger): Boolean {
         logger.debug("BuildId", "Reading manifest file: ${manifestFile.absolutePath}")
         if (!manifestFile.canWrite()) {
             logger.warn("BuildId", "Manifest file is not writable: ${manifestFile.absolutePath}")
