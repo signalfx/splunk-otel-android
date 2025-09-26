@@ -21,11 +21,11 @@ import com.android.build.gradle.api.ApplicationVariant
 import com.splunk.rum.mappingfile.plugin.utils.BuildIdInjector
 import com.splunk.rum.mappingfile.plugin.utils.MappingFileUploader
 import com.splunk.rum.mappingfile.plugin.utils.SplunkLogger
-import org.gradle.api.GradleException
+import java.io.File
 import java.util.*
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import java.io.File
 
 class MappingFilePlugin : Plugin<Project> {
 
@@ -205,7 +205,7 @@ class MappingFilePlugin : Plugin<Project> {
                 val buildId = BuildIdInjector.readBuildIdFromFile(buildDir, variantName)
                     ?: run {
                         val errorMessage = "Build ID file not found for variant '$variantName'. " +
-                                "This indicates the manifest injection task didn't complete successfully."
+                            "This indicates the manifest injection task didn't complete successfully."
                         taskLogger.error("Upload", errorMessage)
                         throw GradleException("Mapping file upload failed for variant '$variantName': $errorMessage")
                     }
@@ -242,11 +242,7 @@ class MappingFilePlugin : Plugin<Project> {
                 BuildIdInjector.injectMetadataIntoMergedManifest(variantName, manifestOutputFiles, buildId, taskLogger)
             }
 
-            fun executeBuildIdInjectionFallback(
-                task: org.gradle.api.Task,
-                buildDir: File,
-                variantName: String
-            ) {
+            fun executeBuildIdInjectionFallback(task: org.gradle.api.Task, buildDir: File, variantName: String) {
                 val taskLogger = SplunkLogger(task.logger)
 
                 taskLogger.info("BuildId", "Executing injection via package task fallback")

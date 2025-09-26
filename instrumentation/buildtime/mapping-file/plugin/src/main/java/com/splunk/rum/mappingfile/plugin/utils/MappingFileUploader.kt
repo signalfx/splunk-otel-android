@@ -19,10 +19,7 @@ package com.splunk.rum.mappingfile.plugin.utils
 import java.io.File
 import org.gradle.api.GradleException
 
-class MappingFileUploader(
-    private val buildDir: File,
-    private val logger: SplunkLogger
-) {
+class MappingFileUploader(private val buildDir: File, private val logger: SplunkLogger) {
 
     private val httpClient = MappingFileUploadClient(logger)
 
@@ -160,10 +157,8 @@ class MappingFileUploader(
         return null
     }
 
-    private fun getMappingFileLocations(variantName: String, buildTypeName: String): List<File> {
-        return listOf(
-            File(buildDir, "outputs/mapping/$variantName/mapping.txt"),
-            File(buildDir, "outputs/mapping/$buildTypeName/mapping.txt")
-        )
-    }
+    private fun getMappingFileLocations(variantName: String, buildTypeName: String): List<File> = listOf(
+        File(buildDir, "outputs/mapping/$variantName/mapping.txt"),
+        File(buildDir, "outputs/mapping/$buildTypeName/mapping.txt")
+    )
 }
