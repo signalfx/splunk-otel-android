@@ -16,22 +16,27 @@
 
 package com.splunk.rum.mappingfile.plugin.utils
 
-import com.android.build.gradle.api.ApplicationVariant
-import com.splunk.rum.mappingfile.plugin.SplunkRumExtension
 import java.io.File
 import org.gradle.api.GradleException
-import org.gradle.api.Project
 
-class MappingFileUploader(private val project: Project) {
+class MappingFileUploader(
+    private val buildDir: File,
+    private val logger: SplunkLogger
+) {
 
-    private val logger = SplunkLogger(project.logger)
     private val httpClient = MappingFileUploadClient(logger)
 
-    fun uploadAfterBuild(variant: ApplicationVariant, buildId: String, extension: SplunkRumExtension) {
-        logger.info("Upload", "Starting upload process for variant '${variant.name}'")
-
-        val accessToken = resolveAccessToken(extension)
-        val realm = resolveRealm(extension)
+    fun uploadAfterBuild(
+        variantName: String,
+        applicationId: String,
+        versionCode: Int,
+        buildTypeName: String,
+        buildId: String,
+        accessToken: String?,
+        realm: String?,
+        failBuildOnUploadFailure: Boolean
+    ) {
+        logger.info("Upload", "Starting upload process for variant '$variantName'")
 
         val missingConfigs = buildList {
             if (accessToken.isNullOrBlank()) add("accessToken")
@@ -52,9 +57,9 @@ class MappingFileUploader(private val project: Project) {
                 Or use environment variables: SPLUNK_ACCESS_TOKEN, SPLUNK_REALM
             """.trimIndent()
 
-            if (extension.failBuildOnUploadFailure.get()) {
+            if (failBuildOnUploadFailure) {
                 logger.error("Config", helpfulMessage)
-                throw GradleException("Mapping file upload failed for variant '${variant.name}': $errorMessage")
+                throw GradleException("Mapping file upload failed for variant '$variantName': $errorMessage")
             } else {
                 logger.warn("Config", "$helpfulMessage (build continuing due to failBuildOnUploadFailure=false)")
                 return
@@ -66,14 +71,14 @@ class MappingFileUploader(private val project: Project) {
             "Configuration resolved - realm: '$realm', token configured: ${!accessToken.isNullOrBlank()}"
         )
 
-        val mappingFile = findMappingFile(variant)
+        val mappingFile = findMappingFile(variantName, buildTypeName)
         if (mappingFile == null) {
-            val errorMessage = "Mapping file not found for variant '${variant.name}'"
+            val errorMessage = "Mapping file not found for variant '$variantName'"
             val detailedMessage = """
-                Mapping file not found for variant '${variant.name}'
+                Mapping file not found for variant '$variantName'
         
                 Searched locations:
-                ${getMappingFileLocations(variant).joinToString("\n") { "  - ${it.absolutePath}" }}
+                ${getMappingFileLocations(variantName, buildTypeName).joinToString("\n") { "  - ${it.absolutePath}" }}
         
                 This usually means:
                 1. ProGuard/R8 minification is not properly configured
@@ -85,9 +90,9 @@ class MappingFileUploader(private val project: Project) {
                 using the Splunk O11Y Web UI or the Splunk RUM CLI tool.
             """.trimIndent()
 
-            if (extension.failBuildOnUploadFailure.get()) {
+            if (failBuildOnUploadFailure) {
                 logger.error("File", detailedMessage)
-                throw GradleException("Mapping file upload failed for variant '${variant.name}': $errorMessage")
+                throw GradleException("Mapping file upload failed for variant '$variantName': $errorMessage")
             } else {
                 logger.error("File", "$detailedMessage (build continuing due to failBuildOnUploadFailure=false)")
                 return
@@ -99,11 +104,11 @@ class MappingFileUploader(private val project: Project) {
         logger.lifecycle(
             "Upload",
             """
-            Uploading mapping file for variant ${variant.name}
+            Uploading mapping file for variant $variantName
             Upload details:
                 File: ${mappingFile.absolutePath}
-                App ID: ${variant.applicationId}
-                Version Code: ${variant.versionCode}
+                App ID: $applicationId
+                Version Code: $versionCode
                 Build ID: $buildId
             """.trimIndent()
         )
@@ -114,8 +119,8 @@ class MappingFileUploader(private val project: Project) {
             httpClient.uploadMappingFile(
                 mappingFile = mappingFile,
                 buildId = buildId,
-                applicationId = variant.applicationId,
-                versionCode = variant.versionCode,
+                applicationId = applicationId,
+                versionCode = versionCode,
                 accessToken = accessToken!!,
                 realm = realm!!
             )
@@ -125,10 +130,10 @@ class MappingFileUploader(private val project: Project) {
 
             val errorMessage = "Upload failed: ${e.message}"
 
-            if (extension.failBuildOnUploadFailure.get()) {
+            if (failBuildOnUploadFailure) {
                 logger.error("Upload", errorMessage)
                 logger.debug("Upload", "Full error stacktrace: ${e.stackTraceToString()}")
-                throw GradleException("Mapping file upload failed for variant '${variant.name}': ${e.message}")
+                throw GradleException("Mapping file upload failed for variant '$variantName': ${e.message}")
             } else {
                 logger.error("Upload", "$errorMessage (build continuing due to failBuildOnUploadFailure=false)")
                 logger.debug("Upload", "Full error stacktrace: ${e.stackTraceToString()}")
@@ -136,22 +141,8 @@ class MappingFileUploader(private val project: Project) {
         }
     }
 
-    private fun resolveAccessToken(extension: SplunkRumExtension): String? {
-        logger.debug("Config", "Resolving access token")
-        return extension.apiAccessToken.orNull
-            ?: project.findProperty("splunk.accessToken") as String?
-            ?: System.getenv("SPLUNK_ACCESS_TOKEN")
-    }
-
-    private fun resolveRealm(extension: SplunkRumExtension): String? {
-        logger.debug("Config", "Resolving realm from multiple sources")
-        return extension.realm.orNull
-            ?: project.findProperty("splunk.realm") as String?
-            ?: System.getenv("SPLUNK_REALM")
-    }
-
-    private fun findMappingFile(variant: ApplicationVariant): File? {
-        val locations = getMappingFileLocations(variant)
+    private fun findMappingFile(variantName: String, buildTypeName: String): File? {
+        val locations = getMappingFileLocations(variantName, buildTypeName)
 
         for ((index, location) in locations.withIndex()) {
             logger.debug("File", "Checking location ${index + 1}: ${location.absolutePath}")
@@ -169,16 +160,10 @@ class MappingFileUploader(private val project: Project) {
         return null
     }
 
-    private fun getMappingFileLocations(variant: ApplicationVariant): List<File> {
-        val buildDir = project.layout.buildDirectory.get().asFile
-        val variantName = variant.name
-
+    private fun getMappingFileLocations(variantName: String, buildTypeName: String): List<File> {
         return listOf(
-            // Standard mapping file location (AGP 7+ standard with R8)
             File(buildDir, "outputs/mapping/$variantName/mapping.txt"),
-
-            // Fallback: build-type specific (some custom configurations)
-            File(buildDir, "outputs/mapping/${variant.buildType.name}/mapping.txt")
+            File(buildDir, "outputs/mapping/$buildTypeName/mapping.txt")
         )
     }
 }
