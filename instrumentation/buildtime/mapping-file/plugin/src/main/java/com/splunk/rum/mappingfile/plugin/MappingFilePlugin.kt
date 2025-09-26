@@ -26,6 +26,7 @@ import java.util.*
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 
 class MappingFilePlugin : Plugin<Project> {
 
@@ -188,7 +189,7 @@ class MappingFilePlugin : Plugin<Project> {
         object TaskActions {
 
             fun executeUploadTask(
-                task: org.gradle.api.Task,
+                task: Task,
                 buildDir: File,
                 variantName: String,
                 applicationId: String,
@@ -226,7 +227,7 @@ class MappingFilePlugin : Plugin<Project> {
             }
 
             fun executeBuildIdInjection(
-                task: org.gradle.api.Task,
+                task: Task,
                 buildDir: File,
                 variantName: String,
                 manifestOutputFiles: Set<File>
@@ -242,7 +243,7 @@ class MappingFilePlugin : Plugin<Project> {
                 BuildIdInjector.injectMetadataIntoMergedManifest(variantName, manifestOutputFiles, buildId, taskLogger)
             }
 
-            fun executeBuildIdInjectionFallback(task: org.gradle.api.Task, buildDir: File, variantName: String) {
+            fun executeBuildIdInjectionFallback(task: Task, buildDir: File, variantName: String) {
                 val taskLogger = SplunkLogger(task.logger)
 
                 taskLogger.info("BuildId", "Executing injection via package task fallback")
