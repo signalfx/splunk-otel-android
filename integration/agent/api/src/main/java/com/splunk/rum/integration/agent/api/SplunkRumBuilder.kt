@@ -259,7 +259,7 @@ class SplunkRumBuilder {
                 accessToken ?: throw IllegalStateException("rumAccessToken was not set")
             )
             beaconEndpoint != null -> EndpointConfiguration(
-                trace = URL(beaconEndpoint)
+                traces = URL(beaconEndpoint)
             )
             else ->
                 throw IllegalStateException("setRealm() or setBeaconEndpoint() was not called")
