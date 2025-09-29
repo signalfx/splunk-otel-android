@@ -21,13 +21,13 @@ interface IAgentStorage {
     val rootDirPath: String
     val isStorageFull: Boolean
 
-    fun writeBaseUrl(value: String)
-    fun deleteBaseUrl()
-    fun readBaseUrl(): String?
+    fun writeTracesBaseUrl(value: String)
+    fun deleteTracesBaseUrl()
+    fun readTracesBaseUrl(): String?
 
-    fun writeSessionReplayBaseUrl(value: String)
-    fun deleteSessionReplayBaseUrl()
-    fun readSessionReplayBaseUrl(): String?
+    fun writeLogsBaseUrl(value: String)
+    fun deleteLogsBaseUrl()
+    fun readLogsBaseUrl(): String?
 
     fun writeDeviceId(value: String)
     fun readDeviceId(): String?

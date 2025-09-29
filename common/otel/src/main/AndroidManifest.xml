@@ -9,7 +9,7 @@
             android:name="com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
-            android:name=".span.UploadSessionReplayDataJob"
+            android:name=".logRecord.UploadSessionReplayDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 

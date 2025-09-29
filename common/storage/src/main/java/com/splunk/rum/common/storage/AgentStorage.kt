@@ -92,25 +92,25 @@ class AgentStorage(context: Context) : IAgentStorage {
             return isFull
         }
 
-    override fun writeBaseUrl(value: String) {
+    override fun writeTracesBaseUrl(value: String) {
         preferences.putString(BASE_URL, value).commit()
     }
 
-    override fun deleteBaseUrl() {
+    override fun deleteTracesBaseUrl() {
         preferences.remove(BASE_URL)
     }
 
-    override fun readBaseUrl(): String? = preferences.getString(BASE_URL)
+    override fun readTracesBaseUrl(): String? = preferences.getString(BASE_URL)
 
-    override fun writeSessionReplayBaseUrl(value: String) {
+    override fun writeLogsBaseUrl(value: String) {
         preferences.putString(SESSION_REPLAY_BASE_URL, value).commit()
     }
 
-    override fun deleteSessionReplayBaseUrl() {
+    override fun deleteLogsBaseUrl() {
         preferences.remove(SESSION_REPLAY_BASE_URL)
     }
 
-    override fun readSessionReplayBaseUrl(): String? = preferences.getString(SESSION_REPLAY_BASE_URL)
+    override fun readLogsBaseUrl(): String? = preferences.getString(SESSION_REPLAY_BASE_URL)
 
     override fun writeDeviceId(value: String) {
         preferences.putString(DEVICE_ID, value).commit()
