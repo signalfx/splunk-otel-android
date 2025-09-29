@@ -22,11 +22,11 @@ import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.android.common.utils.extensions.safeSchedule
 import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.storage.SessionId as SessionIdStorageData
 import com.splunk.rum.integration.agent.internal.id.SessionId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
-import com.splunk.rum.common.storage.SessionId as SessionIdStorageData
 
 interface ISplunkSessionManager {
     val sessionId: String
