@@ -184,78 +184,71 @@ class MappingFilePlugin : Plugin<Project> {
         }
         logger.info("Upload", "Successfully configured upload task for variant '$variantName'")
     }
+}
 
-    companion object {
-        object TaskActions {
+internal object TaskActions {
 
-            fun executeUploadTask(
-                task: Task,
-                buildDir: File,
-                variantName: String,
-                applicationId: String,
-                versionCode: Int,
-                buildTypeName: String,
-                accessToken: String?,
-                realm: String?,
-                failBuildOnUploadFailure: Boolean
-            ) {
-                val taskLogger = SplunkLogger(task.logger)
+    fun executeUploadTask(
+        task: Task,
+        buildDir: File,
+        variantName: String,
+        applicationId: String,
+        versionCode: Int,
+        buildTypeName: String,
+        accessToken: String?,
+        realm: String?,
+        failBuildOnUploadFailure: Boolean
+    ) {
+        val taskLogger = SplunkLogger(task.logger)
 
-                taskLogger.debug("Upload", "Assemble task completed, starting upload process")
+        taskLogger.debug("Upload", "Assemble task completed, starting upload process")
 
-                val buildId = BuildIdInjector.readBuildIdFromFile(buildDir, variantName)
-                    ?: run {
-                        val errorMessage = "Build ID file not found for variant '$variantName'. " +
-                            "This indicates the manifest injection task didn't complete successfully."
-                        taskLogger.error("Upload", errorMessage)
-                        throw GradleException("Mapping file upload failed for variant '$variantName': $errorMessage")
-                    }
-
-                taskLogger.lifecycle("Upload", "Using build ID for variant '$variantName': $buildId")
-
-                val uploader = MappingFileUploader(buildDir, taskLogger)
-                uploader.uploadAfterBuild(
-                    variantName = variantName,
-                    applicationId = applicationId,
-                    versionCode = versionCode,
-                    buildTypeName = buildTypeName,
-                    buildId = buildId,
-                    accessToken = accessToken,
-                    realm = realm,
-                    failBuildOnUploadFailure = failBuildOnUploadFailure
-                )
+        val buildId = BuildIdInjector.readBuildIdFromFile(buildDir, variantName)
+            ?: run {
+                val errorMessage = "Build ID file not found for variant '$variantName'. " +
+                    "This indicates the manifest injection task didn't complete successfully."
+                taskLogger.error("Upload", errorMessage)
+                throw GradleException("Mapping file upload failed for variant '$variantName': $errorMessage")
             }
 
-            fun executeBuildIdInjection(
-                task: Task,
-                buildDir: File,
-                variantName: String,
-                manifestOutputFiles: Set<File>
-            ) {
-                val taskLogger = SplunkLogger(task.logger)
+        taskLogger.lifecycle("Upload", "Using build ID for variant '$variantName': $buildId")
 
-                taskLogger.info("BuildId", "Executing injection after processManifest")
+        val uploader = MappingFileUploader(buildDir, taskLogger)
+        uploader.uploadAfterBuild(
+            variantName = variantName,
+            applicationId = applicationId,
+            versionCode = versionCode,
+            buildTypeName = buildTypeName,
+            buildId = buildId,
+            accessToken = accessToken,
+            realm = realm,
+            failBuildOnUploadFailure = failBuildOnUploadFailure
+        )
+    }
 
-                val buildId = UUID.randomUUID().toString()
-                taskLogger.lifecycle("BuildId", "Generated build ID for variant '$variantName': $buildId")
+    fun executeBuildIdInjection(task: Task, buildDir: File, variantName: String, manifestOutputFiles: Set<File>) {
+        val taskLogger = SplunkLogger(task.logger)
 
-                BuildIdInjector.writeBuildIdToFile(buildDir, variantName, buildId)
-                BuildIdInjector.injectMetadataIntoMergedManifest(variantName, manifestOutputFiles, buildId, taskLogger)
-            }
+        taskLogger.info("BuildId", "Executing injection after processManifest")
 
-            fun executeBuildIdInjectionFallback(task: Task, buildDir: File, variantName: String) {
-                val taskLogger = SplunkLogger(task.logger)
+        val buildId = UUID.randomUUID().toString()
+        taskLogger.lifecycle("BuildId", "Generated build ID for variant '$variantName': $buildId")
 
-                taskLogger.info("BuildId", "Executing injection via package task fallback")
+        BuildIdInjector.writeBuildIdToFile(buildDir, variantName, buildId)
+        BuildIdInjector.injectMetadataIntoMergedManifest(variantName, manifestOutputFiles, buildId, taskLogger)
+    }
 
-                val buildId = UUID.randomUUID().toString()
-                taskLogger.lifecycle("BuildId", "Generated build ID for variant '$variantName': $buildId")
+    fun executeBuildIdInjectionFallback(task: Task, buildDir: File, variantName: String) {
+        val taskLogger = SplunkLogger(task.logger)
 
-                BuildIdInjector.writeBuildIdToFile(buildDir, variantName, buildId)
+        taskLogger.info("BuildId", "Executing injection via package task fallback")
 
-                val manifestFiles = BuildIdInjector.findManifestFiles(buildDir, variantName)
-                BuildIdInjector.injectMetadataIntoManifestFiles(variantName, manifestFiles, buildId, taskLogger)
-            }
-        }
+        val buildId = UUID.randomUUID().toString()
+        taskLogger.lifecycle("BuildId", "Generated build ID for variant '$variantName': $buildId")
+
+        BuildIdInjector.writeBuildIdToFile(buildDir, variantName, buildId)
+
+        val manifestFiles = BuildIdInjector.findManifestFiles(buildDir, variantName)
+        BuildIdInjector.injectMetadataIntoManifestFiles(variantName, manifestFiles, buildId, taskLogger)
     }
 }
