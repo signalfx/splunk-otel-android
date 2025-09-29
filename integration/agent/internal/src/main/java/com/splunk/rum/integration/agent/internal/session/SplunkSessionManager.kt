@@ -22,12 +22,11 @@ import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.android.common.utils.extensions.safeSchedule
 import com.splunk.rum.common.storage.IAgentStorage
-import com.splunk.rum.common.storage.SessionId as SessionIdStorageData
 import com.splunk.rum.integration.agent.internal.id.SessionId
-import com.splunk.rum.integration.agent.internal.id.SimpleId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
+import com.splunk.rum.common.storage.SessionId as SessionIdStorageData
 
 interface ISplunkSessionManager {
     val sessionId: String
@@ -37,7 +36,6 @@ interface ISplunkSessionManager {
     fun install(context: Context)
     fun reset()
     fun sessionId(timestamp: Long): String
-    fun scriptId(): String
 }
 
 object NoOpSplunkSessionManager : ISplunkSessionManager {
@@ -48,7 +46,6 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
     override fun reset() = Unit
 
     override fun sessionId(timestamp: Long): String = ""
-    override fun scriptId(): String = ""
 }
 
 class SplunkSessionManager internal constructor(private val agentStorage: IAgentStorage) : ISplunkSessionManager {
@@ -59,8 +56,6 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
 
     private val sessionIds: MutableList<SessionIdStorageData> = agentStorage.readSessionIds().toMutableList()
-
-    private val scriptId = SimpleId.generate(SCRIPT_ID_LENGTH)
 
     /**
      * The value is valid after the [install] function is called.
@@ -99,8 +94,6 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         .maxByOrNull { it.validFrom }
         ?.id
         ?: throw IllegalArgumentException("No valid session for timestamp: $timestamp")
-
-    override fun scriptId(): String = scriptId
 
     @Synchronized
     private fun createNewSessionIfNeeded(): String {
@@ -200,6 +193,5 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     private companion object {
         const val DEFAULT_SESSION_BACKGROUND_TIMEOUT = 15L * 60L * 1000L // 15m
         const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L // 4h
-        const val SCRIPT_ID_LENGTH = 16
     }
 }
