@@ -145,7 +145,7 @@ object Dependencies {
         private const val testExtTruthVersion = "1.7.0"
         private const val testOrchestratorVersion = "1.6.1"
         private const val testRulesVersion = "1.7.0"
-        private const val testRunnerVersion = "1.5.2"
+        private const val testRunnerVersion = "1.7.0"
         private const val uiAutomatorVersion = "2.3.0"
         private const val mockkVersion = "1.12.4"
 
