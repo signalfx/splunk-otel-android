@@ -7,7 +7,7 @@ object Dependencies {
     private const val ktlintVersion = "1.5.0"
     private const val desugarVersion = "2.1.3"
     private const val bytebuddyVersion = "1.17.2"
-    const val jacocoVersion = "0.8.12"
+    const val jacocoVersion = "0.8.13"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
     const val gradleApi = "com.android.tools.build:gradle-api:$gradleVersion"
@@ -89,7 +89,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.21"
+        private const val version = "1.0.23"
 
         const val bridge = "com.splunk.android:sr-bridge:$version"
         const val commonEncoder = "com.splunk.android:sr-common-encoder:$version"
@@ -139,14 +139,14 @@ object Dependencies {
     }
 
     object AndroidTest {
-        private const val junitVersion = "1.1.3"
+        private const val junitVersion = "1.3.0"
         private const val okhttpLoggingVersion = "4.12.0"
         private const val serializationVersion = "1.5.0"
-        private const val testExtTruthVersion = "1.6.0-alpha03"
-        private const val testOrchestratorVersion = "1.4.2"
-        private const val testRulesVersion = "1.4.0"
-        private const val testRunnerVersion = "1.5.2"
-        private const val uiAutomatorVersion = "2.2.0"
+        private const val testExtTruthVersion = "1.7.0"
+        private const val testOrchestratorVersion = "1.6.1"
+        private const val testRulesVersion = "1.7.0"
+        private const val testRunnerVersion = "1.7.0"
+        private const val uiAutomatorVersion = "2.3.0"
         private const val mockkVersion = "1.12.4"
 
         const val junit = "androidx.test.ext:junit:$junitVersion"
@@ -165,14 +165,14 @@ object Dependencies {
              * Espresso contrib 3.5.1 is the latest version.
              * This version includes jsoup transitively with vulnerabilities, we explicitly set the jsoup version to a safer one.
              */
-            private const val contribVersion = "3.5.1"
+            private const val contribVersion = "3.7.0"
             private const val jsoupVersion = "1.15.3"
 
-            private const val coreVersion = "3.5.1"
-            private const val idlingConcurrentVersion = "3.5.1"
+            private const val coreVersion = "3.7.0"
+            private const val idlingConcurrentVersion = "3.7.0"
             private const val idlingResourceVersion = ""
-            private const val intentsVersion = "3.5.1"
-            private const val webVersion = "3.5.1"
+            private const val intentsVersion = "3.7.0"
+            private const val webVersion = "3.7.0"
 
             const val contrib = "androidx.test.espresso:espresso-contrib:$contribVersion"
             const val jsoup = "org.jsoup:jsoup:$jsoupVersion"
