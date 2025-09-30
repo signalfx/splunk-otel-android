@@ -146,7 +146,7 @@ object Dependencies {
         private const val testOrchestratorVersion = "1.6.1"
         private const val testRulesVersion = "1.7.0"
         private const val testRunnerVersion = "1.5.2"
-        private const val uiAutomatorVersion = "2.2.0"
+        private const val uiAutomatorVersion = "2.3.0"
         private const val mockkVersion = "1.12.4"
 
         const val junit = "androidx.test.ext:junit:$junitVersion"
