@@ -169,7 +169,7 @@ object Dependencies {
             private const val jsoupVersion = "1.15.3"
 
             private const val coreVersion = "3.5.1"
-            private const val idlingConcurrentVersion = "3.5.1"
+            private const val idlingConcurrentVersion = "3.7.0"
             private const val idlingResourceVersion = ""
             private const val intentsVersion = "3.5.1"
             private const val webVersion = "3.5.1"
