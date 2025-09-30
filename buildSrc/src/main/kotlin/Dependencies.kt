@@ -141,7 +141,7 @@ object Dependencies {
     object AndroidTest {
         private const val junitVersion = "1.3.0"
         private const val okhttpLoggingVersion = "4.12.0"
-        private const val serializationVersion = "1.5.0"
+        private const val serializationVersion = "1.9.0"
         private const val testExtTruthVersion = "1.7.0"
         private const val testOrchestratorVersion = "1.6.1"
         private const val testRulesVersion = "1.7.0"
