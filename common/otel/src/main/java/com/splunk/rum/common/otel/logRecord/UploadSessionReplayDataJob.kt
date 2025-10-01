@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.otel.span
+package com.splunk.rum.common.otel.logRecord
 
 import android.annotation.SuppressLint
 import android.app.job.JobInfo
@@ -53,7 +53,7 @@ internal class UploadSessionReplayDataJob : JobService() {
         params?.extras?.getString(DATA_SERIALIZE_KEY)?.let { id ->
             Logger.d(TAG, "startUpload() id: $id")
 
-            val url = storage.readSessionReplayBaseUrl()
+            val url = storage.readLogsBaseUrl()
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")
