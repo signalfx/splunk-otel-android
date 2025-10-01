@@ -8,12 +8,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate_pr_title:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4.3.0
-      - name: Validate PR Title
-        uses: ./.github/actions/validate-pr-title
   check_codestyle:
     runs-on: ubuntu-latest
     steps:
