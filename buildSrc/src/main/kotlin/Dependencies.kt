@@ -147,7 +147,7 @@ object Dependencies {
         private const val testRulesVersion = "1.7.0"
         private const val testRunnerVersion = "1.7.0"
         private const val uiAutomatorVersion = "2.3.0"
-        private const val mockkVersion = "1.12.4"
+        private const val mockkVersion = "1.14.6"
 
         const val junit = "androidx.test.ext:junit:$junitVersion"
         const val okhttpLogging = "com.squareup.okhttp3:logging-interceptor:$okhttpLoggingVersion"
