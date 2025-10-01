@@ -67,7 +67,7 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     }
 
     private val sessionChangeListener = object : SplunkSessionManager.SessionListener {
-        override fun onSessionChanged(sessionId: String) {
+        override fun onSessionChanged(sessionId: String, timestamp: Long) {
             onSessionChange(sessionId)
         }
     }
