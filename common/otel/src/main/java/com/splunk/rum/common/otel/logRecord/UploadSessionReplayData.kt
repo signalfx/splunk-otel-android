@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.otel.span
+package com.splunk.rum.common.otel.logRecord
 
 import android.app.job.JobInfo
 import android.content.Context
