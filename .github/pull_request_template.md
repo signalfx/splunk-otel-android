@@ -16,16 +16,16 @@
 - [ ] I have performed a self-review of my code.
 - [ ] All new and existing tests pass locally.
 - [ ] I have added license headers to all files.
-- [ ] \(Optional) I have added unit tests for my changes.
-- [ ] \(Optional) I have updated the sample app for integration testing.
-- [ ] \(Optional) I have updated any relevant documentation.
+- [ ] (If applicable) I have added unit tests for my changes.
+- [ ] (If applicable) I have updated the sample app for integration testing.
+- [ ] (If applicable) I have updated any relevant documentation.
 
 ### Generative AI usage
 
-- [ ] \(Optional) GAI was not used (or, no additional notation is required)
-- [ ] \(Optional) Coder created a draft manually that was non-substantively modified by GAI (e.g., refactoring was performed by GAI on manually written code)
-- [ ] \(Optional) GAI was used to create a draft that was subsequently customized or modified
-- [ ] \(Optional) Code was generated entirely by GAI
+- [ ] GAI was not used (or, no additional notation is required)
+- [ ] Coder created a draft manually that was non-substantively modified by GAI (e.g., refactoring was performed by GAI on manually written code)
+- [ ] GAI was used to create a draft that was subsequently customized or modified
+- [ ] Code was generated entirely by GAI
 
 ### How to Test These Changes
 
