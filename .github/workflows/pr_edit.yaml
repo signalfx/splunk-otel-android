@@ -1,0 +1,19 @@
+name: PR Title and Description Validation
+
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+jobs:
+  validate_pr_title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.3.0
+      - name: Validate PR Title
+        uses: ./.github/actions/validate-pr-title
+  validate_gai_usage_disclosure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.3.0
+      - name: Validate GAI Usage Disclosure
+        uses: ./.github/actions/validate-gai-usage-disclosure
