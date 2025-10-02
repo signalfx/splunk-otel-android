@@ -21,7 +21,6 @@ import com.splunk.android.common.job.JobIdStorage
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.common.otel.internal.RumConstants
-import com.splunk.rum.common.otel.span.UploadSessionReplayData
 import com.splunk.rum.common.storage.IAgentStorage
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind

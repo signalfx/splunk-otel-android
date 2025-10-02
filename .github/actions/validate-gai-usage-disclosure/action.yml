@@ -1,0 +1,12 @@
+name: "Validate GAI Usage Disclosure"
+description: "Ensures the GAI usage was disclosed in the PR description"
+author: "Frantisek Spurny (fspurny@splunk.com)"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate GAI Usage Disclosure
+      shell: bash
+      env:
+        PR_BODY: ${{ github.event.pull_request.body }}
+      run: bash ./.github/actions/validate-gai-usage-disclosure/gai_usage_disclosure_check.sh
