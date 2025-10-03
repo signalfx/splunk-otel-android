@@ -1,6 +1,16 @@
 #!/bin/bash
 set -e
 
+# List of authors to skip
+SKIP_AUTHORS=("renovate[bot]" "renovate-bot")
+
+for author in "${SKIP_AUTHORS[@]}"; do
+  if [[ "$PR_AUTHOR" == "$author" ]]; then
+    echo "PR authored by $PR_AUTHOR, skipping validation."
+    exit 0
+  fi
+done
+
 # Get PR body from the environment variable set in the workflow
 body="$PR_BODY"
 
