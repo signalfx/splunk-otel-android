@@ -24,5 +24,6 @@ android {
 }
 
 dependencies {
-    api(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.commonUtils)
 }
