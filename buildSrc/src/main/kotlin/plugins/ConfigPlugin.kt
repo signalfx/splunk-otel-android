@@ -98,6 +98,7 @@ class ConfigPlugin : Plugin<Project> by local plugin {
                     }
                 }
                 repositories {
+                    mavenLocal()
                     maven {
                         name = "local"
                         url = uri("$projectDir/repo")
@@ -111,7 +112,7 @@ class ConfigPlugin : Plugin<Project> by local plugin {
                 val artifact = "$defaultGroupId:${publication.artifactId}:${publication.version}"
 
                 println("╔══════════════════════════════════════════════════════════════════════════════════════════════════╗")
-                println("published.toBoxString())
+                println("published!".toBoxString())
                 println(artifact.toBoxString())
                 println("╚══════════════════════════════════════════════════════════════════════════════════════════════════╝")
             }
