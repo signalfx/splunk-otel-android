@@ -1,21 +1,26 @@
-import plugins.ConfigPlugin
-import plugins.pluginIdSuffixProperty
-import plugins.pluginImplementationClassProperty
-import plugins.pluginDisplayNameProperty
-import plugins.pluginArtifactIdProperty
 import utils.artifactPrefix
+import utils.defaultGroupId
 
 plugins {
+    id("java-gradle-plugin")
     kotlin("jvm")
+    id("maven-publish")
+    id("signing")
 }
 
-apply<ConfigPlugin>()
+group = defaultGroupId
+version = Configurations.sdkVersionName
 
-ext {
-    set(pluginIdSuffixProperty, "${artifactPrefix}httpurlconnection-auto-plugin")
-    set(pluginImplementationClassProperty, "com.splunk.rum.httpurlconnection.auto.plugin.HttpURLInstrumentationPlugin")
-    set(pluginDisplayNameProperty, "Splunk Android HttpURLConnection Auto-Instrumentation Plugin")
-    set(pluginArtifactIdProperty, "${artifactPrefix}httpurlconnection-auto-plugin")
+createStandardJars()
+
+gradlePlugin {
+    plugins {
+        create("androidInstrumentationPlugin") {
+            id = "$defaultGroupId.${artifactPrefix}httpurlconnection-auto-plugin"
+            implementationClass = "com.splunk.rum.httpurlconnection.auto.plugin.HttpURLInstrumentationPlugin"
+            displayName = "Splunk Android HttpURLConnection Auto-Instrumentation Plugin"
+        }
+    }
 }
 
 dependencies {
@@ -23,3 +28,7 @@ dependencies {
     implementation(Dependencies.bytebuddy)
     implementation(gradleApi())
 }
+
+configureGradlePluginSigning()
+configureGradlePluginPublishing("${artifactPrefix}httpurlconnection-auto-plugin")
+addPublishingOutput()

@@ -1,21 +1,26 @@
-import plugins.ConfigPlugin
-import plugins.pluginIdSuffixProperty
-import plugins.pluginImplementationClassProperty
-import plugins.pluginDisplayNameProperty
-import plugins.pluginArtifactIdProperty
 import utils.artifactPrefix
+import utils.defaultGroupId
 
 plugins {
+    id("java-gradle-plugin")
     kotlin("jvm")
+    id("maven-publish")
+    id("signing")
 }
 
-apply<ConfigPlugin>()
+group = defaultGroupId
+version = Configurations.sdkVersionName
 
-ext {
-    set(pluginIdSuffixProperty, "${artifactPrefix}okhttp3-auto-plugin")
-    set(pluginImplementationClassProperty, "com.splunk.rum.okhttp3.auto.plugin.OkHttp3InstrumentationPlugin")
-    set(pluginDisplayNameProperty, "Splunk Android OkHttp3 Auto-Instrumentation Plugin")
-    set(pluginArtifactIdProperty, "${artifactPrefix}okhttp3-auto-plugin")
+createStandardJars()
+
+gradlePlugin {
+    plugins {
+        create("androidInstrumentationPlugin") {
+            id = "$defaultGroupId.${artifactPrefix}okhttp3-auto-plugin"
+            implementationClass = "com.splunk.rum.okhttp3.auto.plugin.OkHttp3InstrumentationPlugin"
+            displayName = "Splunk Android OkHttp3 Auto-Instrumentation Plugin"
+        }
+    }
 }
 
 dependencies {
@@ -23,3 +28,7 @@ dependencies {
     implementation(Dependencies.bytebuddy)
     implementation(gradleApi())
 }
+
+configureGradlePluginSigning()
+configureGradlePluginPublishing("${artifactPrefix}okhttp3-auto-plugin")
+addPublishingOutput()

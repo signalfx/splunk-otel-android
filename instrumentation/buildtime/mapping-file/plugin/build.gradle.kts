@@ -1,24 +1,35 @@
-import plugins.ConfigPlugin
-import plugins.pluginIdSuffixProperty
-import plugins.pluginImplementationClassProperty
-import plugins.pluginDisplayNameProperty
-import plugins.pluginArtifactIdProperty
 import utils.artifactPrefix
+import utils.defaultGroupId
+
+private val pluginName = "mapping-file-plugin"
 
 plugins {
+    id("java-gradle-plugin")
     kotlin("jvm")
+    id("maven-publish")
+    id("signing")
 }
 
-apply<ConfigPlugin>()
+group = defaultGroupId
+version = Configurations.sdkVersionName
 
-ext {
-    set(pluginIdSuffixProperty, "${artifactPrefix}mapping-file-plugin")
-    set(pluginImplementationClassProperty, "com.splunk.rum.mappingfile.plugin.MappingFilePlugin")
-    set(pluginDisplayNameProperty, "Splunk Android Mapping File Plugin")
-    set(pluginArtifactIdProperty, "${artifactPrefix}mapping-file-plugin")
+createStandardJars()
+
+gradlePlugin {
+    plugins {
+        create("androidInstrumentationPlugin") {
+            id = "$defaultGroupId.${artifactPrefix}$pluginName"
+            implementationClass = "com.splunk.rum.mappingfile.plugin.MappingFilePlugin"
+            displayName = "Splunk Android Mapping File Plugin"
+        }
+    }
 }
 
 dependencies {
     implementation(gradleApi())
     implementation(Dependencies.gradle)
 }
+
+configureGradlePluginSigning()
+configureGradlePluginPublishing("${artifactPrefix}$pluginName")
+addPublishingOutput()
