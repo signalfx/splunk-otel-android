@@ -11,6 +11,12 @@ class ConfigAndroidLibrary : Plugin<Project> by local plugin {
     apply<ConfigJacoco>()
 
     android {
+        sourceSets {
+            getByName("main") {
+                java.srcDirs("src/main/java", "src/main/kotlin")
+            }
+        }
+
         buildFeatures {
             buildConfig = true
         }
