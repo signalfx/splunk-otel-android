@@ -97,7 +97,7 @@ class AppStartSpanProcessor : SpanProcessor {
             )
         }
 
-        @Suppress("NewApi") //Requires API 26 or core library desugaring
+        @Suppress("NewApi") // Requires API 26 or core library desugaring
         span.end(Instant.now())
     }
 }
