@@ -103,6 +103,7 @@ class SplunkRum private constructor(
         replaceWith = ReplaceWith("globalAttributes.update { attributesUpdater.accept(this) }")
     )
     fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
+        @Suppress("NewApi") //Requires API 26 or core library desugaring
         globalAttributes.update { attributesUpdater.accept(this) }
     }
 

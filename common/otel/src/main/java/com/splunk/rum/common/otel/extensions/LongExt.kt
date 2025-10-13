@@ -18,4 +18,5 @@ package com.splunk.rum.common.otel.extensions
 
 import java.time.Instant
 
+@Suppress("NewApi") //Requires API 26 or core library desugaring
 fun Long.toInstant(): Instant = Instant.ofEpochMilli(this)

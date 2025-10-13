@@ -32,6 +32,7 @@ import java.time.Duration
  */
 data class SlowRenderingModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
+    @Suppress("NewApi") //Requires API 26 or core library desugaring
     val interval: Duration = Duration.ofSeconds(1)
 ) : ModuleConfiguration {
 

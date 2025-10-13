@@ -23,10 +23,12 @@ internal class TimeIndex<T> {
     private val timeMap = TreeMap<Instant, T>()
 
     fun put(value: T) {
+        @Suppress("NewApi") //Requires API 26 or core library desugaring
         timeMap[Instant.now()] = value
     }
 
     fun putAt(time: Instant, value: T) {
+        @Suppress("NewApi") //Requires API 26 or core library desugaring
         timeMap[time] = value
     }
 

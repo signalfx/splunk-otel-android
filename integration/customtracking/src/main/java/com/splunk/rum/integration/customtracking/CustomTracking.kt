@@ -73,6 +73,7 @@ class CustomTracking internal constructor() {
         attributes?.let {
             spanBuilder.setAllAttributes(it)
         }
+        @Suppress("NewApi") //Requires API 26 or core library desugaring
         val timestamp = Instant.now()
         spanBuilder.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
             .setAttribute(RumConstants.ERROR_KEY, "true")
