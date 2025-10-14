@@ -30,7 +30,18 @@ jobs:
           java-version: 17
       - name: Build and test
         run: touch ./local.properties; ./gradlew check javadoc assemble
-  unit_and_instrumented_tests:
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.3.0
+      - name: Set up JDK 17 for running Gradle
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
+  instrumented_tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -49,8 +60,6 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Setup Gradle cache
         uses: gradle/actions/setup-gradle@v3
-      - name: Run Unit Tests
-        run: ./gradlew testDebugUnitTest
       - name: Setup AVD cache
         uses: actions/cache@v4
         id: avd-cache
