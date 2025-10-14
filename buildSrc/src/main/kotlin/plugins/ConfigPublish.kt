@@ -25,17 +25,13 @@ import utils.versionProperty
 class ConfigPublish : Plugin<Project> by local plugin {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
-//    apply(plugin = "org.jetbrains.dokka")
 
     afterEvaluate {
         val sourcesJar by tasks.creating(Jar::class) {
             archiveClassifier.set("sources")
         }
 
-        // TODO: Implement this using dokka -> needs exception in BlackDuck
         val androidJavadocsJar by tasks.registering(org.gradle.api.tasks.bundling.Jar::class) {
-//            dependsOn(tasks["dokkaJavadoc"])
-//            from(File(buildDir, "dokka/javadoc"))
             from("$rootDir/README.md")
             archiveClassifier.set("javadoc")
         }
