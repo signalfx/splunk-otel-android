@@ -30,7 +30,7 @@ jobs:
           java-version: 17
       - name: Build and test
         run: touch ./local.properties; ./gradlew check javadoc assemble
-  test:
+  tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
