@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-# Debug logging
-echo "DEBUG: PR_AUTHOR='$PR_AUTHOR'"
-echo "DEBUG: PR_TITLE='$PR_TITLE'"
-
 # List of authors to skip
 SKIP_AUTHORS=("renovate[bot]" "renovate-bot")
 
