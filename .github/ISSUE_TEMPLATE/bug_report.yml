@@ -1,6 +1,7 @@
 ---
 name: Bug Report
 title: "[BUG] Short descriptive title of the issue"
+description: "Report a bug or unexpected behavior encountered with the splunk-otel-android Agent."
 labels: bug
 assignees: '@signalfx/mrum-android-maintainers'
 body:
