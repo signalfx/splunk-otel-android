@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-title: "[BUG] Short descriptive title of the issue"
+title: "Short descriptive title of the issue"
 description: "Report a bug or unexpected behavior encountered with the splunk-otel-android Agent."
 labels: bug
 assignees: '@signalfx/mrum-android-maintainers'
@@ -53,7 +53,7 @@ body:
     validations:
       required: false
 
-  - type: input
+  - type: textarea
     id: affected-devices
     attributes:
       label: 4. Affected Devices / Android Versions
@@ -71,7 +71,7 @@ body:
     attributes:
       label: 5. Relevant Logs / Stack Trace
       description: If applicable, include any relevant logcat output, stack traces, or crash reports. Please format them using code blocks.
-      render: shell
+      placeholder: Paste logs or stack trace here...
     validations:
       required: false
 
@@ -80,7 +80,7 @@ body:
     attributes:
       label: 6. Code Snippet / Minimal Reproducible Example
       description: If possible, provide a small code snippet or a link to a minimal reproducible example that demonstrates the issue. This helps in quickly understanding and debugging the problem.
-      render: java
+      placeholder: Provide a code snippet or link to a reproducible example...
     validations:
       required: false
 
