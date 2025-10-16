@@ -2,7 +2,7 @@
 name: Bug Report
 title: "[BUG] Short descriptive title of the issue"
 labels: bug
-assignees: ''
+assignees: '@signalfx/mrum-android-maintainers'
 body:
   - type: markdown
     attributes:
