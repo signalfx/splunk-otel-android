@@ -20,6 +20,7 @@ import io.opentelemetry.api.trace.SpanBuilder
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
+@Suppress("NewApi") // Requires API 26 or core library desugaring
 fun SpanBuilder.createZeroLengthSpan(timestamp: Instant = Instant.now()) =
     this.setStartTimestamp(timestamp).startSpan().end(timestamp)
 
