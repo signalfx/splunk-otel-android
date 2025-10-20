@@ -8,7 +8,6 @@ import utils.versionProperty
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    //id("org.jetbrains.dokka")
 }
 
 apply<ConfigAndroidLibrary>()

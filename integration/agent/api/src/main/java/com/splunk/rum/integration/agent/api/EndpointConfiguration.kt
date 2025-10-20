@@ -20,9 +20,9 @@ import java.net.URL
 
 class EndpointConfiguration {
 
-    var traceEndpoint: URL? = null
+    var tracesEndpoint: URL? = null
         private set
-    var sessionReplayEndpoint: URL? = null
+    var logsEndpoint: URL? = null
         private set
     var realm: String? = null
         private set
@@ -38,23 +38,23 @@ class EndpointConfiguration {
     constructor(realm: String, rumAccessToken: String) {
         this.realm = realm
         this.rumAccessToken = rumAccessToken
-        traceEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/rumotlp?auth=$rumAccessToken")
-        this.sessionReplayEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/rumreplay?auth=$rumAccessToken")
+        this.tracesEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/traces?auth=$rumAccessToken")
+        this.logsEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/logs?auth=$rumAccessToken")
     }
 
     /**
-     * @param trace Sets the "beacon" endpoint URL to be used by the RUM library.
+     * @param traces Sets the "beacon" endpoint URL to be used by the RUM library.
      */
-    constructor(trace: URL) {
-        traceEndpoint = trace
+    constructor(traces: URL) {
+        tracesEndpoint = traces
     }
 
     /**
-     * @param trace Sets the "beacon" endpoint URL to be used by the RUM library.
-     * @param sessionReplay Sets the "session replay" endpoint URL to be used by the RUM library.
+     * @param traces Sets the "beacon" endpoint URL to be used by the RUM library.
+     * @param logs Sets the "session replay" endpoint URL to be used by the RUM library.
      */
-    constructor(trace: URL, sessionReplay: URL) {
-        traceEndpoint = trace
-        this.sessionReplayEndpoint = sessionReplay
+    constructor(traces: URL, logs: URL) {
+        tracesEndpoint = traces
+        logsEndpoint = logs
     }
 }
