@@ -52,6 +52,8 @@ class SplunkRumBuilder {
     private var crashReportingEnabled: Boolean = true
     private var anrReportingEnabled: Boolean = true
     private var slowRenderingDetectionEnabled: Boolean = true
+
+    @Suppress("NewApi") // Requires API 26 or core library desugaring
     private var slowRenderingDetectionPollInterval: Duration = Duration.ofSeconds(1)
     private var networkMonitorEnabled: Boolean = true
 
@@ -218,6 +220,7 @@ class SplunkRumBuilder {
 
     @Deprecated("Slow Rendering Detection is now controlled by the SlowRenderingModuleConfiguration")
     fun setSlowRenderingDetectionPollInterval(interval: Duration): SplunkRumBuilder {
+        @Suppress("NewApi") // Requires API 26 or core library desugaring
         if (interval.toMillis() <= 0) {
             Logger.w(TAG, "invalid slowRenderPollingDuration: $interval is not positive")
             return this
@@ -279,6 +282,7 @@ class SplunkRumBuilder {
                 deferredUntilForeground = deferredUntilForeground,
                 spanInterceptor = this.spanFilter?.let {
                     val spanFilterBuilder = SpanFilterBuilder()
+                    @Suppress("NewApi") // Requires API 26 or core library desugaring
                     it.accept(spanFilterBuilder)
                     spanFilterBuilder.toSpanInterceptor()
                 }
