@@ -52,7 +52,7 @@ object Dependencies {
     object Test {
         private const val junitVersion = "4.13.2"
         private const val jsonassertVersion = "1.5.3"
-        private const val mockkVersion = "1.12.4"
+        private const val mockkVersion = "1.14.6"
         private const val mockWebServerVersion = "4.10.0"
 
         const val junit = "junit:junit:$junitVersion"
@@ -89,7 +89,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.23"
+        private const val version = "1.0.24"
 
         const val bridge = "com.splunk.android:sr-bridge:$version"
         const val commonEncoder = "com.splunk.android:sr-common-encoder:$version"

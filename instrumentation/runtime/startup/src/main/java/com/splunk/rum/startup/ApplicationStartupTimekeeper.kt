@@ -19,15 +19,17 @@ package com.splunk.rum.startup
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.os.SystemClock
+import android.view.View
+import android.view.ViewTreeObserver
+import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.android.common.utils.extensions.rootView
 
 object ApplicationStartupTimekeeper {
 
-    private val handler = Handler(Looper.getMainLooper())
+    private const val TAG = "ApplicationStartupTimekeeper"
 
     private var firstTimestamp = 0L
     private var firstElapsed = 0L
@@ -44,16 +46,6 @@ object ApplicationStartupTimekeeper {
     }
 
     internal fun onCreate(application: Application) {
-        handler.twoConsecutivePosts {
-            isColdStartCompleted = true
-
-            if (isEnabled) {
-                val endElapsed = SystemClock.elapsedRealtime()
-                val duration = endElapsed - firstElapsed
-                listeners.forEachFast { it.onColdStarted(firstTimestamp, firstTimestamp + duration, duration) }
-            }
-        }
-
         application.registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
     }
 
@@ -94,38 +86,62 @@ object ApplicationStartupTimekeeper {
         override fun onActivityResumed(activity: Activity) {
             resumedActivityCount++
 
-            if (resumedActivityCount == 1 && (isHotStartPending || isWarmStartPending)) {
-                handler.twoConsecutivePosts {
-                    val endTimestamp = SystemClock.elapsedRealtime()
+            if (isEnabled &&
+                resumedActivityCount == 1 &&
+                (!isColdStartCompleted || isHotStartPending || isWarmStartPending)
+            ) {
+                val rootView = activity.rootView
 
-                    if (isHotStartPending) {
-                        if (isEnabled) {
-                            val duration = endTimestamp - firstActivityStartElapsed
-                            listeners.forEachFast {
-                                it.onHotStarted(
-                                    firstActivityStartTimestamp,
-                                    firstActivityStartTimestamp + duration,
-                                    duration
-                                )
-                            }
-                        }
+                if (rootView == null) {
+                    Logger.w(TAG, "Activity's rootView not found.")
+                    return
+                }
 
-                        isHotStartPending = false
+                rootView.doOnDraw {
+                    if (!isEnabled) {
+                        return@doOnDraw
                     }
 
-                    if (isWarmStartPending) {
-                        if (isEnabled) {
-                            val duration = endTimestamp - firstActivityCreateElapsed
-                            listeners.forEachFast {
-                                it.onWarmStarted(
-                                    firstActivityCreateTimestamp,
-                                    firstActivityCreateTimestamp + duration,
-                                    duration
-                                )
-                            }
-                        }
+                    val reporter: Listener.(Long, Long, Long) -> Unit
 
-                        isWarmStartPending = false
+                    val startTimestamp: Long
+                    val endTimestamp: Long
+                    val duration: Long
+
+                    when {
+                        !isColdStartCompleted -> {
+                            reporter = Listener::onColdStarted
+
+                            startTimestamp = firstTimestamp
+                            duration = SystemClock.elapsedRealtime() - firstElapsed
+                            endTimestamp = firstTimestamp + duration
+
+                            isColdStartCompleted = true
+                        }
+                        isHotStartPending -> {
+                            reporter = Listener::onHotStarted
+
+                            startTimestamp = firstActivityStartTimestamp
+                            duration = SystemClock.elapsedRealtime() - firstActivityStartElapsed
+                            endTimestamp = firstActivityStartTimestamp + duration
+
+                            isHotStartPending = false
+                        }
+                        isWarmStartPending -> {
+                            reporter = Listener::onWarmStarted
+
+                            startTimestamp = firstActivityCreateTimestamp
+                            duration = SystemClock.elapsedRealtime() - firstActivityCreateElapsed
+                            endTimestamp = firstActivityCreateTimestamp + duration
+
+                            isWarmStartPending = false
+                        }
+                        else ->
+                            return@doOnDraw
+                    }
+
+                    listeners.forEachFast {
+                        reporter(it, startTimestamp, endTimestamp, duration)
                     }
                 }
             }
@@ -144,10 +160,28 @@ object ApplicationStartupTimekeeper {
         }
     }
 
-    private fun Handler.twoConsecutivePosts(action: () -> Unit) {
-        post {
-            post(action)
+    // FIXME Compiler error. Use com.splunk.android.common.utils.extensions.doOnDraw once the issue is fixed.
+    private inline fun View.doOnDraw(crossinline action: () -> Unit) {
+        var pendingRemove = false
+
+        val onDrawListener = ViewTreeObserver.OnDrawListener {
+            pendingRemove = true
+            action()
         }
+
+        val onPreDrawListener = object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                if (pendingRemove && viewTreeObserver.isAlive) {
+                    rootView.viewTreeObserver.removeOnDrawListener(onDrawListener)
+                    rootView.viewTreeObserver.removeOnPreDrawListener(this)
+                }
+
+                return true
+            }
+        }
+
+        viewTreeObserver.addOnPreDrawListener(onPreDrawListener)
+        viewTreeObserver.addOnDrawListener(onDrawListener)
     }
 
     interface Listener {

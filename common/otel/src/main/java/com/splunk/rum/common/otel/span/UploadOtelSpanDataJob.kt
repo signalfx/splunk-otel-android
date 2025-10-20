@@ -16,7 +16,6 @@
 
 package com.splunk.rum.common.otel.span
 
-import android.annotation.SuppressLint
 import android.app.job.JobInfo
 import android.app.job.JobParameters
 import android.app.job.JobService
@@ -31,7 +30,6 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 
-@SuppressLint("NewApi")
 internal class UploadOtelSpanDataJob : JobService() {
 
     private val storage by lazy { AgentStorage.attach(application) }
