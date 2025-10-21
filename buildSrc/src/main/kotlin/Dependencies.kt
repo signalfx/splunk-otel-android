@@ -6,7 +6,7 @@ object Dependencies {
     private const val kotlinVersion = "1.8.0"
     private const val ktlintVersion = "1.5.0"
     private const val desugarVersion = "2.1.3"
-    private const val bytebuddyVersion = "1.17.2"
+    private const val bytebuddyVersion = "1.17.8"
     const val jacocoVersion = "0.8.13"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
