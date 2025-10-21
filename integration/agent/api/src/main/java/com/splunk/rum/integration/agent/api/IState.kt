@@ -22,7 +22,7 @@ interface IState {
     val appName: String
     val status: Status
     val appVersion: String
-    val endpointConfiguration: EndpointConfiguration
+    val endpointConfiguration: EndpointConfiguration?
     val deploymentEnvironment: String
     val isDebugLoggingEnabled: Boolean
     val instrumentedProcessName: String?
@@ -37,7 +37,7 @@ class State internal constructor(agentConfiguration: AgentConfiguration) : IStat
     } else {
         Status.NotRunning.SampledOut
     }
-    override val endpointConfiguration: EndpointConfiguration = agentConfiguration.endpoint
+    override val endpointConfiguration: EndpointConfiguration? = agentConfiguration.endpoint
     override val deploymentEnvironment: String = agentConfiguration.deploymentEnvironment
     override val isDebugLoggingEnabled: Boolean = agentConfiguration.enableDebugLogging
     override val instrumentedProcessName: String? = agentConfiguration.instrumentedProcessName

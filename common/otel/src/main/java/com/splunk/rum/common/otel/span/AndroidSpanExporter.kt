@@ -59,18 +59,21 @@ internal class AndroidSpanExporter(
             agentStorage.writeOtelSpanData(spansID, it.toByteArray())
         }
 
-        return if (deferredUntilForeground && !isForeground) {
-            // Just store span ID for deferred upload
-            agentStorage.addBufferedSpanId(spansID)
-            CompletableResultCode.ofSuccess()
-        } else {
-            // Schedule upload immediately
-            jobManager.scheduleJob(UploadOtelSpanData(spansID, jobIdStorage))
+        val hasEndpoint = agentStorage.readTracesBaseUrl() != null
 
-            // Also schedule previously buffered spans
-            flushBufferedSpanIds()
-
-            CompletableResultCode.ofSuccess()
+        return when {
+            !hasEndpoint || (deferredUntilForeground && !isForeground) -> {
+                // Just store span ID for deferred upload
+                agentStorage.addBufferedSpanId(spansID)
+                CompletableResultCode.ofSuccess()
+            }
+            else -> {
+                // Schedule upload immediately
+                jobManager.scheduleJob(UploadOtelSpanData(spansID, jobIdStorage))
+                // Also schedule previously buffered spans
+                flushBufferedSpanIds()
+                CompletableResultCode.ofSuccess()
+            }
         }
     }
 

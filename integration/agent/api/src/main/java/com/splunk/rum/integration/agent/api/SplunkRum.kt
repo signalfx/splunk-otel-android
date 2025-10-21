@@ -20,6 +20,7 @@ import android.app.Application
 import android.os.Build
 import android.webkit.WebView
 import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
@@ -43,6 +44,8 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.api.trace.Span
+import io.opentelemetry.sdk.OpenTelemetrySdk
+import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import okhttp3.Call
 import okhttp3.OkHttpClient
@@ -55,6 +58,7 @@ import okhttp3.OkHttpClient
  * @param globalAttributes Represents the global attributes configured for the agent.
  */
 class SplunkRum private constructor(
+    private val application: Application?,
     agentConfiguration: AgentConfiguration,
     userManager: IUserManager,
     sessionManager: ISplunkSessionManager,
@@ -64,6 +68,37 @@ class SplunkRum private constructor(
     val user: User = User(userManager),
     val globalAttributes: MutableAttributes = MutableAttributes(agentConfiguration.globalAttributes)
 ) {
+
+    private val endpointRef = AtomicReference<EndpointConfiguration?>(agentConfiguration.endpoint)
+    private val endpointLock = Any()
+
+    /**
+     * Gets or sets the endpoint configuration for the RUM agent.
+     * When set, persists the endpoint URLs and triggers a flush of any buffered spans/session replay data.
+     */
+    var endpointConfiguration: EndpointConfiguration?
+        get() = endpointRef.get()
+        set(value) {
+            value?.let { newEndpoint: EndpointConfiguration ->
+                synchronized(endpointLock) {
+                    val application = application ?: run {
+                        Logger.w(TAG, "Cannot set endpoint: application not available (noop instance?)")
+                        return@synchronized
+                    }
+
+                    val storage = AgentStorage.attach(application)
+                    storage.writeTracesBaseUrl(newEndpoint.tracesEndpoint!!.toExternalForm())
+                    storage.writeLogsBaseUrl(newEndpoint.logsEndpoint!!.toExternalForm())
+
+                    endpointRef.set(newEndpoint)
+
+                    Logger.d(TAG, "Endpoint configured, flushing cached data")
+
+                    // Cast to SDK to access forceFlush
+                    (openTelemetry as? OpenTelemetrySdk)?.sdkTracerProvider?.forceFlush()
+                }
+            }
+        }
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
     fun getRumSessionId(): String = session.state.id
@@ -212,6 +247,7 @@ class SplunkRum private constructor(
 
     companion object {
         private val noop = SplunkRum(
+            application = Application(),
             openTelemetry = OpenTelemetry.noop(),
             agentConfiguration = AgentConfiguration.noop,
             state = Noop(),
@@ -256,6 +292,7 @@ class SplunkRum private constructor(
                 Logger.w(TAG, "install() - Unsupported Android version")
 
                 return SplunkRum(
+                    application = application,
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
@@ -274,6 +311,7 @@ class SplunkRum private constructor(
                 Logger.d(TAG, "install() - Subprocess detected exiting")
 
                 return SplunkRum(
+                    application = application,
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
@@ -297,6 +335,7 @@ class SplunkRum private constructor(
             )
 
             instanceInternal = SplunkRum(
+                application = application,
                 agentConfiguration = agentConfiguration,
                 openTelemetry = openTelemetry,
                 userManager = userManager,
