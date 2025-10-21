@@ -166,7 +166,7 @@ object Dependencies {
              * This version includes jsoup transitively with vulnerabilities, we explicitly set the jsoup version to a safer one.
              */
             private const val contribVersion = "3.7.0"
-            private const val jsoupVersion = "1.15.3"
+            private const val jsoupVersion = "1.21.2"
 
             private const val coreVersion = "3.7.0"
             private const val idlingConcurrentVersion = "3.7.0"
