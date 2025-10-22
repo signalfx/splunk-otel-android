@@ -49,6 +49,7 @@ fun Project.configureGradlePluginPublishing(artifactIdValue: String) {
                 }
             }
         }
+        
         repositories {
             mavenLocal()
         }
