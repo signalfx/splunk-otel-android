@@ -8,7 +8,7 @@ This is the process to use to do a release:
 
 1) Make sure that all the required changes are merged. This includes updating the upstream OTel
    libraries' versions, and making sure that the project version (sdkVersionName) in the 
-   `Configurations.kt` file is correctly set to the next planned release version.
+   `Configurations.kt` file is correctly set to the next planned release version
 
 2) Run the `script/tag-release.sh` script to create and push a signed release tag. Note that it
    assumes that the remote is named `origin`, if you named yours differently you might have to push
