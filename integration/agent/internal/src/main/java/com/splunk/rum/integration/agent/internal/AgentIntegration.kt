@@ -97,7 +97,7 @@ class AgentIntegration private constructor(context: Context) {
 
         private var instanceInternal: AgentIntegration? = null
 
-        internal val modules = HashMap<String, Module>()
+        val modules = HashMap<String, Module>()
 
         val instance: AgentIntegration
             get() = instanceInternal
