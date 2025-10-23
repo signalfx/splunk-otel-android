@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Unreleased
+### Version 2.0.3 - 2025-10-22
+* Fixed startup with splash screen
+* Add callback for new sessions and emit log record event based on that
+* Remove desugaring by default
+* Cleanup ConfigPublish code
+* Fix Mapping File Gradle Plugin does not work with configuration-cache=true
+* Update Android MRUM Agent to use standard /v1/logs and /v1/traces
+* Modify scriptId to copy sessionId but take only SCRIPT_ID_LENGTH chars
+
+### Version 2.0.2 - 2025-09-25
+* Support min SDK version 21
+* Update Session Replay to 1.0.23
 
 ### Version 2.0.2 - 2025-09-25
 * Support min SDK version 21

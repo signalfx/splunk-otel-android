@@ -41,12 +41,10 @@ fun Project.configureGradlePluginPublishing(artifactIdValue: String) {
     extensions.configure<PublishingExtension> {
         publications {
             withType<MavenPublication> {
-                if (!name.contains("PluginMarkerMaven")) {
-                    pom.withXml { asNode().addSplunkInfo() }
-                    artifactId = artifactIdValue
-                    artifact(tasks.named("javadocJar"))
-                    artifact(tasks.named("sourcesJar"))
-                }
+                pom.withXml { asNode().addSplunkInfo() }
+                artifactId = artifactIdValue
+                artifact(tasks.named("javadocJar"))
+                artifact(tasks.named("sourcesJar"))
             }
         }
         repositories {
