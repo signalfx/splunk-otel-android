@@ -16,7 +16,6 @@
 
 package com.splunk.rum.common.otel.logRecord
 
-import android.annotation.SuppressLint
 import android.app.job.JobInfo
 import android.app.job.JobParameters
 import android.app.job.JobService
@@ -31,7 +30,6 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 
-@SuppressLint("NewApi")
 internal class UploadOtelLogRecordDataJob : JobService() {
 
     private val storage by lazy { AgentStorage.attach(application) }
@@ -53,7 +51,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
         params?.extras?.getString(DATA_SERIALIZE_KEY)?.let { id ->
             Logger.d(TAG, "startUpload() id: $id")
 
-            val url = storage.readBaseUrl()
+            val url = storage.readTracesBaseUrl()
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")

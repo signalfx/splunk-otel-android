@@ -1,0 +1,28 @@
+name: "Develop build"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+concurrency:
+  group: ci
+  cancel-in-progress: true
+
+jobs:
+  jacoco_test_coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.3.0
+      - name: Set up JDK 17 for running Gradle
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Run Jacoco
+        run: ./gradlew jacocoTestReport
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

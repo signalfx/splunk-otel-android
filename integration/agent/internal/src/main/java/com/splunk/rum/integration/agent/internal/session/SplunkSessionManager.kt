@@ -52,7 +52,6 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
 }
 
 class SplunkSessionManager internal constructor(private val agentStorage: IAgentStorage) : ISplunkSessionManager {
-
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val appStateObserver = AppStateObserver()
 
@@ -129,7 +128,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         sessionId = newSessionId
         sessionIds.add(SessionIdStorageData(newSessionId, now))
         agentStorage.writeSessionIds(sessionIds)
-        sessionListeners.forEachFast { it.onSessionChanged(newSessionId) }
+        sessionListeners.forEachFast { it.onSessionChanged(newSessionId, now) }
         return newSessionId
     }
 
@@ -170,7 +169,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     }
 
     interface SessionListener {
-        fun onSessionChanged(sessionId: String)
+        fun onSessionChanged(sessionId: String, timestamp: Long)
     }
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {
