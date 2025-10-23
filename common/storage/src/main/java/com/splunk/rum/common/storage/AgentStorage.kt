@@ -92,25 +92,25 @@ class AgentStorage(context: Context) : IAgentStorage {
             return isFull
         }
 
-    override fun writeBaseUrl(value: String) {
-        preferences.putString(BASE_URL, value).commit()
+    override fun writeTracesBaseUrl(value: String) {
+        preferences.putString(TRACES_BASE_URL, value).commit()
     }
 
-    override fun deleteBaseUrl() {
-        preferences.remove(BASE_URL)
+    override fun deleteTracesBaseUrl() {
+        preferences.remove(TRACES_BASE_URL)
     }
 
-    override fun readBaseUrl(): String? = preferences.getString(BASE_URL)
+    override fun readTracesBaseUrl(): String? = preferences.getString(TRACES_BASE_URL)
 
-    override fun writeSessionReplayBaseUrl(value: String) {
-        preferences.putString(SESSION_REPLAY_BASE_URL, value).commit()
+    override fun writeLogsBaseUrl(value: String) {
+        preferences.putString(LOGS_BASE_URL, value).commit()
     }
 
-    override fun deleteSessionReplayBaseUrl() {
-        preferences.remove(SESSION_REPLAY_BASE_URL)
+    override fun deleteLogsBaseUrl() {
+        preferences.remove(LOGS_BASE_URL)
     }
 
-    override fun readSessionReplayBaseUrl(): String? = preferences.getString(SESSION_REPLAY_BASE_URL)
+    override fun readLogsBaseUrl(): String? = preferences.getString(LOGS_BASE_URL)
 
     override fun writeDeviceId(value: String) {
         preferences.putString(DEVICE_ID, value).commit()
@@ -275,8 +275,8 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     companion object {
-        private const val BASE_URL = "BASE_URL"
-        private const val SESSION_REPLAY_BASE_URL = "SESSION_REPLAY_BASE_URL"
+        private const val TRACES_BASE_URL = "TRACES_BASE_URL"
+        private const val LOGS_BASE_URL = "LOGS_BASE_URL"
         private const val DEVICE_ID = "DEVICE_ID"
         private const val SESSION_ID = "SESSION_ID"
         private const val SESSION_IDS = "SESSION_IDS"

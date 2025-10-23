@@ -1,0 +1,93 @@
+---
+name: Bug Report
+title: "Short descriptive title of the issue"
+description: "Report a bug or unexpected behavior encountered with the splunk-otel-android Agent."
+labels: bug
+body:
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: 1. Describe the Issue
+      description: A clear and concise description of what the bug is. What were you trying to achieve, and what went wrong?
+      placeholder: Describe the issue here...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: client-version
+    attributes:
+      label: 2. Agent Version
+      description: Please select the exact version of the `splunk-otel-android` agent you are using.
+      options:
+        - 2.0.2
+        - 2.0.0
+        - 1.10.0
+        - 1.9.0
+        - 1.8.1
+        - 1.8.0
+        - 1.7.0
+        - 1.6.0
+        - 1.5.0
+        - 1.4.0
+        - 1.3.1
+        - 1.3.0
+        - 1.2.0
+        - 1.1.0
+        - 1.0.0
+        - Other (please specify in "Additional Context")
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: 3. Steps to Reproduce (Scenario)
+      description: |
+        Steps to reproduce the behavior:
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+      placeholder: Provide detailed steps to reproduce the issue...
+    validations:
+      required: false
+
+  - type: textarea
+    id: affected-devices
+    attributes:
+      label: 4. Affected Devices / Android Versions
+      description: |
+        Please specify the device(s) and Android version(s) where you observed the issue.
+        Example:
+        - Device: Google Pixel 6, Android Version: 13 (API 33)
+        - Device: Samsung Galaxy S22, Android Version: 12 (API 31)
+      placeholder: e.g., Google Pixel 6 (Android 13), Samsung Galaxy S22 (Android 12)
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs-stack-trace
+    attributes:
+      label: 5. Relevant Logs / Stack Trace
+      description: If applicable, include any relevant logcat output, stack traces, or crash reports. Please format them using code blocks.
+      placeholder: Paste logs or stack trace here...
+    validations:
+      required: false
+
+  - type: textarea
+    id: code-snippet
+    attributes:
+      label: 6. Code Snippet / Minimal Reproducible Example
+      description: If possible, provide a small code snippet or a link to a minimal reproducible example that demonstrates the issue. This helps in quickly understanding and debugging the problem.
+      placeholder: Provide a code snippet or link to a reproducible example...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 7. Additional Context
+      description: Add any other context about the problem here. For example, if it only happens under specific network conditions, or after a certain period of time.
+      placeholder: Any other relevant information...
+    validations:
+      required: false
