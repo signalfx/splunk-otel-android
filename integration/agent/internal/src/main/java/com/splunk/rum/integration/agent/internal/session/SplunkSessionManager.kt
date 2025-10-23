@@ -28,9 +28,6 @@ import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.Se
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 
-/**
- * Testing the copilot reviews.
- */
 interface ISplunkSessionManager {
     val sessionId: String
     val previousSessionId: String?
