@@ -18,6 +18,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Support min SDK version 21
 * Update Session Replay to 1.0.23
 
+### Version 2.0.2 - 2025-09-25
+* Support min SDK version 21
+* Update Session Replay to 1.0.23
+
 ### Version 2.0.0 - 2025-08-26
 
 This is the GA version of the updated Splunk Android SDK
