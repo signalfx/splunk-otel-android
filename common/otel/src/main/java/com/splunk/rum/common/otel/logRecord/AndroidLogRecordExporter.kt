@@ -35,6 +35,7 @@ import io.opentelemetry.sdk.trace.ReadableSpan
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+
 /**
  * This Exporter is added to Otel by default, it handles the offline/persistance.
  */
@@ -61,8 +62,15 @@ internal class AndroidLogRecordExporter(
                 agentStorage.writeOtelSessionReplayData(id, it.toByteArray())
             }
 
-            // Job scheduling
-            jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
+            val hasEndpoint = agentStorage.readLogsBaseUrl() != null
+
+            if (!hasEndpoint) {
+                agentStorage.addBufferedSessionReplayId(id)
+            } else {
+                // Schedule immediate upload and flush any buffered session replay
+                jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
+                flushBufferedSessionReplayIds()
+            }
         }
 
         generalLogs.forEach { log ->
@@ -150,7 +158,21 @@ internal class AndroidLogRecordExporter(
         return CompletableResultCode.ofSuccess()
     }
 
-    override fun flush(): CompletableResultCode = CompletableResultCode.ofSuccess()
+    override fun flush(): CompletableResultCode {
+        flushBufferedSessionReplayIds()
+        return CompletableResultCode.ofSuccess()
+    }
 
-    override fun shutdown(): CompletableResultCode = CompletableResultCode.ofSuccess()
+    override fun shutdown(): CompletableResultCode {
+        agentStorage.clearBufferedSessionReplayIds()
+        return CompletableResultCode.ofSuccess()
+    }
+
+    private fun flushBufferedSessionReplayIds() {
+        val bufferedIds = agentStorage.getBufferedSessionReplayIds()
+        bufferedIds.forEach { id ->
+            jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
+        }
+        agentStorage.clearBufferedSessionReplayIds()
+    }
 }
