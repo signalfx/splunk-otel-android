@@ -15,11 +15,11 @@ Follow these steps to perform a release:
 
 3. **Update the version**
    - In `Configurations.kt`, update the `sdkVersionName` to the release version.
-   - Commit the change.
+   - Commit the change to the `release/X.Y.Z` branch.
 
 4. **Update documentation**
    - Update relevant files (`CHANGELOG.md`, `README.md`, etc.) with release notes.
-   - Commit the changes.
+   - Commit the changes to the `release/X.Y.Z` branch.
 
 5. **Create a release PR**
    - Open a pull request from `release/X.Y.Z` → `main`.
@@ -36,6 +36,10 @@ Follow these steps to perform a release:
 
 8. **Merge to main**
    - Once the release is verified, merge the PR into the `main` branch.
+
+9. **Create Github Release**
+   - Once this PR is merged, create a release in **GitHub** that points to the newly created version.
+   - Make sure to provide release notes that at least mirror the contents of `CHANGELOG.md`.
 
 9. **Sync with develop**
    - Create a new PR from `main` → `develop` to synchronize branches.
