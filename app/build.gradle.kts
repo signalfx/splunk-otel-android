@@ -104,40 +104,40 @@ dependencies {
     /**
      * Explicit version of guava jre must be forced because ext truth uses one with vulnerabilities.
      */
-    androidTestImplementation(Dependencies.guavaAndroid)
-    androidTestImplementation(Dependencies.AndroidTest.testExtTruth)
+    androidTestImplementation(AppDependencies.guavaAndroid)
+    androidTestImplementation(AppDependencies.Test.testExtTruth)
 
-    androidTestImplementation(Dependencies.AndroidTest.junit)
-    androidTestImplementation(Dependencies.AndroidTest.mockk)
-    androidTestImplementation(Dependencies.AndroidTest.serialization)
-    androidTestImplementation(Dependencies.AndroidTest.testRules)
-    androidTestImplementation(Dependencies.AndroidTest.testRunner)
-    androidTestImplementation(Dependencies.AndroidTest.uiAutomator)
+    androidTestImplementation(AppDependencies.Test.junit)
+    androidTestImplementation(AppDependencies.Test.mockk)
+    androidTestImplementation(AppDependencies.Test.serialization)
+    androidTestImplementation(AppDependencies.Test.testRules)
+    androidTestImplementation(AppDependencies.Test.testRunner)
+    androidTestImplementation(AppDependencies.Test.uiAutomator)
 
     /**
      * Jsoup must be explicitly included since a newer version is being enforced than what is transitively used by espresso contrib.
      */
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.contrib)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.jsoup)
+    androidTestImplementation(AppDependencies.Test.Espresso.contrib)
+    androidTestImplementation(AppDependencies.Test.Espresso.jsoup)
 
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.core)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.idlingConcurrent)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.idlingResource)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.intents)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.web)
+    androidTestImplementation(AppDependencies.Test.Espresso.core)
+    androidTestImplementation(AppDependencies.Test.Espresso.idlingConcurrent)
+    androidTestImplementation(AppDependencies.Test.Espresso.idlingResource)
+    androidTestImplementation(AppDependencies.Test.Espresso.intents)
+    androidTestImplementation(AppDependencies.Test.Espresso.web)
 
-    androidTestImplementation(Dependencies.okhttp)
-    androidTestImplementation(Dependencies.okio)
-    androidTestImplementation(Dependencies.AndroidTest.okhttpLogging)
+    androidTestImplementation(AppDependencies.okhttp)
+    androidTestImplementation(AppDependencies.okio)
+    androidTestImplementation(AppDependencies.Test.okhttpLogging)
     
-    androidTestImplementation(Dependencies.Test.jsonassert)
+    androidTestImplementation(AppDependencies.Test.jsonassert)
 
-    androidTestUtil(Dependencies.AndroidTest.testOrchestrator)
+    androidTestUtil(AppDependencies.Test.testOrchestrator)
 
     /**
      * Explicit version of guava jre must be forced because ext truth uses one with vulnerabilities.
      */
-    implementation(Dependencies.guavaAndroid)
+    implementation(AppDependencies.guavaAndroid)
 }
 
 tasks.register<Exec>("startOtelCollectorForTests") {
