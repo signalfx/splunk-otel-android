@@ -96,8 +96,8 @@ dependencies {
     /**
      * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
      */
-    implementation(Dependencies.okhttp)
-    implementation(Dependencies.okio)
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okio:okio:3.4.0")
 
     debugImplementation(Dependencies.AndroidDebug.leakCanary)
 
