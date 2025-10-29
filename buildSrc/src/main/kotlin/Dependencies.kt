@@ -63,11 +63,9 @@ object Dependencies {
     object Android {
 
         private const val annotationVersion = "1.9.1"
-        private const val appcompatVersion = "1.7.1"
         private const val materialVersion = "1.9.0"
 
         const val annotation = "androidx.annotation:annotation:$annotationVersion"
-        const val appcompat = "androidx.appcompat:appcompat:$appcompatVersion"
         const val material = "com.google.android.material:material:$materialVersion"
 
         // Test application

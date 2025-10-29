@@ -87,7 +87,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")
 
-    implementation(Dependencies.Android.appcompat)
+    implementation("androidx.appcompat:appcompat:1.7.1")
     implementation(Dependencies.Android.constraintLayout)
     implementation(Dependencies.Android.activityKtx)
     implementation(Dependencies.Android.fragmentKtx)
