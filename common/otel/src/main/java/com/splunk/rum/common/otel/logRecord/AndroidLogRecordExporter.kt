@@ -159,7 +159,9 @@ internal class AndroidLogRecordExporter(
     }
 
     override fun flush(): CompletableResultCode {
-        flushBufferedSessionReplayIds()
+        if (agentStorage.readLogsBaseUrl() != null) {
+            flushBufferedSessionReplayIds()
+        }
         return CompletableResultCode.ofSuccess()
     }
 

@@ -20,6 +20,8 @@ import android.app.Application
 import android.os.Build
 import android.webkit.WebView
 import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.storage.AgentStorage
+import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
@@ -56,7 +58,7 @@ import okhttp3.OkHttpClient
  * @param globalAttributes Represents the global attributes configured for the agent.
  */
 class SplunkRum private constructor(
-    private val application: Application?,
+    private val agentStorage: IAgentStorage?,
     agentConfiguration: AgentConfiguration,
     userManager: IUserManager,
     sessionManager: ISplunkSessionManager,
@@ -71,7 +73,7 @@ class SplunkRum private constructor(
     private val endpointLock = Any()
 
     val preferences: AgentPreferences = AgentPreferences(
-        application = application,
+        agentStorage = agentStorage,
         endpointRef = endpointRef,
         endpointLock = endpointLock,
         openTelemetry = openTelemetry
@@ -226,7 +228,7 @@ class SplunkRum private constructor(
         private val noopEndpointRef = AtomicReference<EndpointConfiguration?>(null)
 
         private val noop = SplunkRum(
-            application = null,
+            agentStorage = null,
             openTelemetry = OpenTelemetry.noop(),
             agentConfiguration = AgentConfiguration.noop,
             endpointRef = noopEndpointRef,
@@ -264,6 +266,8 @@ class SplunkRum private constructor(
             agentConfiguration: AgentConfiguration,
             vararg moduleConfigurations: ModuleConfiguration
         ): SplunkRum {
+            val storage = AgentStorage.attach(application)
+
             if (instanceInternal != null) {
                 return instance
             }
@@ -272,7 +276,7 @@ class SplunkRum private constructor(
                 Logger.w(TAG, "install() - Unsupported Android version")
 
                 return SplunkRum(
-                    application = application,
+                    agentStorage = storage,
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
@@ -291,7 +295,7 @@ class SplunkRum private constructor(
                 Logger.d(TAG, "install() - Subprocess detected exiting")
 
                 return SplunkRum(
-                    application = application,
+                    agentStorage = storage,
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
@@ -315,7 +319,7 @@ class SplunkRum private constructor(
             )
 
             instanceInternal = SplunkRum(
-                application = application,
+                agentStorage = storage,
                 agentConfiguration = agentConfiguration,
                 openTelemetry = openTelemetry,
                 userManager = userManager,

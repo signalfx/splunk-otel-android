@@ -16,15 +16,14 @@
 
 package com.splunk.rum.integration.agent.api
 
-import android.app.Application
 import com.splunk.android.common.logger.Logger
-import com.splunk.rum.common.storage.AgentStorage
+import com.splunk.rum.common.storage.IAgentStorage
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import java.util.concurrent.atomic.AtomicReference
 
 class AgentPreferences internal constructor(
-    private val application: Application?,
+    private val agentStorage: IAgentStorage?,
     private val endpointRef: AtomicReference<EndpointConfiguration?>,
     private val endpointLock: Any,
     private val openTelemetry: OpenTelemetry
@@ -35,20 +34,24 @@ class AgentPreferences internal constructor(
         set(value) {
             value?.let { newEndpoint: EndpointConfiguration ->
                 synchronized(endpointLock) {
-                    val app = application ?: run {
-                        Logger.w(TAG, "Cannot set endpoint: application not available")
+                    val storage = agentStorage ?: run {
+                        Logger.w(TAG, "Cannot set endpoint: storage not available")
                         return@synchronized
                     }
 
-                    val storage = AgentStorage.attach(app)
                     storage.writeTracesBaseUrl(newEndpoint.tracesEndpoint!!.toExternalForm())
-                    storage.writeLogsBaseUrl(newEndpoint.logsEndpoint!!.toExternalForm())
+                    newEndpoint.logsEndpoint?.let { logsUrl ->
+                        storage.writeLogsBaseUrl(logsUrl.toExternalForm())
+                    }
 
                     endpointRef.set(newEndpoint)
 
                     Logger.d(TAG, "Endpoint configured, flushing cached data")
 
-                    (openTelemetry as? OpenTelemetrySdk)?.sdkTracerProvider?.forceFlush()
+                    (openTelemetry as? OpenTelemetrySdk)?.let { sdk ->
+                        sdk.sdkTracerProvider?.forceFlush()
+                        sdk.sdkLoggerProvider?.forceFlush()
+                    }
                 }
             }
         }
