@@ -81,7 +81,6 @@ android {
 }
 
 dependencies {
-    api(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":agent"))
 
