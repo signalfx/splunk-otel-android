@@ -29,7 +29,6 @@ object Dependencies {
     private const val okhttpVersion = "4.11.0"
     private const val okioVersion = "3.4.0"
 
-    const val kotlinStdlibJdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     const val okhttp = "com.squareup.okhttp3:okhttp:$okhttpVersion"
     const val okio = "com.squareup.okio:okio:$okioVersion"
     const val bytebuddy = "net.bytebuddy:byte-buddy:$bytebuddyVersion"

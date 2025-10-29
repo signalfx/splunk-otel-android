@@ -1,4 +1,3 @@
-import Dependencies.kotlinStdlibJdk8
 import plugins.ConfigAndroidApp
 import java.net.InetAddress
 
@@ -84,13 +83,9 @@ android {
 dependencies {
     api(platform(Dependencies.Otel.instrumentationBomAlpha))
 
-    implementation(kotlinStdlibJdk8)
-
-    //implementation("com.cisco.android:rum-agent:24.4.10-2246")
-    // TODO: this is here just so we do not have duplicate logic, it is not publicly available
-    //implementation("com.cisco.android:rum-common-utils:24.4.10-2246")
-
     implementation(project(":agent"))
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
