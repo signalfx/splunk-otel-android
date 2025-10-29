@@ -42,6 +42,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
     private const val TAG = "StartupIntegration"
 
     private val cache: MutableList<StartupData> = mutableListOf()
+    private var isInitializationReported = false
 
     override fun onAttach(context: Context) {
         ApplicationStartupTimekeeper.listeners += applicationStartupTimekeeperListener
@@ -85,6 +86,10 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
     }
 
     private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
+        if (isInitializationReported) return
+
+        isInitializationReported = true
+
         val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: run {
             cache += StartupData(startTimestamp, endTimestamp, name)
             return
