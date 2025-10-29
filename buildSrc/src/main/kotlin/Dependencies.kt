@@ -70,10 +70,6 @@ object Dependencies {
 
         // Test application
 
-        private const val fragmentKtxVersion = "1.3.3"
-
-        const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
-
         object Compose {
             private const val version = "1.2.1" // No need to update
 
