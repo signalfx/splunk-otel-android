@@ -83,7 +83,6 @@ internal class AndroidSpanExporter(
     }
 
     override fun shutdown(): CompletableResultCode {
-        agentStorage.clearBufferedSpanIds()
         return CompletableResultCode.ofSuccess()
     }
 

@@ -166,7 +166,6 @@ internal class AndroidLogRecordExporter(
     }
 
     override fun shutdown(): CompletableResultCode {
-        agentStorage.clearBufferedSessionReplayIds()
         return CompletableResultCode.ofSuccess()
     }
 
