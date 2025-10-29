@@ -49,8 +49,10 @@ object Dependencies {
     object Android {
 
         private const val annotationVersion = "1.9.1"
+        private const val fragmentKtxVersion = "1.3.3"
 
         const val annotation = "androidx.annotation:annotation:$annotationVersion"
+        const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 
         // Test application
 

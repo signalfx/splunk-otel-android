@@ -85,21 +85,21 @@ dependencies {
 
     implementation(project(":agent"))
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")
+    implementation(AppDependencies.kotlinStdlib)
 
-    implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("androidx.activity:activity-ktx:1.2.2")
-    implementation("androidx.fragment:fragment-ktx:1.3.3")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation(AppDependencies.Android.appcompat)
+    implementation(AppDependencies.Android.constraintLayout)
+    implementation(AppDependencies.Android.activityKtx)
+    implementation(AppDependencies.Android.fragmentKtx)
+    implementation(AppDependencies.Android.material)
 
     /**
      * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
      */
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
-    implementation("com.squareup.okio:okio:3.4.0")
+    implementation(AppDependencies.okhttp)
+    implementation(AppDependencies.okio)
 
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+    debugImplementation(AppDependencies.leakCanary)
 
     /**
      * Explicit version of guava jre must be forced because ext truth uses one with vulnerabilities.

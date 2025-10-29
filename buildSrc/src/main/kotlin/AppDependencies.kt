@@ -1,5 +1,9 @@
 object AppDependencies {
 
+    const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0"
+    const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
+
+
     /**
      * OkHttp 4.11.0 is the latest version that does not mandate the use of Kotlin 1.9.0.
      * Since this version includes Okio transitively with vulnerabilities, we explicitly set the Okio version to a safer one.
@@ -23,6 +27,20 @@ object AppDependencies {
      */
     private const val guavaJreVersion = "32.0.1"
     const val guavaAndroid = "com.google.guava:guava:$guavaJreVersion-android"
+
+    object Android {
+        private const val appcompatVersion = "1.7.1"
+        private const val constraintLayoutVersion = "2.2.1"
+        private const val activityKtxVersion = "1.2.2"
+        private const val fragmentKtxVersion = "1.3.3"
+        private const val materialVersion = "1.9.0"
+
+        const val appcompat = "androidx.appcompat:appcompat:$appcompatVersion"
+        const val constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+        const val activityKtx = "androidx.activity:activity-ktx:$activityKtxVersion"
+        const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+        const val material = "com.google.android.material:material:$materialVersion"
+    }
 
     object Test {
         private const val junitVersion = "1.3.0"
