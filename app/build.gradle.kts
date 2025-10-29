@@ -91,7 +91,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.activity:activity-ktx:1.2.2")
     implementation("androidx.fragment:fragment-ktx:1.3.3")
-    implementation(Dependencies.Android.material)
+    implementation("com.google.android.material:material:1.9.0")
 
     /**
      * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
