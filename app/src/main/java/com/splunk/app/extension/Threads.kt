@@ -11,3 +11,14 @@ fun runOnUiThread(block: () -> Unit) {
     else
         mainHandler.post(block)
 }
+
+fun runOnBackgroundThread(
+    name: String = "BackgroundWorker",
+    uncaughtExceptionHandler: Thread.UncaughtExceptionHandler? = null,
+    block: () -> Unit
+): Thread {
+    val thread = Thread(block, name)
+    thread.uncaughtExceptionHandler = uncaughtExceptionHandler
+    thread.start()
+    return thread
+}
