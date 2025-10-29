@@ -1,3 +1,7 @@
+/**
+ * This object holds all the dependencies for the MRUM Agent.
+ * The example application dependencies can be found in AppDependencies.kt.
+ */
 object Dependencies {
 
     // Project level dependencies
@@ -5,15 +9,12 @@ object Dependencies {
     private const val gradleVersion = "8.6.0"
     private const val kotlinVersion = "1.8.0"
     private const val ktlintVersion = "1.5.0"
-    private const val desugarVersion = "2.1.3"
     private const val bytebuddyVersion = "1.17.2"
     const val jacocoVersion = "0.8.13"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
-    const val gradleApi = "com.android.tools.build:gradle-api:$gradleVersion"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
-    const val desugar = "com.android.tools:desugar_jdk_libs:$desugarVersion"
     const val jacoco = "org.jacoco:org.jacoco.core:$jacocoVersion"
 
     // Nexus publish plugin
@@ -36,14 +37,8 @@ object Dependencies {
 
     object Test {
         private const val junitVersion = "4.13.2"
-        private const val jsonassertVersion = "1.5.3"
-        private const val mockkVersion = "1.14.6"
-        private const val mockWebServerVersion = "4.10.0"
 
         const val junit = "junit:junit:$junitVersion"
-        const val jsonassert = "org.skyscreamer:jsonassert:$jsonassertVersion"
-        const val mockk = "io.mockk:mockk:$mockkVersion"
-        const val mockWebServer = "com.squareup.okhttp3:mockwebserver:$mockWebServerVersion"
     }
 
     object Android {
@@ -54,20 +49,16 @@ object Dependencies {
         const val annotation = "androidx.annotation:annotation:$annotationVersion"
         const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 
-        // Test application
-
         object Compose {
-            private const val version = "1.2.1" // No need to update
+            private const val UiVersion = "1.2.1" // No need to update
 
-            const val ui = "androidx.compose.ui:ui:$version"
+            const val ui = "androidx.compose.ui:ui:$UiVersion"
         }
     }
 
     object SessionReplay {
         private const val version = "1.0.24"
 
-        const val bridge = "com.splunk.android:sr-bridge:$version"
-        const val commonEncoder = "com.splunk.android:sr-common-encoder:$version"
         const val commonHttp = "com.splunk.android:sr-common-http:$version"
         const val commonId = "com.splunk.android:sr-common-id:$version"
         const val commonJob = "com.splunk.android:sr-common-job:$version"
@@ -78,10 +69,6 @@ object Dependencies {
         const val instrumentationSessionRecordingCore = "com.splunk.android:sr-instrumentation-session-recording-core:$version"
         const val instrumentationSessionRecordingFrameCapturer = "com.splunk.android:sr-instrumentation-session-recording-frame-capturer:$version"
         const val instrumentationSessionRecordingInteractions = "com.splunk.android:sr-instrumentation-session-recording-interactions:$version"
-        const val instrumentationSessionRecordingScreenshot = "com.splunk.android:sr-instrumentation-session-recording-screenshot:$version"
-        const val instrumentationSessionRecordingWireframe = "com.splunk.android:sr-instrumentation-session-recording-wireframe:$version"
-
-        const val debugger = "com.splunk.android:sr-debugger:$version"
     }
 
     object Otel {

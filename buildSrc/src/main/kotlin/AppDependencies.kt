@@ -1,7 +1,16 @@
+/**
+ * This object holds all the dependencies for the example application.
+ * The Agent dependencies can be found in Dependencies.kt.
+ */
 object AppDependencies {
 
-    const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0"
-    const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
+    private const val kotlinStdlibVersion = "1.8.0"
+    private const val leakCanaryVersion = "2.14"
+    private const val desugarVersion = "2.1.3"
+
+    const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinStdlibVersion"
+    const val leakCanary = "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
+    const val desugar = "com.android.tools:desugar_jdk_libs:$desugarVersion"
 
 
     /**
