@@ -4,6 +4,7 @@
     "config:base"
   ],
   "baseBranches": ["develop"],
+  "schedule": ["monthly"],
   "packageRules": [
     // Exclude updates for gradle.
     {
