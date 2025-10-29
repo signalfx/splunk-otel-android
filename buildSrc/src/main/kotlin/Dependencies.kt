@@ -27,7 +27,7 @@ object Dependencies {
      * Since this version includes Okio transitively with vulnerabilities, we explicitly set the Okio version to a safer one.
      */
     private const val okhttpVersion = "4.11.0"
-    private const val okioVersion = "3.4.0"
+    private const val okioVersion = "3.16.2"
 
     const val kotlinStdlibJdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     const val okhttp = "com.squareup.okhttp3:okhttp:$okhttpVersion"
