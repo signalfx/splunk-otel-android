@@ -18,7 +18,7 @@ package com.splunk.rum.integration.agent.internal.model
 
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
-internal data class Module(
+data class Module(
     val name: String,
     val configuration: ModuleConfiguration? = null,
     val initialization: Initialization? = null

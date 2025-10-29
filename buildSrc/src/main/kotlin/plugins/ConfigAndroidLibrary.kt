@@ -28,8 +28,6 @@ class ConfigAndroidLibrary : Plugin<Project> by local plugin {
         }
 
         compileOptions {
-            isCoreLibraryDesugaringEnabled = true
-
             sourceCompatibility = Configurations.Compilation.sourceCompatibility
             targetCompatibility = Configurations.Compilation.targetCompatibility
         }
@@ -49,9 +47,5 @@ class ConfigAndroidLibrary : Plugin<Project> by local plugin {
                 enableUnitTestCoverage = true
             }
         }
-    }
-
-    dependencies {
-        "coreLibraryDesugaring"(Dependencies.desugar)
     }
 }

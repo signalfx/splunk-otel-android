@@ -4,7 +4,7 @@ object Dependencies {
 
     private const val gradleVersion = "8.6.0"
     private const val kotlinVersion = "1.8.0"
-    private const val ktlintVersion = "1.5.0"
+    private const val ktlintVersion = "1.7.1"
     private const val desugarVersion = "2.1.3"
     private const val bytebuddyVersion = "1.17.2"
     const val jacocoVersion = "0.8.13"
@@ -52,7 +52,7 @@ object Dependencies {
     object Test {
         private const val junitVersion = "4.13.2"
         private const val jsonassertVersion = "1.5.3"
-        private const val mockkVersion = "1.12.4"
+        private const val mockkVersion = "1.14.6"
         private const val mockWebServerVersion = "4.10.0"
 
         const val junit = "junit:junit:$junitVersion"
@@ -89,7 +89,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.23"
+        private const val version = "1.0.24"
 
         const val bridge = "com.splunk.android:sr-bridge:$version"
         const val commonEncoder = "com.splunk.android:sr-common-encoder:$version"
@@ -185,7 +185,7 @@ object Dependencies {
     }
 
     object AndroidDebug {
-        private const val leakCanaryVersion = "2.12"
+        private const val leakCanaryVersion = "2.14"
 
         const val leakCanary = "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
     }

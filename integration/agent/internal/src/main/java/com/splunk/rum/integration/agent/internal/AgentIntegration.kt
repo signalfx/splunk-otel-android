@@ -22,13 +22,16 @@ import android.os.SystemClock
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
+import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.model.Module
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.android.session.SessionManager
 import io.opentelemetry.android.session.SessionObserver
-import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.sdk.OpenTelemetrySdk
+import java.util.concurrent.TimeUnit
 
 class AgentIntegration private constructor(context: Context) {
     val sessionManager: ISplunkSessionManager
@@ -52,7 +55,18 @@ class AgentIntegration private constructor(context: Context) {
         sessionManager = SplunkSessionManager(storage)
     }
 
-    fun install(context: Context, openTelemetry: OpenTelemetry, moduleConfigurations: List<ModuleConfiguration>) {
+    fun install(context: Context, openTelemetry: OpenTelemetrySdk, moduleConfigurations: List<ModuleConfiguration>) {
+        sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                // TODO
+                openTelemetry.sdkLoggerProvider.get("TODO")
+                    .logRecordBuilder()
+                    .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
+                    .setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
+                    .setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
+                    .emit()
+            }
+        }
         sessionManager.install(context)
 
         for (config in moduleConfigurations) {
@@ -83,7 +97,7 @@ class AgentIntegration private constructor(context: Context) {
 
         private var instanceInternal: AgentIntegration? = null
 
-        internal val modules = HashMap<String, Module>()
+        val modules = HashMap<String, Module>()
 
         val instance: AgentIntegration
             get() = instanceInternal

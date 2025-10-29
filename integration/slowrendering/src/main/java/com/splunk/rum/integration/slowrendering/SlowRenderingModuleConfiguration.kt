@@ -30,6 +30,7 @@ import java.time.Duration
  *                    A shorter interval provides more frequent checks but uses more resources.
  *                    Default is 1 second.
  */
+@Suppress("NewApi") // Duration.ofSeconds() requires API 26 or core library desugaring
 data class SlowRenderingModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
     val interval: Duration = Duration.ofSeconds(1)
