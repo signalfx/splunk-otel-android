@@ -87,9 +87,6 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
-
     implementation(Dependencies.Android.appcompat)
     implementation(Dependencies.Android.constraintLayout)
     implementation(Dependencies.Android.activityKtx)
