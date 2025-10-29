@@ -89,7 +89,7 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation(Dependencies.Android.activityKtx)
+    implementation("androidx.activity:activity-ktx:1.2.2")
     implementation(Dependencies.Android.fragmentKtx)
     implementation(Dependencies.Android.material)
 
