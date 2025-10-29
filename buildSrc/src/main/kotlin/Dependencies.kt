@@ -170,10 +170,4 @@ object Dependencies {
             const val web = "androidx.test.espresso:espresso-web:$webVersion"
         }
     }
-
-    object AndroidDebug {
-        private const val leakCanaryVersion = "2.14"
-
-        const val leakCanary = "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
-    }
 }

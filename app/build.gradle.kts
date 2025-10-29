@@ -99,7 +99,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.squareup.okio:okio:3.4.0")
 
-    debugImplementation(Dependencies.AndroidDebug.leakCanary)
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 
     /**
      * Explicit version of guava jre must be forced because ext truth uses one with vulnerabilities.
