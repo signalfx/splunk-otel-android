@@ -46,7 +46,10 @@ class AgentPreferences internal constructor(
                     return@synchronized
                 }
 
-                storage.writeTracesBaseUrl(value.tracesEndpoint!!.toExternalForm())
+                value.tracesEndpoint?.let { tracesUrl ->
+                    storage.writeTracesBaseUrl(tracesUrl.toExternalForm())
+                } ?: Logger.e(TAG, "Cannot set endpoint: tracesEndpoint is null")
+
                 value.logsEndpoint?.let { logsUrl ->
                     storage.writeLogsBaseUrl(logsUrl.toExternalForm())
                 } ?: storage.deleteLogsBaseUrl()

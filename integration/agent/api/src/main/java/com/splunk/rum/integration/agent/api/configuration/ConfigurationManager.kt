@@ -30,7 +30,10 @@ internal class ConfigurationManager private constructor(private val agentStorage
         }
 
         config.endpoint?.let { endpoint ->
-            agentStorage.writeTracesBaseUrl(endpoint.tracesEndpoint!!.toExternalForm())
+            endpoint.tracesEndpoint?.let { tracesUrl ->
+                agentStorage.writeTracesBaseUrl(tracesUrl.toExternalForm())
+            } ?: Logger.e(TAG, "Cannot set endpoint: tracesEndpoint is null")
+
             endpoint.logsEndpoint?.let { logsUrl ->
                 agentStorage.writeLogsBaseUrl(logsUrl.toExternalForm())
             } ?: agentStorage.deleteLogsBaseUrl()
