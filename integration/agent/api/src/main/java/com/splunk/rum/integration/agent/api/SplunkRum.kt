@@ -69,13 +69,9 @@ class SplunkRum private constructor(
     val user: User = User(userManager),
     val globalAttributes: MutableAttributes = MutableAttributes(agentConfiguration.globalAttributes)
 ) {
-
-    private val endpointLock = Any()
-
     val preferences: AgentPreferences = AgentPreferences(
         agentStorage = agentStorage,
         endpointRef = endpointRef,
-        endpointLock = endpointLock,
         openTelemetry = openTelemetry
     )
 

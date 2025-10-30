@@ -165,9 +165,7 @@ internal class AndroidLogRecordExporter(
         return CompletableResultCode.ofSuccess()
     }
 
-    override fun shutdown(): CompletableResultCode {
-        return CompletableResultCode.ofSuccess()
-    }
+    override fun shutdown(): CompletableResultCode = CompletableResultCode.ofSuccess()
 
     private fun flushBufferedSessionReplayIds() {
         val bufferedIds = agentStorage.getBufferedSessionReplayIds()

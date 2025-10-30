@@ -25,9 +25,9 @@ import java.util.concurrent.atomic.AtomicReference
 class AgentPreferences internal constructor(
     private val agentStorage: IAgentStorage?,
     private val endpointRef: AtomicReference<EndpointConfiguration?>,
-    private val endpointLock: Any,
     private val openTelemetry: OpenTelemetry
 ) {
+    private val endpointLock = Any()
 
     var endpointConfiguration: EndpointConfiguration?
         get() = endpointRef.get()

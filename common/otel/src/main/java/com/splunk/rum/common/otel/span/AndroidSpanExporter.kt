@@ -82,9 +82,7 @@ internal class AndroidSpanExporter(
         return CompletableResultCode.ofSuccess()
     }
 
-    override fun shutdown(): CompletableResultCode {
-        return CompletableResultCode.ofSuccess()
-    }
+    override fun shutdown(): CompletableResultCode = CompletableResultCode.ofSuccess()
 
     private fun flushBufferedSpanIds() {
         val bufferedIds = agentStorage.getBufferedSpanIds()
