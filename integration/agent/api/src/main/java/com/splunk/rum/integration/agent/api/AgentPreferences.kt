@@ -32,26 +32,32 @@ class AgentPreferences internal constructor(
     var endpointConfiguration: EndpointConfiguration?
         get() = endpointRef.get()
         set(value) {
-            value?.let { newEndpoint: EndpointConfiguration ->
-                synchronized(endpointLock) {
-                    val storage = agentStorage ?: run {
-                        Logger.w(TAG, "Cannot set endpoint: storage not available")
-                        return@synchronized
-                    }
+            synchronized(endpointLock) {
+                val storage = agentStorage ?: run {
+                    Logger.w(TAG, "Cannot set endpoint: storage not available")
+                    return@synchronized
+                }
 
-                    storage.writeTracesBaseUrl(newEndpoint.tracesEndpoint!!.toExternalForm())
-                    newEndpoint.logsEndpoint?.let { logsUrl ->
-                        storage.writeLogsBaseUrl(logsUrl.toExternalForm())
-                    }
+                if (value == null) {
+                    storage.deleteTracesBaseUrl()
+                    storage.deleteLogsBaseUrl()
+                    endpointRef.set(null)
+                    Logger.d(TAG, "Endpoints cleared")
+                    return@synchronized
+                }
 
-                    endpointRef.set(newEndpoint)
+                storage.writeTracesBaseUrl(value.tracesEndpoint!!.toExternalForm())
+                value.logsEndpoint?.let { logsUrl ->
+                    storage.writeLogsBaseUrl(logsUrl.toExternalForm())
+                } ?: storage.deleteLogsBaseUrl()
 
-                    Logger.d(TAG, "Endpoint configured, flushing cached data")
+                endpointRef.set(value)
 
-                    (openTelemetry as? OpenTelemetrySdk)?.let { sdk ->
-                        sdk.sdkTracerProvider?.forceFlush()
-                        sdk.sdkLoggerProvider?.forceFlush()
-                    }
+                Logger.d(TAG, "Endpoint configured, flushing cached data")
+
+                (openTelemetry as? OpenTelemetrySdk)?.let { sdk ->
+                    sdk.sdkTracerProvider?.forceFlush()
+                    sdk.sdkLoggerProvider?.forceFlush()
                 }
             }
         }

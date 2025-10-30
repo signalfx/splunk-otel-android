@@ -33,7 +33,7 @@ internal class ConfigurationManager private constructor(private val agentStorage
             agentStorage.writeTracesBaseUrl(endpoint.tracesEndpoint!!.toExternalForm())
             endpoint.logsEndpoint?.let { logsUrl ->
                 agentStorage.writeLogsBaseUrl(logsUrl.toExternalForm())
-            }
+            } ?: agentStorage.deleteLogsBaseUrl()
         }
         Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
 
