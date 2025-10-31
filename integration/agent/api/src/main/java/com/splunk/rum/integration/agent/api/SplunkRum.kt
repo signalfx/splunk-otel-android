@@ -269,6 +269,10 @@ class SplunkRum private constructor(
                 return instance
             }
 
+            require(agentConfiguration.deploymentEnvironment.isNotBlank()) {
+                "deploymentEnvironment cannot be an empty string. Please specify a value like 'dev', 'staging', or 'prod'."
+            }
+
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                 Logger.w(TAG, "install() - Unsupported Android version")
 
