@@ -46,14 +46,14 @@ class AgentPreferences internal constructor(
                     return@synchronized
                 }
 
-                value.tracesEndpoint?.let { tracesUrl ->
+                value.traceEndpoint?.let { tracesUrl ->
                     storage.writeTracesBaseUrl(tracesUrl.toExternalForm())
                 } ?: run {
-                    Logger.e(TAG, "Cannot set endpoint: tracesEndpoint is null")
+                    Logger.e(TAG, "Cannot set endpoint: traceEndpoint is null")
                     return@synchronized
                 }
 
-                value.logsEndpoint?.let { logsUrl ->
+                value.sessionReplayEndpoint?.let { logsUrl ->
                     storage.writeLogsBaseUrl(logsUrl.toExternalForm())
                 } ?: storage.deleteLogsBaseUrl()
 
@@ -68,7 +68,7 @@ class AgentPreferences internal constructor(
             }
         }
 
-    companion object {
+    private companion object {
         private const val TAG = "AgentPreferences"
     }
 }

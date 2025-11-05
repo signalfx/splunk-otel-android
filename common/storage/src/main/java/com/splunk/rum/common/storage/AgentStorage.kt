@@ -32,6 +32,7 @@ import com.splunk.rum.common.storage.extensions.statFsFreeSpace
 import com.splunk.rum.common.storage.policy.StoragePolicy
 import java.io.File
 import org.json.JSONArray
+import org.json.JSONException
 
 /**
  * Ideas:
@@ -254,16 +255,18 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun getBufferedSessionReplayIds(): List<String> {
         val json = preferences.getString(SESSION_REPLAY_IDS_KEY)
-        return if (json.isNullOrBlank()) {
+
+        if (json.isNullOrBlank()) {
+            return emptyList()
+        }
+
+        return try {
+            val array = JSONArray(json)
+            List(array.length()) { array.getString(it) }
+        } catch (e: JSONException) {
+            Logger.e(TAG, "getBufferedSessionReplayIds(): sessionReplayIds: $e")
+            clearBufferedSessionReplayIds()
             emptyList()
-        } else {
-            try {
-                val array = JSONArray(json)
-                List(array.length()) { array.getString(it) }
-            } catch (e: Exception) {
-                Logger.e(TAG, "getBufferedSessionReplayIds(): sessionReplayIds: $e")
-                emptyList()
-            }
         }
     }
 
