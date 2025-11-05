@@ -2,24 +2,22 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:base"],
   "baseBranches": ["develop"],
-
-  // Global schedule — run Renovate monthly
-  "schedule": ["monthly"],
-
+  "description": "Run Renovate monthly at midnight on the 1st",
+  "schedule": ["0 0 1 * *"],
   "packageRules": [
     // Exclude updates for Gradle build tools
     {
+      "description": "Disable Android Gradle plugin updates",
       "matchPackageNames": [
         "com.android.tools.build:gradle",
         "com.android.tools.build:gradle-api"
       ],
       "enabled": false
     },
-
-    // Apply quarterly update schedule for app module dependencies
     {
+      "description": "Quarterly updates for app/**",
       "matchPaths": ["app/**"],
-      "schedule": ["quarterly"]
+      "schedule": ["0 0 1 */3 *"]
     }
   ]
 }
