@@ -39,6 +39,7 @@ import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
+import java.util.UUID
 
 internal object SplunkRumAgentCore {
 
@@ -71,6 +72,10 @@ internal object SplunkRumAgentCore {
 
         val storage = AgentStorage.attach(application)
 
+        val appInstallationID = storage.readAppInstallationId() ?: UUID.randomUUID().toString().also {
+            storage.writeAppInstallationId(it)
+        }
+
         val finalConfiguration = ConfigurationManager
             .obtainInstance(storage)
             .preProcessConfiguration(application, agentConfiguration)
@@ -87,7 +92,7 @@ internal object SplunkRumAgentCore {
             // do not override internal agent attributes required by the backend.
             .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
             .addSpanProcessor(LastScreenNameSpanProcessor(ScreenNameTracker))
-            .joinResources(AgentResource.allResource(application, finalConfiguration))
+            .joinResources(AgentResource.allResource(application, appInstallationID, finalConfiguration))
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
