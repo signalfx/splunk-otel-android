@@ -1,27 +1,46 @@
 # Release Process
 
-## Releasing a new version
+## Releasing a New Version
 
-splunk-otel-android is released via a private Splunk gitlab installation.
+`splunk-otel-android` is released via a private Splunk GitLab installation.
 
-This is the process to use to do a release:
+Follow these steps to perform a release:
 
-1) Make sure that all the required changes are merged. This includes updating the upstream OTel
-   libraries' versions, and making sure that the project version (sdkVersionName) in the 
-   `Configurations.kt` file is correctly set to the next planned release version.
+1. **Prepare the release**
+   - Ensure that all required changes are merged into the `develop` branch.
+   - This includes updating the versions of upstream OpenTelemetry (OTel) libraries.
 
-2) Run the `script/tag-release.sh` script to create and push a signed release tag. Note that it
-   assumes that the remote is named `origin`, if you named yours differently you might have to push
-   the tag manually.
+2. **Create a release branch**
+   - Create a new branch named `release/X.Y.Z`, where `X.Y.Z` is the release version.
 
-3) Wait for gitlab to run the release job. If all goes well, it will automatically close
-   and release the "staging" repository...which means the build has been published to sonatype
-   and will appear in maven with in a day or two at most (typically a few hours).
+3. **Update the version**
+   - In `Configurations.kt`, update the `sdkVersionName` to the release version.
+   - Commit the change to the `release/X.Y.Z` branch.
 
-4) Create a PR to update the version (sdkVersionName) in the `Configurations.kt` to the next development
-   version. This PR can and probably should also include updating any documentation (CHANGELOG.md,
-   README.md, etc) that mentions the previous version. Make sure the badge in the top README.md
-   reflects the accurate upstream otel version.
+4. **Update documentation**
+   - Update relevant files (`CHANGELOG.md`, `README.md`, etc.) with release notes.
+   - Commit the changes to the `release/X.Y.Z` branch.
 
-5) Once this PR is merged, create a release in Github that points at the newly created version,
-   and make sure to provide release notes that at least mirror the contents of the CHANGELOG.md
+5. **Create a release PR**
+   - Open a pull request from `release/X.Y.Z` → `main`.
+   - Wait for the CI pipeline to complete successfully.
+
+6. **Tag the release**
+   - If CI passes, run the `script/tag-release.sh` script to create and push a **signed release tag**.
+   - Note: The script assumes the remote is named `origin`. If your remote has a different name, you may need to push the tag manually.
+
+7. **Publish the release**
+   - Wait for GitLab to run the release job.
+   - If successful, it will automatically close and release the “staging” repository.
+   - The build will then be published to Sonatype and appear in Maven within a few hours (up to a day).
+
+8. **Merge to main**
+   - Once the release is verified, merge the PR into the `main` branch.
+
+9. **Create Github Release**
+   - Once this PR is merged, create a release in **GitHub** that points to the newly created version.
+   - Make sure to provide release notes that at least mirror the contents of `CHANGELOG.md`.
+
+9. **Sync with develop**
+   - Create a new PR from `main` → `develop` to synchronize branches.
+   - Resolve any conflicts if they occur and merge the PR.

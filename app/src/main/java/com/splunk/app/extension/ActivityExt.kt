@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.internal.model
+package com.splunk.app.extension
 
-import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import android.app.Activity
+import android.view.ViewGroup
 
-data class Module(
-    val name: String,
-    val configuration: ModuleConfiguration? = null,
-    val initialization: Initialization? = null
-) {
-    data class Initialization(val startTimestamp: Long, val startElapsed: Long, val endElapsed: Long?)
-}
+val Activity.contentView: ViewGroup?
+    get() = findViewById(android.R.id.content)
