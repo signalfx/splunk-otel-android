@@ -78,7 +78,9 @@ internal class AndroidSpanExporter(
     }
 
     override fun flush(): CompletableResultCode {
-        flushBufferedSpanIds()
+        if (agentStorage.readTracesBaseUrl() != null) {
+            flushBufferedSpanIds()
+        }
         return CompletableResultCode.ofSuccess()
     }
 

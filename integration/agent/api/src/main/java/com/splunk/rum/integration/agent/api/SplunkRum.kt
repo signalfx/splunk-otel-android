@@ -58,7 +58,7 @@ import okhttp3.OkHttpClient
  * @param globalAttributes Represents the global attributes configured for the agent.
  */
 class SplunkRum private constructor(
-    private val agentStorage: IAgentStorage?,
+    agentStorage: IAgentStorage?,
     agentConfiguration: AgentConfiguration,
     userManager: IUserManager,
     sessionManager: ISplunkSessionManager,
@@ -222,14 +222,11 @@ class SplunkRum private constructor(
         ) ?: throw IllegalStateException()
 
     companion object {
-        private val noopEndpointRef = AtomicReference<EndpointConfiguration?>(null)
-
         private val noop = SplunkRum(
             agentStorage = null,
             openTelemetry = OpenTelemetry.noop(),
             agentConfiguration = AgentConfiguration.noop,
-            endpointRef = noopEndpointRef,
-            state = Noop(endpointRef = noopEndpointRef),
+            state = Noop(),
             userManager = NoOpUserManager,
             sessionManager = NoOpSplunkSessionManager
         )
@@ -263,8 +260,6 @@ class SplunkRum private constructor(
             agentConfiguration: AgentConfiguration,
             vararg moduleConfigurations: ModuleConfiguration
         ): SplunkRum {
-            val storage = AgentStorage.attach(application)
-
             if (instanceInternal != null) {
                 return instance
             }
@@ -277,7 +272,7 @@ class SplunkRum private constructor(
                 Logger.w(TAG, "install() - Unsupported Android version")
 
                 return SplunkRum(
-                    agentStorage = storage,
+                    agentStorage = null,
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
@@ -296,7 +291,7 @@ class SplunkRum private constructor(
                 Logger.d(TAG, "install() - Subprocess detected exiting")
 
                 return SplunkRum(
-                    agentStorage = storage,
+                    agentStorage = null,
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
@@ -320,7 +315,7 @@ class SplunkRum private constructor(
             )
 
             instanceInternal = SplunkRum(
-                agentStorage = storage,
+                agentStorage = AgentStorage.attach(application),
                 agentConfiguration = agentConfiguration,
                 openTelemetry = openTelemetry,
                 userManager = userManager,

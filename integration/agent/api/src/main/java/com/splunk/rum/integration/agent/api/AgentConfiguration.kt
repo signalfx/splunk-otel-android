@@ -61,7 +61,6 @@ data class AgentConfiguration @JvmOverloads constructor(
 ) {
     internal companion object {
         val noop = AgentConfiguration(
-            endpoint = EndpointConfiguration(),
             appName = "",
             deploymentEnvironment = ""
         )

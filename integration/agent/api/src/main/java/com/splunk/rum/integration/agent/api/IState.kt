@@ -50,13 +50,10 @@ class State internal constructor(
 }
 
 class Noop(
-    notRunningCause: Status.NotRunning = Status.NotRunning.NotInstalled,
-    private val endpointRef: AtomicReference<EndpointConfiguration?> = AtomicReference(null)
-) : IState {
+    notRunningCause: Status.NotRunning = Status.NotRunning.NotInstalled) : IState {
     override val appName: String = ""
     override val status: Status = notRunningCause
-    override val endpointConfiguration: EndpointConfiguration?
-        get() = endpointRef.get()
+    override val endpointConfiguration: EndpointConfiguration? = null
     override val appVersion: String = "0.0.0"
     override val deploymentEnvironment: String = ""
     override val isDebugLoggingEnabled: Boolean = false
