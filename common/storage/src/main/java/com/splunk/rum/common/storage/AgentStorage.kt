@@ -118,6 +118,12 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun readDeviceId(): String? = preferences.getString(DEVICE_ID)
 
+    override fun writeAppInstallationId(value: String) {
+        preferences.putString(APP_INSTALLATION_ID, value).commit()
+    }
+
+    override fun readAppInstallationId(): String? = preferences.getString(APP_INSTALLATION_ID)
+
     override fun writeSessionId(value: String) {
         preferences.putString(SESSION_ID, value).commit()
     }
@@ -278,6 +284,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val TRACES_BASE_URL = "TRACES_BASE_URL"
         private const val LOGS_BASE_URL = "LOGS_BASE_URL"
         private const val DEVICE_ID = "DEVICE_ID"
+        private const val APP_INSTALLATION_ID = "APP_INSTALLATION_ID"
         private const val SESSION_ID = "SESSION_ID"
         private const val SESSION_IDS = "SESSION_IDS"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
