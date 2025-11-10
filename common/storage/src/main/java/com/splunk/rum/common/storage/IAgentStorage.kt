@@ -32,6 +32,9 @@ interface IAgentStorage {
     fun writeDeviceId(value: String)
     fun readDeviceId(): String?
 
+    fun writeAppInstallationId(value: String)
+    fun readAppInstallationId(): String?
+
     fun writeSessionId(value: String)
     fun readSessionId(): String?
     fun deleteSessionId()
