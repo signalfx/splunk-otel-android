@@ -29,6 +29,13 @@ class AgentPreferences internal constructor(
 ) {
     private val endpointLock = Any()
 
+    /**
+     * Sets the endpoint configuration for the RUM agent.
+     *
+     * To read the current endpoint configuration, use [SplunkRum.instance.state.endpointConfiguration].
+     * This getter exists only to satisfy Kotlin's property syntax requirements - State is the
+     * source of truth for reading configuration values.
+     */
     var endpointConfiguration: EndpointConfiguration?
         get() = endpointRef.get()
         set(value) {
@@ -46,11 +53,8 @@ class AgentPreferences internal constructor(
                     return@synchronized
                 }
 
-                value.traceEndpoint?.let { tracesUrl ->
+                value.traceEndpoint.let { tracesUrl ->
                     storage.writeTracesBaseUrl(tracesUrl.toExternalForm())
-                } ?: run {
-                    Logger.e(TAG, "Cannot set endpoint: traceEndpoint is null")
-                    return@synchronized
                 }
 
                 value.sessionReplayEndpoint?.let { logsUrl ->

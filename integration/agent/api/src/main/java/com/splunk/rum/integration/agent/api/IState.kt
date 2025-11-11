@@ -49,8 +49,7 @@ class State internal constructor(
     override val deferredUntilForeground: Boolean = agentConfiguration.deferredUntilForeground
 }
 
-class Noop(
-    notRunningCause: Status.NotRunning = Status.NotRunning.NotInstalled) : IState {
+class Noop(notRunningCause: Status.NotRunning = Status.NotRunning.NotInstalled) : IState {
     override val appName: String = ""
     override val status: Status = notRunningCause
     override val endpointConfiguration: EndpointConfiguration? = null
