@@ -22,6 +22,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
+import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import java.io.File
@@ -65,8 +66,12 @@ class SplunkRumAgentCoreTest {
         `when`(mockAgentConfig.session.samplingRate).thenReturn(1.0)
         `when`(mockAgentConfig.copy()).thenReturn(mockAgentConfig)
         `when`(mockAgentConfig.endpoint).thenReturn(mock())
-        `when`(mockAgentConfig.endpoint.sessionReplayEndpoint).thenReturn(URL("https://example.com/replay"))
-        `when`(mockAgentConfig.endpoint.traceEndpoint).thenReturn(URL("https://example.com/trace"))
+        `when`(mockAgentConfig.endpoint).thenReturn(
+            EndpointConfiguration(
+                URL("https://example.com/trace"),
+                URL("https://example.com/replay")
+            )
+        )
     }
 
     @After
