@@ -51,4 +51,9 @@ dependencies {
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okio)
 
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.androidXTestCore)
+    testImplementation(Dependencies.Test.androidXTestJunit)
+    testImplementation(Dependencies.Test.robolectric)
+    testImplementation(Dependencies.Test.mockito)
 }

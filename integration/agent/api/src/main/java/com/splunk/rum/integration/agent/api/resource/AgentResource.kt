@@ -14,6 +14,7 @@ internal object AgentResource {
 
     private const val KEY_APP = "app"
     private const val KEY_APP_VERSION = "app.version"
+    private const val KEY_APP_INSTALLATION_ID = "app.installation.id"
     private const val KEY_DEPLOYMENT_ENVIRONMENT = "deployment.environment"
     private const val KEY_RUM_SDK_VERSION = "rum.sdk.version"
     private const val KEY_DEVICE_ID = "device.id"
@@ -33,18 +34,26 @@ internal object AgentResource {
      * - AgentConfiguration-specific attributes
      * - Device and OS-specific attributes
      */
-    internal fun allResource(context: Context, agentConfiguration: AgentConfiguration): Resource = Resource
+    internal fun allResource(
+        context: Context,
+        appInstallationID: String,
+        agentConfiguration: AgentConfiguration
+    ): Resource = Resource
         .getDefault()
-        .merge(agentConfigResource(context, agentConfiguration))
+        .merge(agentConfigResource(context, appInstallationID, agentConfiguration))
         .merge(buildResource())
         .merge(sessionReplayResource())
 
-    private fun agentConfigResource(context: Context, agentConfiguration: AgentConfiguration): Resource =
-        Resource.empty().toBuilder()
-            .put(KEY_APP, agentConfiguration.appName)
-            .put(KEY_APP_VERSION, agentConfiguration.appVersion ?: context.appVersion ?: FALLBACK_VERSION)
-            .put(KEY_DEPLOYMENT_ENVIRONMENT, agentConfiguration.deploymentEnvironment)
-            .build()
+    private fun agentConfigResource(
+        context: Context,
+        appInstallationID: String,
+        agentConfiguration: AgentConfiguration
+    ): Resource = Resource.empty().toBuilder()
+        .put(KEY_APP, agentConfiguration.appName)
+        .put(KEY_APP_VERSION, agentConfiguration.appVersion ?: context.appVersion ?: FALLBACK_VERSION)
+        .put(KEY_APP_INSTALLATION_ID, appInstallationID)
+        .put(KEY_DEPLOYMENT_ENVIRONMENT, agentConfiguration.deploymentEnvironment)
+        .build()
 
     private fun buildResource(): Resource = Resource.empty().toBuilder()
         .put(KEY_RUM_SDK_VERSION, BuildConfig.VERSION_NAME)
