@@ -64,6 +64,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         }
 
         cache.clear()
+        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 
     private val appStateListener = object : AppStateObserver.Listener {

@@ -46,6 +46,7 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
+        AgentIntegration.registerModuleInitializationEnd(defaultModuleConfiguration.name)
     }
 
     protected open fun onSessionChange(sessionId: String) {
@@ -61,8 +62,6 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
 
             moduleConfiguration = moduleConfigurations.find { it::class == clazz } as? T ?: defaultModuleConfiguration
             this@ModuleIntegration.onInstall(context, oTelInstallationContext, moduleConfigurations)
-
-            AgentIntegration.registerModuleInitializationEnd(defaultModuleConfiguration.name)
         }
     }
 
