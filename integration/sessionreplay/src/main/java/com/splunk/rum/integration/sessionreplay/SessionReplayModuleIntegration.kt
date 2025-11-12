@@ -129,6 +129,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                 .emit()
 
             val sessionId = sessionManager.sessionId(metadata.startUnixMs)
+
             if (!isRecordingForSessions.contains(sessionId)) {
                 isRecordingForSessions.add(sessionId)
                 instance.sdkLoggerProvider
