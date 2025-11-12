@@ -19,12 +19,16 @@ package com.splunk.rum.integration.agent.internal.module
 import android.content.Context
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.android.instrumentation.InstallationContext
 
 abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultModuleConfiguration: T) {
 
     protected var moduleConfiguration: T = defaultModuleConfiguration
+        private set
+
+    protected lateinit var sessionManager: ISplunkSessionManager
         private set
 
     init {
@@ -34,6 +38,7 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     fun attach(context: Context) {
         val agentIntegration = AgentIntegration.obtainInstance(context)
         agentIntegration.listeners += installationListener
+        sessionManager = agentIntegration.sessionManager
         agentIntegration.sessionManager.sessionListeners += sessionChangeListener
 
         onAttach(context)

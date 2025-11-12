@@ -26,7 +26,9 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 
 class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
+        if (span.attributes.get(SESSION_ID_KEY) == null) {
+            span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
+        }
         span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
     }
 
