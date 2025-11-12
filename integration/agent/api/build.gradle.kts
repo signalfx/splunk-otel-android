@@ -8,7 +8,6 @@ import utils.versionProperty
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    //id("org.jetbrains.dokka")
 }
 
 apply<ConfigAndroidLibrary>()
@@ -52,4 +51,9 @@ dependencies {
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okio)
 
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.androidXTestCore)
+    testImplementation(Dependencies.Test.androidXTestJunit)
+    testImplementation(Dependencies.Test.robolectric)
+    testImplementation(Dependencies.Test.mockito)
 }

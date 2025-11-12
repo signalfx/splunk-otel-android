@@ -56,6 +56,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
             ScreenNameTracker.screenName = screenName
 
+            @Suppress("NewApi") // Requires API 26 or core library desugaring
             val timeNow = Instant.now()
 
             val screenSpan = provider.get(RumConstants.RUM_TRACER_NAME)

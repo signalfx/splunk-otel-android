@@ -1,14 +1,23 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:base",
+    "schedule:monthly"
   ],
   "baseBranches": ["develop"],
   "packageRules": [
-    // Exclude updates for gradle.
     {
-      "matchPackageNames": ["com.android.tools.build:gradle", "com.android.tools.build:gradle-api"],
+      "description": "Disable Android Gradle plugin updates",
+      "matchPackageNames": [
+        "com.android.tools.build:gradle",
+        "com.android.tools.build:gradle-api"
+      ],
       "enabled": false
+    },
+    {
+      "description": "Quarterly updates for app/**",
+      "matchPaths": ["app/**"],
+      "extends": ["schedule:quarterly"]
     }
   ]
 }

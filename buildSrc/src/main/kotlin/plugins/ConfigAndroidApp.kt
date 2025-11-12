@@ -1,5 +1,6 @@
 package plugins
 
+import AppDependencies
 import Dependencies
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -31,6 +32,6 @@ class ConfigAndroidApp : Plugin<Project> by local plugin {
     }
 
     dependencies {
-        "coreLibraryDesugaring"(Dependencies.desugar)
+        "coreLibraryDesugaring"(AppDependencies.desugar)
     }
 }

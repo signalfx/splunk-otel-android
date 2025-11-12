@@ -103,6 +103,7 @@ class SplunkRum private constructor(
         replaceWith = ReplaceWith("globalAttributes.update { attributesUpdater.accept(this) }")
     )
     fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
+        @Suppress("NewApi") // Requires API 26 or core library desugaring
         globalAttributes.update { attributesUpdater.accept(this) }
     }
 
@@ -250,6 +251,10 @@ class SplunkRum private constructor(
         ): SplunkRum {
             if (instanceInternal != null) {
                 return instance
+            }
+
+            require(agentConfiguration.deploymentEnvironment.isNotBlank()) {
+                "deploymentEnvironment cannot be an empty string. Please specify a value like 'dev', 'staging', or 'prod'."
             }
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
