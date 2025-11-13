@@ -1,0 +1,78 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/section_set_title"
+            style="@style/Heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/endpoint_config_section_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/set_realm_token"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_with_realm_token"
+            app:layout_constraintTop_toBottomOf="@id/section_set_title" />
+
+        <TextView
+            android:id="@+id/set_traces_only"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_with_traces_only"
+            app:layout_constraintTop_toBottomOf="@id/set_realm_token" />
+
+        <TextView
+            android:id="@+id/set_traces_and_logs"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/set_with_traces_and_logs"
+            app:layout_constraintTop_toBottomOf="@id/set_traces_only" />
+
+        <TextView
+            android:id="@+id/clear_endpoint"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/clear_endpoint"
+            app:layout_constraintTop_toBottomOf="@id/set_traces_and_logs" />
+
+        <TextView
+            android:id="@+id/log_endpoints"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/log_current_endpoints"
+            app:layout_constraintTop_toBottomOf="@id/clear_endpoint" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

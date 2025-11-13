@@ -17,19 +17,23 @@
 package com.splunk.rum.integration.agent.api
 
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
+import java.util.concurrent.atomic.AtomicReference
 
 interface IState {
     val appName: String
     val status: Status
     val appVersion: String
-    val endpointConfiguration: EndpointConfiguration
+    val endpointConfiguration: EndpointConfiguration?
     val deploymentEnvironment: String
     val isDebugLoggingEnabled: Boolean
     val instrumentedProcessName: String?
     val deferredUntilForeground: Boolean
 }
 
-class State internal constructor(agentConfiguration: AgentConfiguration) : IState {
+class State internal constructor(
+    agentConfiguration: AgentConfiguration,
+    private val endpointRef: AtomicReference<EndpointConfiguration?>
+) : IState {
     override val appName: String = agentConfiguration.appName
     override val appVersion: String = "0.0.0"
     override val status: Status = if (SplunkRumAgentCore.isRunning) {
@@ -37,7 +41,8 @@ class State internal constructor(agentConfiguration: AgentConfiguration) : IStat
     } else {
         Status.NotRunning.SampledOut
     }
-    override val endpointConfiguration: EndpointConfiguration = agentConfiguration.endpoint
+    override val endpointConfiguration: EndpointConfiguration?
+        get() = endpointRef.get()
     override val deploymentEnvironment: String = agentConfiguration.deploymentEnvironment
     override val isDebugLoggingEnabled: Boolean = agentConfiguration.enableDebugLogging
     override val instrumentedProcessName: String? = agentConfiguration.instrumentedProcessName
@@ -47,7 +52,7 @@ class State internal constructor(agentConfiguration: AgentConfiguration) : IStat
 class Noop(notRunningCause: Status.NotRunning = Status.NotRunning.NotInstalled) : IState {
     override val appName: String = ""
     override val status: Status = notRunningCause
-    override val endpointConfiguration: EndpointConfiguration = EndpointConfiguration("", "")
+    override val endpointConfiguration: EndpointConfiguration? = null
     override val appVersion: String = "0.0.0"
     override val deploymentEnvironment: String = ""
     override val isDebugLoggingEnabled: Boolean = false

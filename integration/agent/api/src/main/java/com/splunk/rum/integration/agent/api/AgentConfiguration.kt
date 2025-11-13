@@ -47,7 +47,7 @@ import io.opentelemetry.sdk.trace.data.SpanData
  * @property deferredUntilForeground Whether to defer tracing until the app is brought to the foreground.
  */
 data class AgentConfiguration @JvmOverloads constructor(
-    val endpoint: EndpointConfiguration,
+    val endpoint: EndpointConfiguration? = null,
     val appName: String,
     val deploymentEnvironment: String,
     val appVersion: String? = null,
@@ -61,7 +61,6 @@ data class AgentConfiguration @JvmOverloads constructor(
 ) {
     internal companion object {
         val noop = AgentConfiguration(
-            endpoint = EndpointConfiguration(),
             appName = "",
             deploymentEnvironment = ""
         )

@@ -88,20 +88,22 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
             return
         }
 
-        val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
+        val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider
 
-        if (provider == null || canReport == null) {
+        if (logger == null || canReport == null) {
             Logger.i(TAG, "Tracer provider not ready or reporting status unknown. Caching event")
             cache += applicationLifecycleData
             return
         }
 
-        Logger.d(TAG, "Creating span for app lifecycle event: $applicationLifecycleData")
-        provider.get(RumConstants.RUM_TRACER_NAME)
-            .spanBuilder(RumConstants.APP_LIFECYCLE_NAME)
+        Logger.d(TAG, "Creating log for app lifecycle event: $applicationLifecycleData")
+        logger.get(RumConstants.RUM_TRACER_NAME)
+            .logRecordBuilder()
+            .setTimestamp(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)
+            .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.APP_LIFECYCLE_NAME)
             .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.APP_LIFECYCLE_COMPONENT)
             .setAttribute(RumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
-            .createZeroLengthSpan(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)
+            .emit()
     }
 
     private val AppState.attributeValue: String

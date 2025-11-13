@@ -59,30 +59,32 @@ internal class AndroidSpanExporter(
             agentStorage.writeOtelSpanData(spansID, it.toByteArray())
         }
 
-        return if (deferredUntilForeground && !isForeground) {
-            // Just store span ID for deferred upload
-            agentStorage.addBufferedSpanId(spansID)
-            CompletableResultCode.ofSuccess()
-        } else {
-            // Schedule upload immediately
-            jobManager.scheduleJob(UploadOtelSpanData(spansID, jobIdStorage))
+        val hasEndpoint = agentStorage.readTracesBaseUrl() != null
 
-            // Also schedule previously buffered spans
-            flushBufferedSpanIds()
-
-            CompletableResultCode.ofSuccess()
+        return when {
+            !hasEndpoint || (deferredUntilForeground && !isForeground) -> {
+                // Just store span ID for deferred upload
+                agentStorage.addBufferedSpanId(spansID)
+                CompletableResultCode.ofSuccess()
+            }
+            else -> {
+                // Schedule upload immediately
+                jobManager.scheduleJob(UploadOtelSpanData(spansID, jobIdStorage))
+                // Also schedule previously buffered spans
+                flushBufferedSpanIds()
+                CompletableResultCode.ofSuccess()
+            }
         }
     }
 
     override fun flush(): CompletableResultCode {
-        flushBufferedSpanIds()
+        if (agentStorage.readTracesBaseUrl() != null) {
+            flushBufferedSpanIds()
+        }
         return CompletableResultCode.ofSuccess()
     }
 
-    override fun shutdown(): CompletableResultCode {
-        agentStorage.clearBufferedSpanIds()
-        return CompletableResultCode.ofSuccess()
-    }
+    override fun shutdown(): CompletableResultCode = CompletableResultCode.ofSuccess()
 
     private fun flushBufferedSpanIds() {
         val bufferedIds = agentStorage.getBufferedSpanIds()

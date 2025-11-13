@@ -29,7 +29,7 @@ class SessionReplaySessionIdLogProcessor(private val sessionManager: ISplunkSess
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
         val logRecordData = logRecord.toLogRecordData()
         if (logRecordData.instrumentationScopeInfo.name == RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
-            val id = sessionManager.sessionId(logRecordData.timestampEpochNanos)
+            val id = sessionManager.sessionId(logRecordData.timestampEpochNanos / 1_000_000)
             logRecord.setAttribute(SESSION_ID_KEY, id)
                 .setAttribute(SESSION_RUM_ID_KEY, id)
                 .setAttribute(SCRIPT_INSTANCE_KEY, id.take(SCRIPT_ID_LENGTH))
