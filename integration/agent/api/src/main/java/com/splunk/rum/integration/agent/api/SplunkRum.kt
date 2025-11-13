@@ -32,6 +32,7 @@ import com.splunk.rum.integration.agent.api.user.toInternal
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.Constants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
@@ -258,9 +259,9 @@ class SplunkRum private constructor(
             }
 
             val lowestApiLevel = if (agentConfiguration.forceEnableOnLowerApi) {
-                Build.VERSION_CODES.LOLLIPOP_MR1
+                Constants.lowestExperimentalApiLevelToRun
             } else {
-                Build.VERSION_CODES.N
+                Constants.lowestApiLevelToRun
             }
 
             AgentIntegration.lowestApiLevel = lowestApiLevel
