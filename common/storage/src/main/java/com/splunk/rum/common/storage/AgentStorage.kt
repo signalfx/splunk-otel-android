@@ -32,6 +32,7 @@ import com.splunk.rum.common.storage.extensions.statFsFreeSpace
 import com.splunk.rum.common.storage.policy.StoragePolicy
 import java.io.File
 import org.json.JSONArray
+import org.json.JSONException
 
 /**
  * Ideas:
@@ -250,6 +251,35 @@ class AgentStorage(context: Context) : IAgentStorage {
         preferences.remove(SPAN_IDS_KEY)
     }
 
+    override fun addBufferedSessionReplayId(id: String) {
+        val ids = getBufferedSessionReplayIds().toMutableSet()
+        if (ids.add(id)) {
+            val array = JSONArray(ids)
+            preferences.putString(SESSION_REPLAY_IDS_KEY, array.toString()).commit()
+        }
+    }
+
+    override fun getBufferedSessionReplayIds(): List<String> {
+        val json = preferences.getString(SESSION_REPLAY_IDS_KEY)
+
+        if (json.isNullOrBlank()) {
+            return emptyList()
+        }
+
+        return try {
+            val array = JSONArray(json)
+            List(array.length()) { array.getString(it) }
+        } catch (e: JSONException) {
+            Logger.e(TAG, "getBufferedSessionReplayIds(): sessionReplayIds: $e")
+            clearBufferedSessionReplayIds()
+            emptyList()
+        }
+    }
+
+    override fun clearBufferedSessionReplayIds() {
+        preferences.remove(SESSION_REPLAY_IDS_KEY)
+    }
+
     private fun otelLogDataFile(id: String) = File(logDir, "$id.dat")
     private fun otelSpanDataFile(id: String) = File(spanDir, "$id.dat")
     private fun sessionReplayDataFile(id: String) = File(sessionReplayDir, "$id.dat")
@@ -290,6 +320,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
         private const val SPAN_IDS_KEY = "BUFFERED_SPAN_IDS"
+        private const val SESSION_REPLAY_IDS_KEY = "BUFFERED_SESSION_REPLAY_IDS"
 
         private const val TAG = "AgentStorage"
 

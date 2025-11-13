@@ -20,7 +20,7 @@ import java.net.URL
 
 class EndpointConfiguration {
 
-    var traceEndpoint: URL? = null
+    var traceEndpoint: URL
         private set
     var sessionReplayEndpoint: URL? = null
         private set
@@ -28,8 +28,6 @@ class EndpointConfiguration {
         private set
     var rumAccessToken: String? = null
         private set
-
-    internal constructor()
 
     /**
      * @param realm Sets the realm for the beacon to send RUM telemetry to, e.g. "us0", "eu0".
