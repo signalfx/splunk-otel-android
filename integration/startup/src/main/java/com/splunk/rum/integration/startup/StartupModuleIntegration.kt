@@ -54,7 +54,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
-
+        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
         cache.forEachFast { reportEvent(it.startTimestamp, it.endTimestamp, it.name) }
         cache.clear()
     }

@@ -46,6 +46,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         if (moduleConfiguration.isAutomatedTrackingEnabled) {
             ScreenTrackerIntegration.attach(context)
         }
+        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 
     private val navigationListener = object : Navigation.Listener {

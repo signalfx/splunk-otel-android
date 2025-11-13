@@ -58,5 +58,6 @@ internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModu
                 install(oTelInstallationContext)
             }
         }
+        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 }

@@ -52,5 +52,6 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
                 install(oTelInstallationContext)
             }
         }
+        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 }
