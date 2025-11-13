@@ -87,7 +87,7 @@ class AgentIntegration private constructor(context: Context) {
         fun onInstall(
             context: Context,
             oTelInstallationContext: InstallationContext,
-            moduleConfigurations: List<ModuleConfiguration>,
+            moduleConfigurations: List<ModuleConfiguration>
         )
     }
 
@@ -101,7 +101,7 @@ class AgentIntegration private constructor(context: Context) {
 
         val modules = HashMap<String, Module>()
 
-        var lowestApiLevel: Int = Constants.lowestApiLevelToRun
+        var lowestApiLevel: Int = Constants.LOWEST_RUNTIME_API_LEVEL
 
         val instance: AgentIntegration
             get() = instanceInternal

@@ -259,9 +259,9 @@ class SplunkRum private constructor(
             }
 
             val lowestApiLevel = if (agentConfiguration.forceEnableOnLowerApi) {
-                Constants.lowestExperimentalApiLevelToRun
+                Constants.LOWEST_EXPERIMENTAL_RUNTIME_API_LEVEL
             } else {
-                Constants.lowestApiLevelToRun
+                Constants.LOWEST_RUNTIME_API_LEVEL
             }
 
             AgentIntegration.lowestApiLevel = lowestApiLevel
