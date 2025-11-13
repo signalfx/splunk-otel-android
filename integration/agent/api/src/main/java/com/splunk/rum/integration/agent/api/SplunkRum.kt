@@ -257,7 +257,15 @@ class SplunkRum private constructor(
                 "deploymentEnvironment cannot be an empty string. Please specify a value like 'dev', 'staging', or 'prod'."
             }
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            val lowestApiLevel = if (agentConfiguration.forceEnableOnLowerApi) {
+                Build.VERSION_CODES.LOLLIPOP_MR1
+            } else {
+                Build.VERSION_CODES.N
+            }
+
+            AgentIntegration.lowestApiLevel = lowestApiLevel
+
+            if (Build.VERSION.SDK_INT < lowestApiLevel) {
                 Logger.w(TAG, "install() - Unsupported Android version")
 
                 return SplunkRum(

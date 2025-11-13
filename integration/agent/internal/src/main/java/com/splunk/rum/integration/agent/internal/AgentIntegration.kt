@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.internal
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import android.os.SystemClock
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.internal.RumConstants
@@ -100,6 +101,8 @@ class AgentIntegration private constructor(context: Context) {
         private var instanceInternal: AgentIntegration? = null
 
         val modules = HashMap<String, Module>()
+
+        var lowestApiLevel: Int = Build.VERSION_CODES.N
 
         val instance: AgentIntegration
             get() = instanceInternal
