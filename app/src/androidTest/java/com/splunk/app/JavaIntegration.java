@@ -108,7 +108,7 @@ public class JavaIntegration extends Application {
         globalAttributes.set("int", 1);
 
         AgentConfiguration configuration = new AgentConfiguration(
-                null,
+                new EndpointConfiguration("sample_realm", "sample_token"),
                 "Test",
                 "dev",
                 "1.0",
