@@ -17,6 +17,6 @@
 package com.splunk.rum.integration.agent.internal
 
 object Constants {
-    const val LOWEST_RUNTIME_API_LEVEL = 23
-    const val LOWEST_EXPERIMENTAL_RUNTIME_API_LEVEL = 22
+    const val LOWEST_RUNTIME_API_LEVEL = 24
+    const val LOWEST_EXPERIMENTAL_RUNTIME_API_LEVEL = 21
 }
