@@ -101,6 +101,8 @@ class AgentIntegration private constructor(context: Context) {
 
         val modules = HashMap<String, Module>()
 
+        var lowestApiLevel: Int = Constants.LOWEST_RUNTIME_API_LEVEL
+
         val instance: AgentIntegration
             get() = instanceInternal
                 ?: throw IllegalStateException("Instance is not created, call createInstance() first")

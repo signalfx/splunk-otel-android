@@ -19,6 +19,8 @@ package com.splunk.rum.integration.sessionreplay.api
 import android.os.Build
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.instrumentation.recording.core.api.SessionReplay as CommonSessionReplay
+import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.sessionreplay.SessionReplayModuleIntegration
 import com.splunk.rum.integration.sessionreplay.api.mapping.toCommon
 import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
 
@@ -57,7 +59,7 @@ class SessionReplay internal constructor() {
      * Starts recording of a user activity.
      */
     fun start() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT < AgentIntegration.lowestApiLevel) {
             Logger.w(TAG, "start() - Unsupported Android version")
 
             statusOverride = Status.NotRecording(

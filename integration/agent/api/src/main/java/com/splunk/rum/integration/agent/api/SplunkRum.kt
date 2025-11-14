@@ -34,6 +34,7 @@ import com.splunk.rum.integration.agent.api.user.toInternal
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.Constants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
@@ -268,7 +269,15 @@ class SplunkRum private constructor(
                 "deploymentEnvironment cannot be an empty string. Please specify a value like 'dev', 'staging', or 'prod'."
             }
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            val lowestApiLevel = if (agentConfiguration.forceEnableOnLowerApi) {
+                Constants.LOWEST_EXPERIMENTAL_RUNTIME_API_LEVEL
+            } else {
+                Constants.LOWEST_RUNTIME_API_LEVEL
+            }
+
+            AgentIntegration.lowestApiLevel = lowestApiLevel
+
+            if (Build.VERSION.SDK_INT < lowestApiLevel) {
                 Logger.w(TAG, "install() - Unsupported Android version")
 
                 return SplunkRum(
