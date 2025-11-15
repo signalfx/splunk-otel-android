@@ -37,18 +37,18 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
             Logger.i(
                 TAG,
                 "bodyValue=${log.bodyValue}, " +
-                        "severityText=${log.severityText}, " +
-                        "severity=${log.severity}, " +
-                        "timestampEpochNanos=${log.timestampEpochNanos}, " +
-                        "observedTimestampEpochNanos=${log.observedTimestampEpochNanos}, " +
-                        "traceId=${log.spanContext.traceId}, " +
-                        "spanId=${log.spanContext.spanId}, " +
-                        "traceFlags=${log.spanContext.traceFlags}, " +
-                        "resources=${log.resource.attributes.toSplunkString()}, " +
-                        "attributes=${log.attributes.toSplunkString()}, " +
-                        "totalAttributeCount=${log.totalAttributeCount}, " +
-                        "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
-                        "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
+                    "severityText=${log.severityText}, " +
+                    "severity=${log.severity}, " +
+                    "timestampEpochNanos=${log.timestampEpochNanos}, " +
+                    "observedTimestampEpochNanos=${log.observedTimestampEpochNanos}, " +
+                    "traceId=${log.spanContext.traceId}, " +
+                    "spanId=${log.spanContext.spanId}, " +
+                    "traceFlags=${log.spanContext.traceFlags}, " +
+                    "resources=${log.resource.attributes.toSplunkString()}, " +
+                    "attributes=${log.attributes.toSplunkString()}, " +
+                    "totalAttributeCount=${log.totalAttributeCount}, " +
+                    "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
+                    "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
             )
         }
 
