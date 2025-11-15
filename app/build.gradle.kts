@@ -1,4 +1,3 @@
-import Dependencies.kotlinStdlibJdk8
 import plugins.ConfigAndroidApp
 import java.net.InetAddress
 
@@ -34,9 +33,6 @@ android {
         versionCode = Configurations.sdkVersionCode
         versionName = Configurations.sdkVersionName
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments.put("clearPackageData", "true")
-
         // Read from global gradle.properties (~/.gradle/gradle.properties)
         // If not found, fallback to empty string
         val realm = project.findProperty("splunkRealm") as? String ?: ""
@@ -62,7 +58,6 @@ android {
         unitTests.apply {
             isIncludeAndroidResources = true
         }
-        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     buildFeatures {
@@ -82,70 +77,24 @@ android {
 }
 
 dependencies {
-    api(platform(Dependencies.Otel.instrumentationBomAlpha))
-
-    implementation(kotlinStdlibJdk8)
-
-    //implementation("com.cisco.android:rum-agent:24.4.10-2246")
-    // TODO: this is here just so we do not have duplicate logic, it is not publicly available
-    //implementation("com.cisco.android:rum-common-utils:24.4.10-2246")
 
     implementation(project(":agent"))
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(AppDependencies.kotlinStdlib)
 
-    implementation(Dependencies.Android.appcompat)
-    implementation(Dependencies.Android.constraintLayout)
-    implementation(Dependencies.Android.activityKtx)
-    implementation(Dependencies.Android.fragmentKtx)
-    implementation(Dependencies.Android.material)
+    implementation(AppDependencies.Android.appcompat)
+    implementation(AppDependencies.Android.constraintLayout)
+    implementation(AppDependencies.Android.activityKtx)
+    implementation(AppDependencies.Android.fragmentKtx)
+    implementation(AppDependencies.Android.material)
 
     /**
      * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
      */
-    implementation(Dependencies.okhttp)
-    implementation(Dependencies.okio)
+    implementation(AppDependencies.okhttp)
+    implementation(AppDependencies.okio)
 
-    debugImplementation(Dependencies.AndroidDebug.leakCanary)
-
-    /**
-     * Explicit version of guava jre must be forced because ext truth uses one with vulnerabilities.
-     */
-    androidTestImplementation(Dependencies.guavaAndroid)
-    androidTestImplementation(Dependencies.AndroidTest.testExtTruth)
-
-    androidTestImplementation(Dependencies.AndroidTest.junit)
-    androidTestImplementation(Dependencies.AndroidTest.mockk)
-    androidTestImplementation(Dependencies.AndroidTest.serialization)
-    androidTestImplementation(Dependencies.AndroidTest.testRules)
-    androidTestImplementation(Dependencies.AndroidTest.testRunner)
-    androidTestImplementation(Dependencies.AndroidTest.uiAutomator)
-
-    /**
-     * Jsoup must be explicitly included since a newer version is being enforced than what is transitively used by espresso contrib.
-     */
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.contrib)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.jsoup)
-
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.core)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.idlingConcurrent)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.idlingResource)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.intents)
-    androidTestImplementation(Dependencies.AndroidTest.Espresso.web)
-
-    androidTestImplementation(Dependencies.okhttp)
-    androidTestImplementation(Dependencies.okio)
-    androidTestImplementation(Dependencies.AndroidTest.okhttpLogging)
-    
-    androidTestImplementation(Dependencies.Test.jsonassert)
-
-    androidTestUtil(Dependencies.AndroidTest.testOrchestrator)
-
-    /**
-     * Explicit version of guava jre must be forced because ext truth uses one with vulnerabilities.
-     */
-    implementation(Dependencies.guavaAndroid)
+    debugImplementation(AppDependencies.leakCanary)
 }
 
 tasks.register<Exec>("startOtelCollectorForTests") {

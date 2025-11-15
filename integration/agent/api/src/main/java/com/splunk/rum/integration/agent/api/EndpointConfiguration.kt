@@ -20,16 +20,14 @@ import java.net.URL
 
 class EndpointConfiguration {
 
-    var tracesEndpoint: URL? = null
+    var traceEndpoint: URL
         private set
-    var logsEndpoint: URL? = null
+    var sessionReplayEndpoint: URL? = null
         private set
     var realm: String? = null
         private set
     var rumAccessToken: String? = null
         private set
-
-    internal constructor()
 
     /**
      * @param realm Sets the realm for the beacon to send RUM telemetry to, e.g. "us0", "eu0".
@@ -38,23 +36,23 @@ class EndpointConfiguration {
     constructor(realm: String, rumAccessToken: String) {
         this.realm = realm
         this.rumAccessToken = rumAccessToken
-        this.tracesEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/traces?auth=$rumAccessToken")
-        this.logsEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/logs?auth=$rumAccessToken")
+        this.traceEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/traces?auth=$rumAccessToken")
+        this.sessionReplayEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/logs?auth=$rumAccessToken")
     }
 
     /**
-     * @param traces Sets the "beacon" endpoint URL to be used by the RUM library.
+     * @param trace Sets the "beacon" endpoint URL to be used by the RUM library.
      */
-    constructor(traces: URL) {
-        tracesEndpoint = traces
+    constructor(trace: URL) {
+        this.traceEndpoint = trace
     }
 
     /**
-     * @param traces Sets the "beacon" endpoint URL to be used by the RUM library.
-     * @param logs Sets the "session replay" endpoint URL to be used by the RUM library.
+     * @param trace Sets the "beacon" endpoint URL to be used by the RUM library.
+     * @param sessionReplay Sets the "session replay" endpoint URL to be used by the RUM library.
      */
-    constructor(traces: URL, logs: URL) {
-        tracesEndpoint = traces
-        logsEndpoint = logs
+    constructor(trace: URL, sessionReplay: URL) {
+        this.traceEndpoint = trace
+        this.sessionReplayEndpoint = sessionReplay
     }
 }

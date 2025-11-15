@@ -46,6 +46,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         if (moduleConfiguration.isAutomatedTrackingEnabled) {
             ScreenTrackerIntegration.attach(context)
         }
+        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 
     private val navigationListener = object : Navigation.Listener {
@@ -56,6 +57,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
             ScreenNameTracker.screenName = screenName
 
+            @Suppress("NewApi") // Requires API 26 or core library desugaring
             val timeNow = Instant.now()
 
             val screenSpan = provider.get(RumConstants.RUM_TRACER_NAME)

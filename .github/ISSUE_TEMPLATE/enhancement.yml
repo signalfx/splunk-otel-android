@@ -1,0 +1,17 @@
+name: Enhancement / Feature Request
+description: Submit an enhancement or feature request for the splunk-otel-android Agent.
+title: "Short descriptive title of the enhancement/feature request"
+labels: ["enhancement"]
+assignees:
+  - nehalmol
+  - SenNeonoveNoci
+  - aditi-s3
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Detailed Description
+      description: Please provide a detailed description of the enhancement or feature you are proposing. Explain the problem it solves or the new capability it introduces, and clearly describe the use case(s) where this enhancement would be beneficial.
+      placeholder: Describe your enhancement or feature request here...
+    validations:
+      required: true

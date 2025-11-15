@@ -1,10 +1,9 @@
 package plugins
 
-import Dependencies
+import Configurations
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.dependencies
 
 class ConfigAndroidLibrary : Plugin<Project> by local plugin {
     apply<ConfigLint>()
@@ -28,8 +27,6 @@ class ConfigAndroidLibrary : Plugin<Project> by local plugin {
         }
 
         compileOptions {
-            isCoreLibraryDesugaringEnabled = true
-
             sourceCompatibility = Configurations.Compilation.sourceCompatibility
             targetCompatibility = Configurations.Compilation.targetCompatibility
         }
@@ -49,9 +46,5 @@ class ConfigAndroidLibrary : Plugin<Project> by local plugin {
                 enableUnitTestCoverage = true
             }
         }
-    }
-
-    dependencies {
-        "coreLibraryDesugaring"(Dependencies.desugar)
     }
 }

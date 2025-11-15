@@ -1,19 +1,20 @@
+/**
+ * This object holds all the dependencies for the MRUM Agent.
+ * The example application dependencies can be found in AppDependencies.kt.
+ */
 object Dependencies {
 
     // Project level dependencies
 
     private const val gradleVersion = "8.6.0"
     private const val kotlinVersion = "1.8.0"
-    private const val ktlintVersion = "1.5.0"
-    private const val desugarVersion = "2.1.3"
+    private const val ktlintVersion = "1.7.1"
     private const val bytebuddyVersion = "1.17.2"
     const val jacocoVersion = "0.8.13"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
-    const val gradleApi = "com.android.tools.build:gradle-api:$gradleVersion"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
-    const val desugar = "com.android.tools:desugar_jdk_libs:$desugarVersion"
     const val jacoco = "org.jacoco:org.jacoco.core:$jacocoVersion"
 
     // Nexus publish plugin
@@ -29,70 +30,43 @@ object Dependencies {
     private const val okhttpVersion = "4.11.0"
     private const val okioVersion = "3.4.0"
 
-    const val kotlinStdlibJdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     const val okhttp = "com.squareup.okhttp3:okhttp:$okhttpVersion"
     const val okio = "com.squareup.okio:okio:$okioVersion"
     const val bytebuddy = "net.bytebuddy:byte-buddy:$bytebuddyVersion"
     const val bytebuddyGradlePlugin = "net.bytebuddy:byte-buddy-gradle-plugin:$bytebuddyVersion"
 
-    /**
-     * The bellow listed dependencies transitively include problematic guava version and cannot be updated.
-     * We will force the usage of version 32.0.1, which is the closest version to the one currently used without vulnerabilities.
-     *
-     * guava:31.1-jre is used by:
-     * - org.robolectric:robolectric:4.12.1
-     *
-     * guava:31.1-android is used by:
-     * - androidx.test.ext:truth:1.6.0-alpha03
-     * - com.google.android.exoplayer:exoplayer:2.19.1
-     */
-    private const val guavaJreVersion = "32.0.1"
-    const val guavaAndroid = "com.google.guava:guava:$guavaJreVersion-android"
-
     object Test {
         private const val junitVersion = "4.13.2"
-        private const val jsonassertVersion = "1.5.3"
-        private const val mockkVersion = "1.12.4"
-        private const val mockWebServerVersion = "4.10.0"
+        private const val androidXTestCoreVersion = "1.6.1"
+        private const val androidXTestJunitVersion = "1.2.1"
+        private const val robolectricVersion = "4.13"
+        private const val mockitoVersion = "5.4.0"
 
         const val junit = "junit:junit:$junitVersion"
-        const val jsonassert = "org.skyscreamer:jsonassert:$jsonassertVersion"
-        const val mockk = "io.mockk:mockk:$mockkVersion"
-        const val mockWebServer = "com.squareup.okhttp3:mockwebserver:$mockWebServerVersion"
+        const val androidXTestCore = "androidx.test:core:$androidXTestCoreVersion"
+        const val androidXTestJunit = "androidx.test.ext:junit:$androidXTestJunitVersion"
+        const val robolectric = "org.robolectric:robolectric:$robolectricVersion"
+        const val mockito = "org.mockito:mockito-core:$mockitoVersion"
     }
 
     object Android {
 
         private const val annotationVersion = "1.9.1"
-        private const val appcompatVersion = "1.7.1"
-        private const val materialVersion = "1.9.0"
-
-        const val annotation = "androidx.annotation:annotation:$annotationVersion"
-        const val appcompat = "androidx.appcompat:appcompat:$appcompatVersion"
-        const val material = "com.google.android.material:material:$materialVersion"
-
-        // Test application
-
-        private const val constraintLayoutVersion = "2.2.1"
-        private const val activityKtxVersion = "1.2.2"
         private const val fragmentKtxVersion = "1.3.3"
 
-        const val constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-        const val activityKtx = "androidx.activity:activity-ktx:$activityKtxVersion"
+        const val annotation = "androidx.annotation:annotation:$annotationVersion"
         const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 
         object Compose {
-            private const val version = "1.2.1" // No need to update
+            private const val UiVersion = "1.2.1" // No need to update
 
-            const val ui = "androidx.compose.ui:ui:$version"
+            const val ui = "androidx.compose.ui:ui:$UiVersion"
         }
     }
 
     object SessionReplay {
-        private const val version = "1.0.23"
+        private const val version = "1.0.25"
 
-        const val bridge = "com.splunk.android:sr-bridge:$version"
-        const val commonEncoder = "com.splunk.android:sr-common-encoder:$version"
         const val commonHttp = "com.splunk.android:sr-common-http:$version"
         const val commonId = "com.splunk.android:sr-common-id:$version"
         const val commonJob = "com.splunk.android:sr-common-job:$version"
@@ -103,10 +77,6 @@ object Dependencies {
         const val instrumentationSessionRecordingCore = "com.splunk.android:sr-instrumentation-session-recording-core:$version"
         const val instrumentationSessionRecordingFrameCapturer = "com.splunk.android:sr-instrumentation-session-recording-frame-capturer:$version"
         const val instrumentationSessionRecordingInteractions = "com.splunk.android:sr-instrumentation-session-recording-interactions:$version"
-        const val instrumentationSessionRecordingScreenshot = "com.splunk.android:sr-instrumentation-session-recording-screenshot:$version"
-        const val instrumentationSessionRecordingWireframe = "com.splunk.android:sr-instrumentation-session-recording-wireframe:$version"
-
-        const val debugger = "com.splunk.android:sr-debugger:$version"
     }
 
     object Otel {
@@ -136,57 +106,5 @@ object Dependencies {
         const val androidCrashInstrumentation = "io.opentelemetry.android.instrumentation:crash"
         const val androidANRInstrumentation = "io.opentelemetry.android.instrumentation:anr"
         const val androidSlowRenderingInstrumentation = "io.opentelemetry.android.instrumentation:slowrendering"
-    }
-
-    object AndroidTest {
-        private const val junitVersion = "1.3.0"
-        private const val okhttpLoggingVersion = "4.12.0"
-        private const val serializationVersion = "1.5.0"
-        private const val testExtTruthVersion = "1.7.0"
-        private const val testOrchestratorVersion = "1.6.1"
-        private const val testRulesVersion = "1.7.0"
-        private const val testRunnerVersion = "1.7.0"
-        private const val uiAutomatorVersion = "2.3.0"
-        private const val mockkVersion = "1.12.4"
-
-        const val junit = "androidx.test.ext:junit:$junitVersion"
-        const val okhttpLogging = "com.squareup.okhttp3:logging-interceptor:$okhttpLoggingVersion"
-        const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
-        const val testExtTruth = "androidx.test.ext:truth:$testExtTruthVersion"
-        const val testOrchestrator = "androidx.test:orchestrator:$testOrchestratorVersion"
-        const val testRules = "androidx.test:rules:$testRulesVersion"
-        const val testRunner = "androidx.test:runner:$testRunnerVersion"
-        const val uiAutomator = "androidx.test.uiautomator:uiautomator:$uiAutomatorVersion"
-        const val mockk = "io.mockk:mockk-android:$mockkVersion"
-
-        object Espresso {
-
-            /**
-             * Espresso contrib 3.5.1 is the latest version.
-             * This version includes jsoup transitively with vulnerabilities, we explicitly set the jsoup version to a safer one.
-             */
-            private const val contribVersion = "3.7.0"
-            private const val jsoupVersion = "1.15.3"
-
-            private const val coreVersion = "3.7.0"
-            private const val idlingConcurrentVersion = "3.7.0"
-            private const val idlingResourceVersion = ""
-            private const val intentsVersion = "3.7.0"
-            private const val webVersion = "3.7.0"
-
-            const val contrib = "androidx.test.espresso:espresso-contrib:$contribVersion"
-            const val jsoup = "org.jsoup:jsoup:$jsoupVersion"
-            const val core = "androidx.test.espresso:espresso-core:$coreVersion"
-            const val idlingConcurrent = "androidx.test.espresso.idling:idling-concurrent:$idlingConcurrentVersion"
-            const val idlingResource = "androidx.test.espresso:espresso-idling-resource:$idlingResourceVersion"
-            const val intents = "androidx.test.espresso:espresso-intents:$intentsVersion"
-            const val web = "androidx.test.espresso:espresso-web:$webVersion"
-        }
-    }
-
-    object AndroidDebug {
-        private const val leakCanaryVersion = "2.12"
-
-        const val leakCanary = "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
     }
 }

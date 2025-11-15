@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package com.splunk.app.tests.component
+package com.splunk.app.extension
 
-import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.splunk.app.ui.MainActivity
-import org.junit.Rule
+import android.app.Activity
+import android.view.ViewGroup
 
-abstract class BaseTest {
-
-    @get:Rule
-    val scenario = ActivityScenarioRule(MainActivity::class.java)
-}
+val Activity.contentView: ViewGroup?
+    get() = findViewById(android.R.id.content)

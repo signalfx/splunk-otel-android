@@ -92,5 +92,6 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
             SplunkInternalGlobalAttributeSpanProcessor.attributes[NETWORK_CONNECTION_TYPE] =
                 NetworkState.NO_NETWORK_AVAILABLE.humanName
         }
+        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 }

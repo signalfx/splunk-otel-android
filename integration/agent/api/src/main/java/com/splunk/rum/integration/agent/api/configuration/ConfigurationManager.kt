@@ -29,8 +29,12 @@ internal class ConfigurationManager private constructor(private val agentStorage
             config = config.copy(appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName)
         }
 
-        agentStorage.writeLogsBaseUrl(config.endpoint.logsEndpoint!!.toExternalForm())
-        agentStorage.writeTracesBaseUrl(config.endpoint.tracesEndpoint!!.toExternalForm())
+        config.endpoint?.let { endpoint ->
+            agentStorage.writeTracesBaseUrl(endpoint.traceEndpoint.toExternalForm())
+            endpoint.sessionReplayEndpoint?.let { logsUrl ->
+                agentStorage.writeLogsBaseUrl(logsUrl.toExternalForm())
+            } ?: agentStorage.deleteLogsBaseUrl()
+        }
 
         Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
 

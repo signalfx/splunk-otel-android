@@ -25,6 +25,7 @@ import com.splunk.app.databinding.FragmentMenuBinding
 import com.splunk.app.ui.BaseFragment
 import com.splunk.app.ui.crashreports.CrashReportsFragment
 import com.splunk.app.ui.customtracking.CustomTrackingFragment
+import com.splunk.app.ui.endpointconfiguration.EndpointConfigurationFragment
 import com.splunk.app.ui.globalattributes.GlobalAttributesFragment
 import com.splunk.app.ui.httpurlconnection.HttpURLConnectionFragment
 import com.splunk.app.ui.okhttp.OkHttpFragment
@@ -67,6 +68,9 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
             }
             slowRendering.setOnClickListener {
                 navigateTo(SlowRenderingFragment(), FragmentAnimation.FADE)
+            }
+            endpointConfiguration.setOnClickListener {
+                navigateTo(EndpointConfigurationFragment(), FragmentAnimation.FADE)
             }
         }
     }

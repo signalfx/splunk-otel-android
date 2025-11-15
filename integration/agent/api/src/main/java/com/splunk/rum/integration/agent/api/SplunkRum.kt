@@ -20,6 +20,8 @@ import android.app.Application
 import android.os.Build
 import android.webkit.WebView
 import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.storage.AgentStorage
+import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
@@ -32,6 +34,7 @@ import com.splunk.rum.integration.agent.api.user.toInternal
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.Constants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
@@ -43,6 +46,7 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.api.trace.Span
+import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import okhttp3.Call
 import okhttp3.OkHttpClient
@@ -55,15 +59,22 @@ import okhttp3.OkHttpClient
  * @param globalAttributes Represents the global attributes configured for the agent.
  */
 class SplunkRum private constructor(
+    agentStorage: IAgentStorage?,
     agentConfiguration: AgentConfiguration,
     userManager: IUserManager,
     sessionManager: ISplunkSessionManager,
     val openTelemetry: OpenTelemetry,
-    val state: IState = State(agentConfiguration),
+    private val endpointRef: AtomicReference<EndpointConfiguration?> = AtomicReference(agentConfiguration.endpoint),
+    val state: IState = State(agentConfiguration, endpointRef),
     val session: ISession = Session(SessionState(agentConfiguration.session, sessionManager)),
     val user: User = User(userManager),
     val globalAttributes: MutableAttributes = MutableAttributes(agentConfiguration.globalAttributes)
 ) {
+    val preferences: AgentPreferences = AgentPreferences(
+        agentStorage = agentStorage,
+        endpointRef = endpointRef,
+        openTelemetry = openTelemetry
+    )
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
     fun getRumSessionId(): String = session.state.id
@@ -103,6 +114,7 @@ class SplunkRum private constructor(
         replaceWith = ReplaceWith("globalAttributes.update { attributesUpdater.accept(this) }")
     )
     fun updateGlobalAttributes(attributesUpdater: Consumer<AttributesBuilder>) {
+        @Suppress("NewApi") // Requires API 26 or core library desugaring
         globalAttributes.update { attributesUpdater.accept(this) }
     }
 
@@ -212,6 +224,7 @@ class SplunkRum private constructor(
 
     companion object {
         private val noop = SplunkRum(
+            agentStorage = null,
             openTelemetry = OpenTelemetry.noop(),
             agentConfiguration = AgentConfiguration.noop,
             state = Noop(),
@@ -252,10 +265,23 @@ class SplunkRum private constructor(
                 return instance
             }
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            require(agentConfiguration.deploymentEnvironment.isNotBlank()) {
+                "deploymentEnvironment cannot be an empty string. Please specify a value like 'dev', 'staging', or 'prod'."
+            }
+
+            val lowestApiLevel = if (agentConfiguration.forceEnableOnLowerApi) {
+                Constants.LOWEST_EXPERIMENTAL_RUNTIME_API_LEVEL
+            } else {
+                Constants.LOWEST_RUNTIME_API_LEVEL
+            }
+
+            AgentIntegration.lowestApiLevel = lowestApiLevel
+
+            if (Build.VERSION.SDK_INT < lowestApiLevel) {
                 Logger.w(TAG, "install() - Unsupported Android version")
 
                 return SplunkRum(
+                    agentStorage = null,
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
@@ -274,6 +300,7 @@ class SplunkRum private constructor(
                 Logger.d(TAG, "install() - Subprocess detected exiting")
 
                 return SplunkRum(
+                    agentStorage = null,
                     openTelemetry = OpenTelemetry.noop(),
                     agentConfiguration = AgentConfiguration.noop,
                     state = Noop(
@@ -297,6 +324,7 @@ class SplunkRum private constructor(
             )
 
             instanceInternal = SplunkRum(
+                agentStorage = AgentStorage.attach(application),
                 agentConfiguration = agentConfiguration,
                 openTelemetry = openTelemetry,
                 userManager = userManager,

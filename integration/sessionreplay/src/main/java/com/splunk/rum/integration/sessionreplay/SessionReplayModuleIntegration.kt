@@ -45,6 +45,8 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
     private const val TAG = "SessionReplayIntegration"
 
+    private val isRecordingForSessions: MutableSet<String> = mutableSetOf()
+
     private var timeIndex: TimeIndex<Long> = TimeIndex()
 
     override fun onAttach(context: Context) {
@@ -69,6 +71,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
              */
             sensitivity.setViewClassSensitivity(WebView::class.java, null)
         }
+        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 
     override fun onSessionChange(sessionId: String) {
@@ -116,15 +119,30 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                 AttributeKey.stringKey("segmentMetadata"), segmentMetadata
             )
 
-            val logRecordBuilder = instance.sdkLoggerProvider
+            val sessionReplayDataBuilder = instance.sdkLoggerProvider
                 .loggerBuilder(RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME)
                 .build()
                 .logRecordBuilder()
 
-            logRecordBuilder.setBody(Value.of(data))
+            sessionReplayDataBuilder.setBody(Value.of(data))
                 .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
                 .setAllAttributes(attributes)
                 .emit()
+
+            val sessionId = sessionManager.sessionId(metadata.startUnixMs)
+
+            if (!isRecordingForSessions.contains(sessionId)) {
+                isRecordingForSessions.add(sessionId)
+                instance.sdkLoggerProvider
+                    .get(RumConstants.RUM_TRACER_NAME)
+                    .logRecordBuilder()
+                    .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
+                    .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, "splunk.sessionReplay.isRecording")
+                    .setAttribute(RumConstants.COMPONENT_KEY, "session.replay")
+                    .setAttribute(RumConstants.SESSION_REPLAY_KEY, "splunk")
+                    .setAttribute(RumConstants.SESSION_ID_KEY, sessionId)
+                    .emit()
+            }
 
             return true
         }

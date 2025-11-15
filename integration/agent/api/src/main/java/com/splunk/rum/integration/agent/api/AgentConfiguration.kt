@@ -45,9 +45,10 @@ import io.opentelemetry.sdk.trace.data.SpanData
  * @property session Additional session information.
  * @property instrumentedProcessName The name of the instrumented process.
  * @property deferredUntilForeground Whether to defer tracing until the app is brought to the foreground.
+ * @property forceEnableOnLowerApi Explicitly enable the agent for API 22.
  */
 data class AgentConfiguration @JvmOverloads constructor(
-    val endpoint: EndpointConfiguration,
+    val endpoint: EndpointConfiguration? = null,
     val appName: String,
     val deploymentEnvironment: String,
     val appVersion: String? = null,
@@ -57,11 +58,11 @@ data class AgentConfiguration @JvmOverloads constructor(
     val user: UserConfiguration = UserConfiguration(),
     val session: SessionConfiguration = SessionConfiguration(),
     val instrumentedProcessName: String? = null,
-    val deferredUntilForeground: Boolean = false
+    val deferredUntilForeground: Boolean = false,
+    val forceEnableOnLowerApi: Boolean = false
 ) {
     internal companion object {
         val noop = AgentConfiguration(
-            endpoint = EndpointConfiguration(),
             appName = "",
             deploymentEnvironment = ""
         )
