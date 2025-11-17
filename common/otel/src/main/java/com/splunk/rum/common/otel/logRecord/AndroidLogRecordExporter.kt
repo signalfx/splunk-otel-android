@@ -16,6 +16,7 @@
 
 package com.splunk.rum.common.otel.logRecord
 
+import android.util.Log
 import com.splunk.android.common.job.IJobManager
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
@@ -65,8 +66,12 @@ internal class AndroidLogRecordExporter(
             val hasEndpoint = agentStorage.readLogsBaseUrl() != null
 
             if (!hasEndpoint) {
+                Log.e("EndpointConfiguration", "LOG UPLOAD DEFERRED")
+
                 agentStorage.addBufferedSessionReplayId(id)
             } else {
+                Log.e("EndpointConfiguration", "LOG UPLOAD SCHEDULED")
+
                 // Schedule immediate upload and flush any buffered session replay
                 jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
                 flushBufferedSessionReplayIds()
@@ -169,6 +174,8 @@ internal class AndroidLogRecordExporter(
 
     private fun flushBufferedSessionReplayIds() {
         val bufferedIds = agentStorage.getBufferedSessionReplayIds()
+        Log.e("EndpointConfiguration", "Buffered log IDs: ${bufferedIds.size} - $bufferedIds")
+
         bufferedIds.forEach { id ->
             jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
         }

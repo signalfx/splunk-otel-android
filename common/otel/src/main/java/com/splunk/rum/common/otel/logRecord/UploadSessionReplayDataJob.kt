@@ -104,7 +104,7 @@ internal class UploadSessionReplayDataJob : JobService() {
     }
 
     companion object {
-        private const val TAG = "UploadSessionReplayDataJob"
+        private const val TAG = "EndpointConfiguration SESSION REPLAY"
         private const val DATA_SERIALIZE_KEY = "DATA"
 
         fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder =

@@ -17,6 +17,7 @@
 package com.splunk.rum.common.storage
 
 import android.content.Context
+import android.util.Log
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.storage.Storage
 import com.splunk.android.common.storage.cache.FilePermanentCache
@@ -225,6 +226,8 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun addBufferedSpanId(id: String) {
+        Log.e("EndpointConfiguration", "addBufferedSpanId")
+
         val ids = getBufferedSpanIds().toMutableSet()
         if (ids.add(id)) {
             val array = JSONArray(ids)
@@ -233,6 +236,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun getBufferedSpanIds(): List<String> {
+        Log.e("EndpointConfiguration", "getBufferedSpanIds")
         val json = preferences.getString(SPAN_IDS_KEY)
         return if (json.isNullOrBlank()) {
             emptyList()
@@ -248,10 +252,13 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun clearBufferedSpanIds() {
+        Log.e("EndpointConfiguration", "clearBufferedSpanIds")
+
         preferences.remove(SPAN_IDS_KEY)
     }
 
     override fun addBufferedSessionReplayId(id: String) {
+        Log.e("EndpointConfiguration", "addBufferedSessionReplayId")
         val ids = getBufferedSessionReplayIds().toMutableSet()
         if (ids.add(id)) {
             val array = JSONArray(ids)
@@ -260,6 +267,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun getBufferedSessionReplayIds(): List<String> {
+        Log.e("EndpointConfiguration", "getBufferedSessionReplayIds")
         val json = preferences.getString(SESSION_REPLAY_IDS_KEY)
 
         if (json.isNullOrBlank()) {
@@ -277,6 +285,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun clearBufferedSessionReplayIds() {
+        Log.e("EndpointConfiguration", "clearBufferedSessionReplayIds")
         preferences.remove(SESSION_REPLAY_IDS_KEY)
     }
 

@@ -18,6 +18,7 @@ package com.splunk.rum.common.otel.span
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import com.splunk.android.common.job.IJobManager
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.utils.AppStateObserver
@@ -63,12 +64,14 @@ internal class AndroidSpanExporter(
 
         return when {
             !hasEndpoint || (deferredUntilForeground && !isForeground) -> {
+                Log.e("EndpointConfiguration", "SPAN UPLOAD DEFERRED")
                 // Just store span ID for deferred upload
                 agentStorage.addBufferedSpanId(spansID)
                 CompletableResultCode.ofSuccess()
             }
             else -> {
                 // Schedule upload immediately
+                Log.e("EndpointConfiguration", "SPAN UPLOAD SCHEDULED")
                 jobManager.scheduleJob(UploadOtelSpanData(spansID, jobIdStorage))
                 // Also schedule previously buffered spans
                 flushBufferedSpanIds()
@@ -88,6 +91,8 @@ internal class AndroidSpanExporter(
 
     private fun flushBufferedSpanIds() {
         val bufferedIds = agentStorage.getBufferedSpanIds()
+        Log.e("EndpointConfiguration", "Buffered span IDs: ${bufferedIds.size} - $bufferedIds")
+
         bufferedIds.forEach { id ->
             jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
         }

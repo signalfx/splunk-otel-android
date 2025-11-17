@@ -110,7 +110,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
     }
 
     companion object {
-        private const val TAG = "UploadOtelLogRecordDataJob"
+        private const val TAG = "EndpointConfiguration LOG"
         private const val DATA_SERIALIZE_KEY = "DATA"
 
         fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder =
