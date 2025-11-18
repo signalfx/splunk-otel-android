@@ -57,7 +57,7 @@ class AgentStorageTest {
 
     @Test
     fun `readAppInstallationId returns stored value`() {
-        val expectedId = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+        val expectedId = "6ba7b8109dad11d180b400c04fd430c8"
 
         storage.writeAppInstallationId(expectedId)
         val result = storage.readAppInstallationId()
@@ -67,8 +67,8 @@ class AgentStorageTest {
 
     @Test
     fun `writeAppInstallationId overwrites previous value`() {
-        val firstId = "fb61a5d8-d420-43fc-89cb-405ca8998892"
-        val secondId = "5af7b710-6dqd-21d1-50b4-80c04ad430c0"
+        val firstId = "fb61a5d8d42043fc89cb405ca8998892"
+        val secondId = "5af7b7106dqd21d150b480c04ad430c0"
 
         storage.writeAppInstallationId(firstId)
         storage.writeAppInstallationId(secondId)
@@ -79,7 +79,7 @@ class AgentStorageTest {
 
     @Test
     fun `readAppInstallationId persists across storage instances`() {
-        val testId = "fb61a5d8-d420-43fc-89cb-405ca8998892"
+        val testId = "fb61a5d8d42043fc89cb405ca8998892"
 
         storage.writeAppInstallationId(testId)
 

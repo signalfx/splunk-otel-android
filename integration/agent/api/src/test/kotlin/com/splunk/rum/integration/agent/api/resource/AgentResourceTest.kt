@@ -39,7 +39,7 @@ class AgentResourceTest {
 
     @Test
     fun `allResource contains app installation id attribute`() {
-        val testInstallationId = "550e8400-e29b-41d4-a716-446655440000"
+        val testInstallationId = "550e8400e29b41d4a716446655440000"
         val mockAgentConfig = mock(AgentConfiguration::class.java)
 
         val resource = AgentResource.allResource(context, testInstallationId, mockAgentConfig)
