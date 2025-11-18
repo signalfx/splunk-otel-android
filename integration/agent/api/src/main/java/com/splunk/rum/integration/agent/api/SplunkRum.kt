@@ -314,30 +314,11 @@ class SplunkRum private constructor(
 
             val storage = AgentStorage.attach(application)
 
-            val effectiveEndpoint = agentConfiguration.endpoint ?: run {
-                val cachedTracesUrl = storage.readTracesBaseUrl()
-                val cachedLogsUrl = storage.readLogsBaseUrl()
-
-                if (cachedTracesUrl != null) {
-                    Logger.d(TAG, "No endpoint in config, loading from cached storage")
-                    if (cachedLogsUrl != null) {
-                        EndpointConfiguration(
-                            URL(cachedTracesUrl),
-                            URL(cachedLogsUrl)
-                        )
-                    } else {
-                        EndpointConfiguration(URL(cachedTracesUrl))
-                    }
-                } else {
-                    null
-                }
-            }
-
-            if (effectiveEndpoint == null) {
+            if (agentConfiguration.endpoint == null) {
                 Logger.w(
                     TAG,
                     "Agent installed without endpoint configuration. " +
-                        "Data will be buffered, but not sent until you set an endpoint via " +
+                        "Data will be buffered but not sent until you set an endpoint via " +
                         "SplunkRum.instance.preferences.endpointConfiguration = EndpointConfiguration(...)"
                 )
             }
@@ -358,7 +339,7 @@ class SplunkRum private constructor(
                 agentStorage = storage,
                 agentConfiguration = agentConfiguration,
                 openTelemetry = openTelemetry,
-                endpointRef = AtomicReference(effectiveEndpoint),
+                endpointRef = AtomicReference(agentConfiguration.endpoint),
                 userManager = userManager,
                 sessionManager = sessionManager
             )

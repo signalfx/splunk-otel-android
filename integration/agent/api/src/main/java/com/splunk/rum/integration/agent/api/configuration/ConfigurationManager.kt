@@ -29,7 +29,11 @@ internal class ConfigurationManager private constructor(private val agentStorage
             config = config.copy(appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName)
         }
 
-        config.endpoint?.let { endpoint ->
+        if (config.endpoint == null) {
+            agentStorage.deleteTracesBaseUrl()
+            agentStorage.deleteLogsBaseUrl()
+        } else {
+            val endpoint = config.endpoint
             agentStorage.writeTracesBaseUrl(endpoint.traceEndpoint.toExternalForm())
             endpoint.sessionReplayEndpoint?.let { logsUrl ->
                 agentStorage.writeLogsBaseUrl(logsUrl.toExternalForm())
