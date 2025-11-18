@@ -23,10 +23,10 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration
 
 internal class ConfigurationManager private constructor(private val agentStorage: IAgentStorage) {
     fun preProcessConfiguration(context: Context, proposalConfig: AgentConfiguration): AgentConfiguration {
-        var config = proposalConfig.copy()
-
-        if (config.appVersion == null) {
-            config = config.copy(appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName)
+        val config = if (proposalConfig.appVersion == null) {
+            proposalConfig.copy(appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName)
+        } else {
+            proposalConfig
         }
 
         if (config.endpoint == null) {
