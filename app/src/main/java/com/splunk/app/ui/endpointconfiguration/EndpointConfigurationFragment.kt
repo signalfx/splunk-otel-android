@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.splunk.app.BuildConfig
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentEndpointConfigurationBinding
 import com.splunk.app.ui.BaseFragment
@@ -52,14 +53,16 @@ class EndpointConfigurationFragment : BaseFragment<FragmentEndpointConfiguration
     }
 
     /**
-     * Sets endpoint configuration using realm and token.
-     * Please replace the fields with the actual realm and token you want to test this API with
+     * Sets endpoint configuration using realm and token, uses fields from BuildConfig
      */
     private fun setEndpointWithRealmToken() {
         Log.i(TAG, "Setting endpoint with realm and token")
         try {
             SplunkRum.instance.preferences.endpointConfiguration =
-                EndpointConfiguration(realm = "us0", rumAccessToken = "abc123")
+                EndpointConfiguration(
+                    realm = BuildConfig.SPLUNK_REALM,
+                    rumAccessToken = BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
+                )
             showToast("Endpoint set with realm and token")
             logCurrentEndpoints()
         } catch (e: Exception) {
@@ -70,13 +73,17 @@ class EndpointConfigurationFragment : BaseFragment<FragmentEndpointConfiguration
 
     /**
      * Sets endpoint configuration with traces URL only.
-     * Please replace the fields with the actual URL you want to test with
+     * Uses BuildConfig fields to generate the URL in the same format as the constructor.
      */
     private fun setEndpointWithTracesOnly() {
         Log.i(TAG, "Setting endpoint with traces only")
         try {
+            val realm = BuildConfig.SPLUNK_REALM
+            val token = BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
+            val tracesUrl = URL("https://rum-ingest.$realm.signalfx.com/v1/traces?auth=$token")
+
             SplunkRum.instance.preferences.endpointConfiguration =
-                EndpointConfiguration(URL("https://custom-traces.example.com/v1/traces"))
+                EndpointConfiguration(tracesUrl)
             showToast("Endpoint set with traces only")
             logCurrentEndpoints()
         } catch (e: Exception) {
@@ -87,16 +94,18 @@ class EndpointConfigurationFragment : BaseFragment<FragmentEndpointConfiguration
 
     /**
      * Sets endpoint configuration with both traces and logs URLs.
-     * Please replace the fields with the actual URLs you want to test with
+     * Uses BuildConfig fields to generate the URLs in the same format as the constructor.
      */
     private fun setEndpointWithTracesAndLogs() {
         Log.i(TAG, "Setting endpoint with traces and logs")
         try {
+            val realm = BuildConfig.SPLUNK_REALM
+            val token = BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
+            val tracesUrl = URL("https://rum-ingest.$realm.signalfx.com/v1/traces?auth=$token")
+            val logsUrl = URL("https://rum-ingest.$realm.signalfx.com/v1/logs?auth=$token")
+
             SplunkRum.instance.preferences.endpointConfiguration =
-                EndpointConfiguration(
-                    URL("https://custom-traces.example.com/v1/traces"),
-                    URL("https://custom-logs.example.com/v1/logs")
-                )
+                EndpointConfiguration(tracesUrl, logsUrl)
             showToast("Endpoint set with traces and logs")
             logCurrentEndpoints()
         } catch (e: Exception) {
