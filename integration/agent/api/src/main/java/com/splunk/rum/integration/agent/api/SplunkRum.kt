@@ -334,11 +334,13 @@ class SplunkRum private constructor(
                 moduleConfigurations.toList()
             )
 
+            val endpointRef = AtomicReference(agentConfiguration.endpoint)
+
             instanceInternal = SplunkRum(
                 agentStorage = storage,
                 agentConfiguration = agentConfiguration,
                 openTelemetry = openTelemetry,
-                endpointRef = AtomicReference(agentConfiguration.endpoint),
+                endpointRef = endpointRef,
                 userManager = userManager,
                 sessionManager = sessionManager
             )
