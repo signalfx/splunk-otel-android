@@ -58,10 +58,8 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 Interactions.updateWireframe(frame)
             }
         }
-
-        Interactions.listeners += interactionsListener
-
         setupComposeIdentification()
+        Interactions.listeners += interactionsListener
     }
 
     private fun setupComposeIdentification() {

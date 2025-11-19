@@ -23,14 +23,31 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration
 
 internal class ConfigurationManager private constructor(private val agentStorage: IAgentStorage) {
     fun preProcessConfiguration(context: Context, proposalConfig: AgentConfiguration): AgentConfiguration {
-        var config = proposalConfig.copy()
-
-        if (config.appVersion == null) {
-            config = config.copy(appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName)
+        val config = if (proposalConfig.appVersion == null) {
+            proposalConfig.copy(appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName)
+        } else {
+            proposalConfig
         }
 
-        agentStorage.writeLogsBaseUrl(config.endpoint.sessionReplayEndpoint!!.toExternalForm())
-        agentStorage.writeTracesBaseUrl(config.endpoint.traceEndpoint!!.toExternalForm())
+        if (config.endpoint == null) {
+            Logger.w(
+                TAG,
+                "Agent installed without endpoint configuration. " +
+                    "Data will be buffered but not sent until you configure an endpoint."
+            )
+            agentStorage.deleteTracesBaseUrl()
+            agentStorage.deleteLogsBaseUrl()
+        } else {
+            val endpoint = config.endpoint
+            agentStorage.writeTracesBaseUrl(endpoint.traceEndpoint.toExternalForm())
+            endpoint.sessionReplayEndpoint?.let { logsUrl ->
+                agentStorage.writeLogsBaseUrl(logsUrl.toExternalForm())
+                Logger.d(TAG, "Trace and session replay endpoint URLs written to storage")
+            } ?: run {
+                agentStorage.deleteLogsBaseUrl()
+                Logger.d(TAG, "Trace endpoint URL written to storage, session replay endpoint not configured")
+            }
+        }
 
         Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
 

@@ -20,6 +20,8 @@ import android.app.Application
 import android.content.Context
 import android.os.SystemClock
 import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.RumConstants.RUM_TRACER_NAME
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
@@ -58,9 +60,9 @@ class AgentIntegration private constructor(context: Context) {
     fun install(context: Context, openTelemetry: OpenTelemetrySdk, moduleConfigurations: List<ModuleConfiguration>) {
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
-                // TODO
-                openTelemetry.sdkLoggerProvider.get("TODO")
+                openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME)
                     .logRecordBuilder()
+                    .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, "session.start")
                     .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
                     .setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
                     .setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
@@ -98,6 +100,8 @@ class AgentIntegration private constructor(context: Context) {
         private var instanceInternal: AgentIntegration? = null
 
         val modules = HashMap<String, Module>()
+
+        var lowestApiLevel: Int = Constants.LOWEST_RUNTIME_API_LEVEL
 
         val instance: AgentIntegration
             get() = instanceInternal

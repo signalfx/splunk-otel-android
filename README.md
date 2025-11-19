@@ -45,7 +45,7 @@ The agent is composed of several modules, each responsible for a specific type o
 For complete setup instructions with code examples and advanced configuration options, please refer to the [official documentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
 
 #### Requirements
-* Android API Level 24+ (Android 7.0)
+* Android API Level 24 is the default minimum supported version. However, API Levels 21, 22, and 23 can also be supported by enabling the forceEnableOnLowerApi to true in the AgentConfiguration
 * Android Gradle Plugin 8.6.0+
 * Java 8+ compatibility with core library desugaring
 

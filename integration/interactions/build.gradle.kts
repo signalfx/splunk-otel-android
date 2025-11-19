@@ -31,4 +31,7 @@ dependencies {
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingInteractions)
 
     compileOnly(Dependencies.Android.Compose.ui)
+
+    implementation(platform(Dependencies.Otel.androidBom))
+    implementation(Dependencies.Otel.androidInstrumentation)
 }

@@ -49,5 +49,6 @@ internal object AnrModuleIntegration : ModuleIntegration<AnrModuleConfiguration>
         } else {
             Logger.d(TAG, "ANR reporting is disabled")
         }
+        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 }

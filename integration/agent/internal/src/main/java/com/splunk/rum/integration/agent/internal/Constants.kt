@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package com.splunk.app.lib
+package com.splunk.rum.integration.agent.internal
 
-import com.splunk.app.BuildConfig
-
-object TestConstants {
-    const val DEFAULT_NETWORK_TIMEOUT = 120_000L
-    const val DEFAULT_MELT_TIMEOUT = 20_000L
-    const val ZIPKIN_URL = BuildConfig.IP_ADDRESS
+object Constants {
+    const val LOWEST_RUNTIME_API_LEVEL = 24
+    const val LOWEST_EXPERIMENTAL_RUNTIME_API_LEVEL = 21
 }
