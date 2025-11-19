@@ -64,11 +64,11 @@ class AgentPreferences internal constructor(
                 endpointRef.set(value)
 
                 Logger.d(TAG, "Endpoint configured, flushing cached data")
+            }
 
-                (openTelemetry as? OpenTelemetrySdk)?.let { sdk ->
-                    sdk.sdkTracerProvider?.forceFlush()
-                    sdk.sdkLoggerProvider?.forceFlush()
-                }
+            (openTelemetry as? OpenTelemetrySdk)?.let { sdk ->
+                sdk.sdkTracerProvider?.forceFlush()
+                sdk.sdkLoggerProvider?.forceFlush()
             }
         }
 
