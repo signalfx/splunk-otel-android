@@ -37,7 +37,11 @@ internal class ConfigurationManager private constructor(private val agentStorage
             agentStorage.writeTracesBaseUrl(endpoint.traceEndpoint.toExternalForm())
             endpoint.sessionReplayEndpoint?.let { logsUrl ->
                 agentStorage.writeLogsBaseUrl(logsUrl.toExternalForm())
-            } ?: agentStorage.deleteLogsBaseUrl()
+                Logger.d(TAG, "Trace and session replay endpoint URLs written to storage")
+            } ?: run {
+                agentStorage.deleteLogsBaseUrl()
+                Logger.d(TAG, "Trace endpoint URL written to storage, session replay endpoint not configured")
+            }
         }
 
         Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")

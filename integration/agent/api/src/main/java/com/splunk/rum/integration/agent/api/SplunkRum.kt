@@ -318,7 +318,7 @@ class SplunkRum private constructor(
                 Logger.w(
                     TAG,
                     "Agent installed without endpoint configuration. " +
-                            "Data will be buffered but not sent until you configure an endpoint."
+                        "Data will be buffered but not sent until you configure an endpoint."
                 )
             }
 
