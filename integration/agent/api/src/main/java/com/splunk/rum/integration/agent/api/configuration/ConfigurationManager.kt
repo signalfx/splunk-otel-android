@@ -30,6 +30,11 @@ internal class ConfigurationManager private constructor(private val agentStorage
         }
 
         if (config.endpoint == null) {
+            Logger.w(
+                TAG,
+                "Agent installed without endpoint configuration. " +
+                    "Data will be buffered but not sent until you configure an endpoint."
+            )
             agentStorage.deleteTracesBaseUrl()
             agentStorage.deleteLogsBaseUrl()
         } else {

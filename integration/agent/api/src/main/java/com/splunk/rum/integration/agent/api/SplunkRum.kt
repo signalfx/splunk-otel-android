@@ -314,14 +314,6 @@ class SplunkRum private constructor(
 
             val storage = AgentStorage.attach(application)
 
-            if (agentConfiguration.endpoint == null) {
-                Logger.w(
-                    TAG,
-                    "Agent installed without endpoint configuration. " +
-                        "Data will be buffered but not sent until you configure an endpoint."
-                )
-            }
-
             val userManager = UserManager(agentConfiguration.user.trackingMode.toInternal())
 
             val sessionManager = AgentIntegration.obtainInstance(application).sessionManager
