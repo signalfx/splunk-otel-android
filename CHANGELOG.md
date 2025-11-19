@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Version 2.1.0 - 2025-11-19
+* Added support for setting EndpointConfiguration after Agent installation
+* Added forceEnableOnLowerApi flag to enable runtime support on devices API 21, 22, and 23
+* Add app.installation.id attribute to all signals to uniquely identify application installation
+
+### Version 2.0.4 - 2025-11-04
+* Fixed Proguard configuration to properly repackage modules and avoid conflicts with other obfuscated libraries.
+* Added full support for all FragmentX versions for better Android compatibility.
+* Removed desugaring from the agent — it must now be configured at the app level.
+* Fixed missing Splunk Info metadata in POM files during publication.
+
 ### Version 2.0.3 - 2025-10-22
 * Fixed startup with splash screen
 * Add callback for new sessions and emit log record event based on that
