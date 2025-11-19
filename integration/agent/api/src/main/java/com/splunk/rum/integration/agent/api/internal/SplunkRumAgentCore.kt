@@ -74,9 +74,10 @@ internal object SplunkRumAgentCore {
 
         val storage = AgentStorage.attach(application)
 
-        val appInstallationID = storage.readAppInstallationId() ?: UUID.randomUUID().toString().also {
-            storage.writeAppInstallationId(it)
-        }
+        val appInstallationID = storage.readAppInstallationId()
+            ?: UUID.randomUUID().toString().replace("-", "").also {
+                storage.writeAppInstallationId(it)
+            }
 
         val finalConfiguration = ConfigurationManager
             .obtainInstance(storage)
