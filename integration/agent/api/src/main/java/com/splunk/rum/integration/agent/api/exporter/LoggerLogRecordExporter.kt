@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.agent.api.exporter
 
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.forEachFast
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
@@ -32,11 +33,17 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
             return CompletableResultCode.ofFailure()
         }
 
-        for (log in logs) {
+        logs.forEachFast { log ->
             val instrumentationScopeInfo = log.instrumentationScopeInfo
+            val bodyValue = log.bodyValue
+            val bodyInfo = if (bodyValue.toString().startsWith("ValueBytes{")) {
+                "ValueBytes(size=${bodyValue.toString().length} chars)"
+            } else {
+                bodyValue.toString()
+            }
             Logger.i(
                 TAG,
-                "bodyValue=${log.bodyValue}, " +
+                "bodyValue=$bodyInfo, " +
                     "severityText=${log.severityText}, " +
                     "severity=${log.severity}, " +
                     "timestampEpochNanos=${log.timestampEpochNanos}, " +
