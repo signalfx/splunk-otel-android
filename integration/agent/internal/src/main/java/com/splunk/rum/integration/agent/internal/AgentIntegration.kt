@@ -75,12 +75,10 @@ class AgentIntegration private constructor(context: Context) {
         val seenConfigurationNames = mutableSetOf<String>()
 
         for (config in moduleConfigurations) {
-            if (seenConfigurationNames.contains(config.name)) {
+            if (!seenConfigurationNames.add(config.name)) {
                 Logger.w(TAG, "Duplicate module configuration: ${config.javaClass.name} was ignored.")
                 continue
             }
-
-            seenConfigurationNames.add(config.name)
             val module = modules[config.name] ?: Module(config.name)
             modules[config.name] = module.copy(configuration = config)
         }
