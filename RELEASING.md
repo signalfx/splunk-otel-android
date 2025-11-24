@@ -21,26 +21,30 @@ Follow these steps to perform a release:
    - Update relevant files (`CHANGELOG.md`, `README.md`, etc.) with release notes.
    - Commit the changes to the `release/X.Y.Z` branch.
 
-5. **Create a release PR**
+5. **Update the issue template**
+   - In the [bug report issue template](https://github.com/signalfx/splunk-otel-android/blob/develop/.github/ISSUE_TEMPLATE/bug.yml), ensure that the newly released version is **added to the top of the list** in the `Agent Version` section.
+   - Commit this change to the `release/X.Y.Z` branch.
+
+6. **Create a release PR**
    - Open a pull request from `release/X.Y.Z` → `main`.
    - Wait for the CI pipeline to complete successfully.
 
-6. **Tag the release**
+7. **Tag the release**
    - If CI passes, run the `script/tag-release.sh` script to create and push a **signed release tag**.
    - Note: The script assumes the remote is named `origin`. If your remote has a different name, you may need to push the tag manually.
 
-7. **Publish the release**
+8. **Publish the release**
    - Wait for GitLab to run the release job.
    - If successful, it will automatically close and release the “staging” repository.
    - The build will then be published to Sonatype and appear in Maven within a few hours (up to a day).
 
-8. **Merge to main**
+9. **Merge to main**
    - Once the release is verified, merge the PR into the `main` branch.
 
-9. **Create Github Release**
-   - Once this PR is merged, create a release in **GitHub** that points to the newly created version.
-   - Make sure to provide release notes that at least mirror the contents of `CHANGELOG.md`.
+10. **Create GitHub Release**
+    - Once this PR is merged, create a release in **GitHub** that points to the newly created version.
+    - Make sure to provide release notes that at least mirror the contents of `CHANGELOG.md`.
 
-9. **Sync with develop**
-   - Create a new PR from `main` → `develop` to synchronize branches.
-   - Resolve any conflicts if they occur and merge the PR.
+11. **Sync with develop**
+    - Create a new PR from `main` → `develop` to synchronize branches.
+    - Resolve any conflicts if they occur and merge the PR.
