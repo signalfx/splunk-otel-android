@@ -45,25 +45,21 @@ enum class InternalUserTrackingMode {
     ANONYMOUS_TRACKING
 }
 
-
-private fun InternalUserTrackingMode.initialUserId(): String? =
-    when (this) {
-        InternalUserTrackingMode.NO_TRACKING -> null
-        InternalUserTrackingMode.ANONYMOUS_TRACKING -> NanoId.generate()
-    }
+private fun InternalUserTrackingMode.initialUserId(): String? = when (this) {
+    InternalUserTrackingMode.NO_TRACKING -> null
+    InternalUserTrackingMode.ANONYMOUS_TRACKING -> NanoId.generate()
+}
 
 private fun InternalUserTrackingMode.updatedUserId(
     currentTrackingMode: InternalUserTrackingMode,
     currentUserId: String?
-): String? {
-    return when (this) {
-        InternalUserTrackingMode.NO_TRACKING -> null
-        InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
-            if (currentTrackingMode == InternalUserTrackingMode.ANONYMOUS_TRACKING && currentUserId != null) {
-                currentUserId
-            } else {
-                NanoId.generate()
-            }
+): String? = when (this) {
+    InternalUserTrackingMode.NO_TRACKING -> null
+    InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
+        if (currentTrackingMode == InternalUserTrackingMode.ANONYMOUS_TRACKING && currentUserId != null) {
+            currentUserId
+        } else {
+            NanoId.generate()
         }
     }
 }

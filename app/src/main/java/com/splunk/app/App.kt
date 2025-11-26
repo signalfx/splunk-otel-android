@@ -131,7 +131,6 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-
         HttpURLModuleConfiguration()
 
         val moduleConfigurations = arrayOf(
