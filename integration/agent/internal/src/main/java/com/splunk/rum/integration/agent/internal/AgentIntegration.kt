@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.internal
 import android.app.Application
 import android.content.Context
 import android.os.SystemClock
+import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.common.otel.internal.RumConstants.RUM_TRACER_NAME
@@ -71,11 +72,16 @@ class AgentIntegration private constructor(context: Context) {
         }
         sessionManager.install(context)
 
+        val seenConfigurationNames = mutableSetOf<String>()
+
         for (config in moduleConfigurations) {
+            if (!seenConfigurationNames.add(config.name)) {
+                Logger.w(TAG, "Duplicate module configuration: ${config.javaClass.name} was ignored.")
+                continue
+            }
             val module = modules[config.name] ?: Module(config.name)
             modules[config.name] = module.copy(configuration = config)
         }
-
         val oTelInstallationContext =
             InstallationContext(context.applicationContext as Application, openTelemetry, oTelSessionManager)
         listeners.forEachFast { it.onInstall(context, oTelInstallationContext, moduleConfigurations) }
