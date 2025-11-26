@@ -1,19 +1,3 @@
-/*
- * Copyright 2025 Splunk Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.splunk.rum.integration.agent.internal.user
 
 import com.splunk.android.common.id.NanoId
@@ -24,17 +8,15 @@ interface IUserManager {
 }
 
 class UserManager(userTrackingMode: InternalUserTrackingMode) : IUserManager {
+
+    override var userId: String? = userTrackingMode.initialUserId()
+        private set
+
     override var trackingMode: InternalUserTrackingMode = userTrackingMode
         set(value) {
-            userId = when (value) {
-                InternalUserTrackingMode.NO_TRACKING -> null
-                InternalUserTrackingMode.ANONYMOUS_TRACKING -> NanoId.generate()
-            }
+            userId = value.updatedUserId(currentTrackingMode = field, currentUserId = userId)
             field = value
         }
-
-    override var userId: String? = null
-        private set
 }
 
 object NoOpUserManager : IUserManager {
@@ -45,4 +27,27 @@ object NoOpUserManager : IUserManager {
 enum class InternalUserTrackingMode {
     NO_TRACKING,
     ANONYMOUS_TRACKING
+}
+
+
+private fun InternalUserTrackingMode.initialUserId(): String? =
+    when (this) {
+        InternalUserTrackingMode.NO_TRACKING -> null
+        InternalUserTrackingMode.ANONYMOUS_TRACKING -> NanoId.generate()
+    }
+
+private fun InternalUserTrackingMode.updatedUserId(
+    currentTrackingMode: InternalUserTrackingMode,
+    currentUserId: String?
+): String? {
+    return when (this) {
+        InternalUserTrackingMode.NO_TRACKING -> null
+        InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
+            if (currentTrackingMode == InternalUserTrackingMode.ANONYMOUS_TRACKING && currentUserId != null) {
+                currentUserId
+            } else {
+                NanoId.generate()
+            }
+        }
+    }
 }
