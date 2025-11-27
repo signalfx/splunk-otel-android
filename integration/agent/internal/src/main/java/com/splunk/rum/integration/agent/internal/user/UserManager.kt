@@ -24,17 +24,15 @@ interface IUserManager {
 }
 
 class UserManager(userTrackingMode: InternalUserTrackingMode) : IUserManager {
+
+    override var userId: String? = userTrackingMode.initialUserId()
+        private set
+
     override var trackingMode: InternalUserTrackingMode = userTrackingMode
         set(value) {
-            userId = when (value) {
-                InternalUserTrackingMode.NO_TRACKING -> null
-                InternalUserTrackingMode.ANONYMOUS_TRACKING -> NanoId.generate()
-            }
+            userId = value.updatedUserId(currentTrackingMode = field, currentUserId = userId)
             field = value
         }
-
-    override var userId: String? = null
-        private set
 }
 
 object NoOpUserManager : IUserManager {
@@ -45,4 +43,23 @@ object NoOpUserManager : IUserManager {
 enum class InternalUserTrackingMode {
     NO_TRACKING,
     ANONYMOUS_TRACKING
+}
+
+private fun InternalUserTrackingMode.initialUserId(): String? = when (this) {
+    InternalUserTrackingMode.NO_TRACKING -> null
+    InternalUserTrackingMode.ANONYMOUS_TRACKING -> NanoId.generate()
+}
+
+private fun InternalUserTrackingMode.updatedUserId(
+    currentTrackingMode: InternalUserTrackingMode,
+    currentUserId: String?
+): String? = when (this) {
+    InternalUserTrackingMode.NO_TRACKING -> null
+    InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
+        if (currentTrackingMode == InternalUserTrackingMode.ANONYMOUS_TRACKING && currentUserId != null) {
+            currentUserId
+        } else {
+            NanoId.generate()
+        }
+    }
 }
