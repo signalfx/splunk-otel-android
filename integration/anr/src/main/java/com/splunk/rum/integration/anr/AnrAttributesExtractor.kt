@@ -8,8 +8,7 @@ import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context as OtelContext
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 
-internal class AnrAttributesExtractor(context: Context) :
-    AttributesExtractor<Array<StackTraceElement>, Void> {
+internal class AnrAttributesExtractor(context: Context) : AttributesExtractor<Array<StackTraceElement>, Void> {
 
     private val appStateObserver = AppStateObserver()
     private var isForeground = false
