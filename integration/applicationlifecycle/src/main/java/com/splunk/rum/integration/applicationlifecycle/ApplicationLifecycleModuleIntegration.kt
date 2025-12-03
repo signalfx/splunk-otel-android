@@ -22,7 +22,6 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
@@ -108,8 +107,8 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
 
     private val AppState.attributeValue: String
         get() = when (this) {
-            AppState.CREATED -> "created"
-            AppState.FOREGROUND -> "foreground"
-            AppState.BACKGROUND -> "background"
+            AppState.CREATED -> RumConstants.APP_STATE_CREATED
+            AppState.FOREGROUND -> RumConstants.APP_STATE_FOREGROUND
+            AppState.BACKGROUND -> RumConstants.APP_STATE_BACKGROUND
         }
 }
