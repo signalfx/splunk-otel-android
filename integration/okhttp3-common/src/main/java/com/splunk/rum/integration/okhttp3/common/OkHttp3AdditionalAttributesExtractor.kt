@@ -37,10 +37,24 @@ class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Cha
         response: Response?,
         error: Throwable?
     ) {
-        onResponse(attributes, response)
+        addPayloadAttributes(attributes, chain, response)
+        addServerContext(attributes, response)
     }
 
-    private fun onResponse(attributes: AttributesBuilder, response: Response?) {
+    private fun addPayloadAttributes(attributes: AttributesBuilder, chain: Interceptor.Chain, response: Response?) {
+        val requestBodySize: Long? = chain.request().header("content-length")?.toLongOrNull()?.sanitizeUnknown()
+        attributes.put(RumConstants.HTTP_REQUEST_BODY_SIZE, requestBodySize)
+
+        if (response != null) {
+            val responseBodySize: Long? = response.header("content-length")?.toLongOrNull()?.sanitizeUnknown()
+            attributes.put(RumConstants.HTTP_RESPONSE_BODY_SIZE, responseBodySize)
+        }
+    }
+
+    // HTTP spec uses -1 to indicate unknown length. Return null instead of -1.
+    private fun Long?.sanitizeUnknown(): Long? = if (this != null && this >= 0) this else null
+
+    private fun addServerContext(attributes: AttributesBuilder, response: Response?) {
         response?.headers?.forEach { header ->
             if (!header.first.equals(RumConstants.SERVER_TIMING_HEADER, ignoreCase = true)) {
                 return@forEach

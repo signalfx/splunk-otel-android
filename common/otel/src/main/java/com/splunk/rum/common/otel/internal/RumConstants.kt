@@ -58,4 +58,8 @@ object RumConstants {
     val APP_STATE_KEY: AttributeKey<String> = AttributeKey.stringKey("android.app.state")
     val SESSION_REPLAY_KEY: AttributeKey<String> = AttributeKey.stringKey("splunk.sessionReplay")
     val SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.id")
+
+    val HTTP_REQUEST_BODY_SIZE: AttributeKey<Long?> = AttributeKey.longKey("http.request.body.size")
+    val HTTP_RESPONSE_BODY_SIZE: AttributeKey<Long?> =
+        AttributeKey.longKey("http.response.body.size")
 }

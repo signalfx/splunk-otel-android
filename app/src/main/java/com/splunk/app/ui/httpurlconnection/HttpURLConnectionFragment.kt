@@ -204,6 +204,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 connection.doOutput = true
                 connection.setRequestProperty("Content-Type", "text/plain")
                 connection.setRequestProperty("Accept", "application/json")
+                connection.setRequestProperty("Content-Length", requestBody.toByteArray(Charsets.UTF_8).size.toString())
 
                 connection.outputStream.bufferedWriter().use { it.write(requestBody) }
 
