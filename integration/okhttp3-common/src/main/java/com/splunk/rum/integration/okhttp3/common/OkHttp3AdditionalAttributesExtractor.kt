@@ -42,11 +42,11 @@ class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Cha
     }
 
     private fun addPayloadAttributes(attributes: AttributesBuilder, chain: Interceptor.Chain, response: Response?) {
-        val requestBodySize: Long? = chain.request().header("content-length")?.toLongOrNull()?.sanitizeUnknown()
+        val requestBodySize: Long? = chain.request().header("Content-Length")?.toLongOrNull()?.sanitizeUnknown()
         attributes.put(RumConstants.HTTP_REQUEST_BODY_SIZE, requestBodySize)
 
         if (response != null) {
-            val responseBodySize: Long? = response.header("content-length")?.toLongOrNull()?.sanitizeUnknown()
+            val responseBodySize: Long? = response.header("Content-Length")?.toLongOrNull()?.sanitizeUnknown()
             attributes.put(RumConstants.HTTP_RESPONSE_BODY_SIZE, responseBodySize)
         }
     }
