@@ -23,6 +23,7 @@ import com.splunk.rum.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
+import com.splunk.rum.integration.agent.api.exporter.LoggerLogRecordExporter
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.resource.AgentResource
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
@@ -38,6 +39,7 @@ import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import java.util.UUID
 
@@ -72,9 +74,10 @@ internal object SplunkRumAgentCore {
 
         val storage = AgentStorage.attach(application)
 
-        val appInstallationID = storage.readAppInstallationId() ?: UUID.randomUUID().toString().also {
-            storage.writeAppInstallationId(it)
-        }
+        val appInstallationID = storage.readAppInstallationId()
+            ?: UUID.randomUUID().toString().replace("-", "").also {
+                storage.writeAppInstallationId(it)
+            }
 
         val finalConfiguration = ConfigurationManager
             .obtainInstance(storage)
@@ -101,7 +104,9 @@ internal object SplunkRumAgentCore {
             .addLogRecordProcessor(SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager))
 
         if (agentConfiguration.enableDebugLogging) {
-            initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
+            initializer
+                .addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
+                .addLogRecordProcessor(SimpleLogRecordProcessor.create(LoggerLogRecordExporter()))
         }
 
         val openTelemetry = initializer.build()

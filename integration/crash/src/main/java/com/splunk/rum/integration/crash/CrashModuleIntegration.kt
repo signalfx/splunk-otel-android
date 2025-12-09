@@ -44,7 +44,7 @@ internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfigurat
         if (isEnabled) {
             Logger.d(TAG, "Installing crash reporter")
             val crashReporterInstrumentation = CrashReporterInstrumentation()
-            crashReporterInstrumentation.addAttributesExtractor(CrashAttributesExtractor())
+            crashReporterInstrumentation.addAttributesExtractor(CrashAttributesExtractor(context))
             crashReporterInstrumentation.install(oTelInstallationContext)
         } else {
             Logger.d(TAG, "Crash reporting is disabled")

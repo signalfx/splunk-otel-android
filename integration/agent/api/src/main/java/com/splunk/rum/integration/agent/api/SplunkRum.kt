@@ -46,6 +46,7 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.api.trace.Span
+import java.net.URL
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import okhttp3.Call
@@ -311,6 +312,8 @@ class SplunkRum private constructor(
                 )
             }
 
+            val storage = AgentStorage.attach(application)
+
             val userManager = UserManager(agentConfiguration.user.trackingMode.toInternal())
 
             val sessionManager = AgentIntegration.obtainInstance(application).sessionManager
@@ -323,10 +326,13 @@ class SplunkRum private constructor(
                 moduleConfigurations.toList()
             )
 
+            val endpointRef = AtomicReference(agentConfiguration.endpoint)
+
             instanceInternal = SplunkRum(
-                agentStorage = AgentStorage.attach(application),
+                agentStorage = storage,
                 agentConfiguration = agentConfiguration,
                 openTelemetry = openTelemetry,
+                endpointRef = endpointRef,
                 userManager = userManager,
                 sessionManager = sessionManager
             )

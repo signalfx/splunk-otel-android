@@ -93,7 +93,7 @@ class App : Application() {
     }
 
     private val userConfiguration = UserConfiguration(
-        trackingMode = UserTrackingMode.NO_TRACKING
+        trackingMode = UserTrackingMode.ANONYMOUS_TRACKING
     )
 
     private val sessionConfiguration = SessionConfiguration(
@@ -130,6 +130,8 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        HttpURLModuleConfiguration()
 
         val moduleConfigurations = arrayOf(
             httpURLModuleConfiguration,
