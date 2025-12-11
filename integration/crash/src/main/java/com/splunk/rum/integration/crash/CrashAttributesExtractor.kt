@@ -14,7 +14,7 @@ internal class CrashAttributesExtractor(context: Context) : AttributesExtractor<
 
     private val crashHappened = AtomicBoolean(false)
     private val appStateObserver = AppStateObserver()
-    private var isForeground = false
+    private var appState: String? = null
 
     init {
         appStateObserver.listener = AppStateObserverListener()
@@ -34,9 +34,7 @@ internal class CrashAttributesExtractor(context: Context) : AttributesExtractor<
         }
         attributes.put(RumConstants.COMPONENT_KEY, component)
         attributes.put(RumConstants.ERROR_KEY, "true")
-
-        val appState = if (isForeground) RumConstants.APP_STATE_FOREGROUND else RumConstants.APP_STATE_BACKGROUND
-        attributes.put(RumConstants.APP_STATE_KEY, appState)
+        appState?.let { attributes.put(RumConstants.APP_STATE_KEY, it) }
     }
 
     override fun onEnd(
@@ -51,19 +49,19 @@ internal class CrashAttributesExtractor(context: Context) : AttributesExtractor<
     private inner class AppStateObserverListener : AppStateObserver.Listener {
 
         override fun onAppStarted() {
-            isForeground = true
+            appState = RumConstants.APP_STATE_CREATED
         }
 
         override fun onAppForegrounded() {
-            isForeground = true
+            appState = RumConstants.APP_STATE_FOREGROUND
         }
 
         override fun onAppBackgrounded() {
-            isForeground = false
+            appState = RumConstants.APP_STATE_BACKGROUND
         }
 
         override fun onAppClosed() {
-            isForeground = false
+            appState = RumConstants.APP_STATE_BACKGROUND
         }
     }
 }

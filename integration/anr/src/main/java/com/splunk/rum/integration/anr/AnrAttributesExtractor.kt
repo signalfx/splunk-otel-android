@@ -11,7 +11,7 @@ import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 internal class AnrAttributesExtractor(context: Context) : AttributesExtractor<Array<StackTraceElement>, Void> {
 
     private val appStateObserver = AppStateObserver()
-    private var isForeground = false
+    private var appState: String? = null
 
     init {
         appStateObserver.listener = AppStateObserverListener()
@@ -25,9 +25,7 @@ internal class AnrAttributesExtractor(context: Context) : AttributesExtractor<Ar
     ) {
         attributes.put(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
         attributes.put(RumConstants.ERROR_KEY, "true")
-
-        val appState = if (isForeground) RumConstants.APP_STATE_FOREGROUND else RumConstants.APP_STATE_BACKGROUND
-        attributes.put(RumConstants.APP_STATE_KEY, appState)
+        appState?.let { attributes.put(RumConstants.APP_STATE_KEY, it) }
     }
 
     override fun onEnd(
@@ -42,19 +40,19 @@ internal class AnrAttributesExtractor(context: Context) : AttributesExtractor<Ar
     private inner class AppStateObserverListener : AppStateObserver.Listener {
 
         override fun onAppStarted() {
-            isForeground = true
+            appState = RumConstants.APP_STATE_CREATED
         }
 
         override fun onAppForegrounded() {
-            isForeground = true
+            appState = RumConstants.APP_STATE_FOREGROUND
         }
 
         override fun onAppBackgrounded() {
-            isForeground = false
+            appState = RumConstants.APP_STATE_BACKGROUND
         }
 
         override fun onAppClosed() {
-            isForeground = false
+            appState = RumConstants.APP_STATE_BACKGROUND
         }
     }
 }
