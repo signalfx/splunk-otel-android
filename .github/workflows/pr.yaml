@@ -11,7 +11,7 @@ jobs:
   check_codestyle:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.3.0
+      - uses: actions/checkout@v4.3.1
       - name: Set up JDK 17 for running Gradle
         uses: actions/setup-java@v4.7.1
         with:
@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4.3.0
+      - uses: actions/checkout@v4.3.1
       - name: Set up JDK 17 for running Gradle
         uses: actions/setup-java@v4.7.1
         with:
@@ -34,7 +34,7 @@ jobs:
   unit_tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.3.0
+      - uses: actions/checkout@v4.3.1
       - name: Set up JDK 17 for running Gradle
         uses: actions/setup-java@v4.7.1
         with:
@@ -48,7 +48,7 @@ jobs:
       matrix:
         api-level: [ 29 ]
     steps:
-      - uses: actions/checkout@v4.3.0
+      - uses: actions/checkout@v4.3.1
       - name: Set up JDK 17 for running Gradle
         uses: actions/setup-java@v4.7.1
         with:
@@ -90,7 +90,7 @@ jobs:
   jacoco_test_coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.3.0
+      - uses: actions/checkout@v4.3.1
       - name: Set up JDK 17 for running Gradle
         uses: actions/setup-java@v4.7.1
         with:
@@ -105,7 +105,7 @@ jobs:
   check_links:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.3.0
+      - uses: actions/checkout@v4.3.1
       - name: Link Checker
         uses: lycheeverse/lychee-action@v2.7.0
         with:

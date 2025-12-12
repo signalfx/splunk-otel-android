@@ -615,6 +615,15 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             .url(url)
             .post(requestBody)
 
+        // Add "Content-Length" if known and not already present in headers
+        val hasContentLength = headers?.keys?.any { it.equals("Content-Length", ignoreCase = true) } == true
+        if (!hasContentLength) {
+            val contentLength = requestBody.contentLength()
+            if (contentLength >= 0) {
+                requestBuilder.addHeader("Content-Length", contentLength.toString())
+            }
+        }
+
         headers?.forEach { (key, value) ->
             requestBuilder.addHeader(key, value)
         }
