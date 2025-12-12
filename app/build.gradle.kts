@@ -46,6 +46,7 @@ android {
         getByName("debug") {
             resValue("bool", "leak_canary_add_launcher_icon", "false")
             val ip = InetAddress.getLocalHost().hostAddress
+            isMinifyEnabled = true
             buildConfigField("String", "IP_ADDRESS", "\"$ip\"")
         }
         getByName("release") {

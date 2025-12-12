@@ -118,23 +118,21 @@ class MappingFileUploadClient(private val logger: SplunkLogger) {
         val responseCode = try {
             connection.responseCode
         } catch (e: IOException) {
-            // Connection closed by server before response could be read
+            // HttpURLConnection failed to read the server's error response
             logger.error("Upload", "HTTP operation failed: ${e.message}")
 
-            logger.error("Upload", "Could not read server error details")
-            logger.error("Upload", "The server closed the connection before sending a complete response.")
-            logger.error("Upload", "This is a known limitation with large file uploads using Java's HttpURLConnection.")
-            logger.error("Upload", "")
             logger.error(
                 "Upload",
-                "To get the actual server error response, try uploading with curl (copy as single line):"
+                "Could not read server error response due to HttpURLConnection limitation when handling upload errors"
             )
-            logger.error("Upload", "")
+            logger.error(
+                "Upload",
+                "For additional diagnostics, you can try the upload with curl (copy as single line):"
+            )
             logger.error(
                 "Upload",
                 "curl -X PUT \"https://api.$realm.signalfx.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId\" -H \"X-SF-Token: YOUR_API_TOKEN_HERE\" -F \"filename=${mappingFile.name}\" -F \"file=@${mappingFile.absolutePath}\""
             )
-            logger.error("Upload", "")
             logger.error("Upload", "Replace YOUR_API_TOKEN_HERE with your actual API access token.")
 
             throw e

@@ -123,19 +123,17 @@ class MappingFileUploader(private val buildDir: File, private val logger: Splunk
             )
             logger.lifecycle("Upload", "Successfully uploaded mapping file")
         } catch (e: Exception) {
-            logger.error("Upload", "Full error stacktrace: ${e.stackTraceToString()}")
+            logger.error("Upload", "Upload failed: ${e.message}")
+
+            val errorMessage = "Upload failed: ${e.message}"
 
             if (failBuildOnUploadFailure) {
-                logger.error("Upload", "Upload failed: ${e.message}")
-                throw GradleException(
-                    "Mapping file upload failed for variant '$variantName': ${e.message}. " +
-                        "Check the full build log above for error details and troubleshooting steps."
-                )
+                logger.error("Upload", errorMessage)
+                logger.debug("Upload", "Full error stacktrace: ${e.stackTraceToString()}")
+                throw GradleException("Mapping file upload failed for variant '$variantName': ${e.message}")
             } else {
-                logger.error(
-                    "Upload",
-                    "Upload failed: ${e.message} (build continuing due to failBuildOnUploadFailure=false)"
-                )
+                logger.error("Upload", "$errorMessage (build continuing due to failBuildOnUploadFailure=false)")
+                logger.debug("Upload", "Full error stacktrace: ${e.stackTraceToString()}")
             }
         }
     }
