@@ -118,7 +118,6 @@ class MappingFileUploadClient(private val logger: SplunkLogger) {
         val responseCode = try {
             connection.responseCode
         } catch (e: IOException) {
-            // HttpURLConnection failed to read the server's error response
             logger.error("Upload", "HTTP operation failed: ${e.message}")
             logger.error(
                 "Upload",
