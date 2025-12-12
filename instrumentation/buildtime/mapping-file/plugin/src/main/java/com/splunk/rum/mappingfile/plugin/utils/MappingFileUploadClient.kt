@@ -154,7 +154,6 @@ class MappingFileUploadClient(private val logger: SplunkLogger) {
             logger.warn("Upload", "Error response received (HTTP $responseCode)")
             val errorResponse =
                 connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "No error details"
-
             logger.error("Upload", "Error response body: $errorResponse")
 
             logger.debug("Upload", "Response headers:")
