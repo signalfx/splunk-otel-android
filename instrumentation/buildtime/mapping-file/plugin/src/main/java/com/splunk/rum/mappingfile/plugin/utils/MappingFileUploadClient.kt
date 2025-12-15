@@ -17,6 +17,7 @@
 package com.splunk.rum.mappingfile.plugin.utils
 
 import java.io.File
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -49,11 +50,7 @@ class MappingFileUploadClient(private val logger: SplunkLogger) {
         try {
             setupConnection(connection, accessToken)
             sendMultipartData(connection, mappingFile)
-            handleResponse(connection)
-        } catch (e: Exception) {
-            logger.error("Upload", "HTTP operation failed: ${e.message}")
-            logger.debug("Upload", "HTTP error details: ${e.stackTraceToString()}")
-            throw e
+            handleResponse(connection, realm, applicationId, versionCode, buildId, mappingFile)
         } finally {
             logger.debug("Upload", "HTTP connection closed")
             connection.disconnect()
@@ -108,10 +105,37 @@ class MappingFileUploadClient(private val logger: SplunkLogger) {
         }
     }
 
-    private fun handleResponse(connection: HttpURLConnection) {
+    private fun handleResponse(
+        connection: HttpURLConnection,
+        realm: String,
+        applicationId: String,
+        versionCode: Int,
+        buildId: String,
+        mappingFile: File
+    ) {
         logger.debug("Upload", "Reading HTTP response")
 
-        val responseCode = connection.responseCode
+        val responseCode = try {
+            connection.responseCode
+        } catch (e: IOException) {
+            logger.error("Upload", "HTTP operation failed: ${e.message}")
+            logger.error(
+                "Upload",
+                "Could not read server error response due to HttpURLConnection limitation when handling upload errors"
+            )
+            logger.error(
+                "Upload",
+                "For additional diagnostics, you can try the upload with curl (copy as single line):"
+            )
+            logger.error(
+                "Upload",
+                "curl -X PUT \"https://api.$realm.signalfx.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId\" -H \"X-SF-Token: YOUR_API_TOKEN_HERE\" -F \"filename=${mappingFile.name}\" -F \"file=@${mappingFile.absolutePath}\""
+            )
+            logger.error("Upload", "Replace YOUR_API_TOKEN_HERE with your actual API access token.")
+
+            throw e
+        }
+
         logger.info("Upload", "Response code: $responseCode")
         logger.info("Upload", "Response message: ${connection.responseMessage}")
 
@@ -135,7 +159,7 @@ class MappingFileUploadClient(private val logger: SplunkLogger) {
                 logger.debug("Upload", "Response header $key: ${values.joinToString(", ")}")
             }
 
-            throw Exception("HTTP $responseCode: $errorResponse")
+            throw Exception("HTTP $responseCode")
         }
     }
 
