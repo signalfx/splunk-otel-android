@@ -48,6 +48,7 @@ class AgentPreferences internal constructor(
                 if (value == null) {
                     storage.deleteTracesBaseUrl()
                     storage.deleteLogsBaseUrl()
+                    storage.deleteRumAccessToken()
                     endpointRef.set(null)
                     Logger.d(TAG, "Endpoints cleared")
                     return@synchronized
@@ -56,6 +57,10 @@ class AgentPreferences internal constructor(
                 value.traceEndpoint.let { tracesUrl ->
                     storage.writeTracesBaseUrl(tracesUrl.toExternalForm())
                 }
+
+                value.rumAccessToken?.let { token ->
+                    storage.writeRumAccessToken(token)
+                } ?: storage.deleteRumAccessToken()
 
                 value.sessionReplayEndpoint?.let { logsUrl ->
                     storage.writeLogsBaseUrl(logsUrl.toExternalForm())

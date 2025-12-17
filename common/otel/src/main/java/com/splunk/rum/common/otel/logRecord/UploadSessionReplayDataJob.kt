@@ -67,10 +67,24 @@ internal class UploadSessionReplayDataJob : JobService() {
                 return
             }
 
+            val token = storage.readRumAccessToken()
+            val headers = mutableListOf(Header("Content-Type", "application/x-protobuf"))
+
+            if (token != null) {
+                headers.add(Header("X-SF-Token", token))
+                Logger.d(TAG, "Adding X-SF-Token header for authentication")
+            } else {
+                Logger.w(
+                    TAG,
+                    "No rumAccessToken found in storage. Request may fail authentication. " +
+                        "Ensure EndpointConfiguration was created with a valid token."
+                )
+            }
+
             httpClient.makePostRequest(
                 url = url,
                 queries = emptyList(),
-                headers = listOf(Header("Content-Type", "application/x-protobuf")),
+                headers = headers,
                 body = data,
                 callback = object : HttpClient.Callback {
                     override fun onSuccess(response: Response) {
