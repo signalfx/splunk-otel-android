@@ -44,37 +44,34 @@ class EndpointConfiguration {
     /**
      * @param trace Sets the "beacon" endpoint URL to be used by the RUM library.
      * If the URL contains an 'auth' query parameter, it will be extracted for use in the X-SF-Token header.
+     * @throws IllegalArgumentException if no auth token is found in the URL
      */
     constructor(trace: URL) {
         this.rumAccessToken = extractAuthToken(trace)
-        this.traceEndpoint = trace
-
-        if (rumAccessToken == null) {
-            Logger.w(
-                TAG,
-                "No auth token found in trace URL. Requests may fail authentication. " +
-                    "Consider using EndpointConfiguration(realm, rumAccessToken) constructor."
+            ?: throw IllegalArgumentException(
+                "No auth token found in trace URL. Either:\n" +
+                    "  1. Use EndpointConfiguration(realm, rumAccessToken) constructor, or\n" +
+                    "  2. Include auth parameter in URL: ?auth=YOUR_TOKEN"
             )
-        }
+        this.traceEndpoint = trace
     }
 
     /**
      * @param trace Sets the "beacon" endpoint URL to be used by the RUM library.
      * @param sessionReplay Sets the "session replay" endpoint URL to be used by the RUM library.
      * If either URL contains an 'auth' query parameter, it will be extracted for use in the X-SF-Token header.
+     * @throws IllegalArgumentException if no auth token is found in either URL
      */
     constructor(trace: URL, sessionReplay: URL) {
         // Extract token from either URL (prefer trace endpoint)
         this.rumAccessToken = extractAuthToken(trace) ?: extractAuthToken(sessionReplay)
+            ?: throw IllegalArgumentException(
+                "No auth token found in trace or session replay URLs. Either:\n" +
+                    "  1. Use EndpointConfiguration(realm, rumAccessToken) constructor, or\n" +
+                    "  2. Include auth parameter in at least one URL: ?auth=YOUR_TOKEN"
+            )
         this.traceEndpoint = trace
         this.sessionReplayEndpoint = sessionReplay
-        if (rumAccessToken == null) {
-            Logger.w(
-                TAG,
-                "No auth token found in URLs. Requests may fail authentication. " +
-                    "Consider using EndpointConfiguration(realm, rumAccessToken) constructor."
-            )
-        }
     }
 
     /**
