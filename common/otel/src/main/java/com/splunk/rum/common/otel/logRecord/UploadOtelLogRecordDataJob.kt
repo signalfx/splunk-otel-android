@@ -23,10 +23,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.os.PersistableBundle
 import com.splunk.android.common.http.HttpClient
-import com.splunk.android.common.http.model.Header
 import com.splunk.android.common.http.model.Response
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.otel.http.AuthHeaderBuilder
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 
@@ -67,19 +67,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                 return
             }
 
-            val token = storage.readRumAccessToken()
-            val headers = mutableListOf(Header("Content-Type", "application/x-protobuf"))
-
-            if (token != null) {
-                headers.add(Header("X-SF-Token", token))
-                Logger.d(TAG, "Adding X-SF-Token header for authentication")
-            } else {
-                Logger.w(
-                    TAG,
-                    "No rumAccessToken found in storage. Request may fail authentication. " +
-                        "Ensure EndpointConfiguration was created with a valid token."
-                )
-            }
+            val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
 
             httpClient.makePostRequest(
                 url = url,
