@@ -43,7 +43,7 @@ class EndpointConfiguration {
 
     /**
      * @param trace Sets the "beacon" endpoint URL to be used by the RUM library.
-     * If the URL contains an 'auth' query parameter, it will be extracted for use in the X-SF-Token header.
+     * If the URL contains an 'auth' query parameter, it will be extracted and removed from the URL.
      * @throws IllegalArgumentException if no auth token is found in the URL
      */
     constructor(trace: URL) {
@@ -53,13 +53,13 @@ class EndpointConfiguration {
                     "  1. Use EndpointConfiguration(realm, rumAccessToken) constructor, or\n" +
                     "  2. Include auth parameter in URL: ?auth=YOUR_TOKEN"
             )
-        this.traceEndpoint = trace
+        this.traceEndpoint = removeAuthFromUrl(trace)
     }
 
     /**
      * @param trace Sets the "beacon" endpoint URL to be used by the RUM library.
      * @param sessionReplay Sets the "session replay" endpoint URL to be used by the RUM library.
-     * If either URL contains an 'auth' query parameter, it will be extracted for use in the X-SF-Token header.
+     * If either URL contains an 'auth' query parameter, it will be extracted and removed from the URLs.
      * @throws IllegalArgumentException if no auth token is found in either URL
      */
     constructor(trace: URL, sessionReplay: URL) {
@@ -70,8 +70,8 @@ class EndpointConfiguration {
                     "  1. Use EndpointConfiguration(realm, rumAccessToken) constructor, or\n" +
                     "  2. Include auth parameter in at least one URL: ?auth=YOUR_TOKEN"
             )
-        this.traceEndpoint = trace
-        this.sessionReplayEndpoint = sessionReplay
+        this.traceEndpoint = removeAuthFromUrl(trace)
+        this.sessionReplayEndpoint = removeAuthFromUrl(sessionReplay)
     }
 
     /**
@@ -96,6 +96,26 @@ class EndpointConfiguration {
         }
 
         return token
+    }
+
+    /**
+     * Removes the 'auth' query parameter from a URL.
+     * Example: "https://example.com?auth=ABC123&other=value" -> "https://example.com?other=value"
+     */
+    private fun removeAuthFromUrl(url: URL): URL {
+        val query = url.query ?: return url
+
+        val cleanedParams = query.split("&")
+            .filter { !it.startsWith("auth=") }
+
+        val newQuery = if (cleanedParams.isEmpty()) "" else cleanedParams.joinToString("&")
+        val urlString = if (newQuery.isEmpty()) {
+            "${url.protocol}://${url.authority}${url.path}"
+        } else {
+            "${url.protocol}://${url.authority}${url.path}?$newQuery"
+        }
+
+        return URL(urlString)
     }
 
     companion object {
