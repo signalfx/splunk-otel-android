@@ -39,7 +39,10 @@ class CustomTracking internal constructor() {
     @JvmOverloads
     fun trackCustomEvent(name: String, attributes: Attributes = Attributes.empty()) {
         val tracer = getTracer() ?: return
-        tracer.spanBuilder(name).setAllAttributes(attributes).createZeroLengthSpan()
+        tracer.spanBuilder(name)
+            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CUSTOM_EVENT)
+            .setAllAttributes(attributes)
+            .createZeroLengthSpan()
     }
 
     /**
@@ -51,6 +54,7 @@ class CustomTracking internal constructor() {
     fun trackWorkflow(workflowName: String): Span? {
         val tracer = getTracer() ?: return null
         return tracer.spanBuilder(workflowName)
+            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CUSTOM_WORKFLOW)
             .setAttribute(RumConstants.WORKFLOW_NAME_KEY, workflowName)
             .startSpan()
     }
