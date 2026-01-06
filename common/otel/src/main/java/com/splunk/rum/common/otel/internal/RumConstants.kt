@@ -26,6 +26,8 @@ object RumConstants {
     const val COMPONENT_ERROR: String = "error"
     const val COMPONENT_CRASH: String = "crash"
     const val COMPONENT_HTTP: String = "http"
+    const val COMPONENT_CUSTOM_EVENT: String = "custom-event"
+    const val COMPONENT_CUSTOM_WORKFLOW: String = "custom-workflow"
     const val SERVER_TIMING_HEADER = "server-timing"
     const val CRASH_INSTRUMENTATION_SCOPE_NAME = "io.opentelemetry.crash"
     const val SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME = "SessionReplayDataScopeName"
