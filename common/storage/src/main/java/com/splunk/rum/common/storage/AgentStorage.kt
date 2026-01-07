@@ -113,6 +113,16 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun readLogsBaseUrl(): String? = preferences.getString(LOGS_BASE_URL)
 
+    override fun writeRumAccessToken(value: String) {
+        preferences.putString(RUM_ACCESS_TOKEN, value).commit()
+    }
+
+    override fun deleteRumAccessToken() {
+        preferences.remove(RUM_ACCESS_TOKEN)
+    }
+
+    override fun readRumAccessToken(): String? = preferences.getString(RUM_ACCESS_TOKEN)
+
     override fun writeDeviceId(value: String) {
         preferences.putString(DEVICE_ID, value).commit()
     }
@@ -313,6 +323,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     companion object {
         private const val TRACES_BASE_URL = "TRACES_BASE_URL"
         private const val LOGS_BASE_URL = "LOGS_BASE_URL"
+        private const val RUM_ACCESS_TOKEN = "RUM_ACCESS_TOKEN"
         private const val DEVICE_ID = "DEVICE_ID"
         private const val APP_INSTALLATION_ID = "APP_INSTALLATION_ID"
         private const val SESSION_ID = "SESSION_ID"

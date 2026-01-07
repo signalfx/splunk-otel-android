@@ -62,15 +62,10 @@ class SplunkRumAgentCoreTest {
         mockAgentConfig = mock(AgentConfiguration::class.java, RETURNS_DEEP_STUBS)
 
         // Setup some needed defaults
-        `when`(mockAgentConfig.session).thenReturn(mock())
         `when`(mockAgentConfig.session.samplingRate).thenReturn(1.0)
         `when`(mockAgentConfig.copy()).thenReturn(mockAgentConfig)
-        `when`(mockAgentConfig.endpoint).thenReturn(mock())
         `when`(mockAgentConfig.endpoint).thenReturn(
-            EndpointConfiguration(
-                URL("https://example.com/trace"),
-                URL("https://example.com/replay")
-            )
+            EndpointConfiguration("test", "test-token")
         )
     }
 

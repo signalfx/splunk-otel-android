@@ -23,10 +23,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.os.PersistableBundle
 import com.splunk.android.common.http.HttpClient
-import com.splunk.android.common.http.model.Header
 import com.splunk.android.common.http.model.Response
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.otel.http.AuthHeaderBuilder
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 
@@ -67,10 +67,12 @@ internal class UploadOtelSpanDataJob : JobService() {
                 return
             }
 
+            val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
+
             httpClient.makePostRequest(
                 url = url,
                 queries = emptyList(),
-                headers = listOf(Header("Content-Type", "application/x-protobuf")),
+                headers = headers,
                 body = data,
                 callback = object : HttpClient.Callback {
                     override fun onSuccess(response: Response) {
