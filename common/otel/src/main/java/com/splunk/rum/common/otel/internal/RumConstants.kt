@@ -67,4 +67,7 @@ object RumConstants {
     val HTTP_REQUEST_BODY_SIZE: AttributeKey<Long> = AttributeKey.longKey("http.request.body.size")
     val HTTP_RESPONSE_BODY_SIZE: AttributeKey<Long> =
         AttributeKey.longKey("http.response.body.size")
+
+    val INTERACTIONS_TARGET_XPATH_KEY: AttributeKey<String> = AttributeKey.stringKey("target_xpath")
+    val INTERACTIONS_TARGET_ELEMENT_KEY: AttributeKey<String> = AttributeKey.stringKey("target_element")
 }
