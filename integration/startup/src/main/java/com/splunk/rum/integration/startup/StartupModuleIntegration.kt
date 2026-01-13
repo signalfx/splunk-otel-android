@@ -60,6 +60,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
     @Volatile
     private var installStartTimestamp: Long = 0L
+
     @Volatile
     private var installStartElapsed: Long = 0L
 
@@ -91,12 +92,15 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             isInstallComplete = true
         }
 
-        Logger.d(TAG, "onInstall() - cache size: ${cachedEvents.size}, isLateInstall: $isLateInstall, isInitializationReported: $isInitializationReported")
+        Logger.d(
+            TAG,
+            "onInstall() - cache size: ${cachedEvents.size}, isLateInstall: $isLateInstall, " +
+                "isInitializationReported: $isInitializationReported"
+        )
         super.onInstall(context, oTelInstallationContext, moduleConfigurations)
 
         if (cachedEvents.isNotEmpty()) {
-
-            // We have to defer processing modules on RN as not all modules are installed when StartupModuleIntegration is installed
+            // Defer processing on RN - not all modules are installed when StartupModuleIntegration runs
             Logger.d(TAG, "onInstall() - deferring cache processing until all modules are installed")
             mainHandler.post {
                 Logger.d(TAG, "Processing deferred cache (size: ${cachedEvents.size})")
@@ -155,8 +159,17 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         reportEventInternal(startTimestamp, endTimestamp, name, isHybridFramework = isLateInstall)
     }
 
-    private fun reportEventInternal(startTimestamp: Long, endTimestamp: Long, name: String, isHybridFramework: Boolean) {
-        Logger.d(TAG, "reportEventInternal() - name: $name, isHybridFramework: $isHybridFramework, isInitializationReported: $isInitializationReported")
+    private fun reportEventInternal(
+        startTimestamp: Long,
+        endTimestamp: Long,
+        name: String,
+        isHybridFramework: Boolean
+    ) {
+        Logger.d(
+            TAG,
+            "reportEventInternal() - name: $name, isHybridFramework: $isHybridFramework, " +
+                "isInitializationReported: $isInitializationReported"
+        )
 
         if (isInitializationReported) {
             Logger.d(TAG, "reportEventInternal() - skipping, already reported")
@@ -195,8 +208,8 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         val modules = modules.values
 
         if (asSibling) {
-
-            // Hybrids support path - startup event was cached because install() was called AFTER the first view was drawn and we need to measure only the actual install() duration, not since ContentProvider attaching.
+            // Hybrids support path - startup event was cached because install() was called AFTER
+            // the first view was drawn.
             val lastInitialization =
                 modules.maxByOrNull { it.initialization?.endElapsed ?: Long.MIN_VALUE }?.initialization
                     ?: throw IllegalStateException("Module initialization did not complete")
@@ -204,7 +217,11 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             val initStartTimestamp = installStartTimestamp
             val initEndTimestamp = installStartTimestamp + (lastInitialization.endElapsed!! - installStartElapsed)
 
-            Logger.d(TAG, "reportAppStart() - asSibling: true, initStartTimestamp: $initStartTimestamp, initEndTimestamp: $initEndTimestamp, duration: ${initEndTimestamp - initStartTimestamp}ms")
+            Logger.d(
+                TAG,
+                "reportAppStart() - asSibling: true, initStartTimestamp: $initStartTimestamp, " +
+                    "initEndTimestamp: $initEndTimestamp, duration: ${initEndTimestamp - initStartTimestamp}ms"
+            )
 
             val initSpan = provider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder("SplunkRum.initialize")
@@ -243,7 +260,6 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
             initSpan.end(initEndTimestamp.toInstant())
         } else {
-
             // Original path
             val firstInitialization =
                 modules.minByOrNull { it.initialization?.startTimestamp ?: Long.MAX_VALUE }?.initialization
