@@ -29,11 +29,10 @@ internal object ProcessInfo {
 
     private const val TAG = "ProcessInfo"
 
-    fun getStartUptimeMillis(): Long {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Process.getStartUptimeMillis()
-        else
-            getStartUptimeMillis20()
+    fun getStartUptimeMillis(): Long = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        Process.getStartUptimeMillis()
+    } else {
+        getStartUptimeMillis20()
     }
 
     /**

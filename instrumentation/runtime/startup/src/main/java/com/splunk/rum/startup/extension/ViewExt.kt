@@ -22,10 +22,11 @@ import android.view.ViewTreeObserver
 
 // FIXME Compiler error. Use com.splunk.android.common.utils.extensions.doOnDraw once the issue is fixed.
 internal inline fun View.doOnDraw(crossinline action: () -> Unit) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         doOnDraw29(action)
-    else
+    } else {
         doOnDraw20(action)
+    }
 }
 
 private inline fun View.doOnDraw20(crossinline action: () -> Unit) {
@@ -33,8 +34,9 @@ private inline fun View.doOnDraw20(crossinline action: () -> Unit) {
         override fun onPreDraw(): Boolean {
             action()
 
-            if (viewTreeObserver.isAlive)
+            if (viewTreeObserver.isAlive) {
                 rootView.viewTreeObserver.removeOnPreDrawListener(this)
+            }
 
             return true
         }

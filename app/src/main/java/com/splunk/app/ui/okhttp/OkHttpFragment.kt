@@ -36,6 +36,11 @@ import com.splunk.rum.integration.okhttp3.manual.extension.okHttpManualInstrumen
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.trace.SdkTracerProvider
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import okhttp3.Cache
 import okhttp3.Call
 import okhttp3.Callback
@@ -50,11 +55,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.BufferedSink
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
 
 /**
  * A fragment demonstrating various OkHttp3 use cases and integrations with Splunk RUM instrumentation.

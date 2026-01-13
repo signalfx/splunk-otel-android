@@ -59,13 +59,15 @@ object ApplicationStartupTimekeeper {
         private var isHotStartPending = false
 
         override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 onActivityPreCreatedCompat()
+            }
         }
 
         override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 onActivityPreCreatedCompat()
+            }
         }
 
         private fun onActivityPreCreatedCompat() {
@@ -79,13 +81,15 @@ object ApplicationStartupTimekeeper {
         }
 
         override fun onActivityPreStarted(activity: Activity) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 onActivityPreStartedCompat()
+            }
         }
 
         override fun onActivityStarted(activity: Activity) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 onActivityPreStartedCompat()
+            }
         }
 
         private fun onActivityPreStartedCompat() {
