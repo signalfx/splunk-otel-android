@@ -18,21 +18,20 @@ package com.splunk.rum.startup
 
 import android.app.Activity
 import android.app.Application
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import android.view.View
-import android.view.ViewTreeObserver
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.android.common.utils.extensions.rootView
+import com.splunk.rum.startup.extension.doOnDraw
+import com.splunk.rum.startup.util.ProcessInfo
+import com.splunk.rum.utils.extensions.isStartedInForeground
 
 object ApplicationStartupTimekeeper {
 
     private const val TAG = "ApplicationStartupTimekeeper"
-
-    private var firstTimestamp = 0L
-    private var firstElapsed = 0L
 
     private var isColdStartCompleted = false
 
@@ -40,12 +39,8 @@ object ApplicationStartupTimekeeper {
 
     val listeners: MutableList<Listener> = arrayListOf()
 
-    internal fun onInit() {
-        firstTimestamp = System.currentTimeMillis()
-        firstElapsed = SystemClock.elapsedRealtime()
-    }
-
     internal fun onCreate(application: Application) {
+        isColdStartCompleted = !application.isStartedInForeground
         application.registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
     }
 
@@ -64,6 +59,16 @@ object ApplicationStartupTimekeeper {
         private var isHotStartPending = false
 
         override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                onActivityPreCreatedCompat()
+        }
+
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+                onActivityPreCreatedCompat()
+        }
+
+        private fun onActivityPreCreatedCompat() {
             createdActivityCount++
 
             if (isColdStartCompleted && createdActivityCount == 1) {
@@ -74,6 +79,16 @@ object ApplicationStartupTimekeeper {
         }
 
         override fun onActivityPreStarted(activity: Activity) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                onActivityPreStartedCompat()
+        }
+
+        override fun onActivityStarted(activity: Activity) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+                onActivityPreStartedCompat()
+        }
+
+        private fun onActivityPreStartedCompat() {
             startedActivityCount++
 
             if (isColdStartCompleted && !isWarmStartPending && !isHotStartPending && startedActivityCount == 1) {
@@ -112,9 +127,9 @@ object ApplicationStartupTimekeeper {
                         !isColdStartCompleted -> {
                             reporter = Listener::onColdStarted
 
-                            startTimestamp = firstTimestamp
-                            duration = SystemClock.elapsedRealtime() - firstElapsed
-                            endTimestamp = firstTimestamp + duration
+                            duration = SystemClock.uptimeMillis() - ProcessInfo.getStartUptimeMillis()
+                            endTimestamp = System.currentTimeMillis()
+                            startTimestamp = endTimestamp - duration
 
                             isColdStartCompleted = true
                         }
@@ -158,30 +173,6 @@ object ApplicationStartupTimekeeper {
         override fun onActivityDestroyed(activity: Activity) {
             createdActivityCount--
         }
-    }
-
-    // FIXME Compiler error. Use com.splunk.android.common.utils.extensions.doOnDraw once the issue is fixed.
-    private inline fun View.doOnDraw(crossinline action: () -> Unit) {
-        var pendingRemove = false
-
-        val onDrawListener = ViewTreeObserver.OnDrawListener {
-            pendingRemove = true
-            action()
-        }
-
-        val onPreDrawListener = object : ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                if (pendingRemove && viewTreeObserver.isAlive) {
-                    rootView.viewTreeObserver.removeOnDrawListener(onDrawListener)
-                    rootView.viewTreeObserver.removeOnPreDrawListener(this)
-                }
-
-                return true
-            }
-        }
-
-        viewTreeObserver.addOnPreDrawListener(onPreDrawListener)
-        viewTreeObserver.addOnDrawListener(onDrawListener)
     }
 
     interface Listener {

@@ -72,45 +72,45 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
     /** Sets a global attribute with a String value. */
     private fun setStringAttribute() {
         globalAttributes["stringKey"] = "String Value"
-        context?.showDoneToast(R.string.set_string_global_attribute)
+        showDoneToast(R.string.set_string_global_attribute)
     }
 
     /** Sets a global attribute with a Long value. */
     private fun setLongAttribute() {
         globalAttributes["longKey"] = 12345L
-        context?.showDoneToast(R.string.set_long_global_attribute)
+        showDoneToast(R.string.set_long_global_attribute)
     }
 
     /** Sets a global attribute with a Double value. */
     private fun setDoubleAttribute() {
         globalAttributes["doubleKey"] = 123.45
-        context?.showDoneToast(R.string.set_double_global_attribute)
+        showDoneToast(R.string.set_double_global_attribute)
     }
 
     /** Sets a global attribute with a Boolean value. */
     private fun setBooleanAttribute() {
         globalAttributes["booleanKey"] = true
-        context?.showDoneToast(R.string.set_boolean_global_attribute)
+        showDoneToast(R.string.set_boolean_global_attribute)
     }
 
     /** Sets a global attribute using a generic [AttributeKey]. */
     private fun setGenericAttribute() {
         val key = AttributeKey.stringKey("genericKey")
         globalAttributes[key] = "Generic Value"
-        context?.showDoneToast(R.string.set_generic_global_attribute)
+        showDoneToast(R.string.set_generic_global_attribute)
     }
 
     /** Removes a global attribute by its string key. */
     private fun removeStringAttribute() {
         globalAttributes.remove("stringKey")
-        context?.showDoneToast(R.string.remove_string_global_attribute)
+        showDoneToast(R.string.remove_string_global_attribute)
     }
 
     /** Removes a global attribute using a generic [AttributeKey]. */
     private fun removeGenericAttribute() {
         val key = AttributeKey.stringKey("genericKey")
         globalAttributes.remove(key)
-        context?.showDoneToast(R.string.remove_generic_global_attribute)
+        showDoneToast(R.string.remove_generic_global_attribute)
     }
 
     /** Retrieves and displays a global String attribute in an alert dialog. */
@@ -149,13 +149,13 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
             9876L
         )
         globalAttributes.setAll(attributes)
-        context?.showDoneToast(R.string.set_all_global_attributes)
+        showDoneToast(R.string.set_all_global_attributes)
     }
 
     /** Removes all currently set global attributes. */
     private fun removeAllGlobalAttributes() {
         globalAttributes.removeAll()
-        context?.showDoneToast(R.string.remove_all_global_attributes)
+        showDoneToast(R.string.remove_all_global_attributes)
     }
 
     /**
@@ -180,7 +180,7 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
     private fun legacySetGlobalAttribute() {
         val key = AttributeKey.stringKey("legacyKey")
         splunkRum.setGlobalAttribute(key, "LegacyVal")
-        context?.showDoneToast(R.string.set_string_global_attribute, ApiVariant.LEGACY)
+        showDoneToast(R.string.set_string_global_attribute, ApiVariant.LEGACY)
     }
 
     /**
@@ -192,6 +192,6 @@ class GlobalAttributesFragment : BaseFragment<FragmentGlobalAttributesBinding>()
                 .put(AttributeKey.longKey("legacyUpdate2"), 54321L)
                 .put(AttributeKey.booleanKey("legacyUpdate3"), false)
         }
-        context?.showDoneToast(R.string.update_global_attributes, ApiVariant.LEGACY)
+        showDoneToast(R.string.update_global_attributes, ApiVariant.LEGACY)
     }
 }

@@ -1,10 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<uses-feature
-		android:name="android.hardware.camera"
-		android:required="false" />
-
-	<uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
 	<application
 		android:name=".App"
@@ -25,5 +21,14 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+
+        <service
+            android:name=".restart.TerminationWatcherService"
+            android:stopWithTask="false" />
+
+        <receiver
+            android:name=".restart.RestartReceiver"
+            android:enabled="true"
+            android:exported="false" />
 	</application>
 </manifest>
