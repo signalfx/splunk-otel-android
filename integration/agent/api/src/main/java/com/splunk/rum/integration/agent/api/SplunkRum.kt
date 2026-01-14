@@ -69,7 +69,7 @@ class SplunkRum private constructor(
     val state: IState = State(agentConfiguration, endpointRef),
     val session: ISession = Session(SessionState(agentConfiguration.session, sessionManager)),
     val user: User = User(userManager),
-    val globalAttributes: MutableAttributes = MutableAttributes(agentConfiguration.globalAttributes)
+    val globalAttributes: MutableAttributes
 ) {
     val preferences: AgentPreferences = AgentPreferences(
         agentStorage = agentStorage,
@@ -230,7 +230,8 @@ class SplunkRum private constructor(
             agentConfiguration = AgentConfiguration.noop,
             state = Noop(),
             userManager = NoOpUserManager,
-            sessionManager = NoOpSplunkSessionManager
+            sessionManager = NoOpSplunkSessionManager,
+            globalAttributes = MutableAttributes()
         )
         private var instanceInternal: SplunkRum? = null
         private const val TAG = "SplunkRum"
@@ -289,7 +290,8 @@ class SplunkRum private constructor(
                         notRunningCause = Status.NotRunning.UnsupportedOsVersion
                     ),
                     userManager = NoOpUserManager,
-                    sessionManager = NoOpSplunkSessionManager
+                    sessionManager = NoOpSplunkSessionManager,
+                    globalAttributes = MutableAttributes()
                 )
             }
 
@@ -308,7 +310,8 @@ class SplunkRum private constructor(
                         notRunningCause = Status.NotRunning.Subprocess
                     ),
                     userManager = NoOpUserManager,
-                    sessionManager = NoOpSplunkSessionManager
+                    sessionManager = NoOpSplunkSessionManager,
+                    globalAttributes = MutableAttributes()
                 )
             }
 
@@ -318,12 +321,17 @@ class SplunkRum private constructor(
 
             val sessionManager = AgentIntegration.obtainInstance(application).sessionManager
 
+            // The shared MutableAttributes instance used by both
+            // GlobalAttributeSpanProcessor and the public SplunkRum.globalAttributes API
+            val globalAttributes = MutableAttributes(agentConfiguration.globalAttributes)
+
             val openTelemetry = SplunkRumAgentCore.install(
                 application,
                 agentConfiguration,
                 userManager,
                 sessionManager,
-                moduleConfigurations.toList()
+                moduleConfigurations.toList(),
+                globalAttributes
             )
 
             val endpointRef = AtomicReference(agentConfiguration.endpoint)
@@ -334,7 +342,8 @@ class SplunkRum private constructor(
                 openTelemetry = openTelemetry,
                 endpointRef = endpointRef,
                 userManager = userManager,
-                sessionManager = sessionManager
+                sessionManager = sessionManager,
+                globalAttributes = globalAttributes
             )
 
             return instance

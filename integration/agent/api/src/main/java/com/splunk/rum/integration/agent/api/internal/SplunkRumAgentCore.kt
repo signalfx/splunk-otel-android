@@ -26,6 +26,7 @@ import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerLogRecordExporter
 import com.splunk.rum.integration.agent.api.exporter.LoggerSpanExporter
 import com.splunk.rum.integration.agent.api.resource.AgentResource
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
@@ -53,7 +54,8 @@ internal object SplunkRumAgentCore {
         agentConfiguration: AgentConfiguration,
         userManager: IUserManager,
         sessionManager: ISplunkSessionManager,
-        moduleConfigurations: List<ModuleConfiguration>
+        moduleConfigurations: List<ModuleConfiguration>,
+        globalAttributes: MutableAttributes
     ): OpenTelemetry {
         // Sampling.
         val shouldBeRunning = when (val samplingRate = agentConfiguration.session.samplingRate.coerceIn(0.0, 1.0)) {
@@ -93,7 +95,7 @@ internal object SplunkRumAgentCore {
         )
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
-            .addSpanProcessor(GlobalAttributeSpanProcessor(agentConfiguration.globalAttributes))
+            .addSpanProcessor(GlobalAttributeSpanProcessor(globalAttributes))
             .addSpanProcessor(LastScreenNameSpanProcessor(ScreenNameTracker))
             .joinResources(AgentResource.allResource(application, appInstallationID, finalConfiguration))
             .addSpanProcessor(UserIdSpanProcessor(userManager))
