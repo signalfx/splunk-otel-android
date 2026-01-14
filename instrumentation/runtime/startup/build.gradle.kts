@@ -24,6 +24,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":common:utils"))
+
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
 }

@@ -23,6 +23,7 @@ import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import java.io.File
@@ -129,7 +130,8 @@ class SplunkRumAgentCoreTest {
             mockAgentConfig,
             mockUserManager,
             mockSessionManager,
-            emptyList()
+            emptyList(),
+            MutableAttributes()
         )
     }
 

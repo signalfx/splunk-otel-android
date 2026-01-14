@@ -110,12 +110,12 @@ class SlowRenderingFragment : BaseFragment<FragmentSlowRenderingBinding>() {
 
         rootView.addView(slowRenderView)
 
-        context?.showToast("Running $testName test for ${durationMs / 1_000} seconds")
+        showToast("Running $testName test for ${durationMs / 1_000} seconds")
 
         Handler(Looper.getMainLooper()).postDelayed({
             rootView.removeView(slowRenderView)
             slowRenderView.stopRendering()
-            context?.showDoneToast(
+            showDoneToast(
                 testName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
             )
         }, durationMs)
