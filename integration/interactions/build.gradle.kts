@@ -34,4 +34,6 @@ dependencies {
 
     implementation(platform(Dependencies.Otel.androidBom))
     implementation(Dependencies.Otel.androidInstrumentation)
+
+    testImplementation(Dependencies.Test.junit)
 }
