@@ -99,7 +99,7 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             ApiVariant.LEGACY -> splunkRum.addRumEvent("TestEvent", testAttributes)
         }
 
-        context?.showDoneToast(R.string.track_custom_event, variant)
+        showDoneToast(R.string.track_custom_event, variant)
     }
 
     /**
@@ -120,7 +120,7 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             end()
         }
 
-        context?.showDoneToast(R.string.track_workflow, variant)
+        showDoneToast(R.string.track_workflow, variant)
     }
 
     /**
@@ -147,6 +147,6 @@ class CustomTrackingFragment : BaseFragment<FragmentCustomTrackingBinding>() {
             }
         }
 
-        context?.showDoneToast(R.string.track_exception, variant)
+        showDoneToast(R.string.track_exception, variant)
     }
 }

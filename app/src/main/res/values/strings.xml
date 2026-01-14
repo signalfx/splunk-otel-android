@@ -100,4 +100,9 @@
     <string name="set_with_traces_and_logs">Set with Traces + Logs URLs</string>
     <string name="clear_endpoint">Clear Endpoint (Set to null)</string>
     <string name="log_current_endpoints">Log Current Endpoints</string>
+
+    <!-- Startup -->
+    <string name="startup_title">Startup</string>
+    <string name="startup_restart">Restart on Close</string>
+    <string name="startup_restart_scheduled">Restart scheduled</string>
 </resources>
