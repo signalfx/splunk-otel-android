@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2026 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package com.splunk.app.extension
 
-import android.content.Context
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
 import com.splunk.app.R
 import com.splunk.app.util.ApiVariant
 
-fun Context.showDoneToast(
+fun Fragment.showDoneToast(
     @StringRes labelRes: Int,
     apiVariant: ApiVariant = ApiVariant.LATEST,
     duration: Int = Toast.LENGTH_SHORT
@@ -30,7 +30,7 @@ fun Context.showDoneToast(
     showDoneToast(getString(labelRes), apiVariant, duration)
 }
 
-fun Context.showDoneToast(
+fun Fragment.showDoneToast(
     label: String,
     apiVariant: ApiVariant = ApiVariant.LATEST,
     duration: Int = Toast.LENGTH_SHORT
@@ -43,8 +43,14 @@ fun Context.showDoneToast(
     showToast(message, duration)
 }
 
-fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+fun Fragment.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
     runOnUiThread {
-        Toast.makeText(this, message, duration).show()
+        Toast.makeText(context ?: return@runOnUiThread, message, duration).show()
+    }
+}
+
+fun Fragment.showToast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
+    runOnUiThread {
+        Toast.makeText(context ?: return@runOnUiThread, messageResId, duration).show()
     }
 }
