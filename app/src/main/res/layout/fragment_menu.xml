@@ -175,6 +175,24 @@
 			android:text="@string/endpoint_configuration_title"
 			app:layout_constraintTop_toBottomOf="@id/endpoint_configuration_title" />
 
+        <TextView
+            android:id="@+id/startup_title"
+            style="@style/Heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/startup_title"
+            app:layout_constraintTop_toBottomOf="@+id/endpoint_configuration" />
 
+        <TextView
+            android:id="@+id/startup_restart"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/startup_restart"
+            app:layout_constraintTop_toBottomOf="@id/startup_title" />
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

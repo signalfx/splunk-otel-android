@@ -172,7 +172,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     private fun synchronousGet() {
         executeGetRequest("https://publicobject.com/helloworld.txt")
-        context?.showDoneToast(R.string.synchronous_get)
+        showDoneToast(R.string.synchronous_get)
     }
 
     /**
@@ -182,7 +182,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     private fun asynchronousGet() {
         executeAsynchronousGet("https://httpbin.org/robots.txt")
-        context?.showDoneToast(R.string.asynchronous_get)
+        showDoneToast(R.string.asynchronous_get)
     }
 
     /**
@@ -192,7 +192,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         val url = "https://httpbin.org/headers"
         executeAsynchronousGet(url)
         executeAsynchronousGet(url)
-        context?.showDoneToast(R.string.concurrent_asynchronous_get)
+        showDoneToast(R.string.concurrent_asynchronous_get)
     }
 
     /**
@@ -244,7 +244,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         lock.await()
         span.end()
 
-        context?.showDoneToast(R.string.parent_context_propagation_async_get)
+        showDoneToast(R.string.parent_context_propagation_async_get)
     }
 
     private fun contextPropagationClient(span: Span): OkHttpClient = OkHttpClient.Builder()
@@ -270,7 +270,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     private fun unsuccessfulGet() {
         executeGetRequest("https://httpbin.org/status/404")
-        context?.showDoneToast(R.string.unsuccessful_get)
+        showDoneToast(R.string.unsuccessful_get)
     }
 
     /**
@@ -279,7 +279,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
      */
     private fun retryRequest() {
         executeGetRequest("https://httpbin.org/status/503", true)
-        context?.showDoneToast(R.string.retry_request)
+        showDoneToast(R.string.retry_request)
     }
 
     /**
@@ -305,7 +305,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             }
         }
 
-        context?.showDoneToast(R.string.multiple_headers)
+        showDoneToast(R.string.multiple_headers)
     }
 
     /**
@@ -331,7 +331,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                 "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
         )
 
-        context?.showDoneToast(R.string.server_timing_header_in_response)
+        showDoneToast(R.string.server_timing_header_in_response)
     }
 
     /**
@@ -350,7 +350,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         """.trimMargin()
 
         executePostRequest("https://api.github.com/markdown/raw", postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
-        context?.showDoneToast(R.string.post_markdown)
+        showDoneToast(R.string.post_markdown)
     }
 
     /**
@@ -379,7 +379,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         }
 
         executePostRequest("https://api.github.com/markdown/raw", requestBody)
-        context?.showDoneToast(R.string.post_streaming)
+        showDoneToast(R.string.post_streaming)
     }
 
     /**
@@ -401,7 +401,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         )
 
         executePostRequest("https://api.github.com/markdown/raw", file.asRequestBody(MEDIA_TYPE_MARKDOWN))
-        context?.showDoneToast(R.string.post_file)
+        showDoneToast(R.string.post_file)
     }
 
     /**
@@ -414,7 +414,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             .build()
 
         executePostRequest("https://en.wikipedia.org/w/index.php", formBody)
-        context?.showDoneToast(R.string.post_form_parameters)
+        showDoneToast(R.string.post_form_parameters)
     }
 
     /**
@@ -437,7 +437,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
 
         val headers = mapOf("Authorization" to "Client-ID $IMGUR_CLIENT_ID")
         executePostRequest("https://api.imgur.com/3/image", requestBody, headers)
-        context?.showDoneToast(R.string.post_multipart_request)
+        showDoneToast(R.string.post_multipart_request)
     }
 
     /**
@@ -451,7 +451,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         runOnBackgroundThread {
             try {
                 client.newCall(request).execute()
-                context?.showDoneToast(R.string.network_error)
+                showDoneToast(R.string.network_error)
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -498,7 +498,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
             }
 
             Log.v(TAG, "Response 2 equals Response 1? " + (response1Body == response2Body))
-            context?.showDoneToast(R.string.response_caching)
+            showDoneToast(R.string.response_caching)
         }
     }
 
@@ -545,7 +545,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
                         e
                     )
                 )
-                context?.showDoneToast(R.string.canceled_call)
+                showDoneToast(R.string.canceled_call)
             }
         }
     }

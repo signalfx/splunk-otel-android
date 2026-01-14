@@ -61,7 +61,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     private fun customUrlGet() {
         executeGet(viewBinding.customUrl.text.toString())
-        context?.showDoneToast(R.string.custom_url_get)
+        showDoneToast(R.string.custom_url_get)
     }
 
     /**
@@ -69,7 +69,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     private fun successfulGet() {
         executeGet("https://httpbin.org/get")
-        context?.showDoneToast(R.string.successful_get)
+        showDoneToast(R.string.successful_get)
     }
 
     /**
@@ -77,7 +77,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     private fun unSuccessfulGet() {
         executeGet("https://httpbin.org/status/404")
-        context?.showDoneToast(R.string.unsuccessful_get)
+        showDoneToast(R.string.unsuccessful_get)
     }
 
     /**
@@ -87,7 +87,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     private fun getWithoutInputStream() {
         executeGet("https://httpbin.org/get", false)
-        context?.showDoneToast(R.string.get_without_input_stream)
+        showDoneToast(R.string.get_without_input_stream)
     }
 
     /**
@@ -99,7 +99,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
         executeGet("https://google.com")
         executeGet("https://android.com")
         executeGet("https://httpbin.org/headers")
-        context?.showDoneToast(R.string.four_concurrent_get_requests)
+        showDoneToast(R.string.four_concurrent_get_requests)
     }
 
     /**
@@ -108,7 +108,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     private fun sustainedConnection() {
         executeGet("https://httpbin.org/get", getInputStream = false, disconnect = false)
-        context?.showDoneToast(R.string.sustained_connection)
+        showDoneToast(R.string.sustained_connection)
     }
 
     /**
@@ -117,7 +117,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
      */
     private fun stalledRequest() {
         executeGet("https://httpbin.org/get", getInputStream = false, disconnect = true, stallRequest = true)
-        context?.showDoneToast(R.string.stalled_request)
+        showDoneToast(R.string.stalled_request)
     }
 
     /**
@@ -141,7 +141,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
                 "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
         )
 
-        context?.showDoneToast(R.string.server_timing_header_in_response)
+        showDoneToast(R.string.server_timing_header_in_response)
     }
 
     /**
@@ -153,7 +153,7 @@ class HttpURLConnectionFragment : BaseFragment<FragmentHttpUrlConnectionBinding>
             requestBody = "Writing test content to output stream!"
         )
 
-        context?.showDoneToast(R.string.post)
+        showDoneToast(R.string.post)
     }
 
     private fun executeGet(

@@ -21,10 +21,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.splunk.app.BuildConfig
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentEndpointConfigurationBinding
+import com.splunk.app.extension.showToast
 import com.splunk.app.ui.BaseFragment
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
@@ -156,10 +156,6 @@ class EndpointConfigurationFragment : BaseFragment<FragmentEndpointConfiguration
         } else {
             Log.i(TAG, "  [$source] null")
         }
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
