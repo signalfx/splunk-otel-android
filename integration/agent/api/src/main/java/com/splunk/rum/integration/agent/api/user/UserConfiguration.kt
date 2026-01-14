@@ -17,5 +17,5 @@
 package com.splunk.rum.integration.agent.api.user
 
 data class UserConfiguration @JvmOverloads constructor(
-    val trackingMode: UserTrackingMode = UserTrackingMode.NO_TRACKING
+    val trackingMode: UserTrackingMode = UserTrackingMode.ANONYMOUS_TRACKING
 )
