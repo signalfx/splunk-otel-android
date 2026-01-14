@@ -165,7 +165,6 @@ object ApplicationStartupTimekeeper {
                     }
 
                     if (listenersCache.isEmpty()) {
-
                         // No listeners registered yet - cache the event for later delivery
                         Logger.d(TAG, "No listeners registered, caching ${startType.name} start event")
                         pendingStartupEvent = Triple(startTimestamp, endTimestamp, startType)

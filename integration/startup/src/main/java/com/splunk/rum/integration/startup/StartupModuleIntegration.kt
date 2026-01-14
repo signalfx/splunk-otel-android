@@ -225,8 +225,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
             val initSpan = provider.get(RumConstants.RUM_TRACER_NAME)
                 .spanBuilder("SplunkRum.initialize")
-                .setNoParent()
-                .addLink(span.spanContext)
+                .setParent(io.opentelemetry.context.Context.current().with(span))
                 .setStartTimestamp(initStartTimestamp.toInstant())
                 .startSpan()
 
