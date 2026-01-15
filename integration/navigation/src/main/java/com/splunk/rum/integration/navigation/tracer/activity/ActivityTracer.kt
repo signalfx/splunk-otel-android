@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.navigation.tracer.activity
 
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.navigation.tracer.ActiveSpan
@@ -32,6 +33,7 @@ internal class ActivityTracer(
 ) {
 
     fun startSpanIfNoneInProgress(spanName: String): ActivityTracer {
+        Logger.d("ActivityTracer", "startSpanIfNoneInProgress: $spanName")
         if (activeSpan.isSpanInProgress()) {
             return this
         }
@@ -41,11 +43,13 @@ internal class ActivityTracer(
     }
 
     fun startActivityCreation(): ActivityTracer {
+        Logger.d("ActivityTracer", "startActivityCreation")
         activeSpan.startSpan { createSpan(RumConstants.NAVIGATION_NAME) }
         return this
     }
 
     fun initiateRestartSpanIfNecessary(): ActivityTracer {
+        Logger.d("ActivityTracer", "initiateRestartSpanIfNecessary")
         if (activeSpan.isSpanInProgress()) {
             return this
         }
@@ -55,6 +59,7 @@ internal class ActivityTracer(
     }
 
     fun endSpanForActivityResumed() {
+        Logger.d("ActivityTracer", "endSpanForActivityResumed")
         if (initialAppActivity == null) {
             initialAppActivity = activityName
         }
@@ -63,10 +68,12 @@ internal class ActivityTracer(
     }
 
     fun endActiveSpan() {
+        Logger.d("ActivityTracer", "endActiveSpan")
         activeSpan.endActiveSpan()
     }
 
     fun addEvent(eventName: String): ActivityTracer {
+        Logger.d("ActivityTracer", "addEvent: $eventName")
         activeSpan.addEvent(eventName)
         return this
     }
