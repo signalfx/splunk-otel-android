@@ -3,6 +3,7 @@ package com.splunk.rum.integration.navigation.screen
 import android.app.Application
 import android.content.Context
 import android.os.Build
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.integration.navigation.tracer.activity.ActivityTracerManager
 import com.splunk.rum.integration.navigation.tracer.activity.callback.ActivityCallback21
@@ -16,6 +17,7 @@ import io.opentelemetry.api.trace.Tracer
 internal object ScreenTrackerIntegration {
 
     fun attach(context: Context) {
+        Logger.d("ScreenTrackerIntegration", "attach")
         val tracer = SplunkOpenTelemetrySdk.instance?.getTracer("io.opentelemetry.lifecycle") ?: return
         val application = context.applicationContext as Application
 
@@ -24,6 +26,7 @@ internal object ScreenTrackerIntegration {
     }
 
     private fun registerActivityLifecycle(application: Application, tracer: Tracer) {
+        Logger.d("ScreenTrackerIntegration", "registerActivityLifecycle")
         val tracerManager = ActivityTracerManager(tracer, null)
 
         val activityCallback = if (Build.VERSION.SDK_INT >= 29) {
@@ -36,6 +39,7 @@ internal object ScreenTrackerIntegration {
     }
 
     private fun registerFragmentLifecycle(application: Application, tracer: Tracer) {
+        Logger.d("ScreenTrackerIntegration", "registerFragmentLifecycle")
         val tracerManager = FragmentTracerManager(tracer)
         val callback = FragmentCallback(tracerManager)
 

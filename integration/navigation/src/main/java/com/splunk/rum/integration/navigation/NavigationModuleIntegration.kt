@@ -39,11 +39,13 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
+        Logger.d(TAG, "onInstall")
         if (moduleConfiguration.isEnabled) {
             Navigation.instance.listener = navigationListener
         }
 
         if (moduleConfiguration.isAutomatedTrackingEnabled) {
+            Logger.d(TAG, "automated tracking enabled, attaching ScreenTrackerIntegration")
             ScreenTrackerIntegration.attach(context)
         }
         super.onInstall(context, oTelInstallationContext, moduleConfigurations)
