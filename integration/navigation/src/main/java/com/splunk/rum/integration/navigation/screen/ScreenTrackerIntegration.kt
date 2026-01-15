@@ -28,14 +28,13 @@ internal object ScreenTrackerIntegration {
         val application = context.applicationContext as Application
 
         registerActivityLifecycle(application, tracer)
+        registerFragmentLifecycle(application, tracer)
         current?.get()?.let { activity ->
             activityTracerManager.startActivityCreation(activity)
             if (activity is FragmentActivity) {
                 val callback = FragmentCallback(fragmentTracerManager)
                 activity.supportFragmentManager.registerFragmentLifecycleCallbacks(callback, true)
             }
-        } ?: run {
-            registerFragmentLifecycle(application, tracer)
         }
     }
 
