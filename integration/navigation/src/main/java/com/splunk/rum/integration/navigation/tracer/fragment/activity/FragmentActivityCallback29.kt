@@ -28,6 +28,7 @@ internal class FragmentActivityCallback29(override val fragmentCallback: Fragmen
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
         Logger.d("FragmentActivityCallback29", "onActivityPreCreated")
         if (activity is FragmentActivity) {
+            Logger.d("FragmentActivityCallback29", "onActivityPreCreated FragmentActivity")
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
         }
     }
