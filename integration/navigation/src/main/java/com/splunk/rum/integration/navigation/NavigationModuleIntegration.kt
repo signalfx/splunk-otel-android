@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.common.otel.internal.RumConstants.NAVIGATION_NAME
@@ -37,39 +38,14 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 ) {
 
     private const val TAG = "NavigationIntegration"
-    @Volatile var current: WeakReference<Activity>? = null
+    private var currentActivityReference: WeakReference<Activity>? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (context as Application).registerActivityLifecycleCallbacks(
-            object : Application.ActivityLifecycleCallbacks {
-                override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                    Logger.d(TAG, "onActivityCreated: ${activity::class.java.name}")
-                }
-
+            object : ActivityLifecycleCallbacksAdapter {
                 override fun onActivityStarted(activity: Activity) {
-                    Logger.d(TAG, "onActivityStarted: ${activity::class.java.name}")
-                    current = WeakReference(activity)
-                }
-
-                override fun onActivityResumed(activity: Activity) {
-                    Logger.d(TAG, "onActivityResumed: ${activity::class.java.name}")
-                }
-
-                override fun onActivityPaused(activity: Activity) {
-                    Logger.d(TAG, "onActivityPaused: ${activity::class.java.name}")
-                }
-
-                override fun onActivityStopped(activity: Activity) {
-                    Logger.d(TAG, "onActivityStopped: ${activity::class.java.name}")
-                }
-
-                override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-                    Logger.d(TAG, "onActivitySaveInstanceState: ${activity::class.java.name}")
-                }
-
-                override fun onActivityDestroyed(activity: Activity) {
-                    Logger.d(TAG, "onActivityDestroyed: ${activity::class.java.name}")
+                    currentActivityReference = WeakReference(activity)
                 }
             }
         )
@@ -87,7 +63,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
         if (moduleConfiguration.isAutomatedTrackingEnabled) {
             Logger.d(TAG, "automated tracking enabled, attaching ScreenTrackerIntegration")
-            ScreenTrackerIntegration.attach(context, current)
+            ScreenTrackerIntegration.attach(context, currentActivityReference)
         }
         super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }

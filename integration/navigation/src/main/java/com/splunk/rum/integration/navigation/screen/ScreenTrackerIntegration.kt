@@ -22,14 +22,21 @@ internal object ScreenTrackerIntegration {
     private lateinit var activityTracerManager: ActivityTracerManager
     private lateinit var fragmentTracerManager: FragmentTracerManager
 
-    fun attach(context: Context, current: WeakReference<Activity>?) {
+    /**
+     * Hooks activity and fragment lifecycle callbacks to produce navigation telemetry.
+     *
+     * Note: `attach` assumes it is invoked from `Application.onCreate`. In hybrid setups
+     * where installation happens later, the current activity may already exist; passing
+     * `currentActivity` lets us backfill tracing for that activity.
+     */
+    fun attach(context: Context, currentActivity: WeakReference<Activity>?) {
         Logger.d("ScreenTrackerIntegration", "attach")
         val tracer = SplunkOpenTelemetrySdk.instance?.getTracer("io.opentelemetry.lifecycle") ?: return
         val application = context.applicationContext as Application
 
         registerActivityLifecycle(application, tracer)
         registerFragmentLifecycle(application, tracer)
-        current?.get()?.let { activity ->
+        currentActivity?.get()?.let { activity ->
             activityTracerManager.startActivityCreation(activity)
             if (activity is FragmentActivity) {
                 val callback = FragmentCallback(fragmentTracerManager)
