@@ -24,94 +24,94 @@ import com.splunk.rum.integration.navigation.tracer.activity.ActivityTracerManag
 internal class ActivityCallback29(override val tracer: ActivityTracerManager) : ActivityCallback {
 
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Logger.d("ActivityCallback29",  "onActivityPreCreated")
+        Logger.d("ActivityCallback29", "onActivityPreCreated")
         tracer.startActivityCreation(activity).addEvent("activityPreCreated")
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Logger.d("ActivityCallback29",  "onActivityCreated")
+        Logger.d("ActivityCallback29", "onActivityCreated")
         tracer.addEvent(activity, "activityCreated")
     }
 
     override fun onActivityPostCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Logger.d("ActivityCallback29",  "onActivityPostCreated")
+        Logger.d("ActivityCallback29", "onActivityPostCreated")
         tracer.addEvent(activity, "activityPostCreated")
     }
 
     override fun onActivityPreStarted(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPreStarted")
+        Logger.d("ActivityCallback29", "onActivityPreStarted")
         tracer.initiateRestartSpanIfNecessary(activity).addEvent("activityPreStarted")
     }
 
     override fun onActivityStarted(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityStarted")
+        Logger.d("ActivityCallback29", "onActivityStarted")
         tracer.addEvent(activity, "activityStarted")
     }
 
     override fun onActivityPostStarted(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPostStarted")
+        Logger.d("ActivityCallback29", "onActivityPostStarted")
         tracer.addEvent(activity, "activityPostStarted")
     }
 
     override fun onActivityPreResumed(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPreResumed")
+        Logger.d("ActivityCallback29", "onActivityPreResumed")
         tracer.startSpanIfNoneInProgress(activity, "Resumed").addEvent("activityPreResumed")
     }
 
     override fun onActivityResumed(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityResumed")
+        Logger.d("ActivityCallback29", "onActivityResumed")
         tracer.addEvent(activity, "onActivityResumed")
     }
 
     override fun onActivityPostResumed(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPostResumed")
+        Logger.d("ActivityCallback29", "onActivityPostResumed")
         tracer
             .addEvent(activity, "activityPostResumed")
             .endSpanForActivityResumed()
     }
 
     override fun onActivityPrePaused(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPrePaused")
+        Logger.d("ActivityCallback29", "onActivityPrePaused")
         tracer.startSpanIfNoneInProgress(activity, "Paused").addEvent("activityPrePaused")
     }
 
     override fun onActivityPaused(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPaused")
+        Logger.d("ActivityCallback29", "onActivityPaused")
         tracer.addEvent(activity, "onActivityPaused")
     }
 
     override fun onActivityPostPaused(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPostPaused")
+        Logger.d("ActivityCallback29", "onActivityPostPaused")
         tracer.addEvent(activity, "activityPostPaused").endActiveSpan()
     }
 
     override fun onActivityPreStopped(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPreStopped")
+        Logger.d("ActivityCallback29", "onActivityPreStopped")
         tracer.startSpanIfNoneInProgress(activity, "Stopped").addEvent("activityPreStopped")
     }
 
     override fun onActivityStopped(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityStopped")
+        Logger.d("ActivityCallback29", "onActivityStopped")
         tracer.addEvent(activity, "activityStopped")
     }
 
     override fun onActivityPostStopped(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPostStopped")
+        Logger.d("ActivityCallback29", "onActivityPostStopped")
         tracer.addEvent(activity, "activityPostStopped").endActiveSpan()
     }
 
     override fun onActivityPreDestroyed(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPreDestroyed")
+        Logger.d("ActivityCallback29", "onActivityPreDestroyed")
         tracer.startSpanIfNoneInProgress(activity, "Destroyed").addEvent("activityPreDestroyed")
     }
 
     override fun onActivityDestroyed(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityDestroyed")
+        Logger.d("ActivityCallback29", "onActivityDestroyed")
         tracer.addEvent(activity, "activityDestroyed")
     }
 
     override fun onActivityPostDestroyed(activity: Activity) {
-        Logger.d("ActivityCallback29",  "onActivityPostDestroyed")
+        Logger.d("ActivityCallback29", "onActivityPostDestroyed")
         tracer.addEvent(activity, "activityPostDestroyed").endActiveSpan()
     }
 }

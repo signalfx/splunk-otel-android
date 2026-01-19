@@ -21,8 +21,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.splunk.rum.integration.navigation.tracer.fragment.FragmentTracerManager
 import com.splunk.android.common.logger.Logger
+import com.splunk.rum.integration.navigation.tracer.fragment.FragmentTracerManager
 
 internal class FragmentCallback(private val manager: FragmentTracerManager) :
     FragmentManager.FragmentLifecycleCallbacks() {
