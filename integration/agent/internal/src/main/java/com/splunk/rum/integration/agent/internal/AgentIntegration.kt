@@ -51,14 +51,14 @@ class AgentIntegration private constructor(context: Context) {
     }
 
     init {
-        registerModuleInitializationStart(MODULE_NAME)
-
         val storage = AgentStorage.attach(context)
 
         sessionManager = SplunkSessionManager(storage)
     }
 
     fun install(context: Context, openTelemetry: OpenTelemetrySdk, moduleConfigurations: List<ModuleConfiguration>) {
+        registerModuleInitializationStart(MODULE_NAME)
+
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME)
