@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":integration:agent:internal"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.commonUtils)
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingFrameCapturer)
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingInteractions)
 

@@ -2,12 +2,12 @@ package com.splunk.rum.integration.interactions
 
 import android.graphics.Point
 import android.graphics.Rect
+import com.splunk.android.common.utils.Lock
 import com.splunk.android.instrumentation.recording.interactions.model.ElementNode
 import com.splunk.android.instrumentation.recording.interactions.model.Interaction
 import com.splunk.android.instrumentation.recording.wireframe.model.Wireframe
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
-import java.util.concurrent.locks.Lock
 
 internal class XPathBuilderTest {
 
@@ -74,56 +74,28 @@ internal class XPathBuilderTest {
         override val targetElementPath: List<ElementNode>? = path
     }
 
-    private fun element(view: Wireframe.Frame.Scene.Window.View, position: Int? = null): ElementNode {
-        // ElementNode constructor is internal; build it reflectively for tests.
-        val node = ElementNode::class.java.getDeclaredConstructor(
-            Wireframe.Frame.Scene.Window.View::class.java,
-            Integer::class.java,
-            String::class.java
-        )
-        node.isAccessible = true
-        return node.newInstance(view, position, null)
-    }
+    private fun element(view: Wireframe.Frame.Scene.Window.View, position: Int? = null): ElementNode = ElementNode(
+        view = view,
+        positionInList = position,
+        fragmentTag = null
+    )
 
-    private fun view(
-        id: String? = null,
-        typename: String,
-    ): Wireframe.Frame.Scene.Window.View {
-        // Constructor is internal; instantiate reflectively for tests.
-        val ctor = Wireframe.Frame.Scene.Window.View::class.java.getDeclaredConstructor(
-            String::class.java,
-            String::class.java,
-            Rect::class.java,
-            Wireframe.Frame.Scene.Window.View.Type::class.java,
-            String::class.java,
-            java.lang.Boolean.TYPE,
-            Point::class.java,
-            java.lang.Float.TYPE,
-            List::class.java,
-            List::class.java,
-            List::class.java,
-            String::class.java,
-            java.lang.Boolean.TYPE,
-            java.lang.Boolean.TYPE,
-            Lock::class.java
+    private fun view(id: String? = null, typename: String): Wireframe.Frame.Scene.Window.View =
+        Wireframe.Frame.Scene.Window.View(
+            id = id.orEmpty(),
+            name = "",
+            rect = Rect(),
+            type = Wireframe.Frame.Scene.Window.View.Type.AREA,
+            typename = typename,
+            hasFocus = false,
+            offset = Point(),
+            alpha = 1f,
+            skeletons = emptyList(),
+            foregroundSkeletons = emptyList(),
+            subviews = mutableListOf(),
+            identity = "",
+            isDrawDeterministic = false,
+            isSensitive = false,
+            subviewsLock = Lock()
         )
-        ctor.isAccessible = true
-        return ctor.newInstance(
-            id,
-            "name",
-            Rect(),
-            Wireframe.Frame.Scene.Window.View.Type.TEXT,
-            typename,
-            false,
-            Point(),
-            1f,
-            emptyList<Any>(),
-            emptyList<Any>(),
-            emptyList<Any>(),
-            "identity",
-            false,
-            false,
-            null
-        )
-    }
 }
