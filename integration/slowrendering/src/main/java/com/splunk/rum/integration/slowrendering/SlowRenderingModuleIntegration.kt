@@ -53,6 +53,5 @@ internal object SlowRenderingModuleIntegration : ModuleIntegration<SlowRendering
         } else {
             Logger.d(TAG, "Slow Rendering detection is disabled")
         }
-        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 }

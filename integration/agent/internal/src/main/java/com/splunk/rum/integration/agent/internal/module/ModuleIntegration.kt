@@ -31,10 +31,6 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     protected lateinit var sessionManager: ISplunkSessionManager
         private set
 
-    init {
-        AgentIntegration.registerModuleInitializationStart(defaultModuleConfiguration.name)
-    }
-
     fun attach(context: Context) {
         val agentIntegration = AgentIntegration.obtainInstance(context)
         agentIntegration.listeners += installationListener
@@ -46,12 +42,14 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
 
     protected open fun onAttach(context: Context) {}
 
-    protected open fun onInstall(
+    protected abstract fun onInstall(
         context: Context,
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
-    ) {
-        AgentIntegration.registerModuleInitializationEnd(defaultModuleConfiguration.name)
+    )
+
+    protected open fun onPostInstall() {
+
     }
 
     protected open fun onSessionChange(sessionId: String) {
@@ -66,7 +64,13 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
             val clazz = defaultModuleConfiguration::class
 
             moduleConfiguration = moduleConfigurations.find { it::class == clazz } as? T ?: defaultModuleConfiguration
+            AgentIntegration.registerModuleInitializationStart(defaultModuleConfiguration.name)
             this@ModuleIntegration.onInstall(context, oTelInstallationContext, moduleConfigurations)
+            AgentIntegration.registerModuleInitializationEnd(defaultModuleConfiguration.name)
+        }
+
+        override fun onPostInstall() {
+            this@ModuleIntegration.onPostInstall()
         }
     }
 

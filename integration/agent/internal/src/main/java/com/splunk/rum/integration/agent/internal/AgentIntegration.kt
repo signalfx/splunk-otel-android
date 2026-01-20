@@ -87,6 +87,8 @@ class AgentIntegration private constructor(context: Context) {
         listeners.forEachFast { it.onInstall(context, oTelInstallationContext, moduleConfigurations) }
 
         registerModuleInitializationEnd(MODULE_NAME)
+
+        listeners.forEachFast { it.onPostInstall() }
     }
 
     interface Listener {
@@ -95,6 +97,7 @@ class AgentIntegration private constructor(context: Context) {
             oTelInstallationContext: InstallationContext,
             moduleConfigurations: List<ModuleConfiguration>
         )
+        fun onPostInstall()
     }
 
     companion object {

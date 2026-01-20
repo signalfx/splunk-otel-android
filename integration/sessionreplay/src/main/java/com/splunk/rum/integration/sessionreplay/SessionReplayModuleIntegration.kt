@@ -71,7 +71,6 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
              */
             sensitivity.setViewClassSensitivity(WebView::class.java, null)
         }
-        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 
     override fun onSessionChange(sessionId: String) {
