@@ -29,6 +29,10 @@ interface IAgentStorage {
     fun deleteLogsBaseUrl()
     fun readLogsBaseUrl(): String?
 
+    fun writeRumAccessToken(value: String)
+    fun deleteRumAccessToken()
+    fun readRumAccessToken(): String?
+
     fun writeDeviceId(value: String)
     fun readDeviceId(): String?
 

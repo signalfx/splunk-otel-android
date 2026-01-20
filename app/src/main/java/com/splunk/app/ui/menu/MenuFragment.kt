@@ -16,12 +16,15 @@
 
 package com.splunk.app.ui.menu
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.splunk.app.R
 import com.splunk.app.databinding.FragmentMenuBinding
+import com.splunk.app.extension.showToast
+import com.splunk.app.restart.TerminationWatcherService
 import com.splunk.app.ui.BaseFragment
 import com.splunk.app.ui.crashreports.CrashReportsFragment
 import com.splunk.app.ui.customtracking.CustomTrackingFragment
@@ -45,6 +48,8 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         with(viewBinding) {
+            startupRestart.isEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+
             crashReports.setOnClickListener {
                 navigateTo(CrashReportsFragment(), FragmentAnimation.FADE)
             }
@@ -71,6 +76,10 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
             }
             endpointConfiguration.setOnClickListener {
                 navigateTo(EndpointConfigurationFragment(), FragmentAnimation.FADE)
+            }
+            startupRestart.setOnClickListener {
+                TerminationWatcherService.restartOnClose(requireContext())
+                showToast(R.string.startup_restart_scheduled)
             }
         }
     }

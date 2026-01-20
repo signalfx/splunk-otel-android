@@ -23,6 +23,7 @@ import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
+import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import java.io.File
@@ -62,15 +63,10 @@ class SplunkRumAgentCoreTest {
         mockAgentConfig = mock(AgentConfiguration::class.java, RETURNS_DEEP_STUBS)
 
         // Setup some needed defaults
-        `when`(mockAgentConfig.session).thenReturn(mock())
         `when`(mockAgentConfig.session.samplingRate).thenReturn(1.0)
         `when`(mockAgentConfig.copy()).thenReturn(mockAgentConfig)
-        `when`(mockAgentConfig.endpoint).thenReturn(mock())
         `when`(mockAgentConfig.endpoint).thenReturn(
-            EndpointConfiguration(
-                URL("https://example.com/trace"),
-                URL("https://example.com/replay")
-            )
+            EndpointConfiguration("test", "test-token")
         )
     }
 
@@ -134,7 +130,8 @@ class SplunkRumAgentCoreTest {
             mockAgentConfig,
             mockUserManager,
             mockSessionManager,
-            emptyList()
+            emptyList(),
+            MutableAttributes()
         )
     }
 

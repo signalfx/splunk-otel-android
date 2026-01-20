@@ -88,4 +88,63 @@ class AgentStorageTest {
 
         assertEquals(testId, result)
     }
+
+    @Test
+    fun `readRumAccessToken returns null when not set`() {
+        val result = storage.readRumAccessToken()
+        assertNull(result)
+    }
+
+    @Test
+    fun `readRumAccessToken returns stored value`() {
+        val expectedToken = "test_token_123"
+
+        storage.writeRumAccessToken(expectedToken)
+        val result = storage.readRumAccessToken()
+
+        assertEquals(expectedToken, result)
+    }
+
+    @Test
+    fun `writeRumAccessToken overwrites previous value`() {
+        val firstToken = "first_token_123"
+        val secondToken = "second_token_123"
+
+        storage.writeRumAccessToken(firstToken)
+        storage.writeRumAccessToken(secondToken)
+        val result = storage.readRumAccessToken()
+
+        assertEquals(secondToken, result)
+    }
+
+    @Test
+    fun `readRumAccessToken persists across storage instances`() {
+        val testToken = "persistent_token_123"
+
+        storage.writeRumAccessToken(testToken)
+
+        val newStorage = AgentStorage(context)
+        val result = newStorage.readRumAccessToken()
+
+        assertEquals(testToken, result)
+    }
+
+    @Test
+    fun `deleteRumAccessToken removes stored value`() {
+        val testToken = "token_to_delete_123"
+
+        storage.writeRumAccessToken(testToken)
+        storage.deleteRumAccessToken()
+        val result = storage.readRumAccessToken()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `deleteRumAccessToken handles null gracefully`() {
+        storage.deleteRumAccessToken()
+        val result = storage.readRumAccessToken()
+
+        assertNull(result)
+    }
 }

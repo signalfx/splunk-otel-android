@@ -36,10 +36,22 @@ internal class HttpURLAdditionalAttributesExtractor : AttributesExtractor<URLCon
         responseCode: Int?,
         error: Throwable?
     ) {
-        onResponse(attributes, connection)
+        addPayloadAttributes(attributes, connection)
+        addServerContext(attributes, connection)
     }
 
-    private fun onResponse(attributes: AttributesBuilder, connection: URLConnection) {
+    private fun addPayloadAttributes(attributes: AttributesBuilder, connection: URLConnection) {
+        val requestBodySize: Long? = connection.getRequestProperty("Content-Length")?.toLongOrNull()?.sanitizeUnknown()
+        attributes.put(RumConstants.HTTP_REQUEST_BODY_SIZE, requestBodySize)
+
+        val responseBodySize: Long? = connection.getHeaderField("Content-Length")?.toLongOrNull()?.sanitizeUnknown()
+        attributes.put(RumConstants.HTTP_RESPONSE_BODY_SIZE, responseBodySize)
+    }
+
+    // HTTP spec uses -1 to indicate unknown length. Return null instead of -1.
+    private fun Long?.sanitizeUnknown(): Long? = if (this != null && this >= 0) this else null
+
+    private fun addServerContext(attributes: AttributesBuilder, connection: URLConnection) {
         connection.headerFields.forEach { header ->
             if (!header.key.equals(RumConstants.SERVER_TIMING_HEADER, ignoreCase = true)) {
                 return@forEach
