@@ -49,7 +49,6 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     )
 
     protected open fun onPostInstall() {
-
     }
 
     protected open fun onSessionChange(sessionId: String) {

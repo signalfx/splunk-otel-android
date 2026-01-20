@@ -129,11 +129,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         reportEventInternal(startTimestamp, endTimestamp, name)
     }
 
-    private fun reportEventInternal(
-        startTimestamp: Long,
-        endTimestamp: Long,
-        name: String
-    ) {
+    private fun reportEventInternal(startTimestamp: Long, endTimestamp: Long, name: String) {
         Logger.d(
             TAG,
             "reportEventInternal() - name: $name " +
@@ -183,12 +179,13 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             modules.maxByOrNull { it.initialization?.endElapsed ?: Long.MIN_VALUE }?.initialization
                 ?: throw IllegalStateException("Module initialization did not complete")
 
-        val initEndTimestamp = firstInitialization.startTimestamp + (lastInitialization.endElapsed!! - firstInitialization.startElapsed)
+        val initEndTimestamp =
+            firstInitialization.startTimestamp + (lastInitialization.endElapsed!! - firstInitialization.startElapsed)
 
         Logger.d(
             TAG,
             "reportAppStart() initStartTimestamp: ${firstInitialization.startTimestamp }, " +
-                    "initEndTimestamp: $initEndTimestamp, duration: ${initEndTimestamp - firstInitialization.startTimestamp}ms"
+                "initEndTimestamp: $initEndTimestamp, duration: ${initEndTimestamp - firstInitialization.startTimestamp}ms"
         )
 
         val initSpan = provider.get(RumConstants.RUM_TRACER_NAME)
