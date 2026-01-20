@@ -138,6 +138,11 @@ class AgentIntegration private constructor(context: Context) {
                     endElapsed = null
                 )
             )
+
+            Logger.d(
+                "ONDREJ",
+                "registerModuleInitializationStart() module: $name,  startTimestamp:${modules[name]?.initialization?.startTimestamp}, startElapsed:${modules[name]?.initialization?.startElapsed}"
+            )
         }
 
         fun registerModuleInitializationEnd(name: String) {
@@ -154,6 +159,11 @@ class AgentIntegration private constructor(context: Context) {
                 initialization = module.initialization.copy(
                     endElapsed = SystemClock.elapsedRealtime()
                 )
+            )
+
+            Logger.d(
+                "ONDREJ",
+                "registerModuleInitializationEnd() module: $name,  startTimestamp:${modules[name]?.initialization?.startTimestamp}, startElapsed:${modules[name]?.initialization?.startElapsed}, endElapsed:${modules[name]?.initialization?.endElapsed}"
             )
         }
     }
