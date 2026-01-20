@@ -37,9 +37,13 @@ internal class ConfigurationManager private constructor(private val agentStorage
             )
             agentStorage.deleteTracesBaseUrl()
             agentStorage.deleteLogsBaseUrl()
+            agentStorage.deleteRumAccessToken()
         } else {
             val endpoint = config.endpoint
             agentStorage.writeTracesBaseUrl(endpoint.traceEndpoint.toExternalForm())
+            endpoint.rumAccessToken?.let { token ->
+                agentStorage.writeRumAccessToken(token)
+            } ?: agentStorage.deleteRumAccessToken()
             endpoint.sessionReplayEndpoint?.let { logsUrl ->
                 agentStorage.writeLogsBaseUrl(logsUrl.toExternalForm())
                 Logger.d(TAG, "Trace and session replay endpoint URLs written to storage")
