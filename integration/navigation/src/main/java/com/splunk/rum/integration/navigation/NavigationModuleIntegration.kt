@@ -40,14 +40,16 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     private const val TAG = "NavigationIntegration"
     private var currentActivityReference: WeakReference<Activity>? = null
 
+    private val activityLifecycleCallbacksAdapter = object : ActivityLifecycleCallbacksAdapter {
+        override fun onActivityStarted(activity: Activity) {
+            currentActivityReference = WeakReference(activity)
+        }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (context as Application).registerActivityLifecycleCallbacks(
-            object : ActivityLifecycleCallbacksAdapter {
-                override fun onActivityStarted(activity: Activity) {
-                    currentActivityReference = WeakReference(activity)
-                }
-            }
+            activityLifecycleCallbacksAdapter
         )
     }
 
@@ -64,6 +66,8 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         if (moduleConfiguration.isAutomatedTrackingEnabled) {
             Logger.d(TAG, "automated tracking enabled, attaching ScreenTrackerIntegration")
             ScreenTrackerIntegration.attach(context, currentActivityReference)
+            (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
+            currentActivityReference = null
         }
         super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
