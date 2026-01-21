@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":integration:agent:internal"))
 
     implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.commonUtils)
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingFrameCapturer)
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingInteractions)
 
@@ -34,4 +35,6 @@ dependencies {
 
     implementation(platform(Dependencies.Otel.androidBom))
     implementation(Dependencies.Otel.androidInstrumentation)
+
+    testImplementation(Dependencies.Test.junit)
 }
