@@ -20,12 +20,15 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
+import com.splunk.android.common.logger.Logger
 
 internal class FragmentActivityCallback29(override val fragmentCallback: FragmentLifecycleCallbacks) :
     FragmentActivityCallback {
 
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
+        Logger.d("FragmentActivityCallback29", "onActivityPreCreated")
         if (activity is FragmentActivity) {
+            Logger.d("FragmentActivityCallback29", "onActivityPreCreated FragmentActivity")
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
         }
     }
