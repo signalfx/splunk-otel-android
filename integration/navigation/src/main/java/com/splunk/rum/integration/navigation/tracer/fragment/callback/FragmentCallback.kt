@@ -21,40 +21,48 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.navigation.tracer.fragment.FragmentTracerManager
 
 internal class FragmentCallback(private val manager: FragmentTracerManager) :
     FragmentManager.FragmentLifecycleCallbacks() {
 
     override fun onFragmentPreAttached(fm: FragmentManager, f: Fragment, context: Context) {
+        Logger.d("FragmentCallback", "onFragmentPreAttached")
         manager.getTracer(f)
             .startFragmentCreation()
             .addEvent("fragmentPreAttached")
     }
 
     override fun onFragmentAttached(fm: FragmentManager, f: Fragment, context: Context) {
+        Logger.d("FragmentCallback", "onFragmentAttached")
         manager.addEvent(f, "fragmentAttached")
     }
 
     override fun onFragmentPreCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
+        Logger.d("FragmentCallback", "onFragmentPreCreated")
         manager.addEvent(f, "fragmentPreCreated")
     }
 
     override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
+        Logger.d("FragmentCallback", "onFragmentCreated")
         manager.addEvent(f, "fragmentCreated")
     }
 
     override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
+        Logger.d("FragmentCallback", "onFragmentViewCreated")
         manager.getTracer(f)
             .startSpanIfNoneInProgress("Restored")
             .addEvent("fragmentViewCreated")
     }
 
     override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
+        Logger.d("FragmentCallback", "onFragmentStarted")
         manager.addEvent(f, "fragmentStarted")
     }
 
     override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+        Logger.d("FragmentCallback", "onFragmentResumed")
         manager.getTracer(f)
             .startSpanIfNoneInProgress("Resumed")
             .addEvent("onFragmentResumed")
@@ -62,6 +70,7 @@ internal class FragmentCallback(private val manager: FragmentTracerManager) :
     }
 
     override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
+        Logger.d("FragmentCallback", "onFragmentPaused")
         manager.getTracer(f)
             .startSpanIfNoneInProgress("Paused")
             .addEvent("onFragmentPaused")
@@ -69,6 +78,7 @@ internal class FragmentCallback(private val manager: FragmentTracerManager) :
     }
 
     override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
+        Logger.d("FragmentCallback", "onFragmentStopped")
         manager.getTracer(f)
             .startSpanIfNoneInProgress("Stopped")
             .addEvent("fragmentStopped")
@@ -76,6 +86,7 @@ internal class FragmentCallback(private val manager: FragmentTracerManager) :
     }
 
     override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
+        Logger.d("FragmentCallback", "onFragmentViewDestroyed")
         manager.getTracer(f)
             .startSpanIfNoneInProgress("ViewDestroyed")
             .addEvent("fragmentViewDestroyed")
@@ -83,12 +94,14 @@ internal class FragmentCallback(private val manager: FragmentTracerManager) :
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
+        Logger.d("FragmentCallback", "onFragmentDestroyed")
         manager.getTracer(f)
             .startSpanIfNoneInProgress("Destroyed")
             .addEvent("fragmentDestroyed")
     }
 
     override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
+        Logger.d("FragmentCallback", "onFragmentDetached")
         manager.getTracer(f)
             .startSpanIfNoneInProgress("Detached")
             .addEvent("fragmentDetached")

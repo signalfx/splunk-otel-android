@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.navigation.tracer.fragment
 
 import androidx.fragment.app.Fragment
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
 import com.splunk.rum.integration.navigation.tracer.ActiveSpan
 import io.opentelemetry.api.trace.Tracer
@@ -26,6 +27,7 @@ internal class FragmentTracerManager(private val tracer: Tracer) {
     private val tracers = HashMap<String, FragmentTracer>()
 
     fun addEvent(fragment: Fragment, eventName: String) {
+        Logger.d("FragmentTracerManager", "addEvent: ${fragment.javaClass.name} -> $eventName")
         tracers[fragment.javaClass.name]?.addEvent(eventName)
     }
 
@@ -34,6 +36,7 @@ internal class FragmentTracerManager(private val tracer: Tracer) {
         var activityTracer = tracers[className]
 
         if (activityTracer == null) {
+            Logger.d("FragmentTracerManager", "create tracer for $className")
             activityTracer = FragmentTracer(
                 fragmentName = fragment::class.java.simpleName,
                 screenName = ScreenNameDescriptor.getName(fragment),

@@ -108,26 +108,37 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             val actionName = when (interaction) {
                 is Interaction.Focus ->
                     "focus"
+
                 is Interaction.Keyboard ->
                     "soft_keyboard"
+
                 is Interaction.Orientation ->
                     return
+
                 is Interaction.PhoneButton ->
                     "phone_button"
+
                 is Interaction.Touch.Gesture.DoubleTap ->
                     "double_tap"
+
                 is Interaction.Touch.Gesture.LongPress ->
                     "long_press"
+
                 is Interaction.Touch.Gesture.Pinch ->
                     "pinch"
+
                 is Interaction.Touch.Gesture.RageTap ->
                     "rage_tap"
+
                 is Interaction.Touch.Gesture.Rotation ->
                     "rotation"
+
                 is Interaction.Touch.Gesture.Swipe ->
                     return
+
                 is Interaction.Touch.Gesture.Tap ->
                     "tap"
+
                 is Interaction.Touch.Pointer ->
                     return
             }
@@ -140,14 +151,27 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
             Logger.d(TAG, "onInteraction(actionName: $actionName, targetType: $targetType, interaction: $interaction)")
 
-            logger.get(RumConstants.RUM_TRACER_NAME)
+            val log = logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
                 .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, "action")
                 .setAttribute(attributeKeyComponent, "ui")
                 .setAttribute(attributeKeyActionName, actionName)
                 .setAttribute(attributeKeyTargetType, targetType.orEmpty())
-                .emit()
+
+            if (interaction is Interaction.Targetable) {
+                log.setAttribute(
+                    RumConstants.INTERACTIONS_TARGET_XPATH_KEY,
+                    XpathBuilder.build(interaction)
+                )
+
+                log.setAttribute(
+                    RumConstants.INTERACTIONS_TARGET_ELEMENT_KEY,
+                    interaction.targetElementPath?.lastOrNull()?.view?.typename.orEmpty()
+                )
+            }
+
+            log.emit()
         }
     }
 }

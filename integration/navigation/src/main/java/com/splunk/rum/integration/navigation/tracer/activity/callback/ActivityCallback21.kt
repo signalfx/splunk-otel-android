@@ -18,39 +18,46 @@ package com.splunk.rum.integration.navigation.tracer.activity.callback
 
 import android.app.Activity
 import android.os.Bundle
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.navigation.tracer.activity.ActivityTracerManager
 
 internal class ActivityCallback21(override val tracer: ActivityTracerManager) : ActivityCallback {
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        Logger.d("ActivityCallback21", "onActivityCreated")
         tracer.startActivityCreation(activity)
             .addEvent("activityCreated")
     }
 
     override fun onActivityStarted(activity: Activity) {
+        Logger.d("ActivityCallback21", "onActivityStarted")
         tracer.initiateRestartSpanIfNecessary(activity)
             .addEvent("activityStarted")
     }
 
     override fun onActivityResumed(activity: Activity) {
+        Logger.d("ActivityCallback21", "onActivityResumed")
         tracer.startSpanIfNoneInProgress(activity, "Resumed")
             .addEvent("onActivityResumed")
             .endSpanForActivityResumed()
     }
 
     override fun onActivityPaused(activity: Activity) {
+        Logger.d("ActivityCallback21", "onActivityPaused")
         tracer.startSpanIfNoneInProgress(activity, "Paused")
             .addEvent("onActivityPaused")
             .endActiveSpan()
     }
 
     override fun onActivityStopped(activity: Activity) {
+        Logger.d("ActivityCallback21", "onActivityStopped")
         tracer.startSpanIfNoneInProgress(activity, "Stopped")
             .addEvent("activityStopped")
             .endActiveSpan()
     }
 
     override fun onActivityDestroyed(activity: Activity) {
+        Logger.d("ActivityCallback21", "onActivityDestroyed")
         tracer.startSpanIfNoneInProgress(activity, "Destroyed")
             .addEvent("activityDestroyed")
             .endActiveSpan()

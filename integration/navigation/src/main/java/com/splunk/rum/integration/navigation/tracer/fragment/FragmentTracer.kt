@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.navigation.tracer.fragment
 
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.navigation.tracer.ActiveSpan
@@ -31,6 +32,7 @@ internal class FragmentTracer(
 ) {
 
     fun startSpanIfNoneInProgress(action: String): FragmentTracer {
+        Logger.d("FragmentTracer", "startSpanIfNoneInProgress: $action")
         if (activeSpan.isSpanInProgress()) {
             return this
         }
@@ -40,15 +42,18 @@ internal class FragmentTracer(
     }
 
     fun startFragmentCreation(): FragmentTracer {
+        Logger.d("FragmentTracer", "startFragmentCreation")
         activeSpan.startSpan { createSpan(RumConstants.NAVIGATION_NAME) }
         return this
     }
 
     fun endActiveSpan() {
+        Logger.d("FragmentTracer", "endActiveSpan")
         activeSpan.endActiveSpan()
     }
 
     fun addEvent(eventName: String): FragmentTracer {
+        Logger.d("FragmentTracer", "addEvent: $eventName")
         activeSpan.addEvent(eventName)
         return this
     }

@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.navigation.tracer.activity
 
 import android.app.Activity
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
 import com.splunk.rum.integration.navigation.tracer.ActiveSpan
 import io.opentelemetry.api.trace.Tracer
@@ -40,6 +41,7 @@ internal class ActivityTracerManager(private val tracer: Tracer, private val ini
         var activityTracer = tracers[className]
 
         if (activityTracer == null) {
+            Logger.d("ActivityTracerManager", "create tracer for $className")
             activityTracer = ActivityTracer(
                 initialAppActivity = initialAppActivity,
                 tracer = tracer,
