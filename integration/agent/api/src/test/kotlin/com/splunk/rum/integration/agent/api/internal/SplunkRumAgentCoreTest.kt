@@ -27,6 +27,7 @@ import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
+import java.io.File
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -38,7 +39,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class SplunkRumAgentCoreTest {
