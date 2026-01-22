@@ -140,7 +140,7 @@ class AgentIntegration private constructor(context: Context) {
             )
 
             Logger.d(
-                "ONDREJ",
+                TAG,
                 "registerModuleInitializationStart() module: $name,  startTimestamp:${modules[name]?.initialization?.startTimestamp}, startElapsed:${modules[name]?.initialization?.startElapsed}"
             )
         }
@@ -162,7 +162,7 @@ class AgentIntegration private constructor(context: Context) {
             )
 
             Logger.d(
-                "ONDREJ",
+                TAG,
                 "registerModuleInitializationEnd() module: $name,  startTimestamp:${modules[name]?.initialization?.startTimestamp}, startElapsed:${modules[name]?.initialization?.startElapsed}, endElapsed:${modules[name]?.initialization?.endElapsed}"
             )
         }
