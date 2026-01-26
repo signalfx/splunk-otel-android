@@ -22,10 +22,12 @@ import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.MutableListObserver
 import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.android.common.utils.extensions.rootView
 import com.splunk.rum.startup.extension.doOnDraw
+import com.splunk.rum.startup.model.StartEvent
 import com.splunk.rum.startup.util.ProcessInfo
 import com.splunk.rum.utils.extensions.isStartedInForeground
 
@@ -33,36 +35,13 @@ object ApplicationStartupTimekeeper {
 
     private const val TAG = "ApplicationStartupTimekeeper"
 
+    private val pendingEvents = mutableListOf<StartEvent>()
+
     private var isColdStartCompleted = false
 
     var isEnabled = true
 
-    // Cached startup event for when no listeners are registered yet (RN support)
-    private var pendingStartupEvent: Triple<Long, Long, StartType>? = null
-
-    private val listenersCache: MutableList<Listener> = arrayListOf()
-
-    val listeners: MutableList<Listener> = object : MutableList<Listener> by listenersCache {
-        override fun add(element: Listener): Boolean {
-            val result = listenersCache.add(element)
-
-            pendingStartupEvent?.let { (startTs, endTs, type) ->
-                Logger.d(TAG, "Delivering pending ${type.name} start event to new listener")
-                val duration = endTs - startTs
-
-                when (type) {
-                    StartType.COLD -> element.onColdStarted(startTs, endTs, duration)
-                    StartType.WARM -> element.onWarmStarted(startTs, endTs, duration)
-                    StartType.HOT -> element.onHotStarted(startTs, endTs, duration)
-                }
-                pendingStartupEvent = null
-            }
-
-            return result
-        }
-    }
-
-    private enum class StartType { COLD, WARM, HOT }
+    val listeners: MutableList<Listener> = MutableListObserver<Listener>(arrayListOf(), ListenerObserver())
 
     internal fun onCreate(application: Application) {
         isColdStartCompleted = !application.isStartedInForeground
@@ -130,8 +109,7 @@ object ApplicationStartupTimekeeper {
         override fun onActivityResumed(activity: Activity) {
             resumedActivityCount++
 
-            if (isEnabled &&
-                resumedActivityCount == 1 &&
+            if (isEnabled && resumedActivityCount == 1 &&
                 (!isColdStartCompleted || isHotStartPending || isWarmStartPending)
             ) {
                 val rootView = activity.rootView
@@ -146,56 +124,7 @@ object ApplicationStartupTimekeeper {
                         return@doOnDraw
                     }
 
-                    val startType: StartType
-                    val startTimestamp: Long
-                    val endTimestamp: Long
-                    val duration: Long
-
-                    when {
-                        !isColdStartCompleted -> {
-                            startType = StartType.COLD
-
-                            duration = SystemClock.uptimeMillis() - ProcessInfo.getStartUptimeMillis()
-                            endTimestamp = System.currentTimeMillis()
-                            startTimestamp = endTimestamp - duration
-
-                            isColdStartCompleted = true
-                        }
-                        isHotStartPending -> {
-                            startType = StartType.HOT
-
-                            startTimestamp = firstActivityStartTimestamp
-                            duration = SystemClock.elapsedRealtime() - firstActivityStartElapsed
-                            endTimestamp = firstActivityStartTimestamp + duration
-
-                            isHotStartPending = false
-                        }
-                        isWarmStartPending -> {
-                            startType = StartType.WARM
-
-                            startTimestamp = firstActivityCreateTimestamp
-                            duration = SystemClock.elapsedRealtime() - firstActivityCreateElapsed
-                            endTimestamp = firstActivityCreateTimestamp + duration
-
-                            isWarmStartPending = false
-                        }
-                        else ->
-                            return@doOnDraw
-                    }
-
-                    if (listenersCache.isEmpty()) {
-                        // No listeners registered yet - cache the event for later delivery
-                        Logger.d(TAG, "No listeners registered, caching ${startType.name} start event")
-                        pendingStartupEvent = Triple(startTimestamp, endTimestamp, startType)
-                    } else {
-                        listenersCache.forEachFast { listener ->
-                            when (startType) {
-                                StartType.COLD -> listener.onColdStarted(startTimestamp, endTimestamp, duration)
-                                StartType.WARM -> listener.onWarmStarted(startTimestamp, endTimestamp, duration)
-                                StartType.HOT -> listener.onHotStarted(startTimestamp, endTimestamp, duration)
-                            }
-                        }
-                    }
+                    processStart()
                 }
             }
         }
@@ -211,26 +140,69 @@ object ApplicationStartupTimekeeper {
         override fun onActivityDestroyed(activity: Activity) {
             createdActivityCount--
         }
+
+        private fun processStart() {
+            val startType: StartEvent.Type
+            val startTimestamp: Long
+            val endTimestamp: Long
+
+            when {
+                !isColdStartCompleted -> {
+                    startType = StartEvent.Type.COLD
+
+                    val duration = SystemClock.uptimeMillis() - ProcessInfo.getStartUptimeMillis()
+                    endTimestamp = System.currentTimeMillis()
+                    startTimestamp = endTimestamp - duration
+
+                    isColdStartCompleted = true
+                }
+                isHotStartPending -> {
+                    startType = StartEvent.Type.HOT
+
+                    startTimestamp = firstActivityStartTimestamp
+                    val duration = SystemClock.elapsedRealtime() - firstActivityStartElapsed
+                    endTimestamp = firstActivityStartTimestamp + duration
+
+                    isHotStartPending = false
+                }
+                isWarmStartPending -> {
+                    startType = StartEvent.Type.WARM
+
+                    startTimestamp = firstActivityCreateTimestamp
+                    val duration = SystemClock.elapsedRealtime() - firstActivityCreateElapsed
+                    endTimestamp = firstActivityCreateTimestamp + duration
+
+                    isWarmStartPending = false
+                }
+                else ->
+                    return
+            }
+
+            val event = StartEvent(startType, startTimestamp, endTimestamp)
+
+            if (listeners.isEmpty()) {
+                Logger.d(TAG, "processStart() - No listeners, caching event $event")
+                pendingEvents += event
+            } else {
+                listeners.forEachFast { it.onStartEvent(event) }
+            }
+        }
     }
 
     interface Listener {
+        fun onStartEvent(event: StartEvent)
+    }
 
-        /**
-         * The application is launched from a completely inactive state.
-         * Kill the app > press the application icon.
-         */
-        fun onColdStarted(startTimestamp: Long, endTimestamp: Long, duration: Long)
+    private class ListenerObserver : MutableListObserver.Observer<Listener> {
+        override fun onAdded(element: Listener) {
+            if (listeners.isEmpty()) {
+                pendingEvents.forEachFast {
+                    Logger.d(TAG, "onAdded() - Delivering pending event of type ${it.type.name}")
+                    element.onStartEvent(it)
+                }
 
-        /**
-         * The application is launched after being recently closed or moved to the background, but still resides in memory.
-         * Open the app > press back button > press the app icon.
-         */
-        fun onWarmStarted(startTimestamp: Long, endTimestamp: Long, duration: Long)
-
-        /**
-         * The application is already running in the background and is brought to the foreground.
-         * Open the app > press home button > press the app icon.
-         */
-        fun onHotStarted(startTimestamp: Long, endTimestamp: Long, duration: Long)
+                pendingEvents.clear()
+            }
+        }
     }
 }
