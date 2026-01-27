@@ -21,7 +21,7 @@ class SplunkSessionManagerTest {
 
     @Test
     fun `creates new session when none stored`() {
-        val storage= storageMock()
+        val storage = storageMock()
         val manager = SplunkSessionManager(storage.first)
 
         val createdId = manager.sessionId
