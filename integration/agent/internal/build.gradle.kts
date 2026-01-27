@@ -42,4 +42,6 @@ dependencies {
     compileOnly(Dependencies.Android.Compose.ui)
 
     testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.mockito)
+    testImplementation(Dependencies.Test.robolectric)
 }
