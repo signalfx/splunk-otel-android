@@ -26,9 +26,8 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.toSplunkString
 import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modules
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
+import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
-import com.splunk.rum.startup.model.StartEvent
-import com.splunk.rum.utils.extensions.formatDateTime
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.trace.SdkTracerProvider
@@ -40,10 +39,15 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
     private const val TAG = "StartupIntegration"
 
-    private val cache: MutableList<StartEvent> = mutableListOf()
+    private val lock = Any()
 
-    private val isInstallCompleted: Boolean
-        get() = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider != null
+    private val cache: MutableList<StartupData> = mutableListOf()
+
+    @Volatile
+    private var isInitializationReported = false
+
+    @Volatile
+    private var isInstallComplete = false
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach() - adding listener to ApplicationStartupTimekeeper")
@@ -62,41 +66,97 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         super.onPostInstall()
         Logger.d(TAG, "onPostInstall()")
 
-        cache.forEachFast { reportEventInternal(it) }
-        cache.clear()
+        val cachedEvents: List<StartupData>
+
+        synchronized(lock) {
+            cachedEvents = cache.toList()
+            cache.clear()
+            isInstallComplete = true
+        }
+
+        if (cachedEvents.isNotEmpty()) {
+            Logger.d(TAG, "Processing deferred cache (size: ${cachedEvents.size})")
+            cachedEvents.forEachFast {
+                Logger.d(TAG, "Processing cached event: ${it.name}")
+                reportEventInternal(it.startTimestamp, it.endTimestamp, it.name)
+            }
+        }
+
+        Logger.d(TAG, "onPostInstall() complete")
     }
 
-    private fun reportEvent(event: StartEvent) {
-        if (!isInstallCompleted) {
-            Logger.d(TAG, "reportEvent() - install not complete, caching event: $event")
-            cache += event
+    private val applicationStartupTimekeeperListener = object : ApplicationStartupTimekeeper.Listener {
+        override fun onColdStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
+            Logger.d(
+                TAG,
+                "onColdStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
+            )
+            reportEvent(startTimestamp, endTimestamp, "cold")
+        }
+
+        override fun onWarmStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
+            Logger.d(
+                TAG,
+                "onWarmStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
+            )
+            reportEvent(startTimestamp, endTimestamp, "warm")
+        }
+
+        override fun onHotStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
+            Logger.d(
+                TAG,
+                "onHotStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
+            )
+            reportEvent(startTimestamp, endTimestamp, "hot")
+        }
+    }
+
+    private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
+        synchronized(lock) {
+            if (isInitializationReported) {
+                Logger.d(TAG, "reportEvent() - skipping, already reported")
+                return
+            }
+
+            if (!isInstallComplete) {
+                Logger.d(TAG, "reportEvent() - install not complete, caching event: $name")
+                cache += StartupData(startTimestamp, endTimestamp, name)
+                return
+            }
+        }
+
+        // Install is complete, process the event immediately
+        reportEventInternal(startTimestamp, endTimestamp, name)
+    }
+
+    private fun reportEventInternal(startTimestamp: Long, endTimestamp: Long, name: String) {
+        Logger.d(
+            TAG,
+            "reportEventInternal() - name: $name " +
+                "isInitializationReported: $isInitializationReported"
+        )
+
+        if (isInitializationReported) {
+            Logger.d(TAG, "reportEventInternal() - skipping, already reported")
             return
         }
 
-        reportEventInternal(event)
-    }
-
-    private fun reportEventInternal(event: StartEvent) {
         val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
         if (provider == null) {
             Logger.e(TAG, "reportEventInternal() - SDK not ready")
             return
         }
 
-        Logger.d(TAG, "reportEventInternal() - SDK ready, creating span for: $event")
+        Logger.d(TAG, "reportEventInternal() - SDK ready, creating span for: $name")
+
+        isInitializationReported = true
 
         val span = provider.get(RumConstants.RUM_TRACER_NAME)
             .spanBuilder(RumConstants.APP_START_NAME)
-            .setStartTimestamp(event.startTimestamp, TimeUnit.MILLISECONDS)
+            .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
         reportInitializeSpan(span, provider)
-
-        val name = when (event.type) {
-            StartEvent.Type.COLD -> "cold"
-            StartEvent.Type.WARM -> "warm"
-            StartEvent.Type.HOT -> "hot"
-        }
 
         // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
         // "unknown" to ensure App Start event doesn't show up under a screen on UI
@@ -104,12 +164,12 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             .setAttribute(RumConstants.COMPONENT_KEY, "appstart")
             .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
             .setAttribute("start.type", name)
-            .end(event.endTimestamp.toInstant())
+            .end(endTimestamp.toInstant())
 
         Logger.d(TAG, "reportEventInternal() - span sent successfully for: $name")
     }
 
-    private fun reportInitializeSpan(span: Span, provider: SdkTracerProvider) {
+    private fun reportInitializeSpan(span: Span, provider: SdkTracerProvider, asSibling: Boolean = false) {
         val modules = modules.values
 
         val firstInitialization =
@@ -124,8 +184,8 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
         Logger.d(
             TAG,
-            "reportAppStart() initStartTimestamp: ${firstInitialization.startTimestamp.formatDateTime()}, " +
-                "initEndTimestamp: ${initEndTimestamp.formatDateTime()}, duration: ${initEndTimestamp - firstInitialization.startTimestamp} ms"
+            "reportAppStart() initStartTimestamp: ${firstInitialization.startTimestamp }, " +
+                "initEndTimestamp: $initEndTimestamp, duration: ${initEndTimestamp - firstInitialization.startTimestamp}ms"
         )
 
         val initSpan = provider.get(RumConstants.RUM_TRACER_NAME)
@@ -138,7 +198,8 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
 
         val resources = modules.joinToString(",", "[", "]") {
-            it.configuration?.toSplunkString() ?: "${it.name}.enabled:true"
+            it.configuration?.toSplunkString()
+                ?: "${it.name}.enabled:true"
         }
 
         initSpan.setAttribute("config_settings", resources)
@@ -162,12 +223,5 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         }
 
         initSpan.end(initEndTimestamp.toInstant())
-    }
-
-    private val applicationStartupTimekeeperListener = object : ApplicationStartupTimekeeper.Listener {
-        override fun onStartEvent(event: StartEvent) {
-            Logger.d(TAG, "onStartEvent(event: $event)")
-            reportEvent(event)
-        }
     }
 }

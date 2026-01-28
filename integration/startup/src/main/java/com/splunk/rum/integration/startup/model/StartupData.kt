@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.utils.extensions
+package com.splunk.rum.integration.startup.model
 
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-
-fun Long.formatDateTime(format: String = "HH:mm:ss.SSS"): String =
-    SimpleDateFormat(format, Locale.US).format(Date(this))
+internal data class StartupData(val startTimestamp: Long, val endTimestamp: Long, val name: String)
