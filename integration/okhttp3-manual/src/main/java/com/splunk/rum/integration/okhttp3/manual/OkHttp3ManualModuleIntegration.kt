@@ -50,7 +50,5 @@ internal object OkHttp3ManualModuleIntegration : ModuleIntegration<OkHttp3Manual
                     ?.let { setCapturedResponseHeaders(it) }
             }
             .build()
-
-        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 }

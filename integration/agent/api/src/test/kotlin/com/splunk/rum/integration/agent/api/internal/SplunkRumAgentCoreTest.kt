@@ -24,10 +24,10 @@ import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
+import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import java.io.File
-import java.net.URL
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -74,6 +74,7 @@ class SplunkRumAgentCoreTest {
     fun tearDown() {
         cleanupStorage()
         SplunkRumAgentCore.isRunning = false
+        AgentIntegration.modules.clear()
     }
 
     @Test
@@ -96,6 +97,7 @@ class SplunkRumAgentCoreTest {
 
         // Reset running state to allow re-installation
         SplunkRumAgentCore.isRunning = false
+        AgentIntegration.modules.clear()
 
         // Second install (simulating app restart)
         installSplunkRumAgent()
@@ -113,6 +115,7 @@ class SplunkRumAgentCoreTest {
         // Simulate fresh install
         cleanupStorage()
         SplunkRumAgentCore.isRunning = false
+        AgentIntegration.modules.clear()
         storage = AgentStorage.attach(application) as AgentStorage
 
         // Second installation
