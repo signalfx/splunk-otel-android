@@ -16,8 +16,12 @@
 
 package com.splunk.rum.integration.navigation
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
+import android.os.Bundle
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.common.otel.internal.RumConstants.NAVIGATION_NAME
@@ -26,6 +30,7 @@ import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.navigation.screen.ScreenTrackerIntegration
 import io.opentelemetry.android.instrumentation.InstallationContext
+import java.lang.ref.WeakReference
 import java.time.Instant
 
 internal object NavigationModuleIntegration : ModuleIntegration<NavigationModuleConfiguration>(
@@ -33,20 +38,37 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 ) {
 
     private const val TAG = "NavigationIntegration"
+    private var currentActivityReference: WeakReference<Activity>? = null
+
+    private val activityLifecycleCallbacksAdapter = object : ActivityLifecycleCallbacksAdapter {
+        override fun onActivityStarted(activity: Activity) {
+            currentActivityReference = WeakReference(activity)
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (context as Application).registerActivityLifecycleCallbacks(
+            activityLifecycleCallbacksAdapter
+        )
+    }
 
     override fun onInstall(
         context: Context,
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
+        Logger.d(TAG, "onInstall")
         if (moduleConfiguration.isEnabled) {
             Navigation.instance.listener = navigationListener
         }
 
         if (moduleConfiguration.isAutomatedTrackingEnabled) {
-            ScreenTrackerIntegration.attach(context)
+            Logger.d(TAG, "automated tracking enabled, attaching ScreenTrackerIntegration")
+            ScreenTrackerIntegration.attach(context, currentActivityReference)
+            (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
+            currentActivityReference = null
         }
-        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 
     private val navigationListener = object : Navigation.Listener {

@@ -37,7 +37,32 @@ object ApplicationStartupTimekeeper {
 
     var isEnabled = true
 
-    val listeners: MutableList<Listener> = arrayListOf()
+    // Cached startup event for when no listeners are registered yet (RN support)
+    private var pendingStartupEvent: Triple<Long, Long, StartType>? = null
+
+    private val listenersCache: MutableList<Listener> = arrayListOf()
+
+    val listeners: MutableList<Listener> = object : MutableList<Listener> by listenersCache {
+        override fun add(element: Listener): Boolean {
+            val result = listenersCache.add(element)
+
+            pendingStartupEvent?.let { (startTs, endTs, type) ->
+                Logger.d(TAG, "Delivering pending ${type.name} start event to new listener")
+                val duration = endTs - startTs
+
+                when (type) {
+                    StartType.COLD -> element.onColdStarted(startTs, endTs, duration)
+                    StartType.WARM -> element.onWarmStarted(startTs, endTs, duration)
+                    StartType.HOT -> element.onHotStarted(startTs, endTs, duration)
+                }
+                pendingStartupEvent = null
+            }
+
+            return result
+        }
+    }
+
+    private enum class StartType { COLD, WARM, HOT }
 
     internal fun onCreate(application: Application) {
         isColdStartCompleted = !application.isStartedInForeground
@@ -121,15 +146,14 @@ object ApplicationStartupTimekeeper {
                         return@doOnDraw
                     }
 
-                    val reporter: Listener.(Long, Long, Long) -> Unit
-
+                    val startType: StartType
                     val startTimestamp: Long
                     val endTimestamp: Long
                     val duration: Long
 
                     when {
                         !isColdStartCompleted -> {
-                            reporter = Listener::onColdStarted
+                            startType = StartType.COLD
 
                             duration = SystemClock.uptimeMillis() - ProcessInfo.getStartUptimeMillis()
                             endTimestamp = System.currentTimeMillis()
@@ -138,7 +162,7 @@ object ApplicationStartupTimekeeper {
                             isColdStartCompleted = true
                         }
                         isHotStartPending -> {
-                            reporter = Listener::onHotStarted
+                            startType = StartType.HOT
 
                             startTimestamp = firstActivityStartTimestamp
                             duration = SystemClock.elapsedRealtime() - firstActivityStartElapsed
@@ -147,7 +171,7 @@ object ApplicationStartupTimekeeper {
                             isHotStartPending = false
                         }
                         isWarmStartPending -> {
-                            reporter = Listener::onWarmStarted
+                            startType = StartType.WARM
 
                             startTimestamp = firstActivityCreateTimestamp
                             duration = SystemClock.elapsedRealtime() - firstActivityCreateElapsed
@@ -159,8 +183,18 @@ object ApplicationStartupTimekeeper {
                             return@doOnDraw
                     }
 
-                    listeners.forEachFast {
-                        reporter(it, startTimestamp, endTimestamp, duration)
+                    if (listenersCache.isEmpty()) {
+                        // No listeners registered yet - cache the event for later delivery
+                        Logger.d(TAG, "No listeners registered, caching ${startType.name} start event")
+                        pendingStartupEvent = Triple(startTimestamp, endTimestamp, startType)
+                    } else {
+                        listenersCache.forEachFast { listener ->
+                            when (startType) {
+                                StartType.COLD -> listener.onColdStarted(startTimestamp, endTimestamp, duration)
+                                StartType.WARM -> listener.onWarmStarted(startTimestamp, endTimestamp, duration)
+                                StartType.HOT -> listener.onHotStarted(startTimestamp, endTimestamp, duration)
+                            }
+                        }
                     }
                 }
             }

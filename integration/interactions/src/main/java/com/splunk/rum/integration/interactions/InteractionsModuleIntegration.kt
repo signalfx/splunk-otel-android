@@ -30,10 +30,12 @@ import com.splunk.android.instrumentation.recording.wireframe.model.Wireframe
 import com.splunk.android.instrumentation.recording.wireframe.stats.WireframeStats
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
+import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
 
@@ -60,6 +62,14 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
         }
         setupComposeIdentification()
         Interactions.listeners += interactionsListener
+    }
+
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
+        Logger.d(TAG, "Crash reporting is disabled")
     }
 
     private fun setupComposeIdentification() {
@@ -98,26 +108,37 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             val actionName = when (interaction) {
                 is Interaction.Focus ->
                     "focus"
+
                 is Interaction.Keyboard ->
                     "soft_keyboard"
+
                 is Interaction.Orientation ->
                     return
+
                 is Interaction.PhoneButton ->
                     "phone_button"
+
                 is Interaction.Touch.Gesture.DoubleTap ->
                     "double_tap"
+
                 is Interaction.Touch.Gesture.LongPress ->
                     "long_press"
+
                 is Interaction.Touch.Gesture.Pinch ->
                     "pinch"
+
                 is Interaction.Touch.Gesture.RageTap ->
                     "rage_tap"
+
                 is Interaction.Touch.Gesture.Rotation ->
                     "rotation"
+
                 is Interaction.Touch.Gesture.Swipe ->
                     return
+
                 is Interaction.Touch.Gesture.Tap ->
                     "tap"
+
                 is Interaction.Touch.Pointer ->
                     return
             }
@@ -130,14 +151,27 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
             Logger.d(TAG, "onInteraction(actionName: $actionName, targetType: $targetType, interaction: $interaction)")
 
-            logger.get(RumConstants.RUM_TRACER_NAME)
+            val log = logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
                 .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, "action")
                 .setAttribute(attributeKeyComponent, "ui")
                 .setAttribute(attributeKeyActionName, actionName)
                 .setAttribute(attributeKeyTargetType, targetType.orEmpty())
-                .emit()
+
+            if (interaction is Interaction.Targetable) {
+                log.setAttribute(
+                    RumConstants.INTERACTIONS_TARGET_XPATH_KEY,
+                    XpathBuilder.build(interaction)
+                )
+
+                log.setAttribute(
+                    RumConstants.INTERACTIONS_TARGET_ELEMENT_KEY,
+                    interaction.targetElementPath?.lastOrNull()?.view?.typename.orEmpty()
+                )
+            }
+
+            log.emit()
         }
     }
 }
