@@ -69,7 +69,6 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
             currentActivityReference = null
         }
-        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 
     private val navigationListener = object : Navigation.Listener {

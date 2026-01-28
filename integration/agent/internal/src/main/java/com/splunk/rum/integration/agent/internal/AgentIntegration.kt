@@ -51,14 +51,14 @@ class AgentIntegration private constructor(context: Context) {
     }
 
     init {
-        registerModuleInitializationStart(MODULE_NAME)
-
         val storage = AgentStorage.attach(context)
 
         sessionManager = SplunkSessionManager(storage)
     }
 
     fun install(context: Context, openTelemetry: OpenTelemetrySdk, moduleConfigurations: List<ModuleConfiguration>) {
+        registerModuleInitializationStart(MODULE_NAME)
+
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME)
@@ -87,6 +87,8 @@ class AgentIntegration private constructor(context: Context) {
         listeners.forEachFast { it.onInstall(context, oTelInstallationContext, moduleConfigurations) }
 
         registerModuleInitializationEnd(MODULE_NAME)
+
+        listeners.forEachFast { it.onPostInstall() }
     }
 
     interface Listener {
@@ -95,6 +97,7 @@ class AgentIntegration private constructor(context: Context) {
             oTelInstallationContext: InstallationContext,
             moduleConfigurations: List<ModuleConfiguration>
         )
+        fun onPostInstall()
     }
 
     companion object {
@@ -135,6 +138,11 @@ class AgentIntegration private constructor(context: Context) {
                     endElapsed = null
                 )
             )
+
+            Logger.d(
+                TAG,
+                "registerModuleInitializationStart() module: $name,  startTimestamp:${modules[name]?.initialization?.startTimestamp}, startElapsed:${modules[name]?.initialization?.startElapsed}"
+            )
         }
 
         fun registerModuleInitializationEnd(name: String) {
@@ -151,6 +159,11 @@ class AgentIntegration private constructor(context: Context) {
                 initialization = module.initialization.copy(
                     endElapsed = SystemClock.elapsedRealtime()
                 )
+            )
+
+            Logger.d(
+                TAG,
+                "registerModuleInitializationEnd() module: $name,  startTimestamp:${modules[name]?.initialization?.startTimestamp}, startElapsed:${modules[name]?.initialization?.startElapsed}, endElapsed:${modules[name]?.initialization?.endElapsed}"
             )
         }
     }
