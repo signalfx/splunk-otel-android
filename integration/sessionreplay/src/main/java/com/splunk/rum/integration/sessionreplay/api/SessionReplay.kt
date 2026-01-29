@@ -20,11 +20,11 @@ import android.os.Build
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.instrumentation.recording.core.api.SessionReplay as CommonSessionReplay
 import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.sessionreplay.SessionReplayModuleIntegration
+import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.api.mapping.toCommon
 import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
 
-class SessionReplay internal constructor() {
+class SessionReplay internal constructor(private val configuration: SessionReplayModuleConfiguration) {
 
     private var statusOverride: Status? = null
 
@@ -39,7 +39,7 @@ class SessionReplay internal constructor() {
     /**
      * The current SDK state. Each value is combination of default one and [preferences].
      */
-    val state: State = State(StatusOverrideProvider())
+    val state: State = State(StatusOverrideProvider(), configuration)
 
     /**
      * Sensitivity configuration defines which part of screen will not be visible. Used only when [State.renderingMode] is [RenderingMode.NATIVE].
@@ -59,6 +59,21 @@ class SessionReplay internal constructor() {
      * Starts recording of a user activity.
      */
     fun start() {
+        if (!configuration.isEnabled) {
+            Logger.w(TAG, "start() - Session replay is disabled")
+            return
+        }
+
+        if (configuration.samplingRate < Math.random()) {
+            Logger.w(TAG, "start() - Session replay is disabled due to sampling rate")
+
+            statusOverride = Status.NotRecording(
+                cause = Status.NotRecording.Cause.DISABLED_BY_SAMPLING
+            )
+
+            return
+        }
+
         if (Build.VERSION.SDK_INT < AgentIntegration.lowestApiLevel) {
             Logger.w(TAG, "start() - Unsupported Android version")
 
@@ -88,10 +103,17 @@ class SessionReplay internal constructor() {
 
         private const val TAG = "SessionReplay"
 
+        private var instanceInternal: SessionReplay? = null
+
         /**
          * Returns instance of the SessionReplay.
          */
         @JvmStatic
-        val instance by lazy { SessionReplay() }
+        val instance: SessionReplay
+            get() = instanceInternal ?: throw IllegalStateException("Call install() first")
+
+        internal fun createInstance(configuration: SessionReplayModuleConfiguration) {
+            instanceInternal = SessionReplay(configuration)
+        }
     }
 }

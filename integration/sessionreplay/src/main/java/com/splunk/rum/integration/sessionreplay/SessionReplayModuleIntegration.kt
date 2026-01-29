@@ -31,6 +31,7 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
+import com.splunk.rum.integration.sessionreplay.api.SessionReplay as SplunkSessionReplay
 import com.splunk.rum.integration.sessionreplay.index.TimeIndex
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
@@ -63,12 +64,12 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         Logger.d(TAG, "onInstall()")
         timeIndex.put(1)
 
+        SplunkSessionReplay.createInstance(moduleConfiguration)
+
         with(SessionReplay.instance) {
             dataListeners += sessionReplayDataListener
 
-            /**
-             * For Splunk agents, the WebView must not be sensitive by default.
-             */
+            // For Splunk agents, the WebView must not be sensitive by default.
             sensitivity.setViewClassSensitivity(WebView::class.java, null)
         }
     }
@@ -85,11 +86,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             ComposeElementIdentification.insertModifierIfNeeded(
                 SessionReplayDrawModifier::class,
                 OrderPriority.HIGH
-            ) {
-                    id,
-                    isSensitive,
-                    _
-                ->
+            ) { id, isSensitive, _ ->
                 SessionReplayDrawModifier(id, isSensitive)
             }
         }
