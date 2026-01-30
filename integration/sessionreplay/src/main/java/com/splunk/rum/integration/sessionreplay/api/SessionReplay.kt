@@ -18,15 +18,15 @@ package com.splunk.rum.integration.sessionreplay.api
 
 import android.os.Build
 import com.splunk.android.common.logger.Logger
-import com.splunk.android.instrumentation.recording.core.api.SessionReplay as CommonSessionReplay
 import com.splunk.rum.integration.agent.internal.AgentIntegration
-import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration
+import com.splunk.rum.integration.sessionreplay.SessionReplayModuleIntegration
 import com.splunk.rum.integration.sessionreplay.api.mapping.toCommon
 import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
+import com.splunk.android.instrumentation.recording.core.api.SessionReplay as CommonSessionReplay
 
-class SessionReplay internal constructor(private val configuration: SessionReplayModuleConfiguration) {
-
-    private var statusOverride: Status? = null
+class SessionReplay internal constructor(
+    private val info: SessionReplayModuleIntegration.Info
+) {
 
     /**
      * Preferred configuration. The entered values represent only the preferred configuration. The resulting state may be different according to your
@@ -39,7 +39,7 @@ class SessionReplay internal constructor(private val configuration: SessionRepla
     /**
      * The current SDK state. Each value is combination of default one and [preferences].
      */
-    val state: State = State(StatusOverrideProvider(), configuration)
+    val state: State = State(info)
 
     /**
      * Sensitivity configuration defines which part of screen will not be visible. Used only when [State.renderingMode] is [RenderingMode.NATIVE].
@@ -59,32 +59,28 @@ class SessionReplay internal constructor(private val configuration: SessionRepla
      * Starts recording of a user activity.
      */
     fun start() {
-        if (!configuration.isEnabled) {
+        if (info.moduleConfiguration?.isEnabled == false) {
             Logger.w(TAG, "start() - Session replay is disabled")
-            return
-        }
-
-        if (configuration.samplingRate < Math.random()) {
-            Logger.w(TAG, "start() - Session replay is disabled due to sampling rate")
-
-            statusOverride = Status.NotRecording(
-                cause = Status.NotRecording.Cause.DISABLED_BY_SAMPLING
-            )
-
             return
         }
 
         if (Build.VERSION.SDK_INT < AgentIntegration.lowestApiLevel) {
             Logger.w(TAG, "start() - Unsupported Android version")
 
-            statusOverride = Status.NotRecording(
+            info.statusOverride = Status.NotRecording(
                 cause = Status.NotRecording.Cause.BELOW_MIN_SDK_VERSION
             )
 
             return
         }
 
-        statusOverride = null
+        if ((info.statusOverride as? Status.NotRecording)?.cause == Status.NotRecording.Cause.DISABLED_BY_SAMPLING) {
+            Logger.w(TAG, "start() - Session replay is disabled by sampling")
+            info.pendingStart = true
+            return
+        }
+
+        info.statusOverride = null
         CommonSessionReplay.instance.start()
     }
 
@@ -92,11 +88,12 @@ class SessionReplay internal constructor(private val configuration: SessionRepla
      * Stops recording of a user activity.
      */
     fun stop() {
-        CommonSessionReplay.instance.stop()
-    }
+        if ((info.statusOverride as? Status.NotRecording)?.cause == Status.NotRecording.Cause.DISABLED_BY_SAMPLING) {
+            info.statusOverride = null
+            info.pendingStart = false
+        }
 
-    private inner class StatusOverrideProvider : State.StatusOverrideProvider {
-        override fun onGetStatus(): Status? = statusOverride
+        CommonSessionReplay.instance.stop()
     }
 
     companion object {
@@ -112,8 +109,8 @@ class SessionReplay internal constructor(private val configuration: SessionRepla
         val instance: SessionReplay
             get() = instanceInternal ?: throw IllegalStateException("Call install() first")
 
-        internal fun createInstance(configuration: SessionReplayModuleConfiguration) {
-            instanceInternal = SessionReplay(configuration)
+        internal fun createInstance(info: SessionReplayModuleIntegration.Info) {
+            instanceInternal = SessionReplay(info)
         }
     }
 }

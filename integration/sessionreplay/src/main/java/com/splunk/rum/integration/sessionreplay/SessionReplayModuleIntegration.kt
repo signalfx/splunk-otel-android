@@ -31,14 +31,15 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
-import com.splunk.rum.integration.sessionreplay.api.SessionReplay as SplunkSessionReplay
+import com.splunk.rum.integration.sessionreplay.api.Status
 import com.splunk.rum.integration.sessionreplay.index.TimeIndex
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
-import java.util.concurrent.TimeUnit
 import org.json.JSONObject
+import java.util.concurrent.TimeUnit
+import com.splunk.rum.integration.sessionreplay.api.SessionReplay as SplunkSessionReplay
 
 internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
     defaultModuleConfiguration = SessionReplayModuleConfiguration()
@@ -49,6 +50,11 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
     private val isRecordingForSessions: MutableSet<String> = mutableSetOf()
 
     private var timeIndex: TimeIndex<Long> = TimeIndex()
+
+    private var currentSessionId: String? = null
+    private var isPendingSessionChange = false
+    private var isInstalled = false
+    private val info = Info()
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach()")
@@ -64,7 +70,8 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         Logger.d(TAG, "onInstall()")
         timeIndex.put(1)
 
-        SplunkSessionReplay.createInstance(moduleConfiguration)
+        info.moduleConfiguration = moduleConfiguration
+        SplunkSessionReplay.createInstance(info)
 
         with(SessionReplay.instance) {
             dataListeners += sessionReplayDataListener
@@ -72,13 +79,47 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             // For Splunk agents, the WebView must not be sensitive by default.
             sensitivity.setViewClassSensitivity(WebView::class.java, null)
         }
+
+        isInstalled = true
+
+        if (isPendingSessionChange) {
+            isPendingSessionChange = false
+            processSessionChange()
+        }
     }
 
     override fun onSessionChange(sessionId: String) {
         super.onSessionChange(sessionId)
+
         Logger.d(TAG, "onSessionChange()")
+        currentSessionId = sessionId
         timeIndex.put(1)
-        SessionReplay.instance.newDataChunk()
+
+        processSessionChange()
+    }
+
+    private fun processSessionChange() {
+        if (!isInstalled) {
+            isPendingSessionChange = true
+            return
+        }
+
+        if (moduleConfiguration.samplingRate < Math.random()) {
+            Logger.d(
+                TAG,
+                "onSessionChange() - Session replay for session '$currentSessionId' is disabled due to sampling rate"
+            )
+
+            SplunkSessionReplay.instance.stop()
+
+            info.statusOverride = Status.NotRecording(
+                cause = Status.NotRecording.Cause.DISABLED_BY_SAMPLING
+            )
+        } else if (info.pendingStart) {
+            SessionReplay.instance.start()
+        } else {
+            SessionReplay.instance.newDataChunk()
+        }
     }
 
     private fun setupComposeIdentification() {
@@ -143,4 +184,10 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             return true
         }
     }
+
+    internal data class Info(
+        var moduleConfiguration: SessionReplayModuleConfiguration? = null,
+        var statusOverride: Status? = null,
+        var pendingStart: Boolean = false
+    )
 }
