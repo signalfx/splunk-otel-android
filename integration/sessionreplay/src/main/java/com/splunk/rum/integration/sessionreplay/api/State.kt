@@ -21,9 +21,7 @@ import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.SessionReplayModuleIntegration
 import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
 
-class State internal constructor(
-    private val info: SessionReplayModuleIntegration.Info
-) {
+class State internal constructor(private val info: SessionReplayModuleIntegration.Info) {
 
     /**
      * The current SDK status.

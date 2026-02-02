@@ -18,15 +18,13 @@ package com.splunk.rum.integration.sessionreplay.api
 
 import android.os.Build
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.instrumentation.recording.core.api.SessionReplay as CommonSessionReplay
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.sessionreplay.SessionReplayModuleIntegration
 import com.splunk.rum.integration.sessionreplay.api.mapping.toCommon
 import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
-import com.splunk.android.instrumentation.recording.core.api.SessionReplay as CommonSessionReplay
 
-class SessionReplay internal constructor(
-    private val info: SessionReplayModuleIntegration.Info
-) {
+class SessionReplay internal constructor(private val info: SessionReplayModuleIntegration.Info) {
 
     /**
      * Preferred configuration. The entered values represent only the preferred configuration. The resulting state may be different according to your

@@ -31,15 +31,15 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
+import com.splunk.rum.integration.sessionreplay.api.SessionReplay as SplunkSessionReplay
 import com.splunk.rum.integration.sessionreplay.api.Status
 import com.splunk.rum.integration.sessionreplay.index.TimeIndex
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
-import org.json.JSONObject
 import java.util.concurrent.TimeUnit
-import com.splunk.rum.integration.sessionreplay.api.SessionReplay as SplunkSessionReplay
+import org.json.JSONObject
 
 internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
     defaultModuleConfiguration = SessionReplayModuleConfiguration()
