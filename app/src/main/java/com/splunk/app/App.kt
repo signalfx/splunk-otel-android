@@ -26,6 +26,7 @@ import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import com.splunk.rum.integration.agent.api.user.UserTrackingMode
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
+import com.splunk.rum.integration.lifecycle.LifecycleModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration
 import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration
@@ -126,6 +127,10 @@ class App : Application() {
         interval = Duration.ofMillis(500)
     )
 
+    private val lifecycleModuleConfiguration = LifecycleModuleConfiguration(
+        isEnabled = true
+    )
+
     private val navigationModuleConfiguration = NavigationModuleConfiguration()
 
     override fun onCreate() {
@@ -138,7 +143,9 @@ class App : Application() {
             okHttp3AutoModuleConfiguration,
             okHttp3ManualModuleConfiguration,
             slowRenderingModuleConfiguration,
+            lifecycleModuleConfiguration,
             navigationModuleConfiguration
+
         )
 
         val agentConfiguration = AgentConfiguration(
