@@ -8,7 +8,7 @@ plugins {
     //id("com.splunk.rum-okhttp3-auto-plugin") version "2.1.4-SNAPSHOT"
     //id("com.splunk.rum-httpurlconnection-auto-plugin") version "2.1.4-SNAPSHOT"
     // Uncomment this to test mapping file plugin
-    //id("com.splunk.rum-mapping-file-plugin") version "2.1.1-SNAPSHOT"
+    //id("com.splunk.rum-mapping-file-plugin") version "2.1.4-SNAPSHOT"
 }
 
 apply<ConfigAndroidApp>()
