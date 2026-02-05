@@ -19,6 +19,7 @@ body:
       label: 2. Agent Version
       description: Please select the exact version of the `splunk-otel-android` agent you are using.
       options:
+        - 2.1.4
         - 2.1.3
         - 2.1.1
         - 2.1.0

@@ -49,6 +49,5 @@ internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfigurat
         } else {
             Logger.d(TAG, "Crash reporting is disabled")
         }
-        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 }
