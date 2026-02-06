@@ -25,11 +25,6 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.lifecycle.LifecycleEventEmitter
 import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 
-/**
- * Fragment lifecycle callbacks.
- * Pattern copied from: navigation/tracer/fragment/callback/FragmentCallback.kt
- * Simplified: Just emit events, no span management.
- */
 internal class FragmentLifecycleCallback(private val emitter: LifecycleEventEmitter) :
     FragmentManager.FragmentLifecycleCallbacks() {
 

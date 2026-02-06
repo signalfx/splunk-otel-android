@@ -27,8 +27,6 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Emits OpenTelemetry lifecycle events for Activities and Fragments.
- *
- * Pattern copied from: ApplicationLifecycleModuleIntegration.reportEvent()
  */
 internal class LifecycleEventEmitter {
 
@@ -71,7 +69,6 @@ internal class LifecycleEventEmitter {
 
     /**
      * Emit an OTel lifecycle event.
-     * Pattern from: ApplicationLifecycleModuleIntegration.reportEvent() (lines 84-106)
      */
     private fun emitEvent(
         elementType: String,

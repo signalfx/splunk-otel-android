@@ -25,8 +25,6 @@ import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 
 /**
  * Activity lifecycle callbacks for API 21-28.
- * Pattern copied from: navigation/tracer/activity/callback/ActivityCallback21.kt
- * Simplified: Just emit events, no span management.
  */
 internal class ActivityLifecycleCallback21(private val emitter: LifecycleEventEmitter) :
     Application.ActivityLifecycleCallbacks {

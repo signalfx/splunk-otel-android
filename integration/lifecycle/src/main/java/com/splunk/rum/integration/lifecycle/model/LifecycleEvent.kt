@@ -18,7 +18,6 @@ package com.splunk.rum.integration.lifecycle.model
 
 /**
  * Represents a lifecycle event for Activities or Fragments.
- * Contains all the data needed to emit an OTel lifecycle event.
  */
 internal sealed class LifecycleEvent {
     abstract val elementName: String

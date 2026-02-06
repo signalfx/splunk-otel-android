@@ -31,11 +31,8 @@ import io.opentelemetry.android.instrumentation.InstallationContext
 
 /**
  * Module integration for capturing UI lifecycle events (Activity and Fragment lifecycle transitions).
- *
  * This module registers lifecycle callbacks and emits OpenTelemetry events for all lifecycle
  * transitions, providing detailed visibility into the Activity and Fragment lifecycle.
- *
- * Pattern copied from: navigation/screen/ScreenTrackerIntegration.kt (lines 32-73)
  */
 internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleConfiguration>(
     defaultModuleConfiguration = LifecycleModuleConfiguration()
@@ -66,7 +63,6 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
 
     /**
      * Register Activity lifecycle callbacks.
-     * Pattern from: ScreenTrackerIntegration.registerActivityLifecycle() (lines 48-59)
      */
     private fun registerActivityLifecycle(application: Application, emitter: LifecycleEventEmitter) {
         Logger.d(TAG, "registerActivityLifecycle")
@@ -82,7 +78,6 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
 
     /**
      * Register Fragment lifecycle callbacks via Activity callback pattern.
-     * Pattern from: ScreenTrackerIntegration.registerFragmentLifecycle() (lines 61-73)
      */
     private fun registerFragmentLifecycle(application: Application, emitter: LifecycleEventEmitter) {
         Logger.d(TAG, "registerFragmentLifecycle")

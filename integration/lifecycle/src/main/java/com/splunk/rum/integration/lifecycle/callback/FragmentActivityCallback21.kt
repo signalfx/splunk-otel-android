@@ -24,7 +24,6 @@ import com.splunk.android.common.logger.Logger
 
 /**
  * Registers fragment lifecycle callbacks on FragmentActivity instances (API 21-28).
- * Pattern copied from: navigation/tracer/fragment/activity/FragmentActivityCallback21.kt
  */
 internal class FragmentActivityCallback21(private val fragmentCallback: FragmentLifecycleCallback) :
     Application.ActivityLifecycleCallbacks {
@@ -35,7 +34,7 @@ internal class FragmentActivityCallback21(private val fragmentCallback: Fragment
                 "FragmentActivityCallback21",
                 "Registering fragment callbacks for: ${activity::class.java.simpleName}"
             )
-            // CRITICAL: recursive = true to capture nested fragments
+            // Recursive = true to capture nested fragments
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
         }
     }

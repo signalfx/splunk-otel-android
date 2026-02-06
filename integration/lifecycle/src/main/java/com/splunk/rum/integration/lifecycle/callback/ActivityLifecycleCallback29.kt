@@ -26,9 +26,6 @@ import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 
 /**
  * Activity lifecycle callbacks for API 29+.
- * Pattern copied from: navigation/tracer/activity/callback/ActivityCallback29.kt
- * Simplified: Just emit events, no span management.
- *
  * Note: API 29+ provides additional Pre/Post callbacks, but we only track the main lifecycle events.
  */
 @RequiresApi(29)
