@@ -52,7 +52,6 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
 
         if (!moduleConfiguration.isEnabled) {
             Logger.w(TAG, "Lifecycle module is disabled")
-            super.onInstall(context, oTelInstallationContext, moduleConfigurations)
             return
         }
 
@@ -63,8 +62,6 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
 
         registerActivityLifecycle(application, emitter)
         registerFragmentLifecycle(application, emitter)
-
-        super.onInstall(context, oTelInstallationContext, moduleConfigurations)
     }
 
     /**
