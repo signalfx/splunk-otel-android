@@ -110,4 +110,4 @@ jobs:
         uses: lycheeverse/lychee-action@v2.7.0
         with:
           fail: true
-          lycheeVersion: v0.19.1
+          lycheeVersion: v0.22.0
