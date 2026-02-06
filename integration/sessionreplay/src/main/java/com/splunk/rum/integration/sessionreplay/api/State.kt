@@ -21,13 +21,13 @@ import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.SessionReplayModuleIntegration
 import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
 
-class State internal constructor(private val info: SessionReplayModuleIntegration.Info) {
+class State internal constructor(private val runtimeState: SessionReplayModuleIntegration.RuntimeState) {
 
     /**
      * The current SDK status.
      */
     val status: Status
-        get() = info.statusOverride ?: SessionReplay.instance.state.status.toSplunk()
+        get() = runtimeState.statusOverride ?: SessionReplay.instance.state.status.toSplunk()
 
     /**
      * The sampling rate for session replay.
@@ -35,7 +35,7 @@ class State internal constructor(private val info: SessionReplayModuleIntegratio
      * @see SessionReplayModuleConfiguration.samplingRate
      */
     val samplingRate: Float
-        get() = info.moduleConfiguration?.samplingRate ?: 1f
+        get() = runtimeState.moduleConfiguration?.samplingRate ?: 1f
 
     /**
      * Screen data rendering mode.

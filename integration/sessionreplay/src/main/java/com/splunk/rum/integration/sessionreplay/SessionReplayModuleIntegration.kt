@@ -54,7 +54,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
     private var currentSessionId: String? = null
     private var isPendingSessionChange = false
     private var isInstalled = false
-    private val info = Info()
+    private val runtimeState = RuntimeState()
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach()")
@@ -70,8 +70,8 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         Logger.d(TAG, "onInstall()")
         timeIndex.put(1)
 
-        info.moduleConfiguration = moduleConfiguration
-        SplunkSessionReplay.createInstance(info)
+        runtimeState.moduleConfiguration = moduleConfiguration
+        SplunkSessionReplay.createInstance(runtimeState)
 
         with(SessionReplay.instance) {
             dataListeners += sessionReplayDataListener
@@ -112,10 +112,10 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             SplunkSessionReplay.instance.stop()
 
-            info.statusOverride = Status.NotRecording(
+            runtimeState.statusOverride = Status.NotRecording(
                 cause = Status.NotRecording.Cause.DISABLED_BY_SAMPLING
             )
-        } else if (info.pendingStart) {
+        } else if (runtimeState.pendingStart) {
             SessionReplay.instance.start()
         } else {
             SessionReplay.instance.newDataChunk()
@@ -185,7 +185,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         }
     }
 
-    internal data class Info(
+    internal data class RuntimeState(
         var moduleConfiguration: SessionReplayModuleConfiguration? = null,
         var statusOverride: Status? = null,
         var pendingStart: Boolean = false
