@@ -29,6 +29,7 @@ import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfigurat
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration
 import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration
+import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration
 import com.splunk.rum.integration.sessionreplay.api.RenderingMode
 import com.splunk.rum.integration.sessionreplay.api.SessionReplay
 import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
@@ -128,6 +129,11 @@ class App : Application() {
 
     private val navigationModuleConfiguration = NavigationModuleConfiguration()
 
+    private val sessionReplayModuleConfiguration = SessionReplayModuleConfiguration(
+        isEnabled = true,
+        samplingRate = 0.5f
+    )
+
     override fun onCreate() {
         super.onCreate()
 
@@ -138,7 +144,8 @@ class App : Application() {
             okHttp3AutoModuleConfiguration,
             okHttp3ManualModuleConfiguration,
             slowRenderingModuleConfiguration,
-            navigationModuleConfiguration
+            navigationModuleConfiguration,
+            sessionReplayModuleConfiguration
         )
 
         val agentConfiguration = AgentConfiguration(
