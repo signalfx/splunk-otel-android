@@ -24,9 +24,7 @@ import com.splunk.rum.integration.sessionreplay.SessionReplayModuleIntegration
 import com.splunk.rum.integration.sessionreplay.api.mapping.toCommon
 import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
 
-class SessionReplay internal constructor() {
-
-    private var statusOverride: Status? = null
+class SessionReplay internal constructor(private val runtimeState: SessionReplayModuleIntegration.RuntimeState) {
 
     /**
      * Preferred configuration. The entered values represent only the preferred configuration. The resulting state may be different according to your
@@ -39,7 +37,7 @@ class SessionReplay internal constructor() {
     /**
      * The current SDK state. Each value is combination of default one and [preferences].
      */
-    val state: State = State(StatusOverrideProvider())
+    val state: State = State(runtimeState)
 
     /**
      * Sensitivity configuration defines which part of screen will not be visible. Used only when [State.renderingMode] is [RenderingMode.NATIVE].
@@ -59,17 +57,30 @@ class SessionReplay internal constructor() {
      * Starts recording of a user activity.
      */
     fun start() {
+        if (runtimeState.moduleConfiguration?.isEnabled == false) {
+            Logger.w(TAG, "start() - Session replay is disabled")
+            return
+        }
+
         if (Build.VERSION.SDK_INT < AgentIntegration.lowestApiLevel) {
             Logger.w(TAG, "start() - Unsupported Android version")
 
-            statusOverride = Status.NotRecording(
+            runtimeState.statusOverride = Status.NotRecording(
                 cause = Status.NotRecording.Cause.BELOW_MIN_SDK_VERSION
             )
 
             return
         }
 
-        statusOverride = null
+        if ((runtimeState.statusOverride as? Status.NotRecording)?.cause ==
+            Status.NotRecording.Cause.DISABLED_BY_SAMPLING
+        ) {
+            Logger.w(TAG, "start() - Session replay is disabled by sampling")
+            runtimeState.pendingStart = true
+            return
+        }
+
+        runtimeState.statusOverride = null
         CommonSessionReplay.instance.start()
     }
 
@@ -77,21 +88,31 @@ class SessionReplay internal constructor() {
      * Stops recording of a user activity.
      */
     fun stop() {
-        CommonSessionReplay.instance.stop()
-    }
+        if ((runtimeState.statusOverride as? Status.NotRecording)?.cause ==
+            Status.NotRecording.Cause.DISABLED_BY_SAMPLING
+        ) {
+            runtimeState.statusOverride = null
+            runtimeState.pendingStart = false
+        }
 
-    private inner class StatusOverrideProvider : State.StatusOverrideProvider {
-        override fun onGetStatus(): Status? = statusOverride
+        CommonSessionReplay.instance.stop()
     }
 
     companion object {
 
         private const val TAG = "SessionReplay"
 
+        private var instanceInternal: SessionReplay? = null
+
         /**
          * Returns instance of the SessionReplay.
          */
         @JvmStatic
-        val instance by lazy { SessionReplay() }
+        val instance: SessionReplay
+            get() = instanceInternal ?: throw IllegalStateException("Call install() first")
+
+        internal fun createInstance(runtimeState: SessionReplayModuleIntegration.RuntimeState) {
+            instanceInternal = SessionReplay(runtimeState)
+        }
     }
 }

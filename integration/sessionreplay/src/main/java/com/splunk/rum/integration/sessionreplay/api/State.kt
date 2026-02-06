@@ -17,23 +17,29 @@
 package com.splunk.rum.integration.sessionreplay.api
 
 import com.splunk.android.instrumentation.recording.core.api.SessionReplay
+import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration
+import com.splunk.rum.integration.sessionreplay.SessionReplayModuleIntegration
 import com.splunk.rum.integration.sessionreplay.api.mapping.toSplunk
 
-class State internal constructor(private var statusOverrider: StatusOverrideProvider) {
+class State internal constructor(private val runtimeState: SessionReplayModuleIntegration.RuntimeState) {
 
     /**
      * The current SDK status.
      */
     val status: Status
-        get() = statusOverrider.onGetStatus() ?: SessionReplay.instance.state.status.toSplunk()
+        get() = runtimeState.statusOverride ?: SessionReplay.instance.state.status.toSplunk()
+
+    /**
+     * The sampling rate for session replay.
+     *
+     * @see SessionReplayModuleConfiguration.samplingRate
+     */
+    val samplingRate: Float
+        get() = runtimeState.moduleConfiguration?.samplingRate ?: 1f
 
     /**
      * Screen data rendering mode.
      */
     val renderingMode: RenderingMode
         get() = SessionReplay.instance.state.renderingMode.toSplunk()
-
-    internal interface StatusOverrideProvider {
-        fun onGetStatus(): Status?
-    }
 }
