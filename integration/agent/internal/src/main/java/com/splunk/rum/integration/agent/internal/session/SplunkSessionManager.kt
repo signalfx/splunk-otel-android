@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.internal.session
 
 import android.app.Application
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.android.common.utils.extensions.safeSchedule
@@ -73,7 +74,8 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
     override val sessionListeners: MutableSet<SessionListener> = HashSet()
 
-    private var sessionBackgroundTimeout: Long = DEFAULT_SESSION_BACKGROUND_TIMEOUT
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal var sessionBackgroundTimeout: Long = DEFAULT_SESSION_BACKGROUND_TIMEOUT
 
     private var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
 
@@ -135,7 +137,8 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         agentStorage.deleteSessionId()
     }
 
-    private fun watchSessionInBackgroundValidity() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun watchSessionInBackgroundValidity() {
         saveSessionInBackgroundValidationTime()
 
         sessionValidityWatcher = executor.safeSchedule(sessionBackgroundTimeout) {

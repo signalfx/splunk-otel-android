@@ -18,7 +18,10 @@ package com.splunk.rum.integration.agent.api.session
 
 import com.splunk.android.common.logger.Logger
 
-data class SessionConfiguration @JvmOverloads constructor(val samplingRate: Double = 1.0) {
+data class SessionConfiguration @JvmOverloads constructor(
+    val samplingRate: Double = 1.0,
+    val listeners: List<SessionListener> = emptyList()
+) {
     init {
         if (samplingRate !in 0.0..1.0) {
             Logger.e(
