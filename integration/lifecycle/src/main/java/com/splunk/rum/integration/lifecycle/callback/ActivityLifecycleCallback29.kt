@@ -26,15 +26,31 @@ import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 
 /**
  * Activity lifecycle callbacks for API 29+.
- * Note: API 29+ provides additional Pre/Post callbacks, but we only track the main lifecycle events.
+ * Pattern copied from: navigation/tracer/activity/callback/ActivityCallback29.kt
+ * Simplified: Just emit events, no span management.
  */
 @RequiresApi(29)
 internal class ActivityLifecycleCallback29(private val emitter: LifecycleEventEmitter) :
     Application.ActivityLifecycleCallbacks {
 
+    override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPreCreated: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.PRE_CREATED)
+    }
+
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         Logger.d("ActivityLifecycleCallback29", "onActivityCreated: ${activity::class.java.simpleName}")
         emitter.emitActivityEvent(activity, LifecycleAction.CREATED)
+    }
+
+    override fun onActivityPostCreated(activity: Activity, savedInstanceState: Bundle?) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPostCreated: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.POST_CREATED)
+    }
+
+    override fun onActivityPreStarted(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPreStarted: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.PRE_STARTED)
     }
 
     override fun onActivityStarted(activity: Activity) {
@@ -42,9 +58,29 @@ internal class ActivityLifecycleCallback29(private val emitter: LifecycleEventEm
         emitter.emitActivityEvent(activity, LifecycleAction.STARTED)
     }
 
+    override fun onActivityPostStarted(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPostStarted: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.POST_STARTED)
+    }
+
+    override fun onActivityPreResumed(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPreResumed: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.PRE_RESUMED)
+    }
+
     override fun onActivityResumed(activity: Activity) {
         Logger.d("ActivityLifecycleCallback29", "onActivityResumed: ${activity::class.java.simpleName}")
         emitter.emitActivityEvent(activity, LifecycleAction.RESUMED)
+    }
+
+    override fun onActivityPostResumed(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPostResumed: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.POST_RESUMED)
+    }
+
+    override fun onActivityPrePaused(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPrePaused: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.PRE_PAUSED)
     }
 
     override fun onActivityPaused(activity: Activity) {
@@ -52,17 +88,42 @@ internal class ActivityLifecycleCallback29(private val emitter: LifecycleEventEm
         emitter.emitActivityEvent(activity, LifecycleAction.PAUSED)
     }
 
+    override fun onActivityPostPaused(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPostPaused: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.POST_PAUSED)
+    }
+
+    override fun onActivityPreStopped(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPreStopped: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.PRE_STOPPED)
+    }
+
     override fun onActivityStopped(activity: Activity) {
         Logger.d("ActivityLifecycleCallback29", "onActivityStopped: ${activity::class.java.simpleName}")
         emitter.emitActivityEvent(activity, LifecycleAction.STOPPED)
     }
 
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-        // Not tracked as a lifecycle event
+    override fun onActivityPostStopped(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPostStopped: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.POST_STOPPED)
+    }
+
+    override fun onActivityPreDestroyed(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPreDestroyed: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.PRE_DESTROYED)
     }
 
     override fun onActivityDestroyed(activity: Activity) {
         Logger.d("ActivityLifecycleCallback29", "onActivityDestroyed: ${activity::class.java.simpleName}")
         emitter.emitActivityEvent(activity, LifecycleAction.DESTROYED)
+    }
+
+    override fun onActivityPostDestroyed(activity: Activity) {
+        Logger.d("ActivityLifecycleCallback29", "onActivityPostDestroyed: ${activity::class.java.simpleName}")
+        emitter.emitActivityEvent(activity, LifecycleAction.POST_DESTROYED)
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+        // Not tracked as a lifecycle event
     }
 }

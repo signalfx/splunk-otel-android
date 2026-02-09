@@ -28,9 +28,19 @@ import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 internal class FragmentLifecycleCallback(private val emitter: LifecycleEventEmitter) :
     FragmentManager.FragmentLifecycleCallbacks() {
 
+    override fun onFragmentPreAttached(fm: FragmentManager, f: Fragment, context: Context) {
+        Logger.d("FragmentLifecycleCallback", "onFragmentPreAttached: ${f::class.java.simpleName}")
+        emitter.emitFragmentEvent(f, LifecycleAction.PRE_ATTACHED)
+    }
+
     override fun onFragmentAttached(fm: FragmentManager, f: Fragment, context: Context) {
         Logger.d("FragmentLifecycleCallback", "onFragmentAttached: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.ATTACHED)
+    }
+
+    override fun onFragmentPreCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
+        Logger.d("FragmentLifecycleCallback", "onFragmentPreCreated: ${f::class.java.simpleName}")
+        emitter.emitFragmentEvent(f, LifecycleAction.PRE_CREATED)
     }
 
     override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {

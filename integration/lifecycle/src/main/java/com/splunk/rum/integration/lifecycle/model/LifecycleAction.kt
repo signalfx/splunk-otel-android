@@ -29,7 +29,22 @@ internal enum class LifecycleAction(val attributeValue: String) {
     STOPPED("stopped"),
     DESTROYED("destroyed"),
 
+    // Activity Pre/Post actions (API 29+)
+    PRE_CREATED("pre_created"),
+    POST_CREATED("post_created"),
+    PRE_STARTED("pre_started"),
+    POST_STARTED("post_started"),
+    PRE_RESUMED("pre_resumed"),
+    POST_RESUMED("post_resumed"),
+    PRE_PAUSED("pre_paused"),
+    POST_PAUSED("post_paused"),
+    PRE_STOPPED("pre_stopped"),
+    POST_STOPPED("post_stopped"),
+    PRE_DESTROYED("pre_destroyed"),
+    POST_DESTROYED("post_destroyed"),
+
     // Fragment-specific actions
+    PRE_ATTACHED("pre_attached"),
     ATTACHED("attached"),
     DETACHED("detached"),
     VIEW_CREATED("view_created"),
