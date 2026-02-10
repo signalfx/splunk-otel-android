@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api.internal
 import android.app.Application
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.logger.consumers.AndroidLogConsumer
+import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
@@ -38,6 +39,7 @@ import com.splunk.rum.integration.agent.internal.processor.SessionReplaySessionI
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
@@ -114,6 +116,17 @@ internal object SplunkRumAgentCore {
         val openTelemetry = initializer.build()
 
         isRunning = true
+
+        sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                agentConfiguration.session.listeners.forEachFast {
+                    it.onSessionChanged(
+                        newSessionId = sessionId,
+                        previousSessionId = sessionManager.previousSessionId
+                    )
+                }
+            }
+        }
 
         agentIntegration.install(application, openTelemetry, moduleConfigurations)
 
