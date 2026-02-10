@@ -124,4 +124,3 @@ internal class ActivityLifecycleCallback(private val emitter: LifecycleEventEmit
         // Not tracked as a lifecycle event
     }
 }
-

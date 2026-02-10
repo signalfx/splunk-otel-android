@@ -88,7 +88,10 @@ internal class LifecycleEventEmitter {
     ) {
         synchronized(lock) {
             if (!isInstallComplete) {
-                Logger.d(TAG, "Install not complete, caching lifecycle event: $elementType.$elementName - ${action.attributeValue}")
+                Logger.d(
+                    TAG,
+                    "Install not complete, caching lifecycle event: $elementType.$elementName - ${action.attributeValue}"
+                )
                 cache += LifecycleEventData(elementType, elementName, elementId, action, timestamp)
                 return
             }
@@ -143,7 +146,10 @@ internal class LifecycleEventEmitter {
         if (cachedEvents.isNotEmpty()) {
             Logger.d(TAG, "Processing cached lifecycle events (size: ${cachedEvents.size})")
             cachedEvents.forEachFast { event ->
-                Logger.d(TAG, "Processing cached event: ${event.elementType}.${event.elementName} - ${event.action.attributeValue}")
+                Logger.d(
+                    TAG,
+                    "Processing cached event: ${event.elementType}.${event.elementName} - ${event.action.attributeValue}"
+                )
                 emitEventInternal(
                     event.elementType,
                     event.elementName,

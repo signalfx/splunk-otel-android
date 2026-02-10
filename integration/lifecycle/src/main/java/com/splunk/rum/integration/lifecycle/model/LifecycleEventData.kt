@@ -23,4 +23,3 @@ internal data class LifecycleEventData(
     val action: LifecycleAction,
     val timestamp: Long
 )
-

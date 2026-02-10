@@ -22,4 +22,3 @@ import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapte
 internal interface FragmentActivityCallback : ActivityLifecycleCallbacksAdapter {
     val fragmentCallback: FragmentLifecycleCallbacks
 }
-
