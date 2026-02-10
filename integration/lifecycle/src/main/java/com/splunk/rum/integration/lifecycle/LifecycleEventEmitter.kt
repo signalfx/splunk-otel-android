@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.lifecycle
 
 import android.app.Activity
-import android.util.Log
 import androidx.fragment.app.Fragment
 import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
