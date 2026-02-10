@@ -19,19 +19,28 @@ package com.splunk.rum.integration.lifecycle
 import android.app.Activity
 import androidx.fragment.app.Fragment
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.RumConstants
 import com.splunk.rum.integration.lifecycle.model.LifecycleAction
+import com.splunk.rum.integration.lifecycle.model.LifecycleEventData
 import java.util.concurrent.TimeUnit
 
 /**
  * Emits OpenTelemetry lifecycle events for Activities and Fragments.
+ * Caches events when the logger provider is not ready (such as in Flutter/React Native environments).
  */
 internal class LifecycleEventEmitter {
 
     private companion object {
         const val TAG = "LifecycleEventEmitter"
     }
+
+    private val lock = Any()
+    private val cache: MutableList<LifecycleEventData> = mutableListOf()
+
+    @Volatile
+    private var isInstallComplete = false
 
     /**
      * Emit a lifecycle event for an Activity.
@@ -68,8 +77,30 @@ internal class LifecycleEventEmitter {
 
     /**
      * Emit an OTel lifecycle event.
+     * Caches the event if the logger provider is not ready or installation is not complete.
      */
     private fun emitEvent(
+        elementType: String,
+        elementName: String,
+        elementId: String,
+        action: LifecycleAction,
+        timestamp: Long
+    ) {
+        synchronized(lock) {
+            if (!isInstallComplete) {
+                Logger.d(TAG, "Install not complete, caching lifecycle event: $elementType.$elementName - ${action.attributeValue}")
+                cache += LifecycleEventData(elementType, elementName, elementId, action, timestamp)
+                return
+            }
+        }
+
+        emitEventInternal(elementType, elementName, elementId, action, timestamp)
+    }
+
+    /**
+     * Actually emit the event to OpenTelemetry.
+     */
+    private fun emitEventInternal(
         elementType: String,
         elementName: String,
         elementId: String,
@@ -95,5 +126,32 @@ internal class LifecycleEventEmitter {
             .setAttribute(RumConstants.ELEMENT_ID_KEY, elementId)
             .setAttribute(RumConstants.LIFECYCLE_ACTION_KEY, action.attributeValue)
             .emit()
+    }
+
+    /**
+     * Process all cached events. Called when installation is complete.
+     */
+    fun processCachedEvents() {
+        val cachedEvents: List<LifecycleEventData>
+
+        synchronized(lock) {
+            cachedEvents = cache.toList()
+            cache.clear()
+            isInstallComplete = true
+        }
+
+        if (cachedEvents.isNotEmpty()) {
+            Logger.d(TAG, "Processing cached lifecycle events (size: ${cachedEvents.size})")
+            cachedEvents.forEachFast { event ->
+                Logger.d(TAG, "Processing cached event: ${event.elementType}.${event.elementName} - ${event.action.attributeValue}")
+                emitEventInternal(
+                    event.elementType,
+                    event.elementName,
+                    event.elementId,
+                    event.action,
+                    event.timestamp
+                )
+            }
+        }
     }
 }
