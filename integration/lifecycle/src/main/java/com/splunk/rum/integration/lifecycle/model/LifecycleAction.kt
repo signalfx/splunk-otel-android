@@ -20,7 +20,7 @@ package com.splunk.rum.integration.lifecycle.model
  * Represents the lifecycle actions for Activities and Fragments.
  * Each action corresponds to a lifecycle callback.
  */
-internal enum class LifecycleAction(val attributeValue: String) {
+enum class LifecycleAction(val attributeValue: String) {
     // Activity and Fragment common actions
     CREATED("created"),
     STARTED("started"),

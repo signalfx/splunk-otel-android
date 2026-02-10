@@ -39,7 +39,7 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
 
     private const val TAG = "LifecycleModuleIntegration"
 
-    private val emitter = LifecycleEventEmitter()
+    private var emitter: LifecycleEventEmitter? = null
 
     override fun onInstall(
         context: Context,
@@ -56,15 +56,17 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
         Logger.d(TAG, "Lifecycle module is enabled. Registering lifecycle callbacks.")
 
         val application = context.applicationContext as Application
+        val lifecycleEmitter = LifecycleEventEmitter(moduleConfiguration.allowedEvents)
+        emitter = lifecycleEmitter
 
-        registerActivityLifecycle(application, emitter)
-        registerFragmentLifecycle(application, emitter)
+        registerActivityLifecycle(application, lifecycleEmitter)
+        registerFragmentLifecycle(application, lifecycleEmitter)
     }
 
     override fun onPostInstall() {
         super.onPostInstall()
         Logger.d(TAG, "onPostInstall() - processing cached events")
-        emitter.processCachedEvents()
+        emitter?.processCachedEvents()
     }
 
     /**

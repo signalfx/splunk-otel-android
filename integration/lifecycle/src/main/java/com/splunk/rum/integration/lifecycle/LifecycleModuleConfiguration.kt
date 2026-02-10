@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.lifecycle
 
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 
 /**
  * UI lifecycle module configuration.
@@ -25,12 +26,24 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
  * as OpenTelemetry `device.app.ui.lifecycle` events.
  *
  * @property isEnabled Whether the module is enabled. Default is true.
+ * @property allowedEvents Set of lifecycle actions to track. Default is all events.
  */
-data class LifecycleModuleConfiguration @JvmOverloads constructor(val isEnabled: Boolean = true) : ModuleConfiguration {
+data class LifecycleModuleConfiguration @JvmOverloads constructor(
+    val isEnabled: Boolean = true,
+    val allowedEvents: Set<LifecycleAction> = DEFAULT_ALLOWED_EVENTS
+) : ModuleConfiguration {
 
     override val name: String = "lifecycle"
 
     override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to isEnabled.toString()
+        "enabled" to isEnabled.toString(),
+        "allowedEvents" to allowedEvents.joinToString(",", "[", "]") { it.name }
     )
+
+    companion object {
+        /**
+         * Default set of allowed lifecycle events - includes all events.
+         */
+        val DEFAULT_ALLOWED_EVENTS: Set<LifecycleAction> = LifecycleAction.values().toSet()
+    }
 }

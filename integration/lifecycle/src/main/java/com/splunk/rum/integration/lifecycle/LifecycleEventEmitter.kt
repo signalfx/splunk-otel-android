@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
  * Emits OpenTelemetry lifecycle events for Activities and Fragments.
  * Caches events when the logger provider is not ready (such as in Flutter/React Native environments).
  */
-internal class LifecycleEventEmitter {
+internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAction>) {
 
     private companion object {
         const val TAG = "LifecycleEventEmitter"
@@ -78,6 +78,7 @@ internal class LifecycleEventEmitter {
     /**
      * Emit an OTel lifecycle event.
      * Caches the event if the logger provider is not ready or installation is not complete.
+     * Filters events based on allowedEvents configuration.
      */
     private fun emitEvent(
         elementType: String,
@@ -86,6 +87,14 @@ internal class LifecycleEventEmitter {
         action: LifecycleAction,
         timestamp: Long
     ) {
+        if (action !in allowedEvents) {
+            Logger.d(
+                TAG,
+                "Lifecycle event filtered out (not in allowedEvents): $elementType.$elementName - ${action.attributeValue}"
+            )
+            return
+        }
+
         synchronized(lock) {
             if (!isInstallComplete) {
                 Logger.d(
@@ -133,6 +142,7 @@ internal class LifecycleEventEmitter {
 
     /**
      * Process all cached events. Called when installation is complete.
+     * Filters events based on allowedEvents configuration.
      */
     fun processCachedEvents() {
         val cachedEvents: List<LifecycleEventData>
@@ -146,6 +156,14 @@ internal class LifecycleEventEmitter {
         if (cachedEvents.isNotEmpty()) {
             Logger.d(TAG, "Processing cached lifecycle events (size: ${cachedEvents.size})")
             cachedEvents.forEachFast { event ->
+                if (event.action !in allowedEvents) {
+                    Logger.d(
+                        TAG,
+                        "Cached lifecycle event filtered out (not in allowedEvents): ${event.elementType}.${event.elementName} - ${event.action.attributeValue}"
+                    )
+                    return@forEachFast
+                }
+
                 Logger.d(
                     TAG,
                     "Processing cached event: ${event.elementType}.${event.elementName} - ${event.action.attributeValue}"
