@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2026 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,6 @@
 
 package com.splunk.rum.integration.agent.api.session
 
-import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
-
-class SessionState internal constructor(
-    private val sessionConfiguration: SessionConfiguration,
-    private val sessionManager: ISplunkSessionManager
-) {
-    val id: String
-        get() = sessionManager.sessionId
-    val samplingRate: Double
-        get() = sessionConfiguration.samplingRate
-
-    val listeners: List<SessionListener>
-        get() = sessionConfiguration.listeners
+interface SessionListener {
+    fun onSessionChanged(newSessionId: String, previousSessionId: String?)
 }

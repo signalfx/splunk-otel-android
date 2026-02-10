@@ -9,7 +9,7 @@ object Dependencies {
     private const val gradleVersion = "8.6.0"
     private const val kotlinVersion = "1.8.0"
     private const val ktlintVersion = "1.7.1"
-    private const val bytebuddyVersion = "1.17.2"
+    private const val bytebuddyVersion = "1.18.4"
     const val jacocoVersion = "0.8.14"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
@@ -65,7 +65,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.26"
+        private const val version = "1.0.27"
 
         const val commonHttp = "com.splunk.android:sr-common-http:$version"
         const val commonId = "com.splunk.android:sr-common-id:$version"

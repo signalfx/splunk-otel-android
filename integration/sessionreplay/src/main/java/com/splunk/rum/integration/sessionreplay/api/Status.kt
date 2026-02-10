@@ -16,6 +16,8 @@
 
 package com.splunk.rum.integration.sessionreplay.api
 
+import com.splunk.rum.integration.sessionreplay.SessionReplayModuleConfiguration
+
 sealed interface Status {
 
     /**
@@ -64,7 +66,14 @@ sealed interface Status {
              *  It was impossible to start the recording because the internal
              *  database could not be open, or another internal error occurred.
              */
-            INTERNAL_ERROR
+            INTERNAL_ERROR,
+
+            /**
+             * The recording cannot be started due to sampling.
+             *
+             * @see SessionReplayModuleConfiguration.samplingRate
+             */
+            DISABLED_BY_SAMPLING
         }
     }
 }
