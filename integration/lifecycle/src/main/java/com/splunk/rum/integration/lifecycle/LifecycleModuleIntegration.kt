@@ -22,8 +22,7 @@ import android.os.Build
 import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.lifecycle.callback.ActivityLifecycleCallback21
-import com.splunk.rum.integration.lifecycle.callback.ActivityLifecycleCallback29
+import com.splunk.rum.integration.lifecycle.callback.ActivityLifecycleCallback
 import com.splunk.rum.integration.lifecycle.callback.FragmentActivityCallback21
 import com.splunk.rum.integration.lifecycle.callback.FragmentActivityCallback29
 import com.splunk.rum.integration.lifecycle.callback.FragmentLifecycleCallback
@@ -74,12 +73,7 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
     private fun registerActivityLifecycle(application: Application, emitter: LifecycleEventEmitter) {
         Logger.d(TAG, "registerActivityLifecycle")
 
-        val activityCallback = if (Build.VERSION.SDK_INT >= 29) {
-            ActivityLifecycleCallback29(emitter)
-        } else {
-            ActivityLifecycleCallback21(emitter)
-        }
-
+        val activityCallback = ActivityLifecycleCallback(emitter)
         application.registerActivityLifecycleCallbacks(activityCallback)
     }
 
