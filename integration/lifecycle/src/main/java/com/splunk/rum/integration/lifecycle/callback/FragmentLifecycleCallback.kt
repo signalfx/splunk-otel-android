@@ -28,63 +28,67 @@ import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 internal class FragmentLifecycleCallback(private val emitter: LifecycleEventEmitter) :
     FragmentManager.FragmentLifecycleCallbacks() {
 
+    private companion object {
+        const val TAG = "FragmentLifecycleCallback"
+    }
+
     override fun onFragmentPreAttached(fm: FragmentManager, f: Fragment, context: Context) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentPreAttached: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentPreAttached: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.PRE_ATTACHED)
     }
 
     override fun onFragmentAttached(fm: FragmentManager, f: Fragment, context: Context) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentAttached: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentAttached: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.ATTACHED)
     }
 
     override fun onFragmentPreCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentPreCreated: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentPreCreated: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.PRE_CREATED)
     }
 
     override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentCreated: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentCreated: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.CREATED)
     }
 
     override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentViewCreated: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentViewCreated: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.VIEW_CREATED)
     }
 
     override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentStarted: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentStarted: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.STARTED)
     }
 
     override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentResumed: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentResumed: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.RESUMED)
     }
 
     override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentPaused: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentPaused: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.PAUSED)
     }
 
     override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentStopped: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentStopped: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.STOPPED)
     }
 
     override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentViewDestroyed: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentViewDestroyed: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.VIEW_DESTROYED)
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentDestroyed: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentDestroyed: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.DESTROYED)
     }
 
     override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
-        Logger.d("FragmentLifecycleCallback", "onFragmentDetached: ${f::class.java.simpleName}")
+        Logger.d(TAG, "onFragmentDetached: ${f::class.java.simpleName}")
         emitter.emitFragmentEvent(f, LifecycleAction.DETACHED)
     }
 }
