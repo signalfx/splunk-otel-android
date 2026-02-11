@@ -94,7 +94,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         }
 
     override fun writeTracesBaseUrl(value: String) {
-        preferences.putString(TRACES_BASE_URL, value).commit()
+        preferences.putString(TRACES_BASE_URL, value)
     }
 
     override fun deleteTracesBaseUrl() {
@@ -104,7 +104,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     override fun readTracesBaseUrl(): String? = preferences.getString(TRACES_BASE_URL)
 
     override fun writeLogsBaseUrl(value: String) {
-        preferences.putString(LOGS_BASE_URL, value).commit()
+        preferences.putString(LOGS_BASE_URL, value)
     }
 
     override fun deleteLogsBaseUrl() {
@@ -114,7 +114,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     override fun readLogsBaseUrl(): String? = preferences.getString(LOGS_BASE_URL)
 
     override fun writeRumAccessToken(value: String) {
-        preferences.putString(RUM_ACCESS_TOKEN, value).commit()
+        preferences.putString(RUM_ACCESS_TOKEN, value)
     }
 
     override fun deleteRumAccessToken() {
@@ -124,19 +124,19 @@ class AgentStorage(context: Context) : IAgentStorage {
     override fun readRumAccessToken(): String? = preferences.getString(RUM_ACCESS_TOKEN)
 
     override fun writeDeviceId(value: String) {
-        preferences.putString(DEVICE_ID, value).commit()
+        preferences.putString(DEVICE_ID, value)
     }
 
     override fun readDeviceId(): String? = preferences.getString(DEVICE_ID)
 
     override fun writeAppInstallationId(value: String) {
-        preferences.putString(APP_INSTALLATION_ID, value).commit()
+        preferences.putString(APP_INSTALLATION_ID, value)
     }
 
     override fun readAppInstallationId(): String? = preferences.getString(APP_INSTALLATION_ID)
 
     override fun writeSessionId(value: String) {
-        preferences.putString(SESSION_ID, value).commit()
+        preferences.putString(SESSION_ID, value)
     }
 
     override fun readSessionId(): String? = preferences.getString(SESSION_ID)
@@ -146,7 +146,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun writeSessionValidUntil(value: Long) {
-        preferences.putLong(SESSION_VALID_UNTIL, value).commit()
+        preferences.putLong(SESSION_VALID_UNTIL, value)
     }
 
     override fun readSessionValidUntil(): Long? = preferences.getLong(SESSION_VALID_UNTIL)
@@ -156,7 +156,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     override fun writeSessionValidUntilInBackground(value: Long) {
-        preferences.putLong(SESSION_VALID_UNTIL_IN_BACKGROUND, value).commit()
+        preferences.putLong(SESSION_VALID_UNTIL_IN_BACKGROUND, value)
     }
 
     override fun readSessionValidUntilInBackground(): Long? = preferences.getLong(SESSION_VALID_UNTIL_IN_BACKGROUND)
@@ -238,7 +238,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         val ids = getBufferedSpanIds().toMutableSet()
         if (ids.add(id)) {
             val array = JSONArray(ids)
-            preferences.putString(SPAN_IDS_KEY, array.toString()).commit()
+            preferences.putString(SPAN_IDS_KEY, array.toString())
         }
     }
 
@@ -265,7 +265,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         val ids = getBufferedSessionReplayIds().toMutableSet()
         if (ids.add(id)) {
             val array = JSONArray(ids)
-            preferences.putString(SESSION_REPLAY_IDS_KEY, array.toString()).commit()
+            preferences.putString(SESSION_REPLAY_IDS_KEY, array.toString())
         }
     }
 
