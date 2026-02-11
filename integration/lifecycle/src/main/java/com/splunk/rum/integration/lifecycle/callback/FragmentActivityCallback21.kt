@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation.tracer.fragment.activity
+package com.splunk.rum.integration.lifecycle.callback
 
 import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
 import com.splunk.android.common.logger.Logger
 
-internal class FragmentActivityCallback29(override val fragmentCallback: FragmentLifecycleCallbacks) :
+/**
+ * Registers fragment lifecycle callbacks on FragmentActivity instances (API 21-28).
+ */
+internal class FragmentActivityCallback21(override val fragmentCallback: FragmentLifecycleCallback) :
     FragmentActivityCallback {
 
-    override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Logger.d("FragmentActivityCallback29", "onActivityPreCreated")
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        Logger.d("FragmentActivityCallback21", "onActivityCreated")
         if (activity is FragmentActivity) {
-            Logger.d("FragmentActivityCallback29", "onActivityPreCreated FragmentActivity")
+            Logger.d("FragmentActivityCallback21", "onActivityCreated FragmentActivity")
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
         }
     }
