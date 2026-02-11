@@ -67,7 +67,6 @@ internal class UploadSessionReplayDataJob : JobService() {
 
         Logger.d(TAG, "startUpload() id: $id")
         thread = runOnBackgroundThread {
-
             val url = storage.readLogsBaseUrl()
 
             if (url == null) {

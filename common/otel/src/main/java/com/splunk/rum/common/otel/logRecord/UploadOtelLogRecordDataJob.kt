@@ -67,7 +67,6 @@ internal class UploadOtelLogRecordDataJob : JobService() {
 
         Logger.d(TAG, "startUpload() id: $id")
         thread = runOnBackgroundThread {
-
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {

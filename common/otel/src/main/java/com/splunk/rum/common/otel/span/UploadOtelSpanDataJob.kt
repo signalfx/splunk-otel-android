@@ -67,7 +67,6 @@ internal class UploadOtelSpanDataJob : JobService() {
 
         Logger.d(TAG, "startUpload() id: $id")
         thread = runOnBackgroundThread {
-
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {
@@ -96,9 +95,9 @@ internal class UploadOtelSpanDataJob : JobService() {
                         Logger.d(
                             TAG,
                             "startUpload() onSuccess: response=$response, code=${response.code}," +
-                                    " body=${response.body.toString(
-                                        Charsets.UTF_8
-                                    )}"
+                                " body=${response.body.toString(
+                                    Charsets.UTF_8
+                                )}"
                         )
                         deleteData(id)
                         finishOnce(finished, params, false)
