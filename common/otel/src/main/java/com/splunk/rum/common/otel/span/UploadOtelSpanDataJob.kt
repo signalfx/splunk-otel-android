@@ -29,7 +29,6 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.safeSubmit
 import com.splunk.android.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.common.otel.http.AuthHeaderBuilder
-import com.splunk.rum.common.otel.logRecord.UploadSessionReplayDataJob
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutorService
@@ -63,11 +62,10 @@ internal class UploadOtelSpanDataJob : JobService() {
             return
         }
 
-        val finished = AtomicBoolean(false)
         val id = params.extras?.getString(DATA_SERIALIZE_KEY)
 
         if (id == null) {
-            finishOnce(finished, params, false)
+            jobFinished(params, false)
             return
         }
 
@@ -77,7 +75,7 @@ internal class UploadOtelSpanDataJob : JobService() {
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")
-                finishOnce(finished, params, false)
+                jobFinished(params, false)
                 return@safeSubmit
             }
 
@@ -85,7 +83,7 @@ internal class UploadOtelSpanDataJob : JobService() {
 
             if (data == null) {
                 Logger.d(TAG, "startUpload() data is not valid")
-                finishOnce(finished, params, false)
+                jobFinished(params, false)
                 return@safeSubmit
             }
 
@@ -106,16 +104,16 @@ internal class UploadOtelSpanDataJob : JobService() {
                                 )}"
                         )
                         deleteData(id)
-                        finishOnce(finished, params, false)
+                        jobFinished(params, false)
                     }
 
                     override fun onFailed(e: Exception) {
                         Logger.d(TAG, "startUpload() onFailed: e=$e")
                         when (e) {
-                            is UnknownHostException -> finishOnce(finished, params, true)
+                            is UnknownHostException -> jobFinished(params, true)
                             else -> {
                                 deleteData(id)
-                                finishOnce(finished, params, false)
+                                jobFinished(params, false)
                             }
                         }
                     }

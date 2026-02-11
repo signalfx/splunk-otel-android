@@ -33,7 +33,6 @@ import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicBoolean
 
 internal class UploadSessionReplayDataJob : JobService() {
 
@@ -62,11 +61,10 @@ internal class UploadSessionReplayDataJob : JobService() {
             return
         }
 
-        val finished = AtomicBoolean(false)
         val id = params.extras?.getString(DATA_SERIALIZE_KEY)
 
         if (id == null) {
-            finishOnce(finished, params, false)
+            jobFinished(params, false)
             return
         }
 
@@ -76,7 +74,7 @@ internal class UploadSessionReplayDataJob : JobService() {
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")
-                finishOnce(finished, params, false)
+                jobFinished(params, false)
                 return@safeSubmit
             }
 
@@ -84,7 +82,7 @@ internal class UploadSessionReplayDataJob : JobService() {
 
             if (data == null) {
                 Logger.d(TAG, "startUpload() data is not valid")
-                finishOnce(finished, params, false)
+                jobFinished(params, false)
                 return@safeSubmit
             }
 
@@ -103,16 +101,16 @@ internal class UploadSessionReplayDataJob : JobService() {
                                 " body=${response.body.toString(Charsets.UTF_8)}"
                         )
                         deleteData(id)
-                        finishOnce(finished, params, false)
+                        jobFinished(params, false)
                     }
 
                     override fun onFailed(e: Exception) {
                         Logger.d(TAG, "startUpload() onFailed: e=$e")
                         when (e) {
-                            is UnknownHostException -> finishOnce(finished, params, true)
+                            is UnknownHostException -> jobFinished(params, true)
                             else -> {
                                 deleteData(id)
-                                finishOnce(finished, params, false)
+                                jobFinished(params, false)
                             }
                         }
                     }
@@ -129,12 +127,6 @@ internal class UploadSessionReplayDataJob : JobService() {
     override fun onDestroy() {
         super.onDestroy()
         executor.shutdownNow()
-    }
-
-    private fun finishOnce(finished: AtomicBoolean, params: JobParameters, needsReschedule: Boolean) {
-        if (finished.compareAndSet(false, true)) {
-            jobFinished(params, needsReschedule)
-        }
     }
 
     companion object {
