@@ -26,9 +26,11 @@ import com.splunk.android.common.http.HttpClient
 import com.splunk.android.common.http.model.Response
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.runOnBackgroundThread
 import com.splunk.rum.common.otel.http.AuthHeaderBuilder
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class UploadOtelSpanDataJob : JobService() {
 
@@ -36,8 +38,11 @@ internal class UploadOtelSpanDataJob : JobService() {
     private val jobIdStorage by lazy { JobIdStorage.init(application, isEncrypted = false) }
     private val httpClient by lazy { HttpClient() }
 
+    private var thread: Thread? = null
+
     override fun onStopJob(params: JobParameters?): Boolean {
         Logger.d(TAG, "onStopJob()")
+        thread?.interrupt()
         return true
     }
 
@@ -48,23 +53,35 @@ internal class UploadOtelSpanDataJob : JobService() {
     }
 
     private fun startUpload(params: JobParameters?) {
-        params?.extras?.getString(DATA_SERIALIZE_KEY)?.let { id ->
-            Logger.d(TAG, "startUpload() id: $id")
+        if (params == null) {
+            return
+        }
+
+        val finished = AtomicBoolean(false)
+        val id = params.extras?.getString(DATA_SERIALIZE_KEY)
+
+        if (id == null) {
+            finishOnce(finished, params, false)
+            return
+        }
+
+        Logger.d(TAG, "startUpload() id: $id")
+        thread = runOnBackgroundThread {
 
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")
-                jobFinished(params, false)
-                return
+                finishOnce(finished, params, false)
+                return@runOnBackgroundThread
             }
 
             val data = storage.readOtelSpanData(id)
 
             if (data == null) {
                 Logger.d(TAG, "startUpload() data is not valid")
-                jobFinished(params, false)
-                return
+                finishOnce(finished, params, false)
+                return@runOnBackgroundThread
             }
 
             val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
@@ -79,36 +96,38 @@ internal class UploadOtelSpanDataJob : JobService() {
                         Logger.d(
                             TAG,
                             "startUpload() onSuccess: response=$response, code=${response.code}," +
-                                " body=${response.body.toString(
-                                    Charsets.UTF_8
-                                )}"
+                                    " body=${response.body.toString(
+                                        Charsets.UTF_8
+                                    )}"
                         )
                         deleteData(id)
-                        if (response.isSuccessful) {
-                            jobFinished(params, false)
-                        } else {
-                            jobFinished(params, false)
-                        }
+                        finishOnce(finished, params, false)
                     }
 
                     override fun onFailed(e: Exception) {
                         Logger.d(TAG, "startUpload() onFailed: e=$e")
                         when (e) {
-                            is UnknownHostException -> jobFinished(params, true)
+                            is UnknownHostException -> finishOnce(finished, params, true)
                             else -> {
                                 deleteData(id)
-                                jobFinished(params, false)
+                                finishOnce(finished, params, false)
                             }
                         }
                     }
                 }
             )
-        } ?: jobFinished(params, false)
+        }
     }
 
     private fun deleteData(id: String) {
         jobIdStorage.delete(id)
         storage.deleteOtelSpanData(id)
+    }
+
+    private fun finishOnce(finished: AtomicBoolean, params: JobParameters, needsReschedule: Boolean) {
+        if (finished.compareAndSet(false, true)) {
+            jobFinished(params, needsReschedule)
+        }
     }
 
     companion object {
