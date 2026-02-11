@@ -100,11 +100,11 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                         Logger.d(
                             TAG,
                             "startUpload() onSuccess: response=$response, code=${response.code}," +
-                                    " body=${
-                                        response.body.toString(
-                                            Charsets.UTF_8
-                                        )
-                                    }"
+                                " body=${
+                                    response.body.toString(
+                                        Charsets.UTF_8
+                                    )
+                                }"
                         )
                         deleteData(id)
                         finishOnce(finished, params, false)
