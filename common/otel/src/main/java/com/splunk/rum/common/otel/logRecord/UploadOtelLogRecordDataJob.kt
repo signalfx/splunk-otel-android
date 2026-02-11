@@ -100,9 +100,11 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                         Logger.d(
                             TAG,
                             "startUpload() onSuccess: response=$response, code=${response.code}," +
-                                " body=${response.body.toString(
-                                    Charsets.UTF_8
-                                )}"
+                                    " body=${
+                                        response.body.toString(
+                                            Charsets.UTF_8
+                                        )
+                                    }"
                         )
                         deleteData(id)
                         finishOnce(finished, params, false)
@@ -143,10 +145,13 @@ internal class UploadOtelLogRecordDataJob : JobService() {
         private const val TAG = "UploadOtelLogRecordDataJob"
         private const val DATA_SERIALIZE_KEY = "DATA"
 
+        private const val INITIAL_BACKOFF = 60 * 1000L
+
         fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder =
             JobInfo.Builder(jobId, ComponentName(context, UploadOtelLogRecordDataJob::class.java))
                 .setExtras(PersistableBundle().apply { putString(DATA_SERIALIZE_KEY, id) })
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL)
                 .setRequiresCharging(false)
     }
 }

@@ -29,6 +29,7 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.safeSubmit
 import com.splunk.android.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.common.otel.http.AuthHeaderBuilder
+import com.splunk.rum.common.otel.logRecord.UploadSessionReplayDataJob
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutorService
@@ -143,10 +144,12 @@ internal class UploadOtelSpanDataJob : JobService() {
         private const val TAG = "UploadOtelSpanDataJob"
         private const val DATA_SERIALIZE_KEY = "DATA"
 
+        private const val INITIAL_BACKOFF = 60 * 1000L
         fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder =
             JobInfo.Builder(jobId, ComponentName(context, UploadOtelSpanDataJob::class.java))
                 .setExtras(PersistableBundle().apply { putString(DATA_SERIALIZE_KEY, id) })
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL)
                 .setRequiresCharging(false)
     }
 }

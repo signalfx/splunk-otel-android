@@ -141,10 +141,13 @@ internal class UploadSessionReplayDataJob : JobService() {
         private const val TAG = "UploadSessionReplayDataJob"
         private const val DATA_SERIALIZE_KEY = "DATA"
 
+        private const val INITIAL_BACKOFF = 60 * 1000L
+
         fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder =
             JobInfo.Builder(jobId, ComponentName(context, UploadSessionReplayDataJob::class.java))
                 .setExtras(PersistableBundle().apply { putString(DATA_SERIALIZE_KEY, id) })
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL)
                 .setRequiresCharging(false)
     }
 }
