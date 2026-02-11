@@ -26,10 +26,13 @@ import com.splunk.android.common.http.HttpClient
 import com.splunk.android.common.http.model.Response
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.utils.runOnBackgroundThread
+import com.splunk.android.common.utils.extensions.safeSubmit
+import com.splunk.android.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.common.otel.http.AuthHeaderBuilder
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class UploadOtelSpanDataJob : JobService() {
@@ -38,11 +41,13 @@ internal class UploadOtelSpanDataJob : JobService() {
     private val jobIdStorage by lazy { JobIdStorage.init(application, isEncrypted = false) }
     private val httpClient by lazy { HttpClient() }
 
-    private var thread: Thread? = null
+    private val executor: ExecutorService by lazy {
+        Executors.newSingleThreadExecutor(NamedThreadFactory("uploadSpanExecutor"))
+    }
 
     override fun onStopJob(params: JobParameters?): Boolean {
         Logger.d(TAG, "onStopJob()")
-        thread?.interrupt()
+        executor.shutdownNow()
         return true
     }
 
@@ -66,13 +71,13 @@ internal class UploadOtelSpanDataJob : JobService() {
         }
 
         Logger.d(TAG, "startUpload() id: $id")
-        thread = runOnBackgroundThread {
+        executor.safeSubmit {
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")
                 finishOnce(finished, params, false)
-                return@runOnBackgroundThread
+                return@safeSubmit
             }
 
             val data = storage.readOtelSpanData(id)
@@ -80,7 +85,7 @@ internal class UploadOtelSpanDataJob : JobService() {
             if (data == null) {
                 Logger.d(TAG, "startUpload() data is not valid")
                 finishOnce(finished, params, false)
-                return@runOnBackgroundThread
+                return@safeSubmit
             }
 
             val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
@@ -121,6 +126,11 @@ internal class UploadOtelSpanDataJob : JobService() {
     private fun deleteData(id: String) {
         jobIdStorage.delete(id)
         storage.deleteOtelSpanData(id)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        executor.shutdownNow()
     }
 
     private fun finishOnce(finished: AtomicBoolean, params: JobParameters, needsReschedule: Boolean) {
