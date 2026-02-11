@@ -234,6 +234,10 @@ class AgentStorage(context: Context) : IAgentStorage {
         preferences.putString(SESSION_IDS, json)
     }
 
+    override fun commit() {
+        preferences.commit()
+    }
+
     override fun addBufferedSpanId(id: String) {
         val ids = getBufferedSpanIds().toMutableSet()
         if (ids.add(id)) {
