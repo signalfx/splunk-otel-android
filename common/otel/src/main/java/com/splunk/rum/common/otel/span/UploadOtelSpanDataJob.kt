@@ -59,6 +59,7 @@ internal class UploadOtelSpanDataJob : JobService() {
 
     private fun startUpload(params: JobParameters?) {
         if (params == null) {
+            jobFinished(params, false)
             return
         }
 
@@ -70,7 +71,7 @@ internal class UploadOtelSpanDataJob : JobService() {
         }
 
         Logger.d(TAG, "startUpload() id: $id")
-        executor.safeSubmit {
+        executor.execute {
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {
@@ -130,12 +131,6 @@ internal class UploadOtelSpanDataJob : JobService() {
     override fun onDestroy() {
         super.onDestroy()
         executor.shutdownNow()
-    }
-
-    private fun finishOnce(finished: AtomicBoolean, params: JobParameters, needsReschedule: Boolean) {
-        if (finished.compareAndSet(false, true)) {
-            jobFinished(params, needsReschedule)
-        }
     }
 
     companion object {

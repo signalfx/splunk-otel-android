@@ -58,6 +58,7 @@ internal class UploadSessionReplayDataJob : JobService() {
 
     private fun startUpload(params: JobParameters?) {
         if (params == null) {
+            jobFinished(params, false)
             return
         }
 
