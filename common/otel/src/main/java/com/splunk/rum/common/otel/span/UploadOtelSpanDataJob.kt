@@ -71,7 +71,7 @@ internal class UploadOtelSpanDataJob : JobService() {
         }
 
         Logger.d(TAG, "startUpload() id: $id")
-        executor.execute {
+        executor.safeSubmit {
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {
