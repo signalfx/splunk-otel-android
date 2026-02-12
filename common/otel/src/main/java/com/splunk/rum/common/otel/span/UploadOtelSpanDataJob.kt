@@ -26,14 +26,12 @@ import com.splunk.android.common.http.HttpClient
 import com.splunk.android.common.http.model.Response
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.utils.extensions.safeSubmit
 import com.splunk.android.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.common.otel.http.AuthHeaderBuilder
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicBoolean
 
 internal class UploadOtelSpanDataJob : JobService() {
 
@@ -71,13 +69,13 @@ internal class UploadOtelSpanDataJob : JobService() {
         }
 
         Logger.d(TAG, "startUpload() id: $id")
-        executor.safeSubmit {
+        executor.execute {
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")
                 jobFinished(params, false)
-                return@safeSubmit
+                return@execute
             }
 
             val data = storage.readOtelSpanData(id)
@@ -85,7 +83,7 @@ internal class UploadOtelSpanDataJob : JobService() {
             if (data == null) {
                 Logger.d(TAG, "startUpload() data is not valid")
                 jobFinished(params, false)
-                return@safeSubmit
+                return@execute
             }
 
             val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
