@@ -26,6 +26,7 @@ import com.splunk.android.common.http.HttpClient
 import com.splunk.android.common.http.model.Response
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.safeSubmit
 import com.splunk.android.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.common.otel.http.AuthHeaderBuilder
 import com.splunk.rum.common.storage.AgentStorage
@@ -69,13 +70,13 @@ internal class UploadOtelLogRecordDataJob : JobService() {
         }
 
         Logger.d(TAG, "startUpload() id: $id")
-        executor.execute {
+        executor.safeSubmit {
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")
                 jobFinished(params, false)
-                return@execute
+                return@safeSubmit
             }
 
             val data = storage.readOtelLogData(id)
@@ -83,7 +84,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
             if (data == null) {
                 Logger.d(TAG, "startUpload() data is not valid")
                 jobFinished(params, false)
-                return@execute
+                return@safeSubmit
             }
 
             val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
