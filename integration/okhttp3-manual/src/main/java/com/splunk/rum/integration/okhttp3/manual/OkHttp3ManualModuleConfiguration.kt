@@ -21,10 +21,12 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 /**
  * OkHttp manual module configuration.
  *
+ * @property isEnabled Whether the module is enabled.
  * @property capturedRequestHeaders The list of request headers to capture.
  * @property capturedResponseHeaders The list of response headers to capture.
  */
 data class OkHttp3ManualModuleConfiguration @JvmOverloads constructor(
+    val isEnabled: Boolean = false,
     val capturedRequestHeaders: List<String> = emptyList(),
     val capturedResponseHeaders: List<String> = emptyList()
 ) : ModuleConfiguration {

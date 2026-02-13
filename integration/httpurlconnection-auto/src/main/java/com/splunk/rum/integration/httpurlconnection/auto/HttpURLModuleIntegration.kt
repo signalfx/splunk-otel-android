@@ -36,7 +36,7 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
     ) {
         Logger.d(TAG, "onInstall()")
 
-        // install HttpURLConnection auto-instrumentation if it is enabled
+        // Setup HttpURLConnection auto-instrumentation if it is enabled
         if (moduleConfiguration.isEnabled) {
             HttpUrlInstrumentation().apply {
                 addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
@@ -51,6 +51,8 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
 
                 install(oTelInstallationContext)
             }
+
+            Logger.d(TAG, "Setup completed for HttpURLConnection auto-instrumentation.")
         }
     }
 }

@@ -26,7 +26,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
  * @property capturedResponseHeaders The list of response headers to capture.
  */
 data class OkHttp3AutoModuleConfiguration @JvmOverloads constructor(
-    val isEnabled: Boolean = true,
+    val isEnabled: Boolean = false,
     val capturedRequestHeaders: List<String> = emptyList(),
     val capturedResponseHeaders: List<String> = emptyList()
 ) : ModuleConfiguration {

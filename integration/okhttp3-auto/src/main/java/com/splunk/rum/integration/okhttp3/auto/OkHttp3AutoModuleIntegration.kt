@@ -40,7 +40,7 @@ internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModu
     ) {
         Logger.d(TAG, "onInstall()")
 
-        // install OkHttp3 auto-instrumentation if it is enabled
+        // Setup OkHttp3 auto-instrumentation if it is enabled
         if (moduleConfiguration.isEnabled) {
             OkHttpInstrumentation().apply {
                 addAttributesExtractor(
@@ -57,6 +57,8 @@ internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModu
 
                 install(oTelInstallationContext)
             }
+
+            Logger.d(TAG, "Setup completed for OkHttp3 auto-instrumentation.")
         }
     }
 }
