@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.agent.api.exporter
 
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.forEachFast
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
@@ -32,7 +33,7 @@ internal class LoggerSpanExporter : SpanExporter {
             return CompletableResultCode.ofFailure()
         }
 
-        for (span in spans) {
+        spans.forEachFast { span ->
             val instrumentationScopeInfo = span.instrumentationScopeInfo
             Logger.i(
                 TAG,

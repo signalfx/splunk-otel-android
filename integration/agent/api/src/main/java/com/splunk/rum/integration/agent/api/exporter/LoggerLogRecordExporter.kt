@@ -19,7 +19,9 @@ package com.splunk.rum.integration.agent.api.exporter
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.common.ValueType
 import io.opentelemetry.sdk.common.CompletableResultCode
+import io.opentelemetry.sdk.logs.data.Body
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import java.util.concurrent.atomic.AtomicBoolean
@@ -35,15 +37,9 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
 
         logs.forEachFast { log ->
             val instrumentationScopeInfo = log.instrumentationScopeInfo
-            val bodyValue = log.bodyValue
-            val bodyInfo = if (bodyValue.toString().startsWith("ValueBytes{")) {
-                "ValueBytes(size=${bodyValue.toString().length} chars)"
-            } else {
-                bodyValue.toString()
-            }
+
             Logger.i(
                 TAG,
-                "bodyValue=$bodyInfo, " +
                     "severityText=${log.severityText}, " +
                     "severity=${log.severity}, " +
                     "timestampEpochNanos=${log.timestampEpochNanos}, " +
