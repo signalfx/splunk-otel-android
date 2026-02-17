@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.api.exporter
 
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.rum.common.otel.internal.RumConstants
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
@@ -35,6 +36,19 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
 
         logs.forEachFast { log ->
             val instrumentationScopeInfo = log.instrumentationScopeInfo
+
+            /**
+             * FIXME
+             *
+             * This is a simple hack that ensures that only logs from the session replay instrumentation are
+             * processed by this exporter, because all other logs are currently transformed into spans
+             * and would therefore be logged twice.
+             *
+             * This should be reworked into a more general solution that properly resolves the logging duplication.
+             */
+            if (instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
+                return@forEachFast
+            }
 
             Logger.i(
                 TAG,
