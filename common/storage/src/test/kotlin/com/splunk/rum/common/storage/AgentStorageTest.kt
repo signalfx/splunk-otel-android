@@ -82,6 +82,7 @@ class AgentStorageTest {
         val testId = "fb61a5d8d42043fc89cb405ca8998892"
 
         storage.writeAppInstallationId(testId)
+        storage.commit()
 
         val newStorage = AgentStorage(context)
         val result = newStorage.readAppInstallationId()
@@ -122,6 +123,7 @@ class AgentStorageTest {
         val testToken = "persistent_token_123"
 
         storage.writeRumAccessToken(testToken)
+        storage.commit()
 
         val newStorage = AgentStorage(context)
         val result = newStorage.readRumAccessToken()

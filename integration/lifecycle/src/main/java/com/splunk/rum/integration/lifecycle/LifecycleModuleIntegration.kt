@@ -1,0 +1,98 @@
+/*
+ * Copyright 2026 Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.splunk.rum.integration.lifecycle
+
+import android.app.Application
+import android.content.Context
+import android.os.Build
+import com.splunk.android.common.logger.Logger
+import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
+import com.splunk.rum.integration.lifecycle.callback.ActivityLifecycleCallback
+import com.splunk.rum.integration.lifecycle.callback.FragmentActivityCallback21
+import com.splunk.rum.integration.lifecycle.callback.FragmentActivityCallback29
+import com.splunk.rum.integration.lifecycle.callback.FragmentLifecycleCallback
+import io.opentelemetry.android.instrumentation.InstallationContext
+
+/**
+ * Module integration for capturing UI lifecycle events (Activity and Fragment lifecycle transitions).
+ * This module registers lifecycle callbacks and emits OpenTelemetry events for all lifecycle
+ * transitions, providing detailed visibility into the Activity and Fragment lifecycle.
+ */
+internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleConfiguration>(
+    defaultModuleConfiguration = LifecycleModuleConfiguration()
+) {
+
+    private const val TAG = "LifecycleModuleIntegration"
+
+    private var emitter: LifecycleEventEmitter? = null
+
+    override fun onInstall(
+        context: Context,
+        oTelInstallationContext: InstallationContext,
+        moduleConfigurations: List<ModuleConfiguration>
+    ) {
+        Logger.d(TAG, "onInstall() called")
+
+        if (!moduleConfiguration.isEnabled) {
+            Logger.w(TAG, "Lifecycle module is disabled")
+            return
+        }
+
+        Logger.d(TAG, "Lifecycle module is enabled. Registering lifecycle callbacks.")
+
+        val application = context.applicationContext as Application
+        val lifecycleEmitter = LifecycleEventEmitter(moduleConfiguration.allowedEvents)
+        emitter = lifecycleEmitter
+
+        registerActivityLifecycle(application, lifecycleEmitter)
+        registerFragmentLifecycle(application, lifecycleEmitter)
+    }
+
+    override fun onPostInstall() {
+        super.onPostInstall()
+        Logger.d(TAG, "onPostInstall() - processing cached events")
+        emitter?.processCachedEvents()
+    }
+
+    /**
+     * Register Activity lifecycle callbacks.
+     */
+    private fun registerActivityLifecycle(application: Application, emitter: LifecycleEventEmitter) {
+        Logger.d(TAG, "registerActivityLifecycle")
+
+        val activityCallback = ActivityLifecycleCallback(emitter)
+        application.registerActivityLifecycleCallbacks(activityCallback)
+    }
+
+    /**
+     * Register Fragment lifecycle callbacks via Activity callback pattern.
+     */
+    private fun registerFragmentLifecycle(application: Application, emitter: LifecycleEventEmitter) {
+        Logger.d(TAG, "registerFragmentLifecycle")
+
+        val fragmentCallback = FragmentLifecycleCallback(emitter)
+
+        val fragmentActivityCallback = if (Build.VERSION.SDK_INT >= 29) {
+            FragmentActivityCallback29(fragmentCallback)
+        } else {
+            FragmentActivityCallback21(fragmentCallback)
+        }
+
+        application.registerActivityLifecycleCallbacks(fragmentActivityCallback)
+    }
+}

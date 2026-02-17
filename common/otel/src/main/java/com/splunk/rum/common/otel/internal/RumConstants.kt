@@ -61,6 +61,14 @@ object RumConstants {
     const val APP_STATE_CREATED: String = "created"
     const val APP_STATE_FOREGROUND: String = "foreground"
     const val APP_STATE_BACKGROUND: String = "background"
+
+    // UI Lifecycle instrumentation
+    const val UI_LIFECYCLE_NAME = "device.app.ui.lifecycle"
+    const val UI_LIFECYCLE_COMPONENT = "ui"
+    val ELEMENT_TYPE_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.type")
+    val ELEMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.name")
+    val ELEMENT_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.id")
+    val LIFECYCLE_ACTION_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.lifecycle.action")
     val SESSION_REPLAY_KEY: AttributeKey<String> = AttributeKey.stringKey("splunk.sessionReplay")
     val SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.id")
 

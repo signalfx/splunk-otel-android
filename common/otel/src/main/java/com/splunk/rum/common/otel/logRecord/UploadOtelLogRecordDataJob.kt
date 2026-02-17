@@ -26,9 +26,13 @@ import com.splunk.android.common.http.HttpClient
 import com.splunk.android.common.http.model.Response
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.safeSubmit
+import com.splunk.android.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.common.otel.http.AuthHeaderBuilder
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 internal class UploadOtelLogRecordDataJob : JobService() {
 
@@ -36,8 +40,13 @@ internal class UploadOtelLogRecordDataJob : JobService() {
     private val jobIdStorage by lazy { JobIdStorage.init(application, isEncrypted = false) }
     private val httpClient by lazy { HttpClient() }
 
+    private val executor: ExecutorService by lazy {
+        Executors.newSingleThreadExecutor(NamedThreadFactory("uploadLogExecutor"))
+    }
+
     override fun onStopJob(params: JobParameters?): Boolean {
         Logger.d(TAG, "onStopJob()")
+        executor.shutdownNow()
         return true
     }
 
@@ -48,15 +57,26 @@ internal class UploadOtelLogRecordDataJob : JobService() {
     }
 
     private fun startUpload(params: JobParameters?) {
-        params?.extras?.getString(DATA_SERIALIZE_KEY)?.let { id ->
-            Logger.d(TAG, "startUpload() id: $id")
+        if (params == null) {
+            jobFinished(params, false)
+            return
+        }
 
+        val id = params.extras?.getString(DATA_SERIALIZE_KEY)
+
+        if (id == null) {
+            jobFinished(params, false)
+            return
+        }
+
+        Logger.d(TAG, "startUpload() id: $id")
+        executor.safeSubmit {
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {
                 Logger.d(TAG, "startUpload() url is not valid")
                 jobFinished(params, false)
-                return
+                return@safeSubmit
             }
 
             val data = storage.readOtelLogData(id)
@@ -64,7 +84,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
             if (data == null) {
                 Logger.d(TAG, "startUpload() data is not valid")
                 jobFinished(params, false)
-                return
+                return@safeSubmit
             }
 
             val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
@@ -79,16 +99,14 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                         Logger.d(
                             TAG,
                             "startUpload() onSuccess: response=$response, code=${response.code}," +
-                                " body=${response.body.toString(
-                                    Charsets.UTF_8
-                                )}"
+                                " body=${
+                                    response.body.toString(
+                                        Charsets.UTF_8
+                                    )
+                                }"
                         )
                         deleteData(id)
-                        if (response.isSuccessful) {
-                            jobFinished(params, false)
-                        } else {
-                            jobFinished(params, false)
-                        }
+                        jobFinished(params, false)
                     }
 
                     override fun onFailed(e: Exception) {
@@ -103,7 +121,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                     }
                 }
             )
-        } ?: jobFinished(params, false)
+        }
     }
 
     private fun deleteData(id: String) {
@@ -111,14 +129,22 @@ internal class UploadOtelLogRecordDataJob : JobService() {
         storage.deleteOtelLogData(id)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        executor.shutdownNow()
+    }
+
     companion object {
         private const val TAG = "UploadOtelLogRecordDataJob"
         private const val DATA_SERIALIZE_KEY = "DATA"
+
+        private const val INITIAL_BACKOFF = 60 * 1000L
 
         fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder =
             JobInfo.Builder(jobId, ComponentName(context, UploadOtelLogRecordDataJob::class.java))
                 .setExtras(PersistableBundle().apply { putString(DATA_SERIALIZE_KEY, id) })
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL)
                 .setRequiresCharging(false)
     }
 }
