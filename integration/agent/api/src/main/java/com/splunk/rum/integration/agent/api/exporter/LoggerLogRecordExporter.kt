@@ -19,9 +19,7 @@ package com.splunk.rum.integration.agent.api.exporter
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import io.opentelemetry.api.common.Attributes
-import io.opentelemetry.api.common.ValueType
 import io.opentelemetry.sdk.common.CompletableResultCode
-import io.opentelemetry.sdk.logs.data.Body
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import java.util.concurrent.atomic.AtomicBoolean

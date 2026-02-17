@@ -42,8 +42,8 @@ import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.api.OpenTelemetry
-import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
-import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
+import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor
+import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
 import java.util.UUID
 
 internal object SplunkRumAgentCore {
@@ -109,8 +109,8 @@ internal object SplunkRumAgentCore {
 
         if (agentConfiguration.enableDebugLogging) {
             initializer
-                .addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
-                .addLogRecordProcessor(SimpleLogRecordProcessor.create(LoggerLogRecordExporter()))
+                .addSpanProcessor(BatchSpanProcessor.builder(LoggerSpanExporter()).build())
+                .addLogRecordProcessor(BatchLogRecordProcessor.builder(LoggerLogRecordExporter()).build())
         }
 
         val openTelemetry = initializer.build()
