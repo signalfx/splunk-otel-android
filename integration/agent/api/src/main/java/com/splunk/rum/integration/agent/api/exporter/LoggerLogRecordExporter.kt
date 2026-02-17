@@ -52,7 +52,7 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
 
             Logger.i(
                 TAG,
-                    "severityText=${log.severityText}, " +
+                "severityText=${log.severityText}, " +
                     "severity=${log.severity}, " +
                     "timestampEpochNanos=${log.timestampEpochNanos}, " +
                     "observedTimestampEpochNanos=${log.observedTimestampEpochNanos}, " +
