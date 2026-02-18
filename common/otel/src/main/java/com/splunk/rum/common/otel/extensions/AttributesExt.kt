@@ -18,28 +18,21 @@ package com.splunk.rum.common.otel.extensions
 
 import io.opentelemetry.api.common.Attributes
 
-fun Attributes.joinToString(
-    separator: String = ",",
-    prefix: String = "",
-    postfix: String = "",
-    transform: (String, Any) -> CharSequence = { key, value -> "$key=$value" }
-): String {
-    val attributes = this
-    val attributesSize = size()
-
-    return buildString {
-        append(prefix)
-
-        var i = 0
-
-        attributes.forEach { key, value ->
-            append(transform(key.key, value))
-
-            if (++i < attributesSize) {
-                append(separator)
-            }
-        }
-
-        append(postfix)
+/**
+ * Appends attributes directly to a StringBuilder without creating intermediate String objects.
+ *
+ * @param builder The StringBuilder to append to.
+ * @param separator The separator between key-value pairs. Default is ", ".
+ * @param prefix The prefix before the first attribute. Default is "[".
+ * @param postfix The postfix after the last attribute. Default is "]".
+ */
+fun Attributes.appendTo(builder: StringBuilder, separator: String = ", ", prefix: String = "[", postfix: String = "]") {
+    builder.append(prefix)
+    var first = true
+    forEach { key, value ->
+        if (!first) builder.append(separator)
+        builder.append(key.key).append("=").append(value)
+        first = false
     }
+    builder.append(postfix)
 }
