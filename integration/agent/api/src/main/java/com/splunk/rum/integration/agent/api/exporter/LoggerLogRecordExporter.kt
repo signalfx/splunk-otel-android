@@ -18,9 +18,8 @@ package com.splunk.rum.integration.agent.api.exporter
 
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
-import com.splunk.rum.common.otel.extensions.appendAttributes
+import com.splunk.rum.common.otel.extensions.toSplunkString
 import com.splunk.rum.common.otel.internal.RumConstants
-import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
@@ -36,6 +35,8 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
         }
 
         logs.forEachFast { log ->
+            val instrumentationScopeInfo = log.instrumentationScopeInfo
+
             /**
              * FIXME
              *
@@ -45,11 +46,25 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
              *
              * This should be reworked into a more general solution that properly resolves the logging duplication.
              */
-            if (log.instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
+            if (instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
                 return@forEachFast
             }
 
-            Logger.i(TAG, log.toLogMessage())
+            Logger.i(
+                TAG,
+                "severityText=${log.severityText}, " +
+                    "severity=${log.severity}, " +
+                    "timestampEpochNanos=${log.timestampEpochNanos}, " +
+                    "observedTimestampEpochNanos=${log.observedTimestampEpochNanos}, " +
+                    "traceId=${log.spanContext.traceId}, " +
+                    "spanId=${log.spanContext.spanId}, " +
+                    "traceFlags=${log.spanContext.traceFlags}, " +
+                    "resources=${log.resource.attributes.toSplunkString()}, " +
+                    "attributes=${log.attributes.toSplunkString()}, " +
+                    "totalAttributeCount=${log.totalAttributeCount}, " +
+                    "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
+                    "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
+            )
         }
 
         return CompletableResultCode.ofSuccess()
@@ -61,37 +76,6 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
         CompletableResultCode.ofSuccess()
     } else {
         flush()
-    }
-
-    private fun LogRecordData.toLogMessage(): String {
-        val instrumentationScopeInfo = instrumentationScopeInfo
-
-        return buildString {
-            append("severityText=")
-            append(severityText)
-            append(", severity=")
-            append(severity)
-            append(", timestampEpochNanos=")
-            append(timestampEpochNanos)
-            append(", observedTimestampEpochNanos=")
-            append(observedTimestampEpochNanos)
-            append(", traceId=")
-            append(spanContext.traceId)
-            append(", spanId=")
-            append(spanContext.spanId)
-            append(", traceFlags=")
-            append(spanContext.traceFlags)
-            append(", resources=")
-            appendAttributes(resource.attributes)
-            append(", attributes=")
-            appendAttributes(attributes)
-            append(", totalAttributeCount=")
-            append(totalAttributeCount)
-            append(", instrumentationScopeInfo.name=")
-            append(instrumentationScopeInfo.name)
-            append(", instrumentationScopeInfo.version=")
-            append(instrumentationScopeInfo.version)
-        }
     }
 
     private companion object {
