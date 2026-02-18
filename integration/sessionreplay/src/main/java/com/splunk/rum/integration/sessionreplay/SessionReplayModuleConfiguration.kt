@@ -36,4 +36,6 @@ class SessionReplayModuleConfiguration(val isEnabled: Boolean = true, val sampli
         "enabled" to isEnabled.toString(),
         "samplingRate" to samplingRate.toString()
     )
+
+    override val requiresMainThread: Boolean = true
 }

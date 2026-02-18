@@ -82,13 +82,37 @@ class AgentIntegration private constructor(context: Context) {
             val module = modules[config.name] ?: Module(config.name)
             modules[config.name] = module.copy(configuration = config)
         }
+
+        // Separate modules into background-safe and main-thread-required
+        val (mainThreadConfigs, backgroundConfigs) = moduleConfigurations.partition { it.requiresMainThread }
+
+        Logger.d(TAG, "Background-safe modules: ${backgroundConfigs.map { it.name }}")
+        Logger.d(TAG, "Main-thread-required modules: ${mainThreadConfigs.map { it.name }}")
+
         val oTelInstallationContext =
             InstallationContext(context.applicationContext as Application, openTelemetry, oTelSessionManager)
-        listeners.forEachFast { it.onInstall(context, oTelInstallationContext, moduleConfigurations) }
+
+        // Install background-safe modules immediately
+        if (backgroundConfigs.isNotEmpty()) {
+            listeners.forEachFast { it.onInstall(context, oTelInstallationContext, backgroundConfigs) }
+        }
+
+        // Post main-thread-required modules to the main handler
+        if (mainThreadConfigs.isNotEmpty()) {
+            val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
+            mainHandler.post {
+                Logger.d(TAG, "Installing main-thread-required modules on main thread")
+                listeners.forEachFast { it.onInstall(context, oTelInstallationContext, mainThreadConfigs) }
+
+                // Call onPostInstall after main thread modules are initialized
+                listeners.forEachFast { it.onPostInstall() }
+            }
+        } else {
+            // No main thread modules, call onPostInstall immediately
+            listeners.forEachFast { it.onPostInstall() }
+        }
 
         registerModuleInitializationEnd(MODULE_NAME)
-
-        listeners.forEachFast { it.onPostInstall() }
     }
 
     interface Listener {
