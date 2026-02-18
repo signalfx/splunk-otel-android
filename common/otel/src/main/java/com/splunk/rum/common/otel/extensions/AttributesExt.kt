@@ -1,29 +1,44 @@
+/*
+ * Copyright 2026 Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.splunk.rum.common.otel.extensions
 
 import io.opentelemetry.api.common.Attributes
 
-/**
- * Converts the [Attributes] to a string in the format of "[key1=value1, key2=value2, ...]".
- */
-fun Attributes.toSplunkString() = buildString {
-    append('[')
+fun Attributes.joinToString(
+    separator: String = ",",
+    prefix: String = "",
+    postfix: String = "",
+    transform: (String, Any) -> CharSequence = { key, value -> "$key=$value" }
+): String {
+    val attributes = this
+    val attributesSize = size()
 
-    val iterator = asMap().entries.iterator()
-    if (iterator.hasNext()) {
-        val first = iterator.next()
+    return buildString {
+        append(prefix)
 
-        append(first.key)
-        append('=')
-        append(first.value)
+        var i = 0
 
-        while (iterator.hasNext()) {
-            val entry = iterator.next()
-            append(", ")
-            append(entry.key)
-            append('=')
-            append(entry.value)
+        attributes.forEach { key, value ->
+            append(transform(key.key, value))
+
+            if (++i < attributesSize)
+                append(separator)
         }
-    }
 
-    append(']')
+        append(postfix)
+    }
 }

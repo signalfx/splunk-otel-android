@@ -18,7 +18,7 @@ package com.splunk.rum.integration.agent.api.exporter
 
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
-import com.splunk.rum.common.otel.extensions.toSplunkString
+import com.splunk.rum.common.otel.extensions.joinToString
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
@@ -43,8 +43,8 @@ internal class LoggerSpanExporter : SpanExporter {
                     "spanId=${span.spanId}, " +
                     "parentSpanId=${span.parentSpanId}, " +
                     "kind=${span.kind}, " +
-                    "resources=${span.resource.attributes.toSplunkString()}, " +
-                    "attributes=${span.attributes.toSplunkString()}, " +
+                    "resources=${span.resource.attributes.joinToString(", ", "[", "]")}, " +
+                    "attributes=${span.attributes.joinToString(", ", "[", "]")}, " +
                     "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
                     "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
             )
