@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.api.exporter
 
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.rum.common.otel.extensions.appendAttributes
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
@@ -34,19 +35,7 @@ internal class LoggerSpanExporter : SpanExporter {
         }
 
         spans.forEachFast { span ->
-            val instrumentationScopeInfo = span.instrumentationScopeInfo
-            Logger.i(
-                TAG,
-                "name=${span.name}, " +
-                    "traceId=${span.traceId}, " +
-                    "spanId=${span.spanId}, " +
-                    "parentSpanId=${span.parentSpanId}, " +
-                    "kind=${span.kind}, " +
-                    "resources=${span.resource.attributes.toSplunkString()}, " +
-                    "attributes=${span.attributes.toSplunkString()}, " +
-                    "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
-                    "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
-            )
+            Logger.i(TAG, span.toLogMessage())
         }
 
         return CompletableResultCode.ofSuccess()
@@ -60,9 +49,30 @@ internal class LoggerSpanExporter : SpanExporter {
         flush()
     }
 
-    private fun Attributes.toSplunkString(): String = asMap()
-        .toList()
-        .joinToString(", ", "[", "]") { "${it.first}=${it.second}" }
+    private fun SpanData.toLogMessage(): String {
+        val instrumentationScopeInfo = instrumentationScopeInfo
+
+        return buildString {
+            append("name=")
+            append(name)
+            append(", traceId=")
+            append(traceId)
+            append(", spanId=")
+            append(spanId)
+            append(", parentSpanId=")
+            append(parentSpanId)
+            append(", kind=")
+            append(kind)
+            append(", resources=")
+            appendAttributes(resource.attributes)
+            append(", attributes=")
+            appendAttributes(attributes)
+            append(", instrumentationScopeInfo.name=")
+            append(instrumentationScopeInfo.name)
+            append(", instrumentationScopeInfo.version=")
+            append(instrumentationScopeInfo.version)
+        }
+    }
 
     private companion object {
         const val TAG = "LoggerSpanExporter"
