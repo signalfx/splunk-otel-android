@@ -35,8 +35,9 @@ fun Attributes.joinToString(
         attributes.forEach { key, value ->
             append(transform(key.key, value))
 
-            if (++i < attributesSize)
+            if (++i < attributesSize) {
                 append(separator)
+            }
         }
 
         append(postfix)
