@@ -72,4 +72,6 @@ interface IAgentStorage {
 
     fun readSessionIds(): List<SessionId>
     fun writeSessionIds(sessionIds: List<SessionId>)
+
+    fun commit()
 }
