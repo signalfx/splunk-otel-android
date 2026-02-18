@@ -35,4 +35,6 @@ data class NavigationModuleConfiguration @JvmOverloads constructor(
         "enabled" to isEnabled.toString(),
         "isAutomatedTrackingEnabled" to isAutomatedTrackingEnabled.toString()
     )
+
+    override val requiresMainThread: Boolean = true
 }

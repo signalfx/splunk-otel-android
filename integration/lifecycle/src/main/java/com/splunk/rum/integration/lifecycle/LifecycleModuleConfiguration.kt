@@ -40,6 +40,8 @@ data class LifecycleModuleConfiguration @JvmOverloads constructor(
         "allowedEvents" to allowedEvents.joinToString(",", "[", "]") { it.name }
     )
 
+    override val requiresMainThread: Boolean = true
+
     companion object {
         /**
          * Default set of allowed lifecycle events - includes all events.
