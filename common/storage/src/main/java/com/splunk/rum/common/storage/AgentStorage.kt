@@ -173,9 +173,13 @@ class AgentStorage(context: Context) : IAgentStorage {
         return success
     }
 
-    override fun readOtelLogData(id: String): ByteArray? {
+    override fun readOtelLogData(id: String): File? {
         val file: File = otelLogDataFile(id)
-        return encryptedStorage.readBytes(file)
+        return if (file.exists()) {
+            file
+        } else {
+            null
+        }
     }
 
     override fun deleteOtelLogData(id: String) {
@@ -191,9 +195,13 @@ class AgentStorage(context: Context) : IAgentStorage {
         return success
     }
 
-    override fun readOtelSpanData(id: String): ByteArray? {
+    override fun readOtelSpanData(id: String): File? {
         val file: File = otelSpanDataFile(id)
-        return encryptedStorage.readBytes(file)
+        return if (file.exists()) {
+            file
+        } else {
+            null
+        }
     }
 
     override fun deleteOtelSpanData(id: String) {
