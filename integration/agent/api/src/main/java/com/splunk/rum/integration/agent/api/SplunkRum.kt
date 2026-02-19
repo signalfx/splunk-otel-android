@@ -268,12 +268,8 @@ class SplunkRum private constructor(
                 return instance
             }
 
-            if (agentConfiguration.enableDebugLogging) {
-                Logger.consumers += AndroidLogConsumer()
-                Logger.logLevel = Log.Level.DEBUG
-            } else {
-                Logger.logLevel = Log.Level.WARN
-            }
+            Logger.consumers += AndroidLogConsumer()
+            Logger.logLevel = if (agentConfiguration.enableDebugLogging) Log.Level.DEBUG else Log.Level.WARN
 
             require(agentConfiguration.deploymentEnvironment.isNotBlank()) {
                 "deploymentEnvironment cannot be an empty string. Please specify a value like 'dev', 'staging', or 'prod'."
