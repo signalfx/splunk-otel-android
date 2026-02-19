@@ -173,7 +173,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         return success
     }
 
-    override fun readOtelLogData(id: String): File? {
+    override fun readOtelLogDataFile(id: String): File? {
         val file: File = otelLogDataFile(id)
         return if (file.exists()) {
             file
@@ -195,7 +195,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         return success
     }
 
-    override fun readOtelSpanData(id: String): File? {
+    override fun readOtelSpanDataFile(id: String): File? {
         val file: File = otelSpanDataFile(id)
         return if (file.exists()) {
             file
@@ -217,7 +217,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         return success
     }
 
-    override fun readOtelSessionReplayData(id: String): File? {
+    override fun readOtelSessionReplayDataFile(id: String): File? {
         val file: File = sessionReplayDataFile(id)
         return if (file.exists()) {
             file

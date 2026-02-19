@@ -33,7 +33,6 @@ import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicBoolean
 
 internal class UploadOtelSpanDataJob : JobService() {
 
@@ -80,7 +79,7 @@ internal class UploadOtelSpanDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val dataFile = storage.readOtelSpanData(id)
+            val dataFile = storage.readOtelSpanDataFile(id)
 
             if (dataFile == null) {
                 Logger.d(TAG, "startUpload() span file is not present")

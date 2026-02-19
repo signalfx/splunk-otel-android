@@ -79,7 +79,7 @@ internal class UploadSessionReplayDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val dataFile = storage.readOtelSessionReplayData(id)
+            val dataFile = storage.readOtelSessionReplayDataFile(id)
 
             if (dataFile == null) {
                 Logger.d(TAG, "startUpload() session replay file is not present")
