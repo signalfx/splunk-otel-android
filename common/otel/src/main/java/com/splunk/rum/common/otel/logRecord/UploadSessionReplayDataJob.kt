@@ -79,10 +79,10 @@ internal class UploadSessionReplayDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val data = storage.readOtelSessionReplayData(id)
+            val dataFile = storage.getOtelSessionReplayDataFile(id)
 
-            if (data == null) {
-                Logger.d(TAG, "startUpload() data is not valid")
+            if (dataFile == null) {
+                Logger.d(TAG, "startUpload() session replay file is not present")
                 jobFinished(params, false)
                 return@safeSubmit
             }
@@ -93,7 +93,7 @@ internal class UploadSessionReplayDataJob : JobService() {
                 url = url,
                 queries = emptyList(),
                 headers = headers,
-                body = data,
+                body = dataFile,
                 callback = object : HttpClient.Callback {
                     override fun onSuccess(response: Response) {
                         Logger.d(
