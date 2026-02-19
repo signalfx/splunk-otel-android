@@ -17,49 +17,39 @@
 package com.splunk.rum.integration.agent.api.exporter
 
 import com.splunk.android.common.logger.Logger
-import com.splunk.rum.common.otel.extensions.appendTo
+import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.rum.common.otel.extensions.joinToString
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 
 internal class LoggerSpanExporter : SpanExporter {
 
     private val isShutdown = AtomicBoolean(false)
-    private val loggingScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {
         if (isShutdown.get()) {
             return CompletableResultCode.ofFailure()
         }
 
-        // Execute logging asynchronously on background thread
-        loggingScope.launch {
-            spans.forEach { span ->
-                val message = buildString {
-                    append("name=").append(span.name)
-                    append(", traceId=").append(span.traceId)
-                    append(", spanId=").append(span.spanId)
-                    append(", parentSpanId=").append(span.parentSpanId)
-                    append(", kind=").append(span.kind)
-                    append(", resources=")
-                    span.resource.attributes.appendTo(this)
-                    append(", attributes=")
-                    span.attributes.appendTo(this)
-                    append(", instrumentationScopeInfo.name=").append(span.instrumentationScopeInfo.name)
-                    append(", instrumentationScopeInfo.version=").append(span.instrumentationScopeInfo.version)
-                }
+        spans.forEachFast { span ->
+            val instrumentationScopeInfo = span.instrumentationScopeInfo
 
-                Logger.i(TAG, message)
-            }
+            Logger.i(
+                TAG,
+                "name=${span.name}, " +
+                    "traceId=${span.traceId}, " +
+                    "spanId=${span.spanId}, " +
+                    "parentSpanId=${span.parentSpanId}, " +
+                    "kind=${span.kind}, " +
+                    "resources=${span.resource.attributes.joinToString(", ", "[", "]")}, " +
+                    "attributes=${span.attributes.joinToString(", ", "[", "]")}, " +
+                    "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
+                    "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
+            )
         }
 
-        // Return success immediately without blocking
         return CompletableResultCode.ofSuccess()
     }
 
@@ -68,7 +58,6 @@ internal class LoggerSpanExporter : SpanExporter {
     override fun shutdown(): CompletableResultCode = if (!isShutdown.compareAndSet(false, true)) {
         CompletableResultCode.ofSuccess()
     } else {
-        loggingScope.cancel()
         flush()
     }
 

@@ -23,55 +23,41 @@ import org.junit.Test
 class AttributesExtTest {
 
     @Test
-    fun `appendTo should format attributes correctly`() {
+    fun `joinToString should format attributes correctly`() {
         val attributes = Attributes.builder()
             .put("key1", "value1")
             .put("key2", true)
             .put("key3", 123L)
             .build()
 
-        val result = buildString {
-            attributes.appendTo(this, separator = ",", prefix = "", postfix = "")
-        }
+        val result = attributes.joinToString()
 
         assertEquals("key1=value1,key2=true,key3=123", result)
     }
 
     @Test
-    fun `appendTo with custom arguments should format attributes correctly`() {
+    fun `joinToString with custom arguments should format attributes correctly`() {
         val attributes = Attributes.builder()
             .put("key1", "value1")
             .put("key2", true)
             .build()
 
-        val result = buildString {
-            attributes.appendTo(this, separator = ";", prefix = "[", postfix = "]")
-        }
+        val result = attributes.joinToString(
+            separator = ";",
+            prefix = "[",
+            postfix = "]",
+            transform = { key, value -> "$key:$value" }
+        )
 
-        assertEquals("[key1=value1;key2=true]", result)
+        assertEquals("[key1:value1;key2:true]", result)
     }
 
     @Test
-    fun `appendTo with empty attributes should return prefix and postfix only`() {
+    fun `joinToString with empty attributes should return an empty string`() {
         val attributes = Attributes.empty()
 
-        val result = buildString {
-            attributes.appendTo(this, separator = ",", prefix = "[", postfix = "]")
-        }
+        val result = attributes.joinToString()
 
-        assertEquals("[]", result)
-    }
-
-    @Test
-    fun `appendTo with default arguments should use default prefix and postfix`() {
-        val attributes = Attributes.builder()
-            .put("key1", "value1")
-            .build()
-
-        val result = buildString {
-            attributes.appendTo(this)
-        }
-
-        assertEquals("[key1=value1]", result)
+        assertEquals("", result)
     }
 }
