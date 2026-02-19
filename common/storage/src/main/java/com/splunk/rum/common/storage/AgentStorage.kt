@@ -52,7 +52,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     private val preferencesFileManager = FileManagerFactory.createPlainFileManager()
     private val preferences: Preferences
 
-    private val encryptedStorage =
+    private val internalStorage =
         Storage(FilePermanentCache(FileManagerFactory.createPlainFileManager()))
 
     private val rootDir = File(context.noBackupFilesDirCompat, "agent")
@@ -167,7 +167,7 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun writeOtelLogData(id: String, data: ByteArray): Boolean {
         val file: File = otelLogDataFile(id)
-        val success = encryptedStorage.writeBytes(file, data)
+        val success = internalStorage.writeBytes(file, data)
         Logger.d(TAG, "createOtelLogDataFile(): id = $id, success = $success")
 
         return success
@@ -189,7 +189,7 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun writeOtelSpanData(id: String, data: ByteArray): Boolean {
         val file: File = otelSpanDataFile(id)
-        val success = encryptedStorage.writeBytes(file, data)
+        val success = internalStorage.writeBytes(file, data)
         Logger.d(TAG, "writeOtelSpanData(): id = $id, success = $success")
 
         return success
@@ -211,7 +211,7 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean {
         val file: File = sessionReplayDataFile(id)
-        val success = encryptedStorage.writeBytes(file, data)
+        val success = internalStorage.writeBytes(file, data)
         Logger.d(TAG, "writeOtelSessionReplayData(): id = $id, success = $success")
 
         return success
