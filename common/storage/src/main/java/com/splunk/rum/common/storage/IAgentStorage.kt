@@ -16,6 +16,8 @@
 
 package com.splunk.rum.common.storage
 
+import java.io.File
+
 interface IAgentStorage {
     val freeSpace: Long
     val rootDirPath: String
@@ -63,7 +65,7 @@ interface IAgentStorage {
     fun clearBufferedSpanIds()
 
     fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean
-    fun readOtelSessionReplayData(id: String): ByteArray?
+    fun readOtelSessionReplayData(id: String): File?
     fun deleteOtelSessionReplayData(id: String)
 
     fun addBufferedSessionReplayId(id: String)

@@ -209,9 +209,13 @@ class AgentStorage(context: Context) : IAgentStorage {
         return success
     }
 
-    override fun readOtelSessionReplayData(id: String): ByteArray? {
+    override fun readOtelSessionReplayData(id: String): File? {
         val file: File = sessionReplayDataFile(id)
-        return encryptedStorage.readBytes(file)
+        return if (file.exists()) {
+            file
+        } else {
+            null
+        }
     }
 
     override fun deleteOtelSessionReplayData(id: String) {
