@@ -79,7 +79,7 @@ internal class UploadOtelSpanDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val dataFile = storage.readOtelSpanDataFile(id)
+            val dataFile = storage.getOtelSpanDataFile(id)
 
             if (dataFile == null) {
                 Logger.d(TAG, "startUpload() span file is not present")

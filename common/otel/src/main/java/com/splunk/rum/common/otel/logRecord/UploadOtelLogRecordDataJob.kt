@@ -79,7 +79,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val dataFile = storage.readOtelLogDataFile(id)
+            val dataFile = storage.getOtelLogDataFile(id)
 
             if (dataFile == null) {
                 Logger.d(TAG, "startUpload() log file is not present")

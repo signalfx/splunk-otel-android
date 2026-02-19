@@ -54,18 +54,18 @@ interface IAgentStorage {
     fun deleteSessionValidUntilInBackground()
 
     fun writeOtelLogData(id: String, data: ByteArray): Boolean
-    fun readOtelLogDataFile(id: String): File?
+    fun getOtelLogDataFile(id: String): File?
     fun deleteOtelLogData(id: String)
 
     fun writeOtelSpanData(id: String, data: ByteArray): Boolean
-    fun readOtelSpanDataFile(id: String): File?
+    fun getOtelSpanDataFile(id: String): File?
     fun deleteOtelSpanData(id: String)
     fun addBufferedSpanId(id: String)
     fun getBufferedSpanIds(): List<String>
     fun clearBufferedSpanIds()
 
     fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean
-    fun readOtelSessionReplayDataFile(id: String): File?
+    fun getOtelSessionReplayDataFile(id: String): File?
     fun deleteOtelSessionReplayData(id: String)
 
     fun addBufferedSessionReplayId(id: String)
