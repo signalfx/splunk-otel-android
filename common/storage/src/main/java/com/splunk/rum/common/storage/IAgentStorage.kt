@@ -16,6 +16,8 @@
 
 package com.splunk.rum.common.storage
 
+import java.io.File
+
 interface IAgentStorage {
     val freeSpace: Long
     val rootDirPath: String
@@ -52,18 +54,18 @@ interface IAgentStorage {
     fun deleteSessionValidUntilInBackground()
 
     fun writeOtelLogData(id: String, data: ByteArray): Boolean
-    fun readOtelLogData(id: String): ByteArray?
+    fun getOtelLogDataFile(id: String): File?
     fun deleteOtelLogData(id: String)
 
     fun writeOtelSpanData(id: String, data: ByteArray): Boolean
-    fun readOtelSpanData(id: String): ByteArray?
+    fun getOtelSpanDataFile(id: String): File?
     fun deleteOtelSpanData(id: String)
     fun addBufferedSpanId(id: String)
     fun getBufferedSpanIds(): List<String>
     fun clearBufferedSpanIds()
 
     fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean
-    fun readOtelSessionReplayData(id: String): ByteArray?
+    fun getOtelSessionReplayDataFile(id: String): File?
     fun deleteOtelSessionReplayData(id: String)
 
     fun addBufferedSessionReplayId(id: String)
