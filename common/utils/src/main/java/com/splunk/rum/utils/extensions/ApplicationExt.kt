@@ -15,7 +15,7 @@ val Application.applicationId: String?
         val id = try {
             packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).packageName
         } catch (e: Exception) {
-            Logger.e(TAG, "Failed to retrieve ApplicationInfo: ${e.message}")
+            Logger.e(TAG, "Failed to retrieve ApplicationInfo", e)
             null
         }
         return id
@@ -26,7 +26,7 @@ val Application.splunkBuildId: String?
         val appInfo = try {
             packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
         } catch (e: Exception) {
-            Logger.e(TAG, "Failed to retrieve ApplicationInfo: ${e.message}")
+            Logger.e(TAG, "Failed to retrieve ApplicationInfo", e)
             return null
         }
 
@@ -42,7 +42,7 @@ val Application.splunkBuildId: String?
                 null
             } else {
                 val id = value.toString()
-                Logger.d(TAG, "Found Splunk Build ID: $id")
+                Logger.d(TAG) { "Found Splunk Build ID: $id" }
                 id
             }
         } else {

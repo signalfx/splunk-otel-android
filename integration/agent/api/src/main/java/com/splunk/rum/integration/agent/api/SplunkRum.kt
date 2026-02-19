@@ -19,7 +19,9 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import android.os.Build
 import android.webkit.WebView
+import com.splunk.android.common.logger.Log
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
@@ -46,7 +48,6 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.api.trace.Span
-import java.net.URL
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import okhttp3.Call
@@ -265,6 +266,13 @@ class SplunkRum private constructor(
         ): SplunkRum {
             if (instanceInternal != null) {
                 return instance
+            }
+
+            if (agentConfiguration.enableDebugLogging) {
+                Logger.consumers += AndroidLogConsumer()
+                Logger.logLevel = Log.Level.DEBUG
+            } else {
+                Logger.logLevel = Log.Level.WARN
             }
 
             require(agentConfiguration.deploymentEnvironment.isNotBlank()) {

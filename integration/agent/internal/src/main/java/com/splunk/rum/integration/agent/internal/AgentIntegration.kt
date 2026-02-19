@@ -76,7 +76,7 @@ class AgentIntegration private constructor(context: Context) {
 
         for (config in moduleConfigurations) {
             if (!seenConfigurationNames.add(config.name)) {
-                Logger.w(TAG, "Duplicate module configuration: ${config.javaClass.name} was ignored.")
+                Logger.w(TAG) { "Duplicate module configuration: ${config.javaClass.name} was ignored." }
                 continue
             }
             val module = modules[config.name] ?: Module(config.name)
@@ -97,6 +97,7 @@ class AgentIntegration private constructor(context: Context) {
             oTelInstallationContext: InstallationContext,
             moduleConfigurations: List<ModuleConfiguration>
         )
+
         fun onPostInstall()
     }
 
@@ -139,10 +140,9 @@ class AgentIntegration private constructor(context: Context) {
                 )
             )
 
-            Logger.d(
-                TAG,
+            Logger.d(TAG) {
                 "registerModuleInitializationStart() module: $name,  startTimestamp:${modules[name]?.initialization?.startTimestamp}, startElapsed:${modules[name]?.initialization?.startElapsed}"
-            )
+            }
         }
 
         fun registerModuleInitializationEnd(name: String) {
@@ -161,10 +161,9 @@ class AgentIntegration private constructor(context: Context) {
                 )
             )
 
-            Logger.d(
-                TAG,
+            Logger.d(TAG) {
                 "registerModuleInitializationEnd() module: $name,  startTimestamp:${modules[name]?.initialization?.startTimestamp}, startElapsed:${modules[name]?.initialization?.startElapsed}, endElapsed:${modules[name]?.initialization?.endElapsed}"
-            )
+            }
         }
     }
 }

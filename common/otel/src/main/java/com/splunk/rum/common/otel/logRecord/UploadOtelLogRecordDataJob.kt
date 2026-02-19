@@ -69,7 +69,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
             return
         }
 
-        Logger.d(TAG, "startUpload() id: $id")
+        Logger.d(TAG) { "startUpload() id: $id" }
         executor.safeSubmit {
             val url = storage.readTracesBaseUrl()
 
@@ -110,7 +110,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                     }
 
                     override fun onFailed(e: Exception) {
-                        Logger.d(TAG, "startUpload() onFailed: e=$e")
+                        Logger.d(TAG, "startUpload() onFailed", e)
                         when (e) {
                             is UnknownHostException -> jobFinished(params, true)
                             else -> {

@@ -18,7 +18,6 @@ package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
 import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.common.storage.AgentStorage
@@ -67,10 +66,6 @@ internal object SplunkRumAgentCore {
         }
 
         if (!shouldBeRunning) return OpenTelemetry.noop()
-
-        if (agentConfiguration.enableDebugLogging) {
-            Logger.consumers += AndroidLogConsumer()
-        }
 
         Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 

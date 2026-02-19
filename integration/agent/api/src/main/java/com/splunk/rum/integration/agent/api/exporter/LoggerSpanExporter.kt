@@ -36,8 +36,7 @@ internal class LoggerSpanExporter : SpanExporter {
         spans.forEachFast { span ->
             val instrumentationScopeInfo = span.instrumentationScopeInfo
 
-            Logger.i(
-                TAG,
+            Logger.i(TAG) {
                 "name=${span.name}, " +
                     "traceId=${span.traceId}, " +
                     "spanId=${span.spanId}, " +
@@ -47,7 +46,7 @@ internal class LoggerSpanExporter : SpanExporter {
                     "attributes=${span.attributes.joinToString(", ", "[", "]")}, " +
                     "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
                     "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
-            )
+            }
         }
 
         return CompletableResultCode.ofSuccess()
