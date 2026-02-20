@@ -108,18 +108,19 @@ class App : Application() {
      */
 
     private val httpURLModuleConfiguration = HttpURLModuleConfiguration(
-        isEnabled = true,
+        isEnabled = false,
         capturedRequestHeaders = listOf("Host", "Accept"),
         capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
     )
 
     private val okHttp3AutoModuleConfiguration = OkHttp3AutoModuleConfiguration(
-        isEnabled = true,
+        isEnabled = false,
         capturedRequestHeaders = listOf("User-Agent", "Accept"),
         capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
     )
 
     private val okHttp3ManualModuleConfiguration = OkHttp3ManualModuleConfiguration(
+        isEnabled = true,
         capturedRequestHeaders = listOf("Content-Type", "Accept"),
         capturedResponseHeaders = listOf("Server", "Content-Type", "Content-Length")
     )
@@ -148,8 +149,6 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
-        HttpURLModuleConfiguration()
 
         val moduleConfigurations = arrayOf(
             httpURLModuleConfiguration,

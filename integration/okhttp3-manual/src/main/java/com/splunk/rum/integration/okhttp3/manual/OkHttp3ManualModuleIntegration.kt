@@ -39,16 +39,20 @@ internal object OkHttp3ManualModuleIntegration : ModuleIntegration<OkHttp3Manual
     ) {
         Logger.d(TAG, "onInstall()")
 
-        // Setup OkHttp3 manual instrumentation
-        okHttpTelemetry = OkHttpTelemetry.builder(oTelInstallationContext.openTelemetry)
-            .addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
-            .apply {
-                moduleConfiguration.capturedRequestHeaders.takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedRequestHeaders(it) }
+        // Setup OkHttp3 manual instrumentation if it is enabled
+        if (moduleConfiguration.isEnabled) {
+            okHttpTelemetry = OkHttpTelemetry.builder(oTelInstallationContext.openTelemetry)
+                .addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
+                .apply {
+                    moduleConfiguration.capturedRequestHeaders.takeIf { it.isNotEmpty() }
+                        ?.let { setCapturedRequestHeaders(it) }
 
-                moduleConfiguration.capturedResponseHeaders.takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedResponseHeaders(it) }
-            }
-            .build()
+                    moduleConfiguration.capturedResponseHeaders.takeIf { it.isNotEmpty() }
+                        ?.let { setCapturedResponseHeaders(it) }
+                }
+                .build()
+
+            Logger.d(TAG, "Setup completed for OkHttp3 manual instrumentation.")
+        }
     }
 }

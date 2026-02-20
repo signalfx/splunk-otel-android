@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api.internal
 import android.app.Application
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.android.common.utils.runOnBackgroundThread
 import com.splunk.rum.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
@@ -73,9 +74,13 @@ internal object SplunkRumAgentCore {
 
         val storage = AgentStorage.attach(application)
 
+        // Read appInstallationId synchronously (fast read from cache if exists)
+        // but defer the write operation to background thread to avoid disk I/O on main thread.
         val appInstallationID = storage.readAppInstallationId()
-            ?: UUID.randomUUID().toString().replace("-", "").also {
-                storage.writeAppInstallationId(it)
+            ?: UUID.randomUUID().toString().replace("-", "").also { newId ->
+                runOnBackgroundThread {
+                    storage.writeAppInstallationId(newId)
+                }
             }
 
         val finalConfiguration = ConfigurationManager
