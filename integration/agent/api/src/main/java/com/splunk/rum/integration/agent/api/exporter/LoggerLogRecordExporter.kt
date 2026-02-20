@@ -50,8 +50,7 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
                 return@forEachFast
             }
 
-            Logger.i(
-                TAG,
+            Logger.i(TAG) {
                 "severityText=${log.severityText}, " +
                     "severity=${log.severity}, " +
                     "timestampEpochNanos=${log.timestampEpochNanos}, " +
@@ -64,7 +63,7 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
                     "totalAttributeCount=${log.totalAttributeCount}, " +
                     "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
                     "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
-            )
+            }
         }
 
         return CompletableResultCode.ofSuccess()

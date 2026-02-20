@@ -69,7 +69,7 @@ internal class UploadSessionReplayDataJob : JobService() {
             return
         }
 
-        Logger.d(TAG, "startUpload() id: $id")
+        Logger.d(TAG) { "startUpload() id: $id" }
         executor.safeSubmit {
             val url = storage.readLogsBaseUrl()
 
@@ -96,17 +96,17 @@ internal class UploadSessionReplayDataJob : JobService() {
                 body = dataFile,
                 callback = object : HttpClient.Callback {
                     override fun onSuccess(response: Response) {
-                        Logger.d(
-                            TAG,
+                        Logger.d(TAG) {
                             "startUpload() onSuccess: response=$response, code=${response.code}," +
                                 " body=${response.body.toString(Charsets.UTF_8)}"
-                        )
+                        }
                         deleteData(id)
                         jobFinished(params, false)
                     }
 
                     override fun onFailed(e: Exception) {
-                        Logger.d(TAG, "startUpload() onFailed: e=$e")
+                        Logger.d(TAG, "startUpload() onFailed", e)
+
                         when (e) {
                             is UnknownHostException -> jobFinished(params, true)
                             else -> {

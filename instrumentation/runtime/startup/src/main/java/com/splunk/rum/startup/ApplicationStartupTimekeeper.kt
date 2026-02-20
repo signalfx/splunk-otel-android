@@ -47,7 +47,7 @@ object ApplicationStartupTimekeeper {
             val result = listenersCache.add(element)
 
             pendingStartupEvent?.let { (startTs, endTs, type) ->
-                Logger.d(TAG, "Delivering pending ${type.name} start event to new listener")
+                Logger.d(TAG) { "Delivering pending ${type.name} start event to new listener" }
                 val duration = endTs - startTs
 
                 when (type) {
@@ -185,7 +185,7 @@ object ApplicationStartupTimekeeper {
 
                     if (listenersCache.isEmpty()) {
                         // No listeners registered yet - cache the event for later delivery
-                        Logger.d(TAG, "No listeners registered, caching ${startType.name} start event")
+                        Logger.d(TAG) { "No listeners registered, caching ${startType.name} start event" }
                         pendingStartupEvent = Triple(startTimestamp, endTimestamp, startType)
                     } else {
                         listenersCache.forEachFast { listener ->

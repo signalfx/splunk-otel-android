@@ -75,21 +75,21 @@ class AgentStorage(context: Context) : IAgentStorage {
     override val freeSpace: Long
         get() {
             val freeSpace = rootDir.statFsFreeSpace
-            Logger.v(TAG, "freeSpace: $freeSpace")
+            Logger.v(TAG) { "freeSpace: $freeSpace" }
             return freeSpace
         }
 
     override val rootDirPath: String
         get() {
             val path = rootDir.path
-            Logger.v(TAG, "consistentDirPath: $path")
+            Logger.v(TAG) { "consistentDirPath: $path" }
             return path
         }
 
     override val isStorageFull: Boolean
         get() {
             val isFull = !StoragePolicy(rootDir, 1000.MB, 0.2f, 50.MB).check(freeSpace)
-            Logger.v(TAG, "isStorageFull: $isFull")
+            Logger.v(TAG) { "isStorageFull: $isFull" }
             return isFull
         }
 
@@ -168,7 +168,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     override fun writeOtelLogData(id: String, data: ByteArray): Boolean {
         val file: File = otelLogDataFile(id)
         val success = internalStorage.writeBytes(file, data)
-        Logger.d(TAG, "createOtelLogDataFile(): id = $id, success = $success")
+        Logger.d(TAG) { "createOtelLogDataFile(): id = $id, success = $success" }
 
         return success
     }
@@ -190,7 +190,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     override fun writeOtelSpanData(id: String, data: ByteArray): Boolean {
         val file: File = otelSpanDataFile(id)
         val success = internalStorage.writeBytes(file, data)
-        Logger.d(TAG, "writeOtelSpanData(): id = $id, success = $success")
+        Logger.d(TAG) { "writeOtelSpanData(): id = $id, success = $success" }
 
         return success
     }
@@ -212,7 +212,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     override fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean {
         val file: File = sessionReplayDataFile(id)
         val success = internalStorage.writeBytes(file, data)
-        Logger.d(TAG, "writeOtelSessionReplayData(): id = $id, success = $success")
+        Logger.d(TAG) { "writeOtelSessionReplayData(): id = $id, success = $success" }
 
         return success
     }
@@ -267,7 +267,7 @@ class AgentStorage(context: Context) : IAgentStorage {
                 val array = JSONArray(json)
                 List(array.length()) { array.getString(it) }
             } catch (e: Exception) {
-                Logger.e(TAG, "getBufferedSpanIds(): spanIds: $e")
+                Logger.e(TAG, e) { "getBufferedSpanIds(): spanIds: $json" }
                 emptyList()
             }
         }

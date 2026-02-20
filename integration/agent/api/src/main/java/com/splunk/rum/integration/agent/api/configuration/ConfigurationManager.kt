@@ -53,7 +53,7 @@ internal class ConfigurationManager private constructor(private val agentStorage
             }
         }
 
-        Logger.d(TAG, "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config")
+        Logger.d(TAG) { "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config" }
 
         return config
     }
