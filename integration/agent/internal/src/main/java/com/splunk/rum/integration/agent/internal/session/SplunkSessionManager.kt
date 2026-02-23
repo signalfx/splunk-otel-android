@@ -31,6 +31,7 @@ import java.util.concurrent.ScheduledFuture
 
 interface ISplunkSessionManager {
     val sessionId: String
+    val sessionStart: Long
     val previousSessionId: String?
     val sessionListeners: MutableSet<SessionListener>
 
@@ -41,6 +42,7 @@ interface ISplunkSessionManager {
 
 object NoOpSplunkSessionManager : ISplunkSessionManager {
     override val sessionId: String = ""
+    override val sessionStart: Long = 0
     override val previousSessionId: String? = null
     override val sessionListeners: MutableSet<SessionListener> = mutableSetOf()
     override fun install(context: Context) = Unit
@@ -67,6 +69,12 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
             previousSessionId = agentStorage.readSessionId()
             agentStorage.writeSessionId(value)
             agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
+        }
+
+    @get:Synchronized
+    override val sessionStart: Long
+        get() {
+            return sessionIds.lastOrNull { it.id == sessionId }?.validFrom ?: System.currentTimeMillis()
         }
 
     override var previousSessionId: String? = null

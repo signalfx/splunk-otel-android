@@ -68,7 +68,7 @@ class SplunkRum private constructor(
     val openTelemetry: OpenTelemetry,
     private val endpointRef: AtomicReference<EndpointConfiguration?> = AtomicReference(agentConfiguration.endpoint),
     val state: IState = State(agentConfiguration, endpointRef),
-    val session: ISession = Session(SessionState(agentConfiguration.session, sessionManager)),
+    val session: ISession = Session(SessionState(agentConfiguration.session, sessionManager, userManager)),
     val user: User = User(userManager),
     val globalAttributes: MutableAttributes
 ) {

@@ -53,6 +53,22 @@ class SplunkSessionManagerTest {
     }
 
     @Test
+    fun `sessionStart returns current session start timestamp`() {
+        val now = System.currentTimeMillis()
+        val expectedSessionStart = now - 1_000
+        val (storage, _) = storageMock(
+            sessionId = "existing-session",
+            sessionValidUntil = now + 5_000,
+            sessionValidUntilInBackground = now + 5_000,
+            sessionIds = listOf(SessionId("existing-session", expectedSessionStart))
+        )
+
+        val manager = SplunkSessionManager(storage)
+
+        assertEquals(expectedSessionStart, manager.sessionStart)
+    }
+
+    @Test
     fun `creates new session when stored one is expired`() {
         val now = System.currentTimeMillis()
         val (storage, state) = storageMock(
