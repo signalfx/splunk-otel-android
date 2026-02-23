@@ -61,7 +61,9 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
 
-    private val sessionIds: MutableList<SessionIdStorageData> = agentStorage.readSessionIds().toMutableList()
+    private val sessionIds: MutableList<SessionIdStorageData> by lazy {
+        agentStorage.readSessionIds().toMutableList()
+    }
 
     /**
      * The value is valid after the [install] function is called.
