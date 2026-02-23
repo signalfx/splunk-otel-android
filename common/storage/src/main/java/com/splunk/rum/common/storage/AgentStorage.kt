@@ -360,12 +360,10 @@ class AgentStorage(context: Context) : IAgentStorage {
 
         private var instance: IAgentStorage? = null
 
-        fun attach(context: Context): IAgentStorage {
-            return synchronized(lock) {
-                instance ?: AgentStorage(context).also {
-                    instance = it
-                    Logger.v(TAG, "attach(): AgentStorage attached.")
-                }
+        fun attach(context: Context): IAgentStorage = synchronized(lock) {
+            instance ?: AgentStorage(context).also {
+                instance = it
+                Logger.v(TAG, "attach(): AgentStorage attached.")
             }
         }
     }
