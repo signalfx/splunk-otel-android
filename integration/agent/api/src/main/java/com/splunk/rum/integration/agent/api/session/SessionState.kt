@@ -16,13 +16,15 @@
 
 package com.splunk.rum.integration.agent.api.session
 
+import com.splunk.rum.integration.agent.internal.session.ISessionActivityTracker
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 
 class SessionState internal constructor(
     private val sessionConfiguration: SessionConfiguration,
     private val sessionManager: ISplunkSessionManager,
-    private val userManager: IUserManager
+    private val userManager: IUserManager,
+    private val sessionActivityTracker: ISessionActivityTracker
 ) {
     val id: String
         get() = sessionManager.sessionId
@@ -38,6 +40,6 @@ class SessionState internal constructor(
             sessionId = sessionManager.sessionId,
             anonymousUserId = userManager.userId,
             sessionStart = sessionManager.sessionStart,
-            sessionLastActivity = System.currentTimeMillis() //FIXME
+            sessionLastActivity = sessionActivityTracker.sessionLastActivity ?: sessionManager.sessionStart
         )
 }
