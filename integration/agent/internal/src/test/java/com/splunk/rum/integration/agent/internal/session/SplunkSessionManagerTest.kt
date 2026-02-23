@@ -65,7 +65,7 @@ class SplunkSessionManagerTest {
 
         val manager = SplunkSessionManager(storage)
 
-        assertEquals(expectedSessionStart, manager.sessionStart)
+        assertEquals(expectedSessionStart, manager.sessionSnapshot.sessionStart)
     }
 
     @Test
@@ -81,7 +81,7 @@ class SplunkSessionManagerTest {
 
         val manager = SplunkSessionManager(storage)
 
-        assertEquals(expectedSessionStart, manager.sessionLastActivity)
+        assertEquals(expectedSessionStart, manager.sessionSnapshot.sessionLastActivity)
     }
 
     @Test
@@ -99,7 +99,7 @@ class SplunkSessionManagerTest {
         manager.trackSessionActivity()
 
         val after = System.currentTimeMillis()
-        assertTrue(manager.sessionLastActivity in before..after)
+        assertTrue(manager.sessionSnapshot.sessionLastActivity in before..after)
     }
 
     @Test

@@ -31,9 +31,8 @@ import java.util.concurrent.ScheduledFuture
 
 interface ISplunkSessionManager {
     val sessionId: String
-    val sessionStart: Long
-    val sessionLastActivity: Long
     val previousSessionId: String?
+    val sessionSnapshot: SessionSnapshot
     val sessionListeners: MutableSet<SessionListener>
 
     fun install(context: Context)
@@ -44,9 +43,8 @@ interface ISplunkSessionManager {
 
 object NoOpSplunkSessionManager : ISplunkSessionManager {
     override val sessionId: String = ""
-    override val sessionStart: Long = 0
-    override val sessionLastActivity: Long = 0
     override val previousSessionId: String? = null
+    override val sessionSnapshot: SessionSnapshot = SessionSnapshot.NO_OP
     override val sessionListeners: MutableSet<SessionListener> = mutableSetOf()
     override fun install(context: Context) = Unit
     override fun trackSessionActivity() = Unit
@@ -77,19 +75,21 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
             agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
         }
 
-    @get:Synchronized
-    override val sessionStart: Long
-        get() {
-            val sessionId = sessionId
-            return sessionIds.lastOrNull { it.id == sessionId }?.validFrom ?: System.currentTimeMillis()
-        }
-
-    @get:Synchronized
-    override val sessionLastActivity: Long
-        get() = agentStorage.readSessionLastActivity() ?: sessionStart
-
     override var previousSessionId: String? = null
         private set
+
+    @get:Synchronized
+    override val sessionSnapshot: SessionSnapshot
+        get() {
+            val sessionId = sessionId
+            val sessionStart = sessionIds.lastOrNull { it.id == sessionId }?.validFrom ?: System.currentTimeMillis()
+
+            return SessionSnapshot(
+                sessionId = sessionId,
+                sessionStart = sessionStart,
+                sessionLastActivity = agentStorage.readSessionLastActivity() ?: sessionStart
+            )
+        }
 
     override val sessionListeners: MutableSet<SessionListener> = HashSet()
 

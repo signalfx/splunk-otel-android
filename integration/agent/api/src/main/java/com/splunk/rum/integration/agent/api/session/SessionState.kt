@@ -34,10 +34,13 @@ class SessionState internal constructor(
         get() = sessionConfiguration.listeners
 
     val metadata: SessionMetadata
-        get() = SessionMetadata(
-            sessionId = sessionManager.sessionId,
-            anonymousUserId = userManager.userId,
-            sessionStart = sessionManager.sessionStart,
-            sessionLastActivity = sessionManager.sessionLastActivity
-        )
+        get() {
+            val sessionSnapshot = sessionManager.sessionSnapshot
+            return SessionMetadata(
+                sessionId = sessionSnapshot.sessionId,
+                anonymousUserId = userManager.userId,
+                sessionStart = sessionSnapshot.sessionStart,
+                sessionLastActivity = sessionSnapshot.sessionLastActivity
+            )
+        }
 }
