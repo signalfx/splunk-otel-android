@@ -350,6 +350,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val SESSION_REPLAY_IDS_KEY = "BUFFERED_SESSION_REPLAY_IDS"
 
         private const val TAG = "AgentStorage"
+        private val lock = Any()
 
         /**
          * If storage model changes this version needs to be changed. This will ensure data consistency.
@@ -359,9 +360,11 @@ class AgentStorage(context: Context) : IAgentStorage {
 
         private var instance: IAgentStorage? = null
 
-        fun attach(context: Context): IAgentStorage {
-            Logger.v(TAG, "attach(): AgentStorage attached.")
-            return instance ?: AgentStorage(context).also { instance = it }
+        fun attach(context: Context): IAgentStorage = synchronized(lock) {
+            instance ?: AgentStorage(context).also {
+                instance = it
+                Logger.v(TAG, "attach(): AgentStorage attached.")
+            }
         }
     }
 }
