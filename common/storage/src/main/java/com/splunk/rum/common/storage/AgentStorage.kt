@@ -361,8 +361,6 @@ class AgentStorage(context: Context) : IAgentStorage {
         private var instance: IAgentStorage? = null
 
         fun attach(context: Context): IAgentStorage {
-            instance?.let { return it }
-
             return synchronized(lock) {
                 instance ?: AgentStorage(context).also {
                     instance = it
