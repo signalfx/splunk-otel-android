@@ -69,6 +69,40 @@ class SplunkSessionManagerTest {
     }
 
     @Test
+    fun `sessionLastActivity falls back to sessionStart when no activity tracked`() {
+        val now = System.currentTimeMillis()
+        val expectedSessionStart = now - 1_000
+        val (storage, _) = storageMock(
+            sessionId = "existing-session",
+            sessionValidUntil = now + 5_000,
+            sessionValidUntilInBackground = now + 5_000,
+            sessionIds = listOf(SessionId("existing-session", expectedSessionStart))
+        )
+
+        val manager = SplunkSessionManager(storage)
+
+        assertEquals(expectedSessionStart, manager.sessionLastActivity)
+    }
+
+    @Test
+    fun `sessionLastActivity returns tracked activity timestamp`() {
+        val now = System.currentTimeMillis()
+        val (storage, _) = storageMock(
+            sessionId = "existing-session",
+            sessionValidUntil = now + 5_000,
+            sessionValidUntilInBackground = now + 5_000,
+            sessionIds = listOf(SessionId("existing-session", now - 1_000))
+        )
+        val manager = SplunkSessionManager(storage)
+        val before = System.currentTimeMillis()
+
+        manager.trackSessionActivity()
+
+        val after = System.currentTimeMillis()
+        assertTrue(manager.sessionLastActivity in before..after)
+    }
+
+    @Test
     fun `creates new session when stored one is expired`() {
         val now = System.currentTimeMillis()
         val (storage, state) = storageMock(
@@ -149,6 +183,7 @@ class SplunkSessionManagerTest {
         var sessionId: String? = null,
         var sessionValidUntil: Long? = null,
         var sessionValidUntilInBackground: Long? = null,
+        var sessionLastActivity: Long? = null,
         var sessionIds: List<SessionId> = emptyList()
     )
 
@@ -156,12 +191,14 @@ class SplunkSessionManagerTest {
         sessionId: String? = null,
         sessionValidUntil: Long? = null,
         sessionValidUntilInBackground: Long? = null,
+        sessionLastActivity: Long? = null,
         sessionIds: List<SessionId> = emptyList()
     ): Pair<IAgentStorage, StorageState> {
         val state = StorageState(
             sessionId = sessionId,
             sessionValidUntil = sessionValidUntil,
             sessionValidUntilInBackground = sessionValidUntilInBackground,
+            sessionLastActivity = sessionLastActivity,
             sessionIds = sessionIds
         )
 
@@ -197,6 +234,16 @@ class SplunkSessionManagerTest {
             state.sessionValidUntilInBackground = null
             null
         }.`when`(storage).deleteSessionValidUntilInBackground()
+
+        `when`(storage.readSessionLastActivity()).thenAnswer { state.sessionLastActivity }
+        doAnswer { invocation ->
+            state.sessionLastActivity = invocation.getArgument(0)
+            null
+        }.`when`(storage).writeSessionLastActivity(anyLong())
+        doAnswer {
+            state.sessionLastActivity = null
+            null
+        }.`when`(storage).deleteSessionLastActivity()
 
         `when`(storage.readSessionIds()).thenAnswer { state.sessionIds }
         doAnswer { invocation ->

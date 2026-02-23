@@ -16,13 +16,13 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.integration.agent.internal.session.ISessionActivityTracker
+import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord
 
-class SessionActivityLogProcessor(private val sessionActivityTracker: ISessionActivityTracker) : LogRecordProcessor {
+class SessionActivityLogProcessor(private val sessionManager: ISplunkSessionManager) : LogRecordProcessor {
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
-        sessionActivityTracker.trackActivity()
+        sessionManager.trackSessionActivity()
     }
 }

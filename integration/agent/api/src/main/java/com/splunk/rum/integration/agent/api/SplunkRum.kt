@@ -37,11 +37,8 @@ import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.Constants
-import com.splunk.rum.integration.agent.internal.session.ISessionActivityTracker
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
-import com.splunk.rum.integration.agent.internal.session.NoOpSessionActivityTracker
 import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManager
-import com.splunk.rum.integration.agent.internal.session.SessionActivityTracker
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
@@ -68,12 +65,11 @@ class SplunkRum private constructor(
     agentConfiguration: AgentConfiguration,
     userManager: IUserManager,
     sessionManager: ISplunkSessionManager,
-    sessionActivityTracker: ISessionActivityTracker,
     val openTelemetry: OpenTelemetry,
     private val endpointRef: AtomicReference<EndpointConfiguration?> = AtomicReference(agentConfiguration.endpoint),
     val state: IState = State(agentConfiguration, endpointRef),
     val session: ISession = Session(
-        SessionState(agentConfiguration.session, sessionManager, userManager, sessionActivityTracker)
+        SessionState(agentConfiguration.session, sessionManager, userManager)
     ),
     val user: User = User(userManager),
     val globalAttributes: MutableAttributes
@@ -238,7 +234,6 @@ class SplunkRum private constructor(
             state = Noop(),
             userManager = NoOpUserManager,
             sessionManager = NoOpSplunkSessionManager,
-            sessionActivityTracker = NoOpSessionActivityTracker,
             globalAttributes = MutableAttributes()
         )
         private var instanceInternal: SplunkRum? = null
@@ -302,7 +297,6 @@ class SplunkRum private constructor(
                     ),
                     userManager = NoOpUserManager,
                     sessionManager = NoOpSplunkSessionManager,
-                    sessionActivityTracker = NoOpSessionActivityTracker,
                     globalAttributes = MutableAttributes()
                 )
             }
@@ -323,7 +317,6 @@ class SplunkRum private constructor(
                     ),
                     userManager = NoOpUserManager,
                     sessionManager = NoOpSplunkSessionManager,
-                    sessionActivityTracker = NoOpSessionActivityTracker,
                     globalAttributes = MutableAttributes()
                 )
             }
@@ -333,7 +326,6 @@ class SplunkRum private constructor(
             val userManager = UserManager(agentConfiguration.user.trackingMode.toInternal())
 
             val sessionManager = AgentIntegration.obtainInstance(application).sessionManager
-            val sessionActivityTracker = SessionActivityTracker()
 
             // The shared MutableAttributes instance used by both
             // GlobalAttributeSpanProcessor and the public SplunkRum.globalAttributes API
@@ -344,7 +336,6 @@ class SplunkRum private constructor(
                 agentConfiguration,
                 userManager,
                 sessionManager,
-                sessionActivityTracker,
                 moduleConfigurations.toList(),
                 globalAttributes
             )
@@ -358,7 +349,6 @@ class SplunkRum private constructor(
                 endpointRef = endpointRef,
                 userManager = userManager,
                 sessionManager = sessionManager,
-                sessionActivityTracker = sessionActivityTracker,
                 globalAttributes = globalAttributes
             )
 

@@ -39,7 +39,6 @@ import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcesso
 import com.splunk.rum.integration.agent.internal.processor.SessionReplaySessionIdLogProcessor
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
-import com.splunk.rum.integration.agent.internal.session.ISessionActivityTracker
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
@@ -58,7 +57,6 @@ internal object SplunkRumAgentCore {
         agentConfiguration: AgentConfiguration,
         userManager: IUserManager,
         sessionManager: ISplunkSessionManager,
-        sessionActivityTracker: ISessionActivityTracker,
         moduleConfigurations: List<ModuleConfiguration>,
         globalAttributes: MutableAttributes
     ): OpenTelemetry {
@@ -97,14 +95,14 @@ internal object SplunkRumAgentCore {
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
             .addSpanProcessor(GlobalAttributeSpanProcessor(globalAttributes))
-            .addSpanProcessor(SessionActivitySpanProcessor(sessionActivityTracker))
+            .addSpanProcessor(SessionActivitySpanProcessor(sessionManager))
             .addSpanProcessor(LastScreenNameSpanProcessor(ScreenNameTracker))
             .joinResources(AgentResource.allResource(application, appInstallationID, finalConfiguration))
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
-            .addLogRecordProcessor(SessionActivityLogProcessor(sessionActivityTracker))
+            .addLogRecordProcessor(SessionActivityLogProcessor(sessionManager))
             // Session Replay module is special case of Log Records that are NOT converted to Spans.
             .addLogRecordProcessor(SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager))
 
@@ -120,7 +118,6 @@ internal object SplunkRumAgentCore {
 
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
-                sessionActivityTracker.reset()
                 agentConfiguration.session.listeners.forEachFast {
                     it.onSessionChanged(
                         newSessionId = sessionId,

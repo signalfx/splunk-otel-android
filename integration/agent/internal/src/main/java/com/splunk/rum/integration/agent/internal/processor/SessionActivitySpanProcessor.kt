@@ -16,15 +16,15 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.integration.agent.internal.session.ISessionActivityTracker
+import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-class SessionActivitySpanProcessor(private val sessionActivityTracker: ISessionActivityTracker) : SpanProcessor {
+class SessionActivitySpanProcessor(private val sessionManager: ISplunkSessionManager) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        sessionActivityTracker.trackActivity()
+        sessionManager.trackSessionActivity()
     }
 
     override fun isStartRequired(): Boolean = true

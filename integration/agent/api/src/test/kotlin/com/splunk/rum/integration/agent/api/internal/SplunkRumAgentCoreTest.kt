@@ -26,7 +26,6 @@ import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
-import com.splunk.rum.integration.agent.internal.session.NoOpSessionActivityTracker
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import java.io.File
 import org.junit.After
@@ -134,7 +133,6 @@ class SplunkRumAgentCoreTest {
             mockAgentConfig,
             mockUserManager,
             mockSessionManager,
-            NoOpSessionActivityTracker,
             emptyList(),
             MutableAttributes()
         )
