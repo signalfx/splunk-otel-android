@@ -34,92 +34,92 @@ internal class ActivityLifecycleCallback(private val emitter: LifecycleEventEmit
     }
 
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Logger.d(TAG, "onActivityPreCreated: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPreCreated: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.PRE_CREATED)
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Logger.d(TAG, "onActivityCreated: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityCreated: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.CREATED)
     }
 
     override fun onActivityPostCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Logger.d(TAG, "onActivityPostCreated: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPostCreated: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.POST_CREATED)
     }
 
     override fun onActivityPreStarted(activity: Activity) {
-        Logger.d(TAG, "onActivityPreStarted: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPreStarted: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.PRE_STARTED)
     }
 
     override fun onActivityStarted(activity: Activity) {
-        Logger.d(TAG, "onActivityStarted: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityStarted: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.STARTED)
     }
 
     override fun onActivityPostStarted(activity: Activity) {
-        Logger.d(TAG, "onActivityPostStarted: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPostStarted: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.POST_STARTED)
     }
 
     override fun onActivityPreResumed(activity: Activity) {
-        Logger.d(TAG, "onActivityPreResumed: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPreResumed: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.PRE_RESUMED)
     }
 
     override fun onActivityResumed(activity: Activity) {
-        Logger.d(TAG, "onActivityResumed: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityResumed: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.RESUMED)
     }
 
     override fun onActivityPostResumed(activity: Activity) {
-        Logger.d(TAG, "onActivityPostResumed: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPostResumed: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.POST_RESUMED)
     }
 
     override fun onActivityPrePaused(activity: Activity) {
-        Logger.d(TAG, "onActivityPrePaused: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPrePaused: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.PRE_PAUSED)
     }
 
     override fun onActivityPaused(activity: Activity) {
-        Logger.d(TAG, "onActivityPaused: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPaused: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.PAUSED)
     }
 
     override fun onActivityPostPaused(activity: Activity) {
-        Logger.d(TAG, "onActivityPostPaused: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPostPaused: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.POST_PAUSED)
     }
 
     override fun onActivityPreStopped(activity: Activity) {
-        Logger.d(TAG, "onActivityPreStopped: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPreStopped: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.PRE_STOPPED)
     }
 
     override fun onActivityStopped(activity: Activity) {
-        Logger.d(TAG, "onActivityStopped: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityStopped: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.STOPPED)
     }
 
     override fun onActivityPostStopped(activity: Activity) {
-        Logger.d(TAG, "onActivityPostStopped: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPostStopped: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.POST_STOPPED)
     }
 
     override fun onActivityPreDestroyed(activity: Activity) {
-        Logger.d(TAG, "onActivityPreDestroyed: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPreDestroyed: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.PRE_DESTROYED)
     }
 
     override fun onActivityDestroyed(activity: Activity) {
-        Logger.d(TAG, "onActivityDestroyed: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityDestroyed: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.DESTROYED)
     }
 
     override fun onActivityPostDestroyed(activity: Activity) {
-        Logger.d(TAG, "onActivityPostDestroyed: ${activity::class.java.simpleName}")
+        Logger.d(TAG) { "onActivityPostDestroyed: ${activity::class.java.simpleName}" }
         emitter.emitActivityEvent(activity, LifecycleAction.POST_DESTROYED)
     }
 

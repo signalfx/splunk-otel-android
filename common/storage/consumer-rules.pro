@@ -1,0 +1,1 @@
+-keep public class com.splunk.rum.common.storage.StorageInstaller

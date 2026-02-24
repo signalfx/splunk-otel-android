@@ -105,10 +105,9 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         }
 
         if (moduleConfiguration.samplingRate < Math.random()) {
-            Logger.d(
-                TAG,
+            Logger.d(TAG) {
                 "onSessionChange() - Session replay for session '$currentSessionId' is disabled due to sampling rate"
-            )
+            }
 
             SplunkSessionReplay.instance.stop()
 

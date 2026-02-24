@@ -52,7 +52,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     private val preferencesFileManager = FileManagerFactory.createPlainFileManager()
     private val preferences: Preferences
 
-    private val encryptedStorage =
+    private val internalStorage =
         Storage(FilePermanentCache(FileManagerFactory.createPlainFileManager()))
 
     private val rootDir = File(context.noBackupFilesDirCompat, "agent")
@@ -75,21 +75,21 @@ class AgentStorage(context: Context) : IAgentStorage {
     override val freeSpace: Long
         get() {
             val freeSpace = rootDir.statFsFreeSpace
-            Logger.v(TAG, "freeSpace: $freeSpace")
+            Logger.v(TAG) { "freeSpace: $freeSpace" }
             return freeSpace
         }
 
     override val rootDirPath: String
         get() {
             val path = rootDir.path
-            Logger.v(TAG, "consistentDirPath: $path")
+            Logger.v(TAG) { "consistentDirPath: $path" }
             return path
         }
 
     override val isStorageFull: Boolean
         get() {
             val isFull = !StoragePolicy(rootDir, 1000.MB, 0.2f, 50.MB).check(freeSpace)
-            Logger.v(TAG, "isStorageFull: $isFull")
+            Logger.v(TAG) { "isStorageFull: $isFull" }
             return isFull
         }
 
@@ -167,15 +167,19 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun writeOtelLogData(id: String, data: ByteArray): Boolean {
         val file: File = otelLogDataFile(id)
-        val success = encryptedStorage.writeBytes(file, data)
-        Logger.d(TAG, "createOtelLogDataFile(): id = $id, success = $success")
+        val success = internalStorage.writeBytes(file, data)
+        Logger.d(TAG) { "createOtelLogDataFile(): id = $id, success = $success" }
 
         return success
     }
 
-    override fun readOtelLogData(id: String): ByteArray? {
+    override fun getOtelLogDataFile(id: String): File? {
         val file: File = otelLogDataFile(id)
-        return encryptedStorage.readBytes(file)
+        return if (file.exists()) {
+            file
+        } else {
+            null
+        }
     }
 
     override fun deleteOtelLogData(id: String) {
@@ -185,15 +189,19 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun writeOtelSpanData(id: String, data: ByteArray): Boolean {
         val file: File = otelSpanDataFile(id)
-        val success = encryptedStorage.writeBytes(file, data)
-        Logger.d(TAG, "writeOtelSpanData(): id = $id, success = $success")
+        val success = internalStorage.writeBytes(file, data)
+        Logger.d(TAG) { "writeOtelSpanData(): id = $id, success = $success" }
 
         return success
     }
 
-    override fun readOtelSpanData(id: String): ByteArray? {
+    override fun getOtelSpanDataFile(id: String): File? {
         val file: File = otelSpanDataFile(id)
-        return encryptedStorage.readBytes(file)
+        return if (file.exists()) {
+            file
+        } else {
+            null
+        }
     }
 
     override fun deleteOtelSpanData(id: String) {
@@ -203,15 +211,19 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun writeOtelSessionReplayData(id: String, data: ByteArray): Boolean {
         val file: File = sessionReplayDataFile(id)
-        val success = encryptedStorage.writeBytes(file, data)
-        Logger.d(TAG, "writeOtelSessionReplayData(): id = $id, success = $success")
+        val success = internalStorage.writeBytes(file, data)
+        Logger.d(TAG) { "writeOtelSessionReplayData(): id = $id, success = $success" }
 
         return success
     }
 
-    override fun readOtelSessionReplayData(id: String): ByteArray? {
+    override fun getOtelSessionReplayDataFile(id: String): File? {
         val file: File = sessionReplayDataFile(id)
-        return encryptedStorage.readBytes(file)
+        return if (file.exists()) {
+            file
+        } else {
+            null
+        }
     }
 
     override fun deleteOtelSessionReplayData(id: String) {
@@ -255,7 +267,7 @@ class AgentStorage(context: Context) : IAgentStorage {
                 val array = JSONArray(json)
                 List(array.length()) { array.getString(it) }
             } catch (e: Exception) {
-                Logger.e(TAG, "getBufferedSpanIds(): spanIds: $e")
+                Logger.e(TAG, e) { "getBufferedSpanIds(): spanIds: $json" }
                 emptyList()
             }
         }
@@ -338,6 +350,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val SESSION_REPLAY_IDS_KEY = "BUFFERED_SESSION_REPLAY_IDS"
 
         private const val TAG = "AgentStorage"
+        private val lock = Any()
 
         /**
          * If storage model changes this version needs to be changed. This will ensure data consistency.
@@ -347,9 +360,11 @@ class AgentStorage(context: Context) : IAgentStorage {
 
         private var instance: IAgentStorage? = null
 
-        fun attach(context: Context): IAgentStorage {
-            Logger.v(TAG, "attach(): AgentStorage attached.")
-            return instance ?: AgentStorage(context).also { instance = it }
+        fun attach(context: Context): IAgentStorage = synchronized(lock) {
+            instance ?: AgentStorage(context).also {
+                instance = it
+                Logger.v(TAG, "attach(): AgentStorage attached.")
+            }
         }
     }
 }

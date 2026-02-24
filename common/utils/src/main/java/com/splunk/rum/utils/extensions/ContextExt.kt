@@ -16,7 +16,7 @@ val Context.packageInfo: PackageInfo?
             packageManager.getPackageInfo(packageName, 0)
         }
     } catch (e: Exception) {
-        Logger.e(TAG, "Failed to get PackageInfo: ${e.message}")
+        Logger.e(TAG, "Failed to get PackageInfo", e)
         null
     }
 

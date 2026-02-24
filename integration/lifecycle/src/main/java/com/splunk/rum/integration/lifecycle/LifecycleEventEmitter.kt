@@ -88,19 +88,17 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         timestamp: Long
     ) {
         if (action !in allowedEvents) {
-            Logger.d(
-                TAG,
+            Logger.d(TAG) {
                 "Lifecycle event filtered out (not in allowedEvents): $elementType.$elementName - ${action.attributeValue}"
-            )
+            }
             return
         }
 
         synchronized(lock) {
             if (!isInstallComplete) {
-                Logger.d(
-                    TAG,
+                Logger.d(TAG) {
                     "Install not complete, caching lifecycle event: $elementType.$elementName - ${action.attributeValue}"
-                )
+                }
                 cache += LifecycleEventData(elementType, elementName, elementId, action, timestamp)
                 return
             }
@@ -126,7 +124,7 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
             return
         }
 
-        Logger.d(TAG, "Emitting lifecycle event: $elementType.$elementName - ${action.attributeValue}")
+        Logger.d(TAG) { "Emitting lifecycle event: $elementType.$elementName - ${action.attributeValue}" }
 
         logger.get(RumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
@@ -154,20 +152,18 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         }
 
         if (cachedEvents.isNotEmpty()) {
-            Logger.d(TAG, "Processing cached lifecycle events (size: ${cachedEvents.size})")
+            Logger.d(TAG) { "Processing cached lifecycle events (size: ${cachedEvents.size})" }
             cachedEvents.forEachFast { event ->
                 if (event.action !in allowedEvents) {
-                    Logger.d(
-                        TAG,
+                    Logger.d(TAG) {
                         "Cached lifecycle event filtered out (not in allowedEvents): ${event.elementType}.${event.elementName} - ${event.action.attributeValue}"
-                    )
+                    }
                     return@forEachFast
                 }
 
-                Logger.d(
-                    TAG,
+                Logger.d(TAG) {
                     "Processing cached event: ${event.elementType}.${event.elementName} - ${event.action.attributeValue}"
-                )
+                }
                 emitEventInternal(
                     event.elementType,
                     event.elementName,
