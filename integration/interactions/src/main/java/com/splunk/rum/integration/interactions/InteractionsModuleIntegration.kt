@@ -69,7 +69,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
-        Logger.d(TAG, "Crash reporting is disabled")
+        //Logger.d(TAG, "Crash reporting is disabled")
     }
 
     private fun setupComposeIdentification() {

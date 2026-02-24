@@ -19,4 +19,14 @@ package com.splunk.rum.integration.agent.common.module
 interface ModuleConfiguration {
     val name: String
     val attributes: List<Pair<String, String>>
+
+    /**
+     * Indicates whether this module requires initialization on the main thread.
+     * Modules that register activity lifecycle callbacks or interact with UI components
+     * should return true.
+     *
+     * @return true if the module must be initialized on the main thread, false otherwise
+     */
+    val requiresMainThread: Boolean
+        get() = false
 }
