@@ -53,6 +53,10 @@ interface IAgentStorage {
     fun readSessionValidUntilInBackground(): Long?
     fun deleteSessionValidUntilInBackground()
 
+    fun writeSessionLastActivity(value: Long)
+    fun readSessionLastActivity(): Long?
+    fun deleteSessionLastActivity()
+
     fun writeOtelLogData(id: String, data: ByteArray): Boolean
     fun getOtelLogDataFile(id: String): File?
     fun deleteOtelLogData(id: String)
