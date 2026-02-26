@@ -1,64 +1,93 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Session ID</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        :root {
-            --splunk-flamingo: #FF6F61;
-            --splunk-lipstick: #FF4081;
-        }
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            font-size: 20px;
-        }
+    <head>
+        <title>Session Info</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            :root {
+                --splunk-flamingo: #ff6f61;
+                --splunk-lipstick: #ff4081;
+            }
 
-        button {
-            width: calc(100% - 40px);
-            margin-top: 5px;
-            padding: 8px 20px;
-            background: linear-gradient(315deg, var(--splunk-lipstick), var(--splunk-flamingo));
-            color: #fff;
-            border: none;
-            border-radius: 100px;
-            font-size: 16px;
-            font-weight: bold;
-            text-color: #EF4A37
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: background 0.3s ease;
-            min-height: 35px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                height: 100vh;
+                margin: 0;
+                font-family: Arial, sans-serif;
+                font-size: 20px;
+            }
 
-        button:active::after {
-          opacity: 0.3;
-          transform: translate(-50%, -50%) scale(1);
-          transition: 0s;
-        }
+            button {
+                width: calc(100% - 40px);
+                margin-top: 5px;
+                padding: 8px 20px;
+                background: linear-gradient(315deg, var(--splunk-lipstick), var(--splunk-flamingo));
+                color: #fff;
+                border: none;
+                border-radius: 100px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                transition: background 0.3s ease;
+                min-height: 35px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
 
-        #sessionId {
-            margin-top: 40px;
-        }
-    </style>
-    <script type="text/javascript">
-        function getSessionId() {
-            var sessionId = SplunkRumNative.getNativeSessionId();
-            document.getElementById('sessionId').innerText = "Session ID: " + sessionId;
-        }
-    </script>
-</head>
-<body>
-<button onclick="getSessionId()">Get Session ID</button>
-<p id="sessionId"></p>
-</body>
+            button:active::after {
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(1);
+                transition: 0s;
+            }
+
+            #sessionId,
+            #sessionMetadata {
+                margin-top: 40px;
+                padding: 0 20px;
+                text-align: center;
+                word-break: break-word;
+            }
+
+            #sessionMetadata {
+                font-size: 15px;
+                white-space: pre-wrap;
+            }
+        </style>
+        <script type="text/javascript">
+            function getSessionId() {
+                var sessionId = SplunkRumNative.getNativeSessionId();
+                document.getElementById("sessionId").innerText = "Session ID: " + sessionId;
+            }
+
+            function getSessionMetadata() {
+                if (!SplunkRumNative || !SplunkRumNative.getNativeSessionMetadata) {
+                    document.getElementById("sessionMetadata").innerText =
+                        "Session metadata API is unavailable.";
+                    return;
+                }
+
+                var sessionMetadataJson = SplunkRumNative.getNativeSessionMetadata();
+                try {
+                    var sessionMetadata = JSON.parse(sessionMetadataJson);
+                    document.getElementById("sessionMetadata").innerText =
+                        "Session Metadata:\n" + JSON.stringify(sessionMetadata, null, 2);
+                } catch (e) {
+                    document.getElementById("sessionMetadata").innerText =
+                        "Session Metadata (raw):\n" + sessionMetadataJson;
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <button onclick="getSessionId()">Get Session ID</button>
+        <button onclick="getSessionMetadata()">Get Session Metadata</button>
+        <p id="sessionId"></p>
+        <p id="sessionMetadata"></p>
+    </body>
 </html>
