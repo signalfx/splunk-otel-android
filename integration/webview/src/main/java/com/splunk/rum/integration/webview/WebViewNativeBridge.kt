@@ -22,10 +22,11 @@ class WebViewNativeBridge internal constructor() {
 
     /**
      * This method will enable Splunk Browser-based RUM to integrate with the current Android RUM
-     * Session. It injects a javascript object named "SplunkRumNative" into your WebView which
-     * exposes the Android Session ID to the browser-based RUM javascript implementation.
+     * Session. It injects a JavaScript object named "SplunkRumNative" into your WebView which
+     * exposes Android session APIs (session ID and session metadata) to browser-based RUM
+     * JavaScript implementation.
      *
-     * @param webView The WebView to inject the javascript object into.
+     * @param webView The WebView to inject the JavaScript object into.
      */
     fun integrateWithBrowserRum(webView: WebView) {
         webView.addJavascriptInterface(NativeRumSessionId(), "SplunkRumNative")

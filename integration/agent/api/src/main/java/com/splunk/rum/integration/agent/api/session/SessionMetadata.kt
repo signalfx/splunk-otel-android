@@ -16,9 +16,18 @@
 
 package com.splunk.rum.integration.agent.api.session
 
+import org.json.JSONObject
+
 data class SessionMetadata(
     val sessionId: String,
     val anonymousUserId: String?,
     val sessionStart: Long,
     val sessionLastActivity: Long
-)
+) {
+    fun toJSONObject() = JSONObject().apply {
+        put("sessionId", sessionId)
+        put("anonymousUserId", anonymousUserId)
+        put("sessionStart", sessionStart)
+        put("sessionLastActivity", sessionLastActivity)
+    }
+}
