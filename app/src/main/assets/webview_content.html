@@ -61,7 +61,13 @@
         </style>
         <script type="text/javascript">
             function getSessionId() {
-                var sessionId = SplunkRumNative.getNativeSessionId();
+                var bridge = typeof SplunkRumNative !== "undefined" ? SplunkRumNative : null;
+                if (!bridge || typeof bridge.getNativeSessionId !== "function") {
+                    document.getElementById("sessionId").innerText = "Session ID API is unavailable.";
+                    return;
+                }
+
+                var sessionId = bridge.getNativeSessionId();
                 document.getElementById("sessionId").innerText = "Session ID: " + sessionId;
             }
 
