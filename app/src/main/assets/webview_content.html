@@ -66,13 +66,14 @@
             }
 
             function getSessionMetadata() {
-                if (!SplunkRumNative || !SplunkRumNative.getNativeSessionMetadata) {
+                var bridge = typeof SplunkRumNative !== "undefined" ? SplunkRumNative : null;
+                if (!bridge || typeof bridge.getNativeSessionMetadata !== "function") {
                     document.getElementById("sessionMetadata").innerText =
                         "Session metadata API is unavailable.";
                     return;
                 }
 
-                var sessionMetadataJson = SplunkRumNative.getNativeSessionMetadata();
+                var sessionMetadataJson = bridge.getNativeSessionMetadata();
                 try {
                     var sessionMetadata = JSON.parse(sessionMetadataJson);
                     document.getElementById("sessionMetadata").innerText =
