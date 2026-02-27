@@ -6,7 +6,7 @@ object AppDependencies {
 
     private const val kotlinStdlibVersion = "1.8.0"
     private const val leakCanaryVersion = "2.14"
-    private const val desugarVersion = "2.1.3"
+    private const val desugarVersion = "2.1.5"
 
     const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinStdlibVersion"
     const val leakCanary = "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
