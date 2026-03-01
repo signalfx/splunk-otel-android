@@ -26,7 +26,7 @@ object AppDependencies {
     object Android {
         private const val appcompatVersion = "1.7.1"
         private const val constraintLayoutVersion = "2.2.1"
-        private const val activityKtxVersion = "1.2.2"
+        private const val activityKtxVersion = "1.12.4"
         private const val fragmentKtxVersion = "1.3.3"
         private const val materialVersion = "1.9.0"
 
