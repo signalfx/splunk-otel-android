@@ -45,9 +45,18 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     private const val TAG = "InteractionsIntegration"
 
-    private val attributeKeyComponent = AttributeKey.stringKey("component")
+    // Interaction Event attributes
+    private const val INTERACTION_EVENT_NAME = "action"
+    private const val UI_COMPONENT = "ui"
     private val attributeKeyActionName = AttributeKey.stringKey("action.name")
     private val attributeKeyTargetType = AttributeKey.stringKey("target.type")
+
+    // Frustration Event attributes
+    private const val FRUSTRATION_EVENT_NAME = "frustration"
+    private const val USER_INTERACTION_COMPONENT = "user_interaction"
+
+    private val attributeKeyFrustrationType = AttributeKey.stringKey("frustration.type")
+    private val attributeKeyInteractionType = AttributeKey.stringKey("interaction.type")
 
     override fun onAttach(context: Context) {
         val application = context.applicationContext as Application
@@ -61,7 +70,9 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             }
         }
         setupComposeIdentification()
+
         Interactions.listeners += interactionsListener
+        Interactions.listeners += frustrationsListener
     }
 
     override fun onInstall(
@@ -69,7 +80,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
-        Logger.d(TAG, "Crash reporting is disabled")
+        // No-op, as Interactions does not require any specific installation steps.
     }
 
     private fun setupComposeIdentification() {
@@ -96,7 +107,8 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 return
             }
 
-            if (interaction is Interaction.Touch.Pointer ||
+            if (interaction is Interaction.Touch.Gesture.RageTap ||
+                interaction is Interaction.Touch.Pointer ||
                 interaction is Interaction.Touch.Continuous &&
                 !interaction.isLast
             ) {
@@ -127,9 +139,6 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 is Interaction.Touch.Gesture.Pinch ->
                     "pinch"
 
-                is Interaction.Touch.Gesture.RageTap ->
-                    "rage_tap"
-
                 is Interaction.Touch.Gesture.Rotation ->
                     "rotation"
 
@@ -139,7 +148,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 is Interaction.Touch.Gesture.Tap ->
                     "tap"
 
-                is Interaction.Touch.Pointer ->
+                else ->
                     return
             }
 
@@ -156,8 +165,8 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             val log = logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, "action")
-                .setAttribute(attributeKeyComponent, "ui")
+                .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, INTERACTION_EVENT_NAME)
+                .setAttribute(RumConstants.COMPONENT_KEY, UI_COMPONENT)
                 .setAttribute(attributeKeyActionName, actionName)
                 .setAttribute(attributeKeyTargetType, targetType.orEmpty())
 
@@ -174,6 +183,30 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             }
 
             log.emit()
+        }
+    }
+
+    private val frustrationsListener = object : OnInteractionListener {
+        override fun onInteraction(interaction: Interaction, legacyData: LegacyData?) {
+            if (!moduleConfiguration.isEnabled) {
+                return
+            }
+
+            if (interaction is Interaction.Touch.Gesture.RageTap) {
+                val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider ?: return
+
+                Logger.d(TAG) { "onFrustration(interaction: $interaction)" }
+
+                logger.get(RumConstants.RUM_TRACER_NAME)
+                    .logRecordBuilder()
+                    .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
+                    .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, FRUSTRATION_EVENT_NAME)
+                    .setAttribute(RumConstants.COMPONENT_KEY, USER_INTERACTION_COMPONENT)
+                    .setAttribute(attributeKeyFrustrationType, "rage")
+                    .setAttribute(attributeKeyInteractionType, "tap")
+                    .setAttribute(RumConstants.INTERACTIONS_TARGET_XPATH_KEY, XpathBuilder.build(interaction))
+                    .emit()
+            }
         }
     }
 }
