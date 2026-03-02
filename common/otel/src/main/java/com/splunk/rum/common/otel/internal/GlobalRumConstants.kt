@@ -32,7 +32,6 @@ object GlobalRumConstants {
     const val DEFAULT_SCREEN_NAME = "unknown"
 
     // Components
-    const val COMPONENT_APP_LIFECYCLE = "app-lifecycle"
     const val COMPONENT_UI = "ui"
     const val COMPONENT_UI_LIFECYCLE = "ui"
     const val COMPONENT_SESSION_REPLAY = "session.replay"
@@ -52,19 +51,6 @@ object GlobalRumConstants {
     val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
 
-    /**
-     * Application lifecycle instrumentation
-     */
-
-    const val APP_LIFECYCLE_LOG_NAME = "device.app.lifecycle"
-
-    // Application lifecycle states
-    const val APP_STATE_CREATED = "created"
-    const val APP_STATE_FOREGROUND = "foreground"
-    const val APP_STATE_BACKGROUND = "background"
-
-    // Attribute key
-    val APP_STATE_KEY: AttributeKey<String> = AttributeKey.stringKey("android.app.state")
 
     /**
      * UI lifecycle instrumentation
