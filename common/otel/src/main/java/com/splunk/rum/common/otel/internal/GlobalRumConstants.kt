@@ -29,6 +29,7 @@ object GlobalRumConstants {
     const val DEFAULT_LOG_EVENT_NAME = "splunk.log"
     const val LOG_BODY_ATTRIBUTE = "body"
     const val SESSION_START_EVENT_NAME = "session.start"
+    const val DEFAULT_SCREEN_NAME = "unknown"
 
     // Components
     const val COMPONENT_APP_LIFECYCLE = "app-lifecycle"
@@ -48,59 +49,6 @@ object GlobalRumConstants {
     val PREVIOUS_SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.previous_id")
     val SESSION_RUM_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("splunk.rumSessionId")
     val USER_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("user.anonymous_id")
-
-
-    /**
-     * Navigation instrumentation
-     */
-
-    const val DEFAULT_SCREEN_NAME = "unknown"
-
-    const val NAVIGATION_SPAN_NAME = "Created"
-    const val NAVIGATION_RESTARTED_SPAN_NAME = "Restarted"
-    const val NAVIGATION_RESTORED_SPAN_NAME = "Restored"
-    const val NAVIGATION_RESUMED_SPAN_NAME = "Resumed"
-    const val NAVIGATION_PAUSED_SPAN_NAME = "Paused"
-    const val NAVIGATION_STOPPED_SPAN_NAME = "Stopped"
-    const val NAVIGATION_VIEW_DESTROYED_SPAN_NAME = "ViewDestroyed"
-    const val NAVIGATION_DESTROYED_SPAN_NAME = "Destroyed"
-    const val NAVIGATION_DETACHED_SPAN_NAME = "Detached"
-
-    const val NAVIGATION_ACTIVITY_PRE_CREATED_EVENT = "activityPreCreated"
-    const val NAVIGATION_ACTIVITY_CREATED_EVENT = "activityCreated"
-    const val NAVIGATION_ACTIVITY_POST_CREATED_EVENT = "activityPostCreated"
-    const val NAVIGATION_ACTIVITY_PRE_STARTED_EVENT = "activityPreStarted"
-    const val NAVIGATION_ACTIVITY_STARTED_EVENT = "activityStarted"
-    const val NAVIGATION_ACTIVITY_POST_STARTED_EVENT = "activityPostStarted"
-    const val NAVIGATION_ACTIVITY_PRE_RESUMED_EVENT = "activityPreResumed"
-    const val NAVIGATION_ACTIVITY_RESUMED_EVENT = "onActivityResumed"
-    const val NAVIGATION_ACTIVITY_POST_RESUMED_EVENT = "activityPostResumed"
-    const val NAVIGATION_ACTIVITY_PRE_PAUSED_EVENT = "activityPrePaused"
-    const val NAVIGATION_ACTIVITY_PAUSED_EVENT = "onActivityPaused"
-    const val NAVIGATION_ACTIVITY_POST_PAUSED_EVENT = "activityPostPaused"
-    const val NAVIGATION_ACTIVITY_PRE_STOPPED_EVENT = "activityPreStopped"
-    const val NAVIGATION_ACTIVITY_STOPPED_EVENT = "activityStopped"
-    const val NAVIGATION_ACTIVITY_POST_STOPPED_EVENT = "activityPostStopped"
-    const val NAVIGATION_ACTIVITY_PRE_DESTROYED_EVENT = "activityPreDestroyed"
-    const val NAVIGATION_ACTIVITY_DESTROYED_EVENT = "activityDestroyed"
-    const val NAVIGATION_ACTIVITY_POST_DESTROYED_EVENT = "activityPostDestroyed"
-
-    const val NAVIGATION_FRAGMENT_PRE_ATTACHED_EVENT = "fragmentPreAttached"
-    const val NAVIGATION_FRAGMENT_ATTACHED_EVENT = "fragmentAttached"
-    const val NAVIGATION_FRAGMENT_PRE_CREATED_EVENT = "fragmentPreCreated"
-    const val NAVIGATION_FRAGMENT_CREATED_EVENT = "fragmentCreated"
-    const val NAVIGATION_FRAGMENT_VIEW_CREATED_EVENT = "fragmentViewCreated"
-    const val NAVIGATION_FRAGMENT_STARTED_EVENT = "fragmentStarted"
-    const val NAVIGATION_FRAGMENT_RESUMED_EVENT = "onFragmentResumed"
-    const val NAVIGATION_FRAGMENT_PAUSED_EVENT = "onFragmentPaused"
-    const val NAVIGATION_FRAGMENT_STOPPED_EVENT = "fragmentStopped"
-    const val NAVIGATION_FRAGMENT_VIEW_DESTROYED_EVENT = "fragmentViewDestroyed"
-    const val NAVIGATION_FRAGMENT_DESTROYED_EVENT = "fragmentDestroyed"
-    const val NAVIGATION_FRAGMENT_DETACHED_EVENT = "fragmentDetached"
-
-    // Attribute keys
-    val NAVIGATION_ACTIVITY_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("activity.name")
-    val NAVIGATION_FRAGMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("fragment.name")
     val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
 

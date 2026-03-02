@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.integration.navigation.RumConstant
 import com.splunk.rum.integration.navigation.tracer.fragment.FragmentTracerManager
 
 internal class FragmentCallback(private val manager: FragmentTracerManager) :
@@ -32,80 +33,80 @@ internal class FragmentCallback(private val manager: FragmentTracerManager) :
         Logger.d("FragmentCallback", "onFragmentPreAttached")
         manager.getTracer(f)
             .startFragmentCreation()
-            .addEvent(GlobalRumConstants.NAVIGATION_FRAGMENT_PRE_ATTACHED_EVENT)
+            .addEvent(RumConstant.NAVIGATION_FRAGMENT_PRE_ATTACHED_EVENT)
     }
 
     override fun onFragmentAttached(fm: FragmentManager, f: Fragment, context: Context) {
         Logger.d("FragmentCallback", "onFragmentAttached")
-        manager.addEvent(f, GlobalRumConstants.NAVIGATION_FRAGMENT_ATTACHED_EVENT)
+        manager.addEvent(f, RumConstant.NAVIGATION_FRAGMENT_ATTACHED_EVENT)
     }
 
     override fun onFragmentPreCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
         Logger.d("FragmentCallback", "onFragmentPreCreated")
-        manager.addEvent(f, GlobalRumConstants.NAVIGATION_FRAGMENT_PRE_CREATED_EVENT)
+        manager.addEvent(f, RumConstant.NAVIGATION_FRAGMENT_PRE_CREATED_EVENT)
     }
 
     override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
         Logger.d("FragmentCallback", "onFragmentCreated")
-        manager.addEvent(f, GlobalRumConstants.NAVIGATION_FRAGMENT_CREATED_EVENT)
+        manager.addEvent(f, RumConstant.NAVIGATION_FRAGMENT_CREATED_EVENT)
     }
 
     override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
         Logger.d("FragmentCallback", "onFragmentViewCreated")
         manager.getTracer(f)
-            .startSpanIfNoneInProgress(GlobalRumConstants.NAVIGATION_RESTORED_SPAN_NAME)
-            .addEvent(GlobalRumConstants.NAVIGATION_FRAGMENT_VIEW_CREATED_EVENT)
+            .startSpanIfNoneInProgress(RumConstant.NAVIGATION_RESTORED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_FRAGMENT_VIEW_CREATED_EVENT)
     }
 
     override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
         Logger.d("FragmentCallback", "onFragmentStarted")
-        manager.addEvent(f, GlobalRumConstants.NAVIGATION_FRAGMENT_STARTED_EVENT)
+        manager.addEvent(f, RumConstant.NAVIGATION_FRAGMENT_STARTED_EVENT)
     }
 
     override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
         Logger.d("FragmentCallback", "onFragmentResumed")
         manager.getTracer(f)
-            .startSpanIfNoneInProgress(GlobalRumConstants.NAVIGATION_RESUMED_SPAN_NAME)
-            .addEvent(GlobalRumConstants.NAVIGATION_FRAGMENT_RESUMED_EVENT)
+            .startSpanIfNoneInProgress(RumConstant.NAVIGATION_RESUMED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_FRAGMENT_RESUMED_EVENT)
             .endActiveSpan()
     }
 
     override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
         Logger.d("FragmentCallback", "onFragmentPaused")
         manager.getTracer(f)
-            .startSpanIfNoneInProgress(GlobalRumConstants.NAVIGATION_PAUSED_SPAN_NAME)
-            .addEvent(GlobalRumConstants.NAVIGATION_FRAGMENT_PAUSED_EVENT)
+            .startSpanIfNoneInProgress(RumConstant.NAVIGATION_PAUSED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_FRAGMENT_PAUSED_EVENT)
             .endActiveSpan()
     }
 
     override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
         Logger.d("FragmentCallback", "onFragmentStopped")
         manager.getTracer(f)
-            .startSpanIfNoneInProgress(GlobalRumConstants.NAVIGATION_STOPPED_SPAN_NAME)
-            .addEvent(GlobalRumConstants.NAVIGATION_FRAGMENT_STOPPED_EVENT)
+            .startSpanIfNoneInProgress(RumConstant.NAVIGATION_STOPPED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_FRAGMENT_STOPPED_EVENT)
             .endActiveSpan()
     }
 
     override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
         Logger.d("FragmentCallback", "onFragmentViewDestroyed")
         manager.getTracer(f)
-            .startSpanIfNoneInProgress(GlobalRumConstants.NAVIGATION_VIEW_DESTROYED_SPAN_NAME)
-            .addEvent(GlobalRumConstants.NAVIGATION_FRAGMENT_VIEW_DESTROYED_EVENT)
+            .startSpanIfNoneInProgress(RumConstant.NAVIGATION_VIEW_DESTROYED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_FRAGMENT_VIEW_DESTROYED_EVENT)
             .endActiveSpan()
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
         Logger.d("FragmentCallback", "onFragmentDestroyed")
         manager.getTracer(f)
-            .startSpanIfNoneInProgress(GlobalRumConstants.NAVIGATION_DESTROYED_SPAN_NAME)
-            .addEvent(GlobalRumConstants.NAVIGATION_FRAGMENT_DESTROYED_EVENT)
+            .startSpanIfNoneInProgress(RumConstant.NAVIGATION_DESTROYED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_FRAGMENT_DESTROYED_EVENT)
     }
 
     override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
         Logger.d("FragmentCallback", "onFragmentDetached")
         manager.getTracer(f)
-            .startSpanIfNoneInProgress(GlobalRumConstants.NAVIGATION_DETACHED_SPAN_NAME)
-            .addEvent(GlobalRumConstants.NAVIGATION_FRAGMENT_DETACHED_EVENT)
+            .startSpanIfNoneInProgress(RumConstant.NAVIGATION_DETACHED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_FRAGMENT_DETACHED_EVENT)
             .endActiveSpan()
     }
 }
