@@ -18,7 +18,7 @@ package com.splunk.rum.common.otel.internal
 
 import io.opentelemetry.api.common.AttributeKey
 
-object RumConstants {
+object GlobalRumConstants {
 
     /**
      * General

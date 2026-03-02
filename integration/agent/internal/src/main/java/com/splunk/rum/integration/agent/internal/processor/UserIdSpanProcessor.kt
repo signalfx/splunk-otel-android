@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.common.otel.internal.RumConstants.USER_ID_KEY
+import com.splunk.rum.common.otel.internal.GlobalRumConstants.USER_ID_KEY
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan

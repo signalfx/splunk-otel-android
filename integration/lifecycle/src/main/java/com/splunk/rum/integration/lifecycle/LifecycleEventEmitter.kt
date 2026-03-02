@@ -21,7 +21,7 @@ import androidx.fragment.app.Fragment
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 import com.splunk.rum.integration.lifecycle.model.LifecycleEventData
 import java.util.concurrent.TimeUnit
@@ -51,7 +51,7 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         val elementName = activity::class.java.simpleName
 
         emitEvent(
-            elementType = RumConstants.UI_LIFECYCLE_ACTIVITY_TYPE,
+            elementType = GlobalRumConstants.UI_LIFECYCLE_ACTIVITY_TYPE,
             elementName = elementName,
             elementId = elementId,
             action = action,
@@ -67,7 +67,7 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         val elementId = fragment::class.java.name // Class-level tracking
         val elementName = fragment::class.java.simpleName
         emitEvent(
-            elementType = RumConstants.UI_LIFECYCLE_FRAGMENT_TYPE,
+            elementType = GlobalRumConstants.UI_LIFECYCLE_FRAGMENT_TYPE,
             elementName = elementName,
             elementId = elementId,
             action = action,
@@ -126,15 +126,15 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
 
         Logger.d(TAG) { "Emitting lifecycle event: $elementType.$elementName - ${action.attributeValue}" }
 
-        logger.get(RumConstants.RUM_TRACER_NAME)
+        logger.get(GlobalRumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
-            .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.UI_LIFECYCLE_LOG_NAME)
-            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_UI_LIFECYCLE)
-            .setAttribute(RumConstants.ELEMENT_TYPE_KEY, elementType)
-            .setAttribute(RumConstants.ELEMENT_NAME_KEY, elementName)
-            .setAttribute(RumConstants.ELEMENT_ID_KEY, elementId)
-            .setAttribute(RumConstants.LIFECYCLE_ACTION_KEY, action.attributeValue)
+            .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, GlobalRumConstants.UI_LIFECYCLE_LOG_NAME)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_UI_LIFECYCLE)
+            .setAttribute(GlobalRumConstants.ELEMENT_TYPE_KEY, elementType)
+            .setAttribute(GlobalRumConstants.ELEMENT_NAME_KEY, elementName)
+            .setAttribute(GlobalRumConstants.ELEMENT_ID_KEY, elementId)
+            .setAttribute(GlobalRumConstants.LIFECYCLE_ACTION_KEY, action.attributeValue)
             .emit()
     }
 

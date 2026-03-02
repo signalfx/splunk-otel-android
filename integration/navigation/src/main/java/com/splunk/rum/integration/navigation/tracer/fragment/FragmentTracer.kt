@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.navigation.tracer.fragment
 
 import com.splunk.android.common.logger.Logger
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.navigation.tracer.ActiveSpan
 import io.opentelemetry.api.trace.Span
@@ -42,7 +42,7 @@ internal class FragmentTracer(
 
     fun startFragmentCreation(): FragmentTracer {
         Logger.d("FragmentTracer", "startFragmentCreation")
-        activeSpan.startSpan { createSpan(RumConstants.NAVIGATION_SPAN_NAME) }
+        activeSpan.startSpan { createSpan(GlobalRumConstants.NAVIGATION_SPAN_NAME) }
         return this
     }
 
@@ -61,8 +61,8 @@ internal class FragmentTracer(
         ScreenNameTracker.screenName = screenName
 
         val span = tracer.spanBuilder(spanName)
-            .setAttribute(RumConstants.NAVIGATION_FRAGMENT_NAME_KEY, fragmentName)
-            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_UI)
+            .setAttribute(GlobalRumConstants.NAVIGATION_FRAGMENT_NAME_KEY, fragmentName)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_UI)
             .startSpan()
         return span
     }

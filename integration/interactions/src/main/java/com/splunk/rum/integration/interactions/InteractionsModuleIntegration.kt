@@ -29,7 +29,7 @@ import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.Ses
 import com.splunk.android.instrumentation.recording.wireframe.model.Wireframe
 import com.splunk.android.instrumentation.recording.wireframe.stats.WireframeStats
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
@@ -102,37 +102,37 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
             val actionName = when (interaction) {
                 is Interaction.Focus ->
-                    RumConstants.INTERACTIONS_ACTION_FOCUS
+                    GlobalRumConstants.INTERACTIONS_ACTION_FOCUS
 
                 is Interaction.Keyboard ->
-                    RumConstants.INTERACTIONS_ACTION_SOFT_KEYBOARD
+                    GlobalRumConstants.INTERACTIONS_ACTION_SOFT_KEYBOARD
 
                 is Interaction.Orientation ->
                     return
 
                 is Interaction.PhoneButton ->
-                    RumConstants.INTERACTIONS_ACTION_PHONE_BUTTON
+                    GlobalRumConstants.INTERACTIONS_ACTION_PHONE_BUTTON
 
                 is Interaction.Touch.Gesture.DoubleTap ->
-                    RumConstants.INTERACTIONS_ACTION_DOUBLE_TAP
+                    GlobalRumConstants.INTERACTIONS_ACTION_DOUBLE_TAP
 
                 is Interaction.Touch.Gesture.LongPress ->
-                    RumConstants.INTERACTIONS_ACTION_LONG_PRESS
+                    GlobalRumConstants.INTERACTIONS_ACTION_LONG_PRESS
 
                 is Interaction.Touch.Gesture.Pinch ->
-                    RumConstants.INTERACTIONS_ACTION_PINCH
+                    GlobalRumConstants.INTERACTIONS_ACTION_PINCH
 
                 is Interaction.Touch.Gesture.RageTap ->
-                    RumConstants.INTERACTIONS_ACTION_RAGE_TAP
+                    GlobalRumConstants.INTERACTIONS_ACTION_RAGE_TAP
 
                 is Interaction.Touch.Gesture.Rotation ->
-                    RumConstants.INTERACTIONS_ACTION_ROTATION
+                    GlobalRumConstants.INTERACTIONS_ACTION_ROTATION
 
                 is Interaction.Touch.Gesture.Swipe ->
                     return
 
                 is Interaction.Touch.Gesture.Tap ->
-                    RumConstants.INTERACTIONS_ACTION_TAP
+                    GlobalRumConstants.INTERACTIONS_ACTION_TAP
 
                 is Interaction.Touch.Pointer ->
                     return
@@ -148,22 +148,22 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 "onInteraction(actionName: $actionName, targetType: $targetType, interaction: $interaction)"
             }
 
-            val log = logger.get(RumConstants.RUM_TRACER_NAME)
+            val log = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.INTERACTIONS_EVENT_NAME)
-                .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_UI)
-                .setAttribute(RumConstants.INTERACTIONS_ACTION_NAME_KEY, actionName)
-                .setAttribute(RumConstants.INTERACTIONS_TARGET_TYPE_KEY, targetType.orEmpty())
+                .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, GlobalRumConstants.INTERACTIONS_EVENT_NAME)
+                .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_UI)
+                .setAttribute(GlobalRumConstants.INTERACTIONS_ACTION_NAME_KEY, actionName)
+                .setAttribute(GlobalRumConstants.INTERACTIONS_TARGET_TYPE_KEY, targetType.orEmpty())
 
             if (interaction is Interaction.Targetable) {
                 log.setAttribute(
-                    RumConstants.INTERACTIONS_TARGET_XPATH_KEY,
+                    GlobalRumConstants.INTERACTIONS_TARGET_XPATH_KEY,
                     XpathBuilder.build(interaction)
                 )
 
                 log.setAttribute(
-                    RumConstants.INTERACTIONS_TARGET_ELEMENT_KEY,
+                    GlobalRumConstants.INTERACTIONS_TARGET_ELEMENT_KEY,
                     interaction.targetElementPath?.lastOrNull()?.view?.typename.orEmpty()
                 )
             }

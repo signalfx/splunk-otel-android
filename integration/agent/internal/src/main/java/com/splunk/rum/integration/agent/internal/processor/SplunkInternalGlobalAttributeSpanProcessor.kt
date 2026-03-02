@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.context.Context
@@ -42,7 +42,7 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
 
     companion object {
         val attributes = MutableAttributes().apply {
-            this[RumConstants.SCREEN_NAME_KEY] = RumConstants.DEFAULT_SCREEN_NAME
+            this[GlobalRumConstants.SCREEN_NAME_KEY] = GlobalRumConstants.DEFAULT_SCREEN_NAME
         }
     }
 }
