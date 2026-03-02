@@ -45,12 +45,6 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     private const val TAG = "InteractionsIntegration"
 
-    // Interaction Event attributes
-    private const val INTERACTION_EVENT_NAME = "action"
-    private const val UI_COMPONENT = "ui"
-    private val attributeKeyActionName = AttributeKey.stringKey("action.name")
-    private val attributeKeyTargetType = AttributeKey.stringKey("target.type")
-
     // Frustration Event attributes
     private const val FRUSTRATION_EVENT_NAME = "frustration"
     private const val USER_INTERACTION_COMPONENT = "user_interaction"
@@ -119,34 +113,34 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
             val actionName = when (interaction) {
                 is Interaction.Focus ->
-                    "focus"
+                    RumConstants.INTERACTIONS_ACTION_FOCUS
 
                 is Interaction.Keyboard ->
-                    "soft_keyboard"
+                    RumConstants.INTERACTIONS_ACTION_SOFT_KEYBOARD
 
                 is Interaction.Orientation ->
                     return
 
                 is Interaction.PhoneButton ->
-                    "phone_button"
+                    RumConstants.INTERACTIONS_ACTION_PHONE_BUTTON
 
                 is Interaction.Touch.Gesture.DoubleTap ->
-                    "double_tap"
+                    RumConstants.INTERACTIONS_ACTION_DOUBLE_TAP
 
                 is Interaction.Touch.Gesture.LongPress ->
-                    "long_press"
+                    RumConstants.INTERACTIONS_ACTION_LONG_PRESS
 
                 is Interaction.Touch.Gesture.Pinch ->
-                    "pinch"
+                    RumConstants.INTERACTIONS_ACTION_PINCH
 
                 is Interaction.Touch.Gesture.Rotation ->
-                    "rotation"
+                    RumConstants.INTERACTIONS_ACTION_ROTATION
 
                 is Interaction.Touch.Gesture.Swipe ->
                     return
 
                 is Interaction.Touch.Gesture.Tap ->
-                    "tap"
+                    RumConstants.INTERACTIONS_ACTION_TAP
 
                 else ->
                     return
@@ -165,10 +159,10 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             val log = logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, INTERACTION_EVENT_NAME)
-                .setAttribute(RumConstants.COMPONENT_KEY, UI_COMPONENT)
-                .setAttribute(attributeKeyActionName, actionName)
-                .setAttribute(attributeKeyTargetType, targetType.orEmpty())
+                .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.INTERACTIONS_EVENT_NAME)
+                .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_UI)
+                .setAttribute(RumConstants.INTERACTIONS_ACTION_NAME_KEY, actionName)
+                .setAttribute(RumConstants.INTERACTIONS_TARGET_TYPE_KEY, targetType.orEmpty())
 
             if (interaction is Interaction.Targetable) {
                 log.setAttribute(

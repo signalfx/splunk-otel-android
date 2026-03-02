@@ -80,7 +80,7 @@ class CustomTracking internal constructor() {
         @Suppress("NewApi") // Requires API 26 or core library desugaring
         val timestamp = Instant.now()
         spanBuilder.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
-            .setAttribute(RumConstants.ERROR_KEY, "true")
+            .setAttribute(RumConstants.ERROR_KEY, RumConstants.ERROR_TRUE_VALUE)
             .setStartTimestamp(timestamp)
             .startSpan()
             .recordException(throwable)
