@@ -51,7 +51,7 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         val elementName = activity::class.java.simpleName
 
         emitEvent(
-            elementType = "Activity",
+            elementType = RumConstants.UI_LIFECYCLE_ACTIVITY_TYPE,
             elementName = elementName,
             elementId = elementId,
             action = action,
@@ -67,7 +67,7 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         val elementId = fragment::class.java.name // Class-level tracking
         val elementName = fragment::class.java.simpleName
         emitEvent(
-            elementType = "Fragment",
+            elementType = RumConstants.UI_LIFECYCLE_FRAGMENT_TYPE,
             elementName = elementName,
             elementId = elementId,
             action = action,
@@ -129,8 +129,8 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         logger.get(RumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
-            .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.UI_LIFECYCLE_NAME)
-            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.UI_LIFECYCLE_COMPONENT)
+            .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.UI_LIFECYCLE_LOG_NAME)
+            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_UI_LIFECYCLE)
             .setAttribute(RumConstants.ELEMENT_TYPE_KEY, elementType)
             .setAttribute(RumConstants.ELEMENT_NAME_KEY, elementName)
             .setAttribute(RumConstants.ELEMENT_ID_KEY, elementId)

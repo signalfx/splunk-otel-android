@@ -105,7 +105,7 @@ internal class AndroidLogRecordExporter(
 
             try {
                 if (log.bodyValue != null) {
-                    spanBuilder.setAttribute("body", log.bodyValue.toString())
+                    spanBuilder.setAttribute(RumConstants.LOG_BODY_ATTRIBUTE, log.bodyValue.toString())
                 }
 
                 log.attributes.asMap().forEach attrs@{ (key, value) ->

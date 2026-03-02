@@ -22,11 +22,11 @@ import android.os.SystemClock
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.RumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.common.otel.internal.RumConstants.RUM_TRACER_NAME
+import com.splunk.rum.common.otel.internal.RumConstants.SESSION_ID_KEY
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
-import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
-import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.model.Module
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
@@ -62,7 +62,7 @@ class AgentIntegration private constructor(context: Context) {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME)
                     .logRecordBuilder()
-                    .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, "session.start")
+                    .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_START_EVENT_NAME)
                     .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
                     .setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
                     .setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)

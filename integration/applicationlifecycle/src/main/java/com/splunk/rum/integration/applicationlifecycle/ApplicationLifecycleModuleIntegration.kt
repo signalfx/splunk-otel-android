@@ -98,8 +98,8 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         logger.get(RumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)
-            .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.APP_LIFECYCLE_NAME)
-            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.APP_LIFECYCLE_COMPONENT)
+            .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.APP_LIFECYCLE_LOG_NAME)
+            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_LIFECYCLE)
             .setAttribute(RumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
             .emit()
     }

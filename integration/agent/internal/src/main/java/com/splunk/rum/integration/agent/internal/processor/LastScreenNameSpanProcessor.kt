@@ -26,7 +26,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 class LastScreenNameSpanProcessor(private val screeNameTracker: IScreenNameTracker) : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        if (span.name == RumConstants.NAVIGATION_NAME || span.name == RumConstants.APP_START_NAME) {
+        if (span.name == RumConstants.NAVIGATION_SPAN_NAME || span.name == RumConstants.APP_START_SPAN_NAME) {
             screeNameTracker.lastScreenName?.let { span.setAttribute(RumConstants.LAST_SCREEN_NAME_KEY, it) }
         }
     }
