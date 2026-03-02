@@ -31,7 +31,6 @@ object GlobalRumConstants {
     const val SESSION_START_EVENT_NAME = "session.start"
 
     // Components
-    const val COMPONENT_APP_START = "appstart"
     const val COMPONENT_APP_LIFECYCLE = "app-lifecycle"
     const val COMPONENT_UI = "ui"
     const val COMPONENT_UI_LIFECYCLE = "ui"
@@ -50,21 +49,6 @@ object GlobalRumConstants {
     val SESSION_RUM_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("splunk.rumSessionId")
     val USER_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("user.anonymous_id")
 
-    /**
-     * Application start instrumentation
-     */
-
-    const val APP_START_SPAN_NAME = "AppStart"
-    const val APP_START_INITIALIZE_SPAN_NAME = "SplunkRum.initialize"
-
-    // Application start type
-    const val APP_START_TYPE_COLD = "cold"
-    const val APP_START_TYPE_WARM = "warm"
-    const val APP_START_TYPE_HOT = "hot"
-
-    // Attribute keys
-    val APP_START_TYPE_KEY: AttributeKey<String> = AttributeKey.stringKey("start.type")
-    val APP_START_CONFIG_SETTINGS_KEY: AttributeKey<String> = AttributeKey.stringKey("config_settings")
 
     /**
      * Navigation instrumentation

@@ -90,21 +90,21 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             Logger.d(TAG) {
                 "onColdStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
             }
-            reportEvent(startTimestamp, endTimestamp, GlobalRumConstants.APP_START_TYPE_COLD)
+            reportEvent(startTimestamp, endTimestamp, RumConstants.APP_START_TYPE_COLD)
         }
 
         override fun onWarmStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
             Logger.d(TAG) {
                 "onWarmStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
             }
-            reportEvent(startTimestamp, endTimestamp, GlobalRumConstants.APP_START_TYPE_WARM)
+            reportEvent(startTimestamp, endTimestamp, RumConstants.APP_START_TYPE_WARM)
         }
 
         override fun onHotStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
             Logger.d(TAG) {
                 "onHotStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
             }
-            reportEvent(startTimestamp, endTimestamp, GlobalRumConstants.APP_START_TYPE_HOT)
+            reportEvent(startTimestamp, endTimestamp, RumConstants.APP_START_TYPE_HOT)
         }
     }
 
@@ -147,7 +147,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         isInitializationReported = true
 
         val span = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
-            .spanBuilder(GlobalRumConstants.APP_START_SPAN_NAME)
+            .spanBuilder(RumConstants.APP_START_SPAN_NAME)
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
@@ -156,9 +156,9 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
         // "unknown" to ensure App Start event doesn't show up under a screen on UI
         span
-            .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_APP_START)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_START)
             .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, GlobalRumConstants.DEFAULT_SCREEN_NAME)
-            .setAttribute(GlobalRumConstants.APP_START_TYPE_KEY, name)
+            .setAttribute(RumConstants.APP_START_TYPE_KEY, name)
             .end(endTimestamp.toInstant())
 
         Logger.d(TAG) { "reportEventInternal() - span sent successfully for: $name" }
@@ -183,12 +183,12 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         }
 
         val initSpan = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
-            .spanBuilder(GlobalRumConstants.APP_START_INITIALIZE_SPAN_NAME)
+            .spanBuilder(RumConstants.APP_START_INITIALIZE_SPAN_NAME)
             .setParent(io.opentelemetry.context.Context.current().with(span))
             .setStartTimestamp(firstInitialization.startTimestamp.toInstant())
             .startSpan()
 
-        initSpan.setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_APP_START)
+        initSpan.setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_START)
             .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, GlobalRumConstants.DEFAULT_SCREEN_NAME)
 
         val resources = modules.joinToString(",", "[", "]") {
@@ -196,7 +196,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
                 ?: "${it.name}.enabled:true"
         }
 
-        initSpan.setAttribute(GlobalRumConstants.APP_START_CONFIG_SETTINGS_KEY, resources)
+        initSpan.setAttribute(RumConstants.APP_START_CONFIG_SETTINGS_KEY, resources)
 
         for (module in modules) {
             if (module.initialization == null) {
