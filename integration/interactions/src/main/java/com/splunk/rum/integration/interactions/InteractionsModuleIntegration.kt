@@ -102,37 +102,37 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
             val actionName = when (interaction) {
                 is Interaction.Focus ->
-                    GlobalRumConstants.INTERACTIONS_ACTION_FOCUS
+                    RumConstants.INTERACTIONS_ACTION_FOCUS
 
                 is Interaction.Keyboard ->
-                    GlobalRumConstants.INTERACTIONS_ACTION_SOFT_KEYBOARD
+                    RumConstants.INTERACTIONS_ACTION_SOFT_KEYBOARD
 
                 is Interaction.Orientation ->
                     return
 
                 is Interaction.PhoneButton ->
-                    GlobalRumConstants.INTERACTIONS_ACTION_PHONE_BUTTON
+                    RumConstants.INTERACTIONS_ACTION_PHONE_BUTTON
 
                 is Interaction.Touch.Gesture.DoubleTap ->
-                    GlobalRumConstants.INTERACTIONS_ACTION_DOUBLE_TAP
+                    RumConstants.INTERACTIONS_ACTION_DOUBLE_TAP
 
                 is Interaction.Touch.Gesture.LongPress ->
-                    GlobalRumConstants.INTERACTIONS_ACTION_LONG_PRESS
+                    RumConstants.INTERACTIONS_ACTION_LONG_PRESS
 
                 is Interaction.Touch.Gesture.Pinch ->
-                    GlobalRumConstants.INTERACTIONS_ACTION_PINCH
+                    RumConstants.INTERACTIONS_ACTION_PINCH
 
                 is Interaction.Touch.Gesture.RageTap ->
-                    GlobalRumConstants.INTERACTIONS_ACTION_RAGE_TAP
+                    RumConstants.INTERACTIONS_ACTION_RAGE_TAP
 
                 is Interaction.Touch.Gesture.Rotation ->
-                    GlobalRumConstants.INTERACTIONS_ACTION_ROTATION
+                    RumConstants.INTERACTIONS_ACTION_ROTATION
 
                 is Interaction.Touch.Gesture.Swipe ->
                     return
 
                 is Interaction.Touch.Gesture.Tap ->
-                    GlobalRumConstants.INTERACTIONS_ACTION_TAP
+                    RumConstants.INTERACTIONS_ACTION_TAP
 
                 is Interaction.Touch.Pointer ->
                     return
@@ -151,19 +151,19 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             val log = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, GlobalRumConstants.INTERACTIONS_EVENT_NAME)
-                .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_UI)
-                .setAttribute(GlobalRumConstants.INTERACTIONS_ACTION_NAME_KEY, actionName)
-                .setAttribute(GlobalRumConstants.INTERACTIONS_TARGET_TYPE_KEY, targetType.orEmpty())
+                .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.INTERACTIONS_EVENT_NAME)
+                .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_INTERACTIONS)
+                .setAttribute(RumConstants.INTERACTIONS_ACTION_NAME_KEY, actionName)
+                .setAttribute(RumConstants.INTERACTIONS_TARGET_TYPE_KEY, targetType.orEmpty())
 
             if (interaction is Interaction.Targetable) {
                 log.setAttribute(
-                    GlobalRumConstants.INTERACTIONS_TARGET_XPATH_KEY,
+                    RumConstants.INTERACTIONS_TARGET_XPATH_KEY,
                     XpathBuilder.build(interaction)
                 )
 
                 log.setAttribute(
-                    GlobalRumConstants.INTERACTIONS_TARGET_ELEMENT_KEY,
+                    RumConstants.INTERACTIONS_TARGET_ELEMENT_KEY,
                     interaction.targetElementPath?.lastOrNull()?.view?.typename.orEmpty()
                 )
             }

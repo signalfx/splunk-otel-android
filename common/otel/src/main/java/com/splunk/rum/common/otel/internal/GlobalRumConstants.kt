@@ -32,7 +32,6 @@ object GlobalRumConstants {
     const val DEFAULT_SCREEN_NAME = "unknown"
 
     // Components
-    const val COMPONENT_UI = "ui"
     const val COMPONENT_SESSION_REPLAY = "session.replay"
     const val COMPONENT_HTTP = "http"
     const val COMPONENT_ERROR = "error"
@@ -49,28 +48,6 @@ object GlobalRumConstants {
     val USER_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("user.anonymous_id")
     val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
-
-    /**
-     * Interaction instrumentation
-     */
-
-    // Interaction types
-    const val INTERACTIONS_EVENT_NAME = "action"
-    const val INTERACTIONS_ACTION_FOCUS = "focus"
-    const val INTERACTIONS_ACTION_SOFT_KEYBOARD = "soft_keyboard"
-    const val INTERACTIONS_ACTION_PHONE_BUTTON = "phone_button"
-    const val INTERACTIONS_ACTION_DOUBLE_TAP = "double_tap"
-    const val INTERACTIONS_ACTION_LONG_PRESS = "long_press"
-    const val INTERACTIONS_ACTION_PINCH = "pinch"
-    const val INTERACTIONS_ACTION_RAGE_TAP = "rage_tap"
-    const val INTERACTIONS_ACTION_ROTATION = "rotation"
-    const val INTERACTIONS_ACTION_TAP = "tap"
-
-    // Attribute keys
-    val INTERACTIONS_ACTION_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("action.name")
-    val INTERACTIONS_TARGET_TYPE_KEY: AttributeKey<String> = AttributeKey.stringKey("target.type")
-    val INTERACTIONS_TARGET_XPATH_KEY: AttributeKey<String> = AttributeKey.stringKey("target_xpath")
-    val INTERACTIONS_TARGET_ELEMENT_KEY: AttributeKey<String> = AttributeKey.stringKey("target_element")
 
     /**
      * Session Replay instrumentation
