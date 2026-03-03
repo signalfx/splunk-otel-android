@@ -2,7 +2,7 @@ package com.splunk.rum.integration.startup
 
 import io.opentelemetry.api.common.AttributeKey
 
-object RumConstants {
+internal object RumConstants {
 
     const val COMPONENT_APP_START = "appstart"
     const val APP_START_SPAN_NAME = "AppStart"

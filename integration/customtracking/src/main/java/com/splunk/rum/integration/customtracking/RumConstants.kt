@@ -2,7 +2,7 @@ package com.splunk.rum.integration.customtracking
 
 import io.opentelemetry.api.common.AttributeKey
 
-object RumConstants {
+internal object RumConstants {
 
     const val COMPONENT_CUSTOM_EVENT = "custom-event"
 

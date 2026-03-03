@@ -2,7 +2,7 @@ package com.splunk.rum.integration.lifecycle
 
 import io.opentelemetry.api.common.AttributeKey
 
-object RumConstants {
+internal object RumConstants {
 
     const val COMPONENT_UI_LIFECYCLE = "ui"
     const val UI_LIFECYCLE_LOG_NAME = "device.app.ui.lifecycle"

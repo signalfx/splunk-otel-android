@@ -2,7 +2,7 @@ package com.splunk.rum.integration.navigation
 
 import io.opentelemetry.api.common.AttributeKey
 
-object RumConstant {
+internal object RumConstant {
 
     const val COMPONENT_NAVIGATION = "ui"
 
