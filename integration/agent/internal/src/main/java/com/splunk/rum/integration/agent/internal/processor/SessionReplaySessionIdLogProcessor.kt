@@ -26,7 +26,9 @@ import io.opentelemetry.sdk.logs.ReadWriteLogRecord
 class SessionReplaySessionIdLogProcessor(private val sessionManager: ISplunkSessionManager) : LogRecordProcessor {
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
         val logRecordData = logRecord.toLogRecordData()
-        if (logRecordData.instrumentationScopeInfo.name == GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
+        if (logRecordData.instrumentationScopeInfo.name ==
+            GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME
+        ) {
             val id = sessionManager.sessionId(logRecordData.timestampEpochNanos / 1_000_000)
             logRecord.setAttribute(GlobalRumConstants.SESSION_ID_KEY, id)
                 .setAttribute(RumConstants.SESSION_RUM_ID_KEY, id)

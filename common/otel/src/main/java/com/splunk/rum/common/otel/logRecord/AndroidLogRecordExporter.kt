@@ -48,9 +48,15 @@ internal class AndroidLogRecordExporter(
 
     override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
         val sessionReplayLogs =
-            logs.filter { it.instrumentationScopeInfo.name == GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
+            logs.filter {
+                it.instrumentationScopeInfo.name ==
+                    GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME
+            }
         val generalLogs =
-            logs.filter { it.instrumentationScopeInfo.name != GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
+            logs.filter {
+                it.instrumentationScopeInfo.name !=
+                    GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME
+            }
 
         // We need special handling of Session Replay data because of the current state of the backend implementation.
         if (sessionReplayLogs.isNotEmpty()) {
@@ -94,7 +100,9 @@ internal class AndroidLogRecordExporter(
                 ?: RumConstants.DEFAULT_LOG_EVENT_NAME
 
             // traceId and spanId should be inside the context already from global OTel instance
-            val spanBuilder = SplunkOpenTelemetrySdk.instance!!.sdkTracerProvider.get(GlobalRumConstants.RUM_TRACER_NAME)
+            val spanBuilder = SplunkOpenTelemetrySdk.instance!!.sdkTracerProvider.get(
+                GlobalRumConstants.RUM_TRACER_NAME
+            )
                 .spanBuilder(spanName)
                 .setSpanKind(SpanKind.INTERNAL)
                 .setParent(parentContext)

@@ -172,7 +172,10 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                     .get(GlobalRumConstants.RUM_TRACER_NAME)
                     .logRecordBuilder()
                     .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
-                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_REPLAY_IS_RECORDING_EVENT_NAME)
+                    .setAttribute(
+                        GlobalRumConstants.LOG_EVENT_NAME_KEY,
+                        RumConstants.SESSION_REPLAY_IS_RECORDING_EVENT_NAME
+                    )
                     .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_SESSION_REPLAY)
                     .setAttribute(RumConstants.SESSION_REPLAY_KEY, RumConstants.SESSION_REPLAY_PROVIDER)
                     .setAttribute(GlobalRumConstants.SESSION_ID_KEY, sessionId)
