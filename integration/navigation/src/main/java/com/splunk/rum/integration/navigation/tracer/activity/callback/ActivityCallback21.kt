@@ -19,7 +19,6 @@ package com.splunk.rum.integration.navigation.tracer.activity.callback
 import android.app.Activity
 import android.os.Bundle
 import com.splunk.android.common.logger.Logger
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.navigation.RumConstant
 import com.splunk.rum.integration.navigation.tracer.activity.ActivityTracerManager
 
