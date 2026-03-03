@@ -29,7 +29,7 @@ import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.Ses
 import com.splunk.android.instrumentation.recording.wireframe.model.Wireframe
 import com.splunk.android.instrumentation.recording.wireframe.stats.WireframeStats
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
@@ -156,11 +156,11 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 "onInteraction(actionName: $actionName, targetType: $targetType, interaction: $interaction)"
             }
 
-            val log = logger.get(RumConstants.RUM_TRACER_NAME)
+            val log = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.INTERACTIONS_EVENT_NAME)
-                .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_UI)
+                .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.INTERACTIONS_EVENT_NAME)
+                .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_INTERACTIONS)
                 .setAttribute(RumConstants.INTERACTIONS_ACTION_NAME_KEY, actionName)
                 .setAttribute(RumConstants.INTERACTIONS_TARGET_TYPE_KEY, targetType.orEmpty())
 

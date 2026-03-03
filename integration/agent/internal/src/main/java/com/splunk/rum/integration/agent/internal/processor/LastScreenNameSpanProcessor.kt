@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.internal.attributes.IScreenNameTracker
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
@@ -26,8 +26,10 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 class LastScreenNameSpanProcessor(private val screeNameTracker: IScreenNameTracker) : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        if (span.name == RumConstants.NAVIGATION_SPAN_NAME || span.name == RumConstants.APP_START_SPAN_NAME) {
-            screeNameTracker.lastScreenName?.let { span.setAttribute(RumConstants.LAST_SCREEN_NAME_KEY, it) }
+        if (span.name == GlobalRumConstants.NAVIGATION_SPAN_NAME ||
+            span.name == GlobalRumConstants.APP_START_SPAN_NAME
+        ) {
+            screeNameTracker.lastScreenName?.let { span.setAttribute(GlobalRumConstants.LAST_SCREEN_NAME_KEY, it) }
         }
     }
 

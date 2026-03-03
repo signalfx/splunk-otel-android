@@ -18,9 +18,10 @@ package com.splunk.rum.common.otel.logRecord
 
 import com.splunk.android.common.job.IJobManager
 import com.splunk.android.common.job.JobIdStorage
+import com.splunk.rum.common.otel.RumConstants
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.storage.IAgentStorage
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
@@ -47,9 +48,15 @@ internal class AndroidLogRecordExporter(
 
     override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
         val sessionReplayLogs =
-            logs.filter { it.instrumentationScopeInfo.name == RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
+            logs.filter {
+                it.instrumentationScopeInfo.name ==
+                    GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME
+            }
         val generalLogs =
-            logs.filter { it.instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME }
+            logs.filter {
+                it.instrumentationScopeInfo.name !=
+                    GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME
+            }
 
         // We need special handling of Session Replay data because of the current state of the backend implementation.
         if (sessionReplayLogs.isNotEmpty()) {
@@ -82,18 +89,20 @@ internal class AndroidLogRecordExporter(
              *
              * The resolution order is as follows:
              * 1. Use the `eventName` property from `ExtendedLogRecordData` if available.
-             * 2. Otherwise, fall back to the [RumConstants.LOG_EVENT_NAME_KEY] attribute in the log's attributes.
-             * 3. If neither is present, default to the name [RumConstants.DEFAULT_LOG_EVENT_NAME].
+             * 2. Otherwise, fall back to the [GlobalRumConstants.LOG_EVENT_NAME_KEY] attribute in the log's attributes.
+             * 3. If neither is present, default to the name [GlobalRumConstants.DEFAULT_LOG_EVENT_NAME].
              *
              * This ensures that the span always has a meaningful or fallback name, even when
              * the source log record lacks explicit naming metadata.
              */
             val spanName = (log as ExtendedLogRecordData).eventName
-                ?: log.attributes.get(RumConstants.LOG_EVENT_NAME_KEY)
+                ?: log.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY)
                 ?: RumConstants.DEFAULT_LOG_EVENT_NAME
 
             // traceId and spanId should be inside the context already from global OTel instance
-            val spanBuilder = SplunkOpenTelemetrySdk.instance!!.sdkTracerProvider.get(RumConstants.RUM_TRACER_NAME)
+            val spanBuilder = SplunkOpenTelemetrySdk.instance!!.sdkTracerProvider.get(
+                GlobalRumConstants.RUM_TRACER_NAME
+            )
                 .spanBuilder(spanName)
                 .setSpanKind(SpanKind.INTERNAL)
                 .setParent(parentContext)
@@ -109,7 +118,7 @@ internal class AndroidLogRecordExporter(
                 }
 
                 log.attributes.asMap().forEach attrs@{ (key, value) ->
-                    if (key.key == RumConstants.EVENT_NAME) {
+                    if (key.key == GlobalRumConstants.LOG_EVENT_NAME_KEY.key) {
                         return@attrs
                     }
 

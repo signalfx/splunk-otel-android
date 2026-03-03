@@ -19,7 +19,7 @@ package com.splunk.rum.integration.navigation.tracer.activity.callback
 import android.app.Activity
 import android.os.Bundle
 import com.splunk.android.common.logger.Logger
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.integration.navigation.RumConstant
 import com.splunk.rum.integration.navigation.tracer.activity.ActivityTracerManager
 
 internal class ActivityCallback21(override val tracer: ActivityTracerManager) : ActivityCallback {
@@ -27,40 +27,40 @@ internal class ActivityCallback21(override val tracer: ActivityTracerManager) : 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         Logger.d("ActivityCallback21", "onActivityCreated")
         tracer.startActivityCreation(activity)
-            .addEvent(RumConstants.NAVIGATION_ACTIVITY_CREATED_EVENT)
+            .addEvent(RumConstant.NAVIGATION_ACTIVITY_CREATED_EVENT)
     }
 
     override fun onActivityStarted(activity: Activity) {
         Logger.d("ActivityCallback21", "onActivityStarted")
         tracer.initiateRestartSpanIfNecessary(activity)
-            .addEvent(RumConstants.NAVIGATION_ACTIVITY_STARTED_EVENT)
+            .addEvent(RumConstant.NAVIGATION_ACTIVITY_STARTED_EVENT)
     }
 
     override fun onActivityResumed(activity: Activity) {
         Logger.d("ActivityCallback21", "onActivityResumed")
-        tracer.startSpanIfNoneInProgress(activity, RumConstants.NAVIGATION_RESUMED_SPAN_NAME)
-            .addEvent(RumConstants.NAVIGATION_ACTIVITY_RESUMED_EVENT)
+        tracer.startSpanIfNoneInProgress(activity, RumConstant.NAVIGATION_RESUMED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_ACTIVITY_RESUMED_EVENT)
             .endSpanForActivityResumed()
     }
 
     override fun onActivityPaused(activity: Activity) {
         Logger.d("ActivityCallback21", "onActivityPaused")
-        tracer.startSpanIfNoneInProgress(activity, RumConstants.NAVIGATION_PAUSED_SPAN_NAME)
-            .addEvent(RumConstants.NAVIGATION_ACTIVITY_PAUSED_EVENT)
+        tracer.startSpanIfNoneInProgress(activity, RumConstant.NAVIGATION_PAUSED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_ACTIVITY_PAUSED_EVENT)
             .endActiveSpan()
     }
 
     override fun onActivityStopped(activity: Activity) {
         Logger.d("ActivityCallback21", "onActivityStopped")
-        tracer.startSpanIfNoneInProgress(activity, RumConstants.NAVIGATION_STOPPED_SPAN_NAME)
-            .addEvent(RumConstants.NAVIGATION_ACTIVITY_STOPPED_EVENT)
+        tracer.startSpanIfNoneInProgress(activity, RumConstant.NAVIGATION_STOPPED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_ACTIVITY_STOPPED_EVENT)
             .endActiveSpan()
     }
 
     override fun onActivityDestroyed(activity: Activity) {
         Logger.d("ActivityCallback21", "onActivityDestroyed")
-        tracer.startSpanIfNoneInProgress(activity, RumConstants.NAVIGATION_DESTROYED_SPAN_NAME)
-            .addEvent(RumConstants.NAVIGATION_ACTIVITY_DESTROYED_EVENT)
+        tracer.startSpanIfNoneInProgress(activity, RumConstant.NAVIGATION_DESTROYED_SPAN_NAME)
+            .addEvent(RumConstant.NAVIGATION_ACTIVITY_DESTROYED_EVENT)
             .endActiveSpan()
     }
 }

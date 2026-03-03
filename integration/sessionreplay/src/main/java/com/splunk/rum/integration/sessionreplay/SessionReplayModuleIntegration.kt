@@ -25,7 +25,7 @@ import com.splunk.android.instrumentation.recording.core.api.SessionReplay
 import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.toInstant
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
@@ -146,7 +146,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             timeIndex.putAt((metadata.endUnixMs - 1).toInstant(), index + 1)
 
             val attributes = Attributes.of(
-                RumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_REPLAY_DATA_EVENT_NAME,
+                GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_REPLAY_DATA_EVENT_NAME,
                 RumConstants.SESSION_REPLAY_TOTAL_CHUNKS_KEY, 1.0,
                 RumConstants.SESSION_REPLAY_CHUNK_KEY, 1.0,
                 RumConstants.SESSION_REPLAY_EVENT_INDEX_KEY, index,
@@ -155,7 +155,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             )
 
             val sessionReplayDataBuilder = instance.sdkLoggerProvider
-                .loggerBuilder(RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME)
+                .loggerBuilder(GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME)
                 .build()
                 .logRecordBuilder()
 
@@ -169,13 +169,16 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             if (!isRecordingForSessions.contains(sessionId)) {
                 isRecordingForSessions.add(sessionId)
                 instance.sdkLoggerProvider
-                    .get(RumConstants.RUM_TRACER_NAME)
+                    .get(GlobalRumConstants.RUM_TRACER_NAME)
                     .logRecordBuilder()
                     .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
-                    .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_REPLAY_IS_RECORDING_EVENT_NAME)
-                    .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_SESSION_REPLAY)
+                    .setAttribute(
+                        GlobalRumConstants.LOG_EVENT_NAME_KEY,
+                        RumConstants.SESSION_REPLAY_IS_RECORDING_EVENT_NAME
+                    )
+                    .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_SESSION_REPLAY)
                     .setAttribute(RumConstants.SESSION_REPLAY_KEY, RumConstants.SESSION_REPLAY_PROVIDER)
-                    .setAttribute(RumConstants.SESSION_ID_KEY, sessionId)
+                    .setAttribute(GlobalRumConstants.SESSION_ID_KEY, sessionId)
                     .emit()
             }
 

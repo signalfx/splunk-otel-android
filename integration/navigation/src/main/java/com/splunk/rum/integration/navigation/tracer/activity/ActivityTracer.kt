@@ -17,8 +17,9 @@
 package com.splunk.rum.integration.navigation.tracer.activity
 
 import com.splunk.android.common.logger.Logger
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
+import com.splunk.rum.integration.navigation.RumConstant
 import com.splunk.rum.integration.navigation.tracer.ActiveSpan
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
@@ -43,7 +44,7 @@ internal class ActivityTracer(
 
     fun startActivityCreation(): ActivityTracer {
         Logger.d("ActivityTracer", "startActivityCreation")
-        activeSpan.startSpan { createSpan(RumConstants.NAVIGATION_SPAN_NAME) }
+        activeSpan.startSpan { createSpan(GlobalRumConstants.NAVIGATION_SPAN_NAME) }
         return this
     }
 
@@ -53,7 +54,7 @@ internal class ActivityTracer(
             return this
         }
 
-        activeSpan.startSpan { createSpan(RumConstants.NAVIGATION_RESTARTED_SPAN_NAME) }
+        activeSpan.startSpan { createSpan(RumConstant.NAVIGATION_RESTARTED_SPAN_NAME) }
         return this
     }
 
@@ -81,8 +82,8 @@ internal class ActivityTracer(
         ScreenNameTracker.screenName = screenName
 
         val spanBuilder = tracer.spanBuilder(spanName)
-            .setAttribute(RumConstants.NAVIGATION_ACTIVITY_NAME_KEY, activityName)
-            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_UI)
+            .setAttribute(RumConstant.NAVIGATION_ACTIVITY_NAME_KEY, activityName)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstant.COMPONENT_NAVIGATION)
 
         return spanBuilder.startSpan()
     }
