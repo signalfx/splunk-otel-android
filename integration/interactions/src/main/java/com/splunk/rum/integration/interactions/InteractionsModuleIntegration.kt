@@ -191,11 +191,11 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
                 Logger.d(TAG) { "onFrustration(interaction: $interaction)" }
 
-                logger.get(RumConstants.RUM_TRACER_NAME)
+                logger.get(GlobalRumConstants.RUM_TRACER_NAME)
                     .logRecordBuilder()
                     .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                    .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, FRUSTRATION_EVENT_NAME)
-                    .setAttribute(RumConstants.COMPONENT_KEY, USER_INTERACTION_COMPONENT)
+                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, FRUSTRATION_EVENT_NAME)
+                    .setAttribute(GlobalRumConstants.COMPONENT_KEY, USER_INTERACTION_COMPONENT)
                     .setAttribute(attributeKeyFrustrationType, "rage")
                     .setAttribute(attributeKeyInteractionType, "tap")
                     .setAttribute(RumConstants.INTERACTIONS_TARGET_XPATH_KEY, XpathBuilder.build(interaction))
