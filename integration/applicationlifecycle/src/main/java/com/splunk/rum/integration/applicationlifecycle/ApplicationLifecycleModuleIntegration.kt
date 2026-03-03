@@ -100,14 +100,14 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
             .setTimestamp(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)
             .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.APP_LIFECYCLE_LOG_NAME)
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_LIFECYCLE)
-            .setAttribute(RumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
+            .setAttribute(GlobalRumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
             .emit()
     }
 
     private val AppState.attributeValue: String
         get() = when (this) {
-            AppState.CREATED -> RumConstants.APP_STATE_CREATED
-            AppState.FOREGROUND -> RumConstants.APP_STATE_FOREGROUND
-            AppState.BACKGROUND -> RumConstants.APP_STATE_BACKGROUND
+            AppState.CREATED -> GlobalRumConstants.APP_STATE_CREATED
+            AppState.FOREGROUND -> GlobalRumConstants.APP_STATE_FOREGROUND
+            AppState.BACKGROUND -> GlobalRumConstants.APP_STATE_BACKGROUND
         }
 }

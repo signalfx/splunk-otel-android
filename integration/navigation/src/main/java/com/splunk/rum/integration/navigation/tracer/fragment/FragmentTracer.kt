@@ -43,7 +43,7 @@ internal class FragmentTracer(
 
     fun startFragmentCreation(): FragmentTracer {
         Logger.d("FragmentTracer", "startFragmentCreation")
-        activeSpan.startSpan { createSpan(RumConstant.NAVIGATION_SPAN_NAME) }
+        activeSpan.startSpan { createSpan(GlobalRumConstants.NAVIGATION_SPAN_NAME) }
         return this
     }
 

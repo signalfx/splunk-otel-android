@@ -81,7 +81,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             val timeNow = Instant.now()
 
             val screenSpan = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
-                .spanBuilder(RumConstant.NAVIGATION_SPAN_NAME)
+                .spanBuilder(GlobalRumConstants.NAVIGATION_SPAN_NAME)
                 .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstant.COMPONENT_NAVIGATION)
                 .setStartTimestamp(timeNow)
                 .startSpan()

@@ -29,7 +29,11 @@ class SessionReplaySessionIdLogProcessor(private val sessionManager: ISplunkSess
             val id = sessionManager.sessionId(logRecordData.timestampEpochNanos / 1_000_000)
             logRecord.setAttribute(GlobalRumConstants.SESSION_ID_KEY, id)
                 .setAttribute(GlobalRumConstants.SESSION_RUM_ID_KEY, id)
-                .setAttribute(GlobalRumConstants.SCRIPT_INSTANCE_KEY, id.take(GlobalRumConstants.SCRIPT_INSTANCE_LENGTH))
+                .setAttribute(GlobalRumConstants.SCRIPT_INSTANCE_KEY, id.take(SCRIPT_ID_LENGTH))
         }
+    }
+
+    private companion object {
+        const val SCRIPT_ID_LENGTH = 16
     }
 }

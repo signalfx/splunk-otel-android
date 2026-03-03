@@ -30,14 +30,23 @@ object GlobalRumConstants {
     const val LOG_BODY_ATTRIBUTE = "body"
     const val SESSION_START_EVENT_NAME = "session.start"
     const val DEFAULT_SCREEN_NAME = "unknown"
+    const val SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME = "SessionReplayDataScopeName"
+
+    // Navigation
+    const val NAVIGATION_SPAN_NAME = "Created"
+    const val APP_START_SPAN_NAME = "AppStart"
 
     // Components
-    const val COMPONENT_SESSION_REPLAY = "session.replay"
     const val COMPONENT_HTTP = "http"
     const val COMPONENT_ERROR = "error"
     const val COMPONENT_CRASH = "crash"
     const val COMPONENT_CUSTOM_EVENT = "custom-event"
     const val COMPONENT_CUSTOM_WORKFLOW = "custom-workflow"
+
+    // Application lifecycle states
+    const val APP_STATE_CREATED = "created"
+    const val APP_STATE_FOREGROUND = "foreground"
+    const val APP_STATE_BACKGROUND = "background"
 
     // Attribute keys
     val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey(EVENT_NAME)
@@ -48,25 +57,8 @@ object GlobalRumConstants {
     val USER_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("user.anonymous_id")
     val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
-
-    /**
-     * Session Replay instrumentation
-     */
-
-    const val SCRIPT_INSTANCE_LENGTH = 16
-    const val SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME = "SessionReplayDataScopeName"
-    const val SESSION_REPLAY_DATA_EVENT_NAME = "session_replay_data"
-    const val SESSION_REPLAY_IS_RECORDING_EVENT_NAME = "splunk.sessionReplay.isRecording"
-    const val SESSION_REPLAY_PROVIDER = "splunk"
-
-    // Attribute key
     val SCRIPT_INSTANCE_KEY: AttributeKey<String> = AttributeKey.stringKey("splunk.scriptInstance")
-    val SESSION_REPLAY_KEY: AttributeKey<String> = AttributeKey.stringKey("splunk.sessionReplay")
-    val SESSION_REPLAY_TOTAL_CHUNKS_KEY: AttributeKey<Double> = AttributeKey.doubleKey("rr-web.total-chunks")
-    val SESSION_REPLAY_CHUNK_KEY: AttributeKey<Double> = AttributeKey.doubleKey("rr-web.chunk")
-    val SESSION_REPLAY_EVENT_INDEX_KEY: AttributeKey<Long> = AttributeKey.longKey("rr-web.event")
-    val SESSION_REPLAY_OFFSET_KEY: AttributeKey<Double> = AttributeKey.doubleKey("rr-web.offset")
-    val SESSION_REPLAY_SEGMENT_METADATA_KEY: AttributeKey<String> = AttributeKey.stringKey("segmentMetadata")
+    val APP_STATE_KEY: AttributeKey<String> = AttributeKey.stringKey("android.app.state")
 
     /**
      * Custom event and workflow instrumentation
