@@ -25,10 +25,6 @@ object GlobalRumConstants {
      */
 
     const val RUM_TRACER_NAME = "SplunkRum"
-    const val EVENT_NAME = "event.name"
-    const val DEFAULT_LOG_EVENT_NAME = "splunk.log"
-    const val LOG_BODY_ATTRIBUTE = "body"
-    const val SESSION_START_EVENT_NAME = "session.start"
     const val DEFAULT_SCREEN_NAME = "unknown"
     const val SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME = "SessionReplayDataScopeName"
 
@@ -40,7 +36,6 @@ object GlobalRumConstants {
     const val COMPONENT_HTTP = "http"
     const val COMPONENT_ERROR = "error"
     const val COMPONENT_CRASH = "crash"
-    const val COMPONENT_CUSTOM_WORKFLOW = "custom-workflow"
 
     // Application lifecycle states
     const val APP_STATE_CREATED = "created"
@@ -48,29 +43,16 @@ object GlobalRumConstants {
     const val APP_STATE_BACKGROUND = "background"
 
     // Attribute keys
-    val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey(EVENT_NAME)
+    val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
     val COMPONENT_KEY: AttributeKey<String> = AttributeKey.stringKey("component")
     val SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.id")
     val PREVIOUS_SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.previous_id")
-    val SESSION_RUM_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("splunk.rumSessionId")
-    val USER_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("user.anonymous_id")
     val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
-    val SCRIPT_INSTANCE_KEY: AttributeKey<String> = AttributeKey.stringKey("splunk.scriptInstance")
     val APP_STATE_KEY: AttributeKey<String> = AttributeKey.stringKey("android.app.state")
-
-    /**
-     * Error/crash instrumentation
-     */
-
-    const val CRASH_INSTRUMENTATION_SCOPE_NAME = "io.opentelemetry.crash"
-    const val ERROR_TRUE_VALUE = "true"
 
     // Attribute keys
     val ERROR_KEY: AttributeKey<String> = AttributeKey.stringKey("error")
-    val APPLICATION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("service.application_id")
-    val APP_VERSION_CODE_KEY: AttributeKey<String> = AttributeKey.stringKey("service.version_code")
-    val SPLUNK_BUILD_ID: AttributeKey<String> = AttributeKey.stringKey("splunk.build_id")
 
     /**
      * Network instrumentation

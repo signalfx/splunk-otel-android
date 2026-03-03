@@ -62,7 +62,7 @@ class AgentIntegration private constructor(context: Context) {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME)
                     .logRecordBuilder()
-                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, GlobalRumConstants.SESSION_START_EVENT_NAME)
+                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_START_EVENT_NAME)
                     .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
                     .setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
                     .setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)

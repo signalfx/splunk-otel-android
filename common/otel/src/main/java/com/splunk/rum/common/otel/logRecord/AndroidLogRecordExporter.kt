@@ -18,6 +18,7 @@ package com.splunk.rum.common.otel.logRecord
 
 import com.splunk.android.common.job.IJobManager
 import com.splunk.android.common.job.JobIdStorage
+import com.splunk.rum.common.otel.RumConstants
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
@@ -90,7 +91,7 @@ internal class AndroidLogRecordExporter(
              */
             val spanName = (log as ExtendedLogRecordData).eventName
                 ?: log.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY)
-                ?: GlobalRumConstants.DEFAULT_LOG_EVENT_NAME
+                ?: RumConstants.DEFAULT_LOG_EVENT_NAME
 
             // traceId and spanId should be inside the context already from global OTel instance
             val spanBuilder = SplunkOpenTelemetrySdk.instance!!.sdkTracerProvider.get(GlobalRumConstants.RUM_TRACER_NAME)
@@ -105,11 +106,11 @@ internal class AndroidLogRecordExporter(
 
             try {
                 if (log.bodyValue != null) {
-                    spanBuilder.setAttribute(GlobalRumConstants.LOG_BODY_ATTRIBUTE, log.bodyValue.toString())
+                    spanBuilder.setAttribute(RumConstants.LOG_BODY_ATTRIBUTE, log.bodyValue.toString())
                 }
 
                 log.attributes.asMap().forEach attrs@{ (key, value) ->
-                    if (key.key == GlobalRumConstants.EVENT_NAME) {
+                    if (key.key == GlobalRumConstants.LOG_EVENT_NAME_KEY.key) {
                         return@attrs
                     }
 
@@ -129,7 +130,7 @@ internal class AndroidLogRecordExporter(
                 val effectiveTimestamp = log.timestampEpochNanos.takeIf { it != 0L }
                     ?: log.observedTimestampEpochNanos
 
-                if (log.instrumentationScopeInfo.name == GlobalRumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
+                if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
                     val span = spanBuilder.setStartTimestamp(effectiveTimestamp, TimeUnit.NANOSECONDS).startSpan()
                     val spanData = (span as? ReadableSpan)?.toSpanData()
                     span.end(effectiveTimestamp, TimeUnit.NANOSECONDS)

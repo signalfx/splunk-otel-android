@@ -54,7 +54,7 @@ class CustomTracking internal constructor() {
     fun trackWorkflow(workflowName: String): Span? {
         val tracer = getTracer() ?: return null
         return tracer.spanBuilder(workflowName)
-            .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_CUSTOM_WORKFLOW)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CUSTOM_WORKFLOW)
             .setAttribute(RumConstants.WORKFLOW_NAME_KEY, workflowName)
             .startSpan()
     }
@@ -80,7 +80,7 @@ class CustomTracking internal constructor() {
         @Suppress("NewApi") // Requires API 26 or core library desugaring
         val timestamp = Instant.now()
         spanBuilder.setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_ERROR)
-            .setAttribute(GlobalRumConstants.ERROR_KEY, GlobalRumConstants.ERROR_TRUE_VALUE)
+            .setAttribute(GlobalRumConstants.ERROR_KEY, RumConstants.ERROR_TRUE_VALUE)
             .setStartTimestamp(timestamp)
             .startSpan()
             .recordException(throwable)

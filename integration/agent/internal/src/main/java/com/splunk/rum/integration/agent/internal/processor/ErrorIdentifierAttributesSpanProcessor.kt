@@ -18,8 +18,9 @@ package com.splunk.rum.integration.agent.internal.processor
 
 import android.app.Application
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.integration.agent.internal.RumConstants
+import com.splunk.rum.integration.agent.internal.extentions.splunkBuildId
 import com.splunk.rum.utils.extensions.applicationId
-import com.splunk.rum.utils.extensions.splunkBuildId
 import com.splunk.rum.utils.extensions.versionCode
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
@@ -37,13 +38,13 @@ class ErrorIdentifierAttributesSpanProcessor(application: Application) : SpanPro
             span.getAttribute(GlobalRumConstants.COMPONENT_KEY) == GlobalRumConstants.COMPONENT_CRASH
         ) {
             applicationId?.let {
-                span.setAttribute(GlobalRumConstants.APPLICATION_ID_KEY, it)
+                span.setAttribute(RumConstants.APPLICATION_ID_KEY, it)
             }
             versionCode?.let {
-                span.setAttribute(GlobalRumConstants.APP_VERSION_CODE_KEY, it)
+                span.setAttribute(RumConstants.APP_VERSION_CODE_KEY, it)
             }
             splunkBuildId?.let {
-                span.setAttribute(GlobalRumConstants.SPLUNK_BUILD_ID, it)
+                span.setAttribute(RumConstants.SPLUNK_BUILD_ID, it)
             }
         }
     }
