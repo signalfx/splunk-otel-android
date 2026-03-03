@@ -40,7 +40,6 @@ object GlobalRumConstants {
     const val COMPONENT_HTTP = "http"
     const val COMPONENT_ERROR = "error"
     const val COMPONENT_CRASH = "crash"
-    const val COMPONENT_CUSTOM_EVENT = "custom-event"
     const val COMPONENT_CUSTOM_WORKFLOW = "custom-workflow"
 
     // Application lifecycle states
@@ -59,13 +58,6 @@ object GlobalRumConstants {
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
     val SCRIPT_INSTANCE_KEY: AttributeKey<String> = AttributeKey.stringKey("splunk.scriptInstance")
     val APP_STATE_KEY: AttributeKey<String> = AttributeKey.stringKey("android.app.state")
-
-    /**
-     * Custom event and workflow instrumentation
-     */
-
-    // Attribute keys
-    val WORKFLOW_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("workflow.name")
 
     /**
      * Error/crash instrumentation

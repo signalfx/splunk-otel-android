@@ -40,7 +40,7 @@ class CustomTracking internal constructor() {
     fun trackCustomEvent(name: String, attributes: Attributes = Attributes.empty()) {
         val tracer = getTracer() ?: return
         tracer.spanBuilder(name)
-            .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_CUSTOM_EVENT)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CUSTOM_EVENT)
             .setAllAttributes(attributes)
             .createZeroLengthSpan()
     }
@@ -55,7 +55,7 @@ class CustomTracking internal constructor() {
         val tracer = getTracer() ?: return null
         return tracer.spanBuilder(workflowName)
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_CUSTOM_WORKFLOW)
-            .setAttribute(GlobalRumConstants.WORKFLOW_NAME_KEY, workflowName)
+            .setAttribute(RumConstants.WORKFLOW_NAME_KEY, workflowName)
             .startSpan()
     }
 
