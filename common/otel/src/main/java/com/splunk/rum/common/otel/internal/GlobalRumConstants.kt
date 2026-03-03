@@ -33,7 +33,6 @@ object GlobalRumConstants {
 
     // Components
     const val COMPONENT_UI = "ui"
-    const val COMPONENT_UI_LIFECYCLE = "ui"
     const val COMPONENT_SESSION_REPLAY = "session.replay"
     const val COMPONENT_HTTP = "http"
     const val COMPONENT_ERROR = "error"
@@ -50,23 +49,6 @@ object GlobalRumConstants {
     val USER_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("user.anonymous_id")
     val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
     val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
-
-
-    /**
-     * UI lifecycle instrumentation
-     */
-
-    const val UI_LIFECYCLE_LOG_NAME = "device.app.ui.lifecycle"
-
-    // UI lifecycle types
-    const val UI_LIFECYCLE_ACTIVITY_TYPE = "Activity"
-    const val UI_LIFECYCLE_FRAGMENT_TYPE = "Fragment"
-
-    // Attribute keys
-    val ELEMENT_TYPE_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.type")
-    val ELEMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.name")
-    val ELEMENT_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.id")
-    val LIFECYCLE_ACTION_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.lifecycle.action")
 
     /**
      * Interaction instrumentation
