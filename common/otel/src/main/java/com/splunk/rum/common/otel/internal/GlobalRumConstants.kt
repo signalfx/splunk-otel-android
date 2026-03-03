@@ -21,46 +21,64 @@ import io.opentelemetry.api.common.AttributeKey
 object GlobalRumConstants {
 
     /**
-     * General
+     * Tracer and instrumentation scope names.
      */
-
     const val RUM_TRACER_NAME = "SplunkRum"
-    const val DEFAULT_SCREEN_NAME = "unknown"
     const val SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME = "SessionReplayDataScopeName"
 
-    // Navigation
+    /**
+     * Span names.
+     */
     const val NAVIGATION_SPAN_NAME = "Created"
     const val APP_START_SPAN_NAME = "AppStart"
 
-    // Components
+    /**
+     * Component values.
+     */
     const val COMPONENT_HTTP = "http"
     const val COMPONENT_ERROR = "error"
     const val COMPONENT_CRASH = "crash"
 
-    // Application lifecycle states
+    /**
+     * Application lifecycle state values.
+     */
     const val APP_STATE_CREATED = "created"
     const val APP_STATE_FOREGROUND = "foreground"
     const val APP_STATE_BACKGROUND = "background"
 
-    // Attribute keys
+    /**
+     * Event and common attribute keys.
+     */
     val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
     val COMPONENT_KEY: AttributeKey<String> = AttributeKey.stringKey("component")
-    val SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.id")
-    val PREVIOUS_SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.previous_id")
-    val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
-    val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
     val APP_STATE_KEY: AttributeKey<String> = AttributeKey.stringKey("android.app.state")
 
-    // Attribute keys
+    /**
+     * Session attribute keys.
+     */
+    val SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.id")
+    val PREVIOUS_SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.previous_id")
+
+    /**
+     * Screen values and attribute keys.
+     */
+    const val DEFAULT_SCREEN_NAME = "unknown"
+    val SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("screen.name")
+    val LAST_SCREEN_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("last.screen.name")
+
+    /**
+     * Error attribute keys.
+     */
     val ERROR_KEY: AttributeKey<String> = AttributeKey.stringKey("error")
 
     /**
-     * Network instrumentation
+     * Network headers.
      */
-
     const val SERVER_TIMING_HEADER = "server-timing"
 
-    // Attribute keys
+    /**
+     * Network attribute keys.
+     */
     val LINK_SPAN_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("link.spanId")
     val LINK_TRACE_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("link.traceId")
     val HTTP_REQUEST_BODY_SIZE: AttributeKey<Long> = AttributeKey.longKey("http.request.body.size")
