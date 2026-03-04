@@ -25,9 +25,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
  * @property samplingRate The sampling rate for session replay.
  * 0 means session replay recording cannot be effectively enabled.
  * 0.2 means that, if session replay itself is enabled, only one fifth of sessions can be recorded.
- * 1 means that, if session replay is enabled, all sessions can be recorded.
- *
- * Default value is 0.2.
+ * 1 means that, if session replay is enabled, all sessions can be recorded. Default value is 0.2.
  */
 class SessionReplayModuleConfiguration(val isEnabled: Boolean = true, val samplingRate: Float = 0.2f) :
     ModuleConfiguration {
