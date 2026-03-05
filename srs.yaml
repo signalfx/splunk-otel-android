@@ -1,0 +1,16 @@
+# SRS configuration file
+# Generated from .fossa.yml
+#
+# WARNING: The following FOSSA features are NOT supported in SRS
+# (only skip-files and skip-dirs are supported for now):
+#
+#   - experimental.gradle.configurations-only: ['androidApis', 'androidJdkImage', 'compileOnly', 'compileOnlyApi', 'coreLibraryDesugaring', 'debugApi', 'debugApiElements', 'debugImplementation', 'debugRuntimeClasspath', 'debugRuntimeElements', 'debugRuntimeOnly', 'debugWearApp', 'implementation', 'releaseApi', 'releaseApiElements', 'releaseImplementation', 'releaseRuntimeClasspath', 'releaseRuntimeElements', 'releaseRuntimeOnly', 'releaseVariantReleaseApiPublication', 'releaseVariantReleaseRuntimePublication', 'releaseWearApp', 'runtimeOnly', 'wearApp']
+#     FOSSA was configured to scan only Gradle configurations: ['androidApis', 'androidJdkImage', 'compileOnly', 'compileOnlyApi', 'coreLibraryDesugaring', 'debugApi', 'debugApiElements', 'debugImplementation', 'debugRuntimeClasspath', 'debugRuntimeElements', 'debugRuntimeOnly', 'debugWearApp', 'implementation', 'releaseApi', 'releaseApiElements', 'releaseImplementation', 'releaseRuntimeClasspath', 'releaseRuntimeElements', 'releaseRuntimeOnly', 'releaseVariantReleaseApiPublication', 'releaseVariantReleaseRuntimePublication', 'releaseWearApp', 'runtimeOnly', 'wearApp']
+#     SRS does not support Gradle configuration filtering.
+#     Only 'compileClasspath', 'runtimeClasspath' configurations will be scanned.
+#
+
+scan:
+  scanners:
+  - vuln
+  - license
