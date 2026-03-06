@@ -30,16 +30,18 @@ internal object AuthHeaderBuilder {
      *
      * @param storage The storage instance to read the rumAccessToken from
      * @param logTag The tag to use for logging (typically the class name)
-     * @return A list of headers including Content-Type and X-SF-Token
-     * @throws IllegalStateException if rumAccessToken is not found in storage
+     * @return A list of headers including Content-Type and X-SF-Token, or null if token is missing
      */
-    fun buildHeaders(storage: IAgentStorage, logTag: String): List<Header> {
+    fun buildHeaders(storage: IAgentStorage, logTag: String): List<Header>? {
         val token = storage.readRumAccessToken()
-            ?: throw IllegalStateException(
-                "No rumAccessToken found in storage, but endpoint URL exists. " +
-                    "This indicates internal SDK state corruption or external storage tampering. " +
-                    "Please report this issue to Splunk RUM Android SDK support with logs."
-            )
+            ?: run {
+                Logger.w(
+                    logTag,
+                    "No rumAccessToken found in storage, but endpoint URL exists. " +
+                        "This indicates inconsistent configuration state. Skipping upload."
+                )
+                return null
+            }
 
         Logger.d(logTag, "Adding X-SF-Token header for authentication")
 

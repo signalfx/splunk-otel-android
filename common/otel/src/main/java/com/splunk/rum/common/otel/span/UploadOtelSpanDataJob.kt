@@ -80,6 +80,18 @@ internal class UploadOtelSpanDataJob : JobService() {
                 return@safeSubmit
             }
 
+            val token = storage.readRumAccessToken()
+            if (token == null) {
+                Logger.w(
+                    TAG,
+                    "startUpload() token is not valid, skipping upload. " +
+                        "Endpoint URL exists but token is missing. This may indicate " +
+                        "inconsistent configuration state."
+                )
+                jobFinished(params, false)
+                return@safeSubmit
+            }
+
             val data = storage.readOtelSpanData(id)
 
             if (data == null) {
@@ -89,6 +101,11 @@ internal class UploadOtelSpanDataJob : JobService() {
             }
 
             val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
+                ?: run {
+                    Logger.w(TAG, "startUpload() failed to build headers, skipping upload")
+                    jobFinished(params, false)
+                    return@safeSubmit
+                }
 
             httpClient.makePostRequest(
                 url = url,
