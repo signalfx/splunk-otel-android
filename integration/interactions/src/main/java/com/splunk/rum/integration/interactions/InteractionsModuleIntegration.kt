@@ -36,7 +36,6 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
 
 internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsModuleConfiguration>(
@@ -44,13 +43,6 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 ) {
 
     private const val TAG = "InteractionsIntegration"
-
-    // Frustration Event attributes
-    private const val FRUSTRATION_EVENT_NAME = "frustration"
-    private const val USER_INTERACTION_COMPONENT = "user_interaction"
-
-    private val attributeKeyFrustrationType = AttributeKey.stringKey("frustration.type")
-    private val attributeKeyInteractionType = AttributeKey.stringKey("interaction.type")
 
     override fun onAttach(context: Context) {
         val application = context.applicationContext as Application
@@ -194,10 +186,10 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 logger.get(GlobalRumConstants.RUM_TRACER_NAME)
                     .logRecordBuilder()
                     .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, FRUSTRATION_EVENT_NAME)
-                    .setAttribute(GlobalRumConstants.COMPONENT_KEY, USER_INTERACTION_COMPONENT)
-                    .setAttribute(attributeKeyFrustrationType, "rage")
-                    .setAttribute(attributeKeyInteractionType, "tap")
+                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.FRUSTRATIONS_EVENT_NAME)
+                    .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_FRUSTRATIONS)
+                    .setAttribute(RumConstants.FRUSTRATIONS_TYPE, "rage")
+                    .setAttribute(RumConstants.FRUSTRATIONS_EVENT_NAME, "tap")
                     .setAttribute(RumConstants.INTERACTIONS_TARGET_XPATH_KEY, XpathBuilder.build(interaction))
                     .emit()
             }
