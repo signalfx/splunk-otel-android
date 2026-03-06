@@ -19,7 +19,7 @@ package com.splunk.rum.integration.customtracking
 import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
@@ -40,7 +40,7 @@ class CustomTracking internal constructor() {
     fun trackCustomEvent(name: String, attributes: Attributes = Attributes.empty()) {
         val tracer = getTracer() ?: return
         tracer.spanBuilder(name)
-            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CUSTOM_EVENT)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CUSTOM_EVENT)
             .setAllAttributes(attributes)
             .createZeroLengthSpan()
     }
@@ -54,7 +54,7 @@ class CustomTracking internal constructor() {
     fun trackWorkflow(workflowName: String): Span? {
         val tracer = getTracer() ?: return null
         return tracer.spanBuilder(workflowName)
-            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CUSTOM_WORKFLOW)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_CUSTOM_WORKFLOW)
             .setAttribute(RumConstants.WORKFLOW_NAME_KEY, workflowName)
             .startSpan()
     }
@@ -79,8 +79,8 @@ class CustomTracking internal constructor() {
         }
         @Suppress("NewApi") // Requires API 26 or core library desugaring
         val timestamp = Instant.now()
-        spanBuilder.setAttribute(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_ERROR)
-            .setAttribute(RumConstants.ERROR_KEY, "true")
+        spanBuilder.setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_ERROR)
+            .setAttribute(GlobalRumConstants.ERROR_KEY, RumConstants.ERROR_TRUE_VALUE)
             .setStartTimestamp(timestamp)
             .startSpan()
             .recordException(throwable)
@@ -93,7 +93,7 @@ class CustomTracking internal constructor() {
      * @return A Tracer instance if available, or null if the OpenTelemetry instance is null.
      */
     private fun getTracer(): Tracer? =
-        SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.get(RumConstants.RUM_TRACER_NAME).also {
+        SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.get(GlobalRumConstants.RUM_TRACER_NAME).also {
             if (it == null) {
                 Logger.e(
                     TAG,

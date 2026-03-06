@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.httpurlconnection.auto
 
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.utils.ServerTimingHeaderParser
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context
@@ -26,7 +26,7 @@ import java.net.URLConnection
 internal class HttpURLAdditionalAttributesExtractor : AttributesExtractor<URLConnection, Int> {
 
     override fun onStart(attributes: AttributesBuilder, parentContext: Context, connection: URLConnection) {
-        attributes.put(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_HTTP)
+        attributes.put(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_HTTP)
     }
 
     override fun onEnd(
@@ -42,10 +42,10 @@ internal class HttpURLAdditionalAttributesExtractor : AttributesExtractor<URLCon
 
     private fun addPayloadAttributes(attributes: AttributesBuilder, connection: URLConnection) {
         val requestBodySize: Long? = connection.getRequestProperty("Content-Length")?.toLongOrNull()?.sanitizeUnknown()
-        attributes.put(RumConstants.HTTP_REQUEST_BODY_SIZE, requestBodySize)
+        attributes.put(GlobalRumConstants.HTTP_REQUEST_BODY_SIZE, requestBodySize)
 
         val responseBodySize: Long? = connection.getHeaderField("Content-Length")?.toLongOrNull()?.sanitizeUnknown()
-        attributes.put(RumConstants.HTTP_RESPONSE_BODY_SIZE, responseBodySize)
+        attributes.put(GlobalRumConstants.HTTP_RESPONSE_BODY_SIZE, responseBodySize)
     }
 
     // HTTP spec uses -1 to indicate unknown length. Return null instead of -1.
@@ -53,7 +53,7 @@ internal class HttpURLAdditionalAttributesExtractor : AttributesExtractor<URLCon
 
     private fun addServerContext(attributes: AttributesBuilder, connection: URLConnection) {
         connection.headerFields.forEach { header ->
-            if (!header.key.equals(RumConstants.SERVER_TIMING_HEADER, ignoreCase = true)) {
+            if (!header.key.equals(GlobalRumConstants.SERVER_TIMING_HEADER, ignoreCase = true)) {
                 return@forEach
             }
 
@@ -62,8 +62,8 @@ internal class HttpURLAdditionalAttributesExtractor : AttributesExtractor<URLCon
             header.value.forEach { headerValue ->
                 val serverTraceContext = ServerTimingHeaderParser.parse(headerValue)
                 serverTraceContext?.let {
-                    attributes.put(RumConstants.LINK_TRACE_ID_KEY, it.traceId)
-                    attributes.put(RumConstants.LINK_SPAN_ID_KEY, it.spanId)
+                    attributes.put(GlobalRumConstants.LINK_TRACE_ID_KEY, it.traceId)
+                    attributes.put(GlobalRumConstants.LINK_SPAN_ID_KEY, it.spanId)
                 }
             }
         }
