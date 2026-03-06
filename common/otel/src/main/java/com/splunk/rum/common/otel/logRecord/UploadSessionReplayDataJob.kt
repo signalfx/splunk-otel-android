@@ -79,6 +79,20 @@ internal class UploadSessionReplayDataJob : JobService() {
                 return@safeSubmit
             }
 
+            val token = storage.readRumAccessToken()
+            if (token == null) {
+                Logger.w(
+                    TAG,
+                    "startUpload() token is not valid, skipping upload. " +
+                        "Endpoint URL exists but token is missing. This may indicate " +
+                        "inconsistent configuration state. Re-buffering session replay ID for retry when configuration recovers."
+                )
+                storage.addBufferedSessionReplayId(id)
+                jobIdStorage.delete(id)
+                jobFinished(params, false)
+                return@safeSubmit
+            }
+
             val dataFile = storage.getOtelSessionReplayDataFile(id)
 
             if (dataFile == null) {
@@ -88,6 +102,17 @@ internal class UploadSessionReplayDataJob : JobService() {
             }
 
             val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
+                ?: run {
+                    Logger.w(
+                        TAG,
+                        "startUpload() failed to build headers, skipping upload. " +
+                            "Re-buffering session replay ID for retry when configuration recovers."
+                    )
+                    storage.addBufferedSessionReplayId(id)
+                    jobIdStorage.delete(id)
+                    jobFinished(params, false)
+                    return@safeSubmit
+                }
 
             httpClient.makePostRequest(
                 url = url,
