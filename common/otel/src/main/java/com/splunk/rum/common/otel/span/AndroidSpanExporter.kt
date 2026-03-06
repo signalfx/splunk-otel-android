@@ -60,15 +60,15 @@ internal class AndroidSpanExporter(
         }
 
         val hasEndpoint = agentStorage.readTracesBaseUrl() != null
+        val hasToken = agentStorage.readRumAccessToken() != null
 
         return when {
-            !hasEndpoint || (deferredUntilForeground && !isForeground) -> {
-                // Just store span ID for deferred upload
+            !hasEndpoint || !hasToken || (deferredUntilForeground && !isForeground) -> {
                 agentStorage.addBufferedSpanId(spansID)
                 CompletableResultCode.ofSuccess()
             }
             else -> {
-                // Schedule upload immediately
+                // Schedule upload immediately (both endpoint and token are available)
                 jobManager.scheduleJob(UploadOtelSpanData(spansID, jobIdStorage))
                 // Also schedule previously buffered spans
                 flushBufferedSpanIds()
@@ -78,7 +78,9 @@ internal class AndroidSpanExporter(
     }
 
     override fun flush(): CompletableResultCode {
-        if (agentStorage.readTracesBaseUrl() != null) {
+        val hasEndpoint = agentStorage.readTracesBaseUrl() != null
+        val hasToken = agentStorage.readRumAccessToken() != null
+        if (hasEndpoint && hasToken) {
             flushBufferedSpanIds()
         }
         return CompletableResultCode.ofSuccess()

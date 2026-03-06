@@ -85,8 +85,10 @@ internal class UploadOtelSpanDataJob : JobService() {
                     TAG,
                     "startUpload() token is not valid, skipping upload. " +
                         "Endpoint URL exists but token is missing. This may indicate " +
-                        "inconsistent configuration state."
+                        "inconsistent configuration state. Re-buffering span ID for retry when configuration recovers."
                 )
+                storage.addBufferedSpanId(id)
+                jobIdStorage.delete(id)
                 jobFinished(params, false)
                 return@safeSubmit
             }
@@ -101,7 +103,13 @@ internal class UploadOtelSpanDataJob : JobService() {
 
             val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
                 ?: run {
-                    Logger.w(TAG, "startUpload() failed to build headers, skipping upload")
+                    Logger.w(
+                        TAG,
+                        "startUpload() failed to build headers, skipping upload. " +
+                            "Re-buffering span ID for retry when configuration recovers."
+                    )
+                    storage.addBufferedSpanId(id)
+                    jobIdStorage.delete(id)
                     jobFinished(params, false)
                     return@safeSubmit
                 }
