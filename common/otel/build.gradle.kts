@@ -42,4 +42,6 @@ dependencies {
     implementation(Dependencies.SessionReplay.commonHttp)
     implementation(Dependencies.SessionReplay.commonStorage)
     implementation(Dependencies.SessionReplay.commonUtils)
+
+    testImplementation(Dependencies.Test.junit)
 }

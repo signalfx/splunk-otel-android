@@ -19,7 +19,6 @@ package com.splunk.rum.integration.navigation
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.os.Bundle
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
@@ -73,7 +72,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
     private val navigationListener = object : Navigation.Listener {
         override fun onScreenNameChanged(screenName: String) {
-            Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
+            Logger.d(TAG) { "onScreenNameChanged(screenName: $screenName)" }
 
             val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider ?: return
 

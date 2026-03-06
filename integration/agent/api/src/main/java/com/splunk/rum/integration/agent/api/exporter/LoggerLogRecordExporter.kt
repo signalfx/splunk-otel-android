@@ -18,7 +18,8 @@ package com.splunk.rum.integration.agent.api.exporter
 
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
-import io.opentelemetry.api.common.Attributes
+import com.splunk.rum.common.otel.extensions.joinToString
+import com.splunk.rum.common.otel.internal.RumConstants
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
@@ -35,28 +36,34 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
 
         logs.forEachFast { log ->
             val instrumentationScopeInfo = log.instrumentationScopeInfo
-            val bodyValue = log.bodyValue
-            val bodyInfo = if (bodyValue.toString().startsWith("ValueBytes{")) {
-                "ValueBytes(size=${bodyValue.toString().length} chars)"
-            } else {
-                bodyValue.toString()
+
+            /**
+             * FIXME
+             *
+             * This is a simple hack that ensures that only logs from the session replay instrumentation are
+             * processed by this exporter, because all other logs are currently transformed into spans
+             * and would therefore be logged twice.
+             *
+             * This should be reworked into a more general solution that properly resolves the logging duplication.
+             */
+            if (instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
+                return@forEachFast
             }
-            Logger.i(
-                TAG,
-                "bodyValue=$bodyInfo, " +
-                    "severityText=${log.severityText}, " +
+
+            Logger.i(TAG) {
+                "severityText=${log.severityText}, " +
                     "severity=${log.severity}, " +
                     "timestampEpochNanos=${log.timestampEpochNanos}, " +
                     "observedTimestampEpochNanos=${log.observedTimestampEpochNanos}, " +
                     "traceId=${log.spanContext.traceId}, " +
                     "spanId=${log.spanContext.spanId}, " +
                     "traceFlags=${log.spanContext.traceFlags}, " +
-                    "resources=${log.resource.attributes.toSplunkString()}, " +
-                    "attributes=${log.attributes.toSplunkString()}, " +
+                    "resources=${log.resource.attributes.joinToString(", ", "[", "]")}, " +
+                    "attributes=${log.attributes.joinToString(", ", "[", "]")}, " +
                     "totalAttributeCount=${log.totalAttributeCount}, " +
                     "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
                     "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
-            )
+            }
         }
 
         return CompletableResultCode.ofSuccess()
@@ -69,10 +76,6 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
     } else {
         flush()
     }
-
-    private fun Attributes.toSplunkString(): String = asMap()
-        .toList()
-        .joinToString(", ", "[", "]") { "${it.first}=${it.second}" }
 
     private companion object {
         const val TAG = "LoggerLogRecordExporter"

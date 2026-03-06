@@ -94,7 +94,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
             return
         }
 
-        Logger.d(TAG, "Creating log for app lifecycle event: $applicationLifecycleData")
+        Logger.d(TAG) { "Creating log for app lifecycle event: $applicationLifecycleData" }
         logger.get(RumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)

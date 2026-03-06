@@ -19,7 +19,9 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import android.os.Build
 import android.webkit.WebView
+import com.splunk.android.common.logger.Log
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
@@ -46,7 +48,6 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.api.trace.Span
-import java.net.URL
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import okhttp3.Call
@@ -67,7 +68,9 @@ class SplunkRum private constructor(
     val openTelemetry: OpenTelemetry,
     private val endpointRef: AtomicReference<EndpointConfiguration?> = AtomicReference(agentConfiguration.endpoint),
     val state: IState = State(agentConfiguration, endpointRef),
-    val session: ISession = Session(SessionState(agentConfiguration.session, sessionManager)),
+    val session: ISession = Session(
+        SessionState(agentConfiguration.session, sessionManager, userManager)
+    ),
     val user: User = User(userManager),
     val globalAttributes: MutableAttributes
 ) {
@@ -121,10 +124,11 @@ class SplunkRum private constructor(
 
     /**
      * This method will enable Splunk Browser-based RUM to integrate with the current Android RUM
-     * Session. It injects a javascript object named "SplunkRumNative" into your WebView which
-     * exposes the Android Session ID to the browser-based RUM javascript implementation.
+     * Session. It injects a JavaScript object named "SplunkRumNative" into your WebView which
+     * exposes Android session APIs (session ID and session metadata) to browser-based RUM
+     * JavaScript implementation.
      *
-     * @param webView The WebView to inject the javascript object into.
+     * @param webView The WebView to inject the JavaScript object into.
      */
     @Deprecated(
         message = "Use SplunkRum.instance.webViewNativeBridge.integrateWithBrowserRum(webView)",
@@ -266,6 +270,9 @@ class SplunkRum private constructor(
             if (instanceInternal != null) {
                 return instance
             }
+
+            Logger.consumers += AndroidLogConsumer()
+            Logger.logLevel = if (agentConfiguration.enableDebugLogging) Log.Level.DEBUG else Log.Level.WARN
 
             require(agentConfiguration.deploymentEnvironment.isNotBlank()) {
                 "deploymentEnvironment cannot be an empty string. Please specify a value like 'dev', 'staging', or 'prod'."

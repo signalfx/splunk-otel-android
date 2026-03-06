@@ -75,9 +75,9 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         }
 
         if (cachedEvents.isNotEmpty()) {
-            Logger.d(TAG, "Processing deferred cache (size: ${cachedEvents.size})")
+            Logger.d(TAG) { "Processing deferred cache (size: ${cachedEvents.size})" }
             cachedEvents.forEachFast {
-                Logger.d(TAG, "Processing cached event: ${it.name}")
+                Logger.d(TAG) { "Processing cached event: ${it.name}" }
                 reportEventInternal(it.startTimestamp, it.endTimestamp, it.name)
             }
         }
@@ -87,26 +87,23 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
     private val applicationStartupTimekeeperListener = object : ApplicationStartupTimekeeper.Listener {
         override fun onColdStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
-            Logger.d(
-                TAG,
+            Logger.d(TAG) {
                 "onColdStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
-            )
+            }
             reportEvent(startTimestamp, endTimestamp, "cold")
         }
 
         override fun onWarmStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
-            Logger.d(
-                TAG,
+            Logger.d(TAG) {
                 "onWarmStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
-            )
+            }
             reportEvent(startTimestamp, endTimestamp, "warm")
         }
 
         override fun onHotStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
-            Logger.d(
-                TAG,
+            Logger.d(TAG) {
                 "onHotStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
-            )
+            }
             reportEvent(startTimestamp, endTimestamp, "hot")
         }
     }
@@ -119,7 +116,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             }
 
             if (!isInstallComplete) {
-                Logger.d(TAG, "reportEvent() - install not complete, caching event: $name")
+                Logger.d(TAG) { "reportEvent() - install not complete, caching event: $name" }
                 cache += StartupData(startTimestamp, endTimestamp, name)
                 return
             }
@@ -130,11 +127,9 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
     }
 
     private fun reportEventInternal(startTimestamp: Long, endTimestamp: Long, name: String) {
-        Logger.d(
-            TAG,
-            "reportEventInternal() - name: $name " +
-                "isInitializationReported: $isInitializationReported"
-        )
+        Logger.d(TAG) {
+            "reportEventInternal() - name: $name isInitializationReported: $isInitializationReported"
+        }
 
         if (isInitializationReported) {
             Logger.d(TAG, "reportEventInternal() - skipping, already reported")
@@ -147,7 +142,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             return
         }
 
-        Logger.d(TAG, "reportEventInternal() - SDK ready, creating span for: $name")
+        Logger.d(TAG) { "reportEventInternal() - SDK ready, creating span for: $name" }
 
         isInitializationReported = true
 
@@ -166,7 +161,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             .setAttribute("start.type", name)
             .end(endTimestamp.toInstant())
 
-        Logger.d(TAG, "reportEventInternal() - span sent successfully for: $name")
+        Logger.d(TAG) { "reportEventInternal() - span sent successfully for: $name" }
     }
 
     private fun reportInitializeSpan(span: Span, provider: SdkTracerProvider, asSibling: Boolean = false) {
@@ -182,11 +177,10 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         val initEndTimestamp =
             firstInitialization.startTimestamp + (lastInitialization.endElapsed!! - firstInitialization.startElapsed)
 
-        Logger.d(
-            TAG,
-            "reportAppStart() initStartTimestamp: ${firstInitialization.startTimestamp }, " +
+        Logger.d(TAG) {
+            "reportAppStart() initStartTimestamp: ${firstInitialization.startTimestamp}, " +
                 "initEndTimestamp: $initEndTimestamp, duration: ${initEndTimestamp - firstInitialization.startTimestamp}ms"
-        )
+        }
 
         val initSpan = provider.get(RumConstants.RUM_TRACER_NAME)
             .spanBuilder("SplunkRum.initialize")

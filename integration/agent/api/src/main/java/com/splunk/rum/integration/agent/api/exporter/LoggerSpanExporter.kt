@@ -17,7 +17,8 @@
 package com.splunk.rum.integration.agent.api.exporter
 
 import com.splunk.android.common.logger.Logger
-import io.opentelemetry.api.common.Attributes
+import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.rum.common.otel.extensions.joinToString
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
@@ -32,20 +33,20 @@ internal class LoggerSpanExporter : SpanExporter {
             return CompletableResultCode.ofFailure()
         }
 
-        for (span in spans) {
+        spans.forEachFast { span ->
             val instrumentationScopeInfo = span.instrumentationScopeInfo
-            Logger.i(
-                TAG,
+
+            Logger.i(TAG) {
                 "name=${span.name}, " +
                     "traceId=${span.traceId}, " +
                     "spanId=${span.spanId}, " +
                     "parentSpanId=${span.parentSpanId}, " +
                     "kind=${span.kind}, " +
-                    "resources=${span.resource.attributes.toSplunkString()}, " +
-                    "attributes=${span.attributes.toSplunkString()}, " +
+                    "resources=${span.resource.attributes.joinToString(", ", "[", "]")}, " +
+                    "attributes=${span.attributes.joinToString(", ", "[", "]")}, " +
                     "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
                     "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
-            )
+            }
         }
 
         return CompletableResultCode.ofSuccess()
@@ -58,10 +59,6 @@ internal class LoggerSpanExporter : SpanExporter {
     } else {
         flush()
     }
-
-    private fun Attributes.toSplunkString(): String = asMap()
-        .toList()
-        .joinToString(", ", "[", "]") { "${it.first}=${it.second}" }
 
     private companion object {
         const val TAG = "LoggerSpanExporter"

@@ -149,7 +149,9 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 null
             }
 
-            Logger.d(TAG, "onInteraction(actionName: $actionName, targetType: $targetType, interaction: $interaction)")
+            Logger.d(TAG) {
+                "onInteraction(actionName: $actionName, targetType: $targetType, interaction: $interaction)"
+            }
 
             val log = logger.get(RumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()

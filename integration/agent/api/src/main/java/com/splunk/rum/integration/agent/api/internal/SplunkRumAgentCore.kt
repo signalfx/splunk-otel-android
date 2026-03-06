@@ -18,7 +18,6 @@ package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
 import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.logger.consumers.AndroidLogConsumer
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.common.storage.AgentStorage
@@ -34,6 +33,8 @@ import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.agent.internal.processor.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.LastScreenNameSpanProcessor
+import com.splunk.rum.integration.agent.internal.processor.SessionActivityLogProcessor
+import com.splunk.rum.integration.agent.internal.processor.SessionActivitySpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.SessionReplaySessionIdLogProcessor
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
@@ -68,10 +69,6 @@ internal object SplunkRumAgentCore {
 
         if (!shouldBeRunning) return OpenTelemetry.noop()
 
-        if (agentConfiguration.enableDebugLogging) {
-            Logger.consumers += AndroidLogConsumer()
-        }
-
         Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
         sessionManager.reset()
@@ -98,12 +95,14 @@ internal object SplunkRumAgentCore {
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
             .addSpanProcessor(GlobalAttributeSpanProcessor(globalAttributes))
+            .addSpanProcessor(SessionActivitySpanProcessor(sessionManager))
             .addSpanProcessor(LastScreenNameSpanProcessor(ScreenNameTracker))
             .joinResources(AgentResource.allResource(application, appInstallationID, finalConfiguration))
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
+            .addLogRecordProcessor(SessionActivityLogProcessor(sessionManager))
             // Session Replay module is special case of Log Records that are NOT converted to Spans.
             .addLogRecordProcessor(SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager))
 
