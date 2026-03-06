@@ -188,8 +188,8 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                     .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
                     .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.FRUSTRATIONS_EVENT_NAME)
                     .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_FRUSTRATIONS)
-                    .setAttribute(RumConstants.FRUSTRATIONS_TYPE, "rage")
-                    .setAttribute(RumConstants.FRUSTRATIONS_EVENT_NAME, "tap")
+                    .setAttribute(RumConstants.FRUSTRATIONS_TYPE, RumConstants.FRUSTRATION_TYPE_RAGE)
+                    .setAttribute(RumConstants.FRUSTRATIONS_INTERACTION_TYPE, RumConstants.FRUSTRATION_INTERACTION_TYPE_TAP)
                     .setAttribute(RumConstants.INTERACTIONS_TARGET_XPATH_KEY, XpathBuilder.build(interaction))
                     .emit()
             }

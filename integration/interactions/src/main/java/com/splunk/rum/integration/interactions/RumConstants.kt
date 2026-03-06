@@ -21,7 +21,7 @@ import io.opentelemetry.api.common.AttributeKey
 internal object RumConstants {
 
     const val COMPONENT_INTERACTIONS = "ui"
-    const val COMPONENT_FRUSTRATIONS = "user_interaction"
+    const val COMPONENT_FRUSTRATIONS = "user-interaction"
 
     const val INTERACTIONS_EVENT_NAME = "action"
     const val FRUSTRATIONS_EVENT_NAME = "frustration"
@@ -36,11 +36,15 @@ internal object RumConstants {
     const val INTERACTIONS_ACTION_ROTATION = "rotation"
     const val INTERACTIONS_ACTION_TAP = "tap"
 
+    // Frustration types
+    const val FRUSTRATION_TYPE_RAGE = "rage"
+    const val FRUSTRATION_INTERACTION_TYPE_TAP = "tap"
+
     // Attribute keys
     val INTERACTIONS_ACTION_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("action.name")
     val INTERACTIONS_TARGET_TYPE_KEY: AttributeKey<String> = AttributeKey.stringKey("target.type")
     val INTERACTIONS_TARGET_XPATH_KEY: AttributeKey<String> = AttributeKey.stringKey("target_xpath")
     val INTERACTIONS_TARGET_ELEMENT_KEY: AttributeKey<String> = AttributeKey.stringKey("target_element")
-    val FRUSTRATIONS_TYPE = AttributeKey.stringKey("frustration.type")
-    val FRUSTRATIONS_INTERACTION_TYPE = AttributeKey.stringKey("interaction.type")
+    val FRUSTRATIONS_TYPE: AttributeKey<String> = AttributeKey.stringKey("frustration_type")
+    val FRUSTRATIONS_INTERACTION_TYPE: AttributeKey<String?>? = AttributeKey.stringKey("interaction_type")
 }
