@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.okhttp3.common
 
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.utils.ServerTimingHeaderParser
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context
@@ -27,7 +27,7 @@ import okhttp3.Response
 class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Chain, Response> {
 
     override fun onStart(attributes: AttributesBuilder, parentContext: Context, chain: Interceptor.Chain) {
-        attributes.put(RumConstants.COMPONENT_KEY, RumConstants.COMPONENT_HTTP)
+        attributes.put(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_HTTP)
     }
 
     override fun onEnd(
@@ -43,11 +43,11 @@ class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Cha
 
     private fun addPayloadAttributes(attributes: AttributesBuilder, chain: Interceptor.Chain, response: Response?) {
         val requestBodySize: Long? = chain.request().header("Content-Length")?.toLongOrNull()?.sanitizeUnknown()
-        attributes.put(RumConstants.HTTP_REQUEST_BODY_SIZE, requestBodySize)
+        attributes.put(GlobalRumConstants.HTTP_REQUEST_BODY_SIZE, requestBodySize)
 
         if (response != null) {
             val responseBodySize: Long? = response.header("Content-Length")?.toLongOrNull()?.sanitizeUnknown()
-            attributes.put(RumConstants.HTTP_RESPONSE_BODY_SIZE, responseBodySize)
+            attributes.put(GlobalRumConstants.HTTP_RESPONSE_BODY_SIZE, responseBodySize)
         }
     }
 
@@ -56,14 +56,14 @@ class OkHttp3AdditionalAttributesExtractor : AttributesExtractor<Interceptor.Cha
 
     private fun addServerContext(attributes: AttributesBuilder, response: Response?) {
         response?.headers?.forEach { header ->
-            if (!header.first.equals(RumConstants.SERVER_TIMING_HEADER, ignoreCase = true)) {
+            if (!header.first.equals(GlobalRumConstants.SERVER_TIMING_HEADER, ignoreCase = true)) {
                 return@forEach
             }
 
             val serverTraceContext = ServerTimingHeaderParser.parse(header.second)
             serverTraceContext?.let {
-                attributes.put(RumConstants.LINK_TRACE_ID_KEY, it.traceId)
-                attributes.put(RumConstants.LINK_SPAN_ID_KEY, it.spanId)
+                attributes.put(GlobalRumConstants.LINK_TRACE_ID_KEY, it.traceId)
+                attributes.put(GlobalRumConstants.LINK_SPAN_ID_KEY, it.spanId)
             }
         }
     }

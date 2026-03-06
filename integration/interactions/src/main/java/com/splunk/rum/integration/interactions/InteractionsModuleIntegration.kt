@@ -29,14 +29,13 @@ import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.Ses
 import com.splunk.android.instrumentation.recording.wireframe.model.Wireframe
 import com.splunk.android.instrumentation.recording.wireframe.stats.WireframeStats
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
 
 internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsModuleConfiguration>(
@@ -44,10 +43,6 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 ) {
 
     private const val TAG = "InteractionsIntegration"
-
-    private val attributeKeyComponent = AttributeKey.stringKey("component")
-    private val attributeKeyActionName = AttributeKey.stringKey("action.name")
-    private val attributeKeyTargetType = AttributeKey.stringKey("target.type")
 
     override fun onAttach(context: Context) {
         val application = context.applicationContext as Application
@@ -107,37 +102,37 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
             val actionName = when (interaction) {
                 is Interaction.Focus ->
-                    "focus"
+                    RumConstants.INTERACTIONS_ACTION_FOCUS
 
                 is Interaction.Keyboard ->
-                    "soft_keyboard"
+                    RumConstants.INTERACTIONS_ACTION_SOFT_KEYBOARD
 
                 is Interaction.Orientation ->
                     return
 
                 is Interaction.PhoneButton ->
-                    "phone_button"
+                    RumConstants.INTERACTIONS_ACTION_PHONE_BUTTON
 
                 is Interaction.Touch.Gesture.DoubleTap ->
-                    "double_tap"
+                    RumConstants.INTERACTIONS_ACTION_DOUBLE_TAP
 
                 is Interaction.Touch.Gesture.LongPress ->
-                    "long_press"
+                    RumConstants.INTERACTIONS_ACTION_LONG_PRESS
 
                 is Interaction.Touch.Gesture.Pinch ->
-                    "pinch"
+                    RumConstants.INTERACTIONS_ACTION_PINCH
 
                 is Interaction.Touch.Gesture.RageTap ->
-                    "rage_tap"
+                    RumConstants.INTERACTIONS_ACTION_RAGE_TAP
 
                 is Interaction.Touch.Gesture.Rotation ->
-                    "rotation"
+                    RumConstants.INTERACTIONS_ACTION_ROTATION
 
                 is Interaction.Touch.Gesture.Swipe ->
                     return
 
                 is Interaction.Touch.Gesture.Tap ->
-                    "tap"
+                    RumConstants.INTERACTIONS_ACTION_TAP
 
                 is Interaction.Touch.Pointer ->
                     return
@@ -153,13 +148,13 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 "onInteraction(actionName: $actionName, targetType: $targetType, interaction: $interaction)"
             }
 
-            val log = logger.get(RumConstants.RUM_TRACER_NAME)
+            val log = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, "action")
-                .setAttribute(attributeKeyComponent, "ui")
-                .setAttribute(attributeKeyActionName, actionName)
-                .setAttribute(attributeKeyTargetType, targetType.orEmpty())
+                .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.INTERACTIONS_EVENT_NAME)
+                .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_INTERACTIONS)
+                .setAttribute(RumConstants.INTERACTIONS_ACTION_NAME_KEY, actionName)
+                .setAttribute(RumConstants.INTERACTIONS_TARGET_TYPE_KEY, targetType.orEmpty())
 
             if (interaction is Interaction.Targetable) {
                 log.setAttribute(

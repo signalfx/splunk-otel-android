@@ -19,7 +19,7 @@ package com.splunk.rum.integration.agent.api.exporter
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.extensions.joinToString
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
@@ -46,7 +46,7 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
              *
              * This should be reworked into a more general solution that properly resolves the logging duplication.
              */
-            if (instrumentationScopeInfo.name != RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
+            if (instrumentationScopeInfo.name != GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
                 return@forEachFast
             }
 
