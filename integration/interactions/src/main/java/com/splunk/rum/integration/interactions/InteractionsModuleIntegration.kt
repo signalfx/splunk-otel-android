@@ -56,7 +56,9 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             }
         }
         setupComposeIdentification()
+
         Interactions.listeners += interactionsListener
+        Interactions.listeners += frustrationsListener
     }
 
     override fun onInstall(
@@ -64,7 +66,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
         oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
-        Logger.d(TAG, "Crash reporting is disabled")
+        // No-op, as Interactions does not require any specific installation steps.
     }
 
     private fun setupComposeIdentification() {
@@ -91,7 +93,8 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 return
             }
 
-            if (interaction is Interaction.Touch.Pointer ||
+            if (interaction is Interaction.Touch.Gesture.RageTap ||
+                interaction is Interaction.Touch.Pointer ||
                 interaction is Interaction.Touch.Continuous &&
                 !interaction.isLast
             ) {
@@ -122,9 +125,6 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 is Interaction.Touch.Gesture.Pinch ->
                     RumConstants.INTERACTIONS_ACTION_PINCH
 
-                is Interaction.Touch.Gesture.RageTap ->
-                    RumConstants.INTERACTIONS_ACTION_RAGE_TAP
-
                 is Interaction.Touch.Gesture.Rotation ->
                     RumConstants.INTERACTIONS_ACTION_ROTATION
 
@@ -134,7 +134,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 is Interaction.Touch.Gesture.Tap ->
                     RumConstants.INTERACTIONS_ACTION_TAP
 
-                is Interaction.Touch.Pointer ->
+                else ->
                     return
             }
 
@@ -169,6 +169,30 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             }
 
             log.emit()
+        }
+    }
+
+    private val frustrationsListener = object : OnInteractionListener {
+        override fun onInteraction(interaction: Interaction, legacyData: LegacyData?) {
+            if (!moduleConfiguration.isEnabled) {
+                return
+            }
+
+            if (interaction is Interaction.Touch.Gesture.RageTap) {
+                val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider ?: return
+
+                Logger.d(TAG) { "onFrustration(interaction: $interaction)" }
+
+                logger.get(GlobalRumConstants.RUM_TRACER_NAME)
+                    .logRecordBuilder()
+                    .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
+                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.FRUSTRATIONS_EVENT_NAME)
+                    .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_FRUSTRATIONS)
+                    .setAttribute(RumConstants.FRUSTRATIONS_TYPE, RumConstants.FRUSTRATION_TYPE_RAGE)
+                    .setAttribute(RumConstants.FRUSTRATIONS_INTERACTION_TYPE, RumConstants.FRUSTRATION_INTERACTION_TYPE_TAP)
+                    .setAttribute(RumConstants.INTERACTIONS_TARGET_XPATH_KEY, XpathBuilder.build(interaction))
+                    .emit()
+            }
         }
     }
 }
