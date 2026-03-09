@@ -14,17 +14,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Refactored RUM constants into global and module-scoped constants
 * Bumped lychee link checker versions
 
-### Version 2.1.7 - 2025-02-24
+### Version 2.1.7 - 2026-02-24
 * Changed the upload method to use file reference instead of byte array directly
 * Debug log optimization
 * Improved Logger integration
 * Fixed the agent to preload storage in content provider
 
-### Version 2.1.6 - 2025-02-17
+### Version 2.1.6 - 2026-02-17
 * Implement new Lifecycle Module
 * Add guardrail and move logic to background thread
 
-### Version 2.1.5 - 2025-02-10
+### Version 2.1.5 - 2026-02-10
 * Update agents documentation
 * Add sampling rate for Session Replay
 * Update lychee link checker
@@ -32,13 +32,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Add Session public callback
 * Update Session Replay and build dependencies
 
-### Version 2.1.4 - 2025-01-28
+### Version 2.1.4 - 2026-01-28
 * Add XPath to interactions
 * Fix missing automatic navigation detection signals for hybrid apps
 * Add agents documentation
 * Improve AppStart measurement for React Native support
 
-### Version 2.1.3 - 2025-01-20
+### Version 2.1.3 - 2026-01-20
 * Add Android app state attribute to crash and ANR spans
 * Add payload attributes to HTTP spans
 * Add android.app.state attribute to crash and ANR spans
