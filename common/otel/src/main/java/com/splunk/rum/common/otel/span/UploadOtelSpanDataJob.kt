@@ -29,6 +29,7 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.safeSubmit
 import com.splunk.android.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.common.otel.http.AuthHeaderBuilder
+import com.splunk.rum.common.otel.http.MissingRumAccessTokenException
 import com.splunk.rum.common.storage.AgentStorage
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutorService
@@ -87,7 +88,13 @@ internal class UploadOtelSpanDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
+            val headers = try {
+                AuthHeaderBuilder.buildHeaders(storage, TAG)
+            } catch (e: MissingRumAccessTokenException) {
+                Logger.e(TAG, "startUpload() failed to build auth headers", e)
+                jobFinished(params, false)
+                return@safeSubmit
+            }
 
             httpClient.makePostRequest(
                 url = url,
