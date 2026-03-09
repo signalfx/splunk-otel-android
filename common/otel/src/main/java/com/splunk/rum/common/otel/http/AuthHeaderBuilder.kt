@@ -26,28 +26,27 @@ import com.splunk.rum.common.storage.IAgentStorage
 internal object AuthHeaderBuilder {
 
     /**
-     * Builds a list of HTTP headers including authentication.
+     * Builds a list of HTTP headers including authentication if a token is available.
      *
      * @param storage The storage instance to read the rumAccessToken from
      * @param logTag The tag to use for logging (typically the class name)
-     * @return A list of headers including Content-Type and X-SF-Token
+     * @return A list of headers including Content-Type and X-SF-Token (if token available)
      */
     fun buildHeaders(storage: IAgentStorage, logTag: String): List<Header> {
         val token = storage.readRumAccessToken()
-        if (token == null) {
+        val headers = mutableListOf(Header("Content-Type", "application/x-protobuf"))
+
+        if (token != null) {
+            headers.add(Header("X-SF-Token", token))
+            Logger.d(logTag, "Adding X-SF-Token header for authentication")
+        } else {
             Logger.w(
                 logTag,
-                "No rumAccessToken found in storage, but endpoint URL exists. " +
-                    "This indicates inconsistent configuration state. Skipping auth header; upload may fail with 401."
+                "No rumAccessToken found in storage. Request may fail authentication. " +
+                    "Ensure EndpointConfiguration was created with a valid token."
             )
-            return listOf(Header("Content-Type", "application/x-protobuf"))
         }
 
-        Logger.d(logTag, "Adding X-SF-Token header for authentication")
-
-        return listOf(
-            Header("Content-Type", "application/x-protobuf"),
-            Header("X-SF-Token", token)
-        )
+        return headers
     }
 }
