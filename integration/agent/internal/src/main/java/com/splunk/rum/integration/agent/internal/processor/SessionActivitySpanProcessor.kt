@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Splunk Inc.
+ * Copyright 2026 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,15 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
-import com.splunk.rum.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) : SpanProcessor {
+class SessionActivitySpanProcessor(private val sessionManager: ISplunkSessionManager) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        if (span.attributes.get(SESSION_ID_KEY) == null) {
-            span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
-        }
-        span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
+        sessionManager.trackSessionActivity()
     }
 
     override fun isStartRequired(): Boolean = true

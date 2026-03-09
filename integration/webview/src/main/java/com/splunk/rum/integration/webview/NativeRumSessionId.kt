@@ -18,12 +18,20 @@ package com.splunk.rum.integration.webview
 
 import android.webkit.JavascriptInterface
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.session.SessionMetadata
 
 /**
- * Object to inject into WebViews as a javascript object, in order to integrate with browser RUM.
+ * Object to inject into WebViews as a JavaScript object, in order to integrate with browser RUM.
  */
 internal class NativeRumSessionId {
     @get:JavascriptInterface
     val nativeSessionId: String
         get() = SplunkRum.instance.session.state.id
+
+    /**
+     * Native session metadata serialized as a JSON object.
+     */
+    @get:JavascriptInterface
+    val nativeSessionMetadata: String
+        get() = SplunkRum.instance.session.state.metadata.toJSONObject().toString()
 }

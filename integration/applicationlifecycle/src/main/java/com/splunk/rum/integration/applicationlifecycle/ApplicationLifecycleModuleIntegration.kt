@@ -22,7 +22,7 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.applicationlifecycle.model.AppState
@@ -95,19 +95,19 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         }
 
         Logger.d(TAG) { "Creating log for app lifecycle event: $applicationLifecycleData" }
-        logger.get(RumConstants.RUM_TRACER_NAME)
+        logger.get(GlobalRumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)
-            .setAttribute(RumConstants.LOG_EVENT_NAME_KEY, RumConstants.APP_LIFECYCLE_NAME)
-            .setAttribute(RumConstants.COMPONENT_KEY, RumConstants.APP_LIFECYCLE_COMPONENT)
-            .setAttribute(RumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
+            .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.APP_LIFECYCLE_LOG_NAME)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_LIFECYCLE)
+            .setAttribute(GlobalRumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
             .emit()
     }
 
     private val AppState.attributeValue: String
         get() = when (this) {
-            AppState.CREATED -> RumConstants.APP_STATE_CREATED
-            AppState.FOREGROUND -> RumConstants.APP_STATE_FOREGROUND
-            AppState.BACKGROUND -> RumConstants.APP_STATE_BACKGROUND
+            AppState.CREATED -> GlobalRumConstants.APP_STATE_CREATED
+            AppState.FOREGROUND -> GlobalRumConstants.APP_STATE_FOREGROUND
+            AppState.BACKGROUND -> GlobalRumConstants.APP_STATE_BACKGROUND
         }
 }
