@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Version 2.1.8 - 2026-03-09
+* Fixed IllegalStateException when rumAccessToken was missing but endpoint URL existed during OTEL span uploads
+* Added SessionMetadata API for custom session metadata
+* Exposed native session metadata to Browser RUM bridge
+* Track rage taps as frustration events in interactions
+* Changed default session replay sampling to 20%
+* Refactored RUM constants into global and module-scoped constants
+* Bumped lychee link checker versions
+
 ### Version 2.1.0 - 2025-11-19
 * Added support for setting EndpointConfiguration after Agent installation
 * Added forceEnableOnLowerApi flag to enable runtime support on devices API 21, 22, and 23
