@@ -30,8 +30,7 @@ internal object AuthHeaderBuilder {
      *
      * @param storage The storage instance to read the rumAccessToken from
      * @param logTag The tag to use for logging (typically the class name)
-     * @return A list of headers including Content-Type and X-SF-Token when token is present;
-     *         Content-Type only when token is missing (upload will likely receive 401).
+     * @return A list of headers including Content-Type and X-SF-Token
      */
     fun buildHeaders(storage: IAgentStorage, logTag: String): List<Header> {
         val token = storage.readRumAccessToken()
