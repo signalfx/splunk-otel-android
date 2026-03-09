@@ -79,21 +79,6 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val token = storage.readRumAccessToken()
-            if (token == null) {
-                Logger.w(
-                    TAG,
-                    "startUpload() token is not valid, skipping upload. " +
-                        "Endpoint URL exists but token is missing. This may indicate " +
-                        "inconsistent configuration state. Data file will be kept for potential retry."
-                )
-                // Delete job ID since job is finished, but keep data file
-                // until configuration is fixed and new logs are exported
-                jobIdStorage.delete(id)
-                jobFinished(params, false)
-                return@safeSubmit
-            }
-
             val dataFile = storage.getOtelLogDataFile(id)
 
             if (dataFile == null) {
@@ -103,18 +88,6 @@ internal class UploadOtelLogRecordDataJob : JobService() {
             }
 
             val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
-                ?: run {
-                    Logger.w(
-                        TAG,
-                        "startUpload() failed to build headers, skipping upload. " +
-                            "Data file will be kept for potential retry."
-                    )
-                    // Delete job ID since job is finished, but keep data file
-                    // until configuration is fixed and new logs are exported
-                    jobIdStorage.delete(id)
-                    jobFinished(params, false)
-                    return@safeSubmit
-                }
 
             httpClient.makePostRequest(
                 url = url,

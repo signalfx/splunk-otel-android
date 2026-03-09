@@ -70,9 +70,8 @@ internal class AndroidLogRecordExporter(
             }
 
             val hasEndpoint = agentStorage.readLogsBaseUrl() != null
-            val hasToken = agentStorage.readRumAccessToken() != null
 
-            if (!hasEndpoint || !hasToken) {
+            if (!hasEndpoint) {
                 agentStorage.addBufferedSessionReplayId(id)
             } else {
                 // Schedule immediate upload and flush any buffered session replay
@@ -169,9 +168,7 @@ internal class AndroidLogRecordExporter(
     }
 
     override fun flush(): CompletableResultCode {
-        val hasEndpoint = agentStorage.readLogsBaseUrl() != null
-        val hasToken = agentStorage.readRumAccessToken() != null
-        if (hasEndpoint && hasToken) {
+        if (agentStorage.readLogsBaseUrl() != null) {
             flushBufferedSessionReplayIds()
         }
         return CompletableResultCode.ofSuccess()

@@ -30,18 +30,19 @@ internal object AuthHeaderBuilder {
      *
      * @param storage The storage instance to read the rumAccessToken from
      * @param logTag The tag to use for logging (typically the class name)
-     * @return A list of headers including Content-Type and X-SF-Token, or null if token is missing
+     * @return A list of headers including Content-Type and X-SF-Token when token is present;
+     *         Content-Type only when token is missing (upload will likely receive 401).
      */
-    fun buildHeaders(storage: IAgentStorage, logTag: String): List<Header>? {
+    fun buildHeaders(storage: IAgentStorage, logTag: String): List<Header> {
         val token = storage.readRumAccessToken()
-            ?: run {
-                Logger.w(
-                    logTag,
-                    "No rumAccessToken found in storage, but endpoint URL exists. " +
-                        "This indicates inconsistent configuration state. Skipping upload."
-                )
-                return null
-            }
+        if (token == null) {
+            Logger.w(
+                logTag,
+                "No rumAccessToken found in storage, but endpoint URL exists. " +
+                    "This indicates inconsistent configuration state. Skipping auth header; upload may fail with 401."
+            )
+            return listOf(Header("Content-Type", "application/x-protobuf"))
+        }
 
         Logger.d(logTag, "Adding X-SF-Token header for authentication")
 
