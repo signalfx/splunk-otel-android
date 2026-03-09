@@ -3,7 +3,7 @@ package com.splunk.rum.integration.crash
 import android.app.Application
 import android.content.Context
 import com.splunk.android.common.utils.AppStateObserver
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import io.opentelemetry.android.instrumentation.crash.CrashDetails
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context as OtelContext
@@ -28,13 +28,13 @@ internal class CrashAttributesExtractor(context: Context) : AttributesExtractor<
         // the others that are captured before OS actually kills the process are just additional
         // info (component=error)
         val component = if (crashHappened.compareAndSet(false, true)) {
-            RumConstants.COMPONENT_CRASH
+            GlobalRumConstants.COMPONENT_CRASH
         } else {
-            RumConstants.COMPONENT_ERROR
+            GlobalRumConstants.COMPONENT_ERROR
         }
-        attributes.put(RumConstants.COMPONENT_KEY, component)
-        attributes.put(RumConstants.ERROR_KEY, "true")
-        appState?.let { attributes.put(RumConstants.APP_STATE_KEY, it) }
+        attributes.put(GlobalRumConstants.COMPONENT_KEY, component)
+        attributes.put(GlobalRumConstants.ERROR_KEY, "true")
+        appState?.let { attributes.put(GlobalRumConstants.APP_STATE_KEY, it) }
     }
 
     override fun onEnd(
@@ -49,19 +49,19 @@ internal class CrashAttributesExtractor(context: Context) : AttributesExtractor<
     private inner class AppStateObserverListener : AppStateObserver.Listener {
 
         override fun onAppStarted() {
-            appState = RumConstants.APP_STATE_CREATED
+            appState = GlobalRumConstants.APP_STATE_CREATED
         }
 
         override fun onAppForegrounded() {
-            appState = RumConstants.APP_STATE_FOREGROUND
+            appState = GlobalRumConstants.APP_STATE_FOREGROUND
         }
 
         override fun onAppBackgrounded() {
-            appState = RumConstants.APP_STATE_BACKGROUND
+            appState = GlobalRumConstants.APP_STATE_BACKGROUND
         }
 
         override fun onAppClosed() {
-            appState = RumConstants.APP_STATE_BACKGROUND
+            appState = GlobalRumConstants.APP_STATE_BACKGROUND
         }
     }
 }

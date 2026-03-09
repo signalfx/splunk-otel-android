@@ -16,20 +16,20 @@
 
 package com.splunk.rum.integration.agent.internal.attributes
 
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 
 object ScreenNameTracker : IScreenNameTracker {
     override var lastScreenName: String? = null
         private set
 
-    override var screenName: String = RumConstants.DEFAULT_SCREEN_NAME
+    override var screenName: String = GlobalRumConstants.DEFAULT_SCREEN_NAME
         set(value) {
-            if (field != value && field != RumConstants.DEFAULT_SCREEN_NAME) {
+            if (field != value && field != GlobalRumConstants.DEFAULT_SCREEN_NAME) {
                 lastScreenName = field
             }
             field = value
-            SplunkInternalGlobalAttributeSpanProcessor.attributes[RumConstants.SCREEN_NAME_KEY] = value
+            SplunkInternalGlobalAttributeSpanProcessor.attributes[GlobalRumConstants.SCREEN_NAME_KEY] = value
         }
         get() = field
 }

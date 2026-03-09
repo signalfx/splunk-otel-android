@@ -16,8 +16,8 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.PREVIOUS_SESSION_ID_KEY
-import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
+import com.splunk.rum.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
+import com.splunk.rum.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan

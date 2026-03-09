@@ -21,7 +21,7 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.toInstant
-import com.splunk.rum.common.otel.internal.RumConstants
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.toSplunkString
 import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modules
@@ -90,21 +90,21 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             Logger.d(TAG) {
                 "onColdStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
             }
-            reportEvent(startTimestamp, endTimestamp, "cold")
+            reportEvent(startTimestamp, endTimestamp, RumConstants.APP_START_TYPE_COLD)
         }
 
         override fun onWarmStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
             Logger.d(TAG) {
                 "onWarmStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
             }
-            reportEvent(startTimestamp, endTimestamp, "warm")
+            reportEvent(startTimestamp, endTimestamp, RumConstants.APP_START_TYPE_WARM)
         }
 
         override fun onHotStarted(startTimestamp: Long, endTimestamp: Long, duration: Long) {
             Logger.d(TAG) {
                 "onHotStarted(startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, duration: $duration ms)"
             }
-            reportEvent(startTimestamp, endTimestamp, "hot")
+            reportEvent(startTimestamp, endTimestamp, RumConstants.APP_START_TYPE_HOT)
         }
     }
 
@@ -146,8 +146,8 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
         isInitializationReported = true
 
-        val span = provider.get(RumConstants.RUM_TRACER_NAME)
-            .spanBuilder(RumConstants.APP_START_NAME)
+        val span = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
+            .spanBuilder(RumConstants.APP_START_SPAN_NAME)
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
@@ -156,9 +156,9 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
         // "unknown" to ensure App Start event doesn't show up under a screen on UI
         span
-            .setAttribute(RumConstants.COMPONENT_KEY, "appstart")
-            .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
-            .setAttribute("start.type", name)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_START)
+            .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, GlobalRumConstants.DEFAULT_SCREEN_NAME)
+            .setAttribute(RumConstants.APP_START_TYPE_KEY, name)
             .end(endTimestamp.toInstant())
 
         Logger.d(TAG) { "reportEventInternal() - span sent successfully for: $name" }
@@ -182,21 +182,21 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
                 "initEndTimestamp: $initEndTimestamp, duration: ${initEndTimestamp - firstInitialization.startTimestamp}ms"
         }
 
-        val initSpan = provider.get(RumConstants.RUM_TRACER_NAME)
-            .spanBuilder("SplunkRum.initialize")
+        val initSpan = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
+            .spanBuilder(RumConstants.APP_START_INITIALIZE_SPAN_NAME)
             .setParent(io.opentelemetry.context.Context.current().with(span))
             .setStartTimestamp(firstInitialization.startTimestamp.toInstant())
             .startSpan()
 
-        initSpan.setAttribute(RumConstants.COMPONENT_KEY, "appstart")
-            .setAttribute(RumConstants.SCREEN_NAME_KEY, RumConstants.DEFAULT_SCREEN_NAME)
+        initSpan.setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_START)
+            .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, GlobalRumConstants.DEFAULT_SCREEN_NAME)
 
         val resources = modules.joinToString(",", "[", "]") {
             it.configuration?.toSplunkString()
                 ?: "${it.name}.enabled:true"
         }
 
-        initSpan.setAttribute("config_settings", resources)
+        initSpan.setAttribute(RumConstants.APP_START_CONFIG_SETTINGS_KEY, resources)
 
         for (module in modules) {
             if (module.initialization == null) {
