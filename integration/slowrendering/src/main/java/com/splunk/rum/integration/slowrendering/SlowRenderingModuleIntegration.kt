@@ -22,8 +22,6 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacySlowRenderingModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.android.instrumentation.slowrendering.SlowRenderingInstrumentation
 
 internal object SlowRenderingModuleIntegration : ModuleIntegration<SlowRenderingModuleConfiguration>(
     defaultModuleConfiguration = SlowRenderingModuleConfiguration()
@@ -33,7 +31,6 @@ internal object SlowRenderingModuleIntegration : ModuleIntegration<SlowRendering
 
     override fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
@@ -47,9 +44,9 @@ internal object SlowRenderingModuleIntegration : ModuleIntegration<SlowRendering
 
         if (isEnabled) {
             Logger.d(TAG, "Installing Slow Rendering Detector")
-            val slowRenderingInstrumentation = SlowRenderingInstrumentation()
-            slowRenderingInstrumentation.setSlowRenderingDetectionPollInterval(interval)
-            slowRenderingInstrumentation.install(oTelInstallationContext)
+//            val slowRenderingInstrumentation = SlowRenderingInstrumentation()
+//            slowRenderingInstrumentation.setSlowRenderingDetectionPollInterval(interval)
+//            slowRenderingInstrumentation.install(oTelInstallationContext)
         } else {
             Logger.d(TAG, "Slow Rendering detection is disabled")
         }

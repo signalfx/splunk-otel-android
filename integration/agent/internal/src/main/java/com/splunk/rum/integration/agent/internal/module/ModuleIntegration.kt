@@ -21,7 +21,6 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
-import io.opentelemetry.android.instrumentation.InstallationContext
 
 abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultModuleConfiguration: T) {
 
@@ -44,7 +43,6 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
 
     protected abstract fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     )
 
@@ -57,14 +55,13 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(
             context: Context,
-            oTelInstallationContext: InstallationContext,
             moduleConfigurations: List<ModuleConfiguration>
         ) {
             val clazz = defaultModuleConfiguration::class
 
             moduleConfiguration = moduleConfigurations.find { it::class == clazz } as? T ?: defaultModuleConfiguration
             AgentIntegration.registerModuleInitializationStart(defaultModuleConfiguration.name)
-            this@ModuleIntegration.onInstall(context, oTelInstallationContext, moduleConfigurations)
+            this@ModuleIntegration.onInstall(context, moduleConfigurations)
             AgentIntegration.registerModuleInitializationEnd(defaultModuleConfiguration.name)
         }
 

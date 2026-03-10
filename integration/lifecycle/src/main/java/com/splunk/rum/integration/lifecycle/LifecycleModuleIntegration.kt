@@ -26,7 +26,6 @@ import com.splunk.rum.integration.lifecycle.callback.ActivityLifecycleCallback
 import com.splunk.rum.integration.lifecycle.callback.FragmentActivityCallback21
 import com.splunk.rum.integration.lifecycle.callback.FragmentActivityCallback29
 import com.splunk.rum.integration.lifecycle.callback.FragmentLifecycleCallback
-import io.opentelemetry.android.instrumentation.InstallationContext
 
 /**
  * Module integration for capturing UI lifecycle events (Activity and Fragment lifecycle transitions).
@@ -43,7 +42,6 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
 
     override fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall() called")

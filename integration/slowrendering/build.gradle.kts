@@ -23,7 +23,7 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
+    // implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":integration:agent:internal"))
@@ -31,7 +31,7 @@ dependencies {
 
     implementation(Dependencies.Otel.instrumentationApi)
 
-    implementation(Dependencies.Otel.androidSlowRenderingInstrumentation)
+    // implementation(Dependencies.Otel.androidSlowRenderingInstrumentation)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)

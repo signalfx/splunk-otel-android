@@ -34,7 +34,7 @@ import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.sessionreplay.api.SessionReplay as SplunkSessionReplay
 import com.splunk.rum.integration.sessionreplay.api.Status
 import com.splunk.rum.integration.sessionreplay.index.TimeIndex
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
@@ -63,7 +63,6 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
     override fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")

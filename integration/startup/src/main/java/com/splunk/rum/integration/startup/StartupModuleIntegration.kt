@@ -28,7 +28,6 @@ import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modu
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
-import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import java.util.concurrent.TimeUnit
@@ -56,7 +55,6 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
     override fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")

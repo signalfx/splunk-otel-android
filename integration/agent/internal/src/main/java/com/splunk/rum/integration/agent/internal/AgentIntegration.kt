@@ -30,25 +30,12 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.model.Module
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
-import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.android.session.SessionManager
-import io.opentelemetry.android.session.SessionObserver
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import java.util.concurrent.TimeUnit
 
 class AgentIntegration private constructor(context: Context) {
     val sessionManager: ISplunkSessionManager
     val listeners: MutableSet<Listener> = HashSet()
-
-    // The opentelemetry-android InstallationContext API needs an argument of type
-    // io.opentelemetry.android.session.SessionManager. val oTelSessionManager is a no-op definition of same.
-    val oTelSessionManager = object : SessionManager {
-        override fun getSessionId(): String = "dummy-session-id"
-
-        override fun addObserver(observer: SessionObserver) {
-            // no-op
-        }
-    }
 
     init {
         val storage = AgentStorage.attach(context)
@@ -81,9 +68,7 @@ class AgentIntegration private constructor(context: Context) {
             val module = modules[config.name] ?: Module(config.name)
             modules[config.name] = module.copy(configuration = config)
         }
-        val oTelInstallationContext =
-            InstallationContext(context.applicationContext as Application, openTelemetry, oTelSessionManager)
-        listeners.forEachFast { it.onInstall(context, oTelInstallationContext, moduleConfigurations) }
+        listeners.forEachFast { it.onInstall(context, moduleConfigurations) }
 
         registerModuleInitializationEnd(MODULE_NAME)
 
@@ -93,7 +78,6 @@ class AgentIntegration private constructor(context: Context) {
     interface Listener {
         fun onInstall(
             context: Context,
-            oTelInstallationContext: InstallationContext,
             moduleConfigurations: List<ModuleConfiguration>
         )
 

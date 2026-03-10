@@ -23,11 +23,6 @@ import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacyNetworkMonitorModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
-import io.opentelemetry.android.common.internal.features.networkattributes.data.NetworkState
-import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.android.instrumentation.network.NetworkChangeInstrumentation
-import io.opentelemetry.android.internal.services.Services
-import io.opentelemetry.android.internal.services.network.NetworkChangeListener
 import io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_ICC
 import io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_MCC
 import io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CARRIER_MNC
@@ -43,7 +38,6 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
 
     override fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
@@ -53,44 +47,44 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
                 ?: moduleConfiguration.isEnabled
 
         if (isEnabled) {
-            // install Network Monitor instrumentation if isEnabled is true
-            NetworkChangeInstrumentation().install(oTelInstallationContext)
-
-            // Setup to add network attributes to all spans
-            val currentNetworkProvider = Services.get(oTelInstallationContext.application).currentNetworkProvider
-
-            val listener = NetworkChangeListener { currentNetwork ->
-                SplunkInternalGlobalAttributeSpanProcessor.attributes.apply {
-                    this[NETWORK_CONNECTION_TYPE] = currentNetwork.state.humanName
-
-                    currentNetwork.subType?.let {
-                        this[NETWORK_CONNECTION_SUBTYPE] = it
-                    } ?: remove(NETWORK_CONNECTION_SUBTYPE)
-
-                    currentNetwork.carrierName?.let {
-                        this[NETWORK_CARRIER_NAME] = it
-                    } ?: remove(NETWORK_CARRIER_NAME)
-
-                    currentNetwork.carrierCountryCode?.let {
-                        this[NETWORK_CARRIER_MCC] = it
-                    } ?: remove(NETWORK_CARRIER_MCC)
-
-                    currentNetwork.carrierNetworkCode?.let {
-                        this[NETWORK_CARRIER_MNC] = it
-                    } ?: remove(NETWORK_CARRIER_MNC)
-
-                    currentNetwork.carrierIsoCountryCode?.let {
-                        this[NETWORK_CARRIER_ICC] = it
-                    } ?: remove(NETWORK_CARRIER_ICC)
-                }
-            }
-
-            currentNetworkProvider.addNetworkChangeListener(listener)
-
-            // Set default network.connection.type = unavailable
-            // This is needed as NetworkChangeListener is not triggered on app start when no network is available
-            SplunkInternalGlobalAttributeSpanProcessor.attributes[NETWORK_CONNECTION_TYPE] =
-                NetworkState.NO_NETWORK_AVAILABLE.humanName
+//            // install Network Monitor instrumentation if isEnabled is true
+//            NetworkChangeInstrumentation().install(oTelInstallationContext)
+//
+//            // Setup to add network attributes to all spans
+//            val currentNetworkProvider = Services.get(oTelInstallationContext.application).currentNetworkProvider
+//
+//            val listener = NetworkChangeListener { currentNetwork ->
+//                SplunkInternalGlobalAttributeSpanProcessor.attributes.apply {
+//                    this[NETWORK_CONNECTION_TYPE] = currentNetwork.state.humanName
+//
+//                    currentNetwork.subType?.let {
+//                        this[NETWORK_CONNECTION_SUBTYPE] = it
+//                    } ?: remove(NETWORK_CONNECTION_SUBTYPE)
+//
+//                    currentNetwork.carrierName?.let {
+//                        this[NETWORK_CARRIER_NAME] = it
+//                    } ?: remove(NETWORK_CARRIER_NAME)
+//
+//                    currentNetwork.carrierCountryCode?.let {
+//                        this[NETWORK_CARRIER_MCC] = it
+//                    } ?: remove(NETWORK_CARRIER_MCC)
+//
+//                    currentNetwork.carrierNetworkCode?.let {
+//                        this[NETWORK_CARRIER_MNC] = it
+//                    } ?: remove(NETWORK_CARRIER_MNC)
+//
+//                    currentNetwork.carrierIsoCountryCode?.let {
+//                        this[NETWORK_CARRIER_ICC] = it
+//                    } ?: remove(NETWORK_CARRIER_ICC)
+//                }
+//            }
+//
+//            currentNetworkProvider.addNetworkChangeListener(listener)
+//
+//            // Set default network.connection.type = unavailable
+//            // This is needed as NetworkChangeListener is not triggered on app start when no network is available
+//            SplunkInternalGlobalAttributeSpanProcessor.attributes[NETWORK_CONNECTION_TYPE] =
+//                NetworkState.NO_NETWORK_AVAILABLE.humanName
         }
     }
 }

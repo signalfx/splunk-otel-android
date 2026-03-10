@@ -27,7 +27,6 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.navigation.screen.ScreenTrackerIntegration
-import io.opentelemetry.android.instrumentation.InstallationContext
 import java.lang.ref.WeakReference
 import java.time.Instant
 
@@ -53,7 +52,6 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
     override fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall")

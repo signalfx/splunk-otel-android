@@ -20,8 +20,6 @@ import android.content.Context
 import com.splunk.android.common.logger.Logger
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
 
 internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfiguration>(
     defaultModuleConfiguration = HttpURLModuleConfiguration()
@@ -31,26 +29,13 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
 
     override fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
 
         // install HttpURLConnection auto-instrumentation if it is enabled
         if (moduleConfiguration.isEnabled) {
-            HttpUrlInstrumentation().apply {
-                addAttributesExtractor(HttpURLAdditionalAttributesExtractor())
 
-                moduleConfiguration.capturedRequestHeaders
-                    .takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedRequestHeaders(it) }
-
-                moduleConfiguration.capturedResponseHeaders
-                    .takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedResponseHeaders(it) }
-
-                install(oTelInstallationContext)
-            }
         }
     }
 }

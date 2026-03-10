@@ -23,13 +23,13 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
+    // implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":integration:agent:internal"))
     implementation(project(":integration:okhttp3-common"))
 
-    implementation(Dependencies.Otel.androidOkHttp3Library)
+    // implementation(Dependencies.Otel.androidOkHttp3Library)
 
     implementation(Dependencies.Otel.instrumentationApi)
 

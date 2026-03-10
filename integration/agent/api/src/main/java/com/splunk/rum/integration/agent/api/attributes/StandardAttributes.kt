@@ -16,7 +16,6 @@
 
 package com.splunk.rum.integration.agent.api.attributes
 
-import io.opentelemetry.android.export.SpanDataModifier
 import io.opentelemetry.api.common.AttributeKey
 
 /**

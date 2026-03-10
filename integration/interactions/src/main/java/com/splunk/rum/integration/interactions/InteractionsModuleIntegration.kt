@@ -36,6 +36,7 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.common.AttributeKey
 import java.util.concurrent.TimeUnit
 
 internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsModuleConfiguration>(
@@ -63,10 +64,9 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
 
     override fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
-        // No-op, as Interactions does not require any specific installation steps.
+        Logger.d(TAG, "onInstall()")
     }
 
     private fun setupComposeIdentification() {

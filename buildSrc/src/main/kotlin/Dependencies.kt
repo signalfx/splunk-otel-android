@@ -83,7 +83,7 @@ object Dependencies {
         private const val oTelInstrumentationBomAlpha = "2.15.0-alpha"
         const val otelAndroidBomVersion = "0.11.0-alpha"
         const val instrumentationBomAlpha = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$oTelInstrumentationBomAlpha"
-        const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
+        // const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
 
         const val api = "io.opentelemetry:opentelemetry-api"
         const val sdk = "io.opentelemetry:opentelemetry-sdk"

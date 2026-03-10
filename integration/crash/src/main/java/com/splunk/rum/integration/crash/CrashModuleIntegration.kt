@@ -22,8 +22,6 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.android.instrumentation.crash.CrashReporterInstrumentation
 
 internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfiguration>(
     defaultModuleConfiguration = CrashModuleConfiguration()
@@ -33,7 +31,6 @@ internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfigurat
 
     override fun onInstall(
         context: Context,
-        oTelInstallationContext: InstallationContext,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
@@ -43,9 +40,9 @@ internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfigurat
 
         if (isEnabled) {
             Logger.d(TAG, "Installing crash reporter")
-            val crashReporterInstrumentation = CrashReporterInstrumentation()
-            crashReporterInstrumentation.addAttributesExtractor(CrashAttributesExtractor(context))
-            crashReporterInstrumentation.install(oTelInstallationContext)
+//            val crashReporterInstrumentation = CrashReporterInstrumentation()
+//            crashReporterInstrumentation.addAttributesExtractor(CrashAttributesExtractor(context))
+//            crashReporterInstrumentation.install(oTelInstallationContext)
         } else {
             Logger.d(TAG, "Crash reporting is disabled")
         }
