@@ -60,6 +60,15 @@
             }
         </style>
         <script type="text/javascript">
+            function parseSessionMetadata(payload) {
+                try {
+                    return JSON.parse(payload);
+                } catch (jsonError) {
+                    var decodedPayload = atob(payload);
+                    return JSON.parse(decodedPayload);
+                }
+            }
+
             function getSessionId() {
                 var bridge = typeof SplunkRumNative !== "undefined" ? SplunkRumNative : null;
                 if (!bridge || typeof bridge.getNativeSessionId !== "function") {
@@ -79,9 +88,9 @@
                     return;
                 }
 
-                var sessionMetadataJson = bridge.getNativeSessionMetadata();
+                var sessionMetadataBase64 = bridge.getNativeSessionMetadata();
                 try {
-                    var sessionMetadata = JSON.parse(sessionMetadataJson);
+                    var sessionMetadata = parseSessionMetadata(sessionMetadataBase64);
                     document.getElementById("sessionMetadata").innerText =
                         "Session Metadata:\n" + JSON.stringify(sessionMetadata, null, 2);
                 } catch (e) {
