@@ -17,30 +17,41 @@
 package com.splunk.rum.integration.agent.api.session
 
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
-import com.splunk.rum.integration.agent.internal.user.IUserManager
 
+/**
+ * Exposes immutable accessors for the current RUM session state.
+ */
 class SessionState internal constructor(
     private val sessionConfiguration: SessionConfiguration,
-    private val sessionManager: ISplunkSessionManager,
-    private val userManager: IUserManager
+    private val sessionManager: ISplunkSessionManager
 ) {
+    /**
+     * Unique identifier of the current session.
+     */
     val id: String
         get() = sessionManager.sessionId
 
+    /**
+     * Session start time as a Unix timestamp in milliseconds.
+     */
+    val sessionStart: Long
+        get() = sessionManager.sessionStart
+
+    /**
+     * Time of the last recorded session activity as a Unix timestamp in milliseconds.
+     */
+    val sessionLastActivity: Long
+        get() = sessionManager.sessionLastActivity
+
+    /**
+     * Sampling rate applied to the current session.
+     */
     val samplingRate: Double
         get() = sessionConfiguration.samplingRate
 
+    /**
+     * Listeners notified when the active session changes.
+     */
     val listeners: List<SessionListener>
         get() = sessionConfiguration.listeners
-
-    val metadata: SessionMetadata
-        get() {
-            val sessionSnapshot = sessionManager.sessionSnapshot
-            return SessionMetadata(
-                sessionId = sessionSnapshot.sessionId,
-                anonymousUserId = userManager.userId,
-                sessionStart = sessionSnapshot.sessionStart,
-                sessionLastActivity = sessionSnapshot.sessionLastActivity
-            )
-        }
 }
