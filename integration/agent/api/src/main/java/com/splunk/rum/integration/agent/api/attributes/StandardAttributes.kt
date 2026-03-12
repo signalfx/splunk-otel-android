@@ -16,7 +16,6 @@
 
 package com.splunk.rum.integration.agent.api.attributes
 
-import io.opentelemetry.android.export.SpanDataModifier
 import io.opentelemetry.api.common.AttributeKey
 
 /**
@@ -40,7 +39,7 @@ object StandardAttributes {
 
     /**
      * Full HTTP client request URL in the form `scheme://host[:port]/path?query[#fragment]`.
-     * Useful for span data filtering with the [SpanDataModifier].
+     * Useful for span data filtering.
      */
     @JvmStatic
     val HTTP_URL: AttributeKey<String> = AttributeKey.stringKey("http.url")
