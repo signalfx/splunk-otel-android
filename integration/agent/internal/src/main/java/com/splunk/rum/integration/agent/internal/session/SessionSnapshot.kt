@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.session
 
-class SessionSnapshot(val sessionId: String, val sessionStart: Long, val sessionLastActivity: Long) {
+data class SessionSnapshot(val sessionId: String, val sessionStart: Long, val sessionLastActivity: Long) {
     companion object {
         val NO_OP = SessionSnapshot(
             sessionId = "",
