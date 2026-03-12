@@ -34,13 +34,13 @@ class SessionState internal constructor(
     /**
      * Session start time as a Unix timestamp in milliseconds.
      */
-    val sessionStart: Long
+    val start: Long
         get() = sessionManager.sessionStart
 
     /**
      * Time of the last recorded session activity as a Unix timestamp in milliseconds.
      */
-    val sessionLastActivity: Long
+    val lastActivity: Long
         get() = sessionManager.sessionLastActivity
 
     /**
