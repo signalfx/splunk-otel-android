@@ -78,7 +78,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             val application = context.applicationContext as Application
             val navigationEmitter = NavigationEventEmitter()
             emitter = navigationEmitter
-            screenChangeDetector = ScreenChangeDetector(navigationEmitter, moduleConfiguration.emissionPolicy)
+            screenChangeDetector = ScreenChangeDetector(navigationEmitter)
 
             registerActivityLifecycle(application, screenChangeDetector!!)
             registerFragmentLifecycle(application, screenChangeDetector!!)

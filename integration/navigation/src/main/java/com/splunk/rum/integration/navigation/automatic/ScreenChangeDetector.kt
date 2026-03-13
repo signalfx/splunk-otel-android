@@ -19,21 +19,17 @@ package com.splunk.rum.integration.navigation.automatic
 import android.app.Activity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import com.splunk.rum.integration.navigation.NavigationEmissionPolicy
 import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
 
 /**
  * Detects visible screen changes (Activity/Fragment) and notifies [NavigationEventEmitter].
  * Fragment takes precedence over Activity when both are present.
  *
- * Only emits when the [NavigationEmissionPolicy] allows: [ON_SCREEN_ACTIVE] emits only on resumed
- * callbacks; [ALL_CHANGES] emits on any visible-screen change.
+ * Emits only on resumed (onFragmentResumed / onActivityResumed) as the trigger.
  */
 internal class ScreenChangeDetector(
-    private val eventEmitter: NavigationEventEmitter,
-    private val emissionPolicy: NavigationEmissionPolicy
+    private val eventEmitter: NavigationEventEmitter
 ) {
-
     private var lastResumedActivityName: String? = null
     private var previouslyLastResumedActivityName: String? = null
     private var lastResumedFragmentName: String? = null
@@ -51,7 +47,7 @@ internal class ScreenChangeDetector(
     fun onActivityResumed(activity: Activity) {
         val name = ScreenNameDescriptor.getName(activity)
         lastResumedActivityName = name
-        tryEmitIfChanged(shouldEmit = emissionPolicy.emitOnResumed)
+        tryEmitIfChanged()
     }
 
     fun onActivityPaused(activity: Activity) {
@@ -60,7 +56,6 @@ internal class ScreenChangeDetector(
         if (lastResumedActivityName == name) {
             lastResumedActivityName = null
         }
-        tryEmitIfChanged(shouldEmit = emissionPolicy.emitOnPaused)
     }
 
     fun onFragmentResumed(fragment: Fragment) {
@@ -72,7 +67,7 @@ internal class ScreenChangeDetector(
 
         val name = ScreenNameDescriptor.getName(fragment)
         lastResumedFragmentName = name
-        tryEmitIfChanged(shouldEmit = emissionPolicy.emitOnResumed)
+        tryEmitIfChanged()
     }
 
     fun onFragmentPaused(fragment: Fragment) {
@@ -85,7 +80,6 @@ internal class ScreenChangeDetector(
         }
 
         previouslyLastResumedFragmentName = ScreenNameDescriptor.getName(fragment)
-        tryEmitIfChanged(shouldEmit = emissionPolicy.emitOnPaused)
     }
 
     private var lastEmittedScreenName: String? = null
@@ -100,15 +94,12 @@ internal class ScreenChangeDetector(
     }
 
     /**
-     * Updates internal state and optionally emits a navigation event.
-     * When [shouldEmit] is false (e.g. paused callback with ON_SCREEN_ACTIVE policy), we do not
-     * emit and do not advance [lastEmittedScreenName], so the next resumed callback still
-     * has the correct previous screen.
+     * If the visible screen changed, emit a navigation event and advance [lastEmittedScreenName].
+     * Only called from resumed callbacks.
      */
-    private fun tryEmitIfChanged(shouldEmit: Boolean) {
+    private fun tryEmitIfChanged() {
         val current = currentVisibleScreenName() ?: return
         if (current == lastEmittedScreenName) return
-        if (!shouldEmit) return
 
         val previous = lastEmittedScreenName
         lastEmittedScreenName = current
