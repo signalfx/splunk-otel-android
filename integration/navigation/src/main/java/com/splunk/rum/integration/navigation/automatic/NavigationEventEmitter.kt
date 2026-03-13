@@ -118,21 +118,15 @@ internal class NavigationEventEmitter {
 
     /**
      * Process all cached events. Called when installation is complete.
-     * Drains the cache in a loop so that any event that arrives during replay (before
-     * we set isInstallComplete) is included in the next drain, avoiding loss when
-     * lifecycle callbacks fire quickly at startup.
      */
     fun processCachedEvents() {
-        while (true) {
-            val cachedEvents: List<CachedEvent>
-            synchronized(lock) {
-                cachedEvents = cache.toList()
-                cache.clear()
-                if (cachedEvents.isEmpty()) {
-                    isInstallComplete = true
-                    return
-                }
-            }
+        val cachedEvents: List<CachedEvent>
+        synchronized(lock) {
+            cachedEvents = cache.toList()
+            cache.clear()
+            isInstallComplete = true
+        }
+        if (cachedEvents.isNotEmpty()) {
             Logger.d(TAG) { "Processing cached navigation events (size: ${cachedEvents.size})" }
             cachedEvents.forEach { event ->
                 emitEventInternal(event.screenName, event.previousScreenName, event.attributes, event.timestamp)
