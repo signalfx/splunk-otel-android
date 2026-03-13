@@ -18,6 +18,7 @@ package com.splunk.rum.integration.navigation.descriptor
 
 import android.app.Activity
 import androidx.fragment.app.Fragment
+import com.splunk.rum.integration.navigation.NavigationElement
 import com.splunk.rum.integration.navigation.screen.RumScreenName
 
 internal object ScreenNameDescriptor {
@@ -30,12 +31,19 @@ internal object ScreenNameDescriptor {
 
     fun isIgnored(fragment: Fragment): Boolean = isIgnored(fragment as Any)
 
-    private fun getName(element: Any): String = getAnnotation(element)?.name ?: element::class.java.simpleName
+    private fun getName(element: Any): String =
+        getNavigationElement(element)?.name ?: getRumScreenName(element)?.name ?: element::class.java.simpleName
 
-    private fun isIgnored(element: Any): Boolean = getAnnotation(element)?.isIgnored ?: false
+    private fun isIgnored(element: Any): Boolean =
+        getNavigationElement(element)?.isIgnored ?: getRumScreenName(element)?.isIgnored ?: false
 
-    private fun getAnnotation(element: Any): RumScreenName? {
+    private fun getRumScreenName(element: Any): RumScreenName? {
         val javaClass = element::class.java
         return javaClass.getAnnotation(RumScreenName::class.java)
+    }
+
+    private fun getNavigationElement(element: Any): NavigationElement? {
+        val javaClass = element::class.java
+        return javaClass.getAnnotation(NavigationElement::class.java)
     }
 }

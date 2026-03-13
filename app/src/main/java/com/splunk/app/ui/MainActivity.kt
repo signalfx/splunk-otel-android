@@ -24,7 +24,9 @@ import com.splunk.app.extension.setCustomAnimations
 import com.splunk.app.extension.setSubtitle
 import com.splunk.app.ui.menu.MenuFragment
 import com.splunk.app.util.FragmentAnimation
+import com.splunk.rum.integration.navigation.NavigationElement
 
+@NavigationElement(name = "Main")
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewBinding: ActivityMainBinding

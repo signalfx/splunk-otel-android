@@ -16,16 +16,28 @@
 
 package com.splunk.rum.integration.navigation
 
+import io.opentelemetry.api.common.Attributes
+
 class Navigation internal constructor() {
 
     internal var listener: Listener? = null
 
+    /**
+     * Record a navigation to [screenName] (manual tracking).
+     */
     fun track(screenName: String) {
-        listener?.onScreenNameChanged(screenName)
+        listener?.onScreenNameChanged(screenName, Attributes.empty())
+    }
+
+    /**
+     * Record a navigation to [screenName] with optional [attributes] (manual tracking).
+     */
+    fun track(screenName: String, attributes: Attributes) {
+        listener?.onScreenNameChanged(screenName, attributes)
     }
 
     internal interface Listener {
-        fun onScreenNameChanged(screenName: String)
+        fun onScreenNameChanged(screenName: String, attributes: Attributes)
     }
 
     companion object {

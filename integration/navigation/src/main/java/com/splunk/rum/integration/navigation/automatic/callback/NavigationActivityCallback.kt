@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation.screen.activity
+package com.splunk.rum.integration.navigation.automatic.callback
 
 import android.app.Activity
-import com.splunk.rum.integration.navigation.screen.VisibleScreenTracker
+import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.rum.integration.navigation.automatic.ScreenChangeDetector
 
-internal class ActivityCallback21(override val tracker: VisibleScreenTracker) : ActivityCallback {
+internal class NavigationActivityCallback(private val screenChangeDetector: ScreenChangeDetector) :
+    ActivityLifecycleCallbacksAdapter {
 
     override fun onActivityResumed(activity: Activity) {
-        tracker.onActivityResumed(activity)
+        screenChangeDetector.onActivityResumed(activity)
     }
 
     override fun onActivityPaused(activity: Activity) {
-        tracker.onActivityPaused(activity)
+        screenChangeDetector.onActivityPaused(activity)
     }
 }
