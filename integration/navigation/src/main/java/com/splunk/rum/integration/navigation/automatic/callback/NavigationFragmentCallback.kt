@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation.screen
+package com.splunk.rum.integration.navigation.automatic.callback
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.splunk.rum.integration.navigation.automatic.ScreenChangeDetector
 
-internal class VisibleFragmentTracker(private val visibleScreenTracker: VisibleScreenTracker) :
+internal class NavigationFragmentCallback(private val screenChangeDetector: ScreenChangeDetector) :
     FragmentManager.FragmentLifecycleCallbacks() {
 
     override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-        visibleScreenTracker.onFragmentResumed(f)
+        screenChangeDetector.onFragmentResumed(f)
     }
 
     override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
-        visibleScreenTracker.onFragmentPaused(f)
+        screenChangeDetector.onFragmentPaused(f)
     }
 }
