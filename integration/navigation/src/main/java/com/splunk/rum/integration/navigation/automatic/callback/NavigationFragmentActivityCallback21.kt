@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation.tracer.fragment.activity
+package com.splunk.rum.integration.navigation.automatic.callback
 
 import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
-import com.splunk.android.common.logger.Logger
+import androidx.fragment.app.FragmentManager
 
-internal class FragmentActivityCallback21(override val fragmentCallback: FragmentLifecycleCallbacks) :
-    FragmentActivityCallback {
+internal class NavigationFragmentActivityCallback21(private val fragmentCallback: NavigationFragmentCallback) :
+    com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter {
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Logger.d("FragmentActivityCallback21", "onActivityCreated")
         if (activity is FragmentActivity) {
-            Logger.d("FragmentActivityCallback21", "onActivityCreated FragmentActivity")
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
         }
     }

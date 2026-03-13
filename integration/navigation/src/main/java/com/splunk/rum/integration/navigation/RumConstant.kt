@@ -22,6 +22,8 @@ internal object RumConstant {
 
     const val COMPONENT_NAVIGATION = "ui"
 
+    const val NAVIGATION_LOG_EVENT_NAME = "device.app.ui.navigation"
+
     const val NAVIGATION_RESTARTED_SPAN_NAME = "Restarted"
     const val NAVIGATION_RESTORED_SPAN_NAME = "Restored"
     const val NAVIGATION_RESUMED_SPAN_NAME = "Resumed"
