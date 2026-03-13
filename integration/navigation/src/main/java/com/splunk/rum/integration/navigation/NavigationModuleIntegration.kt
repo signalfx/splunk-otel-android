@@ -124,7 +124,8 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
 
             val navigationEmitter = emitter ?: NavigationEventEmitter().also { emitter = it }
-            val previousScreenName = ScreenNameTracker.lastScreenName
+            // Use current screen as previous (we're transitioning FROM current TO screenName).
+            val previousScreenName = ScreenNameTracker.screenName
             navigationEmitter.emitNavigationEvent(screenName, previousScreenName, attributes)
             screenChangeDetector?.recordEmittedScreen(screenName)
         }

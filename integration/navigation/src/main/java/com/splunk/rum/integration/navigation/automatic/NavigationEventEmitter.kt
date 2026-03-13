@@ -84,47 +84,55 @@ internal class NavigationEventEmitter {
 
         Logger.d(TAG) { "Emitting navigation event: $previousScreenName -> $screenName" }
 
-        val builder = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
-            .logRecordBuilder()
-            .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
-            .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstant.NAVIGATION_LOG_EVENT_NAME)
-            .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstant.COMPONENT_NAVIGATION)
-            .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, screenName)
-
+        // Build a single immutable Attributes snapshot so we don't rely on the builder's
+        // internal mutable state, which may be reused for the next record and can cause
+        // wrong attributes on export when many events are emitted in quick succession.
+        val attrsBuilder = io.opentelemetry.api.common.Attributes.builder()
+            .put(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstant.NAVIGATION_LOG_EVENT_NAME)
+            .put(GlobalRumConstants.COMPONENT_KEY, RumConstant.COMPONENT_NAVIGATION)
+            .put(GlobalRumConstants.SCREEN_NAME_KEY, screenName)
         previousScreenName?.let {
-            builder.setAttribute(GlobalRumConstants.LAST_SCREEN_NAME_KEY, it)
+            attrsBuilder.put(GlobalRumConstants.LAST_SCREEN_NAME_KEY, it)
         }
-
         attributes.forEach { key, value ->
             when (value) {
-                is String -> builder.setAttribute(AttributeKey.stringKey(key.key), value)
-                is Long -> builder.setAttribute(AttributeKey.longKey(key.key), value)
-                is Double -> builder.setAttribute(AttributeKey.doubleKey(key.key), value)
-                is Boolean -> builder.setAttribute(AttributeKey.booleanKey(key.key), value)
-                is List<*> -> builder.setAttribute(
+                is String -> attrsBuilder.put(AttributeKey.stringKey(key.key), value)
+                is Long -> attrsBuilder.put(AttributeKey.longKey(key.key), value)
+                is Double -> attrsBuilder.put(AttributeKey.doubleKey(key.key), value)
+                is Boolean -> attrsBuilder.put(AttributeKey.booleanKey(key.key), value)
+                is List<*> -> attrsBuilder.put(
                     AttributeKey.stringKey(key.key),
                     value.joinToString(",") { it.toString() }
                 )
-                else -> builder.setAttribute(AttributeKey.stringKey(key.key), value.toString())
+                else -> attrsBuilder.put(AttributeKey.stringKey(key.key), value.toString())
             }
         }
+        val allAttributes = attrsBuilder.build()
 
-        builder.emit()
+        logger.get(GlobalRumConstants.RUM_TRACER_NAME)
+            .logRecordBuilder()
+            .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
+            .setAllAttributes(allAttributes)
+            .emit()
     }
 
     /**
      * Process all cached events. Called when installation is complete.
+     * Drains the cache in a loop so that any event that arrives during replay (before
+     * we set isInstallComplete) is included in the next drain, avoiding loss when
+     * lifecycle callbacks fire quickly at startup.
      */
     fun processCachedEvents() {
-        val cachedEvents: List<CachedEvent>
-
-        synchronized(lock) {
-            cachedEvents = cache.toList()
-            cache.clear()
-            isInstallComplete = true
-        }
-
-        if (cachedEvents.isNotEmpty()) {
+        while (true) {
+            val cachedEvents: List<CachedEvent>
+            synchronized(lock) {
+                cachedEvents = cache.toList()
+                cache.clear()
+                if (cachedEvents.isEmpty()) {
+                    isInstallComplete = true
+                    return
+                }
+            }
             Logger.d(TAG) { "Processing cached navigation events (size: ${cachedEvents.size})" }
             cachedEvents.forEach { event ->
                 emitEventInternal(event.screenName, event.previousScreenName, event.attributes, event.timestamp)
