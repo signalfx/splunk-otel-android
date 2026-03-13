@@ -27,9 +27,7 @@ import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
  *
  * Emits only on resumed (onFragmentResumed / onActivityResumed) as the trigger.
  */
-internal class ScreenChangeDetector(
-    private val eventEmitter: NavigationEventEmitter
-) {
+internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmitter) {
     private var lastResumedActivityName: String? = null
     private var previouslyLastResumedActivityName: String? = null
     private var lastResumedFragmentName: String? = null
