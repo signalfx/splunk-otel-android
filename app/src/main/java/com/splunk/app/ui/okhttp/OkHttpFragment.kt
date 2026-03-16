@@ -165,10 +165,12 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         viewBinding.responseCaching.setOnClickListener { responseCaching() }
         viewBinding.canceledCall.setOnClickListener { canceledCall() }
 
-        SplunkRum.instance.navigation.track(
-            "OkHttp",
-            Attributes.builder().put("section", "network").build()
-        )
+        // Manual track commented out: automated tracking handles this screen via @NavigationElement.
+        // Uncomment to test out manual track API
+        // SplunkRum.instance.navigation.track(
+        //     "OkHttp",
+        //     Attributes.builder().put("section", "network").build()
+        // )
     }
 
     /**
