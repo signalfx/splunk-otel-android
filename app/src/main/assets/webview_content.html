@@ -88,14 +88,14 @@
                     return;
                 }
 
-                var sessionMetadataBase64 = bridge.getNativeSessionMetadata();
+                var sessionMetadataPayload = bridge.getNativeSessionMetadata();
                 try {
-                    var sessionMetadata = parseSessionMetadata(sessionMetadataBase64);
+                    var sessionMetadata = parseSessionMetadata(sessionMetadataPayload);
                     document.getElementById("sessionMetadata").innerText =
                         "Session Metadata:\n" + JSON.stringify(sessionMetadata, null, 2);
                 } catch (e) {
                     document.getElementById("sessionMetadata").innerText =
-                        "Session Metadata (raw):\n" + sessionMetadataJson;
+                        "Session Metadata (raw):\n" + sessionMetadataPayload;
                 }
             }
         </script>
