@@ -31,6 +31,7 @@ import com.splunk.rum.integration.navigation.automatic.callback.NavigationActivi
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentActivityCallback21
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentActivityCallback29
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentCallback
+import androidx.fragment.app.FragmentActivity
 import io.opentelemetry.android.instrumentation.InstallationContext
 import java.lang.ref.WeakReference
 
@@ -81,6 +82,15 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
                 registerActivityLifecycle(application, screenChangeDetector!!)
                 registerFragmentLifecycle(application, screenChangeDetector!!)
+
+                // Seed detector with already visible activity for late/hybrid installs.
+                currentActivityReference?.get()?.let { activity ->
+                    screenChangeDetector!!.onActivityResumed(activity)
+                    if (activity is FragmentActivity) {
+                        val fragmentCallback = NavigationFragmentCallback(screenChangeDetector!!)
+                        activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
+                    }
+                }
 
                 (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
                 currentActivityReference = null
