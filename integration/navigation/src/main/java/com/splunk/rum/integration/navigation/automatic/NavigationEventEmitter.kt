@@ -21,7 +21,6 @@ import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.navigation.RumConstant
-import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import java.util.concurrent.TimeUnit
 
@@ -94,19 +93,7 @@ internal class NavigationEventEmitter {
         previousScreenName?.let {
             builder.setAttribute(GlobalRumConstants.LAST_SCREEN_NAME_KEY, it)
         }
-        attributes.forEach { key, value ->
-            when (value) {
-                is String -> builder.setAttribute(AttributeKey.stringKey(key.key), value)
-                is Long -> builder.setAttribute(AttributeKey.longKey(key.key), value)
-                is Double -> builder.setAttribute(AttributeKey.doubleKey(key.key), value)
-                is Boolean -> builder.setAttribute(AttributeKey.booleanKey(key.key), value)
-                is List<*> -> builder.setAttribute(
-                    AttributeKey.stringKey(key.key),
-                    value.joinToString(",") { it.toString() }
-                )
-                else -> builder.setAttribute(AttributeKey.stringKey(key.key), value.toString())
-            }
-        }
+        builder.setAllAttributes(attributes)
         builder.emit()
     }
 
