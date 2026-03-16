@@ -20,6 +20,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Build
+import androidx.fragment.app.FragmentActivity
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
@@ -31,7 +32,6 @@ import com.splunk.rum.integration.navigation.automatic.callback.NavigationActivi
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentActivityCallback21
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentActivityCallback29
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentCallback
-import androidx.fragment.app.FragmentActivity
 import io.opentelemetry.android.instrumentation.InstallationContext
 import java.lang.ref.WeakReference
 
