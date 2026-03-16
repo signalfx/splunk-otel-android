@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * Annotation for Activity or Fragment to specify the screen name used in navigation events
  * and whether to ignore the element for automatic navigation tracking.
  *
- * Use RumScreenName for the same behavior; both are supported.
+ * <p>If both {@code @NavigationElement} and {@code @RumScreenName} are present, {@code @NavigationElement} takes precedence.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
