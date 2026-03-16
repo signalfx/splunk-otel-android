@@ -17,6 +17,8 @@
 package com.splunk.rum.integration.navigation.automatic
 
 import android.app.Activity
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
@@ -28,6 +30,7 @@ import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
  * Emits only on resumed (onFragmentResumed / onActivityResumed) as the trigger.
  */
 internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmitter) {
+    private val handler = Handler(Looper.getMainLooper())
     private var lastResumedActivityName: String? = null
     private var previouslyLastResumedActivityName: String? = null
     private var lastResumedFragmentName: String? = null
@@ -45,7 +48,9 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     fun onActivityResumed(activity: Activity) {
         val name = ScreenNameDescriptor.getName(activity)
         lastResumedActivityName = name
-        tryEmitIfChanged()
+        // Defer so fragment callbacks, which run synchronously during the same resume, execute
+        // first thus avoiding emitting an intermediate activity only event when a fragment is present
+        handler.post { tryEmitIfChanged() }
     }
 
     fun onActivityPaused(activity: Activity) {
