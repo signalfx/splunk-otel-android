@@ -69,22 +69,22 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     ) {
         Logger.d(TAG, "onInstall")
         if (moduleConfiguration.isEnabled) {
-            Navigation.instance.listener = navigationListener
-        }
-
-        if (moduleConfiguration.isAutomatedTrackingEnabled) {
-            Logger.d(TAG, "Navigation module automated tracking enabled. Registering navigation callbacks.")
-
-            val application = context.applicationContext as Application
             val navigationEmitter = NavigationEventEmitter()
             emitter = navigationEmitter
-            screenChangeDetector = ScreenChangeDetector(navigationEmitter)
+            Navigation.instance.listener = navigationListener
 
-            registerActivityLifecycle(application, screenChangeDetector!!)
-            registerFragmentLifecycle(application, screenChangeDetector!!)
+            if (moduleConfiguration.isAutomatedTrackingEnabled) {
+                Logger.d(TAG, "Navigation module automated tracking enabled. Registering navigation callbacks.")
 
-            (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
-            currentActivityReference = null
+                val application = context.applicationContext as Application
+                screenChangeDetector = ScreenChangeDetector(navigationEmitter)
+
+                registerActivityLifecycle(application, screenChangeDetector!!)
+                registerFragmentLifecycle(application, screenChangeDetector!!)
+
+                (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
+                currentActivityReference = null
+            }
         }
     }
 
@@ -123,8 +123,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         override fun onScreenNameChanged(screenName: String, attributes: io.opentelemetry.api.common.Attributes) {
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
 
-            val navigationEmitter = emitter ?: NavigationEventEmitter().also { emitter = it }
-            // Use current screen as previous (we're transitioning FROM current TO screenName).
+            val navigationEmitter = emitter ?: return
             val previousScreenName = ScreenNameTracker.screenName
             navigationEmitter.emitNavigationEvent(screenName, previousScreenName, attributes)
             screenChangeDetector?.recordEmittedScreen(screenName)
