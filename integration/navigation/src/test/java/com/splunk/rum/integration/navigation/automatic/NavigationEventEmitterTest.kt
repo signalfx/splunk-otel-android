@@ -1,0 +1,215 @@
+/*
+ * Copyright 2026 Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.splunk.rum.integration.navigation.automatic
+
+import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
+import com.splunk.rum.integration.navigation.RumConstant
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.sdk.OpenTelemetrySdk
+import io.opentelemetry.sdk.common.CompletableResultCode
+import io.opentelemetry.sdk.logs.SdkLoggerProvider
+import io.opentelemetry.sdk.logs.data.LogRecordData
+import io.opentelemetry.sdk.logs.export.LogRecordExporter
+import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+
+@RunWith(RobolectricTestRunner::class)
+class NavigationEventEmitterTest {
+
+    private val exportedLogs = mutableListOf<LogRecordData>()
+
+    private val collectingExporter = object : LogRecordExporter {
+        override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
+            exportedLogs.addAll(logs)
+            return CompletableResultCode.ofSuccess()
+        }
+
+        override fun flush() = CompletableResultCode.ofSuccess()
+        override fun shutdown() = CompletableResultCode.ofSuccess()
+    }
+
+    @Before
+    fun setUp() {
+        exportedLogs.clear()
+        ScreenNameTracker.screenName = GlobalRumConstants.DEFAULT_SCREEN_NAME
+
+        val loggerProvider = SdkLoggerProvider.builder()
+            .addLogRecordProcessor(SimpleLogRecordProcessor.create(collectingExporter))
+            .build()
+
+        val sdk = OpenTelemetrySdk.builder()
+            .setLoggerProvider(loggerProvider)
+            .build()
+
+        SplunkOpenTelemetrySdk.instance = sdk
+    }
+
+    @After
+    fun tearDown() {
+        SplunkOpenTelemetrySdk.instance = null
+    }
+
+    @Test
+    fun `events are cached before processCachedEvents is called`() {
+        val emitter = NavigationEventEmitter()
+
+        emitter.emitNavigationEvent("Menu", null)
+        emitter.emitNavigationEvent("CrashReportsFragment", "Menu")
+
+        assertEquals(GlobalRumConstants.DEFAULT_SCREEN_NAME, ScreenNameTracker.screenName)
+        assertTrue(exportedLogs.isEmpty())
+    }
+
+    @Test
+    fun `processCachedEvents drains and emits all cached events`() {
+        val emitter = NavigationEventEmitter()
+
+        emitter.emitNavigationEvent("Menu", null)
+        emitter.emitNavigationEvent("CrashReportsFragment", "Menu")
+        emitter.processCachedEvents()
+
+        assertEquals("CrashReportsFragment", ScreenNameTracker.screenName)
+        assertEquals(2, exportedLogs.size)
+    }
+
+    @Test
+    fun `events emit directly after processCachedEvents`() {
+        val emitter = NavigationEventEmitter()
+        emitter.processCachedEvents()
+
+        emitter.emitNavigationEvent("OkHttpFragment", "Menu")
+
+        assertEquals("OkHttpFragment", ScreenNameTracker.screenName)
+        assertEquals(1, exportedLogs.size)
+    }
+
+    @Test
+    fun `emitted log record contains correct event name and component`() {
+        val emitter = NavigationEventEmitter()
+        emitter.processCachedEvents()
+
+        emitter.emitNavigationEvent("Menu", null)
+
+        val log = exportedLogs.single()
+        assertEquals(
+            RumConstant.NAVIGATION_LOG_EVENT_NAME,
+            log.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY)
+        )
+        assertEquals(
+            RumConstant.COMPONENT_NAVIGATION,
+            log.attributes.get(GlobalRumConstants.COMPONENT_KEY)
+        )
+    }
+
+    @Test
+    fun `emitted log record contains screen name`() {
+        val emitter = NavigationEventEmitter()
+        emitter.processCachedEvents()
+
+        emitter.emitNavigationEvent("CustomTrackingFragment", "Menu")
+
+        val log = exportedLogs.single()
+        assertEquals("CustomTrackingFragment", log.attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+    }
+
+    @Test
+    fun `emitted log record contains last screen name when previous is provided`() {
+        val emitter = NavigationEventEmitter()
+        emitter.processCachedEvents()
+
+        emitter.emitNavigationEvent("CrashReportsFragment", "Menu")
+
+        val log = exportedLogs.single()
+        assertEquals("Menu", log.attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+    }
+
+    @Test
+    fun `emitted log record omits last screen name when previous is null`() {
+        val emitter = NavigationEventEmitter()
+        emitter.processCachedEvents()
+
+        emitter.emitNavigationEvent("Menu", null)
+
+        val log = exportedLogs.single()
+        assertNull(log.attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+    }
+
+    @Test
+    fun `setAllAttributes preserves caller-provided attribute types`() {
+        val emitter = NavigationEventEmitter()
+        emitter.processCachedEvents()
+
+        val attrs = Attributes.builder()
+            .put(AttributeKey.stringKey("custom.string"), "value")
+            .put(AttributeKey.longKey("custom.long"), 42L)
+            .put(AttributeKey.doubleKey("custom.double"), 3.14)
+            .put(AttributeKey.booleanKey("custom.bool"), true)
+            .build()
+
+        emitter.emitNavigationEvent("GlobalAttributesFragment", null, attrs)
+
+        val log = exportedLogs.single()
+        assertEquals("value", log.attributes.get(AttributeKey.stringKey("custom.string")))
+        assertEquals(42L, log.attributes.get(AttributeKey.longKey("custom.long")))
+        assertEquals(3.14, log.attributes.get(AttributeKey.doubleKey("custom.double")))
+        assertEquals(true, log.attributes.get(AttributeKey.booleanKey("custom.bool")))
+    }
+
+    @Test
+    fun `cached events preserve their attributes through drain`() {
+        val emitter = NavigationEventEmitter()
+
+        val attrs = Attributes.of(AttributeKey.stringKey("section"), "network")
+        emitter.emitNavigationEvent("OkHttpFragment", null, attrs)
+        emitter.processCachedEvents()
+
+        val log = exportedLogs.single()
+        assertEquals("network", log.attributes.get(AttributeKey.stringKey("section")))
+        assertEquals("OkHttpFragment", log.attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+    }
+
+    @Test
+    fun `processCachedEvents with empty cache does not emit`() {
+        val emitter = NavigationEventEmitter()
+        emitter.processCachedEvents()
+
+        assertTrue(exportedLogs.isEmpty())
+    }
+
+    @Test
+    fun `ScreenNameTracker is updated for each cached event during drain`() {
+        val emitter = NavigationEventEmitter()
+
+        emitter.emitNavigationEvent("Menu", null)
+        emitter.emitNavigationEvent("CrashReportsFragment", "Menu")
+        emitter.emitNavigationEvent("Menu", "CrashReportsFragment")
+        emitter.processCachedEvents()
+
+        assertEquals("Menu", ScreenNameTracker.screenName)
+        assertEquals("CrashReportsFragment", ScreenNameTracker.lastScreenName)
+    }
+}
