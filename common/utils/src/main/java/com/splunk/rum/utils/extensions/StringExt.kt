@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.session
+package com.splunk.rum.utils.extensions
 
-import org.json.JSONObject
+import android.util.Base64
+import android.util.Base64.encodeToString
 
-data class SessionMetadata(
-    val sessionId: String,
-    val anonymousUserId: String?,
-    val sessionStart: Long,
-    val sessionLastActivity: Long
-) {
-    fun toJSONObject() = JSONObject().apply {
-        put("sessionId", sessionId)
-        put("anonymousUserId", anonymousUserId)
-        put("sessionStart", sessionStart)
-        put("sessionLastActivity", sessionLastActivity)
-    }
-}
+fun String.toBase64(): String = encodeToString(this.toByteArray(), Base64.NO_WRAP)

@@ -31,8 +31,10 @@ import java.util.concurrent.ScheduledFuture
 
 interface ISplunkSessionManager {
     val sessionId: String
-    val previousSessionId: String?
+    val sessionStart: Long
+    val sessionLastActivity: Long
     val sessionSnapshot: SessionSnapshot
+    val previousSessionId: String?
     val sessionListeners: MutableSet<SessionListener>
 
     fun install(context: Context)
@@ -43,8 +45,10 @@ interface ISplunkSessionManager {
 
 object NoOpSplunkSessionManager : ISplunkSessionManager {
     override val sessionId: String = ""
-    override val previousSessionId: String? = null
     override val sessionSnapshot: SessionSnapshot = SessionSnapshot.NO_OP
+    override val previousSessionId: String? = null
+    override val sessionStart: Long = 0L
+    override val sessionLastActivity: Long = 0L
     override val sessionListeners: MutableSet<SessionListener> = mutableSetOf()
     override fun install(context: Context) = Unit
     override fun trackSessionActivity() = Unit
@@ -63,6 +67,14 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         agentStorage.readSessionIds().toMutableList()
     }
 
+    override val sessionSnapshot: SessionSnapshot
+        @Synchronized get() {
+            val id = createNewSessionIfNeeded()
+            val start = sessionIds.lastOrNull { it.id == id }?.validFrom ?: System.currentTimeMillis()
+            val lastActivity = agentStorage.readSessionLastActivity() ?: start
+            return SessionSnapshot(id, start, lastActivity)
+        }
+
     /**
      * The value is valid after the [install] function is called.
      */
@@ -78,18 +90,11 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     override var previousSessionId: String? = null
         private set
 
-    @get:Synchronized
-    override val sessionSnapshot: SessionSnapshot
-        get() {
-            val sessionId = sessionId
-            val sessionStart = sessionIds.lastOrNull { it.id == sessionId }?.validFrom ?: System.currentTimeMillis()
+    override val sessionStart: Long
+        get() = sessionSnapshot.sessionStart
 
-            return SessionSnapshot(
-                sessionId = sessionId,
-                sessionStart = sessionStart,
-                sessionLastActivity = agentStorage.readSessionLastActivity() ?: sessionStart
-            )
-        }
+    override val sessionLastActivity: Long
+        get() = sessionSnapshot.sessionLastActivity
 
     override val sessionListeners: MutableSet<SessionListener> = HashSet()
 

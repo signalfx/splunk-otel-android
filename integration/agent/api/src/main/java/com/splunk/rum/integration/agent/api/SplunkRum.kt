@@ -69,7 +69,9 @@ class SplunkRum private constructor(
     private val endpointRef: AtomicReference<EndpointConfiguration?> = AtomicReference(agentConfiguration.endpoint),
     val state: IState = State(agentConfiguration, endpointRef),
     val session: ISession = Session(
-        SessionState(agentConfiguration.session, sessionManager, userManager)
+        sessionManager,
+        userManager,
+        agentConfiguration.session
     ),
     val user: User = User(userManager),
     val globalAttributes: MutableAttributes

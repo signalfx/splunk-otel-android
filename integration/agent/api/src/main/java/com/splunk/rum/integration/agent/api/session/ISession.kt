@@ -16,6 +16,21 @@
 
 package com.splunk.rum.integration.agent.api.session
 
+/**
+ * Represents the current RUM session.
+ */
 interface ISession {
+
+    /**
+     * Exposes the current session state, including the session ID and timing information.
+     */
     val state: SessionState
+
+    /**
+     * Returns the current session metadata encoded as a Base64 JSON payload.
+     *
+     * This value is intended for integrations that need to associate web or native activity with
+     * the active RUM session.
+     */
+    val metadata: String
 }
