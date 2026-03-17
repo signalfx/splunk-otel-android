@@ -29,7 +29,6 @@ object GlobalRumConstants {
     /**
      * Span names.
      */
-    const val NAVIGATION_SPAN_NAME = "Created"
     const val APP_START_SPAN_NAME = "AppStart"
 
     /**
