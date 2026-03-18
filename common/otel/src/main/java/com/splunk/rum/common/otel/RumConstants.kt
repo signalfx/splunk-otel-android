@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2026 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,10 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.session
+package com.splunk.rum.common.otel
 
-/**
- * Represents the current RUM session.
- */
-interface ISession {
-
-    /**
-     * Exposes the current session state, including the session ID and timing information.
-     */
-    val state: SessionState
-
-    /**
-     * Returns the current session metadata encoded as a Base64 JSON payload.
-     *
-     * This value is intended for integrations that need to associate web or native activity with
-     * the active RUM session.
-     */
-    val metadata: String
+internal object RumConstants {
+    const val CRASH_INSTRUMENTATION_SCOPE_NAME = "io.opentelemetry.crash"
+    const val DEFAULT_LOG_EVENT_NAME = "splunk.log"
+    const val LOG_BODY_ATTRIBUTE = "body"
 }

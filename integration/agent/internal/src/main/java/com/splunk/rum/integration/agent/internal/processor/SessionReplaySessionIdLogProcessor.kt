@@ -16,10 +16,8 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.common.otel.internal.RumConstants
-import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SCRIPT_INSTANCE_KEY
-import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_ID_KEY
-import com.splunk.rum.integration.agent.internal.attributes.AttributeConstants.SESSION_RUM_ID_KEY
+import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.integration.agent.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
@@ -28,11 +26,13 @@ import io.opentelemetry.sdk.logs.ReadWriteLogRecord
 class SessionReplaySessionIdLogProcessor(private val sessionManager: ISplunkSessionManager) : LogRecordProcessor {
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
         val logRecordData = logRecord.toLogRecordData()
-        if (logRecordData.instrumentationScopeInfo.name == RumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME) {
+        if (logRecordData.instrumentationScopeInfo.name ==
+            GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME
+        ) {
             val id = sessionManager.sessionId(logRecordData.timestampEpochNanos / 1_000_000)
-            logRecord.setAttribute(SESSION_ID_KEY, id)
-                .setAttribute(SESSION_RUM_ID_KEY, id)
-                .setAttribute(SCRIPT_INSTANCE_KEY, id.take(SCRIPT_ID_LENGTH))
+            logRecord.setAttribute(GlobalRumConstants.SESSION_ID_KEY, id)
+                .setAttribute(RumConstants.SESSION_RUM_ID_KEY, id)
+                .setAttribute(RumConstants.SCRIPT_INSTANCE_KEY, id.take(SCRIPT_ID_LENGTH))
         }
     }
 

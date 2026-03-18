@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2026 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.session
+package com.splunk.rum.integration.customtracking
 
-/**
- * Represents the current RUM session.
- */
-interface ISession {
+import io.opentelemetry.api.common.AttributeKey
 
-    /**
-     * Exposes the current session state, including the session ID and timing information.
-     */
-    val state: SessionState
+internal object RumConstants {
 
-    /**
-     * Returns the current session metadata encoded as a Base64 JSON payload.
-     *
-     * This value is intended for integrations that need to associate web or native activity with
-     * the active RUM session.
-     */
-    val metadata: String
+    const val ERROR_TRUE_VALUE = "true"
+    const val COMPONENT_CUSTOM_EVENT = "custom-event"
+    const val COMPONENT_CUSTOM_WORKFLOW = "custom-workflow"
+
+    // Attribute keys
+    val WORKFLOW_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("workflow.name")
 }

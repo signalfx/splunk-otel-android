@@ -14,20 +14,10 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.agent.api.session
+package com.splunk.rum.integration.applicationlifecycle
 
-import org.json.JSONObject
+internal object RumConstants {
 
-data class SessionMetadata(
-    val sessionId: String,
-    val anonymousUserId: String?,
-    val sessionStart: Long,
-    val sessionLastActivity: Long
-) {
-    fun toJSONObject() = JSONObject().apply {
-        put("sessionId", sessionId)
-        put("anonymousUserId", anonymousUserId)
-        put("sessionStart", sessionStart)
-        put("sessionLastActivity", sessionLastActivity)
-    }
+    const val COMPONENT_APP_LIFECYCLE = "app-lifecycle"
+    const val APP_LIFECYCLE_LOG_NAME = "device.app.lifecycle"
 }
