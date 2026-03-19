@@ -17,13 +17,15 @@
 package com.splunk.rum.integration.agent.api.session
 
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.user.IUserManager
 
 /**
  * Exposes immutable accessors for the current RUM session state.
  */
 class SessionState internal constructor(
     private val sessionConfiguration: SessionConfiguration,
-    private val sessionManager: ISplunkSessionManager
+    private val sessionManager: ISplunkSessionManager,
+    private val userManager: IUserManager
 ) {
     /**
      * Unique identifier of the current session.
@@ -54,4 +56,15 @@ class SessionState internal constructor(
      */
     val listeners: List<SessionListener>
         get() = sessionConfiguration.listeners
+
+    val metadata: SessionMetadata
+        get() {
+            val sessionSnapshot = sessionManager.sessionSnapshot
+            return SessionMetadata(
+                sessionId = sessionSnapshot.sessionId,
+                anonymousUserId = userManager.userId,
+                sessionStart = sessionSnapshot.sessionStart,
+                sessionLastActivity = sessionSnapshot.sessionLastActivity
+            )
+        }
 }

@@ -18,6 +18,7 @@ package com.splunk.rum.integration.webview
 
 import android.webkit.JavascriptInterface
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.session.SessionMetadata
 
 /**
  * Object to inject into WebViews as a JavaScript object, in order to integrate with browser RUM.

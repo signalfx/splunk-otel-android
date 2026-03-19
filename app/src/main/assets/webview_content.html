@@ -69,6 +69,7 @@
                 }
             }
 
+
             function getSessionId() {
                 var bridge = typeof SplunkRumNative !== "undefined" ? SplunkRumNative : null;
                 if (!bridge || typeof bridge.getNativeSessionId !== "function") {

@@ -12,6 +12,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Updated desugar_jdk_libs to v2.1.5
 * Updated ByteBuddy to v1.18.7
 
+
 ### Version 2.1.8 - 2026-03-09
 * Fixed IllegalStateException when rumAccessToken was missing but endpoint URL existed during OTEL span uploads
 * Added SessionMetadata API for custom session metadata
