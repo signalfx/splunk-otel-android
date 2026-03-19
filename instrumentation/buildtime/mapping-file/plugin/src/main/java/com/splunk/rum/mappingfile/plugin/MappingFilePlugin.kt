@@ -90,6 +90,7 @@ class MappingFilePlugin : Plugin<Project> {
         ) {
             it.variantName.set(variantName)
             it.buildDirectory.set(project.layout.buildDirectory)
+            it.outputs.upToDateWhen { false }
         }
 
         variant.artifacts.use(manifestInjector)
