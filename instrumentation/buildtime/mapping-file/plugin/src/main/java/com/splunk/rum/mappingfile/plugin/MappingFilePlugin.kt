@@ -112,23 +112,30 @@ class MappingFilePlugin : Plugin<Project> {
         val assembleTaskName = "assemble${variantName.replaceFirstChar { it.uppercase() }}"
         logger.debug("Upload", "Hooking into task '$assembleTaskName' for upload")
 
+        // Extract Provider references from variant at configuration time.
+        // Providers are serializable and configuration-cache safe, unlike the
+        // variant/extension model objects themselves.
+        val applicationIdProvider = variant.applicationId
+        val versionCodeProvider = variant.outputs.firstOrNull()?.versionCode
+
         project.afterEvaluate {
+            // Resolve extension values now (afterEvaluate guarantees DSL is finalized)
+            val accessToken = extension.apiAccessToken.orNull
+                ?: System.getenv("SPLUNK_ACCESS_TOKEN")
+            val realm = extension.realm.orNull ?: System.getenv("SPLUNK_REALM")
+            val failBuildOnUploadFailure = extension.failBuildOnUploadFailure.get()
+
             val assembleTask = project.tasks.named(assembleTaskName)
             assembleTask.configure { taskConfig ->
                 taskConfig.doLast { executingTask ->
-                    val applicationId = variant.applicationId.get()
-                    val versionCode = variant.outputs.firstOrNull()?.versionCode?.orNull ?: 0
-                    val accessToken = extension.apiAccessToken.orNull
-                        ?: System.getenv("SPLUNK_ACCESS_TOKEN")
-                    val realm = extension.realm.orNull ?: System.getenv("SPLUNK_REALM")
-                    val failBuildOnUploadFailure = extension.failBuildOnUploadFailure.get()
-
+                    // Only plain values and Providers are captured here — no AGP
+                    // model objects or Gradle extensions in the closure.
                     TaskActions.executeUploadTask(
                         task = executingTask,
                         buildDir = buildDir,
                         variantName = variantName,
-                        applicationId = applicationId,
-                        versionCode = versionCode,
+                        applicationId = applicationIdProvider.get(),
+                        versionCode = versionCodeProvider?.orNull ?: 0,
                         buildTypeName = buildTypeName,
                         accessToken = accessToken,
                         realm = realm,
