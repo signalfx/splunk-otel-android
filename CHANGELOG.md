@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Version 2.1.9 - 2026-03-19
+* Fixed RejectedExecutionException crash in UploadOtelSpanDataJob when executor was shut down and could not be recreated
+* Updated session metadata API
+* Removed otel-android-core dependency
+* Updated desugar_jdk_libs to v2.1.5
+* Updated ByteBuddy to v1.18.7
+
 ### Version 2.1.8 - 2026-03-09
 * Fixed IllegalStateException when rumAccessToken was missing but endpoint URL existed during OTEL span uploads
 * Added SessionMetadata API for custom session metadata
