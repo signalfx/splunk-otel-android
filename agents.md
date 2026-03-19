@@ -51,6 +51,27 @@ If a task appears to require changing any public method in `agent/` or `integrat
 - Default behaviors must not change in ways that break existing integrations
 - New features should be opt-in, not opt-out
 
+### 4. Defensive Runtime Behavior (No Crash-First SDK Paths)
+
+**SDK runtime code must be defensive by default.**
+
+- The SDK must not crash customer apps for predictable runtime conditions
+- Avoid introducing `throw`/`error`/`require` in runtime paths where invalid state can occur in production (e.g., missing storage values, unavailable optional modules, unsupported environment state)
+- Prefer graceful degradation (no-op or partial behavior) and continue execution when safe
+- Log failures internally for diagnostics, but keep failures transparent to SDK consumers
+
+#### When exceptions are acceptable
+- Input validation for clearly invalid developer usage at API boundaries (and only when there is no safe fallback)
+- Unit tests and test-only utilities
+- Build-time tooling paths (not app runtime)
+
+#### PR review requirement
+For every PR touching runtime code, reviewers (including AI reviewers) must explicitly check:
+1. Could this change throw in a predictable runtime scenario?
+2. If yes, can we replace it with log + graceful fallback?
+3. Is the fallback behavior backward compatible and non-breaking for host apps?
+4. Is there a test covering the degraded path?
+
 ---
 
 ## Project Overview
@@ -262,6 +283,7 @@ You MAY proceed without explicit approval for:
 | Fix bugs (API-preserving) | ✅ YES | Maintain backwards compatibility |
 | Performance optimization | ✅ YES | If behavior is identical |
 | Update documentation | ✅ YES | Always encouraged |
+| Throw on predictable runtime edge-case | ❌ NO | Use log + graceful fallback instead |
 
 ---
 
