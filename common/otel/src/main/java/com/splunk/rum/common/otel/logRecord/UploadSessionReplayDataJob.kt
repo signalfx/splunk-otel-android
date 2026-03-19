@@ -47,7 +47,7 @@ internal class UploadSessionReplayDataJob : JobService() {
         if (current != null && !current.isShutdown) {
             return current
         }
-        return Executors.newSingleThreadExecutor(NamedThreadFactory("splunkUploadSessionReplayExecutor"))
+        return Executors.newSingleThreadExecutor(NamedThreadFactory("uploadSessionReplayExecutor"))
             .also { executor = it }
     }
 

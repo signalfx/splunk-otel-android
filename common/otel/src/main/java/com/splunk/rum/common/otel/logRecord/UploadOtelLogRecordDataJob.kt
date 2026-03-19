@@ -47,7 +47,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
         if (current != null && !current.isShutdown) {
             return current
         }
-        return Executors.newSingleThreadExecutor(NamedThreadFactory("splunkUploadLogExecutor"))
+        return Executors.newSingleThreadExecutor(NamedThreadFactory("uploadLogExecutor"))
             .also { executor = it }
     }
 

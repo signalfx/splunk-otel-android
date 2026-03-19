@@ -47,7 +47,7 @@ internal class UploadOtelSpanDataJob : JobService() {
         if (current != null && !current.isShutdown) {
             return current
         }
-        return Executors.newSingleThreadExecutor(NamedThreadFactory("splunkUploadSpanExecutor"))
+        return Executors.newSingleThreadExecutor(NamedThreadFactory("uploadSpanExecutor"))
             .also { executor = it }
     }
 
