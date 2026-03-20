@@ -33,6 +33,7 @@ import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragme
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentActivityCallback29
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentCallback
 import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.common.Attributes
 import java.lang.ref.WeakReference
 
 /**
@@ -47,7 +48,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     private const val TAG = "NavigationModuleIntegration"
     private var currentActivityReference: WeakReference<Activity>? = null
 
-    private var emitter: NavigationEventEmitter? = null
+    private val emitter = NavigationEventEmitter()
     private var screenChangeDetector: ScreenChangeDetector? = null
 
     private val activityLifecycleCallbacksAdapter = object : ActivityLifecycleCallbacksAdapter {
@@ -58,6 +59,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Navigation.instance.listener = navigationListener
         (context as Application).registerActivityLifecycleCallbacks(
             activityLifecycleCallbacksAdapter
         )
@@ -70,15 +72,11 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     ) {
         Logger.d(TAG, "onInstall")
         if (moduleConfiguration.isEnabled) {
-            val navigationEmitter = NavigationEventEmitter()
-            emitter = navigationEmitter
-            Navigation.instance.listener = navigationListener
-
             if (moduleConfiguration.isAutomatedTrackingEnabled) {
                 Logger.d(TAG, "Navigation module automated tracking enabled. Registering navigation callbacks.")
 
                 val application = context.applicationContext as Application
-                screenChangeDetector = ScreenChangeDetector(navigationEmitter)
+                screenChangeDetector = ScreenChangeDetector(emitter)
 
                 registerActivityLifecycle(application, screenChangeDetector!!)
                 registerFragmentLifecycle(application, screenChangeDetector!!)
@@ -101,7 +99,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     override fun onPostInstall() {
         super.onPostInstall()
         Logger.d(TAG, "onPostInstall() - processing cached events")
-        emitter?.processCachedEvents()
+        emitter.processCachedEvents()
     }
 
     /**
@@ -130,12 +128,11 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     }
 
     private val navigationListener = object : Navigation.Listener {
-        override fun onScreenNameChanged(screenName: String, attributes: io.opentelemetry.api.common.Attributes) {
-            Logger.d(TAG, "onScreenNameChanged(screenName: $screenName)")
+        override fun onScreenNameChanged(screenName: String, attributes: Attributes) {
+            Logger.d(TAG, "onScreenNameChanged(screenName: $screenName, attributes: $attributes)")
 
-            val navigationEmitter = emitter ?: return
             val previousScreenName = ScreenNameTracker.screenName
-            navigationEmitter.emitNavigationEvent(screenName, previousScreenName, attributes)
+            emitter.emitNavigationEvent(screenName, previousScreenName, attributes)
             screenChangeDetector?.recordEmittedScreen(screenName)
         }
     }

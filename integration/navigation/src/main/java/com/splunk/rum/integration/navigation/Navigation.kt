@@ -23,16 +23,10 @@ class Navigation internal constructor() {
     internal var listener: Listener? = null
 
     /**
-     * Record a navigation to [screenName] (manual tracking).
-     */
-    fun track(screenName: String) {
-        listener?.onScreenNameChanged(screenName, Attributes.empty())
-    }
-
-    /**
      * Record a navigation to [screenName] with optional [attributes] (manual tracking).
      */
-    fun track(screenName: String, attributes: Attributes) {
+    @JvmOverloads
+    fun track(screenName: String, attributes: Attributes = Attributes.empty()) {
         listener?.onScreenNameChanged(screenName, attributes)
     }
 

@@ -20,13 +20,13 @@ import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
+import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 
 /**
  * Registers [NavigationFragmentCallback] for API 29+ (uses onActivityPreCreated).
  */
 internal class NavigationFragmentActivityCallback29(private val fragmentCallback: NavigationFragmentCallback) :
-    com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter {
+    ActivityLifecycleCallbacksAdapter {
 
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
         if (Build.VERSION.SDK_INT >= 29 && activity is FragmentActivity) {
