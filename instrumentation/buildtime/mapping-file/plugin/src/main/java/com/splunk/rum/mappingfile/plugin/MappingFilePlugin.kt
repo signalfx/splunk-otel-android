@@ -19,6 +19,7 @@ package com.splunk.rum.mappingfile.plugin
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
+import com.android.build.api.variant.VariantOutputConfiguration
 import com.android.build.gradle.AppPlugin
 import com.splunk.rum.mappingfile.plugin.utils.BuildIdInjector
 import com.splunk.rum.mappingfile.plugin.utils.MappingFileUploader
@@ -116,7 +117,10 @@ class MappingFilePlugin : Plugin<Project> {
         // Providers are serializable and configuration-cache safe, unlike the
         // variant/extension model objects themselves.
         val applicationIdProvider = variant.applicationId
-        val versionCodeProvider = variant.outputs.firstOrNull()?.versionCode
+        val mainOutput = variant.outputs.firstOrNull {
+            it.outputType == VariantOutputConfiguration.OutputType.SINGLE
+        } ?: variant.outputs.firstOrNull()
+        val versionCodeProvider = mainOutput?.versionCode
 
         project.afterEvaluate {
             // Resolve extension values now (afterEvaluate guarantees DSL is finalized)
@@ -128,14 +132,26 @@ class MappingFilePlugin : Plugin<Project> {
             val assembleTask = project.tasks.named(assembleTaskName)
             assembleTask.configure { taskConfig ->
                 taskConfig.doLast { executingTask ->
-                    // Only plain values and Providers are captured here — no AGP
-                    // model objects or Gradle extensions in the closure.
+                    val versionCode = versionCodeProvider?.orNull
+                    if (versionCode == null) {
+                        val msg = "versionCode is not set for variant '$variantName'. " +
+                            "Cannot upload mapping file without a valid versionCode."
+                        if (failBuildOnUploadFailure) {
+                            throw GradleException(
+                                "Mapping file upload failed for variant '$variantName': $msg"
+                            )
+                        } else {
+                            SplunkLogger(executingTask.logger).warn("Upload", "$msg Skipping upload.")
+                            return@doLast
+                        }
+                    }
+
                     TaskActions.executeUploadTask(
                         task = executingTask,
                         buildDir = buildDir,
                         variantName = variantName,
                         applicationId = applicationIdProvider.get(),
-                        versionCode = versionCodeProvider?.orNull ?: 0,
+                        versionCode = versionCode,
                         buildTypeName = buildTypeName,
                         accessToken = accessToken,
                         realm = realm,
