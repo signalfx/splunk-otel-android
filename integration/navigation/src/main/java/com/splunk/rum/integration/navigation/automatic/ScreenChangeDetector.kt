@@ -46,6 +46,8 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     }
 
     fun onActivityResumed(activity: Activity) {
+        if (ScreenNameDescriptor.isIgnored(activity)) return
+
         val name = ScreenNameDescriptor.getName(activity)
         lastResumedActivityName = name
         // Defer so fragment callbacks, which run synchronously during the same resume, execute
@@ -54,6 +56,8 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     }
 
     fun onActivityPaused(activity: Activity) {
+        if (ScreenNameDescriptor.isIgnored(activity)) return
+
         val name = ScreenNameDescriptor.getName(activity)
         previouslyLastResumedActivityName = name
         if (lastResumedActivityName == name) {

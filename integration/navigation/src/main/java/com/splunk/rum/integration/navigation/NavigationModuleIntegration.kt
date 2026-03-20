@@ -70,34 +70,40 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall")
-        if (moduleConfiguration.isEnabled) {
-            if (moduleConfiguration.isAutomatedTrackingEnabled) {
-                Logger.d(TAG, "Navigation module automated tracking enabled. Registering navigation callbacks.")
+        if (!moduleConfiguration.isEnabled) {
+            Navigation.instance.listener = null
+            (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
+            currentActivityReference = null
+            return
+        }
 
-                val application = context.applicationContext as Application
-                val detector = ScreenChangeDetector(emitter)
-                screenChangeDetector = detector
+        if (moduleConfiguration.isAutomatedTrackingEnabled) {
+            Logger.d(TAG, "Navigation module automated tracking enabled. Registering navigation callbacks.")
 
-                registerActivityLifecycle(application, detector)
-                registerFragmentLifecycle(application, detector)
+            val application = context.applicationContext as Application
+            val detector = ScreenChangeDetector(emitter)
+            screenChangeDetector = detector
 
-                // Seed detector with already visible activity for late/hybrid installs.
-                currentActivityReference?.get()?.let { activity ->
-                    detector.onActivityResumed(activity)
-                    if (activity is FragmentActivity) {
-                        val fragmentCallback = NavigationFragmentCallback(detector)
-                        activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
-                    }
+            registerActivityLifecycle(application, detector)
+            registerFragmentLifecycle(application, detector)
+
+            // Seed detector with already visible activity for late/hybrid installs.
+            currentActivityReference?.get()?.let { activity ->
+                detector.onActivityResumed(activity)
+                if (activity is FragmentActivity) {
+                    val fragmentCallback = NavigationFragmentCallback(detector)
+                    activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
                 }
-
-                (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
-                currentActivityReference = null
             }
         }
+
+        (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
+        currentActivityReference = null
     }
 
     override fun onPostInstall() {
         super.onPostInstall()
+        if (!moduleConfiguration.isEnabled) return
         Logger.d(TAG, "onPostInstall() - processing cached events")
         emitter.processCachedEvents()
     }
