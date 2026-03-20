@@ -87,13 +87,18 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             registerActivityLifecycle(application, detector)
             registerFragmentLifecycle(application, detector)
 
-            // Seed detector with already visible activity for late/hybrid installs.
+            // Seed detector with already visible activity/fragment for late/hybrid installs.
             currentActivityReference?.get()?.let { activity ->
-                detector.onActivityResumed(activity)
                 if (activity is FragmentActivity) {
                     val fragmentCallback = NavigationFragmentCallback(detector)
                     activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
+                    activity.supportFragmentManager.fragments.forEach { fragment ->
+                        if (fragment.isResumed) {
+                            detector.onFragmentResumed(fragment)
+                        }
+                    }
                 }
+                detector.onActivityResumed(activity)
             }
         }
 

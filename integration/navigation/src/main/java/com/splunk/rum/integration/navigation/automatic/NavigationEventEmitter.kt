@@ -79,12 +79,12 @@ internal class NavigationEventEmitter {
         val builder = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
+            .setAllAttributes(attributes)
             .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstant.NAVIGATION_LOG_EVENT_NAME)
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstant.COMPONENT_NAVIGATION)
             .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, screenName)
 
         previousScreenName?.let { builder.setAttribute(GlobalRumConstants.LAST_SCREEN_NAME_KEY, it) }
-        builder.setAllAttributes(attributes)
         builder.emit()
     }
 
