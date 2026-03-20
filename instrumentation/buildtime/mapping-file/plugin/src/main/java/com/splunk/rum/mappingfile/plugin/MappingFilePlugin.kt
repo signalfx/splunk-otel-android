@@ -16,8 +16,11 @@
 
 package com.splunk.rum.mappingfile.plugin
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.api.ApplicationVariant
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.ApplicationVariant
+import com.android.build.api.variant.VariantOutputConfiguration
+import com.android.build.gradle.AppPlugin
 import com.splunk.rum.mappingfile.plugin.utils.BuildIdInjector
 import com.splunk.rum.mappingfile.plugin.utils.MappingFileUploader
 import com.splunk.rum.mappingfile.plugin.utils.SplunkLogger
@@ -43,146 +46,121 @@ class MappingFilePlugin : Plugin<Project> {
         extension = project.extensions.create("splunkRum", SplunkRumExtension::class.java)
         logger.debug("Setup", "Created splunkRum extension")
 
-        project.afterEvaluate {
-            logger.debug("Setup", "Evaluating plugin configuration")
-            if (extension.enabled.get()) {
-                logger.info("Setup", "Plugin is enabled, proceeding with setup")
-                setupBuildIdInjection()
-            } else {
-                logger.lifecycle("Setup", "Plugin is disabled via configuration")
+        project.plugins.withType(AppPlugin::class.java) {
+            logger.debug("Setup", "Found Android application plugin")
+
+            val androidComponents = project.extensions.getByType(
+                ApplicationAndroidComponentsExtension::class.java
+            )
+
+            androidComponents.onVariants { variant ->
+                if (!extension.enabled.get()) {
+                    logger.lifecycle("Setup", "Plugin is disabled via configuration")
+                    return@onVariants
+                }
+
+                if (variant.isMinifyEnabled) {
+                    logger.info("Setup", "Processing variant '${variant.name}' (minification enabled)")
+                    processVariant(variant)
+                } else {
+                    logger.info("Setup", "Skipping variant '${variant.name}' as minification not enabled")
+                }
             }
         }
     }
 
-    private fun setupBuildIdInjection() {
-        logger.debug("Setup", "Looking for Android application plugin")
-        val android = project.extensions.findByType(AppExtension::class.java)
-        if (android == null) {
-            logger.warn("Setup", "Android application plugin not found, skipping setup")
-            return
-        }
-
-        logger.info("Setup", "Found Android application plugin, configuring variants")
-
-        // Extract buildDir at configuration time
+    private fun processVariant(variant: ApplicationVariant) {
+        val variantName = variant.name
+        val buildTypeName = variant.buildType ?: "unknown"
         val buildDir = project.layout.buildDirectory.get().asFile
 
-        android.applicationVariants.configureEach { variant ->
-            logger.debug("Setup", "Evaluating variant '${variant.name}'")
-            if (variant.buildType.isMinifyEnabled) {
-                logger.info("Setup", "Processing variant '${variant.name}' (minification enabled)")
-                processVariant(variant, buildDir)
-            } else {
-                logger.info("Setup", "Skipping variant '${variant.name}' as minification not enabled")
-            }
-        }
-    }
-
-    private fun processVariant(variant: ApplicationVariant, buildDir: File) {
-        logger.debug("Setup", "Starting processing for variant '${variant.name}'")
-
-        // Extract all needed data from variant and extension at configuration time
-        val variantName = variant.name
-        val applicationId = variant.applicationId
-        val versionCode = variant.versionCode
-        val buildTypeName = variant.buildType.name
-        val accessToken = extension.apiAccessToken.orNull ?: System.getenv("SPLUNK_ACCESS_TOKEN")
-        val realm = extension.realm.orNull ?: System.getenv("SPLUNK_REALM")
-        val failBuildOnUploadFailure = extension.failBuildOnUploadFailure.get()
-
-        // Setting up injection of build ID into manifest
+        logger.debug("Setup", "Starting processing for variant '$variantName'")
         logger.info("Setup", "Setting up build ID injection and upload for variant '$variantName'")
-        logger.debug("BuildId", "Initiating build ID injection for variant '$variantName'")
 
-        setupBuildIdInjectionForVariant(variant, variantName, buildDir)
+        setupBuildIdInjectionForVariant(variant, variantName)
 
-        // Set up upload task
-        logger.info("Upload", "Setting up upload task for variant '$variantName'")
-        setupUploadTask(
-            variantName = variantName,
-            applicationId = applicationId,
-            versionCode = versionCode,
-            buildTypeName = buildTypeName,
-            buildDir = buildDir,
-            accessToken = accessToken,
-            realm = realm,
-            failBuildOnUploadFailure = failBuildOnUploadFailure
-        )
+        setupUploadTask(variant, variantName, buildTypeName, buildDir)
     }
 
-    private fun setupBuildIdInjectionForVariant(variant: ApplicationVariant, variantName: String, buildDir: File) {
-        variant.outputs.forEach { output ->
-            try {
-                val processManifestTaskProvider = output.processManifestProvider
-                val processManifestTask = processManifestTaskProvider.get()
+    private fun setupBuildIdInjectionForVariant(variant: ApplicationVariant, variantName: String) {
+        logger.debug("BuildId", "Registering manifest transform task for variant '$variantName'")
 
-                // Extract the actual File paths at configuration time, not the FileCollection
-                val manifestOutputFiles = processManifestTask.outputs.files.files
-
-                processManifestTask.outputs.upToDateWhen { false }
-                processManifestTask.doLast { task ->
-                    // Call static method to avoid capturing plugin instance
-                    TaskActions.executeBuildIdInjection(
-                        task = task,
-                        buildDir = buildDir,
-                        variantName = variantName,
-                        manifestOutputFiles = manifestOutputFiles
-                    )
-                }
-            } catch (e: Exception) {
-                // Fallback approach
-                logger.warn("BuildId", "Could not hook processManifest: ${e.message}")
-                logger.debug("BuildId", "Falling back to package task hook")
-
-                val packageTaskName = "package${variant.name.capitalize(Locale.ROOT)}"
-
-                val packageTask = project.tasks.named(packageTaskName)
-                packageTask.configure { taskConfig ->
-                    taskConfig.doFirst { executingTask ->
-                        // Call static method to avoid capturing plugin instance
-                        TaskActions.executeBuildIdInjectionFallback(
-                            task = executingTask,
-                            buildDir = buildDir,
-                            variantName = variantName
-                        )
-                    }
-                }
-            }
+        val manifestInjector = project.tasks.register(
+            "splunkInjectBuildId${variantName.replaceFirstChar { it.uppercase() }}",
+            ManifestBuildIdInjectorTask::class.java
+        ) {
+            it.variantName.set(variantName)
+            it.buildDirectory.set(project.layout.buildDirectory)
+            it.outputs.upToDateWhen { false }
         }
+
+        variant.artifacts.use(manifestInjector)
+            .wiredWithFiles(
+                ManifestBuildIdInjectorTask::mergedManifest,
+                ManifestBuildIdInjectorTask::updatedManifest
+            )
+            .toTransform(SingleArtifact.MERGED_MANIFEST)
+
+        logger.info("BuildId", "Registered manifest transform for variant '$variantName'")
     }
 
     private fun setupUploadTask(
+        variant: ApplicationVariant,
         variantName: String,
-        applicationId: String,
-        versionCode: Int,
         buildTypeName: String,
-        buildDir: File,
-        accessToken: String?,
-        realm: String?,
-        failBuildOnUploadFailure: Boolean
+        buildDir: File
     ) {
-        // Hook into the assemble task to upload after build completes
-        val assembleTaskName = "assemble${variantName.capitalize(Locale.ROOT)}"
+        val assembleTaskName = "assemble${variantName.replaceFirstChar { it.uppercase() }}"
         logger.debug("Upload", "Hooking into task '$assembleTaskName' for upload")
 
-        val assembleTask = project.tasks.named(assembleTaskName)
-        assembleTask.configure { taskConfig ->
-            taskConfig.doLast { executingTask ->
-                // Call static method to avoid capturing plugin instance
-                TaskActions.executeUploadTask(
-                    task = executingTask,
-                    buildDir = buildDir,
-                    variantName = variantName,
-                    applicationId = applicationId,
-                    versionCode = versionCode,
-                    buildTypeName = buildTypeName,
-                    accessToken = accessToken,
-                    realm = realm,
-                    failBuildOnUploadFailure = failBuildOnUploadFailure
-                )
+        // Extract Provider references from variant at configuration time.
+        // Providers are serializable and configuration-cache safe, unlike the
+        // variant/extension model objects themselves.
+        val applicationIdProvider = variant.applicationId
+        val mainOutput = variant.outputs.firstOrNull {
+            it.outputType == VariantOutputConfiguration.OutputType.SINGLE
+        } ?: variant.outputs.firstOrNull()
+        val versionCodeProvider = mainOutput?.versionCode
+
+        project.afterEvaluate {
+            // Resolve extension values now (afterEvaluate guarantees DSL is finalized)
+            val accessToken = extension.apiAccessToken.orNull
+                ?: System.getenv("SPLUNK_ACCESS_TOKEN")
+            val realm = extension.realm.orNull ?: System.getenv("SPLUNK_REALM")
+            val failBuildOnUploadFailure = extension.failBuildOnUploadFailure.get()
+
+            val assembleTask = project.tasks.named(assembleTaskName)
+            assembleTask.configure { taskConfig ->
+                taskConfig.doLast { executingTask ->
+                    val versionCode = versionCodeProvider?.orNull
+                    if (versionCode == null) {
+                        val msg = "versionCode is not set for variant '$variantName'. " +
+                            "Cannot upload mapping file without a valid versionCode."
+                        if (failBuildOnUploadFailure) {
+                            throw GradleException(
+                                "Mapping file upload failed for variant '$variantName': $msg"
+                            )
+                        } else {
+                            SplunkLogger(executingTask.logger).warn("Upload", "$msg Skipping upload.")
+                            return@doLast
+                        }
+                    }
+
+                    TaskActions.executeUploadTask(
+                        task = executingTask,
+                        buildDir = buildDir,
+                        variantName = variantName,
+                        applicationId = applicationIdProvider.get(),
+                        versionCode = versionCode,
+                        buildTypeName = buildTypeName,
+                        accessToken = accessToken,
+                        realm = realm,
+                        failBuildOnUploadFailure = failBuildOnUploadFailure
+                    )
+                }
             }
+            logger.info("Upload", "Successfully configured upload task for variant '$variantName'")
         }
-        logger.info("Upload", "Successfully configured upload task for variant '$variantName'")
     }
 }
 
@@ -224,31 +202,5 @@ internal object TaskActions {
             realm = realm,
             failBuildOnUploadFailure = failBuildOnUploadFailure
         )
-    }
-
-    fun executeBuildIdInjection(task: Task, buildDir: File, variantName: String, manifestOutputFiles: Set<File>) {
-        val taskLogger = SplunkLogger(task.logger)
-
-        taskLogger.info("BuildId", "Executing injection after processManifest")
-
-        val buildId = UUID.randomUUID().toString()
-        taskLogger.lifecycle("BuildId", "Generated build ID for variant '$variantName': $buildId")
-
-        BuildIdInjector.writeBuildIdToFile(buildDir, variantName, buildId)
-        BuildIdInjector.injectMetadataIntoMergedManifest(variantName, manifestOutputFiles, buildId, taskLogger)
-    }
-
-    fun executeBuildIdInjectionFallback(task: Task, buildDir: File, variantName: String) {
-        val taskLogger = SplunkLogger(task.logger)
-
-        taskLogger.info("BuildId", "Executing injection via package task fallback")
-
-        val buildId = UUID.randomUUID().toString()
-        taskLogger.lifecycle("BuildId", "Generated build ID for variant '$variantName': $buildId")
-
-        BuildIdInjector.writeBuildIdToFile(buildDir, variantName, buildId)
-
-        val manifestFiles = BuildIdInjector.findManifestFiles(buildDir, variantName)
-        BuildIdInjector.injectMetadataIntoManifestFiles(variantName, manifestFiles, buildId, taskLogger)
     }
 }
