@@ -24,7 +24,6 @@ import androidx.fragment.app.FragmentActivity
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
-import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.navigation.automatic.NavigationEventEmitter
 import com.splunk.rum.integration.navigation.automatic.ScreenChangeDetector
@@ -52,7 +51,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     private var screenChangeDetector: ScreenChangeDetector? = null
 
     private val activityLifecycleCallbacksAdapter = object : ActivityLifecycleCallbacksAdapter {
-        override fun onActivityStarted(activity: Activity) {
+        override fun onActivityResumed(activity: Activity) {
             currentActivityReference = WeakReference(activity)
         }
     }
@@ -76,16 +75,17 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
                 Logger.d(TAG, "Navigation module automated tracking enabled. Registering navigation callbacks.")
 
                 val application = context.applicationContext as Application
-                screenChangeDetector = ScreenChangeDetector(emitter)
+                val detector = ScreenChangeDetector(emitter)
+                screenChangeDetector = detector
 
-                registerActivityLifecycle(application, screenChangeDetector!!)
-                registerFragmentLifecycle(application, screenChangeDetector!!)
+                registerActivityLifecycle(application, detector)
+                registerFragmentLifecycle(application, detector)
 
                 // Seed detector with already visible activity for late/hybrid installs.
                 currentActivityReference?.get()?.let { activity ->
-                    screenChangeDetector!!.onActivityResumed(activity)
+                    detector.onActivityResumed(activity)
                     if (activity is FragmentActivity) {
-                        val fragmentCallback = NavigationFragmentCallback(screenChangeDetector!!)
+                        val fragmentCallback = NavigationFragmentCallback(detector)
                         activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
                     }
                 }
@@ -131,8 +131,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         override fun onScreenNameChanged(screenName: String, attributes: Attributes) {
             Logger.d(TAG, "onScreenNameChanged(screenName: $screenName, attributes: $attributes)")
 
-            val previousScreenName = ScreenNameTracker.screenName
-            emitter.emitNavigationEvent(screenName, previousScreenName, attributes)
+            emitter.emitNavigationEvent(screenName, attributes)
             screenChangeDetector?.recordEmittedScreen(screenName)
         }
     }

@@ -39,7 +39,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     /**
      * Current visible screen name: fragment if any, else activity.
      */
-    private fun currentVisibleScreenName(): String? {
+    private fun getCurrentVisibleScreenName(): String? {
         val fragment = lastResumedFragmentName
         if (fragment != null) return fragment
         return lastResumedActivityName
@@ -101,11 +101,10 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
      * Only called from resumed callbacks.
      */
     private fun tryEmitIfChanged() {
-        val current = currentVisibleScreenName() ?: return
+        val current = getCurrentVisibleScreenName() ?: return
         if (current == lastEmittedScreenName) return
 
-        val previous = lastEmittedScreenName
         lastEmittedScreenName = current
-        eventEmitter.emitNavigationEvent(current, previous)
+        eventEmitter.emitNavigationEvent(current)
     }
 }

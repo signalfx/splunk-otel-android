@@ -77,19 +77,19 @@ class NavigationEventEmitterTest {
     fun `events are cached before processCachedEvents is called`() {
         val emitter = NavigationEventEmitter()
 
-        emitter.emitNavigationEvent("Menu", null)
-        emitter.emitNavigationEvent("CrashReportsFragment", "Menu")
+        emitter.emitNavigationEvent("Menu")
+        emitter.emitNavigationEvent("CrashReportsFragment")
 
-        assertEquals(GlobalRumConstants.DEFAULT_SCREEN_NAME, ScreenNameTracker.screenName)
-        assertTrue(exportedLogs.isEmpty())
+        assertEquals("CrashReportsFragment", ScreenNameTracker.screenName)
+        assertTrue("Events should be cached, not exported", exportedLogs.isEmpty())
     }
 
     @Test
     fun `processCachedEvents drains and emits all cached events`() {
         val emitter = NavigationEventEmitter()
 
-        emitter.emitNavigationEvent("Menu", null)
-        emitter.emitNavigationEvent("CrashReportsFragment", "Menu")
+        emitter.emitNavigationEvent("Menu")
+        emitter.emitNavigationEvent("CrashReportsFragment")
         emitter.processCachedEvents()
 
         assertEquals("CrashReportsFragment", ScreenNameTracker.screenName)
@@ -101,7 +101,8 @@ class NavigationEventEmitterTest {
         val emitter = NavigationEventEmitter()
         emitter.processCachedEvents()
 
-        emitter.emitNavigationEvent("OkHttpFragment", "Menu")
+        ScreenNameTracker.screenName = "Menu"
+        emitter.emitNavigationEvent("OkHttpFragment")
 
         assertEquals("OkHttpFragment", ScreenNameTracker.screenName)
         assertEquals(1, exportedLogs.size)
@@ -112,7 +113,7 @@ class NavigationEventEmitterTest {
         val emitter = NavigationEventEmitter()
         emitter.processCachedEvents()
 
-        emitter.emitNavigationEvent("Menu", null)
+        emitter.emitNavigationEvent("Menu")
 
         val log = exportedLogs.single()
         assertEquals(
@@ -130,29 +131,31 @@ class NavigationEventEmitterTest {
         val emitter = NavigationEventEmitter()
         emitter.processCachedEvents()
 
-        emitter.emitNavigationEvent("CustomTrackingFragment", "Menu")
+        ScreenNameTracker.screenName = "Menu"
+        emitter.emitNavigationEvent("CustomTrackingFragment")
 
         val log = exportedLogs.single()
         assertEquals("CustomTrackingFragment", log.attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
     }
 
     @Test
-    fun `emitted log record contains last screen name when previous is provided`() {
+    fun `emitted log record contains last screen name from ScreenNameTracker`() {
         val emitter = NavigationEventEmitter()
         emitter.processCachedEvents()
 
-        emitter.emitNavigationEvent("CrashReportsFragment", "Menu")
+        ScreenNameTracker.screenName = "Menu"
+        emitter.emitNavigationEvent("CrashReportsFragment")
 
         val log = exportedLogs.single()
         assertEquals("Menu", log.attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
     }
 
     @Test
-    fun `emitted log record omits last screen name when previous is null`() {
+    fun `emitted log record omits last screen name when previous is DEFAULT_SCREEN_NAME`() {
         val emitter = NavigationEventEmitter()
         emitter.processCachedEvents()
 
-        emitter.emitNavigationEvent("Menu", null)
+        emitter.emitNavigationEvent("Menu")
 
         val log = exportedLogs.single()
         assertNull(log.attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
@@ -170,7 +173,7 @@ class NavigationEventEmitterTest {
             .put(AttributeKey.booleanKey("custom.bool"), true)
             .build()
 
-        emitter.emitNavigationEvent("GlobalAttributesFragment", null, attrs)
+        emitter.emitNavigationEvent("GlobalAttributesFragment", attrs)
 
         val log = exportedLogs.single()
         assertEquals("value", log.attributes.get(AttributeKey.stringKey("custom.string")))
@@ -184,7 +187,7 @@ class NavigationEventEmitterTest {
         val emitter = NavigationEventEmitter()
 
         val attrs = Attributes.of(AttributeKey.stringKey("section"), "network")
-        emitter.emitNavigationEvent("OkHttpFragment", null, attrs)
+        emitter.emitNavigationEvent("OkHttpFragment", attrs)
         emitter.processCachedEvents()
 
         val log = exportedLogs.single()
@@ -201,15 +204,28 @@ class NavigationEventEmitterTest {
     }
 
     @Test
-    fun `ScreenNameTracker is updated for each cached event during drain`() {
+    fun `ScreenNameTracker is updated eagerly during caching and correctly during drain`() {
         val emitter = NavigationEventEmitter()
 
-        emitter.emitNavigationEvent("Menu", null)
-        emitter.emitNavigationEvent("CrashReportsFragment", "Menu")
-        emitter.emitNavigationEvent("Menu", "CrashReportsFragment")
+        emitter.emitNavigationEvent("Menu")
+        emitter.emitNavigationEvent("CrashReportsFragment")
+        emitter.emitNavigationEvent("Menu")
         emitter.processCachedEvents()
 
         assertEquals("Menu", ScreenNameTracker.screenName)
         assertEquals("CrashReportsFragment", ScreenNameTracker.lastScreenName)
+    }
+
+    @Test
+    fun `cached events capture correct previousScreenName chain`() {
+        val emitter = NavigationEventEmitter()
+
+        emitter.emitNavigationEvent("Menu")
+        emitter.emitNavigationEvent("CrashReportsFragment")
+        emitter.processCachedEvents()
+
+        assertEquals(2, exportedLogs.size)
+        assertNull(exportedLogs[0].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+        assertEquals("Menu", exportedLogs[1].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
     }
 }

@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.navigation.automatic
 
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
@@ -34,39 +35,31 @@ internal class NavigationEventEmitter {
         const val TAG = "NavigationEventEmitter"
     }
 
-    private val lock = Any()
     private val cache: MutableList<CachedEvent> = mutableListOf()
-
-    @Volatile
     private var isInstallComplete = false
 
     /**
      * Emit a navigation event for a screen change.
-     * Updates [ScreenNameTracker.screenName] and emits a log record.
-     * Caches the event if installation is not complete.
+     * Resolves [ScreenNameTracker.screenName] as the previous screen, updates it to [screenName],
+     * and emits a log record. Caches the event if installation is not complete.
      */
-    fun emitNavigationEvent(
-        screenName: String,
-        previousScreenName: String?,
-        attributes: Attributes = Attributes.empty()
-    ) {
+    fun emitNavigationEvent(screenName: String, attributes: Attributes = Attributes.empty()) {
         val timestamp = System.currentTimeMillis()
-        synchronized(lock) {
-            if (!isInstallComplete) {
-                Logger.d(TAG) {
-                    "Install not complete, caching navigation event: $previousScreenName -> $screenName"
-                }
-                cache += CachedEvent(screenName, previousScreenName, attributes, timestamp)
-                return
+        val previousScreenName = ScreenNameTracker.screenName.takeIf {
+            it != GlobalRumConstants.DEFAULT_SCREEN_NAME
+        }
+        ScreenNameTracker.screenName = screenName
+        if (!isInstallComplete) {
+            Logger.d(TAG) {
+                "Install not complete, caching navigation event: $previousScreenName -> $screenName"
             }
+            cache += CachedEvent(screenName, previousScreenName, attributes, timestamp)
+            return
         }
 
         emitEventInternal(screenName, previousScreenName, attributes, timestamp)
     }
 
-    /**
-     * Actually emit the event to OpenTelemetry.
-     */
     private fun emitEventInternal(
         screenName: String,
         previousScreenName: String?,
@@ -90,9 +83,7 @@ internal class NavigationEventEmitter {
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstant.COMPONENT_NAVIGATION)
             .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, screenName)
 
-        previousScreenName?.let {
-            builder.setAttribute(GlobalRumConstants.LAST_SCREEN_NAME_KEY, it)
-        }
+        previousScreenName?.let { builder.setAttribute(GlobalRumConstants.LAST_SCREEN_NAME_KEY, it) }
         builder.setAllAttributes(attributes)
         builder.emit()
     }
@@ -101,15 +92,13 @@ internal class NavigationEventEmitter {
      * Process all cached events. Called when installation is complete.
      */
     fun processCachedEvents() {
-        val cachedEvents: List<CachedEvent>
-        synchronized(lock) {
-            cachedEvents = cache.toList()
-            cache.clear()
-            isInstallComplete = true
-        }
+        val cachedEvents = cache.toList()
+        cache.clear()
+        isInstallComplete = true
+
         if (cachedEvents.isNotEmpty()) {
             Logger.d(TAG) { "Processing cached navigation events (size: ${cachedEvents.size})" }
-            cachedEvents.forEach { event ->
+            cachedEvents.forEachFast { event ->
                 emitEventInternal(event.screenName, event.previousScreenName, event.attributes, event.timestamp)
             }
         }
