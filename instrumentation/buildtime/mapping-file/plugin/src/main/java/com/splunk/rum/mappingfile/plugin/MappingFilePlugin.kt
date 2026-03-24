@@ -21,15 +21,9 @@ import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
 import com.android.build.api.variant.VariantOutputConfiguration
 import com.android.build.gradle.AppPlugin
-import com.splunk.rum.mappingfile.plugin.utils.BuildIdInjector
-import com.splunk.rum.mappingfile.plugin.utils.MappingFileUploader
 import com.splunk.rum.mappingfile.plugin.utils.SplunkLogger
-import java.io.File
-import java.util.*
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 
 class MappingFilePlugin : Plugin<Project> {
 
@@ -72,14 +66,13 @@ class MappingFilePlugin : Plugin<Project> {
     private fun processVariant(variant: ApplicationVariant) {
         val variantName = variant.name
         val buildTypeName = variant.buildType ?: "unknown"
-        val buildDir = project.layout.buildDirectory.get().asFile
 
         logger.debug("Setup", "Starting processing for variant '$variantName'")
         logger.info("Setup", "Setting up build ID injection and upload for variant '$variantName'")
 
         setupBuildIdInjectionForVariant(variant, variantName)
 
-        setupUploadTask(variant, variantName, buildTypeName, buildDir)
+        setupUploadTask(variant, variantName, buildTypeName)
     }
 
     private fun setupBuildIdInjectionForVariant(variant: ApplicationVariant, variantName: String) {
@@ -104,103 +97,44 @@ class MappingFilePlugin : Plugin<Project> {
         logger.info("BuildId", "Registered manifest transform for variant '$variantName'")
     }
 
-    private fun setupUploadTask(
-        variant: ApplicationVariant,
-        variantName: String,
-        buildTypeName: String,
-        buildDir: File
-    ) {
+    private fun setupUploadTask(variant: ApplicationVariant, variantName: String, buildTypeName: String) {
         val assembleTaskName = "assemble${variantName.replaceFirstChar { it.uppercase() }}"
-        logger.debug("Upload", "Hooking into task '$assembleTaskName' for upload")
+        logger.debug("Upload", "Registering upload task for variant '$variantName'")
 
-        // Extract Provider references from variant at configuration time.
-        // Providers are serializable and configuration-cache safe, unlike the
-        // variant/extension model objects themselves.
-        val applicationIdProvider = variant.applicationId
         val mainOutput = variant.outputs.firstOrNull {
             it.outputType == VariantOutputConfiguration.OutputType.SINGLE
         } ?: variant.outputs.firstOrNull()
-        val versionCodeProvider = mainOutput?.versionCode
 
-        project.afterEvaluate {
-            // Resolve extension values now (afterEvaluate guarantees DSL is finalized)
-            val accessToken = extension.apiAccessToken.orNull
-                ?: System.getenv("SPLUNK_ACCESS_TOKEN")
-            val realm = extension.realm.orNull ?: System.getenv("SPLUNK_REALM")
-            val failBuildOnUploadFailure = extension.failBuildOnUploadFailure.get()
-
-            val assembleTask = project.tasks.named(assembleTaskName)
-            assembleTask.configure { taskConfig ->
-                taskConfig.doLast { executingTask ->
-                    val versionCode = versionCodeProvider?.orNull
-                    if (versionCode == null) {
-                        val msg = "versionCode is not set for variant '$variantName'. " +
-                            "Cannot upload mapping file without a valid versionCode."
-                        if (failBuildOnUploadFailure) {
-                            throw GradleException(
-                                "Mapping file upload failed for variant '$variantName': $msg"
-                            )
-                        } else {
-                            SplunkLogger(executingTask.logger).warn("Upload", "$msg Skipping upload.")
-                            return@doLast
-                        }
-                    }
-
-                    TaskActions.executeUploadTask(
-                        task = executingTask,
-                        buildDir = buildDir,
-                        variantName = variantName,
-                        applicationId = applicationIdProvider.get(),
-                        versionCode = versionCode,
-                        buildTypeName = buildTypeName,
-                        accessToken = accessToken,
-                        realm = realm,
-                        failBuildOnUploadFailure = failBuildOnUploadFailure
-                    )
-                }
+        val uploadTask = project.tasks.register(
+            "splunkUploadMappingFile${variantName.replaceFirstChar { it.uppercase() }}",
+            MappingFileUploadTask::class.java
+        ) {
+            it.variantName.set(variantName)
+            it.applicationId.set(variant.applicationId)
+            if (mainOutput != null) {
+                it.versionCode.set(mainOutput.versionCode)
             }
-            logger.info("Upload", "Successfully configured upload task for variant '$variantName'")
+            it.buildTypeName.set(buildTypeName)
+            it.buildDirectory.set(project.layout.buildDirectory)
+            it.failBuildOnUploadFailure.set(extension.failBuildOnUploadFailure)
+            it.accessToken.set(
+                extension.apiAccessToken.orElse(
+                    project.providers.environmentVariable("SPLUNK_ACCESS_TOKEN")
+                )
+            )
+            it.realm.set(
+                extension.realm.orElse(
+                    project.providers.environmentVariable("SPLUNK_REALM")
+                )
+            )
         }
-    }
-}
 
-internal object TaskActions {
-
-    fun executeUploadTask(
-        task: Task,
-        buildDir: File,
-        variantName: String,
-        applicationId: String,
-        versionCode: Int,
-        buildTypeName: String,
-        accessToken: String?,
-        realm: String?,
-        failBuildOnUploadFailure: Boolean
-    ) {
-        val taskLogger = SplunkLogger(task.logger)
-
-        taskLogger.debug("Upload", "Assemble task completed, starting upload process")
-
-        val buildId = BuildIdInjector.readBuildIdFromFile(buildDir, variantName)
-            ?: run {
-                val errorMessage = "Build ID file not found for variant '$variantName'. " +
-                    "This indicates the manifest injection task didn't complete successfully."
-                taskLogger.error("Upload", errorMessage)
-                throw GradleException("Mapping file upload failed for variant '$variantName': $errorMessage")
+        project.tasks.configureEach { task ->
+            if (task.name == assembleTaskName) {
+                task.finalizedBy(uploadTask)
             }
+        }
 
-        taskLogger.lifecycle("Upload", "Using build ID for variant '$variantName': $buildId")
-
-        val uploader = MappingFileUploader(buildDir, taskLogger)
-        uploader.uploadAfterBuild(
-            variantName = variantName,
-            applicationId = applicationId,
-            versionCode = versionCode,
-            buildTypeName = buildTypeName,
-            buildId = buildId,
-            accessToken = accessToken,
-            realm = realm,
-            failBuildOnUploadFailure = failBuildOnUploadFailure
-        )
+        logger.info("Upload", "Registered upload task for variant '$variantName'")
     }
 }
