@@ -130,12 +130,11 @@ class App : Application() {
     )
 
     private val lifecycleModuleConfiguration = LifecycleModuleConfiguration(
-        isEnabled = true,
-        allowedEvents = setOf(LifecycleAction.POST_CREATED, LifecycleAction.DESTROYED)
+        isEnabled = true
         // Default tracks RESUMED + PAUSED only. For more detail, use a preset:
         //   allowedEvents = LifecycleModuleConfiguration.CORE_LIFECYCLE_EVENTS
         //   allowedEvents = LifecycleModuleConfiguration.ALL_LIFECYCLE_EVENTS
-        // or a custom set of events:
+        // or a custom set of events eg:
         //   allowedEvents = setOf(LifecycleAction.POST_CREATED, LifecycleAction.DESTROYED)
 
     )
