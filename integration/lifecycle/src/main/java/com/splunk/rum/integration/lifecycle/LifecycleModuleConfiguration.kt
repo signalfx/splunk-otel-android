@@ -57,7 +57,6 @@ data class LifecycleModuleConfiguration @JvmOverloads constructor(
          * Core lifecycle events without pre/post variants. Covers the main lifecycle transitions
          * for both Activities and Fragments
          */
-        @JvmField
         val CORE_LIFECYCLE_EVENTS: Set<LifecycleAction> = setOf(
             LifecycleAction.CREATED,
             LifecycleAction.STARTED,
@@ -74,7 +73,6 @@ data class LifecycleModuleConfiguration @JvmOverloads constructor(
         /**
          * Every lifecycle callback including pre/post variants (API 29+).
          */
-        @JvmField
         val ALL_LIFECYCLE_EVENTS: Set<LifecycleAction> = LifecycleAction.values().toSet()
     }
 }
