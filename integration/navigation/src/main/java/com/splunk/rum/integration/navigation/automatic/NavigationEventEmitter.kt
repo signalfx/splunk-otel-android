@@ -66,8 +66,6 @@ internal class NavigationEventEmitter {
         attributes: Attributes,
         timestamp: Long
     ) {
-        ScreenNameTracker.screenName = screenName
-
         val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider
         if (logger == null) {
             Logger.w(TAG, "Logger provider not ready, skipping navigation event")
