@@ -72,6 +72,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         Logger.d(TAG, "onInstall")
         if (!moduleConfiguration.isEnabled) {
             Navigation.instance.listener = null
+            emitter.clearCache()
             (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
             currentActivityReference = null
             return
@@ -108,7 +109,10 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
     override fun onPostInstall() {
         super.onPostInstall()
-        if (!moduleConfiguration.isEnabled) return
+        if (!moduleConfiguration.isEnabled || !moduleConfiguration.isAutomatedTrackingEnabled) {
+            emitter.clearCache()
+            return
+        }
         Logger.d(TAG, "onPostInstall() - processing cached events")
         emitter.processCachedEvents()
     }

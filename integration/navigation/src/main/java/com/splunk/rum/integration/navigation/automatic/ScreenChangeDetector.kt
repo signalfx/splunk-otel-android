@@ -27,14 +27,16 @@ import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
  * Detects visible screen changes (Activity/Fragment) and notifies [NavigationEventEmitter].
  * Fragment takes precedence over Activity when both are present.
  *
+ * DialogFragments are ignored as they are overlays, not screen navigations.
+ * Users can manually track full-screen dialogs via [Navigation.track].
+ *
  * Emits only on resumed (onFragmentResumed / onActivityResumed) as the trigger.
  */
+
 internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmitter) {
     private val handler = Handler(Looper.getMainLooper())
     private var lastResumedActivityName: String? = null
-    private var previouslyLastResumedActivityName: String? = null
     private var lastResumedFragmentName: String? = null
-    private var previouslyLastResumedFragmentName: String? = null
 
     /**
      * Current visible screen name: fragment if any, else activity.
@@ -59,18 +61,14 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
         if (ScreenNameDescriptor.isIgnored(activity)) return
 
         val name = ScreenNameDescriptor.getName(activity)
-        previouslyLastResumedActivityName = name
         if (lastResumedActivityName == name) {
             lastResumedActivityName = null
         }
     }
 
     fun onFragmentResumed(fragment: Fragment) {
+        if (fragment is DialogFragment) return
         if (ScreenNameDescriptor.isIgnored(fragment)) return
-
-        if (fragment is DialogFragment) {
-            previouslyLastResumedFragmentName = lastResumedFragmentName
-        }
 
         val name = ScreenNameDescriptor.getName(fragment)
         lastResumedFragmentName = name
@@ -78,15 +76,12 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     }
 
     fun onFragmentPaused(fragment: Fragment) {
+        if (fragment is DialogFragment) return
         if (ScreenNameDescriptor.isIgnored(fragment)) return
 
-        if (fragment is DialogFragment) {
-            lastResumedFragmentName = previouslyLastResumedFragmentName
-        } else if (lastResumedFragmentName == ScreenNameDescriptor.getName(fragment)) {
+        if (lastResumedFragmentName == ScreenNameDescriptor.getName(fragment)) {
             lastResumedFragmentName = null
         }
-
-        previouslyLastResumedFragmentName = ScreenNameDescriptor.getName(fragment)
     }
 
     private var lastEmittedScreenName: String? = null

@@ -87,6 +87,14 @@ internal class NavigationEventEmitter {
     }
 
     /**
+     * Clears any cached events without emitting them.
+     */
+    fun clearCache() {
+        cache.clear()
+        isInstallComplete = true
+    }
+
+    /**
      * Process all cached events. Called when installation is complete.
      */
     fun processCachedEvents() {
