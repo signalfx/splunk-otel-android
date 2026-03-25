@@ -19,7 +19,6 @@ package com.splunk.rum.integration.navigation.automatic
 import android.app.Activity
 import android.os.Handler
 import android.os.Looper
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
 
@@ -27,8 +26,8 @@ import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
  * Detects visible screen changes (Activity/Fragment) and notifies [NavigationEventEmitter].
  * Fragment takes precedence over Activity when both are present.
  *
- * DialogFragments are ignored as they are overlays, not screen navigations.
- * Users can manually track full-screen dialogs via [Navigation.track].
+ * Elements marked as ignored by [ScreenNameDescriptor] (e.g. DialogFragment, NavHostFragment,
+ * or annotated with isIgnored = true) are skipped entirely.
  *
  * Emits on resumed (onFragmentResumed / onActivityResumed) as the primary trigger.
  * Also emits via deferred post on fragment pause to handle the case where a fragment
@@ -69,7 +68,6 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     }
 
     fun onFragmentResumed(fragment: Fragment) {
-        if (fragment is DialogFragment) return
         if (ScreenNameDescriptor.isIgnored(fragment)) return
 
         val name = ScreenNameDescriptor.getName(fragment)
@@ -78,7 +76,6 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     }
 
     fun onFragmentPaused(fragment: Fragment) {
-        if (fragment is DialogFragment) return
         if (ScreenNameDescriptor.isIgnored(fragment)) return
 
         val name = ScreenNameDescriptor.getName(fragment)
@@ -91,7 +88,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     private fun findResumedAncestorName(fragment: Fragment): String? {
         var parent = fragment.parentFragment
         while (parent != null) {
-            if (parent.isResumed && parent !is DialogFragment && !ScreenNameDescriptor.isIgnored(parent)) {
+            if (parent.isResumed && !ScreenNameDescriptor.isIgnored(parent)) {
                 return ScreenNameDescriptor.getName(parent)
             }
             parent = parent.parentFragment

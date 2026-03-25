@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.navigation.descriptor
 
 import android.app.Activity
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.splunk.rum.integration.navigation.NavigationElement
 import com.splunk.rum.integration.navigation.screen.RumScreenName
@@ -35,6 +36,7 @@ internal object ScreenNameDescriptor {
         getNavigationElement(element)?.name ?: getRumScreenName(element)?.name ?: element::class.java.simpleName
 
     private fun isIgnored(element: Any): Boolean {
+        if (element is DialogFragment) return true
         // Ignore NavHostFragment by default (Jetpack Navigation container; not a user-facing screen).
         if (element is Fragment && element.javaClass.name == NAV_HOST_FRAGMENT_CLASS_NAME) {
             return true
