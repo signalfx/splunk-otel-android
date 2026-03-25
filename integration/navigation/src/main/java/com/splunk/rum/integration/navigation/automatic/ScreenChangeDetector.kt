@@ -30,7 +30,9 @@ import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
  * DialogFragments are ignored as they are overlays, not screen navigations.
  * Users can manually track full-screen dialogs via [Navigation.track].
  *
- * Emits only on resumed (onFragmentResumed / onActivityResumed) as the trigger.
+ * Emits on resumed (onFragmentResumed / onActivityResumed) as the primary trigger.
+ * Also emits via deferred post on fragment pause to handle the case where a fragment
+ * is removed without a replacement (falling back to parent fragment or activity).
  */
 
 internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmitter) {
@@ -79,9 +81,22 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
         if (fragment is DialogFragment) return
         if (ScreenNameDescriptor.isIgnored(fragment)) return
 
-        if (lastResumedFragmentName == ScreenNameDescriptor.getName(fragment)) {
-            lastResumedFragmentName = null
+        val name = ScreenNameDescriptor.getName(fragment)
+        if (lastResumedFragmentName == name) {
+            lastResumedFragmentName = findResumedAncestorName(fragment)
         }
+        handler.post { tryEmitIfChanged() }
+    }
+
+    private fun findResumedAncestorName(fragment: Fragment): String? {
+        var parent = fragment.parentFragment
+        while (parent != null) {
+            if (parent.isResumed && parent !is DialogFragment && !ScreenNameDescriptor.isIgnored(parent)) {
+                return ScreenNameDescriptor.getName(parent)
+            }
+            parent = parent.parentFragment
+        }
+        return null
     }
 
     private var lastEmittedScreenName: String? = null
