@@ -18,6 +18,7 @@ package com.splunk.rum.integration.navigation.automatic
 
 import android.app.Activity
 import android.os.Looper
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
@@ -194,6 +195,79 @@ class ScreenChangeDetectorTest {
         )
     }
 
+    @Test
+    fun `dialog fragment resumed does not emit navigation event`() {
+        val dialog = TestDialogFragment()
+
+        detector.onFragmentResumed(dialog)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertTrue(exportedLogs.isEmpty())
+    }
+
+    @Test
+    fun `dialog fragment does not affect underlying screen name`() {
+        val menu = MenuFragment()
+        val dialog = TestDialogFragment()
+
+        detector.onFragmentResumed(menu)
+        assertEquals(1, exportedLogs.size)
+        assertEquals("Menu", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+
+        detector.onFragmentResumed(dialog)
+        detector.onFragmentPaused(dialog)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(1, exportedLogs.size)
+    }
+
+    @Test
+    fun `fragment removed without replacement falls back to activity`() {
+        val activity = activityController.create().get()
+        val menu = MenuFragment()
+
+        detector.onActivityResumed(activity)
+        detector.onFragmentResumed(menu)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(1, exportedLogs.size)
+        assertEquals("Menu", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+
+        detector.onFragmentPaused(menu)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(2, exportedLogs.size)
+        assertEquals("Main", exportedLogs[1].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+        assertEquals("Menu", exportedLogs[1].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+    }
+
+    @Test
+    fun `fragment to fragment transition does not emit extra event from deferred pause`() {
+        val menu = MenuFragment()
+        val crashReports = CrashReportsFragment()
+
+        detector.onFragmentResumed(menu)
+        assertEquals(1, exportedLogs.size)
+
+        detector.onFragmentPaused(menu)
+        detector.onFragmentResumed(crashReports)
+        assertEquals(2, exportedLogs.size)
+
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(2, exportedLogs.size)
+    }
+
+    @Test
+    fun `ignored activity does not emit navigation event`() {
+        val activity = activityController.create().get()
+        val ignoredActivity = Robolectric.buildActivity(IgnoredActivity::class.java).create().get()
+
+        detector.onActivityResumed(ignoredActivity)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertTrue(exportedLogs.isEmpty())
+    }
+
     @NavigationElement(name = "Main")
     class MainActivity : Activity()
 
@@ -203,4 +277,9 @@ class ScreenChangeDetectorTest {
     class CrashReportsFragment : Fragment()
 
     class OkHttpFragment : Fragment()
+
+    class TestDialogFragment : DialogFragment()
+
+    @NavigationElement(name = "Ignored", isIgnored = true)
+    class IgnoredActivity : Activity()
 }

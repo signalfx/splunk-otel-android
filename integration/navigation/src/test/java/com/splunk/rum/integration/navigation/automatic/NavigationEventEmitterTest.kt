@@ -228,4 +228,26 @@ class NavigationEventEmitterTest {
         assertNull(exportedLogs[0].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
         assertEquals("Menu", exportedLogs[1].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
     }
+
+    @Test
+    fun `clearCache drops cached events without emitting`() {
+        val emitter = NavigationEventEmitter()
+
+        emitter.emitNavigationEvent("Menu")
+        emitter.emitNavigationEvent("CrashReportsFragment")
+        emitter.clearCache()
+
+        assertTrue(exportedLogs.isEmpty())
+    }
+
+    @Test
+    fun `clearCache marks install complete so future events emit directly`() {
+        val emitter = NavigationEventEmitter()
+
+        emitter.clearCache()
+        emitter.emitNavigationEvent("Menu")
+
+        assertEquals(1, exportedLogs.size)
+        assertEquals("Menu", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+    }
 }
