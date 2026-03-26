@@ -109,8 +109,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
     override fun onPostInstall() {
         super.onPostInstall()
-        if (!moduleConfiguration.isEnabled || !moduleConfiguration.isAutomatedTrackingEnabled) {
-            emitter.clearCache()
+        if (!moduleConfiguration.isEnabled) {
             return
         }
         Logger.d(TAG, "onPostInstall() - processing cached events")
