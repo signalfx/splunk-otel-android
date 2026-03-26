@@ -230,6 +230,38 @@ class NavigationEventEmitterTest {
     }
 
     @Test
+    fun `manual track events before init are cached and drained with correct screen chain`() {
+        val emitter = NavigationEventEmitter()
+
+        emitter.emitNavigationEvent("Login")
+        emitter.emitNavigationEvent("Dashboard")
+        assertTrue(exportedLogs.isEmpty())
+
+        emitter.processCachedEvents()
+
+        assertEquals(2, exportedLogs.size)
+        assertEquals("Login", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+        assertNull(exportedLogs[0].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+        assertEquals("Dashboard", exportedLogs[1].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+        assertEquals("Login", exportedLogs[1].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+    }
+
+    @Test
+    fun `manual track events emit directly after cache drain`() {
+        val emitter = NavigationEventEmitter()
+
+        emitter.emitNavigationEvent("Login")
+        emitter.processCachedEvents()
+        assertEquals(1, exportedLogs.size)
+
+        emitter.emitNavigationEvent("Dashboard")
+
+        assertEquals(2, exportedLogs.size)
+        assertEquals("Dashboard", exportedLogs[1].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+        assertEquals("Login", exportedLogs[1].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+    }
+
+    @Test
     fun `clearCache drops cached events without emitting`() {
         val emitter = NavigationEventEmitter()
 

@@ -268,8 +268,56 @@ class ScreenChangeDetectorTest {
         assertTrue(exportedLogs.isEmpty())
     }
 
+    @Test
+    fun `activity to activity transition tracks last screen name`() {
+        val mainActivity = activityController.create().get()
+        val settingsActivity = Robolectric.buildActivity(SettingsActivity::class.java).create().get()
+
+        detector.onActivityResumed(mainActivity)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(1, exportedLogs.size)
+        assertEquals("Main", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+
+        detector.onActivityPaused(mainActivity)
+        detector.onActivityResumed(settingsActivity)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(2, exportedLogs.size)
+        assertEquals("Settings", exportedLogs[1].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+        assertEquals("Main", exportedLogs[1].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+    }
+
+    @Test
+    fun `ignored fragment does not emit navigation event`() {
+        val fragment = IgnoredFragment()
+
+        detector.onFragmentResumed(fragment)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertTrue(exportedLogs.isEmpty())
+    }
+
+    @Test
+    fun `ignored fragment does not affect underlying screen name`() {
+        val menu = MenuFragment()
+        val ignored = IgnoredFragment()
+
+        detector.onFragmentResumed(menu)
+        assertEquals(1, exportedLogs.size)
+
+        detector.onFragmentResumed(ignored)
+        detector.onFragmentPaused(ignored)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(1, exportedLogs.size)
+        assertEquals("Menu", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+    }
+
     @NavigationElement(name = "Main")
     class MainActivity : Activity()
+
+    @NavigationElement(name = "Settings")
+    class SettingsActivity : Activity()
 
     @NavigationElement(name = "Menu")
     class MenuFragment : Fragment()
@@ -282,4 +330,7 @@ class ScreenChangeDetectorTest {
 
     @NavigationElement(name = "Ignored", isIgnored = true)
     class IgnoredActivity : Activity()
+
+    @NavigationElement(name = "Hidden", isIgnored = true)
+    class IgnoredFragment : Fragment()
 }

@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.navigation.descriptor
 
 import android.app.Activity
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.splunk.rum.integration.navigation.NavigationElement
 import com.splunk.rum.integration.navigation.screen.RumScreenName
@@ -102,6 +103,18 @@ class ScreenNameDescriptorTest {
         assertTrue(ScreenNameDescriptor.isIgnored(activity))
     }
 
+    @Test
+    fun `isIgnored returns true for DialogFragment`() {
+        val dialog = TestDialogFragment()
+        assertTrue(ScreenNameDescriptor.isIgnored(dialog))
+    }
+
+    @Test
+    fun `isIgnored returns true for annotated DialogFragment`() {
+        val dialog = AnnotatedDialogFragment()
+        assertTrue(ScreenNameDescriptor.isIgnored(dialog))
+    }
+
     @NavigationElement(name = "Menu")
     class MenuFragment : Fragment()
 
@@ -130,4 +143,9 @@ class ScreenNameDescriptorTest {
 
     @NavigationElement(name = "Splash", isIgnored = true)
     class SplashActivity : Activity()
+
+    class TestDialogFragment : DialogFragment()
+
+    @NavigationElement(name = "Confirmation")
+    class AnnotatedDialogFragment : DialogFragment()
 }
