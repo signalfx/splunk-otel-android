@@ -25,8 +25,12 @@ import com.splunk.rum.integration.lifecycle.model.LifecycleAction
  * This module captures Android Activity and Fragment lifecycle transitions and emits them
  * as OpenTelemetry `device.app.ui.lifecycle` events.
  *
+ * By default, only [LifecycleAction.RESUMED] and [LifecycleAction.PAUSED] events are tracked,
+ * producing roughly the same event volume as the legacy navigation module. Use the preset
+ * constants ([CORE_LIFECYCLE_EVENTS], [ALL_LIFECYCLE_EVENTS]) or a custom set for more detail.
+ *
  * @property isEnabled Whether the module is enabled. Default is true.
- * @property allowedEvents Set of lifecycle actions to track. Default is all events.
+ * @property allowedEvents Set of lifecycle actions to track. Default is RESUMED and PAUSED.
  */
 data class LifecycleModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
@@ -42,8 +46,33 @@ data class LifecycleModuleConfiguration @JvmOverloads constructor(
 
     companion object {
         /**
-         * Default set of allowed lifecycle events - includes all events.
+         * Default: tracks only screen visible (resumed) and screen hidden (paused) transitions.
          */
-        val DEFAULT_ALLOWED_EVENTS: Set<LifecycleAction> = LifecycleAction.values().toSet()
+        val DEFAULT_ALLOWED_EVENTS: Set<LifecycleAction> = setOf(
+            LifecycleAction.RESUMED,
+            LifecycleAction.PAUSED
+        )
+
+        /**
+         * Core lifecycle events without pre/post variants. Covers the main lifecycle transitions
+         * for both Activities and Fragments
+         */
+        val CORE_LIFECYCLE_EVENTS: Set<LifecycleAction> = setOf(
+            LifecycleAction.CREATED,
+            LifecycleAction.STARTED,
+            LifecycleAction.RESUMED,
+            LifecycleAction.PAUSED,
+            LifecycleAction.STOPPED,
+            LifecycleAction.DESTROYED,
+            LifecycleAction.ATTACHED,
+            LifecycleAction.VIEW_CREATED,
+            LifecycleAction.VIEW_DESTROYED,
+            LifecycleAction.DETACHED
+        )
+
+        /**
+         * Every lifecycle callback including pre/post variants (API 29+).
+         */
+        val ALL_LIFECYCLE_EVENTS: Set<LifecycleAction> = LifecycleAction.values().toSet()
     }
 }
