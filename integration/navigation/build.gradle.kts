@@ -36,4 +36,9 @@ dependencies {
 
     implementation(Dependencies.SessionReplay.commonUtils)
     implementation(Dependencies.SessionReplay.commonLogger)
+
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.mockito)
+    testImplementation(Dependencies.Test.robolectric)
+    testImplementation(Dependencies.Test.androidXTestCore)
 }
