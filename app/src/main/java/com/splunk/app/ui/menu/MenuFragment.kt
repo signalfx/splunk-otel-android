@@ -36,7 +36,9 @@ import com.splunk.app.ui.slowrendering.SlowRenderingFragment
 import com.splunk.app.ui.webview.WebViewFragment
 import com.splunk.app.util.ApiVariant
 import com.splunk.app.util.FragmentAnimation
+import com.splunk.rum.integration.navigation.NavigationElement
 
+@NavigationElement(name = "Menu")
 class MenuFragment : BaseFragment<FragmentMenuBinding>() {
 
     override val viewBindingCreator: (LayoutInflater, ViewGroup?, Boolean) -> FragmentMenuBinding
