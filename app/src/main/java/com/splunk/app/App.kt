@@ -133,16 +133,17 @@ class App : Application() {
     )
 
     private val lifecycleModuleConfiguration = LifecycleModuleConfiguration(
-        isEnabled = true
+        isEnabled = true,
         // Uncomment below allowedEvents to configure event filtration
-//        allowedEvents = setOf(
-//            LifecycleAction.CREATED,
-//            LifecycleAction.RESUMED,
-//            LifecycleAction.DESTROYED
-//        )
+        allowedEvents = setOf(
+            LifecycleAction.RESUMED
+        )
     )
 
-    private val navigationModuleConfiguration = NavigationModuleConfiguration()
+    private val navigationModuleConfiguration = NavigationModuleConfiguration(
+        isEnabled = true,
+        isAutomatedTrackingEnabled = true
+    )
 
     private val sessionReplayModuleConfiguration = SessionReplayModuleConfiguration(
         isEnabled = true,
