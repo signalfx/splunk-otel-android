@@ -130,11 +130,10 @@ class App : Application() {
     )
 
     private val lifecycleModuleConfiguration = LifecycleModuleConfiguration(
-        isEnabled = true,
-        // Uncomment below allowedEvents to configure event filtration
-        allowedEvents = setOf(
-            LifecycleAction.RESUMED
-        )
+        isEnabled = true
+        // Default tracks CORE_LIFECYCLE_EVENTS (no pre/post variants). For other options:
+        //   allowedEvents = LifecycleModuleConfiguration.ALL_LIFECYCLE_EVENTS
+        //   allowedEvents = setOf(LifecycleAction.RESUMED, LifecycleAction.PAUSED)
     )
 
     private val navigationModuleConfiguration = NavigationModuleConfiguration(

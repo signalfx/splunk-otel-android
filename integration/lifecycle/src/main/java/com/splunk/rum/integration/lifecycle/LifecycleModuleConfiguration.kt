@@ -26,7 +26,7 @@ import com.splunk.rum.integration.lifecycle.model.LifecycleAction
  * as OpenTelemetry `device.app.ui.lifecycle` events.
  *
  * @property isEnabled Whether the module is enabled. Default is true.
- * @property allowedEvents Set of lifecycle actions to track. Default is all events.
+ * @property allowedEvents Set of lifecycle actions to track. Default is [CORE_LIFECYCLE_EVENTS].
  */
 data class LifecycleModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
@@ -42,8 +42,31 @@ data class LifecycleModuleConfiguration @JvmOverloads constructor(
 
     companion object {
         /**
-         * Default set of allowed lifecycle events - includes all events.
+         * Core lifecycle events without pre/post variants. Covers the main lifecycle transitions
+         * for both Activities and Fragments.
          */
-        val DEFAULT_ALLOWED_EVENTS: Set<LifecycleAction> = LifecycleAction.values().toSet()
+        val CORE_LIFECYCLE_EVENTS: Set<LifecycleAction> = setOf(
+            LifecycleAction.CREATED,
+            LifecycleAction.STARTED,
+            LifecycleAction.RESUMED,
+            LifecycleAction.PAUSED,
+            LifecycleAction.STOPPED,
+            LifecycleAction.DESTROYED,
+            LifecycleAction.ATTACHED,
+            LifecycleAction.VIEW_CREATED,
+            LifecycleAction.VIEW_DESTROYED,
+            LifecycleAction.DETACHED
+        )
+
+        /**
+         * Every lifecycle callback including pre/post variants (API 29+).
+         * Full diagnostic detail.
+         */
+        val ALL_LIFECYCLE_EVENTS: Set<LifecycleAction> = LifecycleAction.values().toSet()
+
+        /**
+         * Default: tracks core lifecycle events (no pre/post variants).
+         */
+        val DEFAULT_ALLOWED_EVENTS: Set<LifecycleAction> = CORE_LIFECYCLE_EVENTS
     }
 }
