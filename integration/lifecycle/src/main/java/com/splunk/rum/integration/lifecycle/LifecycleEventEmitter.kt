@@ -66,12 +66,16 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
     fun emitFragmentEvent(fragment: Fragment, action: LifecycleAction) {
         val elementId = fragment::class.java.name // Class-level tracking
         val elementName = fragment::class.java.simpleName
+        val activityName = fragment.activity?.javaClass?.simpleName
+        val parentFragmentName = fragment.parentFragment?.javaClass?.simpleName
         emitEvent(
             elementType = RumConstants.UI_LIFECYCLE_FRAGMENT_TYPE,
             elementName = elementName,
             elementId = elementId,
             action = action,
-            timestamp = System.currentTimeMillis()
+            timestamp = System.currentTimeMillis(),
+            activityName = activityName,
+            parentFragmentName = parentFragmentName
         )
     }
 
@@ -85,7 +89,9 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         elementName: String,
         elementId: String,
         action: LifecycleAction,
-        timestamp: Long
+        timestamp: Long,
+        activityName: String? = null,
+        parentFragmentName: String? = null
     ) {
         if (action !in allowedEvents) {
             Logger.d(TAG) {
@@ -99,12 +105,12 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
                 Logger.d(TAG) {
                     "Install not complete, caching lifecycle event: $elementType.$elementName - ${action.attributeValue}"
                 }
-                cache += LifecycleEventData(elementType, elementName, elementId, action, timestamp)
+                cache += LifecycleEventData(elementType, elementName, elementId, action, timestamp, activityName, parentFragmentName)
                 return
             }
         }
 
-        emitEventInternal(elementType, elementName, elementId, action, timestamp)
+        emitEventInternal(elementType, elementName, elementId, action, timestamp, activityName, parentFragmentName)
     }
 
     /**
@@ -115,7 +121,9 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         elementName: String,
         elementId: String,
         action: LifecycleAction,
-        timestamp: Long
+        timestamp: Long,
+        activityName: String? = null,
+        parentFragmentName: String? = null
     ) {
         val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider
 
@@ -126,7 +134,7 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
 
         Logger.d(TAG) { "Emitting lifecycle event: $elementType.$elementName - ${action.attributeValue}" }
 
-        logger.get(GlobalRumConstants.RUM_TRACER_NAME)
+        val builder = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
             .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.UI_LIFECYCLE_LOG_NAME)
@@ -135,7 +143,15 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
             .setAttribute(RumConstants.ELEMENT_NAME_KEY, elementName)
             .setAttribute(RumConstants.ELEMENT_ID_KEY, elementId)
             .setAttribute(RumConstants.LIFECYCLE_ACTION_KEY, action.attributeValue)
-            .emit()
+
+        if (activityName != null) {
+            builder.setAttribute(RumConstants.ELEMENT_ACTIVITY_NAME_KEY, activityName)
+        }
+        if (parentFragmentName != null) {
+            builder.setAttribute(RumConstants.ELEMENT_PARENT_FRAGMENT_NAME_KEY, parentFragmentName)
+        }
+
+        builder.emit()
     }
 
     /**
@@ -169,7 +185,9 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
                     event.elementName,
                     event.elementId,
                     event.action,
-                    event.timestamp
+                    event.timestamp,
+                    event.activityName,
+                    event.parentFragmentName
                 )
             }
         }

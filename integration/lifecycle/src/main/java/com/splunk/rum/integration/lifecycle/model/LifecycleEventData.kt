@@ -21,5 +21,7 @@ internal data class LifecycleEventData(
     val elementName: String,
     val elementId: String,
     val action: LifecycleAction,
-    val timestamp: Long
+    val timestamp: Long,
+    val activityName: String? = null,
+    val parentFragmentName: String? = null
 )
