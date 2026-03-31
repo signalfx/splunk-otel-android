@@ -35,5 +35,7 @@ internal object RumConstants {
 
     // Fragment hierarchy attributes
     val ELEMENT_ACTIVITY_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.activity.name")
-    val ELEMENT_PARENT_FRAGMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.parent.fragment.name")
+    val ELEMENT_PARENT_FRAGMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey(
+        "device.app.ui.element.parent.fragment.name"
+    )
 }

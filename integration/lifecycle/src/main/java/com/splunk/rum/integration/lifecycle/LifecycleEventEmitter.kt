@@ -105,7 +105,16 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
                 Logger.d(TAG) {
                     "Install not complete, caching lifecycle event: $elementType.$elementName - ${action.attributeValue}"
                 }
-                cache += LifecycleEventData(elementType, elementName, elementId, action, timestamp, activityName, parentFragmentName)
+                cache +=
+                    LifecycleEventData(
+                        elementType,
+                        elementName,
+                        elementId,
+                        action,
+                        timestamp,
+                        activityName,
+                        parentFragmentName
+                    )
                 return
             }
         }
