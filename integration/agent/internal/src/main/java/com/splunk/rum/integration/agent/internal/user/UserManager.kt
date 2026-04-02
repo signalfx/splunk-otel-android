@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.user
 
-import com.splunk.android.common.id.NanoId
+import com.splunk.rum.integration.agent.internal.id.UserId
 
 interface IUserManager {
     var trackingMode: InternalUserTrackingMode
@@ -47,7 +47,7 @@ enum class InternalUserTrackingMode {
 
 private fun InternalUserTrackingMode.initialUserId(): String? = when (this) {
     InternalUserTrackingMode.NO_TRACKING -> null
-    InternalUserTrackingMode.ANONYMOUS_TRACKING -> NanoId.generate()
+    InternalUserTrackingMode.ANONYMOUS_TRACKING -> UserId.generate()
 }
 
 private fun InternalUserTrackingMode.updatedUserId(
@@ -59,7 +59,7 @@ private fun InternalUserTrackingMode.updatedUserId(
         if (currentTrackingMode == InternalUserTrackingMode.ANONYMOUS_TRACKING && currentUserId != null) {
             currentUserId
         } else {
-            NanoId.generate()
+            UserId.generate()
         }
     }
 }
