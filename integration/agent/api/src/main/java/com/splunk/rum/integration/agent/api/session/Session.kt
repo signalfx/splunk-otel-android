@@ -16,4 +16,30 @@
 
 package com.splunk.rum.integration.agent.api.session
 
-class Session internal constructor(override val state: SessionState) : ISession
+import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
+import com.splunk.rum.integration.agent.internal.user.IUserManager
+import com.splunk.rum.utils.extensions.toBase64
+import org.json.JSONObject
+
+class Session internal constructor(
+    val sessionManager: ISplunkSessionManager,
+    val userManager: IUserManager,
+    sessionConfiguration: SessionConfiguration
+) : ISession {
+
+    override val state: SessionState = SessionState(sessionConfiguration, sessionManager)
+
+    override val metadata: String
+        get(): String {
+            val snapshot = sessionManager.sessionSnapshot
+            val json = JSONObject().apply {
+                put("sessionId", snapshot.sessionId)
+                put("anonymousUserId", userManager.userId)
+                put("sessionStart", snapshot.sessionStart)
+                put("sessionLastActivity", snapshot.sessionLastActivity)
+            }
+
+            return json.toString().toBase64()
+        }
+}

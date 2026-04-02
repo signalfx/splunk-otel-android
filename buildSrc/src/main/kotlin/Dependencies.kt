@@ -9,7 +9,7 @@ object Dependencies {
     private const val gradleVersion = "8.6.0"
     private const val kotlinVersion = "1.8.0"
     private const val ktlintVersion = "1.7.1"
-    private const val bytebuddyVersion = "1.18.4"
+    private const val bytebuddyVersion = "1.18.7"
     const val jacocoVersion = "0.8.14"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
@@ -65,7 +65,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.0.28"
+        private const val version = "1.1.2"
 
         const val commonHttp = "com.splunk.android:sr-common-http:$version"
         const val commonId = "com.splunk.android:sr-common-id:$version"
@@ -95,7 +95,6 @@ object Dependencies {
         const val instrumentationApi = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api"
         const val instrumentationOkHttp3Library = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0"
 
-        const val androidCore = "io.opentelemetry.android:core"
         const val androidSession = "io.opentelemetry.android:session"
         const val androidServices = "io.opentelemetry.android:services"
         const val androidCommon = "io.opentelemetry.android:common"
