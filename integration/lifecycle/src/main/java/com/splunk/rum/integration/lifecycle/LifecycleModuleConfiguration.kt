@@ -26,11 +26,11 @@ import com.splunk.rum.integration.lifecycle.model.LifecycleAction
  * as OpenTelemetry `device.app.ui.lifecycle` events.
  *
  * @property isEnabled Whether the module is enabled. Default is true.
- * @property allowedEvents Set of lifecycle actions to track. Default is all events.
+ * @property allowedEvents Set of lifecycle actions to track. Default is [MAIN_LIFECYCLE_EVENTS].
  */
 data class LifecycleModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
-    val allowedEvents: Set<LifecycleAction> = DEFAULT_ALLOWED_EVENTS
+    val allowedEvents: Set<LifecycleAction> = MAIN_LIFECYCLE_EVENTS
 ) : ModuleConfiguration {
 
     override val name: String = "lifecycle"
@@ -42,8 +42,46 @@ data class LifecycleModuleConfiguration @JvmOverloads constructor(
 
     companion object {
         /**
-         * Default set of allowed lifecycle events - includes all events.
+         * The 10 main lifecycle transitions for Activities and Fragments,
+         * without pre/post variants. This is the default.
          */
-        val DEFAULT_ALLOWED_EVENTS: Set<LifecycleAction> = LifecycleAction.values().toSet()
+        val MAIN_LIFECYCLE_EVENTS: Set<LifecycleAction> = setOf(
+            LifecycleAction.CREATED,
+            LifecycleAction.STARTED,
+            LifecycleAction.RESUMED,
+            LifecycleAction.PAUSED,
+            LifecycleAction.STOPPED,
+            LifecycleAction.DESTROYED,
+            LifecycleAction.ATTACHED,
+            LifecycleAction.VIEW_CREATED,
+            LifecycleAction.VIEW_DESTROYED,
+            LifecycleAction.DETACHED
+        )
+
+        /**
+         * Pre/post lifecycle variants only (API 29+).
+         * Use alongside [MAIN_LIFECYCLE_EVENTS] for full detail, or on its own.
+         */
+        val PRE_POST_LIFECYCLE_EVENTS: Set<LifecycleAction> = setOf(
+            LifecycleAction.PRE_CREATED,
+            LifecycleAction.POST_CREATED,
+            LifecycleAction.PRE_STARTED,
+            LifecycleAction.POST_STARTED,
+            LifecycleAction.PRE_RESUMED,
+            LifecycleAction.POST_RESUMED,
+            LifecycleAction.PRE_PAUSED,
+            LifecycleAction.POST_PAUSED,
+            LifecycleAction.PRE_STOPPED,
+            LifecycleAction.POST_STOPPED,
+            LifecycleAction.PRE_DESTROYED,
+            LifecycleAction.POST_DESTROYED,
+            LifecycleAction.PRE_ATTACHED
+        )
+
+        /**
+         * Every lifecycle callback including pre/post variants (API 29+).
+         * Equivalent to [MAIN_LIFECYCLE_EVENTS] + [PRE_POST_LIFECYCLE_EVENTS].
+         */
+        val ALL_LIFECYCLE_EVENTS: Set<LifecycleAction> = LifecycleAction.values().toSet()
     }
 }
