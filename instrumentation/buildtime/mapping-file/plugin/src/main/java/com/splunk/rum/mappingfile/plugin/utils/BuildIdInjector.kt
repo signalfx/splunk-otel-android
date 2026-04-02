@@ -41,97 +41,7 @@ object BuildIdInjector {
         }
     }
 
-    fun injectMetadataIntoMergedManifest(
-        variantName: String,
-        manifestOutputFiles: Set<File>,
-        buildId: String,
-        logger: SplunkLogger
-    ) {
-        try {
-            logger.info("BuildId", "processManifest task outputs for variant '$variantName':")
-            logger.info("BuildId", "Found ${manifestOutputFiles.size} output files:")
-            manifestOutputFiles.forEach { file ->
-                logger.info(
-                    "BuildId",
-                    "  - ${file.absolutePath} (exists: ${file.exists()}, isFile: ${file.isFile})"
-                )
-
-                // If it's a directory, look for AndroidManifest.xml inside it
-                if (file.isDirectory) {
-                    val manifestInDir = File(file, "AndroidManifest.xml")
-                    logger.info(
-                        "BuildId",
-                        "    → Looking for AndroidManifest.xml: ${manifestInDir.absolutePath} (exists: ${manifestInDir.exists()})"
-                    )
-                }
-            }
-
-            // Updated logic to find the manifest - check both files and directories
-            val manifestFile = manifestOutputFiles.firstNotNullOfOrNull { file ->
-                when {
-                    file.isFile && file.name == "AndroidManifest.xml" && file.exists() -> file
-                    file.isDirectory -> {
-                        val manifestInDir = File(file, "AndroidManifest.xml")
-                        if (manifestInDir.exists()) manifestInDir else null
-                    }
-                    else -> null
-                }
-            }
-
-            if (manifestFile != null) {
-                logger.info("BuildId", "Found merged manifest: ${manifestFile.absolutePath}")
-                val wasModified = addMetadataToManifest(manifestFile, buildId, logger)
-                if (wasModified) {
-                    logger.info("BuildId", "Successfully modified manifest")
-                }
-            } else {
-                logger.warn("BuildId", "No AndroidManifest.xml found in task outputs")
-            }
-        } catch (e: Exception) {
-            logger.warn("BuildId", "Could not access manifest via task outputs: ${e.message}")
-        }
-    }
-
-    fun findManifestFiles(buildDir: File, variantName: String): Collection<File> {
-        val manifestFiles = mutableListOf<File>()
-
-        val possiblePaths = listOf(
-            "intermediates/merged_manifests/$variantName/AndroidManifest.xml",
-            "intermediates/merged_manifest/$variantName/AndroidManifest.xml",
-            "intermediates/packaged_manifests/$variantName/AndroidManifest.xml",
-            "outputs/apk/$variantName/AndroidManifest.xml"
-        )
-
-        possiblePaths.forEach { relativePath ->
-            val manifestFile = File(buildDir, relativePath)
-            if (manifestFile.exists()) {
-                manifestFiles.add(manifestFile)
-            }
-        }
-
-        return manifestFiles
-    }
-
-    fun injectMetadataIntoManifestFiles(
-        variantName: String,
-        manifestFiles: Collection<File>,
-        buildId: String,
-        logger: SplunkLogger
-    ) {
-        logger.info("BuildId", "Processing ${manifestFiles.size} manifest files for variant '$variantName'")
-
-        manifestFiles.forEach { manifestFile ->
-            if (manifestFile.exists() && manifestFile.name == "AndroidManifest.xml") {
-                logger.info("BuildId", "Found manifest file: ${manifestFile.absolutePath}")
-                val wasModified = addMetadataToManifest(manifestFile, buildId, logger)
-                if (wasModified) {
-                    logger.info("BuildId", "Successfully modified manifest")
-                }
-            }
-        }
-    }
-
-    private fun addMetadataToManifest(manifestFile: File, buildId: String, logger: SplunkLogger): Boolean {
+    fun addMetadataToManifest(manifestFile: File, buildId: String, logger: SplunkLogger): Boolean {
         logger.debug("BuildId", "Reading manifest file: ${manifestFile.absolutePath}")
         if (!manifestFile.canWrite()) {
             logger.warn("BuildId", "Manifest file is not writable: ${manifestFile.absolutePath}")
@@ -152,7 +62,6 @@ object BuildIdInjector {
             logger.debug("BuildId", "Found <application> tag in manifest")
             val applicationElement = applicationNodes.item(0) as Element
 
-            // Collect potentially existing splunk.build_id to remove (from manual setup or previous runs)
             val toRemove = mutableListOf<Element>()
             val existingMetadata = applicationElement.getElementsByTagName("meta-data")
             for (i in 0 until existingMetadata.length) {
@@ -162,7 +71,6 @@ object BuildIdInjector {
                 }
             }
 
-            // Remove all existing splunk.build_id metadata
             if (toRemove.isNotEmpty()) {
                 logger.info(
                     "BuildId",
@@ -172,14 +80,12 @@ object BuildIdInjector {
                 logger.debug("BuildId", "Removed existing metadata entries")
             }
 
-            // Add newly generated splunk.build_id metadata
             logger.debug("BuildId", "Adding metadata to <application> tag")
             val metaDataElement = document.createElement("meta-data")
             metaDataElement.setAttribute("android:name", "splunk.build_id")
             metaDataElement.setAttribute("android:value", buildId)
             applicationElement.appendChild(metaDataElement)
 
-            // Write back to file without reformatting
             logger.debug("BuildId", "Writing modified XML back to file")
             val transformer = TransformerFactory.newInstance().newTransformer()
             transformer.setOutputProperty(OutputKeys.INDENT, "no")

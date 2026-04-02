@@ -40,13 +40,21 @@ internal class UploadOtelLogRecordDataJob : JobService() {
     private val jobIdStorage by lazy { JobIdStorage.init(application, isEncrypted = false) }
     private val httpClient by lazy { HttpClient() }
 
-    private val executor: ExecutorService by lazy {
-        Executors.newSingleThreadExecutor(NamedThreadFactory("uploadLogExecutor"))
+    private var executor: ExecutorService? = null
+
+    private fun getOrCreateExecutor(): ExecutorService {
+        val current = executor
+        if (current != null && !current.isShutdown) {
+            return current
+        }
+        return Executors.newSingleThreadExecutor(NamedThreadFactory("uploadLogExecutor"))
+            .also { executor = it }
     }
 
     override fun onStopJob(params: JobParameters?): Boolean {
         Logger.d(TAG, "onStopJob()")
-        executor.shutdownNow()
+        executor?.shutdownNow()
+        executor = null
         return true
     }
 
@@ -70,7 +78,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
         }
 
         Logger.d(TAG) { "startUpload() id: $id" }
-        executor.safeSubmit {
+        getOrCreateExecutor().safeSubmit {
             val url = storage.readTracesBaseUrl()
 
             if (url == null) {
@@ -131,7 +139,8 @@ internal class UploadOtelLogRecordDataJob : JobService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        executor.shutdownNow()
+        executor?.shutdownNow()
+        executor = null
     }
 
     companion object {
