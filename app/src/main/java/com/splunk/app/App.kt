@@ -131,8 +131,9 @@ class App : Application() {
 
     private val lifecycleModuleConfiguration = LifecycleModuleConfiguration(
         isEnabled = true
-        // Default tracks CORE_LIFECYCLE_EVENTS (no pre/post variants). For other options:
+        // Default tracks MAIN_LIFECYCLE_EVENTS (no pre/post variants). For other options:
         //   allowedEvents = LifecycleModuleConfiguration.ALL_LIFECYCLE_EVENTS
+        //   allowedEvents = LifecycleModuleConfiguration.PRE_POST_LIFECYCLE_EVENTS
         //   allowedEvents = setOf(LifecycleAction.RESUMED, LifecycleAction.PAUSED)
     )
 
