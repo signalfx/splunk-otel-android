@@ -68,7 +68,6 @@ object Dependencies {
         private const val version = "1.1.2"
 
         const val commonHttp = "com.splunk.android:sr-common-http:$version"
-        const val commonId = "com.splunk.android:sr-common-id:$version"
         const val commonJob = "com.splunk.android:sr-common-job:$version"
         const val commonStorage = "com.splunk.android:sr-common-storage:$version"
         const val commonUtils = "com.splunk.android:sr-common-utils:$version"
