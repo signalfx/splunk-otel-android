@@ -32,4 +32,10 @@ internal object RumConstants {
     val ELEMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.name")
     val ELEMENT_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.id")
     val LIFECYCLE_ACTION_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.lifecycle.action")
+
+    // Fragment hierarchy attributes
+    val ELEMENT_ACTIVITY_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("device.app.ui.element.activity.name")
+    val ELEMENT_PARENT_FRAGMENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey(
+        "device.app.ui.element.parent.fragment.name"
+    )
 }
