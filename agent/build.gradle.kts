@@ -33,7 +33,6 @@ dependencies {
     api(project(":integration:networkmonitor"))
     api(project(":integration:webview"))
     api(project(":integration:sessionreplay"))
-    api(project(":integration:lifecycle"))
     api(project(":integration:navigation"))
     api(project(":integration:applicationlifecycle"))
 }

@@ -26,8 +26,6 @@ import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import com.splunk.rum.integration.agent.api.user.UserTrackingMode
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
-import com.splunk.rum.integration.lifecycle.LifecycleModuleConfiguration
-import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration
 import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration
@@ -129,16 +127,6 @@ class App : Application() {
         interval = Duration.ofMillis(500)
     )
 
-    private val lifecycleModuleConfiguration = LifecycleModuleConfiguration(
-        isEnabled = true
-        // Uncomment below allowedEvents to configure event filtration
-//        allowedEvents = setOf(
-//            LifecycleAction.CREATED,
-//            LifecycleAction.RESUMED,
-//            LifecycleAction.DESTROYED
-//        )
-    )
-
     private val navigationModuleConfiguration = NavigationModuleConfiguration()
 
     private val sessionReplayModuleConfiguration = SessionReplayModuleConfiguration(
@@ -156,7 +144,6 @@ class App : Application() {
             okHttp3AutoModuleConfiguration,
             okHttp3ManualModuleConfiguration,
             slowRenderingModuleConfiguration,
-            lifecycleModuleConfiguration,
             navigationModuleConfiguration,
             sessionReplayModuleConfiguration
         )
