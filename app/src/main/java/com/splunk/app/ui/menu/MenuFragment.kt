@@ -16,6 +16,7 @@
 
 package com.splunk.app.ui.menu
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,6 +27,7 @@ import com.splunk.app.databinding.FragmentMenuBinding
 import com.splunk.app.extension.showToast
 import com.splunk.app.restart.TerminationWatcherService
 import com.splunk.app.ui.BaseFragment
+import com.splunk.app.ui.compose.ComposeNavigationActivity
 import com.splunk.app.ui.crashreports.CrashReportsFragment
 import com.splunk.app.ui.customtracking.CustomTrackingFragment
 import com.splunk.app.ui.endpointconfiguration.EndpointConfigurationFragment
@@ -78,6 +80,9 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
             }
             endpointConfiguration.setOnClickListener {
                 navigateTo(EndpointConfigurationFragment(), FragmentAnimation.FADE)
+            }
+            composeNavigation.setOnClickListener {
+                startActivity(Intent(requireContext(), ComposeNavigationActivity::class.java))
             }
             startupRestart.setOnClickListener {
                 TerminationWatcherService.restartOnClose(requireContext())

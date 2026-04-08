@@ -21,10 +21,11 @@ import android.os.Handler
 import android.os.Looper
 import androidx.fragment.app.Fragment
 import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
+import io.opentelemetry.api.common.Attributes
 
 /**
- * Detects visible screen changes (Activity/Fragment) and notifies [NavigationEventEmitter].
- * Fragment takes precedence over Activity when both are present.
+ * Detects visible screen changes (Activity/Fragment/Compose route) and notifies
+ * [NavigationEventEmitter]. Priority: Compose route > Fragment > Activity.
  *
  * Elements marked as ignored by [ScreenNameDescriptor] (e.g. DialogFragment, NavHostFragment,
  * or annotated with isIgnored = true) are skipped entirely.
@@ -38,13 +39,14 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     private val handler = Handler(Looper.getMainLooper())
     private var lastResumedActivityName: String? = null
     private var lastResumedFragmentName: String? = null
+    private var lastComposeRouteName: String? = null
 
     /**
-     * Current visible screen name: fragment if any, else activity.
+     * Current visible screen name: Compose route > Fragment > Activity.
      */
     private fun getCurrentVisibleScreenName(): String? {
-        val fragment = lastResumedFragmentName
-        if (fragment != null) return fragment
+        lastComposeRouteName?.let { return it }
+        lastResumedFragmentName?.let { return it }
         return lastResumedActivityName
     }
 
@@ -65,6 +67,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
         if (lastResumedActivityName == name) {
             lastResumedActivityName = null
         }
+        lastComposeRouteName = null
     }
 
     fun onFragmentResumed(fragment: Fragment) {
@@ -105,6 +108,25 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
      */
     fun recordEmittedScreen(screenName: String) {
         lastEmittedScreenName = screenName
+    }
+
+    /**
+     * Called when a Compose NavController destination changes. Sets the compose route as the
+     * highest-priority screen name and emits the event with optional [attributes].
+     */
+    fun onComposeRouteChanged(screenName: String, attributes: Attributes = Attributes.empty()) {
+        lastComposeRouteName = screenName
+        if (screenName == lastEmittedScreenName) return
+        lastEmittedScreenName = screenName
+        eventEmitter.emitNavigationEvent(screenName, attributes)
+    }
+
+    /**
+     * Clears the active Compose route, allowing Fragment/Activity names to take precedence again.
+     * Called when a NavController is unregistered.
+     */
+    fun clearComposeRoute() {
+        lastComposeRouteName = null
     }
 
     /**

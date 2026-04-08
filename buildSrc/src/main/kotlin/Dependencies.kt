@@ -53,9 +53,11 @@ object Dependencies {
 
         private const val annotationVersion = "1.9.1"
         private const val fragmentKtxVersion = "1.3.3"
+        private const val navigationVersion = "2.4.0"
 
         const val annotation = "androidx.annotation:annotation:$annotationVersion"
         const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+        const val navigationRuntime = "androidx.navigation:navigation-runtime:$navigationVersion"
 
         object Compose {
             private const val UiVersion = "1.2.1" // No need to update
