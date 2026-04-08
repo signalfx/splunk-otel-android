@@ -21,7 +21,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 /**
  * Navigation module configuration.
  *
- * This module tracks screen navigation and emits OpenTelemetry `device.app.ui.navigation` events
+ * This module tracks screen navigation and emits OpenTelemetry `app.ui.navigation` events
  * for screen arrivals when automated tracking is enabled. Detection uses onFragmentResumed /
  * onActivityResumed as the trigger (per ticket: fragment detection relies on onFragmentResumed).
  *
