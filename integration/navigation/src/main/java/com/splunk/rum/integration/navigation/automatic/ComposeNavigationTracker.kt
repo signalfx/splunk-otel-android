@@ -43,12 +43,7 @@ internal class ComposeNavigationTracker(
     private var activeListener: NavController.OnDestinationChangedListener? = null
 
     fun register(navController: NavController) {
-        if (registeredController?.get() === navController) {
-            navController.currentDestination?.let { destination ->
-                handleDestinationChanged(destination, navController.currentBackStackEntry?.arguments)
-            }
-            return
-        }
+        if (registeredController?.get() === navController) return
 
         unregisterCurrent()
 
