@@ -156,9 +156,10 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     }
 
     private fun isNavigationAvailable(): Boolean = try {
-        Class.forName("androidx.navigation.NavController")
+        Class.forName("androidx.navigation.NavDestination")
+            .getMethod("getRoute")
         true
-    } catch (_: ClassNotFoundException) {
+    } catch (_: Exception) {
         false
     }
 
