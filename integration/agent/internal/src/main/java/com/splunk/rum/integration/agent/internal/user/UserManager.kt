@@ -50,11 +50,13 @@ class UserManager(userTrackingMode: InternalUserTrackingMode, private val agentS
                 agentStorage.deleteAnonymousUserId()
             }
             InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
-                if (agentStorage.readAnonymousUserId() == null) {
-                    Logger.d(TAG) { "User tracking enabled. No anonymous user id found, generating a new one." }
-                    agentStorage.writeAnonymousUserId(UserId.generate())
+                val existingUserId = agentStorage.readAnonymousUserId()
+                if (existingUserId == null) {
+                    val newUserId = UserId.generate()
+                    agentStorage.writeAnonymousUserId(newUserId)
+                    Logger.d(TAG) { "User tracking enabled. Generated new anonymous user id: $newUserId" }
                 } else {
-                    Logger.d(TAG) { "User tracking enabled. Anonymous user id already exists." }
+                    Logger.d(TAG) { "User tracking enabled. Existing anonymous user id: $existingUserId" }
                 }
             }
         }
