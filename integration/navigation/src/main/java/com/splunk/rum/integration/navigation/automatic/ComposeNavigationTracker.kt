@@ -44,8 +44,8 @@ internal class ComposeNavigationTracker(
 
     fun register(navController: NavController) {
         if (registeredController?.get() === navController) {
-            navController.currentDestination?.route?.let {
-                screenChangeDetector.onComposeRouteChanged(it)
+            navController.currentDestination?.let { destination ->
+                handleDestinationChanged(destination, navController.currentBackStackEntry?.arguments)
             }
             return
         }

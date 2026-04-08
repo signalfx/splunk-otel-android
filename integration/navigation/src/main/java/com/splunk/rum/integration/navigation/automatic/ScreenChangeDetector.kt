@@ -40,6 +40,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     private var lastResumedActivityName: String? = null
     private var lastResumedFragmentName: String? = null
     private var lastComposeRouteName: String? = null
+    private var composeRouteActivityName: String? = null
 
     /**
      * Current visible screen name: Compose route > Fragment > Activity.
@@ -55,6 +56,12 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
 
         val name = ScreenNameDescriptor.getName(activity)
         lastResumedActivityName = name
+
+        if (composeRouteActivityName != null && composeRouteActivityName != name) {
+            lastComposeRouteName = null
+            composeRouteActivityName = null
+        }
+
         // Defer so fragment callbacks, which run synchronously during the same resume, execute
         // first thus avoiding emitting an intermediate activity only event when a fragment is present
         handler.post { tryEmitIfChanged() }
@@ -67,7 +74,6 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
         if (lastResumedActivityName == name) {
             lastResumedActivityName = null
         }
-        lastComposeRouteName = null
     }
 
     fun onFragmentResumed(fragment: Fragment) {
@@ -113,9 +119,12 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     /**
      * Called when a Compose NavController destination changes. Sets the compose route as the
      * highest-priority screen name and emits the event with optional [attributes].
+     * Associates the route with the currently resumed activity so it can be cleared
+     * when a different activity resumes.
      */
     fun onComposeRouteChanged(screenName: String, attributes: Attributes = Attributes.empty()) {
         lastComposeRouteName = screenName
+        composeRouteActivityName = lastResumedActivityName
         if (screenName == lastEmittedScreenName) return
         lastEmittedScreenName = screenName
         eventEmitter.emitNavigationEvent(screenName, attributes)
@@ -127,6 +136,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
      */
     fun clearComposeRoute() {
         lastComposeRouteName = null
+        composeRouteActivityName = null
     }
 
     /**
