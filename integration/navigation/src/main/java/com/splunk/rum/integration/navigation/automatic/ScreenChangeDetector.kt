@@ -106,6 +106,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     }
 
     private var lastEmittedScreenName: String? = null
+    private var lastEmittedComposeAttributes: Attributes? = null
 
     /**
      * Records that a navigation event was emitted for [screenName] (e.g. from manual tracking).
@@ -121,12 +122,16 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
      * highest-priority screen name and emits the event with optional [attributes].
      * Associates the route with the currently resumed activity so it can be cleared
      * when a different activity resumes.
+     *
+     * Deduplicates by both screen name and attributes so navigating the same route template
+     * with different arguments (e.g. profile/user_123 → profile/user_456) still emits.
      */
     fun onComposeRouteChanged(screenName: String, attributes: Attributes = Attributes.empty()) {
         lastComposeRouteName = screenName
         composeRouteActivityName = lastResumedActivityName
-        if (screenName == lastEmittedScreenName) return
+        if (screenName == lastEmittedScreenName && attributes == lastEmittedComposeAttributes) return
         lastEmittedScreenName = screenName
+        lastEmittedComposeAttributes = attributes
         eventEmitter.emitNavigationEvent(screenName, attributes)
     }
 
@@ -137,6 +142,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     fun clearComposeRoute() {
         lastComposeRouteName = null
         composeRouteActivityName = null
+        lastEmittedComposeAttributes = null
     }
 
     /**
