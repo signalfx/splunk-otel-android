@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.user
 
+import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.internal.id.UserId
 
@@ -45,14 +46,21 @@ class UserManager(userTrackingMode: InternalUserTrackingMode, private val agentS
     private fun updateAnonymousUserIdForTrackingMode(trackingMode: InternalUserTrackingMode) {
         when (trackingMode) {
             InternalUserTrackingMode.NO_TRACKING -> {
+                Logger.d(TAG) { "User tracking disabled, deleting anonymous user id." }
                 agentStorage.deleteAnonymousUserId()
             }
             InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
+                Logger.d(TAG) { "User tracking enabled, ensuring anonymous user id exists." }
                 if (agentStorage.readAnonymousUserId() == null) {
+                    Logger.d(TAG) { "No anonymous user id found, generating a new one." }
                     agentStorage.writeAnonymousUserId(UserId.generate())
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "UserManager"
     }
 }
 
