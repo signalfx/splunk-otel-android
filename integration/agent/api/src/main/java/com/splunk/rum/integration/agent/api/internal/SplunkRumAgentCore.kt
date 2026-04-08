@@ -20,6 +20,7 @@ import android.app.Application
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.OpenTelemetryInitializer
+import com.splunk.rum.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
@@ -51,6 +52,7 @@ internal object SplunkRumAgentCore {
 
     private const val TAG = "SplunkRumAgentCore"
     var isRunning: Boolean = false
+    var installTimestamp: Long = 0L
 
     fun install(
         application: Application,
@@ -58,7 +60,8 @@ internal object SplunkRumAgentCore {
         userManager: IUserManager,
         sessionManager: ISplunkSessionManager,
         moduleConfigurations: List<ModuleConfiguration>,
-        globalAttributes: MutableAttributes
+        globalAttributes: MutableAttributes,
+        offlineOtelDataProcessor: OfflineOtelDataProcessor
     ): OpenTelemetry {
         // Sampling.
         val shouldBeRunning = when (val samplingRate = agentConfiguration.session.samplingRate.coerceIn(0.0, 1.0)) {
@@ -75,22 +78,17 @@ internal object SplunkRumAgentCore {
 
         val storage = AgentStorage.attach(application)
 
-        val appInstallationID = storage.readAppInstallationId()
-            ?: UUID.randomUUID().toString().replace("-", "").also {
-                storage.writeAppInstallationId(it)
-            }
+        val appInstallationID = storage.readAppInstallationId() ?: UUID.randomUUID().toString().replace("-", "").also {
+            storage.writeAppInstallationId(it)
+        }
 
-        val finalConfiguration = ConfigurationManager
-            .obtainInstance(storage)
-            .preProcessConfiguration(application, agentConfiguration)
+        val finalConfiguration =
+            ConfigurationManager.obtainInstance(storage).preProcessConfiguration(application, agentConfiguration)
 
-        val agentIntegration = AgentIntegration
-            .obtainInstance(application)
+        val agentIntegration = AgentIntegration.obtainInstance(application)
 
         val initializer = OpenTelemetryInitializer(
-            application,
-            agentConfiguration.deferredUntilForeground,
-            agentConfiguration.spanInterceptor
+            application, agentConfiguration.deferredUntilForeground, agentConfiguration.spanInterceptor
         )
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
@@ -107,8 +105,7 @@ internal object SplunkRumAgentCore {
             .addLogRecordProcessor(SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager))
 
         if (agentConfiguration.enableDebugLogging) {
-            initializer
-                .addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
+            initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
                 .addLogRecordProcessor(SimpleLogRecordProcessor.create(LoggerLogRecordExporter()))
         }
 
@@ -120,14 +117,18 @@ internal object SplunkRumAgentCore {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 agentConfiguration.session.listeners.forEachFast {
                     it.onSessionChanged(
-                        newSessionId = sessionId,
-                        previousSessionId = sessionManager.previousSessionId
+                        newSessionId = sessionId, previousSessionId = sessionManager.previousSessionId
                     )
                 }
             }
         }
 
         agentIntegration.install(application, openTelemetry, moduleConfigurations)
+
+        installTimestamp = System.currentTimeMillis()
+        if (agentConfiguration.endpoint != null) {
+            offlineOtelDataProcessor.start(installTimestamp)
+        }
 
         return openTelemetry
     }

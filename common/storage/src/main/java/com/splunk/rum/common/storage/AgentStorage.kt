@@ -256,6 +256,18 @@ class AgentStorage(context: Context) : IAgentStorage {
         preferences.putString(SESSION_IDS, json)
     }
 
+    override fun getLogs(olderThan: Long): List<File> {
+       return logDir.listFiles()?.filter { it.lastModified() < olderThan } ?: emptyList()
+    }
+
+    override fun getSessionReplayData(olderThan: Long): List<File> {
+        return sessionReplayDir.listFiles()?.filter { it.lastModified() < olderThan } ?: emptyList()
+    }
+
+    override fun getSpans(olderThan: Long): List<File> {
+        return spanDir.listFiles()?.filter { it.lastModified() < olderThan } ?: emptyList()
+    }
+
     override fun commit() {
         preferences.commit()
     }
@@ -266,6 +278,11 @@ class AgentStorage(context: Context) : IAgentStorage {
             val array = JSONArray(ids)
             preferences.putString(SPAN_IDS_KEY, array.toString())
         }
+    }
+
+    override fun setBufferedSpanIds(ids: List<String>) {
+        val array = JSONArray(ids)
+        preferences.putString(SPAN_IDS_KEY, array.toString())
     }
 
     override fun getBufferedSpanIds(): List<String> {
@@ -293,6 +310,11 @@ class AgentStorage(context: Context) : IAgentStorage {
             val array = JSONArray(ids)
             preferences.putString(SESSION_REPLAY_IDS_KEY, array.toString())
         }
+    }
+
+    override fun setBufferedSessionReplayIds(ids: List<String>) {
+        val array = JSONArray(ids)
+        preferences.putString(SESSION_REPLAY_IDS_KEY, array.toString())
     }
 
     override fun getBufferedSessionReplayIds(): List<String> {

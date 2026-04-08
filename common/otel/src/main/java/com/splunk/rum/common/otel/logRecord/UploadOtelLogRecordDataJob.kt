@@ -21,6 +21,7 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
+import android.os.Build
 import android.os.PersistableBundle
 import com.splunk.android.common.http.HttpClient
 import com.splunk.android.common.http.model.Response
@@ -149,11 +150,19 @@ internal class UploadOtelLogRecordDataJob : JobService() {
 
         private const val INITIAL_BACKOFF = 60 * 1000L
 
-        fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder =
-            JobInfo.Builder(jobId, ComponentName(context, UploadOtelLogRecordDataJob::class.java))
+        fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder  {
+            val builder = JobInfo.Builder(jobId, ComponentName(context, UploadOtelLogRecordDataJob::class.java))
                 .setExtras(PersistableBundle().apply { putString(DATA_SERIALIZE_KEY, id) })
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL)
                 .setRequiresCharging(false)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                builder.setEstimatedNetworkBytes(0, 40_000)
+            }
+
+            return builder
+        }
+
     }
 }

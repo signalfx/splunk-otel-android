@@ -65,6 +65,8 @@ interface IAgentStorage {
     fun getOtelSpanDataFile(id: String): File?
     fun deleteOtelSpanData(id: String)
     fun addBufferedSpanId(id: String)
+
+    fun setBufferedSpanIds(ids: List<String>)
     fun getBufferedSpanIds(): List<String>
     fun clearBufferedSpanIds()
 
@@ -73,11 +75,19 @@ interface IAgentStorage {
     fun deleteOtelSessionReplayData(id: String)
 
     fun addBufferedSessionReplayId(id: String)
+
+    fun setBufferedSessionReplayIds(ids: List<String>)
     fun getBufferedSessionReplayIds(): List<String>
     fun clearBufferedSessionReplayIds()
 
     fun readSessionIds(): List<SessionId>
     fun writeSessionIds(sessionIds: List<SessionId>)
+
+    fun getSpans(olderThan: Long): List<File>
+
+    fun getLogs(olderThan: Long): List<File>
+
+    fun getSessionReplayData(olderThan: Long): List<File>
 
     fun commit()
 }
