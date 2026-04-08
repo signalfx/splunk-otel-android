@@ -57,9 +57,12 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
         val name = ScreenNameDescriptor.getName(activity)
         lastResumedActivityName = name
 
-        if (composeRouteActivityName != null && composeRouteActivityName != name) {
+        if (lastComposeRouteName != null && composeRouteActivityName == null) {
+            composeRouteActivityName = name
+        } else if (composeRouteActivityName != null && composeRouteActivityName != name) {
             lastComposeRouteName = null
             composeRouteActivityName = null
+            lastEmittedComposeAttributes = null
         }
 
         // Defer so fragment callbacks, which run synchronously during the same resume, execute
