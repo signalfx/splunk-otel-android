@@ -57,6 +57,10 @@ interface IAgentStorage {
     fun readSessionLastActivity(): Long?
     fun deleteSessionLastActivity()
 
+    fun writeAnonymousUserId(value: String)
+    fun readAnonymousUserId(): String?
+    fun deleteAnonymousUserId()
+
     fun writeOtelLogData(id: String, data: ByteArray): Boolean
     fun getOtelLogDataFile(id: String): File?
     fun deleteOtelLogData(id: String)
