@@ -16,8 +16,8 @@
 
 package com.splunk.rum.integration.agent.internal.user
 
-import com.splunk.android.common.id.NanoId
 import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.integration.agent.internal.id.UserId
 
 interface IUserManager {
     var trackingMode: InternalUserTrackingMode
@@ -49,7 +49,7 @@ class UserManager(userTrackingMode: InternalUserTrackingMode, private val agentS
             }
             InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
                 if (agentStorage.readAnonymousUserId() == null) {
-                    agentStorage.writeAnonymousUserId(NanoId.generate())
+                    agentStorage.writeAnonymousUserId(UserId.generate())
                 }
             }
         }
