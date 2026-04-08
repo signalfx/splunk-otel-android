@@ -17,22 +17,43 @@
 package com.splunk.rum.integration.agent.internal.user
 
 import com.splunk.android.common.id.NanoId
+import com.splunk.rum.common.storage.IAgentStorage
 
 interface IUserManager {
     var trackingMode: InternalUserTrackingMode
     val userId: String?
 }
 
-class UserManager(userTrackingMode: InternalUserTrackingMode) : IUserManager {
+class UserManager(userTrackingMode: InternalUserTrackingMode, private val agentStorage: IAgentStorage) : IUserManager {
 
-    override var userId: String? = userTrackingMode.initialUserId()
-        private set
+    init {
+        updateAnonymousUserIdForTrackingMode(userTrackingMode)
+    }
+
+    override val userId: String?
+        get() = when (trackingMode) {
+            InternalUserTrackingMode.NO_TRACKING -> null
+            InternalUserTrackingMode.ANONYMOUS_TRACKING -> agentStorage.readAnonymousUserId()
+        }
 
     override var trackingMode: InternalUserTrackingMode = userTrackingMode
         set(value) {
-            userId = value.updatedUserId(currentTrackingMode = field, currentUserId = userId)
+            updateAnonymousUserIdForTrackingMode(value)
             field = value
         }
+
+    private fun updateAnonymousUserIdForTrackingMode(trackingMode: InternalUserTrackingMode) {
+        when (trackingMode) {
+            InternalUserTrackingMode.NO_TRACKING -> {
+                agentStorage.deleteAnonymousUserId()
+            }
+            InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
+                if (agentStorage.readAnonymousUserId() == null) {
+                    agentStorage.writeAnonymousUserId(NanoId.generate())
+                }
+            }
+        }
+    }
 }
 
 object NoOpUserManager : IUserManager {
@@ -43,23 +64,4 @@ object NoOpUserManager : IUserManager {
 enum class InternalUserTrackingMode {
     NO_TRACKING,
     ANONYMOUS_TRACKING
-}
-
-private fun InternalUserTrackingMode.initialUserId(): String? = when (this) {
-    InternalUserTrackingMode.NO_TRACKING -> null
-    InternalUserTrackingMode.ANONYMOUS_TRACKING -> NanoId.generate()
-}
-
-private fun InternalUserTrackingMode.updatedUserId(
-    currentTrackingMode: InternalUserTrackingMode,
-    currentUserId: String?
-): String? = when (this) {
-    InternalUserTrackingMode.NO_TRACKING -> null
-    InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
-        if (currentTrackingMode == InternalUserTrackingMode.ANONYMOUS_TRACKING && currentUserId != null) {
-            currentUserId
-        } else {
-            NanoId.generate()
-        }
-    }
 }
