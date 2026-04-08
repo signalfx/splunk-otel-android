@@ -107,11 +107,15 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             }
         }
 
-        Navigation.instance.composeTracker = ComposeNavigationTracker(
-            screenChangeDetector = detector,
-            processor = moduleConfiguration.navigationEventProcessor
-        )
-        Logger.d(TAG, "ComposeNavigationTracker initialized")
+        if (isNavigationAvailable()) {
+            Navigation.instance.composeTracker = ComposeNavigationTracker(
+                screenChangeDetector = detector,
+                processor = moduleConfiguration.navigationEventProcessor
+            )
+            Logger.d(TAG, "ComposeNavigationTracker initialized")
+        } else {
+            Logger.d(TAG, "androidx.navigation not found on classpath, Compose navigation tracking disabled")
+        }
 
         (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
         currentActivityReference = null
@@ -149,6 +153,13 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         }
 
         application.registerActivityLifecycleCallbacks(fragmentActivityCallback)
+    }
+
+    private fun isNavigationAvailable(): Boolean = try {
+        Class.forName("androidx.navigation.NavController")
+        true
+    } catch (_: ClassNotFoundException) {
+        false
     }
 
     private val navigationListener = object : Navigation.Listener {
