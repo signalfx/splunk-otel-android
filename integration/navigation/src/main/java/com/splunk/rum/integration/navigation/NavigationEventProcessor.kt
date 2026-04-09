@@ -20,11 +20,8 @@ package com.splunk.rum.integration.navigation
  * Processes navigation events before they are emitted.
  *
  * Use to transform screen names, filter events, or modify attributes.
- * The [NavigationEvent] passed to [process] is mutable: modify [NavigationEvent.screenName]
- * or [NavigationEvent.attributes] as needed.
- *
- * Return `true` to emit the event, or `false` to suppress it.
+ * Return the [NavigationEvent] (modified or as-is) to emit it, or `null` to suppress it.
  */
 fun interface NavigationEventProcessor {
-    fun process(event: NavigationEvent): Boolean
+    fun process(event: NavigationEvent): NavigationEvent?
 }

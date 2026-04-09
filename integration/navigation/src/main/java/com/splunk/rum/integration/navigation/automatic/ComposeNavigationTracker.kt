@@ -86,17 +86,18 @@ internal class ComposeNavigationTracker(
             destination.parent?.route?.let { attrMap[ATTR_NAV_GRAPH] = it }
 
             val event = NavigationEvent(
-                screenName = screenName,
+                name = screenName,
                 attributes = attrMap,
                 sourceType = NavigationEvent.SourceType.COMPOSE_ROUTE
             )
 
-            if (!processor.process(event)) {
+            val result = processor.process(event)
+            if (result == null) {
                 Logger.d(TAG, "NavigationEventProcessor suppressed event for: $screenName")
                 return
             }
 
-            screenChangeDetector.onComposeRouteChanged(event.screenName, mapToAttributes(event.attributes))
+            screenChangeDetector.onComposeRouteChanged(result.name, mapToAttributes(result.attributes))
         } else {
             val attrs = buildAttributes(arguments, destination)
             screenChangeDetector.onComposeRouteChanged(screenName, attrs)

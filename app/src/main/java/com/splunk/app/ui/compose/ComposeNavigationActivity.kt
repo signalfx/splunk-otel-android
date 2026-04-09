@@ -70,15 +70,21 @@ fun ComposeNavigationApp(onBack: () -> Unit = {}) {
     SplunkRum.instance.navigation.registerNavController(navController)
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Compose Navigation") }) }
+        topBar = {
+            TopAppBar(title = { Text("Compose Navigation") })
+        }
     ) { padding ->
         NavHost(
             navController = navController,
             startDestination = "home",
             modifier = Modifier.padding(padding)
         ) {
-            composable("home") { HomeScreen(navController, onBack) }
-            composable("settings") { SettingsScreen(navController) }
+            composable("home") {
+                HomeScreen(navController, onBack)
+            }
+            composable("settings") {
+                SettingsScreen(navController)
+            }
             composable(
                 route = "profile/{userId}",
                 arguments = listOf(navArgument("userId") { type = NavType.StringType })
@@ -102,7 +108,9 @@ fun ComposeNavigationApp(onBack: () -> Unit = {}) {
                     navController = navController
                 )
             }
-            composable("nested_tabs") { NestedTabsScreen(navController) }
+            composable("nested_tabs") {
+                NestedTabsScreen(navController)
+            }
             dialog("confirm_dialog") {
                 ConfirmDialog(navController)
             }
@@ -125,42 +133,58 @@ fun HomeScreen(navController: NavController, onBack: () -> Unit = {}) {
         Button(
             onClick = { navController.navigate("settings") },
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Go to Settings") }
+        ) {
+            Text("Go to Settings")
+        }
 
         Button(
             onClick = { navController.navigate("profile/user_12345") },
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Profile (user_12345)") }
+        ) {
+            Text("Profile (user_12345)")
+        }
 
         Button(
             onClick = { navController.navigate("profile/user_67890") },
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Profile (user_67890)") }
+        ) {
+            Text("Profile (user_67890)")
+        }
 
         Button(
             onClick = { navController.navigate("search?query=opentelemetry") },
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Search: opentelemetry") }
+        ) {
+            Text("Search: opentelemetry")
+        }
 
         Button(
             onClick = { navController.navigate("search") },
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Search (no query)") }
+        ) {
+            Text("Search (no query)")
+        }
 
         Button(
             onClick = { navController.navigate("confirm_dialog") },
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Show Dialog") }
+        ) {
+            Text("Show Dialog")
+        }
 
         Button(
             onClick = { navController.navigate("nested_tabs") },
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Nested Tabs (own NavHost)") }
+        ) {
+            Text("Nested Tabs (own NavHost)")
+        }
 
         OutlinedButton(
             onClick = onBack,
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Back to Main Menu") }
+        ) {
+            Text("Back to Main Menu")
+        }
     }
 }
 
@@ -175,7 +199,9 @@ fun SettingsScreen(navController: NavController) {
     ) {
         Text("Settings", style = MaterialTheme.typography.h5)
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { navController.popBackStack() }) { Text("Back") }
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Back")
+        }
     }
 }
 
@@ -191,7 +217,9 @@ fun ProfileScreen(userId: String, navController: NavController) {
         Text("Profile", style = MaterialTheme.typography.h5)
         Text("User ID: $userId", style = MaterialTheme.typography.body1)
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { navController.popBackStack() }) { Text("Back") }
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Back")
+        }
     }
 }
 
@@ -210,7 +238,9 @@ fun SearchScreen(query: String, navController: NavController) {
             style = MaterialTheme.typography.body1
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { navController.popBackStack() }) { Text("Back") }
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Back")
+        }
     }
 }
 
@@ -220,7 +250,7 @@ fun NestedTabsScreen(parentNavController: NavController) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
-            "Nested Tabs (separate NavController)",
+            text = "Nested Tabs (separate NavController)",
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(16.dp)
         )
@@ -234,14 +264,20 @@ fun NestedTabsScreen(parentNavController: NavController) {
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val tabs = listOf("tab_feed" to "Feed", "tab_trending" to "Trending", "tab_inbox" to "Inbox")
+            val tabs = listOf(
+                "tab_feed" to "Feed",
+                "tab_trending" to "Trending",
+                "tab_inbox" to "Inbox"
+            )
             tabs.forEach { (route, label) ->
                 val selected = currentRoute == route
                 if (selected) {
                     Button(
                         onClick = {},
                         modifier = Modifier.weight(1f)
-                    ) { Text(label) }
+                    ) {
+                        Text(label)
+                    }
                 } else {
                     OutlinedButton(
                         onClick = {
@@ -252,7 +288,9 @@ fun NestedTabsScreen(parentNavController: NavController) {
                             }
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text(label) }
+                    ) {
+                        Text(label)
+                    }
                 }
             }
         }
@@ -266,9 +304,15 @@ fun NestedTabsScreen(parentNavController: NavController) {
                 .weight(1f)
                 .padding(16.dp)
         ) {
-            composable("tab_feed") { TabContent("Feed", "Latest posts and updates") }
-            composable("tab_trending") { TabContent("Trending", "Popular content right now") }
-            composable("tab_inbox") { TabContent("Inbox", "Your messages and notifications") }
+            composable("tab_feed") {
+                TabContent("Feed", "Latest posts and updates")
+            }
+            composable("tab_trending") {
+                TabContent("Trending", "Popular content right now")
+            }
+            composable("tab_inbox") {
+                TabContent("Inbox", "Your messages and notifications")
+            }
         }
 
         Button(
@@ -276,7 +320,9 @@ fun NestedTabsScreen(parentNavController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-        ) { Text("Back to Home") }
+        ) {
+            Text("Back to Home")
+        }
     }
 }
 
@@ -300,10 +346,14 @@ fun ConfirmDialog(navController: NavController) {
         title = { Text("Confirm") },
         text = { Text("This is a dialog destination.") },
         confirmButton = {
-            TextButton(onClick = { navController.popBackStack() }) { Text("OK") }
+            TextButton(onClick = { navController.popBackStack() }) {
+                Text("OK")
+            }
         },
         dismissButton = {
-            TextButton(onClick = { navController.popBackStack() }) { Text("Cancel") }
+            TextButton(onClick = { navController.popBackStack() }) {
+                Text("Cancel")
+            }
         }
     )
 }

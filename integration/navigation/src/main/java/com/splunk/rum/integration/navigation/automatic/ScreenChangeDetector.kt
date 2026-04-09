@@ -45,11 +45,8 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     /**
      * Current visible screen name: Compose route > Fragment > Activity.
      */
-    private fun getCurrentVisibleScreenName(): String? {
-        lastComposeRouteName?.let { return it }
-        lastResumedFragmentName?.let { return it }
-        return lastResumedActivityName
-    }
+    private fun getCurrentVisibleScreenName(): String? =
+        lastComposeRouteName ?: lastResumedFragmentName ?: lastResumedActivityName
 
     fun onActivityResumed(activity: Activity) {
         if (ScreenNameDescriptor.isIgnored(activity)) return

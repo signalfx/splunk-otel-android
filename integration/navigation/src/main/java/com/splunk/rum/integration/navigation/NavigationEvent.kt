@@ -20,11 +20,11 @@ package com.splunk.rum.integration.navigation
  * Represents a navigation event that can be inspected and modified by a [NavigationEventProcessor]
  * before it is emitted.
  *
- * @property screenName The screen name for this event. Modify to rename the screen.
+ * @property name The screen name for this event. Modify to rename the screen.
  * @property attributes Mutable map of event attributes. Modify to add, remove, or change attributes.
  * @property sourceType The origin of this navigation event.
  */
-class NavigationEvent(var screenName: String, val attributes: MutableMap<String, String>, val sourceType: SourceType) {
+class NavigationEvent(var name: String, val attributes: MutableMap<String, String>, val sourceType: SourceType) {
 
     /**
      * Identifies the origin of a navigation event.
