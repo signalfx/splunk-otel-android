@@ -34,8 +34,10 @@ class ErrorIdentifierAttributesSpanProcessor(application: Application) : SpanPro
     private var splunkBuildId: String? = application.splunkBuildId
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        if (span.getAttribute(GlobalRumConstants.COMPONENT_KEY) == GlobalRumConstants.COMPONENT_ERROR ||
-            span.getAttribute(GlobalRumConstants.COMPONENT_KEY) == GlobalRumConstants.COMPONENT_CRASH
+        val component = span.getAttribute(GlobalRumConstants.COMPONENT_KEY)
+        if (component == GlobalRumConstants.COMPONENT_ERROR ||
+            component == GlobalRumConstants.COMPONENT_CRASH ||
+            component == GlobalRumConstants.COMPONENT_ANR
         ) {
             applicationId?.let {
                 span.setAttribute(RumConstants.APPLICATION_ID_KEY, it)
