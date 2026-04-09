@@ -326,7 +326,10 @@ class SplunkRum private constructor(
 
             val storage = AgentStorage.attach(application)
 
-            val userManager = UserManager(agentConfiguration.user.trackingMode.toInternal())
+            val userManager = UserManager(
+                agentConfiguration.user.trackingMode.toInternal(),
+                storage
+            )
 
             val sessionManager = AgentIntegration.obtainInstance(application).sessionManager
 
