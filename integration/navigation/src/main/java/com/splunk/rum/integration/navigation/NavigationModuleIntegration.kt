@@ -73,7 +73,6 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         Logger.d(TAG, "onInstall")
         if (!moduleConfiguration.isEnabled) {
             Navigation.instance.listener = null
-            Navigation.instance.composeTracker?.unregisterCurrent()
             Navigation.instance.composeTracker = null
             emitter.clearCache()
             (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
