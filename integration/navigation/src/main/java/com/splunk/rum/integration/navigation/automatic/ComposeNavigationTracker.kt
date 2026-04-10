@@ -45,7 +45,7 @@ internal class ComposeNavigationTracker(
     fun register(navController: NavController) {
         if (registeredController?.get() === navController) return
 
-        unregisterCurrent()
+        clearRegistration()
 
         val listener = NavController.OnDestinationChangedListener { _, destination, arguments ->
             handleDestinationChanged(destination, arguments)
@@ -58,15 +58,12 @@ internal class ComposeNavigationTracker(
 
     fun unregister(navController: NavController) {
         if (registeredController?.get() === navController) {
-            activeListener?.let { navController.removeOnDestinationChangedListener(it) }
-            registeredController = null
-            activeListener = null
-            screenChangeDetector.clearComposeRoute()
+            clearRegistration()
             Logger.d(TAG, "Unregistered NavController")
         }
     }
 
-    fun unregisterCurrent() {
+    private fun clearRegistration() {
         registeredController?.get()?.let { controller ->
             activeListener?.let { controller.removeOnDestinationChangedListener(it) }
         }
