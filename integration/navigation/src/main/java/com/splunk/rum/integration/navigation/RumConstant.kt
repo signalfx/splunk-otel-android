@@ -16,9 +16,13 @@
 
 package com.splunk.rum.integration.navigation
 
+import io.opentelemetry.api.common.AttributeKey
+
 internal object RumConstant {
 
     const val COMPONENT_NAVIGATION = "ui"
 
-    const val NAVIGATION_LOG_EVENT_NAME = "device.app.ui.navigation"
+    const val NAVIGATION_LOG_EVENT_NAME = "app.ui.navigation"
+
+    val NAVIGATION_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("navigation.name")
 }
