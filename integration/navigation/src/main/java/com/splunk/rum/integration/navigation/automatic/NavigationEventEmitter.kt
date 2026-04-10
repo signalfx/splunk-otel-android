@@ -26,7 +26,7 @@ import io.opentelemetry.api.common.Attributes
 import java.util.concurrent.TimeUnit
 
 /**
- * Emits OpenTelemetry navigation events (device.app.ui.navigation).
+ * Emits OpenTelemetry navigation events (app.ui.navigation).
  * Updates [ScreenNameTracker] and caches events when the logger provider is not ready or installation is not complete.
  */
 internal class NavigationEventEmitter {
@@ -80,6 +80,7 @@ internal class NavigationEventEmitter {
             .setAllAttributes(attributes)
             .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstant.NAVIGATION_LOG_EVENT_NAME)
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstant.COMPONENT_NAVIGATION)
+            .setAttribute(RumConstant.NAVIGATION_NAME_KEY, screenName)
             .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, screenName)
 
         previousScreenName?.let { builder.setAttribute(GlobalRumConstants.LAST_SCREEN_NAME_KEY, it) }
