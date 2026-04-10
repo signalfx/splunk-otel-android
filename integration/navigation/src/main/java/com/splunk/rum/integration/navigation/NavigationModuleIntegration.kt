@@ -113,7 +113,10 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             )
             Logger.d(TAG, "ComposeNavigationTracker initialized")
         } else {
-            Logger.d(TAG, "androidx.navigation.NavDestination.getRoute not found on classpath, Compose navigation tracking disabled: requires androidx.navigation 2.4.0+")
+            Logger.d(
+                TAG,
+                "androidx.navigation.NavDestination.getRoute not found on classpath, Compose navigation tracking disabled: requires androidx.navigation 2.4.0+"
+            )
         }
 
         (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
