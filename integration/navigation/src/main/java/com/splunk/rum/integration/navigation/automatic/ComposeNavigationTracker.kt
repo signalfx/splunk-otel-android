@@ -78,10 +78,10 @@ internal class ComposeNavigationTracker(
 
         val screenName = destination.route ?: return
 
-        if (processor != null) {
-            val attrMap = extractArguments(arguments)
-            destination.parent?.route?.let { attrMap[ATTR_NAV_GRAPH] = it }
+        val attrMap = extractArguments(arguments)
+        destination.parent?.route?.let { attrMap[ATTR_NAV_GRAPH] = it }
 
+        if (processor != null) {
             val event = NavigationEvent(
                 name = screenName,
                 attributes = attrMap,
@@ -96,8 +96,7 @@ internal class ComposeNavigationTracker(
 
             screenChangeDetector.onComposeRouteChanged(result.name, mapToAttributes(result.attributes))
         } else {
-            val attrs = buildAttributes(arguments, destination)
-            screenChangeDetector.onComposeRouteChanged(screenName, attrs)
+            screenChangeDetector.onComposeRouteChanged(screenName, mapToAttributes(attrMap))
         }
     }
 
@@ -113,24 +112,6 @@ internal class ComposeNavigationTracker(
             }
         }
         return map
-    }
-
-    private fun buildAttributes(arguments: Bundle?, destination: NavDestination): Attributes {
-        val builder = Attributes.builder()
-        if (arguments != null) {
-            for (key in arguments.keySet()) {
-                if (key.startsWith(NAV_INTERNAL_KEY_PREFIX)) continue
-                @Suppress("DEPRECATION")
-                val value = arguments.get(key)
-                if (value != null) {
-                    builder.put(AttributeKey.stringKey(key), value.toString())
-                }
-            }
-        }
-        destination.parent?.route?.let {
-            builder.put(AttributeKey.stringKey(ATTR_NAV_GRAPH), it)
-        }
-        return builder.build()
     }
 
     private fun mapToAttributes(map: Map<String, String>): Attributes {
