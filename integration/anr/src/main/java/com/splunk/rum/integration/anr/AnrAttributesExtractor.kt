@@ -23,7 +23,7 @@ internal class AnrAttributesExtractor(context: Context) : AttributesExtractor<Ar
         parentContext: OtelContext,
         stackTrace: Array<StackTraceElement>
     ) {
-        attributes.put(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_ERROR)
+        attributes.put(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_ANR)
         attributes.put(GlobalRumConstants.ERROR_KEY, "true")
         appState?.let { attributes.put(GlobalRumConstants.APP_STATE_KEY, it) }
     }

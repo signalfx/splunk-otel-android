@@ -65,7 +65,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.1.2"
+        private const val version = "1.1.3"
 
         const val commonHttp = "com.splunk.android:sr-common-http:$version"
         const val commonJob = "com.splunk.android:sr-common-job:$version"
