@@ -342,6 +342,16 @@ class AgentStorage(context: Context) : IAgentStorage {
     private fun otelSpanDataFile(id: String) = File(spanDir, "$id.dat")
     private fun sessionReplayDataFile(id: String) = File(sessionReplayDir, "$id.dat")
 
+    override fun writeAnonymousUserId(value: String) {
+        preferences.putString(ANONYMOUS_USER_ID, value)
+    }
+
+    override fun readAnonymousUserId(): String? = preferences.getString(ANONYMOUS_USER_ID)
+
+    override fun deleteAnonymousUserId() {
+        preferences.remove(ANONYMOUS_USER_ID)
+    }
+
     fun cleanUpStorage(context: Context): Boolean {
         val files = ArrayList<File>()
         files += rootDir.listFiles()
@@ -375,6 +385,8 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val DEVICE_ID = "DEVICE_ID"
         private const val APP_INSTALLATION_ID = "APP_INSTALLATION_ID"
         private const val SESSION_ID = "SESSION_ID"
+
+        private const val ANONYMOUS_USER_ID = "ANONYMOUS_USER_ID"
         private const val SESSION_IDS = "SESSION_IDS"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
