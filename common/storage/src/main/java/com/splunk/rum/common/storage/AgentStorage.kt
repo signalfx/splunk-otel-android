@@ -175,6 +175,16 @@ class AgentStorage(context: Context) : IAgentStorage {
         preferences.remove(SESSION_LAST_ACTIVITY)
     }
 
+    override fun writeAnonymousUserId(value: String) {
+        preferences.putString(ANONYMOUS_USER_ID, value)
+    }
+
+    override fun readAnonymousUserId(): String? = preferences.getString(ANONYMOUS_USER_ID)
+
+    override fun deleteAnonymousUserId() {
+        preferences.remove(ANONYMOUS_USER_ID)
+    }
+
     override fun writeOtelLogData(id: String, data: ByteArray): Boolean {
         val file: File = otelLogDataFile(id)
         val success = internalStorage.writeBytes(file, data)
@@ -379,6 +389,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
         private const val SESSION_LAST_ACTIVITY = "SESSION_LAST_ACTIVITY"
+        private const val ANONYMOUS_USER_ID = "ANONYMOUS_USER_ID"
         private const val SPAN_IDS_KEY = "BUFFERED_SPAN_IDS"
         private const val SESSION_REPLAY_IDS_KEY = "BUFFERED_SESSION_REPLAY_IDS"
 

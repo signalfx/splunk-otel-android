@@ -34,7 +34,6 @@ dependencies {
     implementation(Dependencies.Otel.androidInstrumentation)
 
     implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonId)
     implementation(Dependencies.SessionReplay.commonHttp)
     implementation(Dependencies.SessionReplay.commonStorage)
     implementation(Dependencies.SessionReplay.commonUtils)
