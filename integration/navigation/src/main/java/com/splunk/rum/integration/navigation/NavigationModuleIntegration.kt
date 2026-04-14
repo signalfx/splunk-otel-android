@@ -25,6 +25,7 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
+import com.splunk.rum.integration.navigation.automatic.ComposeNavigationTracker
 import com.splunk.rum.integration.navigation.automatic.NavigationEventEmitter
 import com.splunk.rum.integration.navigation.automatic.ScreenChangeDetector
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationActivityCallback
@@ -72,18 +73,20 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         Logger.d(TAG, "onInstall")
         if (!moduleConfiguration.isEnabled) {
             Navigation.instance.listener = null
+            Navigation.instance.composeTracker = null
             emitter.clearCache()
             (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
             currentActivityReference = null
             return
         }
 
+        val detector = ScreenChangeDetector(emitter)
+        screenChangeDetector = detector
+
         if (moduleConfiguration.isAutomatedTrackingEnabled) {
             Logger.d(TAG, "Navigation module automated tracking enabled. Registering navigation callbacks.")
 
             val application = context.applicationContext as Application
-            val detector = ScreenChangeDetector(emitter)
-            screenChangeDetector = detector
 
             registerActivityLifecycle(application, detector)
             registerFragmentLifecycle(application, detector)
@@ -101,6 +104,19 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
                 }
                 detector.onActivityResumed(activity)
             }
+        }
+
+        if (isNavigationAvailable()) {
+            Navigation.instance.composeTracker = ComposeNavigationTracker(
+                screenChangeDetector = detector,
+                processor = moduleConfiguration.navigationEventProcessor
+            )
+            Logger.d(TAG, "ComposeNavigationTracker initialized")
+        } else {
+            Logger.d(
+                TAG,
+                "androidx.navigation.NavDestination.getRoute not found on classpath, Compose navigation tracking disabled: requires androidx.navigation 2.4.0+"
+            )
         }
 
         (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
@@ -139,6 +155,14 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         }
 
         application.registerActivityLifecycleCallbacks(fragmentActivityCallback)
+    }
+
+    private fun isNavigationAvailable(): Boolean = try {
+        Class.forName("androidx.navigation.NavDestination")
+            .getMethod("getRoute")
+        true
+    } catch (_: Exception) {
+        false
     }
 
     private val navigationListener = object : Navigation.Listener {
