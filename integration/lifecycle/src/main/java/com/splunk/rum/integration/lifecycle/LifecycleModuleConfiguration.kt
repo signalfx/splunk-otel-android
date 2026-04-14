@@ -23,7 +23,7 @@ import com.splunk.rum.integration.lifecycle.model.LifecycleAction
  * UI lifecycle module configuration.
  *
  * This module captures Android Activity and Fragment lifecycle transitions and emits them
- * as OpenTelemetry `device.app.ui.lifecycle` events.
+ * as OpenTelemetry `app.ui.lifecycle` events.
  *
  * @property isEnabled Whether the module is enabled. Default is true.
  * @property allowedEvents Set of lifecycle actions to track. Default is [MAIN_LIFECYCLE_EVENTS].

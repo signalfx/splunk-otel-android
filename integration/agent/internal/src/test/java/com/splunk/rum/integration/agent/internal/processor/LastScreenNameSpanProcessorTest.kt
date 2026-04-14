@@ -46,7 +46,7 @@ class LastScreenNameSpanProcessorTest {
 
     @Test
     fun `does not set last screen name on navigation event span`() {
-        val span = mockSpan("device.app.ui.navigation")
+        val span = mockSpan("app.ui.navigation")
 
         processor.onStart(Context.root(), span)
 
@@ -58,7 +58,7 @@ class LastScreenNameSpanProcessorTest {
 
     @Test
     fun `does not set last screen name on lifecycle span`() {
-        val span = mockSpan("device.app.ui.lifecycle")
+        val span = mockSpan("app.ui.lifecycle")
 
         processor.onStart(Context.root(), span)
 

@@ -39,7 +39,7 @@ import java.lang.ref.WeakReference
 /**
  * Module integration for capturing navigation events (screen changes).
  * When automated tracking is enabled, this module registers Activity and Fragment callbacks
- * to detect screen changes and emits OpenTelemetry device.app.ui.navigation events.
+ * to detect screen changes and emits OpenTelemetry app.ui.navigation events.
  */
 internal object NavigationModuleIntegration : ModuleIntegration<NavigationModuleConfiguration>(
     defaultModuleConfiguration = NavigationModuleConfiguration()
