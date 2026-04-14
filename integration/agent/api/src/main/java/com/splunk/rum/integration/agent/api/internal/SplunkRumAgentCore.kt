@@ -88,7 +88,9 @@ internal object SplunkRumAgentCore {
         val agentIntegration = AgentIntegration.obtainInstance(application)
 
         val initializer = OpenTelemetryInitializer(
-            application, agentConfiguration.deferredUntilForeground, agentConfiguration.spanInterceptor
+            application,
+            agentConfiguration.deferredUntilForeground,
+            agentConfiguration.spanInterceptor
         )
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
@@ -117,7 +119,8 @@ internal object SplunkRumAgentCore {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 agentConfiguration.session.listeners.forEachFast {
                     it.onSessionChanged(
-                        newSessionId = sessionId, previousSessionId = sessionManager.previousSessionId
+                        newSessionId = sessionId,
+                        previousSessionId = sessionManager.previousSessionId
                     )
                 }
             }

@@ -151,7 +151,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
         private const val INITIAL_BACKOFF = 60 * 1000L
         private const val AVERAGE_UPLOAD_SIZE = 40_000L
 
-        fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder  {
+        fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder {
             val builder = JobInfo.Builder(jobId, ComponentName(context, UploadOtelLogRecordDataJob::class.java))
                 .setExtras(PersistableBundle().apply { putString(DATA_SERIALIZE_KEY, id) })
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
@@ -164,6 +164,5 @@ internal class UploadOtelLogRecordDataJob : JobService() {
 
             return builder
         }
-
     }
 }

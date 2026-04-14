@@ -160,6 +160,5 @@ internal class UploadSessionReplayDataJob : JobService() {
 
             return builder
         }
-
     }
 }

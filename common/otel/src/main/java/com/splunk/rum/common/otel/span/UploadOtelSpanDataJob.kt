@@ -148,11 +148,11 @@ internal class UploadOtelSpanDataJob : JobService() {
         private const val INITIAL_BACKOFF = 60 * 1000L
         private const val AVERAGE_UPLOAD_SIZE = 40_000L
         fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder {
-           val builder = JobInfo.Builder(jobId, ComponentName(context, UploadOtelSpanDataJob::class.java))
-               .setExtras(PersistableBundle().apply { putString(DATA_SERIALIZE_KEY, id) })
-               .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-               .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL)
-               .setRequiresCharging(false)
+            val builder = JobInfo.Builder(jobId, ComponentName(context, UploadOtelSpanDataJob::class.java))
+                .setExtras(PersistableBundle().apply { putString(DATA_SERIALIZE_KEY, id) })
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL)
+                .setRequiresCharging(false)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 builder.setEstimatedNetworkBytes(0, AVERAGE_UPLOAD_SIZE)
