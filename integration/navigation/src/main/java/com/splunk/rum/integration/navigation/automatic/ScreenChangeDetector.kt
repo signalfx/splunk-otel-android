@@ -21,10 +21,11 @@ import android.os.Handler
 import android.os.Looper
 import androidx.fragment.app.Fragment
 import com.splunk.rum.integration.navigation.descriptor.ScreenNameDescriptor
+import io.opentelemetry.api.common.Attributes
 
 /**
- * Detects visible screen changes (Activity/Fragment) and notifies [NavigationEventEmitter].
- * Fragment takes precedence over Activity when both are present.
+ * Detects visible screen changes (Activity/Fragment/Compose route) and notifies
+ * [NavigationEventEmitter]. Priority: Compose route > Fragment > Activity.
  *
  * Elements marked as ignored by [ScreenNameDescriptor] (e.g. DialogFragment, NavHostFragment,
  * or annotated with isIgnored = true) are skipped entirely.
@@ -38,21 +39,29 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     private val handler = Handler(Looper.getMainLooper())
     private var lastResumedActivityName: String? = null
     private var lastResumedFragmentName: String? = null
+    private var lastComposeRouteName: String? = null
+    private var composeRouteActivityName: String? = null
 
     /**
-     * Current visible screen name: fragment if any, else activity.
+     * Current visible screen name: Compose route > Fragment > Activity.
      */
-    private fun getCurrentVisibleScreenName(): String? {
-        val fragment = lastResumedFragmentName
-        if (fragment != null) return fragment
-        return lastResumedActivityName
-    }
+    private fun getCurrentVisibleScreenName(): String? =
+        lastComposeRouteName ?: lastResumedFragmentName ?: lastResumedActivityName
 
     fun onActivityResumed(activity: Activity) {
         if (ScreenNameDescriptor.isIgnored(activity)) return
 
         val name = ScreenNameDescriptor.getName(activity)
         lastResumedActivityName = name
+
+        if (lastComposeRouteName != null && composeRouteActivityName == null) {
+            composeRouteActivityName = name
+        } else if (composeRouteActivityName != null && composeRouteActivityName != name) {
+            lastComposeRouteName = null
+            composeRouteActivityName = null
+            lastEmittedComposeAttributes = null
+        }
+
         // Defer so fragment callbacks, which run synchronously during the same resume, execute
         // first thus avoiding emitting an intermediate activity only event when a fragment is present
         handler.post { tryEmitIfChanged() }
@@ -97,6 +106,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     }
 
     private var lastEmittedScreenName: String? = null
+    private var lastEmittedComposeAttributes: Attributes? = null
 
     /**
      * Records that a navigation event was emitted for [screenName] (e.g. from manual tracking).
@@ -105,6 +115,34 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
      */
     fun recordEmittedScreen(screenName: String) {
         lastEmittedScreenName = screenName
+    }
+
+    /**
+     * Called when a Compose NavController destination changes. Sets the compose route as the
+     * highest-priority screen name and emits the event with optional [attributes].
+     * Associates the route with the currently resumed activity so it can be cleared
+     * when a different activity resumes.
+     *
+     * Deduplicates by both screen name and attributes so navigating the same route template
+     * with different arguments (e.g. profile/user_123 → profile/user_456) still emits.
+     */
+    fun onComposeRouteChanged(screenName: String, attributes: Attributes = Attributes.empty()) {
+        lastComposeRouteName = screenName
+        composeRouteActivityName = lastResumedActivityName
+        if (screenName == lastEmittedScreenName && attributes == lastEmittedComposeAttributes) return
+        lastEmittedScreenName = screenName
+        lastEmittedComposeAttributes = attributes
+        eventEmitter.emitNavigationEvent(screenName, attributes)
+    }
+
+    /**
+     * Clears the active Compose route, allowing Fragment/Activity names to take precedence again.
+     * Called when a NavController is unregistered.
+     */
+    fun clearComposeRoute() {
+        lastComposeRouteName = null
+        composeRouteActivityName = null
+        lastEmittedComposeAttributes = null
     }
 
     /**

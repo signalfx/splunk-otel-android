@@ -34,6 +34,8 @@ dependencies {
 
     implementation(Dependencies.Android.fragmentKtx)
 
+    compileOnly(Dependencies.Android.navigationRuntime)
+
     implementation(Dependencies.SessionReplay.commonUtils)
     implementation(Dependencies.SessionReplay.commonLogger)
 

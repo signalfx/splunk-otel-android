@@ -27,10 +27,13 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
  *
  * @property isEnabled Whether the module is enabled. Default is true.
  * @property isAutomatedTrackingEnabled Whether Fragment and Activity lifecycle tracking is enabled. Default is false.
+ * @property navigationEventProcessor Optional processor for transforming or filtering navigation events
+ *   from Compose routes before they are emitted. See [NavigationEventProcessor].
  */
 data class NavigationModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
-    val isAutomatedTrackingEnabled: Boolean = false
+    val isAutomatedTrackingEnabled: Boolean = false,
+    val navigationEventProcessor: NavigationEventProcessor? = null
 ) : ModuleConfiguration {
 
     override val name: String = "navigation"
