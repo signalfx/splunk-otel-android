@@ -149,6 +149,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
         private const val DATA_SERIALIZE_KEY = "DATA"
 
         private const val INITIAL_BACKOFF = 60 * 1000L
+        private const val AVERAGE_UPLOAD_SIZE = 40_000L
 
         fun createJobInfoBuilder(context: Context, jobId: Int, id: String): JobInfo.Builder  {
             val builder = JobInfo.Builder(jobId, ComponentName(context, UploadOtelLogRecordDataJob::class.java))
@@ -158,7 +159,7 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                 .setRequiresCharging(false)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                builder.setEstimatedNetworkBytes(0, 40_000)
+                builder.setEstimatedNetworkBytes(0, AVERAGE_UPLOAD_SIZE)
             }
 
             return builder
