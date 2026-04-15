@@ -37,8 +37,8 @@ class EndpointConfiguration {
     constructor(realm: String, rumAccessToken: String) {
         this.realm = realm
         this.rumAccessToken = rumAccessToken
-        this.traceEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/traces")
-        this.sessionReplayEndpoint = URL("https://rum-ingest.$realm.signalfx.com/v1/logs")
+        this.traceEndpoint = URL("https://rum-ingest.$realm.observability.splunkcloud.com/v1/traces")
+        this.sessionReplayEndpoint = URL("https://rum-ingest.$realm.observability.splunkcloud.com/v1/logs")
     }
 
     /**
