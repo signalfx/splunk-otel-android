@@ -33,7 +33,7 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
             // at export time, causing a race when manual tracking (with differing screenName argument)
             // and automatic tracking fire back to back
             if (key == GlobalRumConstants.SCREEN_NAME_KEY &&
-                span.name == GlobalRumConstants.NAVIGATION_LOG_EVENT_NAME &&
+                span.name == GlobalRumConstants.NAVIGATION_EVENT_NAME &&
                 span.getAttribute(GlobalRumConstants.SCREEN_NAME_KEY) != null
             ) {
                 return@forEach

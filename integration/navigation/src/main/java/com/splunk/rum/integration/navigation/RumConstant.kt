@@ -23,7 +23,7 @@ internal object RumConstant {
 
     const val COMPONENT_NAVIGATION = "ui"
 
-    const val NAVIGATION_LOG_EVENT_NAME = GlobalRumConstants.NAVIGATION_LOG_EVENT_NAME
+    const val NAVIGATION_LOG_EVENT_NAME = GlobalRumConstants.NAVIGATION_EVENT_NAME
 
     val NAVIGATION_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("navigation.name")
 }

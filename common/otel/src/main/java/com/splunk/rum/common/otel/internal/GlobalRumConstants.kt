@@ -62,7 +62,7 @@ object GlobalRumConstants {
     /**
      * Log event names.
      */
-    const val NAVIGATION_LOG_EVENT_NAME = "app.ui.navigation"
+    const val NAVIGATION_EVENT_NAME = "app.ui.navigation"
 
     /**
      * Screen values and attribute keys.
