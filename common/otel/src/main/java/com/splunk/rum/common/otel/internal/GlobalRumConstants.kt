@@ -60,6 +60,11 @@ object GlobalRumConstants {
     val PREVIOUS_SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.previous_id")
 
     /**
+     * Log event names.
+     */
+    const val NAVIGATION_LOG_EVENT_NAME = "app.ui.navigation"
+
+    /**
      * Screen values and attribute keys.
      */
     const val DEFAULT_SCREEN_NAME = "unknown"
