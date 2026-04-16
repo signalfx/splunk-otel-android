@@ -48,4 +48,5 @@ Follow these steps to perform a release:
 
 11. **Sync with develop**
     - Create a new PR from `main` → `develop` to synchronize branches.
+    - Make sure the merge is done via `Create a merge commit` and not `Squash and merge`
     - Resolve any conflicts if they occur and merge the PR.
