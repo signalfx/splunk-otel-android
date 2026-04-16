@@ -80,7 +80,7 @@ class EndpointConfigurationFragment : BaseFragment<FragmentEndpointConfiguration
         try {
             val realm = BuildConfig.SPLUNK_REALM
             val token = BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
-            val tracesUrl = URL("https://rum-ingest.$realm.signalfx.com/v1/traces?auth=$token")
+            val tracesUrl = URL("https://rum-ingest.$realm.observability.splunkcloud.com/v1/traces?auth=$token")
 
             SplunkRum.instance.preferences.endpointConfiguration =
                 EndpointConfiguration(tracesUrl)
@@ -101,8 +101,8 @@ class EndpointConfigurationFragment : BaseFragment<FragmentEndpointConfiguration
         try {
             val realm = BuildConfig.SPLUNK_REALM
             val token = BuildConfig.SPLUNK_RUM_ACCESS_TOKEN
-            val tracesUrl = URL("https://rum-ingest.$realm.signalfx.com/v1/traces?auth=$token")
-            val logsUrl = URL("https://rum-ingest.$realm.signalfx.com/v1/logs?auth=$token")
+            val tracesUrl = URL("https://rum-ingest.$realm.observability.splunkcloud.com/v1/traces?auth=$token")
+            val logsUrl = URL("https://rum-ingest.$realm.observability.splunkcloud.com/v1/logs?auth=$token")
 
             SplunkRum.instance.preferences.endpointConfiguration =
                 EndpointConfiguration(tracesUrl, logsUrl)
