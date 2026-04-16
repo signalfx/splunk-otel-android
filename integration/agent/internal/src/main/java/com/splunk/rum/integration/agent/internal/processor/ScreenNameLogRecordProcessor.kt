@@ -26,8 +26,8 @@ import io.opentelemetry.sdk.logs.ReadWriteLogRecord
  * Snapshots the current [IScreenNameTracker.screenName] onto every log record at emit time.
  *
  * Log records are batched before being converted to spans. Without this processor, the
- * global `screen.name` attribute is applied later — at span-creation time — when the value
- * may already reflect a *subsequent* navigation event. By stamping the value here we
+ * global `screen.name` attribute is applied later, at span creation time, when the value
+ * may already reflect a subsequent navigation event. By stamping the value here we
  * capture the screen that was active when the event actually occurred.
  *
  * Log records that already carry `screen.name` (e.g. navigation events set it in the
