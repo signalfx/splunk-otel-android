@@ -39,6 +39,7 @@ Follow these steps to perform a release:
    - The build will then be published to Sonatype and appear in Maven within a few hours (up to a day).
 
 9. **Merge to main**
+   - Make sure the merge is done via `Create a merge commit` and not `Squash and merge`
    - Once the release is verified, merge the PR into the `main` branch.
 
 10. **Create GitHub Release**
