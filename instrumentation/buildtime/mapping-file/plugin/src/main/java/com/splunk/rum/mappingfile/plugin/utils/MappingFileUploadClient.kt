@@ -58,7 +58,8 @@ class MappingFileUploadClient(private val logger: SplunkLogger) {
     }
 
     private fun buildUploadUrl(realm: String, applicationId: String, versionCode: Int, buildId: String): String {
-        val url = "https://api.$realm.signalfx.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId"
+        val baseUrl = "https://api.$realm.observability.splunkcloud.com"
+        val url = "$baseUrl/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId"
         logger.debug("Upload", "Constructed upload URL for realm '$realm'")
         return url
     }
@@ -129,7 +130,7 @@ class MappingFileUploadClient(private val logger: SplunkLogger) {
             )
             logger.error(
                 "Upload",
-                "curl -X PUT \"https://api.$realm.signalfx.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId\" -H \"X-SF-Token: YOUR_API_TOKEN_HERE\" -F \"filename=${mappingFile.name}\" -F \"file=@${mappingFile.absolutePath}\""
+                "curl -X PUT \"https://api.$realm.observability.splunkcloud.com/v2/rum-mfm/proguard/$applicationId/$versionCode/$buildId\" -H \"X-SF-Token: YOUR_API_TOKEN_HERE\" -F \"filename=${mappingFile.name}\" -F \"file=@${mappingFile.absolutePath}\""
             )
             logger.error("Upload", "Replace YOUR_API_TOKEN_HERE with your actual API access token.")
 

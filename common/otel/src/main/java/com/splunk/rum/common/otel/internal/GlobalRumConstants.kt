@@ -38,6 +38,7 @@ object GlobalRumConstants {
     const val COMPONENT_HTTP = "http"
     const val COMPONENT_ERROR = "error"
     const val COMPONENT_CRASH = "crash"
+    const val COMPONENT_ANR = "anr"
 
     /**
      * Application lifecycle state values.
