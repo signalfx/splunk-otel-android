@@ -28,12 +28,12 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         attributes.forEach { key, value ->
-            // Navigation spans set screen.name at emit time via the log
-            // record. Without this guard the global attribute would overwrite the per event value
-            // at export time, causing a race when manual tracking (with differing screenName argument)
-            // and automatic tracking fire back to back
+            // screen.name is snapshotted onto every log record at emit time by
+            // ScreenNameLogRecordProcessor. When those log records are later converted to
+            // spans the attribute is already present. Overwriting it here with the current
+            // global value would be incorrect because ScreenNameTracker may have advanced
+            // to a different screen between emit and batch-flush.
             if (key == GlobalRumConstants.SCREEN_NAME_KEY &&
-                span.name == GlobalRumConstants.NAVIGATION_EVENT_NAME &&
                 span.getAttribute(GlobalRumConstants.SCREEN_NAME_KEY) != null
             ) {
                 return@forEach
