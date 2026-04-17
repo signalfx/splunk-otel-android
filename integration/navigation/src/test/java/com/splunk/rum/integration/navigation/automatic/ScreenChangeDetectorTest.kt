@@ -313,6 +313,49 @@ class ScreenChangeDetectorTest {
         assertEquals("Menu", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
     }
 
+    @Test
+    fun `navigating to ignored fragment does not emit spurious activity event`() {
+        val activity = activityController.create().get()
+        val menu = MenuFragment()
+        val ignored = IgnoredFragment()
+
+        detector.onActivityResumed(activity)
+        detector.onFragmentResumed(menu)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(1, exportedLogs.size)
+        assertEquals("Menu", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+
+        detector.onFragmentPaused(menu)
+        detector.onFragmentResumed(ignored)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(1, exportedLogs.size)
+    }
+
+    @Test
+    fun `returning from ignored fragment to tracked fragment emits correctly`() {
+        val activity = activityController.create().get()
+        val menu = MenuFragment()
+        val ignored = IgnoredFragment()
+
+        detector.onActivityResumed(activity)
+        detector.onFragmentResumed(menu)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(1, exportedLogs.size)
+
+        detector.onFragmentPaused(menu)
+        detector.onFragmentResumed(ignored)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(1, exportedLogs.size)
+
+        detector.onFragmentPaused(ignored)
+        detector.onFragmentResumed(menu)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(1, exportedLogs.size)
+        assertEquals("Menu", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+    }
+
     @NavigationElement(name = "Main")
     class MainActivity : Activity()
 
