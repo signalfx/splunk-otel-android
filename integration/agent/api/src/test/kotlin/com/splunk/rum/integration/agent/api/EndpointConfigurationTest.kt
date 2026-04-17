@@ -30,22 +30,25 @@ class EndpointConfigurationTest {
 
         assertEquals("us0", config.realm)
         assertEquals("test_token_123", config.rumAccessToken)
-        assertEquals("https://rum-ingest.us0.signalfx.com/v1/traces", config.traceEndpoint.toString())
-        assertEquals("https://rum-ingest.us0.signalfx.com/v1/logs", config.sessionReplayEndpoint.toString())
+        assertEquals("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces", config.traceEndpoint.toString())
+        assertEquals(
+            "https://rum-ingest.us0.observability.splunkcloud.com/v1/logs",
+            config.sessionReplayEndpoint.toString()
+        )
     }
 
     @Test
     fun `single URL constructor extracts token and removes it from URL`() {
-        val url = URL("https://rum-ingest.us0.signalfx.com/v1/traces?auth=extracted_token_123")
+        val url = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces?auth=extracted_token_123")
         val config = EndpointConfiguration(url)
 
         assertEquals("extracted_token_123", config.rumAccessToken)
-        assertEquals("https://rum-ingest.us0.signalfx.com/v1/traces", config.traceEndpoint.toString())
+        assertEquals("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces", config.traceEndpoint.toString())
     }
 
     @Test
     fun `single URL constructor throws exception when no auth parameter`() {
-        val url = URL("https://rum-ingest.us0.signalfx.com/v1/traces")
+        val url = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces")
 
         val exception = assertThrows(IllegalArgumentException::class.java) {
             EndpointConfiguration(url)
@@ -57,7 +60,7 @@ class EndpointConfigurationTest {
 
     @Test
     fun `single URL constructor throws exception when auth parameter is empty`() {
-        val url = URL("https://rum-ingest.us0.signalfx.com/v1/traces?auth=")
+        val url = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces?auth=")
 
         val exception = assertThrows(IllegalArgumentException::class.java) {
             EndpointConfiguration(url)
@@ -69,7 +72,7 @@ class EndpointConfigurationTest {
 
     @Test
     fun `single URL constructor throws exception when no query string`() {
-        val url = URL("https://rum-ingest.us0.signalfx.com/v1/traces")
+        val url = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces")
 
         val exception = assertThrows(IllegalArgumentException::class.java) {
             EndpointConfiguration(url)
@@ -81,32 +84,38 @@ class EndpointConfigurationTest {
 
     @Test
     fun `dual URL constructor extracts token from trace URL and removes it`() {
-        val traceUrl = URL("https://rum-ingest.us0.signalfx.com/v1/traces?auth=trace_token_123")
-        val replayUrl = URL("https://rum-ingest.us0.signalfx.com/v1/logs")
+        val traceUrl = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces?auth=trace_token_123")
+        val replayUrl = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/logs")
 
         val config = EndpointConfiguration(traceUrl, replayUrl)
 
         assertEquals("trace_token_123", config.rumAccessToken)
-        assertEquals("https://rum-ingest.us0.signalfx.com/v1/traces", config.traceEndpoint.toString())
-        assertEquals("https://rum-ingest.us0.signalfx.com/v1/logs", config.sessionReplayEndpoint.toString())
+        assertEquals("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces", config.traceEndpoint.toString())
+        assertEquals(
+            "https://rum-ingest.us0.observability.splunkcloud.com/v1/logs",
+            config.sessionReplayEndpoint.toString()
+        )
     }
 
     @Test
     fun `dual URL constructor extracts token from session replay URL and removes it`() {
-        val traceUrl = URL("https://rum-ingest.us0.signalfx.com/v1/traces")
-        val replayUrl = URL("https://rum-ingest.us0.signalfx.com/v1/logs?auth=replay_token_123")
+        val traceUrl = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces")
+        val replayUrl = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/logs?auth=replay_token_123")
 
         val config = EndpointConfiguration(traceUrl, replayUrl)
 
         assertEquals("replay_token_123", config.rumAccessToken)
-        assertEquals("https://rum-ingest.us0.signalfx.com/v1/traces", config.traceEndpoint.toString())
-        assertEquals("https://rum-ingest.us0.signalfx.com/v1/logs", config.sessionReplayEndpoint.toString())
+        assertEquals("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces", config.traceEndpoint.toString())
+        assertEquals(
+            "https://rum-ingest.us0.observability.splunkcloud.com/v1/logs",
+            config.sessionReplayEndpoint.toString()
+        )
     }
 
     @Test
     fun `dual URL constructor prefers trace URL token over session replay URL token`() {
-        val traceUrl = URL("https://rum-ingest.us0.signalfx.com/v1/traces?auth=trace_token_123")
-        val replayUrl = URL("https://rum-ingest.us0.signalfx.com/v1/logs?auth=replay_token_456")
+        val traceUrl = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces?auth=trace_token_123")
+        val replayUrl = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/logs?auth=replay_token_456")
 
         val config = EndpointConfiguration(traceUrl, replayUrl)
 
@@ -115,8 +124,8 @@ class EndpointConfigurationTest {
 
     @Test
     fun `dual URL constructor throws exception when no auth in either URL`() {
-        val traceUrl = URL("https://rum-ingest.us0.signalfx.com/v1/traces")
-        val replayUrl = URL("https://rum-ingest.us0.signalfx.com/v1/logs")
+        val traceUrl = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces")
+        val replayUrl = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/logs")
 
         val exception = assertThrows(IllegalArgumentException::class.java) {
             EndpointConfiguration(traceUrl, replayUrl)
@@ -128,34 +137,38 @@ class EndpointConfigurationTest {
 
     @Test
     fun `URL constructor handles multiple query parameters and only removes auth`() {
-        val url = URL("https://rum-ingest.us0.signalfx.com/v1/traces?other=value&auth=multi_param_token&another=param")
+        val url =
+            URL(
+                "https://rum-ingest.us0.observability.splunkcloud.com/v1/traces?other=value&auth=multi_param_token&another=param"
+            )
 
         val config = EndpointConfiguration(url)
 
         assertEquals("multi_param_token", config.rumAccessToken)
         assertEquals(
-            "https://rum-ingest.us0.signalfx.com/v1/traces?other=value&another=param",
+            "https://rum-ingest.us0.observability.splunkcloud.com/v1/traces?other=value&another=param",
             config.traceEndpoint.toString()
         )
     }
 
     @Test
     fun `URL constructor handles auth parameter with special characters`() {
-        val url = URL("https://rum-ingest.us0.signalfx.com/v1/traces?auth=token_with-special.chars_123")
+        val url =
+            URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces?auth=token_with-special.chars_123")
 
         val config = EndpointConfiguration(url)
 
         assertEquals("token_with-special.chars_123", config.rumAccessToken)
-        assertEquals("https://rum-ingest.us0.signalfx.com/v1/traces", config.traceEndpoint.toString())
+        assertEquals("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces", config.traceEndpoint.toString())
     }
 
     @Test
     fun `URL with only auth parameter removes query string entirely`() {
-        val url = URL("https://rum-ingest.us0.signalfx.com/v1/traces?auth=only_token_123")
+        val url = URL("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces?auth=only_token_123")
 
         val config = EndpointConfiguration(url)
 
         assertEquals("only_token_123", config.rumAccessToken)
-        assertEquals("https://rum-ingest.us0.signalfx.com/v1/traces", config.traceEndpoint.toString())
+        assertEquals("https://rum-ingest.us0.observability.splunkcloud.com/v1/traces", config.traceEndpoint.toString())
     }
 }
