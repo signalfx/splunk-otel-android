@@ -170,6 +170,15 @@ class ScreenChangeDetectorTest {
     }
 
     @Test
+    fun `recordEmittedScreen prevents duplicate emission from automatic Compose tracking`() {
+        detector.recordEmittedScreen("home")
+
+        detector.onComposeRouteChanged("home")
+
+        assertTrue(exportedLogs.isEmpty())
+    }
+
+    @Test
     fun `activity becomes visible screen when fragment is paused`() {
         val activity = activityController.create().get()
         val menu = MenuFragment()

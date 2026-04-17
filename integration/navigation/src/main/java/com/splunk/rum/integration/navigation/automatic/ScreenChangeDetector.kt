@@ -124,6 +124,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
      */
     fun recordEmittedScreen(screenName: String) {
         lastEmittedScreenName = screenName
+        lastEmittedComposeAttributes = Attributes.empty()
     }
 
     /**
