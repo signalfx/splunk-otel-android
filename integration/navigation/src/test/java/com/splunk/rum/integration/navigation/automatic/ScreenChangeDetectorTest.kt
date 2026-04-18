@@ -323,7 +323,7 @@ class ScreenChangeDetectorTest {
     }
 
     @Test
-    fun `navigating to ignored fragment does not emit spurious activity event`() {
+    fun `navigating to ignored fragment does not emit false activity event`() {
         val activity = activityController.create().get()
         val menu = MenuFragment()
         val ignored = IgnoredFragment()
