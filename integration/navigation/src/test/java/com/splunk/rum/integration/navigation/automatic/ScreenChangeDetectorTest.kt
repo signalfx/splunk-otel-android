@@ -323,7 +323,7 @@ class ScreenChangeDetectorTest {
     }
 
     @Test
-    fun `navigating to ignored fragment does not emit false activity event`() {
+    fun `navigating to ignored fragment does not emit a false activity event`() {
         val activity = activityController.create().get()
         val menu = MenuFragment()
         val ignored = IgnoredFragment()
@@ -363,6 +363,43 @@ class ScreenChangeDetectorTest {
 
         assertEquals(1, exportedLogs.size)
         assertEquals("Menu", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+    }
+
+    @Test
+    fun `back to back fragment pauses do not emit duplicate events`() {
+        val activity = activityController.create().get()
+        val parent = MenuFragment()
+        val child = CrashReportsFragment()
+
+        detector.onActivityResumed(activity)
+        detector.onFragmentResumed(parent)
+        detector.onFragmentResumed(child)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(2, exportedLogs.size)
+
+        detector.onFragmentPaused(child)
+        detector.onFragmentPaused(parent)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(3, exportedLogs.size)
+        assertEquals("Main", exportedLogs[2].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+    }
+
+    @Test
+    fun `clearComposeRoute does not re-emit when fragment has same name`() {
+        val activity = activityController.create().get()
+
+        detector.onActivityResumed(activity)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(1, exportedLogs.size)
+
+        detector.onComposeRouteChanged("Main")
+        assertEquals(2, exportedLogs.size)
+
+        detector.clearComposeRoute()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertEquals(2, exportedLogs.size)
     }
 
     @NavigationElement(name = "Main")
