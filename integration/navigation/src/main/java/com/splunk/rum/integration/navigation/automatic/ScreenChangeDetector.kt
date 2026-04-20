@@ -92,6 +92,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
         val name = ScreenNameDescriptor.getName(fragment)
         if (lastResumedFragmentName == name) {
             lastResumedFragmentName = findResumedAncestorName(fragment)
+                ?: findResumedSiblingName(fragment)
         }
         handler.removeCallbacks(deferredPauseRunnable)
         handler.post(deferredPauseRunnable)
@@ -110,6 +111,21 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
             parent = parent.parentFragment
         }
         return null
+    }
+
+    /**
+     * Finds a resumed sibling fragment in the same FragmentManager.
+     * Handles add()-based overlays where the underlying fragment was never paused.
+     */
+    private fun findResumedSiblingName(fragment: Fragment): String? {
+        val fm = try {
+            fragment.parentFragmentManager
+        } catch (_: IllegalStateException) {
+            return null
+        }
+        return fm.fragments.lastOrNull {
+            it !== fragment && it.isResumed && !ScreenNameDescriptor.isIgnored(it)
+        }?.let { ScreenNameDescriptor.getName(it) }
     }
 
     private var lastEmittedScreenName: String? = null
