@@ -41,7 +41,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     private var lastResumedFragmentName: String? = null
     private var lastComposeRouteName: String? = null
     private var composeRouteActivityName: String? = null
-    private var pendingPauseEmit: Runnable? = null
+    private val deferredPauseRunnable = Runnable { tryEmitIfChanged() }
 
     /**
      * Current visible screen name: Compose route > Fragment > Activity.
@@ -93,14 +93,12 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
         if (lastResumedFragmentName == name) {
             lastResumedFragmentName = findResumedAncestorName(fragment)
         }
-        val runnable = Runnable { tryEmitIfChanged() }
-        pendingPauseEmit = runnable
-        handler.post(runnable)
+        handler.removeCallbacks(deferredPauseRunnable)
+        handler.post(deferredPauseRunnable)
     }
 
     private fun cancelPendingPauseEmit() {
-        pendingPauseEmit?.let { handler.removeCallbacks(it) }
-        pendingPauseEmit = null
+        handler.removeCallbacks(deferredPauseRunnable)
     }
 
     private fun findResumedAncestorName(fragment: Fragment): String? {
