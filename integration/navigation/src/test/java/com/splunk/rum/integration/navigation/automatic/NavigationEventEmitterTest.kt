@@ -30,7 +30,6 @@ import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -151,14 +150,14 @@ class NavigationEventEmitterTest {
     }
 
     @Test
-    fun `emitted log record omits last screen name when previous is DEFAULT_SCREEN_NAME`() {
+    fun `emitted log record includes unknown as last screen name on first navigation`() {
         val emitter = NavigationEventEmitter()
         emitter.processCachedEvents()
 
         emitter.emitNavigationEvent("Menu")
 
         val log = exportedLogs.single()
-        assertNull(log.attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+        assertEquals("unknown", log.attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
     }
 
     @Test
@@ -225,7 +224,7 @@ class NavigationEventEmitterTest {
         emitter.processCachedEvents()
 
         assertEquals(2, exportedLogs.size)
-        assertNull(exportedLogs[0].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+        assertEquals("unknown", exportedLogs[0].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
         assertEquals("Menu", exportedLogs[1].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
     }
 
@@ -241,7 +240,7 @@ class NavigationEventEmitterTest {
 
         assertEquals(2, exportedLogs.size)
         assertEquals("Login", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
-        assertNull(exportedLogs[0].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
+        assertEquals("unknown", exportedLogs[0].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
         assertEquals("Dashboard", exportedLogs[1].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
         assertEquals("Login", exportedLogs[1].attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY))
     }
