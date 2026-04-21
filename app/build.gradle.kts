@@ -62,6 +62,11 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = AppDependencies.Android.Compose.compilerVersion
     }
 
     packagingOptions {
@@ -93,6 +98,13 @@ dependencies {
      */
     implementation(AppDependencies.okhttp)
     implementation(AppDependencies.okio)
+
+    implementation(AppDependencies.Android.Compose.ui)
+    implementation(AppDependencies.Android.Compose.material)
+    implementation(AppDependencies.Android.Compose.uiToolingPreview)
+    implementation(AppDependencies.Android.Compose.activityCompose)
+    implementation(AppDependencies.Android.Compose.navigationCompose)
+    debugImplementation(AppDependencies.Android.Compose.uiTooling)
 
     debugImplementation(AppDependencies.leakCanary)
 }

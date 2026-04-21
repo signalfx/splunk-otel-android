@@ -28,6 +28,16 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         attributes.forEach { key, value ->
+            // screen.name is added onto every log record at emit time by
+            // ScreenNameLogRecordProcessor. When those log records are later converted to
+            // spans the attribute is already present. Overwriting it here with the current
+            // global value would be incorrect because ScreenNameTracker may have advanced
+            // to a different screen between emit and batch flush.
+            if (key == GlobalRumConstants.SCREEN_NAME_KEY &&
+                span.getAttribute(GlobalRumConstants.SCREEN_NAME_KEY) != null
+            ) {
+                return@forEach
+            }
             @Suppress("UNCHECKED_CAST")
             span.setAttribute(key as AttributeKey<Any>, value)
         }

@@ -29,7 +29,6 @@ object GlobalRumConstants {
     /**
      * Span names.
      */
-    const val NAVIGATION_SPAN_NAME = "Created"
     const val APP_START_SPAN_NAME = "AppStart"
 
     /**
@@ -59,6 +58,11 @@ object GlobalRumConstants {
      */
     val SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.id")
     val PREVIOUS_SESSION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("session.previous_id")
+
+    /**
+     * Log event names.
+     */
+    const val NAVIGATION_EVENT_NAME = "app.ui.navigation"
 
     /**
      * Screen values and attribute keys.
