@@ -166,7 +166,6 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     fun clearComposeRoute() {
         lastComposeRouteName = null
         composeRouteActivityName = null
-        lastEmittedComposeAttributes = null
     }
 
     /**
