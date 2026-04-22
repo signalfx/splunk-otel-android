@@ -41,6 +41,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     private var lastResumedFragmentName: String? = null
     private var lastComposeRouteName: String? = null
     private var composeRouteActivityName: String? = null
+    private val deferredPauseRunnable = Runnable { tryEmitIfChanged() }
 
     /**
      * Current visible screen name: Compose route > Fragment > Activity.
@@ -77,6 +78,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     }
 
     fun onFragmentResumed(fragment: Fragment) {
+        cancelPendingPauseEmit()
         if (ScreenNameDescriptor.isIgnored(fragment)) return
 
         val name = ScreenNameDescriptor.getName(fragment)
@@ -90,8 +92,14 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
         val name = ScreenNameDescriptor.getName(fragment)
         if (lastResumedFragmentName == name) {
             lastResumedFragmentName = findResumedAncestorName(fragment)
+                ?: findResumedSiblingName(fragment)
         }
-        handler.post { tryEmitIfChanged() }
+        handler.removeCallbacks(deferredPauseRunnable)
+        handler.post(deferredPauseRunnable)
+    }
+
+    private fun cancelPendingPauseEmit() {
+        handler.removeCallbacks(deferredPauseRunnable)
     }
 
     private fun findResumedAncestorName(fragment: Fragment): String? {
@@ -105,6 +113,21 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
         return null
     }
 
+    /**
+     * Finds a resumed sibling fragment in the same FragmentManager.
+     * Handles add()-based overlays where the underlying fragment was never paused.
+     */
+    private fun findResumedSiblingName(fragment: Fragment): String? {
+        val fm = try {
+            fragment.parentFragmentManager
+        } catch (_: IllegalStateException) {
+            return null
+        }
+        return fm.fragments.lastOrNull {
+            it !== fragment && it.isResumed && !ScreenNameDescriptor.isIgnored(it)
+        }?.let { ScreenNameDescriptor.getName(it) }
+    }
+
     private var lastEmittedScreenName: String? = null
     private var lastEmittedComposeAttributes: Attributes? = null
 
@@ -115,6 +138,7 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
      */
     fun recordEmittedScreen(screenName: String) {
         lastEmittedScreenName = screenName
+        lastEmittedComposeAttributes = Attributes.empty()
     }
 
     /**
@@ -142,7 +166,6 @@ internal class ScreenChangeDetector(private val eventEmitter: NavigationEventEmi
     fun clearComposeRoute() {
         lastComposeRouteName = null
         composeRouteActivityName = null
-        lastEmittedComposeAttributes = null
     }
 
     /**
