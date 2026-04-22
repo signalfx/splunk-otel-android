@@ -12,6 +12,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * **Jetpack Compose Navigation Support**: Added navigation tracking for apps using Jetpack Compose Navigation
 
 ##### Enhancements:
+* NavHostFragment is now ignored by default in navigation tracking to avoid redundant screen events
 * Updated lifecycle module default allowed events to core lifecycle events
 * Updated navigation data model
 * Enabled StrictMode in the sample application
