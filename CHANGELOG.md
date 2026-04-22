@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Version 2.3.0 - 2026-04-22
+
+##### New features:
+* **Navigation & Lifecycle Tracking**: Redesigned event based navigation module, tracks Activity and Fragment screen transitions
+* **Jetpack Compose Navigation Support**: Added navigation tracking for apps using Jetpack Compose Navigation
+
+##### Enhancements:
+* Updated lifecycle module default allowed events to core lifecycle events
+* Updated navigation data model
+* Enabled StrictMode in the sample application
+* Fixed `screen.name` override bug that caused duplicate screen name attributes
+* **Screen Name Log Processor**: Added `ScreenNameLogRecordProcessor` to snapshot `screen.name` at log emit time
+
+
 ### Version 2.1.8 - 2026-03-09
 * Fixed IllegalStateException when rumAccessToken was missing but endpoint URL existed during OTEL span uploads
 * Added SessionMetadata API for custom session metadata
