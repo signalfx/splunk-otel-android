@@ -45,9 +45,7 @@ internal class NavigationEventEmitter {
      */
     fun emitNavigationEvent(screenName: String, attributes: Attributes = Attributes.empty()) {
         val timestamp = System.currentTimeMillis()
-        val previousScreenName = ScreenNameTracker.screenName.takeIf {
-            it != GlobalRumConstants.DEFAULT_SCREEN_NAME
-        }
+        val previousScreenName = ScreenNameTracker.screenName
         ScreenNameTracker.screenName = screenName
         if (!isInstallComplete) {
             Logger.d(TAG) {
