@@ -49,8 +49,9 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        SplunkRum.instance.navigation.track(getString(titleRes))
+        // Manual navigation track disabled when automated tracking is on to avoid duplicate events.
+        // Uncomment to use manual-only tracking (and disable isAutomatedTrackingEnabled in App.kt).
+        // SplunkRum.instance.navigation.track(getString(titleRes))
     }
 
     override fun onDestroyView() {

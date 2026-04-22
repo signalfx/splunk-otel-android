@@ -19,14 +19,21 @@ package com.splunk.rum.integration.navigation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 
 /**
- * Configuration for the navigation module.
+ * Navigation module configuration.
  *
- * @property isEnabled Whether the navigation module is enabled.
- * @property isAutomatedTrackingEnabled Whether Fragment and Activity lifecycle tracking is enabled.
+ * This module tracks screen navigation and emits OpenTelemetry `app.ui.navigation` events
+ * for screen arrivals when automated tracking is enabled. Detection uses onFragmentResumed /
+ * onActivityResumed as the trigger (per ticket: fragment detection relies on onFragmentResumed).
+ *
+ * @property isEnabled Whether the module is enabled. Default is true.
+ * @property isAutomatedTrackingEnabled Whether Fragment and Activity lifecycle tracking is enabled. Default is false.
+ * @property navigationEventProcessor Optional processor for transforming or filtering navigation events
+ *   from Compose routes before they are emitted. See [NavigationEventProcessor].
  */
 data class NavigationModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
-    val isAutomatedTrackingEnabled: Boolean = false
+    val isAutomatedTrackingEnabled: Boolean = false,
+    val navigationEventProcessor: NavigationEventProcessor? = null
 ) : ModuleConfiguration {
 
     override val name: String = "navigation"
