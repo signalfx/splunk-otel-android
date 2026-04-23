@@ -33,6 +33,7 @@ import com.splunk.app.util.ApiVariant
 import com.splunk.rum.integration.agent.api.SplunkRum
 import com.splunk.rum.integration.navigation.extension.navigation
 import com.splunk.rum.integration.okhttp3.manual.extension.okHttpManualInstrumentation
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.trace.SdkTracerProvider
@@ -164,7 +165,12 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         viewBinding.responseCaching.setOnClickListener { responseCaching() }
         viewBinding.canceledCall.setOnClickListener { canceledCall() }
 
-        SplunkRum.instance.navigation.track("OkHttp")
+        // Manual track commented out: automated tracking handles this screen via @NavigationElement.
+        // Uncomment to test out manual track API
+        // SplunkRum.instance.navigation.track(
+        //     "OkHttp",
+        //     Attributes.builder().put("section", "network").build()
+        // )
     }
 
     /**

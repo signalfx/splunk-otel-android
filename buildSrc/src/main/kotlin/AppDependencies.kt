@@ -35,5 +35,21 @@ object AppDependencies {
         const val activityKtx = "androidx.activity:activity-ktx:$activityKtxVersion"
         const val fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
         const val material = "com.google.android.material:material:$materialVersion"
+
+        object Compose {
+            const val compilerVersion = "1.4.0"
+
+            private const val uiVersion = "1.3.3"
+            private const val materialVersion = "1.3.1"
+            private const val activityComposeVersion = "1.6.1"
+            private const val navigationComposeVersion = "2.5.3"
+
+            const val ui = "androidx.compose.ui:ui:$uiVersion"
+            const val material = "androidx.compose.material:material:$materialVersion"
+            const val uiToolingPreview = "androidx.compose.ui:ui-tooling-preview:$uiVersion"
+            const val uiTooling = "androidx.compose.ui:ui-tooling:$uiVersion"
+            const val activityCompose = "androidx.activity:activity-compose:$activityComposeVersion"
+            const val navigationCompose = "androidx.navigation:navigation-compose:$navigationComposeVersion"
+        }
     }
 }
