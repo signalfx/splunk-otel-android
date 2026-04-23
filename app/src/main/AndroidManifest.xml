@@ -22,6 +22,12 @@
 			</intent-filter>
 		</activity>
 
+		<activity
+			android:name=".ui.compose.ComposeNavigationActivity"
+			android:exported="false"
+			android:screenOrientation="fullSensor"
+			android:theme="@style/Theme.MaterialComponents.Light" />
+
         <service
             android:name=".restart.TerminationWatcherService"
             android:stopWithTask="false" />

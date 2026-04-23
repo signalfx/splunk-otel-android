@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Splunk Inc.
+ * Copyright 2026 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation.tracer.fragment.activity
+package com.splunk.rum.integration.navigation
 
-import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
-import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
-
-internal interface FragmentActivityCallback : ActivityLifecycleCallbacksAdapter {
-    val fragmentCallback: FragmentLifecycleCallbacks
+/**
+ * Processes navigation events before they are emitted.
+ *
+ * Use to transform screen names, filter events, or modify attributes.
+ * Return the [NavigationEvent] (modified or as-is) to emit it, or `null` to suppress it.
+ */
+fun interface NavigationEventProcessor {
+    fun process(event: NavigationEvent): NavigationEvent?
 }
