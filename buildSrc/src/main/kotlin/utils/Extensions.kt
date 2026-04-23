@@ -39,7 +39,6 @@ fun Node.addSplunkInfo() {
         .appendNode("developer")
     developerNode.appendNode("id", "splunk")
     developerNode.appendNode("name", "Splunk Instrumentation Authors")
-    developerNode.appendNode("email", "support+java@signalfx.com")
     developerNode.appendNode("organization", "Splunk Inc.")
     developerNode.appendNode("organizationUrl", "https://splunk.com/")
 
