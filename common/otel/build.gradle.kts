@@ -44,4 +44,5 @@ dependencies {
     implementation(Dependencies.SessionReplay.commonUtils)
 
     testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.mockito)
 }
