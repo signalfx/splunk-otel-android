@@ -34,6 +34,7 @@ import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.agent.internal.processor.ErrorIdentifierAttributesSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.GlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.LastScreenNameSpanProcessor
+import com.splunk.rum.integration.agent.internal.processor.ScreenNameLogRecordProcessor
 import com.splunk.rum.integration.agent.internal.processor.SessionActivityLogProcessor
 import com.splunk.rum.integration.agent.internal.processor.SessionActivitySpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcessor
@@ -102,6 +103,7 @@ internal object SplunkRumAgentCore {
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
+            .addLogRecordProcessor(ScreenNameLogRecordProcessor(ScreenNameTracker))
             .addLogRecordProcessor(SessionActivityLogProcessor(sessionManager))
             // Session Replay module is special case of Log Records that are NOT converted to Spans.
             .addLogRecordProcessor(SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager))

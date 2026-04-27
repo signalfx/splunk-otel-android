@@ -17,6 +17,10 @@
 package com.splunk.app
 
 import android.app.Application
+import android.os.Build
+import android.os.StrictMode
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
@@ -27,7 +31,6 @@ import com.splunk.rum.integration.agent.api.user.UserTrackingMode
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
 import com.splunk.rum.integration.lifecycle.LifecycleModuleConfiguration
-import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
 import com.splunk.rum.integration.okhttp3.auto.OkHttp3AutoModuleConfiguration
 import com.splunk.rum.integration.okhttp3.manual.OkHttp3ManualModuleConfiguration
@@ -131,15 +134,16 @@ class App : Application() {
 
     private val lifecycleModuleConfiguration = LifecycleModuleConfiguration(
         isEnabled = true
-        // Uncomment below allowedEvents to configure event filtration
-//        allowedEvents = setOf(
-//            LifecycleAction.CREATED,
-//            LifecycleAction.RESUMED,
-//            LifecycleAction.DESTROYED
-//        )
+        // Default tracks MAIN_LIFECYCLE_EVENTS (no pre/post variants). For other options:
+        //   allowedEvents = LifecycleModuleConfiguration.ALL_LIFECYCLE_EVENTS
+        //   allowedEvents = LifecycleModuleConfiguration.PRE_POST_LIFECYCLE_EVENTS
+        //   allowedEvents = setOf(LifecycleAction.RESUMED, LifecycleAction.PAUSED)
     )
 
-    private val navigationModuleConfiguration = NavigationModuleConfiguration()
+    private val navigationModuleConfiguration = NavigationModuleConfiguration(
+        isEnabled = true,
+        isAutomatedTrackingEnabled = true
+    )
 
     private val sessionReplayModuleConfiguration = SessionReplayModuleConfiguration(
         isEnabled = true,
@@ -149,7 +153,9 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        HttpURLModuleConfiguration()
+        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            setupStrictMode()
+        }
 
         val moduleConfigurations = arrayOf(
             httpURLModuleConfiguration,
@@ -183,10 +189,37 @@ class App : Application() {
         sessionReplay.start()
     }
 
-    companion object {
-        private const val APP_NAME = "Splunk OTel Android"
-        private const val APP_VERSION = "1.0.0-test"
-        private const val DEPLOYMENT_ENVIRONMENT = "test"
-        private const val ENABLE_DEBUG_LOGGING = true
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun setupStrictMode() {
+        val showWarning = { message: String ->
+            Toast.makeText(this, "🔴 STRICT MODE 🔴\n$message", Toast.LENGTH_LONG).show()
+        }
+
+        StrictMode.setThreadPolicy(
+            StrictMode.ThreadPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .penaltyListener(mainExecutor) {
+                    showWarning("Thread: ${it.javaClass.simpleName}")
+                }
+                .build()
+        )
+
+        StrictMode.setVmPolicy(
+            StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .penaltyListener(mainExecutor) {
+                    showWarning("VM: ${it.javaClass.simpleName}")
+                }
+                .build()
+        )
+    }
+
+    private companion object {
+        const val APP_NAME = "Splunk OTel Android"
+        const val APP_VERSION = "1.0.0-test"
+        const val DEPLOYMENT_ENVIRONMENT = "test"
+        const val ENABLE_DEBUG_LOGGING = true
     }
 }
