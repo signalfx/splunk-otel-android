@@ -11,9 +11,9 @@ jobs:
   check_codestyle:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Set up JDK 17 for running Gradle
-        uses: actions/setup-java@v4.8.0
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
         with:
           distribution: temurin
           java-version: 17
@@ -22,9 +22,9 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Set up JDK 17 for running Gradle
-        uses: actions/setup-java@v4.8.0
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
         with:
           distribution: temurin
           java-version: 17
@@ -34,9 +34,9 @@ jobs:
   unit_tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Set up JDK 17 for running Gradle
-        uses: actions/setup-java@v4.8.0
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
         with:
           distribution: temurin
           java-version: 17
@@ -49,9 +49,9 @@ jobs:
   #     matrix:
   #       api-level: [ 29 ]
   #   steps:
-  #     - uses: actions/checkout@v4.3.1
+  #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
   #     - name: Set up JDK 17 for running Gradle
-  #       uses: actions/setup-java@v4.8.0
+  #       uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
   #       with:
   #         distribution: temurin
   #         java-version: 17
@@ -87,13 +87,12 @@ jobs:
   #         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
   #         disable-animations: true
   #         script: ./gradlew connectedDebugAndroidTest
-
   jacoco_test_coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Set up JDK 17 for running Gradle
-        uses: actions/setup-java@v4.8.0
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
         with:
           distribution: temurin
           java-version: 17
@@ -106,9 +105,9 @@ jobs:
   check_links:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Link Checker
-        uses: lycheeverse/lychee-action@v2.8.0
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
         with:
           fail: true
           lycheeVersion: v0.23.0
