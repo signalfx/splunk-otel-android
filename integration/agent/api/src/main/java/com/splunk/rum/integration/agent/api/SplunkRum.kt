@@ -22,6 +22,7 @@ import android.webkit.WebView
 import com.splunk.android.common.logger.Log
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.logger.consumers.AndroidLogConsumer
+import com.splunk.rum.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
@@ -29,7 +30,6 @@ import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore
 import com.splunk.rum.integration.agent.api.session.ISession
 import com.splunk.rum.integration.agent.api.session.Session
-import com.splunk.rum.integration.agent.api.session.SessionState
 import com.splunk.rum.integration.agent.api.subprocess.SubprocessDetector
 import com.splunk.rum.integration.agent.api.user.User
 import com.splunk.rum.integration.agent.api.user.toInternal
@@ -65,6 +65,7 @@ class SplunkRum private constructor(
     agentConfiguration: AgentConfiguration,
     userManager: IUserManager,
     sessionManager: ISplunkSessionManager,
+    onEndpointConfigured: (() -> Unit) = {},
     val openTelemetry: OpenTelemetry,
     private val endpointRef: AtomicReference<EndpointConfiguration?> = AtomicReference(agentConfiguration.endpoint),
     val state: IState = State(agentConfiguration, endpointRef),
@@ -79,7 +80,8 @@ class SplunkRum private constructor(
     val preferences: AgentPreferences = AgentPreferences(
         agentStorage = agentStorage,
         endpointRef = endpointRef,
-        openTelemetry = openTelemetry
+        openTelemetry = openTelemetry,
+        onEndpointConfigured = onEndpointConfigured
     )
 
     @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
@@ -332,6 +334,7 @@ class SplunkRum private constructor(
             )
 
             val sessionManager = AgentIntegration.obtainInstance(application).sessionManager
+            val offlineOtelDataProcessor = OfflineOtelDataProcessor.attach(application)
 
             // The shared MutableAttributes instance used by both
             // GlobalAttributeSpanProcessor and the public SplunkRum.globalAttributes API
@@ -343,7 +346,8 @@ class SplunkRum private constructor(
                 userManager,
                 sessionManager,
                 moduleConfigurations.toList(),
-                globalAttributes
+                globalAttributes,
+                offlineOtelDataProcessor
             )
 
             val endpointRef = AtomicReference(agentConfiguration.endpoint)
@@ -355,7 +359,10 @@ class SplunkRum private constructor(
                 endpointRef = endpointRef,
                 userManager = userManager,
                 sessionManager = sessionManager,
-                globalAttributes = globalAttributes
+                globalAttributes = globalAttributes,
+                onEndpointConfigured = {
+                    offlineOtelDataProcessor.start(SplunkRumAgentCore.installTimestamp)
+                }
             )
 
             return instance

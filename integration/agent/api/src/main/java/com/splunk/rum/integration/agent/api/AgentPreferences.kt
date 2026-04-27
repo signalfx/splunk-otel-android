@@ -25,7 +25,8 @@ import java.util.concurrent.atomic.AtomicReference
 class AgentPreferences internal constructor(
     private val agentStorage: IAgentStorage?,
     private val endpointRef: AtomicReference<EndpointConfiguration?>,
-    private val openTelemetry: OpenTelemetry
+    private val openTelemetry: OpenTelemetry,
+    private val onEndpointConfigured: (() -> Unit)
 ) {
     private val endpointLock = Any()
 
@@ -39,6 +40,7 @@ class AgentPreferences internal constructor(
     var endpointConfiguration: EndpointConfiguration?
         get() = endpointRef.get()
         set(value) {
+            var notifyEndpointConfigured = false
             synchronized(endpointLock) {
                 val storage = agentStorage ?: run {
                     Logger.w(TAG, "Cannot set endpoint: storage not available")
@@ -67,8 +69,13 @@ class AgentPreferences internal constructor(
                 } ?: storage.deleteLogsBaseUrl()
 
                 endpointRef.set(value)
+                notifyEndpointConfigured = true
 
                 Logger.d(TAG, "Endpoint configured, flushing cached data")
+            }
+
+            if (notifyEndpointConfigured) {
+                onEndpointConfigured.invoke()
             }
 
             (openTelemetry as? OpenTelemetrySdk)?.let { sdk ->

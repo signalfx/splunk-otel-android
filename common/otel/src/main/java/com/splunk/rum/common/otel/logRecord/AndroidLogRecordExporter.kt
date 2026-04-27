@@ -178,9 +178,10 @@ internal class AndroidLogRecordExporter(
 
     private fun flushBufferedSessionReplayIds() {
         val bufferedIds = agentStorage.getBufferedSessionReplayIds()
-        bufferedIds.forEach { id ->
+        val failedIds = bufferedIds.filter { id ->
             jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
+            false
         }
-        agentStorage.clearBufferedSessionReplayIds()
+        agentStorage.setBufferedSessionReplayIds(failedIds)
     }
 }

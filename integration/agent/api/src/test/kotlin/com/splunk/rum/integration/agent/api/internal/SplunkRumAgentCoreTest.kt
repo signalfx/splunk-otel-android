@@ -20,6 +20,7 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
+import com.splunk.rum.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
@@ -50,6 +51,8 @@ class SplunkRumAgentCoreTest {
     private lateinit var mockSessionManager: ISplunkSessionManager
     private lateinit var mockAgentConfig: AgentConfiguration
 
+    private lateinit var mockOfflineOtelDataProcessor: OfflineOtelDataProcessor
+
     @Before
     fun setUp() {
         application = ApplicationProvider.getApplicationContext()
@@ -61,6 +64,7 @@ class SplunkRumAgentCoreTest {
         mockUserManager = mock(IUserManager::class.java)
         mockSessionManager = mock(ISplunkSessionManager::class.java)
         mockAgentConfig = mock(AgentConfiguration::class.java, RETURNS_DEEP_STUBS)
+        mockOfflineOtelDataProcessor = mock(OfflineOtelDataProcessor::class.java, RETURNS_DEEP_STUBS)
 
         // Setup some needed defaults
         `when`(mockAgentConfig.session.samplingRate).thenReturn(1.0)
@@ -134,7 +138,8 @@ class SplunkRumAgentCoreTest {
             mockUserManager,
             mockSessionManager,
             emptyList(),
-            MutableAttributes()
+            MutableAttributes(),
+            mockOfflineOtelDataProcessor
         )
     }
 

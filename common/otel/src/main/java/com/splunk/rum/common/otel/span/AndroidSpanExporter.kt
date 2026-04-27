@@ -88,10 +88,11 @@ internal class AndroidSpanExporter(
 
     private fun flushBufferedSpanIds() {
         val bufferedIds = agentStorage.getBufferedSpanIds()
-        bufferedIds.forEach { id ->
+        val failedIDs = bufferedIds.filter { id ->
             jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+            false
         }
-        agentStorage.clearBufferedSpanIds()
+        agentStorage.setBufferedSpanIds(failedIDs)
     }
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {
