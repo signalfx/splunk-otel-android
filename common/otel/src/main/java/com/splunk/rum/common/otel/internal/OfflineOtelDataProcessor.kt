@@ -57,17 +57,17 @@ class OfflineOtelDataProcessor internal constructor(
     }
 
     private fun startProcessingLocalData(olderThan: Long) {
-        agentStorage.getLogs(olderThan).map { it.name }.forEach {
+        agentStorage.getLogs(olderThan).map { it.nameWithoutExtension }.forEach {
             cancelJob(it)
             jobManager.scheduleJob(UploadOtelLogRecordData(it, jobIdStorage))
         }
 
-        agentStorage.getSpans(olderThan).map { it.name }.forEach {
+        agentStorage.getSpans(olderThan).map { it.nameWithoutExtension }.forEach {
             cancelJob(it)
             jobManager.scheduleJob(UploadOtelSpanData(it, jobIdStorage))
         }
 
-        agentStorage.getSessionReplayData(olderThan).map { it.name }.forEach {
+        agentStorage.getSessionReplayData(olderThan).map { it.nameWithoutExtension }.forEach {
             cancelJob(it)
             jobManager.scheduleJob(UploadSessionReplayData(it, jobIdStorage))
         }
