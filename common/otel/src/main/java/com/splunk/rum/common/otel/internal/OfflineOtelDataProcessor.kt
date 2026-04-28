@@ -23,6 +23,7 @@ import com.splunk.android.common.job.JobManager
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.safeSubmit
 import com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordData
+import com.splunk.rum.common.otel.logRecord.UploadSessionReplayData
 import com.splunk.rum.common.otel.span.UploadOtelSpanData
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.common.storage.IAgentStorage
@@ -68,7 +69,7 @@ class OfflineOtelDataProcessor internal constructor(
 
         agentStorage.getSessionReplayData(olderThan).map { it.name }.forEach {
             cancelJob(it)
-            jobManager.scheduleJob(UploadOtelSpanData(it, jobIdStorage))
+            jobManager.scheduleJob(UploadSessionReplayData(it, jobIdStorage))
         }
     }
 
