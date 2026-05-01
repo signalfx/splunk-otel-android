@@ -275,6 +275,9 @@ class SplunkRum private constructor(
                 return instance
             }
 
+            // Use the default OTel Java SDK ThreadLocal ContextStorage to bypass SPI lookup that violates Android strict mode
+            System.setProperty("io.opentelemetry.context.contextStorageProvider", "default")
+
             Logger.consumers += AndroidLogConsumer()
             Logger.logLevel = if (agentConfiguration.enableDebugLogging) Log.Level.DEBUG else Log.Level.WARN
 
