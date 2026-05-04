@@ -275,8 +275,7 @@ class SplunkRum private constructor(
                 return instance
             }
 
-            // Use the default OTel Java SDK ThreadLocal ContextStorage to bypass SPI lookup that violates Android strict mode
-            System.setProperty("io.opentelemetry.context.contextStorageProvider", "default")
+            configureContextStorageProvider()
 
             Logger.consumers += AndroidLogConsumer()
             Logger.logLevel = if (agentConfiguration.enableDebugLogging) Log.Level.DEBUG else Log.Level.WARN
@@ -404,5 +403,29 @@ class SplunkRum private constructor(
             ReplaceWith("SplunkRum.install()", "com.splunk.rum.integration.agent.api.SplunkRum.install")
         )
         fun noop(): SplunkRum = noop
+
+        /**
+         * Forces the OTel Context API to use its built-in ThreadLocal ContextStorage and skip the
+         * ServiceLoader-based ContextStorageProvider SPI lookup, which performs a classpath/disk
+         * read at first context use and trips Android StrictMode.
+         *
+         * Only sets the property when it is unset. Existing values (including a non-default
+         * provider intentionally configured by the host app) are preserved; a non-default value
+         * is logged for diagnostic purposes.
+         */
+        internal fun configureContextStorageProvider() {
+            when (val existing = System.getProperty(CONTEXT_STORAGE_PROVIDER_PROPERTY)) {
+                null -> System.setProperty(CONTEXT_STORAGE_PROVIDER_PROPERTY, DEFAULT_CONTEXT_STORAGE_VALUE)
+                DEFAULT_CONTEXT_STORAGE_VALUE -> Unit
+                else -> Logger.w(
+                    TAG,
+                    "Preserving existing OTel contextStorageProvider '$existing'; " +
+                        "skipping default override (StrictMode SPI walk may still occur)"
+                )
+            }
+        }
+
+        private const val CONTEXT_STORAGE_PROVIDER_PROPERTY = "io.opentelemetry.context.contextStorageProvider"
+        private const val DEFAULT_CONTEXT_STORAGE_VALUE = "default"
     }
 }
