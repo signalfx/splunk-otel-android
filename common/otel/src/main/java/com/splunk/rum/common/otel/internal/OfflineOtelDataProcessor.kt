@@ -21,6 +21,7 @@ import com.splunk.android.common.job.IJobManager
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.job.JobManager
 import com.splunk.android.common.logger.Logger
+import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.android.common.utils.extensions.safeSubmit
 import com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordData
 import com.splunk.rum.common.otel.logRecord.UploadSessionReplayData
@@ -57,19 +58,22 @@ class OfflineOtelDataProcessor internal constructor(
     }
 
     private fun startProcessingLocalData(olderThan: Long) {
-        agentStorage.getLogs(olderThan).map { it.nameWithoutExtension }.forEach {
-            cancelJob(it)
-            jobManager.scheduleJob(UploadOtelLogRecordData(it, jobIdStorage))
+        agentStorage.getLogs(olderThan).forEachFast {
+            val id = it.nameWithoutExtension
+            cancelJob(id)
+            jobManager.scheduleJob(UploadOtelLogRecordData(id, jobIdStorage))
         }
 
-        agentStorage.getSpans(olderThan).map { it.nameWithoutExtension }.forEach {
-            cancelJob(it)
-            jobManager.scheduleJob(UploadOtelSpanData(it, jobIdStorage))
+        agentStorage.getSpans(olderThan).forEachFast {
+            val id = it.nameWithoutExtension
+            cancelJob(id)
+            jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
         }
 
-        agentStorage.getSessionReplayData(olderThan).map { it.nameWithoutExtension }.forEach {
-            cancelJob(it)
-            jobManager.scheduleJob(UploadSessionReplayData(it, jobIdStorage))
+        agentStorage.getSessionReplayData(olderThan).forEachFast {
+            val id = it.nameWithoutExtension
+            cancelJob(id)
+            jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
         }
     }
 

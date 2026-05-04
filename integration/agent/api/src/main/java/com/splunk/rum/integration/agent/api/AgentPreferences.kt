@@ -26,7 +26,7 @@ class AgentPreferences internal constructor(
     private val agentStorage: IAgentStorage?,
     private val endpointRef: AtomicReference<EndpointConfiguration?>,
     private val openTelemetry: OpenTelemetry,
-    private val onEndpointConfigured: (() -> Unit)
+    private val onEndpointConfigured: () -> Unit
 ) {
     private val endpointLock = Any()
 
