@@ -181,7 +181,7 @@ internal class AndroidLogRecordExporter(
         val bufferedIds = agentStorage.getBufferedSessionReplayIds()
         val failedIds = bufferedIds.filter { id ->
             val result = jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
-            when(result) {
+            when (result) {
                 is JobResult.Failure -> true
                 JobResult.Success -> false
             }
