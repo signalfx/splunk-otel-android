@@ -24,11 +24,7 @@ package com.splunk.rum.common.storage
  * Uses manual JSON serialization to avoid dependency on android.json
  * which is unavailable in JVM unit tests.
  */
-data class StoredEndpointConfig(
-    val tracesBaseUrl: String,
-    val logsBaseUrl: String?,
-    val rumAccessToken: String?
-) {
+data class StoredEndpointConfig(val tracesBaseUrl: String, val logsBaseUrl: String?, val rumAccessToken: String?) {
     fun toJson(): String {
         val sb = StringBuilder()
         sb.append('{')
@@ -70,8 +66,7 @@ data class StoredEndpointConfig(
             return "\"$escaped\""
         }
 
-        private fun jsonStringOrNull(value: String?): String =
-            if (value == null) "null" else jsonString(value)
+        private fun jsonStringOrNull(value: String?): String = if (value == null) "null" else jsonString(value)
 
         /**
          * Minimal JSON object parser that handles string values and null.
@@ -127,12 +122,30 @@ data class StoredEndpointConfig(
                 val c = s[i]
                 if (c == '\\' && i + 1 < s.length) {
                     when (s[i + 1]) {
-                        '"' -> { sb.append('"'); i += 2 }
-                        '\\' -> { sb.append('\\'); i += 2 }
-                        'n' -> { sb.append('\n'); i += 2 }
-                        'r' -> { sb.append('\r'); i += 2 }
-                        't' -> { sb.append('\t'); i += 2 }
-                        else -> { sb.append(s[i + 1]); i += 2 }
+                        '"' -> {
+                            sb.append('"')
+                            i += 2
+                        }
+                        '\\' -> {
+                            sb.append('\\')
+                            i += 2
+                        }
+                        'n' -> {
+                            sb.append('\n')
+                            i += 2
+                        }
+                        'r' -> {
+                            sb.append('\r')
+                            i += 2
+                        }
+                        't' -> {
+                            sb.append('\t')
+                            i += 2
+                        }
+                        else -> {
+                            sb.append(s[i + 1])
+                            i += 2
+                        }
                     }
                 } else if (c == '"') {
                     return sb.toString() to (i + 1)
