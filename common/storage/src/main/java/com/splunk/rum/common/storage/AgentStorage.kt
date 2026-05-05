@@ -175,16 +175,6 @@ class AgentStorage(context: Context) : IAgentStorage {
         preferences.remove(SESSION_LAST_ACTIVITY)
     }
 
-    override fun writeAnonymousUserId(value: String) {
-        preferences.putString(ANONYMOUS_USER_ID, value)
-    }
-
-    override fun readAnonymousUserId(): String? = preferences.getString(ANONYMOUS_USER_ID)
-
-    override fun deleteAnonymousUserId() {
-        preferences.remove(ANONYMOUS_USER_ID)
-    }
-
     override fun writeOtelLogData(id: String, data: ByteArray): Boolean {
         val file: File = otelLogDataFile(id)
         val success = internalStorage.writeBytes(file, data)
@@ -266,6 +256,18 @@ class AgentStorage(context: Context) : IAgentStorage {
         preferences.putString(SESSION_IDS, json)
     }
 
+    override fun getLogs(olderThan: Long): List<File> = logDir.listFiles()?.filter {
+        it.lastModified() < olderThan
+    } ?: emptyList()
+
+    override fun getSessionReplayData(olderThan: Long): List<File> = sessionReplayDir.listFiles()?.filter {
+        it.lastModified() < olderThan
+    } ?: emptyList()
+
+    override fun getSpans(olderThan: Long): List<File> = spanDir.listFiles()?.filter {
+        it.lastModified() < olderThan
+    } ?: emptyList()
+
     override fun commit() {
         preferences.commit()
     }
@@ -276,6 +278,11 @@ class AgentStorage(context: Context) : IAgentStorage {
             val array = JSONArray(ids)
             preferences.putString(SPAN_IDS_KEY, array.toString())
         }
+    }
+
+    override fun setBufferedSpanIds(ids: List<String>) {
+        val array = JSONArray(ids)
+        preferences.putString(SPAN_IDS_KEY, array.toString())
     }
 
     override fun getBufferedSpanIds(): List<String> {
@@ -305,6 +312,11 @@ class AgentStorage(context: Context) : IAgentStorage {
         }
     }
 
+    override fun setBufferedSessionReplayIds(ids: List<String>) {
+        val array = JSONArray(ids)
+        preferences.putString(SESSION_REPLAY_IDS_KEY, array.toString())
+    }
+
     override fun getBufferedSessionReplayIds(): List<String> {
         val json = preferences.getString(SESSION_REPLAY_IDS_KEY)
 
@@ -329,6 +341,16 @@ class AgentStorage(context: Context) : IAgentStorage {
     private fun otelLogDataFile(id: String) = File(logDir, "$id.dat")
     private fun otelSpanDataFile(id: String) = File(spanDir, "$id.dat")
     private fun sessionReplayDataFile(id: String) = File(sessionReplayDir, "$id.dat")
+
+    override fun writeAnonymousUserId(value: String) {
+        preferences.putString(ANONYMOUS_USER_ID, value)
+    }
+
+    override fun readAnonymousUserId(): String? = preferences.getString(ANONYMOUS_USER_ID)
+
+    override fun deleteAnonymousUserId() {
+        preferences.remove(ANONYMOUS_USER_ID)
+    }
 
     fun cleanUpStorage(context: Context): Boolean {
         val files = ArrayList<File>()
@@ -363,11 +385,12 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val DEVICE_ID = "DEVICE_ID"
         private const val APP_INSTALLATION_ID = "APP_INSTALLATION_ID"
         private const val SESSION_ID = "SESSION_ID"
+
+        private const val ANONYMOUS_USER_ID = "ANONYMOUS_USER_ID"
         private const val SESSION_IDS = "SESSION_IDS"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
         private const val SESSION_LAST_ACTIVITY = "SESSION_LAST_ACTIVITY"
-        private const val ANONYMOUS_USER_ID = "ANONYMOUS_USER_ID"
         private const val SPAN_IDS_KEY = "BUFFERED_SPAN_IDS"
         private const val SESSION_REPLAY_IDS_KEY = "BUFFERED_SESSION_REPLAY_IDS"
 

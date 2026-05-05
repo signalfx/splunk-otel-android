@@ -18,6 +18,7 @@ package com.splunk.rum.common.otel.logRecord
 
 import com.splunk.android.common.job.IJobManager
 import com.splunk.android.common.job.JobIdStorage
+import com.splunk.android.common.job.JobResult
 import com.splunk.rum.common.otel.RumConstants
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
@@ -178,9 +179,13 @@ internal class AndroidLogRecordExporter(
 
     private fun flushBufferedSessionReplayIds() {
         val bufferedIds = agentStorage.getBufferedSessionReplayIds()
-        bufferedIds.forEach { id ->
-            jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
+        val failedIds = bufferedIds.filter { id ->
+            val result = jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
+            when (result) {
+                is JobResult.Failure -> true
+                JobResult.Success -> false
+            }
         }
-        agentStorage.clearBufferedSessionReplayIds()
+        agentStorage.setBufferedSessionReplayIds(failedIds)
     }
 }
