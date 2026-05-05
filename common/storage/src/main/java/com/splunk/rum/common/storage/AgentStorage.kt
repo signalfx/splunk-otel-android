@@ -141,47 +141,71 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     @Deprecated("Use writeEndpointConfig()")
     override fun writeTracesBaseUrl(value: String) {
-        preferences.putString(TRACES_BASE_URL, value)
+        val current = readEndpointConfig()
+        if (current != null) {
+            writeEndpointConfig(current.copy(tracesBaseUrl = value))
+        } else {
+            preferences.putString(TRACES_BASE_URL, value)
+        }
     }
 
     @Deprecated("Use deleteEndpointConfig()")
     override fun deleteTracesBaseUrl() {
-        preferences.remove(TRACES_BASE_URL)
+        val current = readEndpointConfig()
+        if (current != null) {
+            deleteEndpointConfig()
+        } else {
+            preferences.remove(TRACES_BASE_URL)
+        }
     }
 
-    /**
-     * Note: calling this may trigger one-time migration from legacy keys to the
-     * atomic ENDPOINT_CONFIG key via [readEndpointConfig].
-     */
     @Deprecated("Use readEndpointConfig()")
     override fun readTracesBaseUrl(): String? =
         readEndpointConfig()?.tracesBaseUrl ?: preferences.getString(TRACES_BASE_URL)
 
     @Deprecated("Use writeEndpointConfig()")
     override fun writeLogsBaseUrl(value: String) {
-        preferences.putString(LOGS_BASE_URL, value)
+        val current = readEndpointConfig()
+        if (current != null) {
+            writeEndpointConfig(current.copy(logsBaseUrl = value))
+        } else {
+            preferences.putString(LOGS_BASE_URL, value)
+        }
     }
 
     @Deprecated("Use deleteEndpointConfig()")
     override fun deleteLogsBaseUrl() {
-        preferences.remove(LOGS_BASE_URL)
+        val current = readEndpointConfig()
+        if (current != null) {
+            writeEndpointConfig(current.copy(logsBaseUrl = null))
+        } else {
+            preferences.remove(LOGS_BASE_URL)
+        }
     }
 
-    /** See [readTracesBaseUrl] note on migration side-effect. */
     @Deprecated("Use readEndpointConfig()")
     override fun readLogsBaseUrl(): String? = readEndpointConfig()?.logsBaseUrl ?: preferences.getString(LOGS_BASE_URL)
 
     @Deprecated("Use writeEndpointConfig()")
     override fun writeRumAccessToken(value: String) {
-        preferences.putString(RUM_ACCESS_TOKEN, value)
+        val current = readEndpointConfig()
+        if (current != null) {
+            writeEndpointConfig(current.copy(rumAccessToken = value))
+        } else {
+            preferences.putString(RUM_ACCESS_TOKEN, value)
+        }
     }
 
     @Deprecated("Use deleteEndpointConfig()")
     override fun deleteRumAccessToken() {
-        preferences.remove(RUM_ACCESS_TOKEN)
+        val current = readEndpointConfig()
+        if (current != null) {
+            writeEndpointConfig(current.copy(rumAccessToken = null))
+        } else {
+            preferences.remove(RUM_ACCESS_TOKEN)
+        }
     }
 
-    /** See [readTracesBaseUrl] note on migration side-effect. */
     @Deprecated("Use readEndpointConfig()")
     override fun readRumAccessToken(): String? =
         readEndpointConfig()?.rumAccessToken ?: preferences.getString(RUM_ACCESS_TOKEN)
