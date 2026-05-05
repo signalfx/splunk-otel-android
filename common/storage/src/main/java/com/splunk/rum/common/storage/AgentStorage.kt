@@ -93,35 +93,98 @@ class AgentStorage(context: Context) : IAgentStorage {
             return isFull
         }
 
+    override fun writeEndpointConfig(config: StoredEndpointConfig) {
+        preferences.putString(ENDPOINT_CONFIG, config.toJson())
+        clearLegacyEndpointKeys()
+    }
+
+    override fun readEndpointConfig(): StoredEndpointConfig? {
+        val json = preferences.getString(ENDPOINT_CONFIG)
+        if (json != null) {
+            val config = StoredEndpointConfig.fromJson(json)
+            if (config == null) {
+                Logger.w(TAG, "readEndpointConfig() stored JSON is corrupted, discarding: $json")
+                preferences.remove(ENDPOINT_CONFIG)
+            }
+            return config
+        }
+        return migrateFromLegacyKeys()
+    }
+
+    override fun deleteEndpointConfig() {
+        preferences.remove(ENDPOINT_CONFIG)
+        clearLegacyEndpointKeys()
+    }
+
+    /**
+     * One-time migration from separate legacy keys to atomic ENDPOINT_CONFIG.
+     * Concurrent calls are safe: migration is idempotent (same config written, legacy keys cleared).
+     */
+    private fun migrateFromLegacyKeys(): StoredEndpointConfig? {
+        val tracesUrl = preferences.getString(TRACES_BASE_URL) ?: return null
+        val config = StoredEndpointConfig(
+            tracesBaseUrl = tracesUrl,
+            logsBaseUrl = preferences.getString(LOGS_BASE_URL),
+            rumAccessToken = preferences.getString(RUM_ACCESS_TOKEN)
+        )
+        Logger.d(TAG, "Migrating legacy endpoint keys to atomic config")
+        preferences.putString(ENDPOINT_CONFIG, config.toJson())
+        clearLegacyEndpointKeys()
+        return config
+    }
+
+    private fun clearLegacyEndpointKeys() {
+        preferences.remove(TRACES_BASE_URL)
+        preferences.remove(LOGS_BASE_URL)
+        preferences.remove(RUM_ACCESS_TOKEN)
+    }
+
+    @Deprecated("Use writeEndpointConfig()")
     override fun writeTracesBaseUrl(value: String) {
         preferences.putString(TRACES_BASE_URL, value)
     }
 
+    @Deprecated("Use deleteEndpointConfig()")
     override fun deleteTracesBaseUrl() {
         preferences.remove(TRACES_BASE_URL)
     }
 
-    override fun readTracesBaseUrl(): String? = preferences.getString(TRACES_BASE_URL)
+    /**
+     * Note: calling this may trigger one-time migration from legacy keys to the
+     * atomic ENDPOINT_CONFIG key via [readEndpointConfig].
+     */
+    @Deprecated("Use readEndpointConfig()")
+    override fun readTracesBaseUrl(): String? =
+        readEndpointConfig()?.tracesBaseUrl ?: preferences.getString(TRACES_BASE_URL)
 
+    @Deprecated("Use writeEndpointConfig()")
     override fun writeLogsBaseUrl(value: String) {
         preferences.putString(LOGS_BASE_URL, value)
     }
 
+    @Deprecated("Use deleteEndpointConfig()")
     override fun deleteLogsBaseUrl() {
         preferences.remove(LOGS_BASE_URL)
     }
 
-    override fun readLogsBaseUrl(): String? = preferences.getString(LOGS_BASE_URL)
+    /** See [readTracesBaseUrl] note on migration side-effect. */
+    @Deprecated("Use readEndpointConfig()")
+    override fun readLogsBaseUrl(): String? = readEndpointConfig()?.logsBaseUrl ?: preferences.getString(LOGS_BASE_URL)
 
+    @Deprecated("Use writeEndpointConfig()")
     override fun writeRumAccessToken(value: String) {
         preferences.putString(RUM_ACCESS_TOKEN, value)
     }
 
+    @Deprecated("Use deleteEndpointConfig()")
     override fun deleteRumAccessToken() {
         preferences.remove(RUM_ACCESS_TOKEN)
     }
 
-    override fun readRumAccessToken(): String? = preferences.getString(RUM_ACCESS_TOKEN)
+    /** See [readTracesBaseUrl] note on migration side-effect. */
+    @Deprecated("Use readEndpointConfig()")
+    override fun readRumAccessToken(): String? =
+        readEndpointConfig()?.rumAccessToken ?: preferences.getString(RUM_ACCESS_TOKEN)
 
     override fun writeDeviceId(value: String) {
         preferences.putString(DEVICE_ID, value)
@@ -357,6 +420,7 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     companion object {
+        private const val ENDPOINT_CONFIG = "ENDPOINT_CONFIG"
         private const val TRACES_BASE_URL = "TRACES_BASE_URL"
         private const val LOGS_BASE_URL = "LOGS_BASE_URL"
         private const val RUM_ACCESS_TOKEN = "RUM_ACCESS_TOKEN"

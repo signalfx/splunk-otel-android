@@ -69,12 +69,11 @@ internal class AndroidLogRecordExporter(
                 agentStorage.writeOtelSessionReplayData(id, it.toByteArray())
             }
 
-            val hasEndpoint = agentStorage.readLogsBaseUrl() != null
+            val config = agentStorage.readEndpointConfig()
 
-            if (!hasEndpoint) {
+            if (config?.logsBaseUrl == null) {
                 agentStorage.addBufferedSessionReplayId(id)
             } else {
-                // Schedule immediate upload and flush any buffered session replay
                 jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
                 flushBufferedSessionReplayIds()
             }
@@ -168,7 +167,8 @@ internal class AndroidLogRecordExporter(
     }
 
     override fun flush(): CompletableResultCode {
-        if (agentStorage.readLogsBaseUrl() != null) {
+        val config = agentStorage.readEndpointConfig()
+        if (config?.logsBaseUrl != null) {
             flushBufferedSessionReplayIds()
         }
         return CompletableResultCode.ofSuccess()

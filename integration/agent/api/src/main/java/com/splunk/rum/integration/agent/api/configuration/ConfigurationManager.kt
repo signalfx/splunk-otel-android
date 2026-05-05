@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api.configuration
 import android.content.Context
 import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.storage.StoredEndpointConfig
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 
 internal class ConfigurationManager private constructor(private val agentStorage: IAgentStorage) {
@@ -35,22 +36,16 @@ internal class ConfigurationManager private constructor(private val agentStorage
                 "Agent installed without endpoint configuration. " +
                     "Data will be buffered but not sent until you configure an endpoint."
             )
-            agentStorage.deleteTracesBaseUrl()
-            agentStorage.deleteLogsBaseUrl()
-            agentStorage.deleteRumAccessToken()
+            agentStorage.deleteEndpointConfig()
         } else {
             val endpoint = config.endpoint
-            agentStorage.writeTracesBaseUrl(endpoint.traceEndpoint.toExternalForm())
-            endpoint.rumAccessToken?.let { token ->
-                agentStorage.writeRumAccessToken(token)
-            } ?: agentStorage.deleteRumAccessToken()
-            endpoint.sessionReplayEndpoint?.let { logsUrl ->
-                agentStorage.writeLogsBaseUrl(logsUrl.toExternalForm())
-                Logger.d(TAG, "Trace and session replay endpoint URLs written to storage")
-            } ?: run {
-                agentStorage.deleteLogsBaseUrl()
-                Logger.d(TAG, "Trace endpoint URL written to storage, session replay endpoint not configured")
-            }
+            val storedConfig = StoredEndpointConfig(
+                tracesBaseUrl = endpoint.traceEndpoint.toExternalForm(),
+                logsBaseUrl = endpoint.sessionReplayEndpoint?.toExternalForm(),
+                rumAccessToken = endpoint.rumAccessToken
+            )
+            agentStorage.writeEndpointConfig(storedConfig)
+            Logger.d(TAG, "Endpoint configuration written to storage atomically")
         }
 
         Logger.d(TAG) { "preProcessConfiguration() proposalConfig: $proposalConfig, config: $config" }

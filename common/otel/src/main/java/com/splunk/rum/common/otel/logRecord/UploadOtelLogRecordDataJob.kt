@@ -79,10 +79,10 @@ internal class UploadOtelLogRecordDataJob : JobService() {
 
         Logger.d(TAG) { "startUpload() id: $id" }
         getOrCreateExecutor().safeSubmit {
-            val url = storage.readTracesBaseUrl()
+            val config = storage.readEndpointConfig()
 
-            if (url == null) {
-                Logger.d(TAG, "startUpload() url is not valid")
+            if (config == null) {
+                Logger.d(TAG, "startUpload() no endpoint configuration available")
                 jobFinished(params, false)
                 return@safeSubmit
             }
@@ -95,7 +95,8 @@ internal class UploadOtelLogRecordDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
+            val url = config.tracesBaseUrl
+            val headers = AuthHeaderBuilder.buildHeaders(config, TAG)
 
             httpClient.makePostRequest(
                 url = url,

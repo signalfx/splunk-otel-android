@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.api
 
 import com.splunk.android.common.logger.Logger
 import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.storage.StoredEndpointConfig
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import java.util.concurrent.atomic.AtomicReference
@@ -46,29 +47,21 @@ class AgentPreferences internal constructor(
                 }
 
                 if (value == null) {
-                    storage.deleteTracesBaseUrl()
-                    storage.deleteLogsBaseUrl()
-                    storage.deleteRumAccessToken()
+                    storage.deleteEndpointConfig()
                     endpointRef.set(null)
                     Logger.d(TAG, "Endpoints cleared")
                     return@synchronized
                 }
 
-                value.traceEndpoint.let { tracesUrl ->
-                    storage.writeTracesBaseUrl(tracesUrl.toExternalForm())
-                }
-
-                value.rumAccessToken?.let { token ->
-                    storage.writeRumAccessToken(token)
-                } ?: storage.deleteRumAccessToken()
-
-                value.sessionReplayEndpoint?.let { logsUrl ->
-                    storage.writeLogsBaseUrl(logsUrl.toExternalForm())
-                } ?: storage.deleteLogsBaseUrl()
-
+                val storedConfig = StoredEndpointConfig(
+                    tracesBaseUrl = value.traceEndpoint.toExternalForm(),
+                    logsBaseUrl = value.sessionReplayEndpoint?.toExternalForm(),
+                    rumAccessToken = value.rumAccessToken
+                )
+                storage.writeEndpointConfig(storedConfig)
                 endpointRef.set(value)
 
-                Logger.d(TAG, "Endpoint configured, flushing cached data")
+                Logger.d(TAG, "Endpoint configured atomically, flushing cached data")
             }
 
             (openTelemetry as? OpenTelemetrySdk)?.let { sdk ->
