@@ -20,6 +20,7 @@ import android.app.Application
 import android.content.Context
 import com.splunk.android.common.job.IJobManager
 import com.splunk.android.common.job.JobIdStorage
+import com.splunk.android.common.job.JobResult
 import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.rum.common.storage.IAgentStorage
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
@@ -66,6 +67,7 @@ internal class AndroidSpanExporter(
                 agentStorage.addBufferedSpanId(spansID)
                 CompletableResultCode.ofSuccess()
             }
+
             else -> {
                 jobManager.scheduleJob(UploadOtelSpanData(spansID, jobIdStorage))
                 flushBufferedSpanIds()
@@ -85,10 +87,14 @@ internal class AndroidSpanExporter(
 
     private fun flushBufferedSpanIds() {
         val bufferedIds = agentStorage.getBufferedSpanIds()
-        bufferedIds.forEach { id ->
-            jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+        val failedIDs = bufferedIds.filter { id ->
+            val result = jobManager.scheduleJob(UploadOtelSpanData(id, jobIdStorage))
+            when (result) {
+                is JobResult.Failure -> true
+                JobResult.Success -> false
+            }
         }
-        agentStorage.clearBufferedSpanIds()
+        agentStorage.setBufferedSpanIds(failedIDs)
     }
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {
