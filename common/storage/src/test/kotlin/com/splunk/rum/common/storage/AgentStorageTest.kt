@@ -144,5 +144,4 @@ class AgentStorageTest {
         val newStorage = AgentStorage(context)
         assertEquals(config, newStorage.readEndpointConfig())
     }
-
 }
