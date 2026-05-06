@@ -75,6 +75,7 @@ internal class AndroidLogRecordExporter(
             if (config?.logsBaseUrl == null) {
                 agentStorage.addBufferedSessionReplayId(id)
             } else {
+                // Schedule immediate upload and flush any buffered session replay
                 jobManager.scheduleJob(UploadSessionReplayData(id, jobIdStorage))
                 flushBufferedSessionReplayIds()
             }

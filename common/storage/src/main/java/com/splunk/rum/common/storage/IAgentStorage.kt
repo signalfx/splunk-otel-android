@@ -27,33 +27,6 @@ interface IAgentStorage {
     fun readEndpointConfig(): StoredEndpointConfig?
     fun deleteEndpointConfig()
 
-    @Deprecated("Use writeEndpointConfig() for atomic writes", ReplaceWith("writeEndpointConfig(config)"))
-    fun writeTracesBaseUrl(value: String)
-
-    @Deprecated("Use deleteEndpointConfig() for atomic deletes", ReplaceWith("deleteEndpointConfig()"))
-    fun deleteTracesBaseUrl()
-
-    @Deprecated("Use readEndpointConfig() for atomic reads", ReplaceWith("readEndpointConfig()"))
-    fun readTracesBaseUrl(): String?
-
-    @Deprecated("Use writeEndpointConfig() for atomic writes", ReplaceWith("writeEndpointConfig(config)"))
-    fun writeLogsBaseUrl(value: String)
-
-    @Deprecated("Use deleteEndpointConfig() for atomic deletes", ReplaceWith("deleteEndpointConfig()"))
-    fun deleteLogsBaseUrl()
-
-    @Deprecated("Use readEndpointConfig() for atomic reads", ReplaceWith("readEndpointConfig()"))
-    fun readLogsBaseUrl(): String?
-
-    @Deprecated("Use writeEndpointConfig() for atomic writes", ReplaceWith("writeEndpointConfig(config)"))
-    fun writeRumAccessToken(value: String)
-
-    @Deprecated("Use deleteEndpointConfig() for atomic deletes", ReplaceWith("deleteEndpointConfig()"))
-    fun deleteRumAccessToken()
-
-    @Deprecated("Use readEndpointConfig() for atomic reads", ReplaceWith("readEndpointConfig()"))
-    fun readRumAccessToken(): String?
-
     fun writeDeviceId(value: String)
     fun readDeviceId(): String?
 

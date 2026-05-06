@@ -64,12 +64,15 @@ internal class AndroidSpanExporter(
 
         return when {
             !hasConfig || (deferredUntilForeground && !isForeground) -> {
+                // Just store span ID for deferred upload
                 agentStorage.addBufferedSpanId(spansID)
                 CompletableResultCode.ofSuccess()
             }
 
             else -> {
+                // Schedule upload immediately
                 jobManager.scheduleJob(UploadOtelSpanData(spansID, jobIdStorage))
+                // Also schedule previously buffered spans
                 flushBufferedSpanIds()
                 CompletableResultCode.ofSuccess()
             }
