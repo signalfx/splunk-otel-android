@@ -140,6 +140,45 @@ splunkRealm=<realm>
 splunkRumAccessToken=<a valid Splunk RUM access token for the realm>
 ```
 
+## Android StrictMode
+
+To avoid `StrictMode.DiskReadViolation` on the main thread during app startup that is
+caused by OpenTelemetry's `ServiceLoader` scan for `ContextStorageProvider`
+implementations, `SplunkRum.install()` sets the JVM system property
+`io.opentelemetry.context.contextStorageProvider` to `"default"` if it is unset.
+This short-circuits OpenTelemetry to its built-in `ThreadLocal` context storage
+and skips the classpath/jar scan that triggers StrictMode.
+
+This is transparent for most apps, which already use the default `ThreadLocal`
+context storage. If your app registers a custom `ContextStorageProvider` via
+the `META-INF/services` SPI, set the property to your provider's class name
+**before** `SplunkRum.install()` so the SDK preserves it:
+
+```kotlin
+System.setProperty(
+    "io.opentelemetry.context.contextStorageProvider",
+    "com.example.MyContextStorageProvider"
+)
+SplunkRum.install(this, agentConfiguration)
+```
+
+The SDK only writes the property after `install()` clears its precondition
+checks; no-op installs leave the property untouched.
+
+## ProGuard / R8
+
+The SDK ships [consumer ProGuard rules](https://developer.android.com/studio/build/shrink-code#consumer-rules)
+that are applied to your app's R8 build automatically — no setup required.
+
+The SDK suppresses the following R8 warnings for compile-time-only `AutoValue` annotations
+referenced by upstream OpenTelemetry:
+
+```pro
+-dontwarn com.google.auto.value.AutoValue
+-dontwarn com.google.auto.value.AutoValue$Builder
+-dontwarn com.google.auto.value.AutoValue$CopyAnnotations
+```
+
 ## Troubleshooting
 
 For troubleshooting issues with the Splunk OpenTelemetry instrumentation of Android, see
