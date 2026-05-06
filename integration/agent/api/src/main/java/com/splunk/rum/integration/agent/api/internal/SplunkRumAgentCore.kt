@@ -73,6 +73,10 @@ internal object SplunkRumAgentCore {
 
         if (!shouldBeRunning) return OpenTelemetry.noop()
 
+        // Configure the OTel Context API only once we are committed to running RUM, so no-op
+        // install paths do not mutate this process-wide JVM property for unrelated host-app code.
+        configureContextStorageProvider()
+
         Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
         sessionManager.reset()
@@ -137,4 +141,24 @@ internal object SplunkRumAgentCore {
 
         return openTelemetry
     }
+
+    /**
+     * Configures the OTel Context API to use its built-in default ThreadLocal ContextStorage and skip the
+     * ServiceLoader-based ContextStorageProvider SPI lookup, which performs a classpath/disk
+     * read at first context use and trips Android StrictMode.
+     */
+    internal fun configureContextStorageProvider() {
+        when (val existing = System.getProperty(CONTEXT_STORAGE_PROVIDER_PROPERTY)) {
+            null -> System.setProperty(CONTEXT_STORAGE_PROVIDER_PROPERTY, DEFAULT_CONTEXT_STORAGE_VALUE)
+            DEFAULT_CONTEXT_STORAGE_VALUE -> Unit
+            else -> Logger.w(
+                TAG,
+                "Preserving existing OTel contextStorageProvider '$existing'; " +
+                    "skipping default override (StrictMode SPI walk may still occur)"
+            )
+        }
+    }
+
+    private const val CONTEXT_STORAGE_PROVIDER_PROPERTY = "io.opentelemetry.context.contextStorageProvider"
+    private const val DEFAULT_CONTEXT_STORAGE_VALUE = "default"
 }
