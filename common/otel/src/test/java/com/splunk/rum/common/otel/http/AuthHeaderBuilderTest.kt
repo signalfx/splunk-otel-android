@@ -29,7 +29,7 @@ class AuthHeaderBuilderTest {
     fun `buildHeaders includes auth token when available`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://example.com/v1/traces",
-            logsBaseUrl = null,
+            sessionReplayBaseUrl = null,
             rumAccessToken = "test-token-123"
         )
 
@@ -44,7 +44,7 @@ class AuthHeaderBuilderTest {
     fun `buildHeaders does not crash when token is null`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://example.com/v1/traces",
-            logsBaseUrl = null,
+            sessionReplayBaseUrl = null,
             rumAccessToken = null
         )
 
@@ -59,7 +59,7 @@ class AuthHeaderBuilderTest {
     fun `buildHeaders always includes Content-Type header`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://example.com/v1/traces",
-            logsBaseUrl = null,
+            sessionReplayBaseUrl = null,
             rumAccessToken = null
         )
 
@@ -72,7 +72,7 @@ class AuthHeaderBuilderTest {
     fun `buildHeaders does not include X-SF-Token when token is null`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://example.com/v1/traces",
-            logsBaseUrl = null,
+            sessionReplayBaseUrl = null,
             rumAccessToken = null
         )
 
@@ -85,7 +85,7 @@ class AuthHeaderBuilderTest {
     fun `buildHeaders treats empty string token same as null`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://example.com/v1/traces",
-            logsBaseUrl = null,
+            sessionReplayBaseUrl = null,
             rumAccessToken = ""
         )
 

@@ -41,7 +41,7 @@ internal class ConfigurationManager private constructor(private val agentStorage
             val endpoint = config.endpoint
             val storedConfig = StoredEndpointConfig(
                 tracesBaseUrl = endpoint.traceEndpoint.toExternalForm(),
-                logsBaseUrl = endpoint.sessionReplayEndpoint?.toExternalForm(),
+                sessionReplayBaseUrl = endpoint.sessionReplayEndpoint?.toExternalForm(),
                 rumAccessToken = endpoint.rumAccessToken
             )
             agentStorage.writeEndpointConfig(storedConfig)

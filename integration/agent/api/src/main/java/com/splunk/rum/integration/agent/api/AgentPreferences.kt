@@ -57,7 +57,7 @@ class AgentPreferences internal constructor(
 
                 val storedConfig = StoredEndpointConfig(
                     tracesBaseUrl = value.traceEndpoint.toExternalForm(),
-                    logsBaseUrl = value.sessionReplayEndpoint?.toExternalForm(),
+                    sessionReplayBaseUrl = value.sessionReplayEndpoint?.toExternalForm(),
                     rumAccessToken = value.rumAccessToken
                 )
                 storage.writeEndpointConfig(storedConfig)

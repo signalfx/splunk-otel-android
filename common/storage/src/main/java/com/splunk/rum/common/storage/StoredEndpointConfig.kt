@@ -16,6 +16,7 @@
 
 package com.splunk.rum.common.storage
 
+import com.splunk.android.common.logger.Logger
 import org.json.JSONObject
 
 /**
@@ -23,28 +24,36 @@ import org.json.JSONObject
  * Stored as a single JSON string in preferences to prevent partial-write
  * inconsistencies between URL and token.
  */
-data class StoredEndpointConfig(val tracesBaseUrl: String, val logsBaseUrl: String?, val rumAccessToken: String?) {
+data class StoredEndpointConfig(
+    val tracesBaseUrl: String,
+    val sessionReplayBaseUrl: String?,
+    val rumAccessToken: String?
+) {
     fun toJson(): String {
         val json = JSONObject()
         json.put(KEY_TRACES_URL, tracesBaseUrl)
-        json.put(KEY_LOGS_URL, logsBaseUrl ?: JSONObject.NULL)
+        json.put(KEY_SESSION_REPLAY_URL, sessionReplayBaseUrl ?: JSONObject.NULL)
         json.put(KEY_TOKEN, rumAccessToken ?: JSONObject.NULL)
         return json.toString()
     }
 
     companion object {
+        private const val TAG = "StoredEndpointConfig"
         private const val KEY_TRACES_URL = "tracesBaseUrl"
-        private const val KEY_LOGS_URL = "logsBaseUrl"
+        private const val KEY_SESSION_REPLAY_URL = "sessionReplayBaseUrl"
         private const val KEY_TOKEN = "rumAccessToken"
 
         fun fromJson(json: String): StoredEndpointConfig? = try {
             val obj = JSONObject(json)
             StoredEndpointConfig(
                 tracesBaseUrl = obj.getString(KEY_TRACES_URL),
-                logsBaseUrl = obj.optString(KEY_LOGS_URL).takeIf { !obj.isNull(KEY_LOGS_URL) },
+                sessionReplayBaseUrl = obj.optString(KEY_SESSION_REPLAY_URL).takeIf {
+                    !obj.isNull(KEY_SESSION_REPLAY_URL)
+                },
                 rumAccessToken = obj.optString(KEY_TOKEN).takeIf { !obj.isNull(KEY_TOKEN) }
             )
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Logger.w(TAG, "fromJson() failed: ${e.javaClass.simpleName}")
             null
         }
     }

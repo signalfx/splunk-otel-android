@@ -102,7 +102,7 @@ class AgentStorageTest {
     fun `writeEndpointConfig and readEndpointConfig roundtrip`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://rum-ingest.us0.signalfx.com/v1/traces",
-            logsBaseUrl = "https://rum-ingest.us0.signalfx.com/v1/logs",
+            sessionReplayBaseUrl = "https://rum-ingest.us0.signalfx.com/v1/logs",
             rumAccessToken = "test-token"
         )
 

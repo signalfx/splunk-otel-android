@@ -30,7 +30,7 @@ class StoredEndpointConfigTest {
     fun `roundtrip with all fields`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://rum-ingest.us0.signalfx.com/v1/traces",
-            logsBaseUrl = "https://rum-ingest.us0.signalfx.com/v1/logs",
+            sessionReplayBaseUrl = "https://rum-ingest.us0.signalfx.com/v1/logs",
             rumAccessToken = "my-token-123"
         )
 
@@ -42,10 +42,10 @@ class StoredEndpointConfigTest {
     }
 
     @Test
-    fun `roundtrip with null logsBaseUrl`() {
+    fun `roundtrip with null sessionReplayBaseUrl`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://example.com/v1/traces",
-            logsBaseUrl = null,
+            sessionReplayBaseUrl = null,
             rumAccessToken = "token"
         )
 
@@ -54,14 +54,14 @@ class StoredEndpointConfigTest {
 
         assertNotNull(restored)
         assertEquals(config, restored)
-        assertNull(restored!!.logsBaseUrl)
+        assertNull(restored!!.sessionReplayBaseUrl)
     }
 
     @Test
     fun `roundtrip with null rumAccessToken`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://example.com/v1/traces",
-            logsBaseUrl = "https://example.com/v1/logs",
+            sessionReplayBaseUrl = "https://example.com/v1/logs",
             rumAccessToken = null
         )
 
@@ -77,7 +77,7 @@ class StoredEndpointConfigTest {
     fun `roundtrip with all nullable fields null`() {
         val config = StoredEndpointConfig(
             tracesBaseUrl = "https://example.com/v1/traces",
-            logsBaseUrl = null,
+            sessionReplayBaseUrl = null,
             rumAccessToken = null
         )
 
@@ -100,7 +100,7 @@ class StoredEndpointConfigTest {
 
     @Test
     fun `fromJson returns null when tracesBaseUrl is missing`() {
-        val json = """{"logsBaseUrl":"https://example.com","rumAccessToken":"tok"}"""
+        val json = """{"sessionReplayBaseUrl":"https://example.com","rumAccessToken":"tok"}"""
         assertNull(StoredEndpointConfig.fromJson(json))
     }
 }

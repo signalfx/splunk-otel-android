@@ -103,7 +103,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         if (json != null) {
             val config = StoredEndpointConfig.fromJson(json)
             if (config == null) {
-                Logger.w(TAG, "readEndpointConfig() stored JSON is corrupted, discarding: $json")
+                Logger.w(TAG, "readEndpointConfig() stored JSON is corrupted, discarding")
                 preferences.remove(ENDPOINT_CONFIG)
             }
             return config
@@ -124,7 +124,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         val tracesUrl = preferences.getString(TRACES_BASE_URL) ?: return null
         val config = StoredEndpointConfig(
             tracesBaseUrl = tracesUrl,
-            logsBaseUrl = preferences.getString(LOGS_BASE_URL),
+            sessionReplayBaseUrl = preferences.getString(LOGS_BASE_URL),
             rumAccessToken = preferences.getString(RUM_ACCESS_TOKEN)
         )
         Logger.d(TAG, "Migrating legacy endpoint keys to atomic config")

@@ -88,7 +88,7 @@ internal class UploadSessionReplayDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val url = config.logsBaseUrl
+            val url = config.sessionReplayBaseUrl
             if (url == null) {
                 Logger.d(TAG, "startUpload() session replay endpoint not configured")
                 jobFinished(params, false)
