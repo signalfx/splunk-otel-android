@@ -144,4 +144,54 @@ class AgentStorageTest {
         val newStorage = AgentStorage(context)
         assertEquals(config, newStorage.readEndpointConfig())
     }
+
+    // --- Legacy migration tests ---
+
+    @Test
+    fun `readEndpointConfig migrates from legacy keys`() {
+        storage.writeLegacyEndpointKeys(
+            tracesBaseUrl = "https://legacy-traces.com",
+            logsBaseUrl = "https://legacy-logs.com",
+            rumAccessToken = "legacy-token"
+        )
+
+        val result = storage.readEndpointConfig()
+
+        assertNotNull(result)
+        assertEquals("https://legacy-traces.com", result!!.tracesBaseUrl)
+        assertEquals("https://legacy-logs.com", result.sessionReplayBaseUrl)
+        assertEquals("legacy-token", result.rumAccessToken)
+    }
+
+    @Test
+    fun `readEndpointConfig migrates partial legacy state gracefully`() {
+        storage.writeLegacyEndpointKeys(tracesBaseUrl = "https://traces-only.com")
+
+        val result = storage.readEndpointConfig()
+
+        assertNotNull(result)
+        assertEquals("https://traces-only.com", result!!.tracesBaseUrl)
+        assertNull(result.sessionReplayBaseUrl)
+        assertNull(result.rumAccessToken)
+    }
+
+    @Test
+    fun `readEndpointConfig returns null when only legacy token exists without URL`() {
+        storage.writeLegacyEndpointKeys(rumAccessToken = "orphan-token")
+
+        assertNull(storage.readEndpointConfig())
+    }
+
+    @Test
+    fun `writeEndpointConfig clears legacy keys`() {
+        storage.writeLegacyEndpointKeys(
+            tracesBaseUrl = "https://old.com",
+            rumAccessToken = "old-token"
+        )
+
+        val config = StoredEndpointConfig("https://new.com", null, "new-token")
+        storage.writeEndpointConfig(config)
+
+        assertEquals(config, storage.readEndpointConfig())
+    }
 }

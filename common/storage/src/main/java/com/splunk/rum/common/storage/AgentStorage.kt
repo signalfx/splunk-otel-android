@@ -139,6 +139,16 @@ class AgentStorage(context: Context) : IAgentStorage {
         preferences.remove(RUM_ACCESS_TOKEN)
     }
 
+    internal fun writeLegacyEndpointKeys(
+        tracesBaseUrl: String? = null,
+        logsBaseUrl: String? = null,
+        rumAccessToken: String? = null
+    ) {
+        tracesBaseUrl?.let { preferences.putString(TRACES_BASE_URL, it) }
+        logsBaseUrl?.let { preferences.putString(LOGS_BASE_URL, it) }
+        rumAccessToken?.let { preferences.putString(RUM_ACCESS_TOKEN, it) }
+    }
+
     override fun writeDeviceId(value: String) {
         preferences.putString(DEVICE_ID, value)
     }
