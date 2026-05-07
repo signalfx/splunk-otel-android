@@ -140,19 +140,12 @@ splunkRealm=<realm>
 splunkRumAccessToken=<a valid Splunk RUM access token for the realm>
 ```
 
-## Android StrictMode
+## Set property for custom ContextStorageProvider (optional)
 
-To avoid `StrictMode.DiskReadViolation` on the main thread during app startup that is
-caused by OpenTelemetry's `ServiceLoader` scan for `ContextStorageProvider`
-implementations, `SplunkRum.install()` sets the JVM system property
-`io.opentelemetry.context.contextStorageProvider` to `"default"` if it is unset.
-This short-circuits OpenTelemetry to its built-in `ThreadLocal` context storage
-and skips the classpath/jar scan that triggers StrictMode.
-
-This is transparent for most apps, which already use the default `ThreadLocal`
-context storage. If your app registers a custom `ContextStorageProvider` via
-the `META-INF/services` SPI, set the property to your provider's class name
-**before** `SplunkRum.install()` so the SDK preserves it:
+If your application registers a custom `ContextStorageProvider` via the
+`META-INF/services` SPI, set the JVM system property
+`io.opentelemetry.context.contextStorageProvider` to your provider's fully
+qualified class name **before** calling `SplunkRum.install()`, for example:
 
 ```kotlin
 System.setProperty(
@@ -162,8 +155,15 @@ System.setProperty(
 SplunkRum.install(this, agentConfiguration)
 ```
 
-The SDK only writes the property after `install()` clears its precondition
-checks; no-op installs leave the property untouched.
+This ensures the SDK preserves your custom provider.
+
+**Note:** By default, if this property is unset, `SplunkRum.install()` sets it to `"default"`.
+This forces OpenTelemetry to use its built-in `ThreadLocal` context storage and avoids the
+classpath/jar scanning that can cause `StrictMode.DiskReadViolation` on the main thread during
+app startup. For most apps that already use the default `ThreadLocal` storage, this behavior is transparent.
+
+The SDK sets this property only after `install()` clears its precondition checks; if the install is
+a no-op, the property remains unchanged.
 
 ## ProGuard / R8
 
