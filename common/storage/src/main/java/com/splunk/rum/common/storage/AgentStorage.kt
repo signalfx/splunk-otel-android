@@ -118,10 +118,13 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     /**
      * One-time migration from separate legacy keys to atomic ENDPOINT_CONFIG.
-     * Concurrent calls are safe: migration is idempotent (same config written, legacy keys cleared).
+     * Synchronized so that concurrent callers cannot interleave reads and clears,
+     * which would overwrite ENDPOINT_CONFIG with partially null values.
      */
-    private fun migrateFromLegacyKeys(): StoredEndpointConfig? {
-        val tracesUrl = preferences.getString(TRACES_BASE_URL) ?: return null
+    private fun migrateFromLegacyKeys(): StoredEndpointConfig? = synchronized(migrationLock) {
+        preferences.getString(ENDPOINT_CONFIG)?.let { return@synchronized StoredEndpointConfig.fromJson(it) }
+
+        val tracesUrl = preferences.getString(TRACES_BASE_URL) ?: return@synchronized null
         val config = StoredEndpointConfig(
             tracesBaseUrl = tracesUrl,
             sessionReplayBaseUrl = preferences.getString(LOGS_BASE_URL),
@@ -130,7 +133,7 @@ class AgentStorage(context: Context) : IAgentStorage {
         Logger.d(TAG, "Migrating legacy endpoint keys to atomic config")
         preferences.putString(ENDPOINT_CONFIG, config.toJson())
         clearLegacyEndpointKeys()
-        return config
+        config
     }
 
     private fun clearLegacyEndpointKeys() {
@@ -423,6 +426,7 @@ class AgentStorage(context: Context) : IAgentStorage {
 
         private const val TAG = "AgentStorage"
         private val lock = Any()
+        private val migrationLock = Any()
 
         /**
          * If storage model changes this version needs to be changed. This will ensure data consistency.
