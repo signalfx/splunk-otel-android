@@ -23,17 +23,9 @@ interface IAgentStorage {
     val rootDirPath: String
     val isStorageFull: Boolean
 
-    fun writeTracesBaseUrl(value: String)
-    fun deleteTracesBaseUrl()
-    fun readTracesBaseUrl(): String?
-
-    fun writeLogsBaseUrl(value: String)
-    fun deleteLogsBaseUrl()
-    fun readLogsBaseUrl(): String?
-
-    fun writeRumAccessToken(value: String)
-    fun deleteRumAccessToken()
-    fun readRumAccessToken(): String?
+    fun writeEndpointConfig(config: StoredEndpointConfig)
+    fun readEndpointConfig(): StoredEndpointConfig?
+    fun deleteEndpointConfig()
 
     fun writeDeviceId(value: String)
     fun readDeviceId(): String?

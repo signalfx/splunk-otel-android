@@ -16,12 +16,10 @@
 
 package com.splunk.rum.common.otel.http
 
-import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.storage.StoredEndpointConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 
 class AuthHeaderBuilderTest {
 
@@ -29,10 +27,13 @@ class AuthHeaderBuilderTest {
 
     @Test
     fun `buildHeaders includes auth token when available`() {
-        val storage = mock(IAgentStorage::class.java)
-        `when`(storage.readRumAccessToken()).thenReturn("test-token-123")
+        val config = StoredEndpointConfig(
+            tracesBaseUrl = "https://example.com/v1/traces",
+            sessionReplayBaseUrl = null,
+            rumAccessToken = "test-token-123"
+        )
 
-        val headers = AuthHeaderBuilder.buildHeaders(storage, logTag)
+        val headers = AuthHeaderBuilder.buildHeaders(config, logTag)
 
         assertEquals(2, headers.size)
         assertTrue(headers.any { it.name == "Content-Type" && it.value == "application/x-protobuf" })
@@ -41,10 +42,13 @@ class AuthHeaderBuilderTest {
 
     @Test
     fun `buildHeaders does not crash when token is null`() {
-        val storage = mock(IAgentStorage::class.java)
-        `when`(storage.readRumAccessToken()).thenReturn(null)
+        val config = StoredEndpointConfig(
+            tracesBaseUrl = "https://example.com/v1/traces",
+            sessionReplayBaseUrl = null,
+            rumAccessToken = null
+        )
 
-        val headers = AuthHeaderBuilder.buildHeaders(storage, logTag)
+        val headers = AuthHeaderBuilder.buildHeaders(config, logTag)
 
         assertEquals(1, headers.size)
         assertEquals("Content-Type", headers[0].name)
@@ -53,31 +57,41 @@ class AuthHeaderBuilderTest {
 
     @Test
     fun `buildHeaders always includes Content-Type header`() {
-        val storage = mock(IAgentStorage::class.java)
-        `when`(storage.readRumAccessToken()).thenReturn(null)
+        val config = StoredEndpointConfig(
+            tracesBaseUrl = "https://example.com/v1/traces",
+            sessionReplayBaseUrl = null,
+            rumAccessToken = null
+        )
 
-        val headers = AuthHeaderBuilder.buildHeaders(storage, logTag)
+        val headers = AuthHeaderBuilder.buildHeaders(config, logTag)
 
         assertTrue(headers.any { it.name == "Content-Type" && it.value == "application/x-protobuf" })
     }
 
     @Test
     fun `buildHeaders does not include X-SF-Token when token is null`() {
-        val storage = mock(IAgentStorage::class.java)
-        `when`(storage.readRumAccessToken()).thenReturn(null)
+        val config = StoredEndpointConfig(
+            tracesBaseUrl = "https://example.com/v1/traces",
+            sessionReplayBaseUrl = null,
+            rumAccessToken = null
+        )
 
-        val headers = AuthHeaderBuilder.buildHeaders(storage, logTag)
+        val headers = AuthHeaderBuilder.buildHeaders(config, logTag)
 
         assertTrue(headers.none { it.name == "X-SF-Token" })
     }
 
     @Test
-    fun `buildHeaders does not include X-SF-Token when token is empty`() {
-        val storage = mock(IAgentStorage::class.java)
-        `when`(storage.readRumAccessToken()).thenReturn("")
+    fun `buildHeaders treats empty string token same as null`() {
+        val config = StoredEndpointConfig(
+            tracesBaseUrl = "https://example.com/v1/traces",
+            sessionReplayBaseUrl = null,
+            rumAccessToken = ""
+        )
 
-        val headers = AuthHeaderBuilder.buildHeaders(storage, logTag)
+        val headers = AuthHeaderBuilder.buildHeaders(config, logTag)
 
-        assertTrue(headers.any { it.name == "X-SF-Token" && it.value == "" })
+        assertEquals(1, headers.size)
+        assertTrue(headers.none { it.name == "X-SF-Token" })
     }
 }

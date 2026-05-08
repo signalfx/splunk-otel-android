@@ -60,10 +60,10 @@ internal class AndroidSpanExporter(
             agentStorage.writeOtelSpanData(spansID, it.toByteArray())
         }
 
-        val hasEndpoint = agentStorage.readTracesBaseUrl() != null
+        val hasConfig = agentStorage.readEndpointConfig() != null
 
         return when {
-            !hasEndpoint || (deferredUntilForeground && !isForeground) -> {
+            !hasConfig || (deferredUntilForeground && !isForeground) -> {
                 // Just store span ID for deferred upload
                 agentStorage.addBufferedSpanId(spansID)
                 CompletableResultCode.ofSuccess()
@@ -80,7 +80,7 @@ internal class AndroidSpanExporter(
     }
 
     override fun flush(): CompletableResultCode {
-        if (agentStorage.readTracesBaseUrl() != null) {
+        if (agentStorage.readEndpointConfig() != null) {
             flushBufferedSpanIds()
         }
         return CompletableResultCode.ofSuccess()
