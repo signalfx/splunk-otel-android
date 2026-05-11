@@ -2,6 +2,8 @@
 
 <p align="center">
   <strong>
+    <a href="https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/install-the-splunk-rum-android-agent">Official Installation Docs</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
     <a href="#getting-started">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
     <a href="CONTRIBUTING.md">Getting Involved</a>
