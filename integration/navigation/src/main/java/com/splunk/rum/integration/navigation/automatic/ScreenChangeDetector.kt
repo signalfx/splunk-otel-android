@@ -27,7 +27,7 @@ import io.opentelemetry.api.common.Attributes
  * Detects visible screen changes (Activity/Fragment/Compose route) and notifies
  * [NavigationEventEmitter]. Priority: Compose route > Fragment > Activity.
  *
- * Elements marked as ignored by [ScreenNameDescriptor] (e.g. DialogFragment, NavHostFragment,
+ * Elements marked as ignored by [ScreenNameDescriptor] (e.g. DialogFragment, NavHost implementations,
  * or annotated with isIgnored = true) are skipped entirely.
  *
  * Emits on resumed (onFragmentResumed / onActivityResumed) as the primary trigger.

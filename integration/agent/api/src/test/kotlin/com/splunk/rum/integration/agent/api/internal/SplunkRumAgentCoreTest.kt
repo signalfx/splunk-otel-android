@@ -20,6 +20,7 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
+import com.splunk.rum.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
@@ -50,6 +51,11 @@ class SplunkRumAgentCoreTest {
     private lateinit var mockSessionManager: ISplunkSessionManager
     private lateinit var mockAgentConfig: AgentConfiguration
 
+    private val contextStorageProviderProperty = "io.opentelemetry.context.contextStorageProvider"
+    private var previousContextStorageProviderValue: String? = null
+
+    private lateinit var mockOfflineOtelDataProcessor: OfflineOtelDataProcessor
+
     @Before
     fun setUp() {
         application = ApplicationProvider.getApplicationContext()
@@ -61,6 +67,7 @@ class SplunkRumAgentCoreTest {
         mockUserManager = mock(IUserManager::class.java)
         mockSessionManager = mock(ISplunkSessionManager::class.java)
         mockAgentConfig = mock(AgentConfiguration::class.java, RETURNS_DEEP_STUBS)
+        mockOfflineOtelDataProcessor = mock(OfflineOtelDataProcessor::class.java, RETURNS_DEEP_STUBS)
 
         // Setup some needed defaults
         `when`(mockAgentConfig.session.samplingRate).thenReturn(1.0)
@@ -68,6 +75,12 @@ class SplunkRumAgentCoreTest {
         `when`(mockAgentConfig.endpoint).thenReturn(
             EndpointConfiguration("test", "test-token")
         )
+
+        // Snapshot any prior value so tearDown can restore it; install() flows below mutate
+        // this JVM-wide property and we don't want to discard a value set by the Gradle test
+        // runner or by a prior test's leftover state.
+        previousContextStorageProviderValue = System.getProperty(contextStorageProviderProperty)
+        System.clearProperty(contextStorageProviderProperty)
     }
 
     @After
@@ -75,6 +88,10 @@ class SplunkRumAgentCoreTest {
         cleanupStorage()
         SplunkRumAgentCore.isRunning = false
         AgentIntegration.modules.clear()
+        when (val previous = previousContextStorageProviderValue) {
+            null -> System.clearProperty(contextStorageProviderProperty)
+            else -> System.setProperty(contextStorageProviderProperty, previous)
+        }
     }
 
     @Test
@@ -127,6 +144,51 @@ class SplunkRumAgentCoreTest {
         assertNotEquals("Installation IDs should be unique", firstId, secondId)
     }
 
+    @Test
+    fun `install configures context storage provider when actually starting RUM`() {
+        assertNull(System.getProperty(contextStorageProviderProperty))
+
+        installSplunkRumAgent()
+
+        assertEquals("default", System.getProperty(contextStorageProviderProperty))
+    }
+
+    @Test
+    fun `install does not configure context storage provider when sampled out`() {
+        `when`(mockAgentConfig.session.samplingRate).thenReturn(0.0)
+        assertNull(System.getProperty(contextStorageProviderProperty))
+
+        installSplunkRumAgent()
+
+        assertNull(System.getProperty(contextStorageProviderProperty))
+    }
+
+    @Test
+    fun `configureContextStorageProvider() sets property to default when unset`() {
+        SplunkRumAgentCore.configureContextStorageProvider()
+
+        assertEquals("default", System.getProperty(contextStorageProviderProperty))
+    }
+
+    @Test
+    fun `configureContextStorageProvider() leaves property alone when already set to default`() {
+        System.setProperty(contextStorageProviderProperty, "default")
+
+        SplunkRumAgentCore.configureContextStorageProvider()
+
+        assertEquals("default", System.getProperty(contextStorageProviderProperty))
+    }
+
+    @Test
+    fun `configureContextStorageProvider() preserves a non-default custom provider configured by host app`() {
+        val custom = "com.example.MyContextStorageProvider"
+        System.setProperty(contextStorageProviderProperty, custom)
+
+        SplunkRumAgentCore.configureContextStorageProvider()
+
+        assertEquals(custom, System.getProperty(contextStorageProviderProperty))
+    }
+
     private fun installSplunkRumAgent() {
         SplunkRumAgentCore.install(
             application,
@@ -134,7 +196,8 @@ class SplunkRumAgentCoreTest {
             mockUserManager,
             mockSessionManager,
             emptyList(),
-            MutableAttributes()
+            MutableAttributes(),
+            mockOfflineOtelDataProcessor
         )
     }
 

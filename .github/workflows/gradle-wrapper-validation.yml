@@ -12,6 +12,6 @@ jobs:
   validation:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
-      - uses: gradle/actions/wrapper-validation@v4.4.4
+      - uses: gradle/actions/wrapper-validation@da187c8e6ffbd3802e00f2477aa5a822b25f2dda # v4.4.4
