@@ -25,7 +25,6 @@ import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.navigation.automatic.NavigationEventEmitter
 import com.splunk.rum.integration.navigation.automatic.ScreenChangeDetector
-import com.splunk.rum.integration.navigation.automatic.callback.NavigationActivityCallback
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentCallback
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.common.CompletableResultCode
@@ -46,10 +45,13 @@ import org.junit.runner.RunWith
 /**
  * Instrumented tests for automatic navigation tracking.
  *
- * These complement the Robolectric-based [ScreenChangeDetectorTest] by exercising
- * the full callback chain (Activity/Fragment lifecycle → ScreenChangeDetector →
- * NavigationEventEmitter → log record) on real Android lifecycle callbacks and
+ * These complement the Robolectric-based ScreenChangeDetectorTest by exercising
+ * the full fragment callback chain (FragmentLifecycleCallbacks → ScreenChangeDetector →
+ * NavigationEventEmitter → log record) with real Android lifecycle callbacks and
  * real Handler.post() timing.
+ *
+ * Activity state is seeded via direct detector calls (not application-level callbacks)
+ * to avoid callback leaking across tests through the shared Application instance.
  */
 @RunWith(AndroidJUnit4::class)
 class NavigationTrackingInstrumentedTest {
@@ -99,13 +101,11 @@ class NavigationTrackingInstrumentedTest {
             val fragmentCallback = NavigationFragmentCallback(detector)
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
 
-            val activityCallback = NavigationActivityCallback(detector)
-            activity.application.registerActivityLifecycleCallbacks(activityCallback)
             detector.onActivityResumed(activity)
 
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, TrackedFragmentA())
-                .commit()
+                .commitNow()
         }
 
         waitForIdle()
@@ -117,7 +117,7 @@ class NavigationTrackingInstrumentedTest {
         scenario.onActivity { activity ->
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, TrackedFragmentB())
-                .commit()
+                .commitNow()
         }
 
         waitForIdle()
@@ -146,7 +146,7 @@ class NavigationTrackingInstrumentedTest {
 
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, IgnoredTestFragment())
-                .commit()
+                .commitNow()
         }
 
         waitForIdle()
@@ -169,13 +169,11 @@ class NavigationTrackingInstrumentedTest {
             val fragmentCallback = NavigationFragmentCallback(detector)
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
 
-            val activityCallback = NavigationActivityCallback(detector)
-            activity.application.registerActivityLifecycleCallbacks(activityCallback)
             detector.onActivityResumed(activity)
 
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, TrackedFragmentA())
-                .commit()
+                .commitNow()
         }
 
         waitForIdle()
@@ -187,7 +185,7 @@ class NavigationTrackingInstrumentedTest {
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, IgnoredTestFragment())
                 .addToBackStack(null)
-                .commit()
+                .commitNow()
         }
 
         waitForIdle()
@@ -219,13 +217,11 @@ class NavigationTrackingInstrumentedTest {
             val fragmentCallback = NavigationFragmentCallback(detector)
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
 
-            val activityCallback = NavigationActivityCallback(detector)
-            activity.application.registerActivityLifecycleCallbacks(activityCallback)
             detector.onActivityResumed(activity)
 
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, TrackedFragmentA())
-                .commit()
+                .commitNow()
         }
 
         waitForIdle()
@@ -236,7 +232,7 @@ class NavigationTrackingInstrumentedTest {
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, IgnoredTestFragment())
                 .addToBackStack(null)
-                .commit()
+                .commitNow()
         }
 
         waitForIdle()
@@ -259,7 +255,7 @@ class NavigationTrackingInstrumentedTest {
     }
 
     @Test
-    fun fragmentTakePrecedenceOverActivityOnResume() {
+    fun fragmentTakesPrecedenceOverActivityOnResume() {
         val scenario = ActivityScenario.launch(NavigationTestActivity::class.java)
 
         scenario.onActivity { activity ->
@@ -270,13 +266,11 @@ class NavigationTrackingInstrumentedTest {
             val fragmentCallback = NavigationFragmentCallback(detector)
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentCallback, true)
 
-            val activityCallback = NavigationActivityCallback(detector)
-            activity.application.registerActivityLifecycleCallbacks(activityCallback)
-            detector.onActivityResumed(activity)
-
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, TrackedFragmentA())
-                .commit()
+                .commitNow()
+
+            detector.onActivityResumed(activity)
         }
 
         waitForIdle()
@@ -298,12 +292,15 @@ class NavigationTrackingInstrumentedTest {
         latch.await(5, TimeUnit.SECONDS)
     }
 
-    private fun navigationLogs(): List<LogRecordData> = exportedLogs.filter {
-        it.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY) ==
-            GlobalRumConstants.NAVIGATION_EVENT_NAME
-    }
+    private fun navigationLogs(): List<LogRecordData> =
+        exportedLogs.filter {
+            it.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY) ==
+                GlobalRumConstants.NAVIGATION_EVENT_NAME
+        }
 
-    private fun LogRecordData.screenName(): String? = attributes.get(GlobalRumConstants.SCREEN_NAME_KEY)
+    private fun LogRecordData.screenName(): String? =
+        attributes.get(GlobalRumConstants.SCREEN_NAME_KEY)
 
-    private fun LogRecordData.lastScreenName(): String? = attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY)
+    private fun LogRecordData.lastScreenName(): String? =
+        attributes.get(GlobalRumConstants.LAST_SCREEN_NAME_KEY)
 }
