@@ -44,5 +44,4 @@ fun Attributes.joinToString(
     }
 }
 
-fun Attributes.containsAny(vararg keys: String): Boolean =
-    asMap().keys.any { it.key in keys }
+fun Attributes.containsAny(vararg keys: String): Boolean = asMap().keys.any { it.key in keys }

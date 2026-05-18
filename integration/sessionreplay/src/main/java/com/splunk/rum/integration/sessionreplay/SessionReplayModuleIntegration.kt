@@ -38,8 +38,8 @@ import com.splunk.rum.integration.sessionreplay.index.TimeIndex
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
-import org.json.JSONObject
 import java.util.concurrent.TimeUnit
+import org.json.JSONObject
 
 internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
     defaultModuleConfiguration = SessionReplayModuleConfiguration()
@@ -187,11 +187,10 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             return true
         }
 
-        private fun shouldDisplayWireframe(attributes: Attributes): Boolean =
-            !attributes.containsAny(
-                "app.framework.rn.version",
-                "app.framework.flutter.version"
-            )
+        private fun shouldDisplayWireframe(attributes: Attributes): Boolean = !attributes.containsAny(
+            "app.framework.rn.version",
+            "app.framework.flutter.version"
+        )
     }
 
     internal data class RuntimeState(
