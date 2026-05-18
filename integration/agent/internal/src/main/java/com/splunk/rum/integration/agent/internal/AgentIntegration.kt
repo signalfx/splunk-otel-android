@@ -33,12 +33,15 @@ import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.android.session.SessionManager
 import io.opentelemetry.android.session.SessionObserver
+import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import java.util.concurrent.TimeUnit
 
 class AgentIntegration private constructor(context: Context) {
     val sessionManager: ISplunkSessionManager
     val listeners: MutableSet<Listener> = HashSet()
+    var globalAttributes: Attributes = Attributes.empty()
+        private set
 
     // The opentelemetry-android InstallationContext API needs an argument of type
     // io.opentelemetry.android.session.SessionManager. val oTelSessionManager is a no-op definition of same.
@@ -55,7 +58,14 @@ class AgentIntegration private constructor(context: Context) {
         sessionManager = SplunkSessionManager(storage)
     }
 
-    fun install(context: Context, openTelemetry: OpenTelemetrySdk, moduleConfigurations: List<ModuleConfiguration>) {
+    fun install(
+        context: Context,
+        openTelemetry: OpenTelemetrySdk,
+        moduleConfigurations: List<ModuleConfiguration>,
+        globalAttributes: Attributes
+    ) {
+        this.globalAttributes = globalAttributes
+
         registerModuleInitializationStart(MODULE_NAME)
 
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
