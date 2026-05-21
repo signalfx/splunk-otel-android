@@ -22,6 +22,7 @@ import com.splunk.android.common.job.IJobManager
 import com.splunk.android.common.job.JobIdStorage
 import com.splunk.android.common.job.JobResult
 import com.splunk.android.common.utils.AppStateObserver
+import com.splunk.rum.common.otel.extensions.containsAnyKeyWithPrefix
 import com.splunk.rum.common.storage.IAgentStorage
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
@@ -129,7 +130,7 @@ internal class AndroidSpanExporter(
 
         internal fun filterInternalSpanAttributes(spans: Collection<SpanData>): List<SpanData> = spans.map { span ->
             val attributes = span.attributes
-            if (attributes.asMap().keys.none { key -> key.key.startsWith(INTERNAL_SPAN_PREFIX) }) {
+            if (!attributes.containsAnyKeyWithPrefix(INTERNAL_SPAN_PREFIX)) {
                 span
             } else {
                 val filteredAttributes = attributes.toBuilder()

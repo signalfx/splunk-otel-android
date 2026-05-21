@@ -188,8 +188,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         }
 
         private fun shouldDisplayWireframe(attributes: Attributes): Boolean = !attributes.containsAny(
-            "app.framework.rn.version",
-            "app.framework.flutter.version"
+            "splunk.agent.internal.sessionReplay.hideWireframe"
         )
     }
 

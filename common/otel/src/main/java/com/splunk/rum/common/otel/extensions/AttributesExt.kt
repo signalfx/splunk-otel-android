@@ -45,3 +45,6 @@ fun Attributes.joinToString(
 }
 
 fun Attributes.containsAny(vararg keys: String): Boolean = asMap().keys.any { it.key in keys }
+
+fun Attributes.containsAnyKeyWithPrefix(vararg prefixes: String): Boolean =
+    asMap().keys.any { key -> prefixes.any { prefix -> key.key.startsWith(prefix) } }
