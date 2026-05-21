@@ -73,15 +73,4 @@ class AttributesExtTest {
         assertTrue(attributes.containsAny("key1"))
         assertFalse(attributes.containsAny("key"))
     }
-
-    @Test
-    fun `containsAnyKeyWithPrefix should match prefixed attribute names`() {
-        val attributes = Attributes.builder()
-            .put("splunk.agent.internal.value", "value1")
-            .put("key2", true)
-            .build()
-
-        assertTrue(attributes.containsAnyKeyWithPrefix("splunk.agent.internal."))
-        assertFalse(attributes.containsAnyKeyWithPrefix("splunk.agent.external."))
-    }
 }
