@@ -25,6 +25,7 @@ import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.rum.common.storage.IAgentStorage
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
+import io.opentelemetry.sdk.trace.data.DelegatingSpanData
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.io.ByteArrayOutputStream
@@ -51,7 +52,7 @@ internal class AndroidSpanExporter(
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {
         if (spans.isEmpty()) return CompletableResultCode.ofSuccess()
 
-        val exportRequest = TraceRequestMarshaler.create(spans)
+        val exportRequest = TraceRequestMarshaler.create(filterInternalSpanAttributes(spans))
         val spansID = UUID.randomUUID().toString()
 
         // Save data to our storage.
@@ -116,6 +117,30 @@ internal class AndroidSpanExporter(
 
         override fun onAppClosed() {
             isForeground = false
+        }
+    }
+
+    companion object {
+
+        /**
+         * Prefix for span attributes that are used internally by the agent and should not be sent to backend.
+         */
+        private const val INTERNAL_SPAN_PREFIX = "splunk.agent.internal."
+
+        internal fun filterInternalSpanAttributes(spans: Collection<SpanData>): List<SpanData> = spans.map { span ->
+            val attributes = span.attributes
+            if (attributes.asMap().keys.none { key -> key.key.startsWith(INTERNAL_SPAN_PREFIX) }) {
+                span
+            } else {
+                val filteredAttributes = attributes.toBuilder()
+                    .removeIf { key -> key.key.startsWith(INTERNAL_SPAN_PREFIX) }
+                    .build()
+
+                object : DelegatingSpanData(span) {
+                    override fun getAttributes() = filteredAttributes
+                    override fun getTotalAttributeCount(): Int = filteredAttributes.size()
+                }
+            }
         }
     }
 }
