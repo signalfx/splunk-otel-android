@@ -39,7 +39,7 @@ object AppDependencies {
         object Compose {
             const val compilerVersion = "1.4.0"
 
-            private const val uiVersion = "1.3.3"
+            private const val uiVersion = "1.11.2"
             private const val materialVersion = "1.3.1"
             private const val activityComposeVersion = "1.6.1"
             private const val navigationComposeVersion = "2.5.3"
