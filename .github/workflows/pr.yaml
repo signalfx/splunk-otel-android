@@ -47,7 +47,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        api-level: [ 29 ]
+        api-level: [ 24, 29 ]
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Set up JDK 17 for running Gradle
