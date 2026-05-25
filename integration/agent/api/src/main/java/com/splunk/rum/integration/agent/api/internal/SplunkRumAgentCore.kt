@@ -132,7 +132,7 @@ internal object SplunkRumAgentCore {
             }
         }
 
-        agentIntegration.install(application, openTelemetry, moduleConfigurations, globalAttributes)
+        agentIntegration.install(application, openTelemetry, moduleConfigurations)
 
         installTimestamp = System.currentTimeMillis()
         if (agentConfiguration.endpoint != null) {

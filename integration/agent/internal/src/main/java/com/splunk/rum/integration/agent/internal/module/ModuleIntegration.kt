@@ -22,14 +22,10 @@ import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.api.common.Attributes
 
 abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultModuleConfiguration: T) {
 
     protected var moduleConfiguration: T = defaultModuleConfiguration
-        private set
-
-    protected var globalAttributes: Attributes = Attributes.empty()
         private set
 
     protected lateinit var sessionManager: ISplunkSessionManager
@@ -67,7 +63,6 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
             val clazz = defaultModuleConfiguration::class
 
             moduleConfiguration = moduleConfigurations.find { it::class == clazz } as? T ?: defaultModuleConfiguration
-            this@ModuleIntegration.globalAttributes = AgentIntegration.obtainInstance(context).globalAttributes
             AgentIntegration.registerModuleInitializationStart(defaultModuleConfiguration.name)
             this@ModuleIntegration.onInstall(context, oTelInstallationContext, moduleConfigurations)
             AgentIntegration.registerModuleInitializationEnd(defaultModuleConfiguration.name)

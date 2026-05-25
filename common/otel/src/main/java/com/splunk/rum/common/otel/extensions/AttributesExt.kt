@@ -43,6 +43,3 @@ fun Attributes.joinToString(
         append(postfix)
     }
 }
-
-fun Attributes.containsAny(vararg keys: String): Boolean =
-    asMap().keys.any { it.key in keys }

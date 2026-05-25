@@ -24,7 +24,6 @@ import com.splunk.android.instrumentation.recording.core.api.Metadata
 import com.splunk.android.instrumentation.recording.core.api.SessionReplay
 import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.extensions.containsAny
 import com.splunk.rum.common.otel.extensions.toInstant
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
@@ -38,12 +37,13 @@ import com.splunk.rum.integration.sessionreplay.index.TimeIndex
 import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
-import org.json.JSONObject
 import java.util.concurrent.TimeUnit
+import org.json.JSONObject
 
 internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
     defaultModuleConfiguration = SessionReplayModuleConfiguration()
 ) {
+
     private const val TAG = "SessionReplayIntegration"
 
     private val isRecordingForSessions: MutableSet<String> = mutableSetOf()
@@ -137,11 +137,9 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             val instance = SplunkOpenTelemetrySdk.instance ?: return false
 
-            val segmentMetadata = JSONObject()
-                .put("startUnixMs", metadata.startUnixMs)
+            val segmentMetadata = JSONObject().put("startUnixMs", metadata.startUnixMs)
                 .put("endUnixMs", metadata.endUnixMs)
                 .put("source", metadata.platform)
-                .put("displayWireframe", shouldDisplayWireframe(globalAttributes))
                 .toString()
 
             val index = timeIndex.getAt(metadata.startUnixMs.toInstant()) ?: 1
@@ -186,12 +184,6 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             return true
         }
-
-        private fun shouldDisplayWireframe(attributes: Attributes): Boolean =
-            !attributes.containsAny(
-                "app.framework.rn.version",
-                "app.framework.flutter.version"
-            )
     }
 
     internal data class RuntimeState(
