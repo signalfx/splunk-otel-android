@@ -110,13 +110,25 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             SplunkSessionReplay.instance.stop()
 
+            runtimeState.isSessionDisabledBySampling = true
             runtimeState.statusOverride = Status.NotRecording(
                 cause = Status.NotRecording.Cause.DISABLED_BY_SAMPLING
             )
-        } else if (runtimeState.pendingStart) {
-            SessionReplay.instance.start()
         } else {
-            SessionReplay.instance.newDataChunk()
+            runtimeState.isSessionDisabledBySampling = false
+
+            if ((runtimeState.statusOverride as? Status.NotRecording)?.cause ==
+                Status.NotRecording.Cause.DISABLED_BY_SAMPLING
+            ) {
+                runtimeState.statusOverride = null
+            }
+
+            if (runtimeState.pendingStart) {
+                runtimeState.pendingStart = false
+                SessionReplay.instance.start()
+            } else {
+                SessionReplay.instance.newDataChunk()
+            }
         }
     }
 
@@ -189,6 +201,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
     internal data class RuntimeState(
         var moduleConfiguration: SessionReplayModuleConfiguration? = null,
         var statusOverride: Status? = null,
-        var pendingStart: Boolean = false
+        var pendingStart: Boolean = false,
+        var isSessionDisabledBySampling: Boolean = false
     )
 }
