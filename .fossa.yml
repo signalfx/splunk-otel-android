@@ -9,8 +9,6 @@ experimental:
     configurations-only:
       - androidApis
       - androidJdkImage
-      - compileOnly
-      - compileOnlyApi
       - coreLibraryDesugaring
       - debugApi
       - debugApiElements
