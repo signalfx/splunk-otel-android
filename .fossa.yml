@@ -2,10 +2,9 @@ version: 3
 
 experimental:
   gradle:
-    # other configurations will be excluded, we don't wish to analyze compile only and test dependencies
-    #
-    # full list of gradle configurations created with the following command:
-    # ./gradlew --console plain splunk-otel-android:dependencies | fgrep ' - ' | sed -e 's/ - .*//' | sed -e 's/^/- /'
+    # The `configurations-only` option restricts analysis to the specified Gradle configurations.
+    # We intentionally omit `compileOnly` and test-related configurations because those
+    # dependencies are not packaged into the final artifact.
     configurations-only:
       - androidApis
       - androidJdkImage
