@@ -43,4 +43,5 @@ dependencies {
     testImplementation(Dependencies.Test.mockito)
     testImplementation(Dependencies.Test.robolectric)
     testImplementation(Dependencies.Test.androidXTestCore)
+    testImplementation(Dependencies.Android.navigationRuntime)
 }

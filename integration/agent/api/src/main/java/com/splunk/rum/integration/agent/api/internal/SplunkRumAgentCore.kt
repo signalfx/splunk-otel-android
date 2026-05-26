@@ -20,6 +20,7 @@ import android.app.Application
 import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.OpenTelemetryInitializer
+import com.splunk.rum.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
@@ -52,6 +53,7 @@ internal object SplunkRumAgentCore {
 
     private const val TAG = "SplunkRumAgentCore"
     var isRunning: Boolean = false
+    var installTimestamp: Long = 0L
 
     fun install(
         application: Application,
@@ -59,7 +61,8 @@ internal object SplunkRumAgentCore {
         userManager: IUserManager,
         sessionManager: ISplunkSessionManager,
         moduleConfigurations: List<ModuleConfiguration>,
-        globalAttributes: MutableAttributes
+        globalAttributes: MutableAttributes,
+        offlineOtelDataProcessor: OfflineOtelDataProcessor
     ): OpenTelemetry {
         // Sampling.
         val shouldBeRunning = when (val samplingRate = agentConfiguration.session.samplingRate.coerceIn(0.0, 1.0)) {
@@ -70,23 +73,24 @@ internal object SplunkRumAgentCore {
 
         if (!shouldBeRunning) return OpenTelemetry.noop()
 
+        // Configure the OTel Context API only once we are committed to running RUM, so no-op
+        // install paths do not mutate this process-wide JVM property for unrelated host-app code.
+        configureContextStorageProvider()
+
         Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
         sessionManager.reset()
 
         val storage = AgentStorage.attach(application)
 
-        val appInstallationID = storage.readAppInstallationId()
-            ?: UUID.randomUUID().toString().replace("-", "").also {
-                storage.writeAppInstallationId(it)
-            }
+        val appInstallationID = storage.readAppInstallationId() ?: UUID.randomUUID().toString().replace("-", "").also {
+            storage.writeAppInstallationId(it)
+        }
 
-        val finalConfiguration = ConfigurationManager
-            .obtainInstance(storage)
-            .preProcessConfiguration(application, agentConfiguration)
+        val finalConfiguration =
+            ConfigurationManager.obtainInstance(storage).preProcessConfiguration(application, agentConfiguration)
 
-        val agentIntegration = AgentIntegration
-            .obtainInstance(application)
+        val agentIntegration = AgentIntegration.obtainInstance(application)
 
         val initializer = OpenTelemetryInitializer(
             application,
@@ -109,8 +113,7 @@ internal object SplunkRumAgentCore {
             .addLogRecordProcessor(SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager))
 
         if (agentConfiguration.enableDebugLogging) {
-            initializer
-                .addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
+            initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
                 .addLogRecordProcessor(SimpleLogRecordProcessor.create(LoggerLogRecordExporter()))
         }
 
@@ -131,6 +134,31 @@ internal object SplunkRumAgentCore {
 
         agentIntegration.install(application, openTelemetry, moduleConfigurations)
 
+        installTimestamp = System.currentTimeMillis()
+        if (agentConfiguration.endpoint != null) {
+            offlineOtelDataProcessor.start(installTimestamp)
+        }
+
         return openTelemetry
     }
+
+    /**
+     * Configures the OTel Context API to use its built-in default ThreadLocal ContextStorage and skip the
+     * ServiceLoader-based ContextStorageProvider SPI lookup, which performs a classpath/disk
+     * read at first context use and trips Android StrictMode.
+     */
+    internal fun configureContextStorageProvider() {
+        when (val existing = System.getProperty(CONTEXT_STORAGE_PROVIDER_PROPERTY)) {
+            null -> System.setProperty(CONTEXT_STORAGE_PROVIDER_PROPERTY, DEFAULT_CONTEXT_STORAGE_VALUE)
+            DEFAULT_CONTEXT_STORAGE_VALUE -> Unit
+            else -> Logger.w(
+                TAG,
+                "Preserving existing OTel contextStorageProvider '$existing'; " +
+                    "skipping default override (StrictMode SPI walk may still occur)"
+            )
+        }
+    }
+
+    private const val CONTEXT_STORAGE_PROVIDER_PROPERTY = "io.opentelemetry.context.contextStorageProvider"
+    private const val DEFAULT_CONTEXT_STORAGE_VALUE = "default"
 }

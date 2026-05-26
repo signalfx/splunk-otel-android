@@ -93,35 +93,64 @@ class AgentStorage(context: Context) : IAgentStorage {
             return isFull
         }
 
-    override fun writeTracesBaseUrl(value: String) {
-        preferences.putString(TRACES_BASE_URL, value)
+    override fun writeEndpointConfig(config: StoredEndpointConfig) {
+        preferences.putString(ENDPOINT_CONFIG, config.toJson())
+        clearLegacyEndpointKeys()
     }
 
-    override fun deleteTracesBaseUrl() {
+    override fun readEndpointConfig(): StoredEndpointConfig? {
+        val json = preferences.getString(ENDPOINT_CONFIG)
+        if (json != null) {
+            val config = StoredEndpointConfig.fromJson(json)
+            if (config == null) {
+                Logger.w(TAG, "readEndpointConfig() stored JSON is corrupted, discarding")
+                preferences.remove(ENDPOINT_CONFIG)
+            }
+            return config
+        }
+        return migrateFromLegacyKeys()
+    }
+
+    override fun deleteEndpointConfig() {
+        preferences.remove(ENDPOINT_CONFIG)
+        clearLegacyEndpointKeys()
+    }
+
+    /**
+     * One-time migration from separate legacy keys to atomic ENDPOINT_CONFIG.
+     * Synchronized so that concurrent callers cannot interleave reads and clears,
+     * which would overwrite ENDPOINT_CONFIG with partially null values.
+     */
+    private fun migrateFromLegacyKeys(): StoredEndpointConfig? = synchronized(migrationLock) {
+        preferences.getString(ENDPOINT_CONFIG)?.let { return@synchronized StoredEndpointConfig.fromJson(it) }
+
+        val tracesUrl = preferences.getString(TRACES_BASE_URL) ?: return@synchronized null
+        val config = StoredEndpointConfig(
+            tracesBaseUrl = tracesUrl,
+            sessionReplayBaseUrl = preferences.getString(LOGS_BASE_URL),
+            rumAccessToken = preferences.getString(RUM_ACCESS_TOKEN)
+        )
+        Logger.d(TAG, "Migrating legacy endpoint keys to atomic config")
+        preferences.putString(ENDPOINT_CONFIG, config.toJson())
+        clearLegacyEndpointKeys()
+        config
+    }
+
+    private fun clearLegacyEndpointKeys() {
         preferences.remove(TRACES_BASE_URL)
-    }
-
-    override fun readTracesBaseUrl(): String? = preferences.getString(TRACES_BASE_URL)
-
-    override fun writeLogsBaseUrl(value: String) {
-        preferences.putString(LOGS_BASE_URL, value)
-    }
-
-    override fun deleteLogsBaseUrl() {
         preferences.remove(LOGS_BASE_URL)
-    }
-
-    override fun readLogsBaseUrl(): String? = preferences.getString(LOGS_BASE_URL)
-
-    override fun writeRumAccessToken(value: String) {
-        preferences.putString(RUM_ACCESS_TOKEN, value)
-    }
-
-    override fun deleteRumAccessToken() {
         preferences.remove(RUM_ACCESS_TOKEN)
     }
 
-    override fun readRumAccessToken(): String? = preferences.getString(RUM_ACCESS_TOKEN)
+    internal fun writeLegacyEndpointKeys(
+        tracesBaseUrl: String? = null,
+        logsBaseUrl: String? = null,
+        rumAccessToken: String? = null
+    ) {
+        tracesBaseUrl?.let { preferences.putString(TRACES_BASE_URL, it) }
+        logsBaseUrl?.let { preferences.putString(LOGS_BASE_URL, it) }
+        rumAccessToken?.let { preferences.putString(RUM_ACCESS_TOKEN, it) }
+    }
 
     override fun writeDeviceId(value: String) {
         preferences.putString(DEVICE_ID, value)
@@ -173,16 +202,6 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override fun deleteSessionLastActivity() {
         preferences.remove(SESSION_LAST_ACTIVITY)
-    }
-
-    override fun writeAnonymousUserId(value: String) {
-        preferences.putString(ANONYMOUS_USER_ID, value)
-    }
-
-    override fun readAnonymousUserId(): String? = preferences.getString(ANONYMOUS_USER_ID)
-
-    override fun deleteAnonymousUserId() {
-        preferences.remove(ANONYMOUS_USER_ID)
     }
 
     override fun writeOtelLogData(id: String, data: ByteArray): Boolean {
@@ -266,6 +285,18 @@ class AgentStorage(context: Context) : IAgentStorage {
         preferences.putString(SESSION_IDS, json)
     }
 
+    override fun getLogs(olderThan: Long): List<File> = logDir.listFiles()?.filter {
+        it.lastModified() < olderThan
+    } ?: emptyList()
+
+    override fun getSessionReplayData(olderThan: Long): List<File> = sessionReplayDir.listFiles()?.filter {
+        it.lastModified() < olderThan
+    } ?: emptyList()
+
+    override fun getSpans(olderThan: Long): List<File> = spanDir.listFiles()?.filter {
+        it.lastModified() < olderThan
+    } ?: emptyList()
+
     override fun commit() {
         preferences.commit()
     }
@@ -276,6 +307,11 @@ class AgentStorage(context: Context) : IAgentStorage {
             val array = JSONArray(ids)
             preferences.putString(SPAN_IDS_KEY, array.toString())
         }
+    }
+
+    override fun setBufferedSpanIds(ids: List<String>) {
+        val array = JSONArray(ids)
+        preferences.putString(SPAN_IDS_KEY, array.toString())
     }
 
     override fun getBufferedSpanIds(): List<String> {
@@ -305,6 +341,11 @@ class AgentStorage(context: Context) : IAgentStorage {
         }
     }
 
+    override fun setBufferedSessionReplayIds(ids: List<String>) {
+        val array = JSONArray(ids)
+        preferences.putString(SESSION_REPLAY_IDS_KEY, array.toString())
+    }
+
     override fun getBufferedSessionReplayIds(): List<String> {
         val json = preferences.getString(SESSION_REPLAY_IDS_KEY)
 
@@ -329,6 +370,16 @@ class AgentStorage(context: Context) : IAgentStorage {
     private fun otelLogDataFile(id: String) = File(logDir, "$id.dat")
     private fun otelSpanDataFile(id: String) = File(spanDir, "$id.dat")
     private fun sessionReplayDataFile(id: String) = File(sessionReplayDir, "$id.dat")
+
+    override fun writeAnonymousUserId(value: String) {
+        preferences.putString(ANONYMOUS_USER_ID, value)
+    }
+
+    override fun readAnonymousUserId(): String? = preferences.getString(ANONYMOUS_USER_ID)
+
+    override fun deleteAnonymousUserId() {
+        preferences.remove(ANONYMOUS_USER_ID)
+    }
 
     fun cleanUpStorage(context: Context): Boolean {
         val files = ArrayList<File>()
@@ -357,22 +408,25 @@ class AgentStorage(context: Context) : IAgentStorage {
     }
 
     companion object {
+        private const val ENDPOINT_CONFIG = "ENDPOINT_CONFIG"
         private const val TRACES_BASE_URL = "TRACES_BASE_URL"
         private const val LOGS_BASE_URL = "LOGS_BASE_URL"
         private const val RUM_ACCESS_TOKEN = "RUM_ACCESS_TOKEN"
         private const val DEVICE_ID = "DEVICE_ID"
         private const val APP_INSTALLATION_ID = "APP_INSTALLATION_ID"
         private const val SESSION_ID = "SESSION_ID"
+
+        private const val ANONYMOUS_USER_ID = "ANONYMOUS_USER_ID"
         private const val SESSION_IDS = "SESSION_IDS"
         private const val SESSION_VALID_UNTIL = "SESSION_VALID_UNTIL"
         private const val SESSION_VALID_UNTIL_IN_BACKGROUND = "SESSION_VALID_UNTIL_IN_BACKGROUND"
         private const val SESSION_LAST_ACTIVITY = "SESSION_LAST_ACTIVITY"
-        private const val ANONYMOUS_USER_ID = "ANONYMOUS_USER_ID"
         private const val SPAN_IDS_KEY = "BUFFERED_SPAN_IDS"
         private const val SESSION_REPLAY_IDS_KEY = "BUFFERED_SESSION_REPLAY_IDS"
 
         private const val TAG = "AgentStorage"
         private val lock = Any()
+        private val migrationLock = Any()
 
         /**
          * If storage model changes this version needs to be changed. This will ensure data consistency.

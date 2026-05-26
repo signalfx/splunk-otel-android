@@ -23,6 +23,7 @@ import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
 import java.io.File
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
@@ -90,63 +91,107 @@ class AgentStorageTest {
         assertEquals(testId, result)
     }
 
+    // --- Atomic endpoint config tests ---
+
     @Test
-    fun `readRumAccessToken returns null when not set`() {
-        val result = storage.readRumAccessToken()
-        assertNull(result)
+    fun `readEndpointConfig returns null when not set`() {
+        assertNull(storage.readEndpointConfig())
     }
 
     @Test
-    fun `readRumAccessToken returns stored value`() {
-        val expectedToken = "test_token_123"
+    fun `writeEndpointConfig and readEndpointConfig roundtrip`() {
+        val config = StoredEndpointConfig(
+            tracesBaseUrl = "https://rum-ingest.us0.signalfx.com/v1/traces",
+            sessionReplayBaseUrl = "https://rum-ingest.us0.signalfx.com/v1/logs",
+            rumAccessToken = "test-token"
+        )
 
-        storage.writeRumAccessToken(expectedToken)
-        val result = storage.readRumAccessToken()
+        storage.writeEndpointConfig(config)
+        val result = storage.readEndpointConfig()
 
-        assertEquals(expectedToken, result)
+        assertNotNull(result)
+        assertEquals(config, result)
     }
 
     @Test
-    fun `writeRumAccessToken overwrites previous value`() {
-        val firstToken = "first_token_123"
-        val secondToken = "second_token_123"
+    fun `writeEndpointConfig overwrites previous config`() {
+        val first = StoredEndpointConfig("https://first.com", null, "token1")
+        val second = StoredEndpointConfig("https://second.com", "https://logs.com", "token2")
 
-        storage.writeRumAccessToken(firstToken)
-        storage.writeRumAccessToken(secondToken)
-        val result = storage.readRumAccessToken()
+        storage.writeEndpointConfig(first)
+        storage.writeEndpointConfig(second)
 
-        assertEquals(secondToken, result)
+        assertEquals(second, storage.readEndpointConfig())
     }
 
     @Test
-    fun `readRumAccessToken persists across storage instances`() {
-        val testToken = "persistent_token_123"
+    fun `deleteEndpointConfig removes config`() {
+        val config = StoredEndpointConfig("https://example.com", null, "token")
 
-        storage.writeRumAccessToken(testToken)
+        storage.writeEndpointConfig(config)
+        storage.deleteEndpointConfig()
+
+        assertNull(storage.readEndpointConfig())
+    }
+
+    @Test
+    fun `readEndpointConfig persists across storage instances`() {
+        val config = StoredEndpointConfig("https://example.com", "https://logs.com", "token")
+
+        storage.writeEndpointConfig(config)
         storage.commit()
 
         val newStorage = AgentStorage(context)
-        val result = newStorage.readRumAccessToken()
+        assertEquals(config, newStorage.readEndpointConfig())
+    }
 
-        assertEquals(testToken, result)
+    // --- Legacy migration tests ---
+
+    @Test
+    fun `readEndpointConfig migrates from legacy keys`() {
+        storage.writeLegacyEndpointKeys(
+            tracesBaseUrl = "https://legacy-traces.com",
+            logsBaseUrl = "https://legacy-logs.com",
+            rumAccessToken = "legacy-token"
+        )
+
+        val result = storage.readEndpointConfig()
+
+        assertNotNull(result)
+        assertEquals("https://legacy-traces.com", result!!.tracesBaseUrl)
+        assertEquals("https://legacy-logs.com", result.sessionReplayBaseUrl)
+        assertEquals("legacy-token", result.rumAccessToken)
     }
 
     @Test
-    fun `deleteRumAccessToken removes stored value`() {
-        val testToken = "token_to_delete_123"
+    fun `readEndpointConfig migrates partial legacy state gracefully`() {
+        storage.writeLegacyEndpointKeys(tracesBaseUrl = "https://traces-only.com")
 
-        storage.writeRumAccessToken(testToken)
-        storage.deleteRumAccessToken()
-        val result = storage.readRumAccessToken()
+        val result = storage.readEndpointConfig()
 
-        assertNull(result)
+        assertNotNull(result)
+        assertEquals("https://traces-only.com", result!!.tracesBaseUrl)
+        assertNull(result.sessionReplayBaseUrl)
+        assertNull(result.rumAccessToken)
     }
 
     @Test
-    fun `deleteRumAccessToken handles null gracefully`() {
-        storage.deleteRumAccessToken()
-        val result = storage.readRumAccessToken()
+    fun `readEndpointConfig returns null when only legacy token exists without URL`() {
+        storage.writeLegacyEndpointKeys(rumAccessToken = "orphan-token")
 
-        assertNull(result)
+        assertNull(storage.readEndpointConfig())
+    }
+
+    @Test
+    fun `writeEndpointConfig clears legacy keys`() {
+        storage.writeLegacyEndpointKeys(
+            tracesBaseUrl = "https://old.com",
+            rumAccessToken = "old-token"
+        )
+
+        val config = StoredEndpointConfig("https://new.com", null, "new-token")
+        storage.writeEndpointConfig(config)
+
+        assertEquals(config, storage.readEndpointConfig())
     }
 }
