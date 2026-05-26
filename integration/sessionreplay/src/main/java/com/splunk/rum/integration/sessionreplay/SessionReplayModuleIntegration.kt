@@ -111,7 +111,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             }
 
             if (runtimeState.isRecordingRequested && !runtimeState.isSessionDisabledBySampling) {
-                SplunkSessionReplay.instance.stop()
+                SessionReplay.instance.stop()
             }
 
             runtimeState.isSessionDisabledBySampling = true
