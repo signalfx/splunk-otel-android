@@ -1,292 +1,125 @@
 # AI Agent Guidelines for Splunk Android RUM SDK
 
-This guide provides essential information for AI agents working within the `splunk-otel-android` repository.
+This repo is the Splunk Android RUM SDK: a lightweight, multi-module Gradle/Kotlin library built on OpenTelemetry and embedded in customer Android apps. Keep this file concise; move long module notes to focused docs only when this guide can no longer stay scannable.
+
+## Non-Negotiables
 
----
+- **No new dependencies** unless the user explicitly asks. Even dependencies listed in `buildSrc/src/main/kotlin/Dependencies.kt` need explicit approval because SDK size and consumer conflicts matter.
+- **Public API is stable.** Treat `agent/` and any `integration/` module exposed via `:agent` `api` dependencies as customer-facing.
+- **Do not change public API or default behavior without confirmation.** This includes signatures, defaults, visibility, constants, data classes, errors, side effects, deprecations, removals, and telemetry semantics.
+- **Maintain backward compatibility.** SDK consumers should be able to upgrade without source changes unless a breaking change is intentional, documented, and approved.
+- **SDK runtime paths must not crash host apps for predictable conditions.** Prefer graceful fallback plus internal diagnostics over `throw`, `error`, or `require` in production runtime paths.
+- **Production mobile performance is a primary correctness concern.** Optimize for low startup, main-thread, memory, CPU, network, storage, and battery impact.
 
-## ⚠️ Critical Rules
-
-### 1. NO New External Dependencies
-
-**Under NO circumstances should you add any new dependency to the SDK.**
-
-- The Splunk RUM SDK is designed to be **lightweight** and must minimize its footprint in customer applications
-- Adding dependencies increases artifact size and can introduce version conflicts for SDK consumers
-- All allowed dependencies are defined in `buildSrc/src/main/kotlin/Dependencies.kt`
-- Even dependencies that exist in `Dependencies.kt` should only be used if **explicitly requested** by the user
-- If a task seems to require a new dependency, **stop and ask the user** for an alternative approach
-
-### 2. Public API Immutability
-
-**The public API is stable and must NOT be changed without explicit user confirmation.**
-
-#### What is Public API?
-- **`:agent` module** (`agent/`) — The main entry point for SDK consumers
-- **`:integration` modules** (`integration/`) — Any module under the integration folder that `:agent` imports as an `api` dependency
-
-#### What constitutes a Public API change?
-- Method/function signatures (name, parameters, defaults, return types)
-- Behavior, semantics, and side effects
-- Exceptions/errors that can be raised
-- Public constants and exported symbols
-- Request/response schemas and data classes
-- Visibility changes (public → private/internal)
-- Deprecations or removals
-
-#### The Rule
-> **Default assumption: Public API is immutable unless the user explicitly asks for the change and confirms it.**
-
-If a task appears to require changing any public method in `agent/` or `integration/`:
-1. **STOP** and inform the user
-2. **Document** what would need to change and why
-3. **Wait** for explicit user confirmation before proceeding
-4. Explore alternative approaches that don't modify public API
-
-### 3. Backwards Compatibility
-
-**All changes must maintain backwards compatibility.**
-
-- SDK consumers should be able to update to new versions without code changes
-- Deprecated APIs must continue to function (mark with `@Deprecated` annotation with migration guidance)
-- Default behaviors must not change in ways that break existing integrations
-- New features should be opt-in, not opt-out
-
-### 4. Defensive Runtime Behavior (No Crash-First SDK Paths)
-
-**SDK runtime code must be defensive by default.**
-
-- The SDK must not crash customer apps for predictable runtime conditions
-- Avoid introducing `throw`/`error`/`require` in runtime paths where invalid state can occur in production (e.g., missing storage values, unavailable optional modules, unsupported environment state)
-- Prefer graceful degradation (no-op or partial behavior) and continue execution when safe
-- Log failures internally for diagnostics, but keep failures transparent to SDK consumers
-
-#### When exceptions are acceptable
-- Input validation for clearly invalid developer usage at API boundaries (and only when there is no safe fallback)
-- Unit tests and test-only utilities
-- Build-time tooling paths (not app runtime)
-
-#### PR review requirement
-For every PR touching runtime code, reviewers (including AI reviewers) must explicitly check:
-1. Could this change throw in a predictable runtime scenario?
-2. If yes, can we replace it with log + graceful fallback?
-3. Is the fallback behavior backward compatible and non-breaking for host apps?
-4. Is there a test covering the degraded path?
-
----
-
-## Project Overview
-
-This repository contains the source code for the **Splunk Android RUM (Real User Monitoring) SDK**. It is an open-source, multi-module Gradle project written in Kotlin, built on OpenTelemetry.
-
-The SDK provides instrumentation for:
-- ANR Detection
-- App Startup Tracking
-- Crash Reporting
-- Custom Event Tracking
-- Navigation Tracking
-- Network Monitoring
-- HTTP Request Instrumentation (OkHttp3, HttpURLConnection)
-- Session Replay
-- Slow/Frozen Rendering Detection
-- User Interaction Tracking
-- WebView Integration
-
----
-
-## Project Structure
-
-```
-splunk-otel-android/
-├── agent/                      # Main SDK entry point (PUBLIC API)
-├── integration/                # Feature modules (PUBLIC API where exposed via agent)
-│   ├── agent/
-│   │   ├── api/               # Public API interfaces
-│   │   ├── common/            # Shared agent code
-│   │   └── internal/          # Internal implementation
-│   ├── anr/                   # ANR detection
-│   ├── applicationlifecycle/  # App lifecycle tracking
-│   ├── crash/                 # Crash reporting
-│   ├── customtracking/        # Custom events API
-│   ├── httpurlconnection-auto/# Auto HttpURLConnection instrumentation
-│   ├── interactions/          # User interaction tracking
-│   ├── navigation/            # Screen navigation tracking
-│   ├── networkmonitor/        # Network state monitoring
-│   ├── okhttp3-auto/          # Auto OkHttp3 instrumentation
-│   ├── okhttp3-common/        # Shared OkHttp3 code
-│   ├── okhttp3-manual/        # Manual OkHttp3 instrumentation
-│   ├── sessionreplay/         # Session replay
-│   ├── slowrendering/         # Slow rendering detection
-│   ├── startup/               # App startup tracking
-│   └── webview/               # WebView integration
-├── common/                     # Shared utilities (internal)
-│   ├── otel/                  # OpenTelemetry helpers
-│   ├── storage/               # Storage utilities
-│   └── utils/                 # General utilities
-├── instrumentation/            # Build-time instrumentation
-│   ├── buildtime/             # Gradle plugins for auto-instrumentation
-│   └── runtime/               # Runtime instrumentation hooks
-├── buildSrc/                   # Build configuration and dependencies
-└── app/                        # Sample application
-```
-
----
-
-## Building and Running
-
-The project uses Gradle with the wrapper script `./gradlew`.
-
-### Building
-
-```bash
-# Build entire project
-./gradlew build
-
-# Build specific module
-./gradlew :<module>:build
-
-# Examples:
-./gradlew :agent:build
-./gradlew :integration:crash:build
-```
-
-### Running Tests
-
-#### Unit Tests (JVM)
-```bash
-./gradlew :<module>:check
-
-# Examples:
-./gradlew :agent:check
-./gradlew :integration:navigation:check
-```
-
-#### Integration Tests (Device/Emulator)
-```bash
-./gradlew :<module>:connectedCheck
-```
-
----
-
-## Development Conventions
-
-### Code Formatting
-
-The project uses **ktlint** for code formatting. Always format before committing:
-
-```bash
-# Format entire project
-./gradlew ktlintFormat
-
-# Format specific module
-./gradlew :<module>:ktlintFormat
-```
-
-### Kotlin Style
-- Follow standard Kotlin coding conventions
-- Use meaningful names for classes, functions, and variables
-- Document public APIs with KDoc comments
-- Prefer immutability (`val` over `var`, immutable collections)
-- Use `internal` visibility for SDK-internal code that shouldn't be exposed
-
-### Testing
-- Write unit tests for all new functionality
-- Tests should be focused and test one behavior each
-- Use descriptive test names that explain the scenario
-- Mock external dependencies appropriately
-
----
-
-## Iteration Loop
-
-After making any change, follow this workflow:
-
-### 1. Format Code
-```bash
-./gradlew :<module>:ktlintFormat
-```
-
-### 2. Run Unit Tests
-```bash
-./gradlew :<module>:check
-```
-
-### 3. Run Integration Tests (if applicable)
-```bash
-./gradlew :<module>:connectedCheck
-```
-
-### 4. Verify Build
-```bash
-./gradlew :<module>:build
-```
-
----
-
-## Allowed Changes (Without User Approval)
-
-You MAY proceed without explicit approval for:
-- Internal refactors that do **not** change public behavior
-- Bug fixes that preserve existing API contracts
-- Performance improvements with identical external behavior
-- Adding/updating tests
-- Documentation improvements
-- Comments and code clarity improvements
-- Private/internal implementation details
-
----
-
-## Changes Requiring User Confirmation
-
-**ALWAYS stop and ask** before:
-- Adding ANY new dependency (even if it exists in Dependencies.kt)
-- Modifying any public API in `agent/` or `integration/`
-- Changing default behaviors
-- Deprecating existing functionality
-- Removing any code that might be used by SDK consumers
-- Making changes that could break backwards compatibility
-
----
-
-## Module Guidelines
-
-### Working with `agent/` Module
-- This is the main entry point consumers use
-- Every public class/method is part of the stable API
-- Changes here have the highest impact on consumers
-
-### Working with `integration/` Modules
-- Feature-specific instrumentation modules
-- Public APIs exposed through `:agent` must be stable
-- Internal implementation can be modified freely
-
-### Working with `common/` Modules
-- Shared utilities for internal SDK use
-- Not exposed to consumers
-- Can be modified more freely, but consider impact on dependent modules
-
-### Working with `instrumentation/` Modules
-- Build-time and runtime instrumentation
-- Gradle plugins for automatic instrumentation
-- Changes affect how the SDK integrates with customer build processes
-
----
-
-## Quick Reference
-
-| Action | Allowed? | Notes |
-|--------|----------|-------|
-| Add new dependency | ❌ NO | Never without explicit user request |
-| Modify public API | ❌ ASK | Requires user confirmation |
-| Change default behavior | ❌ ASK | Could break existing integrations |
-| Internal refactoring | ✅ YES | If it doesn't affect public behavior |
-| Add tests | ✅ YES | Always encouraged |
-| Fix bugs (API-preserving) | ✅ YES | Maintain backwards compatibility |
-| Performance optimization | ✅ YES | If behavior is identical |
-| Update documentation | ✅ YES | Always encouraged |
-| Throw on predictable runtime edge-case | ❌ NO | Use log + graceful fallback instead |
-
----
-
-## Updating This Guide
-
-If you discover new patterns, conventions, or important information that would help future AI agents work with this repository, update this guide accordingly.
+## Repo Map
+
+| Path | Purpose |
+| --- | --- |
+| `agent/` | Main SDK entry point and stable public API |
+| `integration/` | Feature instrumentation; public when exposed through `:agent` |
+| `integration/{anr,applicationlifecycle,crash,customtracking,httpurlconnection-auto,interactions,navigation,networkmonitor,okhttp3-*,sessionreplay,slowrendering,startup,webview}/` | Instrumentation modules |
+| `integration/agent/api/` | Public API interfaces |
+| `integration/agent/common/` | Shared agent implementation |
+| `integration/agent/internal/` | Internal agent implementation |
+| `common/otel/`, `common/storage/`, `common/utils/` | Internal shared helpers |
+| `instrumentation/buildtime/` | Gradle plugins and build-time instrumentation |
+| `instrumentation/runtime/` | Runtime hooks used by instrumentation |
+| `buildSrc/src/main/kotlin/Dependencies.kt` | Allowed dependency catalog, not approval to use dependencies |
+| `app/` | Sample application |
+
+## Common Commands
+
+Use the narrowest module command that validates the change.
+
+| Task | Command |
+| --- | --- |
+| Format module | `./gradlew :<module>:ktlintFormat` |
+| Check module | `./gradlew :<module>:check` |
+| Build module | `./gradlew :<module>:build` |
+| Device/emulator tests | `./gradlew :<module>:connectedCheck` |
+| Whole repo build | `./gradlew build` |
+| Whole repo format | `./gradlew ktlintFormat` |
+
+## Change Rules
+
+- Follow existing Kotlin, Gradle, threading, storage, and module patterns before adding abstractions.
+- Keep changes inside the smallest reasonable module boundary.
+- Prefer `internal` for SDK implementation details.
+- Document public APIs with KDoc.
+- Deprecated APIs must continue to work and include migration guidance.
+- New features should be opt-in unless the user explicitly approves a default behavior change.
+- Do not add coroutine, threading, reactive, serialization, or utility dependencies to solve local implementation problems.
+- When runtime state is invalid or optional components are absent, no-op or partially degrade when safe.
+- Exceptions are acceptable only for invalid developer usage at API boundaries with no safe fallback, tests/test utilities, or build-time tooling.
+
+## PR Review Priorities
+
+Review findings in this order. Lead with customer impact, not style.
+
+### P1 - Host App Safety and Production Performance
+
+- Block or request measurement for avoidable overhead in customer apps at scale.
+- Watch hot paths: SDK init, lifecycle callbacks, UI instrumentation, ANR/crash handling, network interceptors, span/log/event creation, processors, exporters, and background work.
+- Flag repeated allocations, reflection, regex parsing, per-signal encoder/formatter creation, disk/network I/O, locks, O(n) scans over growing data, retained `Context`/`Activity`, and large retained objects.
+- Flag unbounded queues, retries, timers, listeners, observers, or background work that grows with sessions, spans, events, logs, screens, requests, or lifecycle churn.
+- Consider aggregate parent-app impact, not just local method cost. Ask for benchmarks, profiling, limits, or a safer design when cost is unclear.
+
+### P2 - Public API and Compatibility
+
+- Public API changes must be backward compatible unless the PR clearly states an intentional breaking change.
+- Surface removed/renamed symbols, changed signatures/defaults/visibility, new thrown exceptions, behavior changes, constants, schemas, exported data classes, and telemetry semantics.
+- For intentional client-visible changes, require compatibility rationale, migration guidance, `CHANGELOG.md`, and tests covering relevant old/new behavior.
+- If risk is unclear, raise concrete customer failures: compile breaks, changed telemetry, startup failure, disabled instrumentation, or unexpected runtime behavior.
+
+### P3 - Pattern Fit and Maintainability
+
+- New code should look like neighboring code in the same module.
+- Prefer existing batching, buffering, scheduling, storage, naming, visibility, and helper patterns.
+- Flag broad refactors, shared utility changes, or cross-module behavior changes unrelated to the PR goal.
+
+### P4 - Android Lifecycle and Concurrency
+
+- Shared mutable state must be synchronized using repo-standard patterns.
+- Verify callbacks, processors, exporters, storage, listeners, and lifecycle hooks are safe under repeated, concurrent, or reentrant calls.
+- Avoid main-thread blocking and background work without lifecycle, cancellation, and queue-size bounds.
+- Treat singleton state, lazy init, volatile state, retained `Context`, process death, app foreground/background transitions, shutdown, and reconfiguration as risk areas.
+
+### P5 - Telemetry Correctness
+
+- Known fact: all signals, including logs and events, are converted to spans before upload.
+- Review log/event changes by their final span names, timestamps, attributes, parent context, session/screen data, sampling, and upload behavior.
+- Changes to processors, exporters, interceptors, global attributes, retry behavior, or required attributes can affect every signal type.
+
+### P6 - Test Value
+
+- Tests should prove observable behavior, not only execute code paths.
+- Prefer coverage for emitted spans, state transitions, configuration effects, degraded runtime paths, lifecycle ordering, concurrency edges, API compatibility, telemetry semantics, and performance-sensitive boundaries.
+- Flag tests that only assert `not null`, `no throw`, implementation details, or sleeps without synchronization.
+- If risky behavior lacks meaningful coverage, call out the missing scenario directly.
+
+### P7 - Style and Docs
+
+- Style issues are last unless they obscure correctness or future maintenance.
+- Keep docs and `CHANGELOG.md` updates focused on customer-visible behavior.
+
+## Design Assumptions to Surface
+
+Call these out as design choices when a PR relies on or changes them:
+
+1. The SDK runs inside customer apps and must not add substantial startup, main-thread, memory, battery, storage, or network overhead.
+2. Logs, events, and other signals become spans before upload; signal-specific assumptions must still be checked against final span output.
+3. SDK init, shutdown, and reconfiguration can race with Android lifecycle callbacks and instrumentation hooks.
+4. Network, storage, process lifetime, clocks, retries, and background execution are unreliable on mobile devices.
+5. Unenforced assumptions should be enforced, documented, tested, or handled with graceful fallback.
+
+## When to Stop and Ask
+
+- Adding any dependency.
+- Changing public API, default behavior, or telemetry semantics.
+- Deprecating/removing customer-visible behavior.
+- Introducing runtime exceptions on predictable production paths.
+- Making a change that may break backward compatibility.
+
+## Keep This Guide Short
+
+Keep this file as the short entry point. If guidance grows too detailed, move focused material into linked docs such as `docs/agent-pr-review.md` for review examples or `docs/agent-module-map.md` for module inventories.
