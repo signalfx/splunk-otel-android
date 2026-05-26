@@ -103,32 +103,40 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             return
         }
 
-        if (moduleConfiguration.samplingRate < Math.random()) {
+        val sampledOut = moduleConfiguration.samplingRate < Math.random()
+
+        if (sampledOut) {
             Logger.d(TAG) {
                 "onSessionChange() - Session replay for session '$currentSessionId' is disabled due to sampling rate"
             }
 
-            SplunkSessionReplay.instance.stop()
+            if (runtimeState.isRecordingRequested && !runtimeState.isSessionDisabledBySampling) {
+                SplunkSessionReplay.instance.stop()
+            }
 
             runtimeState.isSessionDisabledBySampling = true
             runtimeState.statusOverride = Status.NotRecording(
                 cause = Status.NotRecording.Cause.DISABLED_BY_SAMPLING
             )
-        } else {
-            runtimeState.isSessionDisabledBySampling = false
 
-            if ((runtimeState.statusOverride as? Status.NotRecording)?.cause ==
-                Status.NotRecording.Cause.DISABLED_BY_SAMPLING
-            ) {
-                runtimeState.statusOverride = null
-            }
+            return
+        }
 
-            if (runtimeState.pendingStart) {
-                runtimeState.pendingStart = false
+        val wasSampledOut = runtimeState.isSessionDisabledBySampling
+        runtimeState.isSessionDisabledBySampling = false
+
+        if ((runtimeState.statusOverride as? Status.NotRecording)?.cause ==
+            Status.NotRecording.Cause.DISABLED_BY_SAMPLING
+        ) {
+            runtimeState.statusOverride = null
+        }
+
+        when {
+            wasSampledOut && runtimeState.isRecordingRequested ->
                 SessionReplay.instance.start()
-            } else {
+            runtimeState.isRecordingRequested ->
                 SessionReplay.instance.newDataChunk()
-            }
+            else -> Unit
         }
     }
 
@@ -201,7 +209,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
     internal data class RuntimeState(
         var moduleConfiguration: SessionReplayModuleConfiguration? = null,
         var statusOverride: Status? = null,
-        var pendingStart: Boolean = false,
+        var isRecordingRequested: Boolean = false,
         var isSessionDisabledBySampling: Boolean = false
     )
 }

@@ -72,9 +72,10 @@ class SessionReplay internal constructor(private val runtimeState: SessionReplay
             return
         }
 
+        runtimeState.isRecordingRequested = true
+
         if (runtimeState.isSessionDisabledBySampling) {
             Logger.w(TAG, "start() - Session replay is disabled by sampling")
-            runtimeState.pendingStart = true
             return
         }
 
@@ -86,8 +87,9 @@ class SessionReplay internal constructor(private val runtimeState: SessionReplay
      * Stops recording of a user activity.
      */
     fun stop() {
+        runtimeState.isRecordingRequested = false
+
         if (runtimeState.isSessionDisabledBySampling) {
-            runtimeState.pendingStart = false
             return
         }
 
