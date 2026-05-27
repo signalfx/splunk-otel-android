@@ -80,10 +80,17 @@ internal class UploadSessionReplayDataJob : JobService() {
 
         Logger.d(TAG) { "startUpload() id: $id" }
         getOrCreateExecutor().safeSubmit {
-            val url = storage.readLogsBaseUrl()
+            val config = storage.readEndpointConfig()
 
+            if (config == null) {
+                Logger.d(TAG, "startUpload() no endpoint configuration available")
+                jobFinished(params, false)
+                return@safeSubmit
+            }
+
+            val url = config.sessionReplayBaseUrl
             if (url == null) {
-                Logger.d(TAG, "startUpload() url is not valid")
+                Logger.d(TAG, "startUpload() session replay endpoint not configured")
                 jobFinished(params, false)
                 return@safeSubmit
             }
@@ -96,7 +103,7 @@ internal class UploadSessionReplayDataJob : JobService() {
                 return@safeSubmit
             }
 
-            val headers = AuthHeaderBuilder.buildHeaders(storage, TAG)
+            val headers = AuthHeaderBuilder.buildHeaders(config, TAG)
 
             httpClient.makePostRequest(
                 url = url,
