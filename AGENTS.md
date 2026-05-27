@@ -17,7 +17,7 @@ This repo is the Splunk Android RUM SDK: a lightweight, multi-module Gradle/Kotl
 | --- | --- |
 | `agent/` | Main SDK entry point and stable public API |
 | `integration/` | Feature instrumentation; public when exposed through `:agent` |
-| `integration/{anr,applicationlifecycle,crash,customtracking,httpurlconnection-auto,interactions,navigation,networkmonitor,okhttp3-*,sessionreplay,slowrendering,startup,webview}/` | Instrumentation modules |
+| `integration/{anr,applicationlifecycle,crash,customtracking,httpurlconnection-auto,interactions,lifecycle,navigation,networkmonitor,okhttp3-*,sessionreplay,slowrendering,startup,webview}/` | Instrumentation modules |
 | `integration/agent/api/` | Public API interfaces |
 | `integration/agent/common/` | Shared agent implementation |
 | `integration/agent/internal/` | Internal agent implementation |
@@ -49,6 +49,7 @@ Use the narrowest module command that validates the change.
 - Deprecated APIs must continue to work and include migration guidance.
 - New features should be opt-in unless the user explicitly approves a default behavior change.
 - Do not add coroutine, threading, reactive, serialization, or utility dependencies to solve local implementation problems.
+- GitHub Actions must be pinned to commit SHAs, not mutable version tags.
 - When runtime state is invalid or optional components are absent, no-op or partially degrade when safe.
 - Exceptions are acceptable only for invalid developer usage at API boundaries with no safe fallback, tests/test utilities, or build-time tooling.
 
@@ -60,6 +61,7 @@ Review findings in this order. Lead with customer impact, not style.
 
 - Block or request measurement for avoidable overhead in customer apps at scale.
 - Watch hot paths: SDK init, lifecycle callbacks, UI instrumentation, ANR/crash handling, network interceptors, span/log/event creation, processors, exporters, and background work.
+- Flag any `throw`, `error`, `require`, forced unwrap, unchecked cast, or non-null assertion in SDK runtime paths when the state can predictably happen in production.
 - Flag repeated allocations, reflection, regex parsing, per-signal encoder/formatter creation, disk/network I/O, locks, O(n) scans over growing data, retained `Context`/`Activity`, and large retained objects.
 - Flag unbounded queues, retries, timers, listeners, observers, or background work that grows with sessions, spans, events, logs, screens, requests, or lifecycle churn.
 - Consider aggregate parent-app impact, not just local method cost. Ask for benchmarks, profiling, limits, or a safer design when cost is unclear.
@@ -86,9 +88,9 @@ Review findings in this order. Lead with customer impact, not style.
 
 ### P5 - Telemetry Correctness
 
-- Known fact: all signals, including logs and events, are converted to spans before upload.
-- Review log/event changes by their final span names, timestamps, attributes, parent context, session/screen data, sampling, and upload behavior.
-- Changes to processors, exporters, interceptors, global attributes, retry behavior, or required attributes can affect every signal type.
+- Most non-Session-Replay logs and events are converted into spans before upload; Session Replay logs are exported and uploaded as OTLP log payloads.
+- Review telemetry changes against their actual export path: final span data for span-backed signals, and log payload/body, scope, timestamps, attributes, session data, endpoint, buffering, and upload behavior for Session Replay.
+- Changes to processors, exporters, interceptors, global attributes, retry behavior, buffering, endpoints, or required attributes can affect multiple signal types.
 
 ### P6 - Test Value
 
@@ -107,7 +109,7 @@ Review findings in this order. Lead with customer impact, not style.
 Call these out as design choices when a PR relies on or changes them:
 
 1. The SDK runs inside customer apps and must not add substantial startup, main-thread, memory, battery, storage, or network overhead.
-2. Logs, events, and other signals become spans before upload; signal-specific assumptions must still be checked against final span output.
+2. Most logs/events become spans before upload, but Session Replay remains log-backed; signal-specific assumptions must be checked against the actual payload that is uploaded.
 3. SDK init, shutdown, and reconfiguration can race with Android lifecycle callbacks and instrumentation hooks.
 4. Network, storage, process lifetime, clocks, retries, and background execution are unreliable on mobile devices.
 5. Unenforced assumptions should be enforced, documented, tested, or handled with graceful fallback.
