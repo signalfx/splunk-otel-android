@@ -103,7 +103,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             return
         }
 
-        val sampledOut = moduleConfiguration.samplingRate < Math.random()
+        val sampledOut = moduleConfiguration.samplingRate <= Math.random()
 
         if (sampledOut) {
             Logger.d(TAG) {
