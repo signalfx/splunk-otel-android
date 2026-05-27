@@ -43,7 +43,7 @@ class GlobalAttributeSpanProcessor(private val globalAttributes: Attributes) : S
 
     override fun isEndRequired(): Boolean = false
 
-    companion object {
-        private const val INTERNAL_ATTRIBUTE_PREFIX = "splunk.agent.internal."
+    private companion object {
+        const val INTERNAL_ATTRIBUTE_PREFIX = "splunk.agent.internal."
     }
 }
