@@ -39,12 +39,14 @@ object Dependencies {
         private const val junitVersion = "4.13.2"
         private const val androidXTestCoreVersion = "1.6.1"
         private const val androidXTestJunitVersion = "1.2.1"
+        private const val androidXTestRunnerVersion = "1.6.2"
         private const val robolectricVersion = "4.13"
         private const val mockitoVersion = "5.4.0"
 
         const val junit = "junit:junit:$junitVersion"
         const val androidXTestCore = "androidx.test:core:$androidXTestCoreVersion"
         const val androidXTestJunit = "androidx.test.ext:junit:$androidXTestJunitVersion"
+        const val androidXTestRunner = "androidx.test:runner:$androidXTestRunnerVersion"
         const val robolectric = "org.robolectric:robolectric:$robolectricVersion"
         const val mockito = "org.mockito:mockito-core:$mockitoVersion"
     }
