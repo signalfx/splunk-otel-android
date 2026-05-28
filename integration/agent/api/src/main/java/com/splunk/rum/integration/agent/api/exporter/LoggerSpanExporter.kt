@@ -20,6 +20,8 @@ import com.splunk.android.common.logger.Logger
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.rum.common.otel.extensions.joinToString
 import io.opentelemetry.sdk.common.CompletableResultCode
+import io.opentelemetry.sdk.trace.data.EventData
+import io.opentelemetry.sdk.trace.data.LinkData
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.util.concurrent.atomic.AtomicBoolean
@@ -37,19 +39,55 @@ internal class LoggerSpanExporter : SpanExporter {
             val instrumentationScopeInfo = span.instrumentationScopeInfo
 
             Logger.i(TAG) {
-                "name=${span.name}, " +
-                    "traceId=${span.traceId}, " +
-                    "spanId=${span.spanId}, " +
-                    "parentSpanId=${span.parentSpanId}, " +
-                    "kind=${span.kind}, " +
-                    "resources=${span.resource.attributes.joinToString(", ", "[", "]")}, " +
-                    "attributes=${span.attributes.joinToString(", ", "[", "]")}, " +
-                    "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +
-                    "instrumentationScopeInfo.version=${instrumentationScopeInfo.version}"
+                buildString {
+                    append("name=${span.name}, ")
+                    append("traceId=${span.traceId}, ")
+                    append("spanId=${span.spanId}, ")
+                    append("parentSpanId=${span.parentSpanId}, ")
+                    append("kind=${span.kind}, ")
+                    append("startEpochNanos=${span.startEpochNanos}, ")
+                    append("endEpochNanos=${span.endEpochNanos}, ")
+                    append("durationNanos=${span.endEpochNanos - span.startEpochNanos}, ")
+                    append("status.code=${span.status.statusCode}, ")
+                    append("status.description=${span.status.description}, ")
+                    append("resources=${span.resource.attributes.joinToString(", ", "[", "]")}, ")
+                    append("attributes=${span.attributes.joinToString(", ", "[", "]")}, ")
+                    append("totalAttributeCount=${span.totalAttributeCount}, ")
+                    append("events=${formatEvents(span.events)}, ")
+                    append("totalRecordedEvents=${span.totalRecordedEvents}, ")
+                    append("links=${formatLinks(span.links)}, ")
+                    append("totalRecordedLinks=${span.totalRecordedLinks}, ")
+                    append("instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, ")
+                    append("instrumentationScopeInfo.version=${instrumentationScopeInfo.version}")
+                }
             }
         }
 
         return CompletableResultCode.ofSuccess()
+    }
+
+    private fun formatEvents(events: List<EventData>): String = buildString {
+        append("[")
+        events.forEachIndexed { index, event ->
+            append("{name=${event.name}")
+            append(", epochNanos=${event.epochNanos}")
+            append(", attributes=${event.attributes.joinToString(", ", "[", "]")}")
+            append("}")
+            if (index < events.size - 1) append(", ")
+        }
+        append("]")
+    }
+
+    private fun formatLinks(links: List<LinkData>): String = buildString {
+        append("[")
+        links.forEachIndexed { index, link ->
+            append("{traceId=${link.spanContext.traceId}")
+            append(", spanId=${link.spanContext.spanId}")
+            append(", attributes=${link.attributes.joinToString(", ", "[", "]")}")
+            append("}")
+            if (index < links.size - 1) append(", ")
+        }
+        append("]")
     }
 
     override fun flush(): CompletableResultCode = CompletableResultCode.ofSuccess()
