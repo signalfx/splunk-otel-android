@@ -185,7 +185,8 @@ class NavigationTrackingInstrumentedTest {
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, IgnoredTestFragment())
                 .addToBackStack(null)
-                .commitNow()
+                .commit()
+            activity.supportFragmentManager.executePendingTransactions()
         }
 
         waitForIdle()
@@ -232,7 +233,8 @@ class NavigationTrackingInstrumentedTest {
             activity.supportFragmentManager.beginTransaction()
                 .replace(NavigationTestActivity.CONTAINER_ID, IgnoredTestFragment())
                 .addToBackStack(null)
-                .commitNow()
+                .commit()
+            activity.supportFragmentManager.executePendingTransactions()
         }
 
         waitForIdle()
