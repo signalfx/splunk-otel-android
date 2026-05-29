@@ -88,9 +88,7 @@ jobs:
           disable-animations: true
           script: |
             ./gradlew connectedDebugAndroidTest || GRADLE_EXIT=$?
-            echo "=== Instrumented Test Results (API ${{ matrix.api-level }}) ==="
-            find . -path '*/androidTest-results/connected/debug/*' -name '*.xml' -exec sh -c 'for f; do m=$(echo "$f" | sed "s|./\(.*\)/build/.*|\1|"); t=$(grep -o "tests=\"[0-9]*\"" "$f" | head -1 | grep -o "[0-9]*"); fl=$(grep -o "failures=\"[0-9]*\"" "$f" | head -1 | grep -o "[0-9]*"); e=$(grep -o "errors=\"[0-9]*\"" "$f" | head -1 | grep -o "[0-9]*"); echo "  $m: $t tests, $fl failures, $e errors"; done' _ {} +
-            echo "============================================="
+            echo "" && echo "--- Test Summary (API ${{ matrix.api-level }}) ---" && find . -path '*/androidTest-results/connected/debug/*' -name '*.xml' -exec grep -l 'testsuite' {} \; | while read f; do m=$(echo "$f" | sed 's|./\(.*\)/build/.*|\1|'); t=$(grep -o 'tests="[0-9]*"' "$f" | head -1 | grep -o '[0-9]*'); fl=$(grep -o 'failures="[0-9]*"' "$f" | head -1 | grep -o '[0-9]*'); echo "  $m: $t tests, $fl failures"; done && echo ""
             # Kill crashpad_handler to prevent emulator shutdown hang
             # -f required: process name exceeds pkill's 15-char comm limit
             # [c] character class prevents pkill from matching its own shell process

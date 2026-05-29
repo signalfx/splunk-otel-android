@@ -45,12 +45,12 @@ import org.junit.runner.RunWith
 /**
  * Instrumented tests for automatic navigation tracking.
  *
- * These complement the Robolectric-based ScreenChangeDetectorTest by exercising
+ * These complement the Robolectric based ScreenChangeDetectorTest by exercising
  * the full fragment callback chain (FragmentLifecycleCallbacks → ScreenChangeDetector →
  * NavigationEventEmitter → log record) with real Android lifecycle callbacks and
  * real Handler.post() timing.
  *
- * Activity state is seeded via direct detector calls (not application-level callbacks)
+ * Activity state is seeded via direct detector calls instead of applicationlevel callbacks
  * to avoid callback leaking across tests through the shared Application instance.
  */
 @RunWith(AndroidJUnit4::class)
