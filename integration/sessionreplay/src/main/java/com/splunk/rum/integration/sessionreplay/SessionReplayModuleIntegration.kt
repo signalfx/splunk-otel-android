@@ -102,20 +102,40 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             return
         }
 
-        if (moduleConfiguration.samplingRate < Math.random()) {
+        val sampledOut = moduleConfiguration.samplingRate <= Math.random()
+
+        if (sampledOut) {
             Logger.d(TAG) {
                 "onSessionChange() - Session replay for session '$currentSessionId' is disabled due to sampling rate"
             }
 
-            SplunkSessionReplay.instance.stop()
+            if (runtimeState.isRecordingRequested && !runtimeState.isSessionDisabledBySampling) {
+                SessionReplay.instance.stop()
+            }
 
+            runtimeState.isSessionDisabledBySampling = true
             runtimeState.statusOverride = Status.NotRecording(
                 cause = Status.NotRecording.Cause.DISABLED_BY_SAMPLING
             )
-        } else if (runtimeState.pendingStart) {
-            SessionReplay.instance.start()
-        } else {
-            SessionReplay.instance.newDataChunk()
+
+            return
+        }
+
+        val wasSampledOut = runtimeState.isSessionDisabledBySampling
+        runtimeState.isSessionDisabledBySampling = false
+
+        if ((runtimeState.statusOverride as? Status.NotRecording)?.cause ==
+            Status.NotRecording.Cause.DISABLED_BY_SAMPLING
+        ) {
+            runtimeState.statusOverride = null
+        }
+
+        when {
+            wasSampledOut && runtimeState.isRecordingRequested ->
+                SessionReplay.instance.start()
+            runtimeState.isRecordingRequested ->
+                SessionReplay.instance.newDataChunk()
+            else -> Unit
         }
     }
 
@@ -190,6 +210,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
     internal data class RuntimeState(
         var moduleConfiguration: SessionReplayModuleConfiguration? = null,
         var statusOverride: Status? = null,
-        var pendingStart: Boolean = false
+        var isRecordingRequested: Boolean = false,
+        var isSessionDisabledBySampling: Boolean = false
     )
 }
