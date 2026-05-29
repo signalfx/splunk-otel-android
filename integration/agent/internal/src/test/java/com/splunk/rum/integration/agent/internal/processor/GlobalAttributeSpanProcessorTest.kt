@@ -25,7 +25,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
 
 class GlobalAttributeSpanProcessorTest {
 
@@ -39,7 +41,7 @@ class GlobalAttributeSpanProcessorTest {
 
         processor.onStart(Context.root(), span)
 
-        verify(span).setAllAttributes(attributes)
+        verify(span).setAttribute(AttributeKey.stringKey("app.version"), "1.0")
     }
 
     @Test
@@ -53,7 +55,8 @@ class GlobalAttributeSpanProcessorTest {
         val span = mock(ReadWriteSpan::class.java)
         processor.onStart(Context.root(), span)
 
-        verify(span).setAllAttributes(attributes)
+        verify(span).setAttribute(AttributeKey.stringKey("user.id"), "user-123")
+        verify(span).setAttribute(AttributeKey.stringKey("account.id"), "acct-456")
     }
 
     @Test
@@ -68,8 +71,7 @@ class GlobalAttributeSpanProcessorTest {
         val span = mock(ReadWriteSpan::class.java)
         processor.onStart(Context.root(), span)
 
-        val currentAttributes = attributes as Attributes
-        verify(span).setAllAttributes(currentAttributes)
+        verify(span).setAttribute(AttributeKey.stringKey("env"), "production")
     }
 
     @Test
@@ -89,8 +91,28 @@ class GlobalAttributeSpanProcessorTest {
         val span = mock(ReadWriteSpan::class.java)
         processor.onStart(Context.root(), span)
 
-        val currentAttributes = attributes as Attributes
-        verify(span).setAllAttributes(currentAttributes)
+        verify(span).setAttribute(AttributeKey.stringKey("keep"), "yes")
+        verify(span, never()).setAttribute(AttributeKey.stringKey("remove"), "gone")
+    }
+
+    @Test
+    fun `onStart skips internal global attributes`() {
+        val internalAttributeKey = AttributeKey.booleanKey("splunk.agent.internal.sessionReplay.hideWireframe")
+        val attributes = MutableAttributes(
+            Attributes.of(
+                AttributeKey.stringKey("app.version"),
+                "1.0",
+                internalAttributeKey,
+                true
+            )
+        )
+        val processor = GlobalAttributeSpanProcessor(attributes)
+        val span = mock(ReadWriteSpan::class.java)
+
+        processor.onStart(Context.root(), span)
+
+        verify(span).setAttribute(AttributeKey.stringKey("app.version"), "1.0")
+        verify(span, never()).setAttribute(internalAttributeKey, true)
     }
 
     @Test
@@ -101,7 +123,7 @@ class GlobalAttributeSpanProcessorTest {
 
         processor.onStart(Context.root(), span)
 
-        verify(span).setAllAttributes(attributes)
+        verifyNoInteractions(span)
     }
 
     @Test
