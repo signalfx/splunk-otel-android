@@ -1,0 +1,10 @@
+name: PR Title and Description Validation
+
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+
+jobs:
+  validate_title_and_description:
+    uses: signalfx/splunk-common-android/.github/workflows/pr_title_description_validation_template.yaml@develop
+    secrets: inherit
