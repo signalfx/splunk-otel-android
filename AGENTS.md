@@ -5,7 +5,7 @@ This repo is the Splunk Android RUM SDK: a lightweight, multi-module Gradle/Kotl
 ## Non-Negotiables
 
 - **No new dependencies** unless the user explicitly asks. Even dependencies listed in `buildSrc/src/main/kotlin/Dependencies.kt` need explicit approval because SDK size and consumer conflicts matter.
-- **Public API is stable.** Treat `agent/` and any `integration/` module exposed via `:agent` `api` dependencies as customer-facing.
+- **Public API is stable.** Treat `agent/`, any module exposed through `api(...)` dependencies, and customer-facing Gradle plugin surfaces under `instrumentation/buildtime/` as compatibility-sensitive.
 - **Do not change public API or default behavior without confirmation.** This includes signatures, defaults, visibility, constants, data classes, errors, side effects, deprecations, removals, and telemetry semantics.
 - **Maintain backward compatibility.** SDK consumers should be able to upgrade without source changes unless a breaking change is intentional, documented, and approved.
 - **SDK runtime paths must not crash host apps for predictable conditions.** Prefer graceful fallback plus internal diagnostics over `throw`, `error`, or `require` in production runtime paths.
@@ -19,10 +19,11 @@ This repo is the Splunk Android RUM SDK: a lightweight, multi-module Gradle/Kotl
 | `integration/` | Feature instrumentation; public when exposed through `:agent` |
 | `integration/{anr,applicationlifecycle,crash,customtracking,httpurlconnection-auto,interactions,lifecycle,navigation,networkmonitor,okhttp3-*,sessionreplay,slowrendering,startup,webview}/` | Instrumentation modules |
 | `integration/agent/api/` | Public API interfaces |
-| `integration/agent/common/` | Shared agent implementation |
+| `integration/agent/common/` | Transitive public API via `integration/agent/api`; compatibility-sensitive shared agent types |
 | `integration/agent/internal/` | Internal agent implementation |
-| `common/otel/`, `common/storage/`, `common/utils/` | Internal shared helpers |
-| `instrumentation/buildtime/` | Gradle plugins and build-time instrumentation |
+| `common/otel/` | Transitive public API via `integration/agent/api`; compatibility-sensitive OpenTelemetry helpers |
+| `common/storage/`, `common/utils/` | Internal shared helpers unless exposed through an `api(...)` dependency |
+| `instrumentation/buildtime/` | Customer-facing Gradle plugins and build-time instrumentation; plugin IDs, extensions, tasks, and defaults are public API |
 | `instrumentation/runtime/` | Runtime hooks used by instrumentation |
 | `buildSrc/src/main/kotlin/Dependencies.kt` | Allowed dependency catalog, not approval to use dependencies |
 | `app/` | Sample application |
@@ -69,6 +70,8 @@ Review findings in this order. Lead with customer impact, not style.
 ### P2 - Public API and Compatibility
 
 - Public API changes must be backward compatible unless the PR clearly states an intentional breaking change.
+- Treat transitive `api(...)` dependencies as public API, including public symbols in `common/otel/` and `integration/agent/common/` exposed by `integration/agent/api`.
+- Treat published Gradle plugin IDs, extensions such as `splunkRum`, DSL properties, task names, task behavior, and defaults as customer-facing API.
 - Surface removed/renamed symbols, changed signatures/defaults/visibility, new thrown exceptions, behavior changes, constants, schemas, exported data classes, and telemetry semantics.
 - For intentional client-visible changes, require compatibility rationale, migration guidance, `CHANGELOG.md`, and tests covering relevant old/new behavior.
 - If risk is unclear, raise concrete customer failures: compile breaks, changed telemetry, startup failure, disabled instrumentation, or unexpected runtime behavior.
