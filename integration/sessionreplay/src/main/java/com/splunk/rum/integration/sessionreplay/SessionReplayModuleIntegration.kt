@@ -39,7 +39,6 @@ import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
-import org.json.JSONObject
 
 internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
     defaultModuleConfiguration = SessionReplayModuleConfiguration()
@@ -137,15 +136,11 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             val instance = SplunkOpenTelemetrySdk.instance ?: return false
 
-            val segmentMetadata = JSONObject()
-                .put("startUnixMs", metadata.startUnixMs)
-                .put("endUnixMs", metadata.endUnixMs)
-                .put("source", metadata.platform)
-                .put("displayWireframe", shouldDisplayWireframe(globalAttributes))
-                .toString()
-
             val index = timeIndex.getAt(metadata.startUnixMs.toInstant()) ?: 1
             timeIndex.putAt((metadata.endUnixMs - 1).toInstant(), index + 1)
+
+            val metadataJson = metadata.toJSONObject()
+            metadataJson.put("displayWireframe", shouldDisplayWireframe(globalAttributes))
 
             val attributes = Attributes.of(
                 GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_REPLAY_DATA_EVENT_NAME,
@@ -153,7 +148,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                 RumConstants.SESSION_REPLAY_CHUNK_KEY, 1.0,
                 RumConstants.SESSION_REPLAY_EVENT_INDEX_KEY, index,
                 RumConstants.SESSION_REPLAY_OFFSET_KEY, index.toDouble(),
-                RumConstants.SESSION_REPLAY_SEGMENT_METADATA_KEY, segmentMetadata
+                RumConstants.SESSION_REPLAY_SEGMENT_METADATA_KEY, metadataJson.toString()
             )
 
             val sessionReplayDataBuilder = instance.sdkLoggerProvider
