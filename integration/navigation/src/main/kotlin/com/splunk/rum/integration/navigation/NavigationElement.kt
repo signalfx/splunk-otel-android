@@ -25,7 +25,4 @@ package com.splunk.rum.integration.navigation
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class NavigationElement(
-    val name: String,
-    val isIgnored: Boolean = false,
-)
+annotation class NavigationElement(val name: String, val isIgnored: Boolean = false)

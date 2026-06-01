@@ -18,7 +18,4 @@ package com.splunk.rum.integration.navigation.screen
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class RumScreenName(
-    val name: String,
-    val isIgnored: Boolean = false,
-)
+annotation class RumScreenName(val name: String, val isIgnored: Boolean = false)
