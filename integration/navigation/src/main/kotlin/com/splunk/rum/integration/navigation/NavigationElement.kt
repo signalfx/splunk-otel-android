@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.splunk.rum.integration.navigation
 
 /**
  * Annotation for Activity or Fragment to specify the screen name used in navigation events
  * and whether to ignore the element for automatic navigation tracking.
  *
- * <p>If both {@code @NavigationElement} and {@code @RumScreenName} are present, {@code @NavigationElement} takes precedence.
+ * If both [NavigationElement] and [com.splunk.rum.integration.navigation.screen.RumScreenName]
+ * are present, [NavigationElement] takes precedence.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface NavigationElement {
-
-    String name();
-
-    boolean isIgnored() default false;
-}
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class NavigationElement(
+    val name: String,
+    val isIgnored: Boolean = false,
+)
