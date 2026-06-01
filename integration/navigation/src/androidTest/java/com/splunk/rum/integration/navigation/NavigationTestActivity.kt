@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.navigation
 
 import android.os.Bundle
+import android.view.View
 import android.widget.FrameLayout
 import androidx.fragment.app.FragmentActivity
 
@@ -24,7 +25,7 @@ import androidx.fragment.app.FragmentActivity
 class NavigationTestActivity : FragmentActivity() {
 
     companion object {
-        const val CONTAINER_ID = 0x7f_0a_0001
+        val CONTAINER_ID = View.generateViewId()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
