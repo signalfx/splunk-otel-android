@@ -41,7 +41,7 @@ object AppDependencies {
 
             private const val uiVersion = "1.3.3"
             private const val materialVersion = "1.3.1"
-            private const val activityComposeVersion = "1.6.1"
+            private const val activityComposeVersion = "1.13.0"
             private const val navigationComposeVersion = "2.5.3"
 
             const val ui = "androidx.compose.ui:ui:$uiVersion"
