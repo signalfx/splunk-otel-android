@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
+import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
@@ -25,7 +26,14 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 class GlobalAttributeSpanProcessor(private val globalAttributes: Attributes) : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        span.setAllAttributes(globalAttributes)
+        globalAttributes.forEach { key, value ->
+            if (key.key.startsWith(INTERNAL_ATTRIBUTE_PREFIX)) {
+                return@forEach
+            }
+
+            @Suppress("UNCHECKED_CAST")
+            span.setAttribute(key as AttributeKey<Any>, value)
+        }
     }
 
     override fun isStartRequired(): Boolean = true
@@ -34,4 +42,8 @@ class GlobalAttributeSpanProcessor(private val globalAttributes: Attributes) : S
     }
 
     override fun isEndRequired(): Boolean = false
+
+    private companion object {
+        const val INTERNAL_ATTRIBUTE_PREFIX = "splunk.agent.internal."
+    }
 }

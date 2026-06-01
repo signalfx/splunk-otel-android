@@ -18,6 +18,8 @@ package com.splunk.rum.common.otel.extensions
 
 import io.opentelemetry.api.common.Attributes
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AttributesExtTest {
@@ -59,5 +61,16 @@ class AttributesExtTest {
         val result = attributes.joinToString()
 
         assertEquals("", result)
+    }
+
+    @Test
+    fun `containsAny should match exact attribute names`() {
+        val attributes = Attributes.builder()
+            .put("key1", "value1")
+            .put("key2", true)
+            .build()
+
+        assertTrue(attributes.containsAny("key1"))
+        assertFalse(attributes.containsAny("key"))
     }
 }
