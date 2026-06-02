@@ -24,6 +24,7 @@ import com.splunk.android.instrumentation.recording.core.api.Metadata
 import com.splunk.android.instrumentation.recording.core.api.SessionReplay
 import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.common.otel.extensions.containsAny
 import com.splunk.rum.common.otel.extensions.toInstant
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
@@ -38,12 +39,10 @@ import io.opentelemetry.android.instrumentation.InstallationContext
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
 import java.util.concurrent.TimeUnit
-import org.json.JSONObject
 
 internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplayModuleConfiguration>(
     defaultModuleConfiguration = SessionReplayModuleConfiguration()
 ) {
-
     private const val TAG = "SessionReplayIntegration"
 
     private val isRecordingForSessions: MutableSet<String> = mutableSetOf()
@@ -103,20 +102,40 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             return
         }
 
-        if (moduleConfiguration.samplingRate < Math.random()) {
+        val sampledOut = moduleConfiguration.samplingRate <= Math.random()
+
+        if (sampledOut) {
             Logger.d(TAG) {
                 "onSessionChange() - Session replay for session '$currentSessionId' is disabled due to sampling rate"
             }
 
-            SplunkSessionReplay.instance.stop()
+            if (runtimeState.isRecordingRequested && !runtimeState.isSessionDisabledBySampling) {
+                SessionReplay.instance.stop()
+            }
 
+            runtimeState.isSessionDisabledBySampling = true
             runtimeState.statusOverride = Status.NotRecording(
                 cause = Status.NotRecording.Cause.DISABLED_BY_SAMPLING
             )
-        } else if (runtimeState.pendingStart) {
-            SessionReplay.instance.start()
-        } else {
-            SessionReplay.instance.newDataChunk()
+
+            return
+        }
+
+        val wasSampledOut = runtimeState.isSessionDisabledBySampling
+        runtimeState.isSessionDisabledBySampling = false
+
+        if ((runtimeState.statusOverride as? Status.NotRecording)?.cause ==
+            Status.NotRecording.Cause.DISABLED_BY_SAMPLING
+        ) {
+            runtimeState.statusOverride = null
+        }
+
+        when {
+            wasSampledOut && runtimeState.isRecordingRequested ->
+                SessionReplay.instance.start()
+            runtimeState.isRecordingRequested ->
+                SessionReplay.instance.newDataChunk()
+            else -> Unit
         }
     }
 
@@ -137,13 +156,11 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             val instance = SplunkOpenTelemetrySdk.instance ?: return false
 
-            val segmentMetadata = JSONObject().put("startUnixMs", metadata.startUnixMs)
-                .put("endUnixMs", metadata.endUnixMs)
-                .put("source", metadata.platform)
-                .toString()
-
             val index = timeIndex.getAt(metadata.startUnixMs.toInstant()) ?: 1
             timeIndex.putAt((metadata.endUnixMs - 1).toInstant(), index + 1)
+
+            val metadataJson = metadata.toJSONObject()
+            metadataJson.put("displayWireframe", shouldDisplayWireframe(globalAttributes))
 
             val attributes = Attributes.of(
                 GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_REPLAY_DATA_EVENT_NAME,
@@ -151,7 +168,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                 RumConstants.SESSION_REPLAY_CHUNK_KEY, 1.0,
                 RumConstants.SESSION_REPLAY_EVENT_INDEX_KEY, index,
                 RumConstants.SESSION_REPLAY_OFFSET_KEY, index.toDouble(),
-                RumConstants.SESSION_REPLAY_SEGMENT_METADATA_KEY, segmentMetadata
+                RumConstants.SESSION_REPLAY_SEGMENT_METADATA_KEY, metadataJson.toString()
             )
 
             val sessionReplayDataBuilder = instance.sdkLoggerProvider
@@ -184,11 +201,16 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             return true
         }
+
+        private fun shouldDisplayWireframe(attributes: Attributes): Boolean = !attributes.containsAny(
+            "splunk.agent.internal.sessionReplay.hideWireframe"
+        )
     }
 
     internal data class RuntimeState(
         var moduleConfiguration: SessionReplayModuleConfiguration? = null,
         var statusOverride: Status? = null,
-        var pendingStart: Boolean = false
+        var isRecordingRequested: Boolean = false,
+        var isSessionDisabledBySampling: Boolean = false
     )
 }

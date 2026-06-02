@@ -20,6 +20,10 @@ ext {
 
 android {
     namespace = "com.splunk.rum.integration.navigation"
+
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 }
 
 dependencies {
@@ -43,4 +47,10 @@ dependencies {
     testImplementation(Dependencies.Test.mockito)
     testImplementation(Dependencies.Test.robolectric)
     testImplementation(Dependencies.Test.androidXTestCore)
+    testImplementation(Dependencies.Android.navigationRuntime)
+
+    androidTestImplementation(Dependencies.Test.junit)
+    androidTestImplementation(Dependencies.Test.androidXTestCore)
+    androidTestImplementation(Dependencies.Test.androidXTestJunit)
+    androidTestImplementation(Dependencies.Test.androidXTestRunner)
 }

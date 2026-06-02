@@ -37,14 +37,19 @@ internal object ScreenNameDescriptor {
 
     private fun isIgnored(element: Any): Boolean {
         if (element is DialogFragment) return true
-        // Ignore NavHostFragment by default (Jetpack Navigation container; not a user-facing screen).
-        if (element is Fragment && element.javaClass.name == NAV_HOST_FRAGMENT_CLASS_NAME) {
-            return true
-        }
+        if (element is Fragment && element.isNavHost()) return true
         return getNavigationElement(element)?.isIgnored ?: getRumScreenName(element)?.isIgnored ?: false
     }
 
-    private const val NAV_HOST_FRAGMENT_CLASS_NAME = "androidx.navigation.fragment.NavHostFragment"
+    private val navHostClass: Class<*>? by lazy {
+        try {
+            Class.forName("androidx.navigation.NavHost")
+        } catch (_: ClassNotFoundException) {
+            null
+        }
+    }
+
+    private fun Fragment.isNavHost(): Boolean = navHostClass?.isAssignableFrom(javaClass) ?: false
 
     private fun getRumScreenName(element: Any): RumScreenName? {
         val javaClass = element::class.java

@@ -1,21 +1,15 @@
----
-
-<p align="center">
-  <strong>
-    <a href="#getting-started">Getting Started</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="CONTRIBUTING.md">Getting Involved</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="SECURITY.md">Security</a>
-  </strong>
-</p>
+# Splunk OpenTelemetry Instrumentation for Android
 
 ![Stable][stable-image]
 [![Maven Central][maven-image]][maven-link]
 
----
+## Documentation
 
-# Splunk Android SDK
+- [Install the Splunk RUM Android Agent](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/install-the-splunk-rum-android-agent)
+- [Record Android Sessions](https://help.splunk.com/en/splunk-observability-cloud/monitor-end-user-experience/real-user-monitoring/replay-user-sessions/record-android-sessions)
+- [Troubleshoot Android Instrumentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/troubleshoot-android-instrumentation)
+
+# Overview
 
 The Splunk Android SDK provides comprehensive Real User Monitoring capabilities for Android applications.
 Built on OpenTelemetry, it features a modular architecture that allows you to include only the instrumentations and features that you need.
@@ -82,7 +76,7 @@ allprojects {
 
 Add the Splunk RUM agent library to your app module's `build.gradle` file dependencies:
 ```
-implementation("com.splunk:splunk-otel-android:2.3.0")
+implementation("com.splunk:splunk-otel-android:2.3.1")
 ```
 
 **Important:** Remove the following line from your dependencies if present, as the upstream OpenTelemetry Android repo is already linked in our SDK:
@@ -140,10 +134,49 @@ splunkRealm=<realm>
 splunkRumAccessToken=<a valid Splunk RUM access token for the realm>
 ```
 
+## Set property for custom ContextStorageProvider (optional)
+
+If your application registers a custom `ContextStorageProvider` via the
+`META-INF/services` SPI, set the JVM system property
+`io.opentelemetry.context.contextStorageProvider` to your provider's fully
+qualified class name **before** calling `SplunkRum.install()`, for example:
+
+```kotlin
+System.setProperty(
+    "io.opentelemetry.context.contextStorageProvider",
+    "com.example.MyContextStorageProvider"
+)
+SplunkRum.install(this, agentConfiguration)
+```
+
+This ensures the SDK preserves your custom provider.
+
+**Note:** By default, if this property is unset, `SplunkRum.install()` sets it to `"default"`.
+This forces OpenTelemetry to use its built-in `ThreadLocal` context storage and avoids the
+classpath/jar scanning that can cause `StrictMode.DiskReadViolation` on the main thread during
+app startup. For most apps that already use the default `ThreadLocal` storage, this behavior is transparent.
+
+The SDK sets this property only after `install()` clears its precondition checks; if the install is
+a no-op, the property remains unchanged.
+
+## ProGuard / R8
+
+The SDK ships [consumer ProGuard rules](https://developer.android.com/studio/build/shrink-code#consumer-rules)
+that are applied to your app's R8 build automatically — no setup required.
+
+The SDK suppresses the following R8 warnings for compile-time-only `AutoValue` annotations
+referenced by upstream OpenTelemetry:
+
+```pro
+-dontwarn com.google.auto.value.AutoValue
+-dontwarn com.google.auto.value.AutoValue$Builder
+-dontwarn com.google.auto.value.AutoValue$CopyAnnotations
+```
+
 ## Troubleshooting
 
 For troubleshooting issues with the Splunk OpenTelemetry instrumentation of Android, see
-[Troubleshoot Android instrumentation for Splunk Observability Cloud](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications/troubleshooting)
+[Troubleshoot Android instrumentation for Splunk Observability Cloud](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/troubleshoot-android-instrumentation)
 in the official documentation.
 
 # License

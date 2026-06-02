@@ -72,11 +72,10 @@ class SessionReplay internal constructor(private val runtimeState: SessionReplay
             return
         }
 
-        if ((runtimeState.statusOverride as? Status.NotRecording)?.cause ==
-            Status.NotRecording.Cause.DISABLED_BY_SAMPLING
-        ) {
+        runtimeState.isRecordingRequested = true
+
+        if (runtimeState.isSessionDisabledBySampling) {
             Logger.w(TAG, "start() - Session replay is disabled by sampling")
-            runtimeState.pendingStart = true
             return
         }
 
@@ -88,11 +87,10 @@ class SessionReplay internal constructor(private val runtimeState: SessionReplay
      * Stops recording of a user activity.
      */
     fun stop() {
-        if ((runtimeState.statusOverride as? Status.NotRecording)?.cause ==
-            Status.NotRecording.Cause.DISABLED_BY_SAMPLING
-        ) {
-            runtimeState.statusOverride = null
-            runtimeState.pendingStart = false
+        runtimeState.isRecordingRequested = false
+
+        if (runtimeState.isSessionDisabledBySampling) {
+            return
         }
 
         CommonSessionReplay.instance.stop()

@@ -19,6 +19,8 @@ package com.splunk.rum.integration.navigation.descriptor
 import android.app.Activity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
 import com.splunk.rum.integration.navigation.NavigationElement
 import com.splunk.rum.integration.navigation.screen.RumScreenName
 import org.junit.Assert.assertEquals
@@ -115,6 +117,12 @@ class ScreenNameDescriptorTest {
         assertTrue(ScreenNameDescriptor.isIgnored(dialog))
     }
 
+    @Test
+    fun `isIgnored returns true for custom NavHost implementation`() {
+        val fragment = CustomNavHostFragment()
+        assertTrue(ScreenNameDescriptor.isIgnored(fragment))
+    }
+
     @NavigationElement(name = "Menu")
     class MenuFragment : Fragment()
 
@@ -148,4 +156,11 @@ class ScreenNameDescriptorTest {
 
     @NavigationElement(name = "Confirmation")
     class AnnotatedDialogFragment : DialogFragment()
+
+    class CustomNavHostFragment :
+        Fragment(),
+        NavHost {
+        override val navController: NavController
+            get() = throw UnsupportedOperationException("stub for test")
+    }
 }

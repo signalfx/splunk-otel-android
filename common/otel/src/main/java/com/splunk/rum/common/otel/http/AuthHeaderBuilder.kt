@@ -18,7 +18,7 @@ package com.splunk.rum.common.otel.http
 
 import com.splunk.android.common.http.model.Header
 import com.splunk.android.common.logger.Logger
-import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.storage.StoredEndpointConfig
 
 /**
  * Utility object for building HTTP headers with authentication for telemetry uploads.
@@ -28,22 +28,21 @@ internal object AuthHeaderBuilder {
     /**
      * Builds a list of HTTP headers including authentication if a token is available.
      *
-     * @param storage The storage instance to read the rumAccessToken from
+     * @param config The endpoint configuration containing the token (from a single atomic read)
      * @param logTag The tag to use for logging (typically the class name)
      * @return A list of headers including Content-Type and X-SF-Token (if token available)
      */
-    fun buildHeaders(storage: IAgentStorage, logTag: String): List<Header> {
-        val token = storage.readRumAccessToken()
+    fun buildHeaders(config: StoredEndpointConfig, logTag: String): List<Header> {
         val headers = mutableListOf(Header("Content-Type", "application/x-protobuf"))
 
-        if (token != null) {
+        val token = config.rumAccessToken
+        if (!token.isNullOrEmpty()) {
             headers.add(Header("X-SF-Token", token))
             Logger.d(logTag, "Adding X-SF-Token header for authentication")
         } else {
             Logger.w(
                 logTag,
-                "No rumAccessToken found in storage. Request may fail authentication. " +
-                    "Ensure EndpointConfiguration was created with a valid token."
+                "No rumAccessToken in endpoint configuration. Request may fail authentication."
             )
         }
 
