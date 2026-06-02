@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Splunk Inc.
+ * Copyright 2025 Splunk Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.navigation
+package com.splunk.rum.integration.navigation.screen;
 
-/**
- * Annotation for Activity or Fragment to specify the screen name used in navigation events
- * and whether to ignore the element for automatic navigation tracking.
- *
- * If both [NavigationElement] and [com.splunk.rum.integration.navigation.screen.RumScreenName]
- * are present, [NavigationElement] takes precedence.
- */
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
-annotation class NavigationElement(val name: String, val isIgnored: Boolean = false)
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface RumScreenName {
+
+    String name();
+
+    boolean isIgnored() default false;
+}
