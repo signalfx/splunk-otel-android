@@ -46,9 +46,7 @@ class ConfigJacoco : Plugin<Project> by local plugin {
 
         sourceDirectories.setFrom(
             files(
-                "$projectDir/src/main/java",
                 "$projectDir/src/main/kotlin",
-                "$projectDir/src/debug/java",
                 "$projectDir/src/debug/kotlin"
             )
         )
