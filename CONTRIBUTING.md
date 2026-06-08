@@ -45,6 +45,14 @@ To contribute documentation for this project, open a pull request in the
 the [CONTRIBUTING.md](https://github.com/splunk/public-o11y-docs/blob/main/CONTRIBUTING.md)
 guide of the Splunk Observability Cloud documentation for more information.
 
+Instrumentation module README files are generated repository reference
+documentation under `integration/<module>/README.md`. When adding or changing
+instrumentation behavior, update the affected README using the [instrumentation
+README template](docs/instrumentation-readme-template.md) and [instrumentation
+README guidelines](docs/instrumentation-readme-guidelines.md).
+Codex users can use the
+[instrumentation README skill](.codex/skills/instrumentation-readme/SKILL.md).
+
 ## Contributing via Pull Requests
 
 Contributions via Pull Requests (PRs) are much appreciated. Before sending us a

@@ -19,6 +19,7 @@ package com.splunk.app
 import android.app.Application
 import android.os.Build
 import android.os.StrictMode
+import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.splunk.rum.integration.agent.api.AgentConfiguration
@@ -182,6 +183,8 @@ class App : Application() {
         val agent = SplunkRum.install(this, agentConfiguration, *moduleConfigurations)
 
         configureAndStartSessionReplay(agent.sessionReplay)
+
+        View.generateViewId()
     }
 
     private fun configureAndStartSessionReplay(sessionReplay: SessionReplay) {

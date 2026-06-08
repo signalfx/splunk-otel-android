@@ -72,6 +72,8 @@ For every PR touching runtime code, reviewers (including AI reviewers) must expl
 3. Is the fallback behavior backward compatible and non-breaking for host apps?
 4. Is there a test covering the degraded path?
 
+For instrumentation changes, reviewers must check that `integration/<module>/README.md` was updated from `docs/instrumentation-readme-template.md` and `docs/instrumentation-readme-guidelines.md` when behavior, API, setup, defaults, or telemetry changed.
+
 ---
 
 ## Project Overview
