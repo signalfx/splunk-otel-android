@@ -95,6 +95,17 @@ jobs:
             sleep 3
             pkill -f -SIGKILL '[c]rashpad_handler' || true
             exit ${GRADLE_EXIT:-0}
+      - name: Print test summary
+        if: always()
+        run: |
+          echo "--- Test Summary (API ${{ matrix.api-level }}) ---"
+          find . -path '*/androidTest-results/connected/debug/*' -name '*.xml' \
+            -exec grep -l 'testsuite' {} \; | while read -r f; do
+            module=$(echo "$f" | sed 's|./\(.*\)/build/.*|\1|')
+            tests=$(grep -o 'tests="[0-9]*"' "$f" | head -1 | grep -o '[0-9]*')
+            failures=$(grep -o 'failures="[0-9]*"' "$f" | head -1 | grep -o '[0-9]*')
+            echo "  $module: $tests tests, $failures failures"
+          done
   jacoco_test_coverage:
     runs-on: ubuntu-latest
     steps:
