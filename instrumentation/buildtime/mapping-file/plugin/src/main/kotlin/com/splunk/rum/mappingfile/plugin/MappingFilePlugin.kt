@@ -20,7 +20,6 @@ import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
 import com.android.build.api.variant.VariantOutputConfiguration
-import com.android.build.gradle.AppPlugin
 import com.splunk.rum.mappingfile.plugin.utils.SplunkLogger
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -40,7 +39,7 @@ class MappingFilePlugin : Plugin<Project> {
         extension = project.extensions.create("splunkRum", SplunkRumExtension::class.java)
         logger.debug("Setup", "Created splunkRum extension")
 
-        project.plugins.withType(AppPlugin::class.java) {
+        project.plugins.withId("com.android.application") {
             logger.debug("Setup", "Found Android application plugin")
 
             val androidComponents = project.extensions.getByType(
