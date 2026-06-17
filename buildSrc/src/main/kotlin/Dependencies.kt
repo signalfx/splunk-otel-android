@@ -13,6 +13,7 @@ object Dependencies {
     const val jacocoVersion = "0.8.14"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
+    const val gradleApi = "com.android.tools.build:gradle-api:$gradleVersion"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
     const val jacoco = "org.jacoco:org.jacoco.core:$jacocoVersion"
