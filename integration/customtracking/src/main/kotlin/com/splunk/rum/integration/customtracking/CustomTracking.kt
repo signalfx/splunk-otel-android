@@ -23,6 +23,7 @@ import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
+import io.opentelemetry.semconv.ExceptionAttributes
 import java.time.Instant
 
 class CustomTracking internal constructor() {
@@ -85,6 +86,35 @@ class CustomTracking internal constructor() {
             .startSpan()
             .recordException(throwable)
             .end(timestamp)
+    }
+
+    /**
+     * Add a custom error to RUM monitoring with an explicit stacktrace. This can be useful for
+     * tracking errors from runtimes that do not expose JVM [Throwable] instances.
+     *
+     * This event will be turned into a Span and sent to the RUM ingest along with other,
+     * auto-generated spans.
+     *
+     * @param type The error type.
+     * @param message The error message.
+     * @param stacktrace The error stacktrace, if available.
+     * @param attributes Any [Attributes] to associate with the event.
+     */
+    @JvmOverloads
+    fun trackError(type: String, message: String, stacktrace: String?, attributes: Attributes = Attributes.empty()) {
+        val tracer = getTracer() ?: return
+        val spanBuilder = tracer.spanBuilder(type)
+            .setAllAttributes(attributes)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_ERROR)
+            .setAttribute(GlobalRumConstants.ERROR_KEY, RumConstants.ERROR_TRUE_VALUE)
+            .setAttribute(ExceptionAttributes.EXCEPTION_TYPE, type)
+            .setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, message)
+
+        stacktrace?.let {
+            spanBuilder.setAttribute(ExceptionAttributes.EXCEPTION_STACKTRACE, it)
+        }
+
+        spanBuilder.createZeroLengthSpan()
     }
 
     /**
