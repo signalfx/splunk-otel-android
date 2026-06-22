@@ -88,6 +88,35 @@ class CustomTracking internal constructor() {
     }
 
     /**
+     * Add a custom error to RUM monitoring with an explicit stacktrace. This can be useful for
+     * tracking errors from runtimes that do not expose JVM [Throwable] instances.
+     *
+     * This event will be turned into a Span and sent to the RUM ingest along with other,
+     * auto-generated spans.
+     *
+     * @param type The error type.
+     * @param message The error message.
+     * @param stacktrace The error stacktrace, if available.
+     * @param attributes Any [Attributes] to associate with the event.
+     */
+    @JvmOverloads
+    fun trackError(type: String, message: String, stacktrace: String?, attributes: Attributes = Attributes.empty()) {
+        val tracer = getTracer() ?: return
+        val spanBuilder = tracer.spanBuilder(type)
+            .setAllAttributes(attributes)
+            .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_ERROR)
+            .setAttribute(GlobalRumConstants.ERROR_KEY, RumConstants.ERROR_TRUE_VALUE)
+            .setAttribute(GlobalRumConstants.EXCEPTION_TYPE_KEY, type)
+            .setAttribute(GlobalRumConstants.EXCEPTION_MESSAGE_KEY, message)
+
+        stacktrace?.let {
+            spanBuilder.setAttribute(GlobalRumConstants.EXCEPTION_STACKTRACE_KEY, it)
+        }
+
+        spanBuilder.createZeroLengthSpan()
+    }
+
+    /**
      * Retrieves the Tracer instance for the application.
      *
      * @return A Tracer instance if available, or null if the OpenTelemetry instance is null.

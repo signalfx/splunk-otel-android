@@ -75,6 +75,9 @@ object GlobalRumConstants {
      * Error attribute keys.
      */
     val ERROR_KEY: AttributeKey<String> = AttributeKey.stringKey("error")
+    val EXCEPTION_TYPE_KEY: AttributeKey<String> = AttributeKey.stringKey("exception.type")
+    val EXCEPTION_MESSAGE_KEY: AttributeKey<String> = AttributeKey.stringKey("exception.message")
+    val EXCEPTION_STACKTRACE_KEY: AttributeKey<String> = AttributeKey.stringKey("exception.stacktrace")
 
     /**
      * Network headers.
