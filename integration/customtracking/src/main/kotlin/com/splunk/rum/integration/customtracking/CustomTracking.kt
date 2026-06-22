@@ -23,7 +23,6 @@ import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
-import io.opentelemetry.semconv.ExceptionAttributes
 import java.time.Instant
 
 class CustomTracking internal constructor() {
@@ -107,11 +106,11 @@ class CustomTracking internal constructor() {
             .setAllAttributes(attributes)
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_ERROR)
             .setAttribute(GlobalRumConstants.ERROR_KEY, RumConstants.ERROR_TRUE_VALUE)
-            .setAttribute(ExceptionAttributes.EXCEPTION_TYPE, type)
-            .setAttribute(ExceptionAttributes.EXCEPTION_MESSAGE, message)
+            .setAttribute(GlobalRumConstants.EXCEPTION_TYPE_KEY, type)
+            .setAttribute(GlobalRumConstants.EXCEPTION_MESSAGE_KEY, message)
 
         stacktrace?.let {
-            spanBuilder.setAttribute(ExceptionAttributes.EXCEPTION_STACKTRACE, it)
+            spanBuilder.setAttribute(GlobalRumConstants.EXCEPTION_STACKTRACE_KEY, it)
         }
 
         spanBuilder.createZeroLengthSpan()
