@@ -27,7 +27,7 @@ gradlePlugin {
 
 dependencies {
     implementation(gradleApi())
-    implementation(Dependencies.gradle)
+    compileOnly(Dependencies.gradleApi)
 }
 
 configureGradlePluginSigning()
