@@ -11,7 +11,21 @@ import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningExtension
 import utils.defaultGroupId
 
-fun Project.createStandardJars() {
+/**
+ * Controls the JAR manifest [java.lang.Package.getImplementationVersion] value read at plugin runtime.
+ *
+ * - [OtelAndroidBom]: pinned OTel Android BOM version (e.g. HttpURLConnection agent on Maven Central).
+ * - [SplunkPublication]: this Gradle project's published version, including `-SNAPSHOT` when applicable
+ *   (e.g. Splunk-vendored OkHttp agent published alongside the plugin).
+ */
+enum class PluginImplementationVersion {
+    OtelAndroidBom,
+    SplunkPublication,
+}
+
+fun Project.createStandardJars(
+    implementationVersion: PluginImplementationVersion = PluginImplementationVersion.OtelAndroidBom,
+) {
     tasks.create("javadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
         from(tasks.named("javadoc"))
@@ -24,11 +38,26 @@ fun Project.createStandardJars() {
         })
     }
 
-    tasks.named<Jar>("jar") {
-        manifest {
-            attributes(
-                "Implementation-Version" to Dependencies.Otel.otelAndroidBomVersion
-            )
+    when (implementationVersion) {
+        PluginImplementationVersion.OtelAndroidBom -> {
+            tasks.named<Jar>("jar") {
+                manifest {
+                    attributes(
+                        "Implementation-Version" to Dependencies.Otel.otelAndroidBomVersion,
+                    )
+                }
+            }
+        }
+
+        PluginImplementationVersion.SplunkPublication -> {
+            // Root build.gradle appends -SNAPSHOT in afterEvaluate; read version after that runs.
+            afterEvaluate {
+                tasks.named<Jar>("jar") {
+                    manifest {
+                        attributes("Implementation-Version" to version.toString())
+                    }
+                }
+            }
         }
     }
 
