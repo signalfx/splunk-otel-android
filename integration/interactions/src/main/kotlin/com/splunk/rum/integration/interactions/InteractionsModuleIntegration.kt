@@ -35,6 +35,7 @@ import com.splunk.rum.integration.agent.internal.identification.ComposeElementId
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
+import com.splunk.rum.integration.interactions.api.InteractionCapture
 import io.opentelemetry.android.instrumentation.InstallationContext
 import java.util.concurrent.TimeUnit
 
@@ -47,6 +48,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
     override fun onAttach(context: Context) {
         val application = context.applicationContext as Application
 
+        InteractionCapture.createInstance()
         Interactions.attach(application)
         FrameCapturer.attach(application)
 
