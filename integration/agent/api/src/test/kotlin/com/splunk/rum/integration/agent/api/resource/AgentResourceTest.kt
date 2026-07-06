@@ -22,9 +22,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import io.opentelemetry.api.common.AttributeKey
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
@@ -46,5 +48,21 @@ class AgentResourceTest {
 
         val actualId = resource.getAttribute(AttributeKey.stringKey("app.installation.id"))
         assertEquals(testInstallationId, actualId)
+    }
+
+    @Test
+    fun `allResource emits deployment environment under semconv deployment_environment_name key`() {
+        val testInstallationId = "550e8400e29b41d4a716446655440000"
+        val testEnvironment = "production"
+        val mockAgentConfig = mock(AgentConfiguration::class.java)
+        `when`(mockAgentConfig.deploymentEnvironment).thenReturn(testEnvironment)
+
+        val resource = AgentResource.allResource(context, testInstallationId, mockAgentConfig)
+
+        assertEquals(
+            testEnvironment,
+            resource.getAttribute(AttributeKey.stringKey("deployment.environment.name"))
+        )
+        assertNull(resource.getAttribute(AttributeKey.stringKey("deployment.environment")))
     }
 }
