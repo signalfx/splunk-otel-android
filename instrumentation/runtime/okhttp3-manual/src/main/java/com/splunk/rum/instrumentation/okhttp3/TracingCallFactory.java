@@ -20,10 +20,7 @@ package com.splunk.rum.instrumentation.okhttp3;
 import androidx.annotation.Nullable;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
-import io.opentelemetry.instrumentation.api.util.VirtualField;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -33,27 +30,6 @@ import okio.Timeout;
 
 class TracingCallFactory implements Call.Factory {
 
-  private static final VirtualField<Request, Context> contextsByRequest =
-      VirtualField.find(Request.class, Context.class);
-
-  // We use old-school reflection here, rather than MethodHandles because Android doesn't support
-  // MethodHandles until API 26.
-  @Nullable private static Method timeoutMethod;
-  @Nullable private static Method cloneMethod;
-
-  static {
-    try {
-      timeoutMethod = Call.class.getMethod("timeout");
-    } catch (NoSuchMethodException e) {
-      timeoutMethod = null;
-    }
-    try {
-      cloneMethod = Call.class.getDeclaredMethod("clone");
-    } catch (NoSuchMethodException e) {
-      cloneMethod = null;
-    }
-  }
-
   private final OkHttpClient okHttpClient;
 
   TracingCallFactory(OkHttpClient okHttpClient) {
@@ -62,22 +38,27 @@ class TracingCallFactory implements Call.Factory {
 
   @Nullable
   static Context getCallingContextForRequest(Request request) {
-    return contextsByRequest.get(request);
+    return request.tag(Context.class);
   }
 
   @Override
   public Call newCall(Request request) {
     Context callingContext = Context.current();
-    Request requestCopy = request.newBuilder().build();
-    contextsByRequest.set(requestCopy, callingContext);
-    return new TracingCall(okHttpClient.newCall(requestCopy), callingContext);
+    Request requestWithContext = attachContextToRequest(request, callingContext);
+    return new TracingCall(okHttpClient, okHttpClient.newCall(requestWithContext), callingContext);
+  }
+
+  private static Request attachContextToRequest(Request request, Context context) {
+    return request.newBuilder().tag(Context.class, context).build();
   }
 
   static class TracingCall implements Call {
+    private final OkHttpClient okHttpClient;
     private final Call delegate;
     private final Context callingContext;
 
-    TracingCall(Call delegate, Context callingContext) {
+    TracingCall(OkHttpClient okHttpClient, Call delegate, Context callingContext) {
+      this.okHttpClient = okHttpClient;
       this.delegate = delegate;
       this.callingContext = callingContext;
     }
@@ -89,16 +70,10 @@ class TracingCallFactory implements Call.Factory {
 
     @Override
     public Call clone() {
-      if (cloneMethod == null) {
-        return new TracingCall(delegate.clone(), Context.current());
-      }
-      try {
-        // we pull the current context here, because the cloning might be happening in a different
-        // context than the original call creation.
-        return new TracingCall((Call) cloneMethod.invoke(delegate), Context.current());
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        return new TracingCall(delegate.clone(), Context.current());
-      }
+      // Cloning may happen under a different context than the original call creation.
+      Context currentContext = Context.current();
+      Request updatedRequest = attachContextToRequest(delegate.request(), currentContext);
+      return new TracingCall(okHttpClient, okHttpClient.newCall(updatedRequest), currentContext);
     }
 
     @Override
@@ -128,18 +103,9 @@ class TracingCallFactory implements Call.Factory {
       return delegate.request();
     }
 
-    // @Override method was introduced in 3.12
+    @Override
     public Timeout timeout() {
-      if (timeoutMethod == null) {
-        return Timeout.NONE;
-      }
-      try {
-        return (Timeout) timeoutMethod.invoke(delegate);
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        // do nothing...we're before 3.12, or something else has gone wrong that we can't do
-        // anything about.
-        return Timeout.NONE;
-      }
+      return delegate.timeout();
     }
 
     private static class TracingCallback implements Callback {

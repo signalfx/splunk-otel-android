@@ -14,17 +14,17 @@ import utils.defaultGroupId
 /**
  * Controls the JAR manifest [java.lang.Package.getImplementationVersion] value read at plugin runtime.
  *
- * - [OtelAndroidBom]: pinned OTel Android BOM version (e.g. HttpURLConnection agent on Maven Central).
- * - [SplunkPublication]: this Gradle project's published version, including `-SNAPSHOT` when applicable
+ * - [OTEL_ANDROID_BOM]: pinned OTel Android BOM version (e.g. HttpURLConnection agent on Maven Central).
+ * - [SPLUNK_PUBLICATION]: this Gradle project's published version, including `-SNAPSHOT` when applicable
  *   (e.g. Splunk-vendored OkHttp agent published alongside the plugin).
  */
 enum class PluginImplementationVersion {
-    OtelAndroidBom,
-    SplunkPublication,
+    OTEL_ANDROID_BOM,
+    SPLUNK_PUBLICATION,
 }
 
 fun Project.createStandardJars(
-    implementationVersion: PluginImplementationVersion = PluginImplementationVersion.OtelAndroidBom,
+    implementationVersion: PluginImplementationVersion = PluginImplementationVersion.OTEL_ANDROID_BOM,
 ) {
     tasks.create("javadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
@@ -39,7 +39,7 @@ fun Project.createStandardJars(
     }
 
     when (implementationVersion) {
-        PluginImplementationVersion.OtelAndroidBom -> {
+        PluginImplementationVersion.OTEL_ANDROID_BOM -> {
             tasks.named<Jar>("jar") {
                 manifest {
                     attributes(
@@ -49,7 +49,7 @@ fun Project.createStandardJars(
             }
         }
 
-        PluginImplementationVersion.SplunkPublication -> {
+        PluginImplementationVersion.SPLUNK_PUBLICATION -> {
             // Root build.gradle appends -SNAPSHOT in afterEvaluate; read version after that runs.
             afterEvaluate {
                 tasks.named<Jar>("jar") {

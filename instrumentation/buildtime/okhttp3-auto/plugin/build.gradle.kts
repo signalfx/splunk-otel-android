@@ -11,7 +11,7 @@ plugins {
 group = defaultGroupId
 version = Configurations.sdkVersionName
 
-createStandardJars(implementationVersion = PluginImplementationVersion.SplunkPublication)
+createStandardJars(implementationVersion = PluginImplementationVersion.SPLUNK_PUBLICATION)
 
 gradlePlugin {
     plugins {
