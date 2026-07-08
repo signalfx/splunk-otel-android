@@ -27,6 +27,7 @@ class OkHttp3InstrumentationPlugin : Plugin<Project> {
 
     companion object {
         private const val BYTE_BUDDY_GRADLE_PLUGIN_ID = "net.bytebuddy.byte-buddy-gradle-plugin"
+        private const val OKHTTP3_AGENT_DEPENDENCY = "com.splunk:rum-okhttp3-auto-agent"
     }
 
     private lateinit var project: Project
@@ -48,7 +49,7 @@ class OkHttp3InstrumentationPlugin : Plugin<Project> {
     private fun addDependenciesForOkhttp3NRTracing() {
         project.dependencies.add(
             "byteBuddy",
-            "io.opentelemetry.android.instrumentation:okhttp3-agent:$dependenciesVersion"
+            "$OKHTTP3_AGENT_DEPENDENCY:$dependenciesVersion"
         )
     }
 }

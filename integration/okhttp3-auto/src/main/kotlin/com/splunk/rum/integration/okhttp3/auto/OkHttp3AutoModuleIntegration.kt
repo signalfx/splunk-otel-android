@@ -18,14 +18,10 @@ package com.splunk.rum.integration.okhttp3.auto
 
 import android.content.Context
 import com.splunk.android.common.logger.Logger
+import com.splunk.rum.instrumentation.okhttp3.auto.OkHttpInstrumentation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.okhttp3.common.OkHttp3AdditionalAttributesExtractor
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
-import io.opentelemetry.instrumentation.library.okhttp.v3_0.OkHttpInstrumentation
-import okhttp3.Interceptor
-import okhttp3.Response
 
 internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModuleConfiguration>(
     defaultModuleConfiguration = OkHttp3AutoModuleConfiguration()
@@ -40,22 +36,18 @@ internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModu
     ) {
         Logger.d(TAG, "onInstall()")
 
-        // install OkHttp3 auto-instrumentation if it is enabled
         if (moduleConfiguration.isEnabled) {
+            // Installing OkHttp3 auto-instrumentation
             OkHttpInstrumentation().apply {
-                addAttributesExtractor(
-                    OkHttp3AdditionalAttributesExtractor() as AttributesExtractor<Interceptor.Chain, Response>
-                )
-
                 moduleConfiguration.capturedRequestHeaders
                     .takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedRequestHeaders(it) }
+                    ?.let { capturedRequestHeaders = it }
 
                 moduleConfiguration.capturedResponseHeaders
                     .takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedResponseHeaders(it) }
+                    ?.let { capturedResponseHeaders = it }
 
-                install(oTelInstallationContext)
+                install(oTelInstallationContext.openTelemetry)
             }
         }
     }
