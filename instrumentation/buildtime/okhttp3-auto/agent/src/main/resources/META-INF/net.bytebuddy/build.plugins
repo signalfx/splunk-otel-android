@@ -1,0 +1,2 @@
+com.splunk.rum.instrumentation.okhttp3.agent.OkHttpClientPlugin
+com.splunk.rum.instrumentation.okhttp3.agent.callback.OkHttpCallbackPlugin
