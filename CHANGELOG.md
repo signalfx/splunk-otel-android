@@ -11,7 +11,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ##### New features:
 * Added explicit-stack error tracking API for custom tracking
-* Added okhttp3 auto and manual instrumentation
 * Added interaction preferences
 
 ##### Enhancements:
