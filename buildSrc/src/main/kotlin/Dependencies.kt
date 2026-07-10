@@ -10,9 +10,10 @@ object Dependencies {
     private const val kotlinVersion = "1.8.0"
     private const val ktlintVersion = "1.7.1"
     private const val bytebuddyVersion = "1.18.8"
-    const val jacocoVersion = "0.8.14"
+    const val jacocoVersion = "0.8.15"
 
     const val gradle = "com.android.tools.build:gradle:$gradleVersion"
+    const val gradleApi = "com.android.tools.build:gradle-api:$gradleVersion"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     const val ktlint = "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
     const val jacoco = "org.jacoco:org.jacoco.core:$jacocoVersion"
@@ -96,14 +97,14 @@ object Dependencies {
         const val semConvIncubating = "io.opentelemetry.semconv:opentelemetry-semconv-incubating"
 
         const val instrumentationApi = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api"
-        const val instrumentationOkHttp3Library = "io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0"
+        const val instrumentationApiIncubator =
+            "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator"
 
         const val androidSession = "io.opentelemetry.android:session"
         const val androidServices = "io.opentelemetry.android:services"
         const val androidCommon = "io.opentelemetry.android:common"
         const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation"
         const val androidHttpUrlLibrary = "io.opentelemetry.android.instrumentation:httpurlconnection-library"
-        const val androidOkHttp3Library = "io.opentelemetry.android.instrumentation:okhttp3-library"
         const val androidNetworkMonitorInstrumentation = "io.opentelemetry.android.instrumentation:network"
         const val androidCrashInstrumentation = "io.opentelemetry.android.instrumentation:crash"
         const val androidANRInstrumentation = "io.opentelemetry.android.instrumentation:anr"
