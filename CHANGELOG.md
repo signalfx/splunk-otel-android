@@ -7,8 +7,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.3.2 - 2026-07-10
+
+##### New features:
+* Added explicit-stack error tracking API for custom tracking
+* Added interaction preferences
+
 ##### Enhancements:
-* Renamed the `deployment.environment` resource attribute to `deployment.environment.name`.
+* Renamed the `deployment.environment` resource attribute to `deployment.environment.name`
+* Remove unused dependency to eliminate vulnerable transitive dependencies on Jackson libraries
+
+##### Fixes:
 * Fixed warm and hot `AppStart` spans being skipped after the initial startup
 
 ### Version 2.3.0 - 2026-04-22
