@@ -14,7 +14,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added interaction preferences
 
 ##### Enhancements:
-* Removed unused OpenTelemetry dependency that pulled in Jackson
+* Remove unused dependency to eliminate vulnerable transitive dependencies on Jackson libraries
 
 ##### Fixes:
 * Fixed warm and hot `AppStart` spans being skipped after the initial startup
