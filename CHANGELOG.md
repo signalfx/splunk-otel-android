@@ -9,6 +9,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Version 2.3.2 - 2026-07-10
 
+##### New features:
+* Added explicit-stack error tracking API for custom tracking
+* Added okhttp3 auto and manual instrumentation
+* Added interaction preferences
+
+##### Enhancements:
+* Removed unused OpenTelemetry dependency that pulled in Jackson
+
 ##### Fixes:
 * Fixed warm and hot `AppStart` spans being skipped after the initial startup
 
