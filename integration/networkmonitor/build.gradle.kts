@@ -28,7 +28,9 @@ dependencies {
 
     implementation(project(":integration:agent:internal"))
 
-    implementation(Dependencies.Otel.androidNetworkMonitorInstrumentation)
+    implementation(Dependencies.Otel.androidNetworkMonitorInstrumentation) {
+        exclude(group = "io.opentelemetry", module = "opentelemetry-sdk-extension-incubator")
+    }
     implementation(Dependencies.Otel.androidServices)
     implementation(Dependencies.Otel.androidCommon)
 

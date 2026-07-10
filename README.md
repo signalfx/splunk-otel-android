@@ -173,6 +173,15 @@ referenced by upstream OpenTelemetry:
 -dontwarn com.google.auto.value.AutoValue$CopyAnnotations
 ```
 
+The SDK also suppresses missing-class warnings for optional Jackson types referenced by the
+upstream OTLP exporter JSON marshaler. Splunk export uses protobuf marshalers, so these classes are
+not required at runtime:
+
+```pro
+-dontwarn com.fasterxml.jackson.core.JsonFactory
+-dontwarn com.fasterxml.jackson.core.JsonGenerator
+```
+
 ## Troubleshooting
 
 For troubleshooting issues with the Splunk OpenTelemetry instrumentation of Android, see

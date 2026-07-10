@@ -20,6 +20,10 @@ ext {
 
 android {
     namespace = "com.splunk.rum.integration.startup"
+
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 }
 
 dependencies {
@@ -33,4 +37,9 @@ dependencies {
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
+
+    androidTestImplementation(Dependencies.Test.junit)
+    androidTestImplementation(Dependencies.Test.androidXTestCore)
+    androidTestImplementation(Dependencies.Test.androidXTestJunit)
+    androidTestImplementation(Dependencies.Test.androidXTestRunner)
 }
