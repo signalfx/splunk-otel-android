@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.3.2 - 2026-07-10
+
 ##### Fixes:
 * Fixed warm and hot `AppStart` spans being skipped after the initial startup
 
