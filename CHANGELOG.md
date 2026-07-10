@@ -7,7 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
-##### Fixes:
+##### Enhancements:
+* Renamed the `deployment.environment` resource attribute to `deployment.environment.name`.
 * Fixed warm and hot `AppStart` spans being skipped after the initial startup
 
 ### Version 2.3.0 - 2026-04-22
