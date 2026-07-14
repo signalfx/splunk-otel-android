@@ -1,0 +1,70 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.splunk.rum.instrumentation.okhttp3;
+
+import com.splunk.rum.instrumentation.okhttp3.common.internal.ConnectionErrorSpanInterceptor;
+import com.splunk.rum.instrumentation.okhttp3.common.internal.TracingInterceptor;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
+
+/** Entrypoint for instrumenting OkHttp clients. */
+public final class OkHttpTelemetry {
+  private final Instrumenter<Interceptor.Chain, Response> instrumenter;
+  private final ContextPropagators propagators;
+
+  /** Returns a new instance configured with the given {@link OpenTelemetry} instance. */
+  public static OkHttpTelemetry create(OpenTelemetry openTelemetry) {
+    return builder(openTelemetry).build();
+  }
+
+  /** Returns a builder configured with the given {@link OpenTelemetry} instance. */
+  public static OkHttpTelemetryBuilder builder(OpenTelemetry openTelemetry) {
+    return new OkHttpTelemetryBuilder(openTelemetry);
+  }
+
+  OkHttpTelemetry(
+      Instrumenter<Interceptor.Chain, Response> instrumenter, ContextPropagators propagators) {
+    this.instrumenter = instrumenter;
+    this.propagators = propagators;
+  }
+
+  /**
+   * Construct a new OpenTelemetry tracing-enabled {@link okhttp3.Call.Factory} using the provided
+   * {@link OkHttpClient} instance.
+   *
+   * <p>Using this method will result in proper propagation and span parenting, for both {@linkplain
+   * Call#execute() synchronous} and {@linkplain Call#enqueue(Callback) asynchronous} usages.
+   *
+   * @param baseClient An instance of OkHttpClient configured as desired.
+   * @return a {@link Call.Factory} for creating new {@link Call} instances.
+   */
+  public Call.Factory newCallFactory(OkHttpClient baseClient) {
+    OkHttpClient.Builder builder = baseClient.newBuilder();
+    // add our interceptors before other interceptors
+    builder.interceptors().add(0, new ContextInterceptor());
+    builder.interceptors().add(1, new ConnectionErrorSpanInterceptor(instrumenter));
+    builder.networkInterceptors().add(0, new TracingInterceptor(instrumenter, propagators));
+    OkHttpClient tracingClient = builder.build();
+    return new TracingCallFactory(tracingClient);
+  }
+}

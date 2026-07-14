@@ -15,6 +15,16 @@
       "enabled": false
     },
     {
+      "description": "Disable dependencies updates",
+      "matchPackageNames": [
+        "androidx.activity:activity-compose",
+        "androidx.activity:activity-ktx",
+        "androidx.annotation:annotation",
+        "androidx.compose.material:material"
+      ],
+      "enabled": false
+    },
+    {
       "description": "Quarterly updates for app/**",
       "matchPaths": ["app/**"],
       "extends": ["schedule:quarterly"]

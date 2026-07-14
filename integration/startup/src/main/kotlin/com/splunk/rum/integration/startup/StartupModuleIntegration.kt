@@ -110,11 +110,6 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
     private fun reportEvent(startTimestamp: Long, endTimestamp: Long, name: String) {
         synchronized(lock) {
-            if (isInitializationReported) {
-                Logger.d(TAG, "reportEvent() - skipping, already reported")
-                return
-            }
-
             if (!isInstallComplete) {
                 Logger.d(TAG) { "reportEvent() - install not complete, caching event: $name" }
                 cache += StartupData(startTimestamp, endTimestamp, name)
@@ -127,15 +122,6 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
     }
 
     private fun reportEventInternal(startTimestamp: Long, endTimestamp: Long, name: String) {
-        Logger.d(TAG) {
-            "reportEventInternal() - name: $name isInitializationReported: $isInitializationReported"
-        }
-
-        if (isInitializationReported) {
-            Logger.d(TAG, "reportEventInternal() - skipping, already reported")
-            return
-        }
-
         val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
         if (provider == null) {
             Logger.e(TAG, "reportEventInternal() - SDK not ready")
@@ -144,14 +130,23 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
         Logger.d(TAG) { "reportEventInternal() - SDK ready, creating span for: $name" }
 
-        isInitializationReported = true
+        val shouldReportInitialization = synchronized(lock) {
+            if (isInitializationReported) {
+                false
+            } else {
+                isInitializationReported = true
+                true
+            }
+        }
 
         val span = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
             .spanBuilder(RumConstants.APP_START_SPAN_NAME)
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
-        reportInitializeSpan(span, provider)
+        if (shouldReportInitialization) {
+            reportInitializeSpan(span, provider)
+        }
 
         // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
         // "unknown" to ensure App Start event doesn't show up under a screen on UI
