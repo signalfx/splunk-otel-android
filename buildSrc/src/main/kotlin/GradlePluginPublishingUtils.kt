@@ -12,20 +12,11 @@ import org.gradle.plugins.signing.SigningExtension
 import utils.defaultGroupId
 
 /**
- * Controls the JAR manifest [java.lang.Package.getImplementationVersion] value read at plugin runtime.
- *
- * - [OTEL_ANDROID_BOM]: pinned OTel Android BOM version (e.g. HttpURLConnection agent on Maven Central).
- * - [SPLUNK_PUBLICATION]: this Gradle project's published version, including `-SNAPSHOT` when applicable
- *   (e.g. Splunk-vendored OkHttp agent published alongside the plugin).
+ * Adds standard javadoc/sources jars and sets the main JAR manifest
+ * [java.lang.Package.getImplementationVersion] to this project's published SDK version,
+ * including `-SNAPSHOT` when applicable.
  */
-enum class PluginImplementationVersion {
-    OTEL_ANDROID_BOM,
-    SPLUNK_PUBLICATION,
-}
-
-fun Project.createStandardJars(
-    implementationVersion: PluginImplementationVersion = PluginImplementationVersion.OTEL_ANDROID_BOM,
-) {
+fun Project.createStandardJars() {
     tasks.create("javadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
         from(tasks.named("javadoc"))
@@ -38,25 +29,11 @@ fun Project.createStandardJars(
         })
     }
 
-    when (implementationVersion) {
-        PluginImplementationVersion.OTEL_ANDROID_BOM -> {
-            tasks.named<Jar>("jar") {
-                manifest {
-                    attributes(
-                        "Implementation-Version" to Dependencies.Otel.otelAndroidBomVersion,
-                    )
-                }
-            }
-        }
-
-        PluginImplementationVersion.SPLUNK_PUBLICATION -> {
-            // Root build.gradle appends -SNAPSHOT in afterEvaluate; read version after that runs.
-            afterEvaluate {
-                tasks.named<Jar>("jar") {
-                    manifest {
-                        attributes("Implementation-Version" to version.toString())
-                    }
-                }
+    // Root build.gradle appends -SNAPSHOT in afterEvaluate; read version after that runs.
+    afterEvaluate {
+        tasks.named<Jar>("jar") {
+            manifest {
+                attributes("Implementation-Version" to version.toString())
             }
         }
     }
