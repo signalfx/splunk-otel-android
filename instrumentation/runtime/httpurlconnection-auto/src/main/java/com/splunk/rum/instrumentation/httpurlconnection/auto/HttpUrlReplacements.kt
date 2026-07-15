@@ -72,18 +72,18 @@ object HttpUrlReplacements {
 
     @JvmStatic
     @Throws(IOException::class)
-    fun replacementForContent(connection: URLConnection): Any = replaceThrowable(connection, connection::getContent)
+    fun replacementForContent(connection: URLConnection): Any? = replaceThrowable(connection, connection::getContent)
 
     @JvmStatic
     @Throws(IOException::class)
-    fun replacementForContent(connection: URLConnection, classes: Array<Class<*>>): Any =
+    fun replacementForContent(connection: URLConnection, classes: Array<Class<*>>): Any? =
         replaceThrowable(connection) { connection.getContent(classes) }
 
     @JvmStatic
-    fun replacementForContentType(connection: URLConnection): String = replace(connection) { connection.contentType }
+    fun replacementForContentType(connection: URLConnection): String? = replace(connection) { connection.contentType }
 
     @JvmStatic
-    fun replacementForContentEncoding(connection: URLConnection): String =
+    fun replacementForContentEncoding(connection: URLConnection): String? =
         replace(connection) { connection.contentEncoding }
 
     @JvmStatic
@@ -104,11 +104,11 @@ object HttpUrlReplacements {
     fun replacementForLastModified(connection: URLConnection): Long = replace(connection) { connection.lastModified }
 
     @JvmStatic
-    fun replacementForHeaderField(connection: URLConnection, name: String): String =
+    fun replacementForHeaderField(connection: URLConnection, name: String): String? =
         replace(connection) { connection.getHeaderField(name) }
 
     @JvmStatic
-    fun replacementForHeaderFields(connection: URLConnection): Map<String, List<String>> =
+    fun replacementForHeaderFields(connection: URLConnection): Map<String, List<String>>? =
         replace(connection) { connection.headerFields }
 
     @JvmStatic
@@ -135,28 +135,28 @@ object HttpUrlReplacements {
     }
 
     @JvmStatic
-    fun replacementForHeaderFieldKey(connection: URLConnection, index: Int): String {
+    fun replacementForHeaderFieldKey(connection: URLConnection, index: Int): String? {
         // HttpURLConnection also overrides this and that is covered in
         // replacementForHttpHeaderFieldKey method.
         return replace(connection) { connection.getHeaderFieldKey(index) }
     }
 
     @JvmStatic
-    fun replacementForHttpHeaderFieldKey(connection: HttpURLConnection, index: Int): String {
+    fun replacementForHttpHeaderFieldKey(connection: HttpURLConnection, index: Int): String? {
         // URLConnection also overrides this and that is covered in replacementForHeaderFieldKey
         // method.
         return replace(connection) { connection.getHeaderFieldKey(index) }
     }
 
     @JvmStatic
-    fun replacementForHeaderField(connection: URLConnection, index: Int): String {
+    fun replacementForHeaderField(connection: URLConnection, index: Int): String? {
         // HttpURLConnection also overrides this and that is covered in
         // replacementForHttpHeaderField method.
         return replace(connection) { connection.getHeaderField(index) }
     }
 
     @JvmStatic
-    fun replacementForHttpHeaderField(connection: HttpURLConnection, index: Int): String {
+    fun replacementForHttpHeaderField(connection: HttpURLConnection, index: Int): String? {
         // URLConnection also overrides this and that is covered in replacementForHeaderField
         // method.
         return replace(connection) { connection.getHeaderField(index) }
@@ -171,7 +171,7 @@ object HttpUrlReplacements {
 
     @JvmStatic
     @Throws(IOException::class)
-    fun replacementForResponseMessage(connection: URLConnection): String {
+    fun replacementForResponseMessage(connection: URLConnection): String? {
         val httpURLConnection = connection as HttpURLConnection
         return replaceThrowable(connection, httpURLConnection::getResponseMessage)
     }
@@ -215,7 +215,7 @@ object HttpUrlReplacements {
         }
 
         return InstrumentedInputStream(connection, errorStream)
-    } /* no-op */
+    }
 
     private fun <T> replace(connection: URLConnection, resultProvider: () -> T): T {
         startTracingAtFirstConnection(connection)
