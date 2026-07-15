@@ -76,7 +76,7 @@ object HttpUrlReplacements {
 
     @JvmStatic
     @Throws(IOException::class)
-    fun replacementForContent(connection: URLConnection, classes: Array<Class<*>>): Any? =
+    fun replacementForContent(connection: URLConnection, classes: Array<Class<*>?>?): Any? =
         replaceThrowable(connection) { connection.getContent(classes) }
 
     @JvmStatic
@@ -104,7 +104,7 @@ object HttpUrlReplacements {
     fun replacementForLastModified(connection: URLConnection): Long = replace(connection) { connection.lastModified }
 
     @JvmStatic
-    fun replacementForHeaderField(connection: URLConnection, name: String): String? =
+    fun replacementForHeaderField(connection: URLConnection, name: String?): String? =
         replace(connection) { connection.getHeaderField(name) }
 
     @JvmStatic
@@ -112,23 +112,23 @@ object HttpUrlReplacements {
         replace(connection) { connection.headerFields }
 
     @JvmStatic
-    fun replacementForHeaderFieldInt(connection: URLConnection, name: String, default: Int): Int =
+    fun replacementForHeaderFieldInt(connection: URLConnection, name: String?, default: Int): Int =
         replace(connection) { connection.getHeaderFieldInt(name, default) }
 
     @JvmStatic
     @SuppressLint("NewApi") // Requires API 24 when invoked; minSdk < 24 host apps need core library desugaring.
-    fun replacementForHeaderFieldLong(connection: URLConnection, name: String, default: Long): Long =
+    fun replacementForHeaderFieldLong(connection: URLConnection, name: String?, default: Long): Long =
         replace(connection) { getHeaderFieldLong(connection, name, default) }
 
     @JvmStatic
-    fun replacementForHeaderFieldDate(connection: URLConnection, name: String, default: Long): Long {
+    fun replacementForHeaderFieldDate(connection: URLConnection, name: String?, default: Long): Long {
         // HttpURLConnection also overrides this and that is covered in
         // replacementForHttpHeaderFieldDate method.
         return replace(connection) { connection.getHeaderFieldDate(name, default) }
     }
 
     @JvmStatic
-    fun replacementForHttpHeaderFieldDate(connection: HttpURLConnection, name: String, default: Long): Long {
+    fun replacementForHttpHeaderFieldDate(connection: HttpURLConnection, name: String?, default: Long): Long {
         // URLConnection also overrides this and that is covered in replacementForHeaderFieldDate
         // method.
         return replace(connection) { connection.getHeaderFieldDate(name, default) }
@@ -332,7 +332,7 @@ object HttpUrlReplacements {
     private fun getContentLengthLong(connection: URLConnection): Long = connection.contentLengthLong
 
     @SuppressLint("NewApi")
-    private fun getHeaderFieldLong(connection: URLConnection, name: String, default: Long): Long =
+    private fun getHeaderFieldLong(connection: URLConnection, name: String?, default: Long): Long =
         connection.getHeaderFieldLong(name, default)
 
     internal fun reportIdleConnectionsOlderThan(timeInterval: Long) {
