@@ -102,10 +102,6 @@ internal class AndroidSpanExporter(
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {
 
-        override fun onAppStarted() {
-            isForeground = true
-        }
-
         override fun onAppForegrounded() {
             isForeground = true
         }

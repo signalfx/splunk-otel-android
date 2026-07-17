@@ -16,6 +16,7 @@ import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class SplunkSessionManagerTest {
@@ -136,6 +137,29 @@ class SplunkSessionManagerTest {
         assertNull(state.sessionId)
         assertNull(state.sessionValidUntil)
         assertNull(state.sessionValidUntilInBackground)
+    }
+
+    @Test
+    fun `install reuses existing valid session`() {
+        val now = System.currentTimeMillis()
+        val (storage, _) = storageMock(
+            sessionId = "existing-session",
+            sessionValidUntil = now + 60_000,
+            sessionValidUntilInBackground = now + 60_000,
+            sessionIds = listOf(SessionId("existing-session", now - 1_000))
+        )
+        val manager = SplunkSessionManager(storage)
+        var sessionChangedCount = 0
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                sessionChangedCount++
+            }
+        }
+
+        manager.install(RuntimeEnvironment.getApplication())
+
+        assertEquals("existing-session", manager.sessionId)
+        assertEquals(0, sessionChangedCount)
     }
 
     @Test

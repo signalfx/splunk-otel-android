@@ -79,8 +79,6 @@ internal object SplunkRumAgentCore {
 
         Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
 
-        sessionManager.reset()
-
         val storage = AgentStorage.attach(application)
 
         val appInstallationID = storage.readAppInstallationId() ?: UUID.randomUUID().toString().replace("-", "").also {
