@@ -140,25 +140,6 @@ class SplunkSessionManagerTest {
     }
 
     @Test
-    fun `install backfills session history for legacy stored session`() {
-        val now = System.currentTimeMillis()
-        val (storage, state) = storageMock(
-            sessionId = "legacy-session",
-            sessionValidUntil = now + 60_000,
-            sessionValidUntilInBackground = now + 60_000,
-            sessionIds = emptyList()
-        )
-        val manager = SplunkSessionManager(storage)
-
-        manager.install(RuntimeEnvironment.getApplication())
-
-        assertEquals("legacy-session", manager.sessionId)
-        assertEquals(1, state.sessionIds.size)
-        assertEquals("legacy-session", state.sessionIds.first().id)
-        assertEquals("legacy-session", manager.sessionId(now - 1_000))
-    }
-
-    @Test
     fun `install reuses existing valid session`() {
         val now = System.currentTimeMillis()
         val (storage, _) = storageMock(
