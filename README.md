@@ -76,7 +76,7 @@ allprojects {
 
 Add the Splunk RUM agent library to your app module's `build.gradle` file dependencies:
 ```
-implementation("com.splunk:splunk-otel-android:2.3.1")
+implementation("com.splunk:splunk-otel-android:2.3.2")
 ```
 
 **Important:** Remove the following line from your dependencies if present, as the upstream OpenTelemetry Android repo is already linked in our SDK:
@@ -171,6 +171,15 @@ referenced by upstream OpenTelemetry:
 -dontwarn com.google.auto.value.AutoValue
 -dontwarn com.google.auto.value.AutoValue$Builder
 -dontwarn com.google.auto.value.AutoValue$CopyAnnotations
+```
+
+The SDK also suppresses missing-class warnings for optional Jackson types referenced by the
+upstream OTLP exporter JSON marshaler. Splunk export uses protobuf marshalers, so these classes are
+not required at runtime:
+
+```pro
+-dontwarn com.fasterxml.jackson.core.JsonFactory
+-dontwarn com.fasterxml.jackson.core.JsonGenerator
 ```
 
 ## Troubleshooting

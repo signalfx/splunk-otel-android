@@ -24,20 +24,11 @@ android {
 
 dependencies {
     implementation(platform(Dependencies.Otel.androidBom))
-    implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":integration:agent:internal"))
-    implementation(project(":integration:okhttp3-common"))
+    implementation(project(":instrumentation:runtime:okhttp3-auto"))
 
-    implementation(Dependencies.Otel.androidOkHttp3Library)
-
-    implementation(Dependencies.Otel.instrumentationApi)
-
-    /**
-     * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.
-     */
-    implementation(Dependencies.okhttp)
-    implementation(Dependencies.okio)
+    implementation(Dependencies.Otel.androidInstrumentation)
 
     implementation(Dependencies.SessionReplay.commonLogger)
 }

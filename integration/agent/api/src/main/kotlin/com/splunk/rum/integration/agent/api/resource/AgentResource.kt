@@ -15,7 +15,7 @@ internal object AgentResource {
     private const val KEY_APP = "app"
     private const val KEY_APP_VERSION = "app.version"
     private const val KEY_APP_INSTALLATION_ID = "app.installation.id"
-    private const val KEY_DEPLOYMENT_ENVIRONMENT = "deployment.environment"
+    private const val KEY_DEPLOYMENT_ENVIRONMENT = "deployment.environment.name"
     private const val KEY_RUM_SDK_VERSION = "rum.sdk.version"
     private const val KEY_DEVICE_ID = "device.id"
     private const val KEY_DEVICE_MODEL_NAME = "device.model.name"
