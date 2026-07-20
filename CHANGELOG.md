@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+##### Fixes:
+* Fixed session inflation on background process cold starts: a valid persisted session is now reused across process restarts instead of a new session being created on every start.
+
 ### Version 2.3.2 - 2026-07-10
 
 ##### New features:
