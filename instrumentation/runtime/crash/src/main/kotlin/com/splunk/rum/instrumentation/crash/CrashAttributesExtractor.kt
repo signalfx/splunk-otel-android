@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Splunk Inc.
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +15,20 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.otel
+package com.splunk.rum.instrumentation.crash
 
-internal object RumConstants {
-    const val CRASH_INSTRUMENTATION_SCOPE_NAME = "com.splunk.rum.crash"
-    const val DEFAULT_LOG_EVENT_NAME = "splunk.log"
-    const val LOG_BODY_ATTRIBUTE = "body"
+import io.opentelemetry.api.common.AttributesBuilder
+
+/**
+ * Extracts additional attributes to attach to a crash event.
+ *
+ * Implementations must not throw; the crash reporter isolates failures, but extractors run while the
+ * process is already terminating, so they should be fast and allocation-light.
+ */
+fun interface CrashAttributesExtractor {
+
+    /**
+     * Adds attributes derived from [crashDetails] to [attributes].
+     */
+    fun extract(attributes: AttributesBuilder, crashDetails: CrashDetails)
 }
