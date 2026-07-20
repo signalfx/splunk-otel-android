@@ -141,7 +141,9 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
             sessionValidUntil > now
 
         if (isCurrentSessionIdValid) {
-            return requireNotNull(savedSessionId)
+            val id = requireNotNull(savedSessionId)
+            backfillSessionHistoryIfNeeded(id, requireNotNull(sessionValidUntil), now)
+            return id
         }
 
         deleteSessionInBackgroundValidationTime()
@@ -162,6 +164,17 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
     fun deleteSessionLastActivity() {
         agentStorage.deleteSessionLastActivity()
+    }
+
+    private fun backfillSessionHistoryIfNeeded(sessionId: String, sessionValidUntil: Long, now: Long) {
+        if (sessionIds.any { it.id == sessionId }) {
+            return
+        }
+
+        val validFrom =
+            agentStorage.readSessionLastActivity() ?: (sessionValidUntil - maxSessionLength).coerceAtMost(now)
+        sessionIds.add(SessionIdStorageData(sessionId, validFrom))
+        agentStorage.writeSessionIds(sessionIds)
     }
 
     private fun clearLastSession() {

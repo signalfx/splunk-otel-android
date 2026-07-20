@@ -104,6 +104,10 @@ internal class AndroidSpanExporter(
 
         override fun onAppForegrounded() {
             isForeground = true
+
+            if (agentStorage.readEndpointConfig() != null) {
+                flushBufferedSpanIds()
+            }
         }
 
         override fun onAppBackgrounded() {
