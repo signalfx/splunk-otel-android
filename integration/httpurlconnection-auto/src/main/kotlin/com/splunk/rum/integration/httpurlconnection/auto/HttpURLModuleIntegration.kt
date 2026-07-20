@@ -18,10 +18,10 @@ package com.splunk.rum.integration.httpurlconnection.auto
 
 import android.content.Context
 import com.splunk.android.common.logger.Logger
+import com.splunk.rum.instrumentation.httpurlconnection.auto.HttpUrlInstrumentation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.instrumentation.library.httpurlconnection.HttpUrlInstrumentation
 
 internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfiguration>(
     defaultModuleConfiguration = HttpURLModuleConfiguration()
@@ -43,13 +43,13 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
 
                 moduleConfiguration.capturedRequestHeaders
                     .takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedRequestHeaders(it) }
+                    ?.let { capturedRequestHeaders = it }
 
                 moduleConfiguration.capturedResponseHeaders
                     .takeIf { it.isNotEmpty() }
-                    ?.let { setCapturedResponseHeaders(it) }
+                    ?.let { capturedResponseHeaders = it }
 
-                install(oTelInstallationContext)
+                install(oTelInstallationContext.openTelemetry)
             }
         }
     }
