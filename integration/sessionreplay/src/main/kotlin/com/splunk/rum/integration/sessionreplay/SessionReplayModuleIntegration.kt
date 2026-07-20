@@ -80,10 +80,8 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
         isInstalled = true
 
-        if (isPendingSessionChange) {
-            isPendingSessionChange = false
-            processSessionChange()
-        }
+        isPendingSessionChange = false
+        processSessionChange()
     }
 
     override fun onSessionChange(sessionId: String) {
@@ -102,7 +100,10 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             return
         }
 
-        val sampledOut = moduleConfiguration.samplingRate <= Math.random()
+        val sessionId = currentSessionId ?: sessionManager.sessionId
+        currentSessionId = sessionId
+
+        val sampledOut = !SessionReplaySampler.shouldRecord(sessionId, moduleConfiguration.samplingRate)
 
         if (sampledOut) {
             Logger.d(TAG) {
