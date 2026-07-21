@@ -27,6 +27,7 @@ class HttpURLInstrumentationPlugin : Plugin<Project> {
 
     companion object {
         private const val BYTE_BUDDY_GRADLE_PLUGIN_ID = "net.bytebuddy.byte-buddy-gradle-plugin"
+        private const val HTTP_URL_CONNECTION_AGENT_DEPENDENCY = "com.splunk:rum-httpurlconnection-auto-agent"
     }
 
     private lateinit var project: Project
@@ -47,7 +48,7 @@ class HttpURLInstrumentationPlugin : Plugin<Project> {
     private fun addDependenciesForHttpURLNRTracing() {
         project.dependencies.add(
             "byteBuddy",
-            "io.opentelemetry.android.instrumentation:httpurlconnection-agent:$dependenciesVersion"
+            "$HTTP_URL_CONNECTION_AGENT_DEPENDENCY:$dependenciesVersion"
         )
     }
 }
