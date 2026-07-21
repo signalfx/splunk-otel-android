@@ -50,7 +50,6 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
     private var timeIndex: TimeIndex<Long> = TimeIndex()
 
     private var currentSessionId: String? = null
-    private var isPendingSessionChange = false
     private var isInstalled = false
     private val runtimeState = RuntimeState()
 
@@ -80,7 +79,6 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
         isInstalled = true
 
-        isPendingSessionChange = false
         processSessionChange()
     }
 
@@ -96,7 +94,6 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
     private fun processSessionChange() {
         if (!isInstalled) {
-            isPendingSessionChange = true
             return
         }
 
