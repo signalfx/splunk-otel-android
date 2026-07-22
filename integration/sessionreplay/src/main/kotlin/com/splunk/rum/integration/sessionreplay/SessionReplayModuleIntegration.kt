@@ -46,6 +46,8 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 ) {
     private const val TAG = "SessionReplayIntegration"
 
+    private const val SESSION_SAMPLER_DOMAIN = "sessionReplay"
+
     private val isRecordingForSessions: MutableSet<String> = mutableSetOf()
 
     private var timeIndex: TimeIndex<Long> = TimeIndex()
@@ -101,7 +103,12 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         val sessionId = currentSessionId ?: sessionManager.sessionId
         currentSessionId = sessionId
 
-        val sampledOut = !SessionSampler.shouldSample(moduleConfiguration.samplingRate.toDouble()) { sessionId }
+        val sampledOut = !SessionSampler.shouldSample(
+            moduleConfiguration.samplingRate.toDouble(),
+            SESSION_SAMPLER_DOMAIN
+        ) {
+            sessionId
+        }
 
         if (sampledOut) {
             Logger.d(TAG) {

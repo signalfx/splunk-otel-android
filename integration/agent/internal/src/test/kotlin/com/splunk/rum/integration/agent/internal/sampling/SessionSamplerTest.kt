@@ -58,8 +58,8 @@ class SessionSamplerTest {
     fun `session id is not resolved for trivial rates`() {
         val boom: () -> String = { error("session id must not be resolved for 0.0 or 1.0 rates") }
 
-        assertFalse(SessionSampler.shouldSample(0.0, boom))
-        assertTrue(SessionSampler.shouldSample(1.0, boom))
+        assertFalse(SessionSampler.shouldSample(0.0, sessionId = boom))
+        assertTrue(SessionSampler.shouldSample(1.0, sessionId = boom))
     }
 
     @Test
@@ -81,6 +81,60 @@ class SessionSamplerTest {
 
         val sampledIn = (0 until total).count {
             SessionSampler.shouldSample(rate) { randomSessionId() }
+        }
+
+        val observed = sampledIn.toDouble() / total
+        assertTrue("observed=$observed, expected~$rate", abs(observed - rate) < 0.02)
+    }
+
+    @Test
+    fun `default domain matches empty domain`() {
+        repeat(1000) {
+            val sessionId = randomSessionId()
+            assertEquals(
+                SessionSampler.shouldSample(0.3) { sessionId },
+                SessionSampler.shouldSample(0.3, "") { sessionId }
+            )
+        }
+    }
+
+    @Test
+    fun `decision is stable for the same session id and domain`() {
+        repeat(1000) {
+            val sessionId = randomSessionId()
+            val first = SessionSampler.shouldSample(0.2, "sessionReplay") { sessionId }
+            val second = SessionSampler.shouldSample(0.2, "sessionReplay") { sessionId }
+            assertEquals(first, second)
+        }
+    }
+
+    @Test
+    fun `different domains are not fully nested for the same session and rate`() {
+        val total = 5_000
+        val rate = 0.5
+        var sameDecisionCount = 0
+
+        repeat(total) {
+            val sessionId = randomSessionId()
+            val default = SessionSampler.shouldSample(rate) { sessionId }
+            val replay = SessionSampler.shouldSample(rate, "sessionReplay") { sessionId }
+            if (default == replay) sameDecisionCount++
+        }
+
+        val observedAgreement = sameDecisionCount.toDouble() / total
+        assertTrue(
+            "observedAgreement=$observedAgreement should not be nearly fully correlated",
+            observedAgreement < 0.7
+        )
+    }
+
+    @Test
+    fun `sampled proportion is close to the configured rate for a non-default domain`() {
+        val rate = 0.2
+        val total = 100_000
+
+        val sampledIn = (0 until total).count {
+            SessionSampler.shouldSample(rate, "sessionReplay") { randomSessionId() }
         }
 
         val observed = sampledIn.toDouble() / total

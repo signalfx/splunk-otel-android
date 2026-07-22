@@ -41,6 +41,8 @@ interface ISplunkSessionManager {
     fun trackSessionActivity()
     fun reset()
     fun sessionId(timestamp: Long): String
+    fun attachLifecycleObserver(context: Context)
+    fun resolveSessionIdForSampling(): String
 }
 
 object NoOpSplunkSessionManager : ISplunkSessionManager {
@@ -55,6 +57,8 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
     override fun reset() = Unit
 
     override fun sessionId(timestamp: Long): String = ""
+    override fun attachLifecycleObserver(context: Context) = Unit
+    override fun resolveSessionIdForSampling(): String = ""
 }
 
 class SplunkSessionManager internal constructor(private val agentStorage: IAgentStorage) : ISplunkSessionManager {
@@ -62,6 +66,8 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     private val appStateObserver = AppStateObserver()
 
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
+    private var lifecycleObserverAttached = false
+    private var deferredSessionChange: Pair<String, Long>? = null
 
     private val sessionIds: MutableList<SessionIdStorageData> by lazy {
         agentStorage.readSessionIds().toMutableList()
@@ -69,7 +75,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
     override val sessionSnapshot: SessionSnapshot
         @Synchronized get() {
-            val id = createNewSessionIfNeeded()
+            val id = createNewSessionIfNeeded(notify = true)
             val start = sessionIds.lastOrNull { it.id == id }?.validFrom ?: System.currentTimeMillis()
             val lastActivity = agentStorage.readSessionLastActivity() ?: start
             return SessionSnapshot(id, start, lastActivity)
@@ -80,7 +86,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
      */
     @set:Synchronized
     override var sessionId: String
-        get() = createNewSessionIfNeeded()
+        get() = createNewSessionIfNeeded(notify = true)
         private set(value) {
             previousSessionId = agentStorage.readSessionId()
             agentStorage.writeSessionId(value)
@@ -104,11 +110,24 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     private var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
 
     override fun install(context: Context) {
-        createNewSessionIfNeeded()
+        createNewSessionIfNeeded(notify = true)
+        flushDeferredSessionChange()
+        attachLifecycleObserver(context)
+    }
+
+    @Synchronized
+    override fun attachLifecycleObserver(context: Context) {
+        if (lifecycleObserverAttached) {
+            return
+        }
+
+        lifecycleObserverAttached = true
 
         appStateObserver.listener = AppStateObserverListener()
         appStateObserver.attach(context.applicationContext as Application)
     }
+
+    override fun resolveSessionIdForSampling(): String = createNewSessionIfNeeded(notify = false)
 
     override fun reset() {
         clearLastSession()
@@ -121,7 +140,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         ?: throw IllegalArgumentException("No valid session for timestamp: $timestamp")
 
     @Synchronized
-    private fun createNewSessionIfNeeded(): String {
+    private fun createNewSessionIfNeeded(notify: Boolean): String {
         val savedSessionId = agentStorage.readSessionId()
         val sessionValidInBackgroundUntil = agentStorage.readSessionValidUntilInBackground()
         val sessionValidUntil = agentStorage.readSessionValidUntil()
@@ -152,8 +171,20 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         sessionId = newSessionId
         sessionIds.add(SessionIdStorageData(newSessionId, now))
         agentStorage.writeSessionIds(sessionIds)
-        sessionListeners.forEachFast { it.onSessionChanged(newSessionId, now) }
+
+        if (notify) {
+            sessionListeners.forEachFast { it.onSessionChanged(newSessionId, now) }
+        } else {
+            deferredSessionChange = newSessionId to now
+        }
         return newSessionId
+    }
+
+    @Synchronized
+    private fun flushDeferredSessionChange() {
+        val (id, timestamp) = deferredSessionChange ?: return
+        deferredSessionChange = null
+        sessionListeners.forEachFast { it.onSessionChanged(id, timestamp) }
     }
 
     override fun trackSessionActivity() {
@@ -181,7 +212,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
             deleteSessionInBackgroundValidationTime()
             deleteSessionValidationTime()
 
-            createNewSessionIfNeeded()
+            createNewSessionIfNeeded(notify = true)
         }
     }
 

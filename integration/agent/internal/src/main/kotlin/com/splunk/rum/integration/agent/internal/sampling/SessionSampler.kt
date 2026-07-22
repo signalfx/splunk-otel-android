@@ -27,11 +27,11 @@ object SessionSampler {
      * Returns whether the session identified by [sessionId] should be sampled in for the given
      * [samplingRate] (clamped to `0.0..1.0`).
      */
-    fun shouldSample(samplingRate: Double, sessionId: () -> String): Boolean =
+    fun shouldSample(samplingRate: Double, domain: String = "", sessionId: () -> String): Boolean =
         when (val rate = samplingRate.coerceIn(0.0, 1.0)) {
             0.0 -> false
             1.0 -> true
-            else -> sessionIdToUInt32(sessionId()) < (rate * UINT32_MAX).toLong()
+            else -> (sessionIdToUInt32(sessionId()) xor domainSalt(domain)) < (rate * UINT32_MAX).toLong()
         }
 
     private fun sessionIdToUInt32(sessionId: String): Long {
@@ -46,4 +46,7 @@ object SessionSampler {
 
         return accumulator and UINT32_MAX
     }
+
+    private fun domainSalt(domain: String): Long =
+        if (domain.isEmpty()) 0L else domain.hashCode().toLong() and UINT32_MAX
 }

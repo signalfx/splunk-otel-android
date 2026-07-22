@@ -163,6 +163,73 @@ class SplunkSessionManagerTest {
     }
 
     @Test
+    fun `resolveSessionIdForSampling creates and persists a session without notifying listeners`() {
+        val (storage, state) = storageMock()
+        val manager = SplunkSessionManager(storage)
+        var sessionChangedCount = 0
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                sessionChangedCount++
+            }
+        }
+
+        val resolvedId = manager.resolveSessionIdForSampling()
+
+        assertNotNull(resolvedId)
+        assertEquals(resolvedId, state.sessionId)
+        assertEquals("listener must not fire until the notification is flushed", 0, sessionChangedCount)
+    }
+
+    @Test
+    fun `install flushes a notification deferred by resolveSessionIdForSampling`() {
+        val (storage, _) = storageMock()
+        val manager = SplunkSessionManager(storage)
+
+        val resolvedId = manager.resolveSessionIdForSampling()
+
+        var notifiedSessionId: String? = null
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                notifiedSessionId = sessionId
+            }
+        }
+
+        manager.install(RuntimeEnvironment.getApplication())
+
+        assertEquals(resolvedId, notifiedSessionId)
+    }
+
+    @Test
+    fun `install does not re-flush a notification once delivered`() {
+        val (storage, _) = storageMock()
+        val manager = SplunkSessionManager(storage)
+        manager.resolveSessionIdForSampling()
+
+        var sessionChangedCount = 0
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                sessionChangedCount++
+            }
+        }
+
+        manager.install(RuntimeEnvironment.getApplication())
+        manager.install(RuntimeEnvironment.getApplication())
+
+        assertEquals(1, sessionChangedCount)
+    }
+
+    @Test
+    fun `attachLifecycleObserver can be called before and is safe to call again from install`() {
+        val (storage, _) = storageMock()
+        val manager = SplunkSessionManager(storage)
+
+        // Should not throw when called multiple times across the sampling and install paths.
+        manager.attachLifecycleObserver(RuntimeEnvironment.getApplication())
+        manager.resolveSessionIdForSampling()
+        manager.install(RuntimeEnvironment.getApplication())
+    }
+
+    @Test
     fun `sessionId returns correct id for timestamp`() {
         val storage = storageMock(
             sessionIds = listOf(

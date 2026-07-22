@@ -65,8 +65,10 @@ internal object SplunkRumAgentCore {
         globalAttributes: MutableAttributes,
         offlineOtelDataProcessor: OfflineOtelDataProcessor
     ): OpenTelemetry {
+        sessionManager.attachLifecycleObserver(application)
+
         val shouldBeRunning = SessionSampler.shouldSample(agentConfiguration.session.samplingRate) {
-            sessionManager.sessionId
+            sessionManager.resolveSessionIdForSampling()
         }
 
         if (!shouldBeRunning) return OpenTelemetry.noop()

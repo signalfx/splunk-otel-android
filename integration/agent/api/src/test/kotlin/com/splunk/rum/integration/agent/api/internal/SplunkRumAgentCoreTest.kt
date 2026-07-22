@@ -40,6 +40,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
 @RunWith(AndroidJUnit4::class)
@@ -168,6 +169,7 @@ class SplunkRumAgentCoreTest {
     fun `install sampling decision is deterministic and stable across restarts for a reused session`() {
         val sessionId = "abcdef0123456789abcdef0123456789"
         `when`(mockSessionManager.sessionId).thenReturn(sessionId)
+        `when`(mockSessionManager.resolveSessionIdForSampling()).thenReturn(sessionId)
         `when`(mockAgentConfig.session.samplingRate).thenReturn(0.5)
 
         val expected = SessionSampler.shouldSample(0.5) { sessionId }
@@ -184,6 +186,25 @@ class SplunkRumAgentCoreTest {
 
         assertEquals("Decision must match the deterministic sampler", expected, firstDecision)
         assertEquals("Decision must be stable across restarts for the same session", firstDecision, secondDecision)
+    }
+
+    @Test
+    fun `install attaches the session lifecycle observer even when sampled out`() {
+        `when`(mockAgentConfig.session.samplingRate).thenReturn(0.0)
+
+        installSplunkRumAgent()
+
+        verify(mockSessionManager).attachLifecycleObserver(application)
+    }
+
+    @Test
+    fun `install resolves the sampling session id without notifying listeners directly`() {
+        `when`(mockAgentConfig.session.samplingRate).thenReturn(0.5)
+        `when`(mockSessionManager.resolveSessionIdForSampling()).thenReturn("abcdef0123456789abcdef0123456789")
+
+        installSplunkRumAgent()
+
+        verify(mockSessionManager).resolveSessionIdForSampling()
     }
 
     @Test
