@@ -14,34 +14,36 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.integration.sessionreplay
+package com.splunk.rum.integration.agent.internal.sampling
 
 /**
  * Deterministic, session-stable sampling decision.
- *
- * The decision is derived purely from the session id, so the same session always yields the same
- * result. This keeps the decision consistent across process restarts for a reused session, instead
- * of being re-rolled on every cold start.
  */
-internal object SessionReplaySampler {
+object SessionSampler {
 
     private const val UINT32_MAX = 0xFFFFFFFFL
 
-    fun shouldRecord(sessionId: String, samplingRate: Float): Boolean =
-        when (val rate = samplingRate.coerceIn(0f, 1f)) {
-            0f -> false
-            1f -> true
-            else -> sessionIdToUInt32(sessionId) < (rate * UINT32_MAX).toLong()
+    /**
+     * Returns whether the session identified by [sessionId] should be sampled in for the given
+     * [samplingRate] (clamped to `0.0..1.0`).
+     */
+    fun shouldSample(samplingRate: Double, sessionId: () -> String): Boolean =
+        when (val rate = samplingRate.coerceIn(0.0, 1.0)) {
+            0.0 -> false
+            1.0 -> true
+            else -> sessionIdToUInt32(sessionId()) < (rate * UINT32_MAX).toLong()
         }
 
     private fun sessionIdToUInt32(sessionId: String): Long {
         var accumulator = 0L
         var index = 0
+
         while (index < sessionId.length) {
             val end = minOf(index + 8, sessionId.length)
             accumulator = accumulator xor (sessionId.substring(index, end).toLongOrNull(16) ?: 0L)
             index += 8
         }
+
         return accumulator and UINT32_MAX
     }
 }

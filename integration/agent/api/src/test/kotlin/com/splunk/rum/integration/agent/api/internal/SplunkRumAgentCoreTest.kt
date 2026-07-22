@@ -26,6 +26,7 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.sampling.SessionSampler
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import java.io.File
@@ -164,6 +165,28 @@ class SplunkRumAgentCoreTest {
     }
 
     @Test
+    fun `install sampling decision is deterministic and stable across restarts for a reused session`() {
+        val sessionId = "abcdef0123456789abcdef0123456789"
+        `when`(mockSessionManager.sessionId).thenReturn(sessionId)
+        `when`(mockAgentConfig.session.samplingRate).thenReturn(0.5)
+
+        val expected = SessionSampler.shouldSample(0.5) { sessionId }
+
+        installSplunkRumAgent()
+        val firstDecision = SplunkRumAgentCore.isRunning
+
+        // Simulate a process restart that reuses the same session.
+        SplunkRumAgentCore.isRunning = false
+        AgentIntegration.modules.clear()
+
+        installSplunkRumAgent()
+        val secondDecision = SplunkRumAgentCore.isRunning
+
+        assertEquals("Decision must match the deterministic sampler", expected, firstDecision)
+        assertEquals("Decision must be stable across restarts for the same session", firstDecision, secondDecision)
+    }
+
+    @Test
     fun `configureContextStorageProvider() sets property to default when unset`() {
         SplunkRumAgentCore.configureContextStorageProvider()
 
@@ -214,7 +237,7 @@ class SplunkRumAgentCoreTest {
             val field = AgentStorage::class.java.getDeclaredField("instance")
             field.isAccessible = true
             field.set(null, null)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Ignore reflection errors in tests
         }
     }

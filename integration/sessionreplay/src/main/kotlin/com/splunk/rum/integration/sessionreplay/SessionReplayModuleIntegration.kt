@@ -31,6 +31,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
+import com.splunk.rum.integration.agent.internal.sampling.SessionSampler
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.sessionreplay.api.SessionReplay as SplunkSessionReplay
 import com.splunk.rum.integration.sessionreplay.api.Status
@@ -100,7 +101,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
         val sessionId = currentSessionId ?: sessionManager.sessionId
         currentSessionId = sessionId
 
-        val sampledOut = !SessionReplaySampler.shouldRecord(sessionId, moduleConfiguration.samplingRate)
+        val sampledOut = !SessionSampler.shouldSample(moduleConfiguration.samplingRate.toDouble()) { sessionId }
 
         if (sampledOut) {
             Logger.d(TAG) {
