@@ -16,11 +16,11 @@
 
 package com.splunk.rum.integration.agent.internal.sampling
 
+import kotlin.math.abs
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.math.abs
 
 class SessionSamplerTest {
 
