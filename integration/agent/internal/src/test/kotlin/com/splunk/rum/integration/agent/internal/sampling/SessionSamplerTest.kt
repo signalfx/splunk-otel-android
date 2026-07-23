@@ -141,5 +141,48 @@ class SessionSamplerTest {
         assertTrue("observed=$observed, expected~$rate", abs(observed - rate) < 0.02)
     }
 
+    @Test
+    fun `replay decision is independent of the agent decision`() {
+        val agentRate = 0.5
+        val replayRate = 0.2
+        val total = 100_000
+
+        var agentSampled = 0
+        var replaySampledAmongAgentSampled = 0
+
+        repeat(total) {
+            val sessionId = randomSessionId()
+            val agentIn = SessionSampler.shouldSample(agentRate) { sessionId }
+            if (!agentIn) return@repeat
+
+            agentSampled++
+            if (SessionSampler.shouldSample(replayRate, "sessionReplay") { sessionId }) {
+                replaySampledAmongAgentSampled++
+            }
+        }
+
+        val conditionalReplayRate = replaySampledAmongAgentSampled.toDouble() / agentSampled
+        assertTrue(
+            "conditionalReplayRate=$conditionalReplayRate should be ~$replayRate, not 0.0, $agentRate, or 1.0",
+            abs(conditionalReplayRate - replayRate) < 0.02
+        )
+    }
+
+    @Test
+    fun `legacy non-hex session ids are sampled close to the configured rate`() {
+        val rate = 0.3
+        val total = 100_000
+
+        val sampledIn = (0 until total).count {
+            SessionSampler.shouldSample(rate) { legacySessionId() }
+        }
+
+        val observed = sampledIn.toDouble() / total
+        assertTrue("observed=$observed, expected~$rate", abs(observed - rate) < 0.02)
+    }
+
     private fun randomSessionId(): String = (0 until 32).joinToString("") { "0123456789abcdef".random().toString() }
+
+    private fun legacySessionId(): String =
+        (0 until 32).joinToString("") { "ghijklmnopqrstuvwxyz-_".random().toString() }
 }

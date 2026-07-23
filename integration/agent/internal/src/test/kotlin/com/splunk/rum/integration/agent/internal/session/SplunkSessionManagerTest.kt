@@ -245,14 +245,57 @@ class SplunkSessionManagerTest {
         assertEquals("latest", manager.sessionId(1_000))
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `sessionId throws when no matching timestamp`() {
+    @Test
+    fun `sessionId falls back to earliest known session when timestamp precedes all history`() {
         val storage = storageMock(
-            sessionIds = listOf(SessionId("only", 500))
+            sessionIds = listOf(
+                SessionId("earliest", 500),
+                SessionId("later", 900)
+            )
         )
         val manager = SplunkSessionManager(storage.first)
 
-        manager.sessionId(100)
+        assertEquals("earliest", manager.sessionId(100))
+    }
+
+    @Test
+    fun `sessionId falls back to stored id when history is empty`() {
+        val storage = storageMock(
+            sessionId = "stored-session",
+            sessionIds = emptyList()
+        )
+        val manager = SplunkSessionManager(storage.first)
+
+        assertEquals("stored-session", manager.sessionId(100))
+    }
+
+    @Test
+    fun `sessionId returns empty string when no history and no stored id`() {
+        val storage = storageMock(sessionIds = emptyList())
+        val manager = SplunkSessionManager(storage.first)
+
+        assertEquals("", manager.sessionId(100))
+    }
+
+    @Test
+    fun `reusing a valid session backfills missing history so timestamp lookup does not throw`() {
+        val now = System.currentTimeMillis()
+        val validUntil = now + 60_000
+        val (storage, state) = storageMock(
+            sessionId = "legacy-session",
+            sessionValidUntil = validUntil,
+            sessionValidUntilInBackground = validUntil,
+            sessionIds = emptyList()
+        )
+        val manager = SplunkSessionManager(storage)
+
+        assertEquals("legacy-session", manager.sessionId)
+
+        assertEquals(1, state.sessionIds.size)
+        val backfilled = state.sessionIds.first()
+        assertEquals("legacy-session", backfilled.id)
+        assertEquals(validUntil - DEFAULT_SESSION_LENGTH, backfilled.validFrom)
+        assertEquals("legacy-session", manager.sessionId(now))
     }
 
     @Test
@@ -349,5 +392,9 @@ class SplunkSessionManagerTest {
         }.`when`(storage).writeSessionIds(org.mockito.ArgumentMatchers.anyList())
 
         return storage to state
+    }
+
+    private companion object {
+        const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L // 4h, mirrors SplunkSessionManager
     }
 }

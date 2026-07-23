@@ -23,11 +23,11 @@ import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.android.common.utils.extensions.forEachFast
 import com.splunk.android.common.utils.extensions.safeSchedule
 import com.splunk.rum.common.storage.IAgentStorage
-import com.splunk.rum.common.storage.SessionId as SessionIdStorageData
 import com.splunk.rum.integration.agent.internal.id.SessionId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
+import com.splunk.rum.common.storage.SessionId as SessionIdStorageData
 
 interface ISplunkSessionManager {
     val sessionId: String
@@ -133,11 +133,19 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
         clearLastSession()
     }
 
-    override fun sessionId(timestamp: Long): String = sessionIds
-        .filter { it.validFrom <= timestamp }
-        .maxByOrNull { it.validFrom }
-        ?.id
-        ?: throw IllegalArgumentException("No valid session for timestamp: $timestamp")
+    override fun sessionId(timestamp: Long): String {
+        val match = sessionIds
+            .filter { it.validFrom <= timestamp }
+            .maxByOrNull { it.validFrom }
+
+        if (match != null) {
+            return match.id
+        }
+
+        return sessionIds.minByOrNull { it.validFrom }?.id
+            ?: agentStorage.readSessionId()
+            ?: ""
+    }
 
     @Synchronized
     private fun createNewSessionIfNeeded(notify: Boolean): String {
@@ -160,7 +168,9 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
             sessionValidUntil > now
 
         if (isCurrentSessionIdValid) {
-            return requireNotNull(savedSessionId)
+            val validSessionId = requireNotNull(savedSessionId)
+            backfillSessionHistoryIfNeeded(validSessionId, sessionValidUntil)
+            return validSessionId
         }
 
         deleteSessionInBackgroundValidationTime()
@@ -178,6 +188,16 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
             deferredSessionChange = newSessionId to now
         }
         return newSessionId
+    }
+
+    private fun backfillSessionHistoryIfNeeded(sessionId: String, sessionValidUntil: Long?) {
+        if (sessionIds.any { it.id == sessionId }) {
+            return
+        }
+
+        val validFrom = (sessionValidUntil ?: System.currentTimeMillis()) - maxSessionLength
+        sessionIds.add(SessionIdStorageData(sessionId, validFrom))
+        agentStorage.writeSessionIds(sessionIds)
     }
 
     @Synchronized
