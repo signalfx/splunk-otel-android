@@ -32,14 +32,9 @@ internal class AnrDetectorToggler(private val anrWatcher: Runnable, private val 
 
     private var future: ScheduledFuture<*>? = null
 
-    @Synchronized
     override fun onAppForegrounded() {
         if (future == null) {
-            // Fixed-rate (not fixed-delay): each poll blocks up to one interval waiting for the main
-            // thread, so fixed-delay would add the poll interval on top of every wait and roughly
-            // double detection latency (~10s). Fixed-rate keeps polls on a steady cadence so the 5
-            // missed polls line up with the intended ~5s threshold.
-            future = scheduler.scheduleAtFixedRate(
+            future = scheduler.scheduleWithFixedDelay(
                 anrWatcher,
                 POLL_INTERVAL_SECONDS,
                 POLL_INTERVAL_SECONDS,
@@ -48,7 +43,6 @@ internal class AnrDetectorToggler(private val anrWatcher: Runnable, private val 
         }
     }
 
-    @Synchronized
     override fun onAppBackgrounded() {
         future?.cancel(true)
         future = null
