@@ -39,7 +39,7 @@ class AnrDetectorTogglerTest {
         anrWatcher = mock(Runnable::class.java)
         scheduler = mock(ScheduledExecutorService::class.java)
         future = mock(ScheduledFuture::class.java)
-        `when`(scheduler.scheduleWithFixedDelay(anrWatcher, 1L, 1L, TimeUnit.SECONDS)).thenReturn(future)
+        `when`(scheduler.scheduleAtFixedRate(anrWatcher, 1L, 1L, TimeUnit.SECONDS)).thenReturn(future)
         toggler = AnrDetectorToggler(anrWatcher, scheduler)
     }
 
@@ -49,7 +49,7 @@ class AnrDetectorTogglerTest {
         toggler.onAppForegrounded()
         toggler.onAppForegrounded()
 
-        verify(scheduler, times(1)).scheduleWithFixedDelay(anrWatcher, 1L, 1L, TimeUnit.SECONDS)
+        verify(scheduler, times(1)).scheduleAtFixedRate(anrWatcher, 1L, 1L, TimeUnit.SECONDS)
     }
 
     @Test
@@ -69,6 +69,6 @@ class AnrDetectorTogglerTest {
         toggler.onAppBackgrounded()
         toggler.onAppForegrounded()
 
-        verify(scheduler, times(2)).scheduleWithFixedDelay(anrWatcher, 1L, 1L, TimeUnit.SECONDS)
+        verify(scheduler, times(2)).scheduleAtFixedRate(anrWatcher, 1L, 1L, TimeUnit.SECONDS)
     }
 }

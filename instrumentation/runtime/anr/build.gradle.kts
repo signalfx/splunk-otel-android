@@ -26,6 +26,8 @@ dependencies {
     implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
+    implementation(project(":common:utils"))
+
     implementation(Dependencies.Otel.api)
     implementation(Dependencies.Otel.semConv)
 

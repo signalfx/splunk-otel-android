@@ -22,9 +22,9 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import com.splunk.android.common.utils.AppStateObserver
+import com.splunk.rum.utils.extensions.isStartedInForeground
 import io.opentelemetry.api.OpenTelemetry
 import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ThreadFactory
 
 /**
@@ -38,9 +38,6 @@ class AnrReporterInstrumentation {
 
     private val additionalExtractors = mutableListOf<AnrAttributesExtractor>()
 
-    private var scheduler: ScheduledExecutorService? = null
-    private var appStateObserver: AppStateObserver? = null
-
     /** Adds an [AnrAttributesExtractor] that enriches emitted ANR events. */
     fun addAttributesExtractor(extractor: AnrAttributesExtractor): AnrReporterInstrumentation {
         additionalExtractors.add(extractor)
@@ -49,25 +46,25 @@ class AnrReporterInstrumentation {
 
     /** Installs the ANR watchdog and starts foreground-only detection. */
     fun install(context: Context, openTelemetry: OpenTelemetry) {
+        val application = context.applicationContext as Application
         val reporter = AnrReporter(openTelemetry, additionalExtractors.toList())
 
         val mainLooper = Looper.getMainLooper()
         val watcher = AnrWatcher(Handler(mainLooper), mainLooper.thread, reporter::report)
 
         val watchdogScheduler = Executors.newScheduledThreadPool(1, daemonThreadFactory())
-        scheduler = watchdogScheduler
 
+        val toggler = AnrDetectorToggler(watcher, watchdogScheduler)
         val observer = AppStateObserver()
-        observer.listener = AnrDetectorToggler(watcher, watchdogScheduler)
-        observer.attach(context.applicationContext as Application)
-        appStateObserver = observer
-    }
+        observer.listener = toggler
+        observer.attach(application)
 
-    /** Stops detection and releases the watchdog thread. Safe to call multiple times. */
-    fun shutdown() {
-        scheduler?.shutdownNow()
-        scheduler = null
-        appStateObserver = null
+        // AppStateObserver only emits onAppForegrounded on a transition. If the app is already in the
+        // foreground when we install (e.g. late/hybrid initialization after the first Activity
+        // resumed), schedule detection now so the current foreground session is covered.
+        if (application.isStartedInForeground) {
+            toggler.onAppForegrounded()
+        }
     }
 
     private fun daemonThreadFactory() = ThreadFactory { runnable ->
