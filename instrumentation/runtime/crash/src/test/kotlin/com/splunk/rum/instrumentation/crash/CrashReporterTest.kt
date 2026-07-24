@@ -177,11 +177,11 @@ class CrashReporterTest {
     }
 
     private companion object {
-        private val EVENT_NAME_KEY = AttributeKey.stringKey("event.name")
-        private val THREAD_ID_KEY = AttributeKey.longKey("thread.id")
-        private val THREAD_NAME_KEY = AttributeKey.stringKey("thread.name")
-        private val EXCEPTION_TYPE_KEY = AttributeKey.stringKey("exception.type")
-        private val EXCEPTION_MESSAGE_KEY = AttributeKey.stringKey("exception.message")
-        private val EXCEPTION_STACKTRACE_KEY = AttributeKey.stringKey("exception.stacktrace")
+        val EVENT_NAME_KEY = AttributeKey.stringKey("event.name")
+        val THREAD_ID_KEY = AttributeKey.longKey("thread.id")
+        val THREAD_NAME_KEY = AttributeKey.stringKey("thread.name")
+        val EXCEPTION_TYPE_KEY = AttributeKey.stringKey("exception.type")
+        val EXCEPTION_MESSAGE_KEY = AttributeKey.stringKey("exception.message")
+        val EXCEPTION_STACKTRACE_KEY = AttributeKey.stringKey("exception.stacktrace")
     }
 }

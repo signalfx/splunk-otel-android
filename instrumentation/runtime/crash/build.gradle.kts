@@ -36,5 +36,4 @@ dependencies {
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.robolectric)
     testImplementation(Dependencies.Test.androidXTestCore)
-    testImplementation(Dependencies.Test.mockito)
 }
