@@ -46,4 +46,15 @@ class RumAnrAttributesExtractorTest {
         assertEquals(GlobalRumConstants.COMPONENT_ANR, attributes.get(GlobalRumConstants.COMPONENT_KEY))
         assertEquals("true", attributes.get(GlobalRumConstants.ERROR_KEY))
     }
+
+    @Test
+    fun `defaults app state to foreground when no lifecycle transition has been observed`() {
+        // ANR detection is foreground-only, so a reported ANR with no observed transition
+        // (e.g. late/hybrid init) is still attributed to the foreground.
+        val builder = Attributes.builder()
+        extractor.extract(builder, emptyArray())
+        val attributes = builder.build()
+
+        assertEquals(GlobalRumConstants.APP_STATE_FOREGROUND, attributes.get(GlobalRumConstants.APP_STATE_KEY))
+    }
 }

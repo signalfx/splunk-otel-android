@@ -39,7 +39,8 @@ internal class RumAnrAttributesExtractor(context: Context) : AnrAttributesExtrac
     override fun extract(attributes: AttributesBuilder, stackTrace: Array<StackTraceElement>) {
         attributes.put(GlobalRumConstants.COMPONENT_KEY, GlobalRumConstants.COMPONENT_ANR)
         attributes.put(GlobalRumConstants.ERROR_KEY, "true")
-        appState?.let { attributes.put(GlobalRumConstants.APP_STATE_KEY, it) }
+        val state = appState ?: GlobalRumConstants.APP_STATE_FOREGROUND
+        attributes.put(GlobalRumConstants.APP_STATE_KEY, state)
     }
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {

@@ -32,6 +32,7 @@ internal class AnrDetectorToggler(private val anrWatcher: Runnable, private val 
 
     private var future: ScheduledFuture<*>? = null
 
+    @Synchronized
     override fun onAppForegrounded() {
         if (future == null) {
             future = scheduler.scheduleWithFixedDelay(
@@ -43,6 +44,7 @@ internal class AnrDetectorToggler(private val anrWatcher: Runnable, private val 
         }
     }
 
+    @Synchronized
     override fun onAppBackgrounded() {
         future?.cancel(true)
         future = null
