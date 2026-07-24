@@ -25,24 +25,15 @@ import io.opentelemetry.api.OpenTelemetry
 import java.time.Duration
 
 /**
- * Entry point for installing slow/frozen rendering detection.
- *
- * Detection polls per-activity frame render durations on a background thread and emits zero-duration
- * spans summarising slow and frozen frames. It is only supported on Android N (API 24) and newer;
- * on older platforms [install] logs a warning and returns without registering anything.
+ * Entry point for installing slow/frozen rendering detection. Only supported on Android N (API 24)
+ * and newer; [install] no-ops (with a warning) on older platforms.
  */
-@Suppress("NewApi") // Duration.ofSeconds()/toMillis() require API 26 or core library desugaring
+@Suppress("NewApi") // Duration APIs require API 26 or core library desugaring
 class SlowRenderingInstrumentation {
 
     private var slowRenderingDetectionPollInterval: Duration = Duration.ofSeconds(1)
 
-    /**
-     * Configures the rate at which frame render durations are polled.
-     *
-     * A non-positive [interval] is ignored (the previous value is kept).
-     *
-     * @return `this`, for chaining.
-     */
+    /** Sets the frame-duration poll rate. Non-positive [interval]s are ignored. Returns `this`. */
     fun setSlowRenderingDetectionPollInterval(interval: Duration): SlowRenderingInstrumentation {
         if (interval.toMillis() <= 0) {
             Logger.e(TAG, "Invalid slowRenderingDetectionPollInterval: $interval; must be positive")

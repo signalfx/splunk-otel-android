@@ -132,7 +132,7 @@ class SlowRenderListenerTest {
 
         val perActivityListener = resumeAndCapture(listener, window, activity)
 
-        // 2 slow (>16ms, <=700ms), 1 frozen (>700ms), 1 normal (ignored).
+        // 2 slow, 1 frozen, 1 normal (ignored).
         perActivityListener.onFrameMetricsAvailable(window, frame(20), 0)
         perActivityListener.onFrameMetricsAvailable(window, frame(30), 0)
         perActivityListener.onFrameMetricsAvailable(window, frame(800), 0)
@@ -159,7 +159,7 @@ class SlowRenderListenerTest {
 
         val perActivityListener = resumeAndCapture(listener, window, activity)
 
-        // Huge duration but marked as the first draw frame -> ignored.
+        // First draw frame -> ignored despite huge duration.
         perActivityListener.onFrameMetricsAvailable(window, frame(5000, firstDrawFrame = 1), 0)
         // Negative duration -> ignored.
         perActivityListener.onFrameMetricsAvailable(window, frameWithRawDuration(-1L), 0)
@@ -178,7 +178,7 @@ class SlowRenderListenerTest {
         val perActivityListener = resumeAndCapture(listener, window, activity)
 
         perActivityListener.onFrameMetricsAvailable(window, frame(1), 0)
-        perActivityListener.onFrameMetricsAvailable(window, frame(16), 0) // exactly at threshold, not > 16
+        perActivityListener.onFrameMetricsAvailable(window, frame(16), 0) // at threshold, not > 16
 
         listener.onActivityPaused(activity)
 
@@ -202,7 +202,7 @@ class SlowRenderListenerTest {
         val frozen = exportedSpans.single { it.name == SlowRenderListener.FROZEN_RENDERS_SPAN_NAME }
         assertEquals(1L, frozen.attributes.get(AttributeKey.longKey("count")))
 
-        // Histogram is reset after reporting: a second poll with no new frames emits nothing.
+        // Histogram resets after reporting: a second poll with no new frames emits nothing.
         exportedSpans.clear()
         pollTask.run()
         assertTrue(exportedSpans.isEmpty())

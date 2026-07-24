@@ -36,13 +36,10 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 /**
- * Polls per-activity frame render durations and reports slow/frozen frame counts as spans.
- *
- * A single background [HandlerThread] receives frame metrics for every resumed activity; a scheduled
- * executor drains the per-activity histograms on the configured [pollInterval]. Histograms are also
- * drained (and reported) when an activity is paused so nothing is lost on navigation.
+ * Polls each resumed activity's frame render durations on a background [HandlerThread] and reports
+ * slow/frozen frame counts as spans, on the [pollInterval] and on pause.
  */
-// FrameMetrics APIs require API 24; install() guards on SDK_INT before this listener is created.
+// FrameMetrics needs API 24; install() guards on SDK_INT before creating this listener.
 @Suppress("NewApi")
 internal class SlowRenderListener internal constructor(
     private val tracer: Tracer,
@@ -164,10 +161,10 @@ internal class SlowRenderListener internal constructor(
             }
 
             val drawDurationsNs = frameMetrics.getMetric(FrameMetrics.DRAW_DURATION)
-            // Ignore values < 0; something must have gone wrong.
+            // Ignore negative durations.
             if (drawDurationsNs >= 0) {
                 synchronized(lock) {
-                    // Calculation copied from FrameMetricsAggregator (round to nearest ms).
+                    // Round to nearest ms (as FrameMetricsAggregator does).
                     val durationMs = ((drawDurationsNs + NANOS_ROUNDING_VALUE) / NANOS_PER_MS).toInt()
                     val oldValue = drawDurationHistogram.get(durationMs)
                     drawDurationHistogram.put(durationMs, oldValue + 1)
@@ -186,7 +183,7 @@ internal class SlowRenderListener internal constructor(
         private companion object {
             private val NANOS_PER_MS = TimeUnit.MILLISECONDS.toNanos(1).toInt()
 
-            // Rounding value adds half a millisecond, for rounding to nearest ms.
+            // Half a millisecond, for rounding to nearest ms.
             private val NANOS_ROUNDING_VALUE = NANOS_PER_MS / 2
         }
     }
@@ -205,7 +202,7 @@ internal class SlowRenderListener internal constructor(
         private val frameMetricsThread = HandlerThread("FrameMetricsCollector")
 
         private fun startFrameMetricsLoop(): Looper {
-            // Precaution: this is meant to be called once and the thread should not yet be started.
+            // Started once; guarded in case of repeat calls.
             if (!frameMetricsThread.isAlive) {
                 frameMetricsThread.start()
             }
