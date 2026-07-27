@@ -24,12 +24,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Entry point for installing crash reporting. Register extra [CrashAttributesExtractor]s via
  * [addAttributesExtractor] before [install]; a [RuntimeDetailsExtractor] is added automatically.
- * [install] is idempotent.
+ * [install] is idempotent process-wide: only the first call installs a handler.
  */
 class CrashReporterInstrumentation {
 
     private val additionalExtractors = mutableListOf<CrashAttributesExtractor>()
-    private val installed = AtomicBoolean(false)
 
     /** Adds a [CrashAttributesExtractor] that enriches emitted crash events. */
     fun addAttributesExtractor(extractor: CrashAttributesExtractor): CrashReporterInstrumentation {
@@ -39,11 +38,16 @@ class CrashReporterInstrumentation {
 
     /** Installs the crash reporting uncaught exception handler. No-ops if already installed. */
     fun install(context: Context, openTelemetry: OpenTelemetry) {
+        // Process-wide guard: the handler and battery receiver are global, so a per-instance guard
+        // would let a second instance chain another handler and leak another receiver.
         if (!installed.compareAndSet(false, true)) {
             return
         }
-        // New list, not a mutation of additionalExtractors.
         val extractors = additionalExtractors + RuntimeDetailsExtractor.create(context.applicationContext)
         CrashReporter(openTelemetry, extractors).install()
+    }
+
+    internal companion object {
+        internal val installed = AtomicBoolean(false)
     }
 }

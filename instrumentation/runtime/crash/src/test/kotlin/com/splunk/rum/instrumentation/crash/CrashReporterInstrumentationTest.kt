@@ -37,11 +37,13 @@ class CrashReporterInstrumentationTest {
     @Before
     fun setUp() {
         originalHandler = Thread.getDefaultUncaughtExceptionHandler()
+        CrashReporterInstrumentation.installed.set(false)
     }
 
     @After
     fun tearDown() {
         Thread.setDefaultUncaughtExceptionHandler(originalHandler)
+        CrashReporterInstrumentation.installed.set(false)
     }
 
     @Test
@@ -55,7 +57,19 @@ class CrashReporterInstrumentationTest {
         val afterSecond = Thread.getDefaultUncaughtExceptionHandler()
 
         assertTrue(afterFirst is CrashReportingExceptionHandler)
-        // Second install is a no-op, so the handler is not re-wrapped.
+        assertSame(afterFirst, afterSecond)
+    }
+
+    @Test
+    fun `install is idempotent across separate instances`() {
+        CrashReporterInstrumentation().install(context, OpenTelemetry.noop())
+        val afterFirst = Thread.getDefaultUncaughtExceptionHandler()
+
+        // A second instance (e.g. from reconfiguration) must not chain a handler or receiver.
+        CrashReporterInstrumentation().install(context, OpenTelemetry.noop())
+        val afterSecond = Thread.getDefaultUncaughtExceptionHandler()
+
+        assertTrue(afterFirst is CrashReportingExceptionHandler)
         assertSame(afterFirst, afterSecond)
     }
 }
