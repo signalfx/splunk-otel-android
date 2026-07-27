@@ -64,6 +64,27 @@ class CrashReportingExceptionHandlerTest {
     }
 
     @Test
+    fun `delegates to existing handler even when crash reporting throws`() {
+        var delegatedThrowable: Throwable? = null
+        val existingHandler = Thread.UncaughtExceptionHandler { _, e -> delegatedThrowable = e }
+
+        val handler = CrashReportingExceptionHandler(
+            crashSender = { throw OutOfMemoryError("reporting failed") },
+            sdkLoggerProvider = null,
+            existingHandler = existingHandler
+        )
+
+        val throwable = RuntimeException("boom")
+        try {
+            handler.uncaughtException(Thread.currentThread(), throwable)
+        } catch (expected: OutOfMemoryError) {
+            // The reporting failure propagates after delegation; that is expected.
+        }
+
+        assertSame(throwable, delegatedThrowable)
+    }
+
+    @Test
     fun `reports crash when there is no existing handler`() {
         var reported = false
 

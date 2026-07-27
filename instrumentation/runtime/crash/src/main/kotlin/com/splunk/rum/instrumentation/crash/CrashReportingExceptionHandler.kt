@@ -31,13 +31,15 @@ internal class CrashReportingExceptionHandler(
 ) : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(thread: Thread, throwable: Throwable) {
-        crashSender(CrashDetails(thread, throwable))
+        try {
+            crashSender(CrashDetails(thread, throwable))
 
-        // Do our best to make sure the crash makes it out of the VM before it dies.
-        sdkLoggerProvider?.forceFlush()?.join(FLUSH_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-
-        // Preserve any existing behavior.
-        existingHandler?.uncaughtException(thread, throwable)
+            // Do our best to make sure the crash makes it out of the VM before it dies.
+            sdkLoggerProvider?.forceFlush()?.join(FLUSH_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        } finally {
+            // Always delegate, even if reporting/flushing threw (e.g. OutOfMemoryError).
+            existingHandler?.uncaughtException(thread, throwable)
+        }
     }
 
     private companion object {
