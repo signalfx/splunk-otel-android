@@ -58,7 +58,6 @@ internal class CrashReporter(
         val cause = crashDetails.cause
 
         val attributes = Attributes.builder()
-            .put(LOG_EVENT_NAME_KEY, CRASH_EVENT_NAME)
             .put(ThreadIncubatingAttributes.THREAD_ID, thread.id)
             .put(ThreadIncubatingAttributes.THREAD_NAME, thread.name)
             .put(ExceptionAttributes.EXCEPTION_TYPE, cause.javaClass.name)
@@ -73,6 +72,9 @@ internal class CrashReporter(
                 Logger.e(TAG, "Crash attributes extractor failed: ${extractor.javaClass.name}", e)
             }
         }
+
+        // Set last so a custom extractor cannot override device.crash.
+        attributes.put(LOG_EVENT_NAME_KEY, CRASH_EVENT_NAME)
 
         openTelemetry.logsBridge
             .get(CRASH_INSTRUMENTATION_SCOPE_NAME)

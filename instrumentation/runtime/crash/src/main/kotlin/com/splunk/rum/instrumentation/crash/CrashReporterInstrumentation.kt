@@ -19,16 +19,17 @@ package com.splunk.rum.instrumentation.crash
 
 import android.content.Context
 import io.opentelemetry.api.OpenTelemetry
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Entry point for installing crash reporting.
- *
- * Register any additional [CrashAttributesExtractor]s via [addAttributesExtractor] before calling
- * [install]. A [RuntimeDetailsExtractor] is added automatically at install time.
+ * Entry point for installing crash reporting. Register extra [CrashAttributesExtractor]s via
+ * [addAttributesExtractor] before [install]; a [RuntimeDetailsExtractor] is added automatically.
+ * [install] is idempotent.
  */
 class CrashReporterInstrumentation {
 
     private val additionalExtractors = mutableListOf<CrashAttributesExtractor>()
+    private val installed = AtomicBoolean(false)
 
     /** Adds a [CrashAttributesExtractor] that enriches emitted crash events. */
     fun addAttributesExtractor(extractor: CrashAttributesExtractor): CrashReporterInstrumentation {
@@ -36,9 +37,13 @@ class CrashReporterInstrumentation {
         return this
     }
 
-    /** Installs the crash reporting uncaught exception handler. */
+    /** Installs the crash reporting uncaught exception handler. No-ops if already installed. */
     fun install(context: Context, openTelemetry: OpenTelemetry) {
-        addAttributesExtractor(RuntimeDetailsExtractor.create(context.applicationContext))
-        CrashReporter(openTelemetry, additionalExtractors.toList()).install()
+        if (!installed.compareAndSet(false, true)) {
+            return
+        }
+        // New list, not a mutation of additionalExtractors.
+        val extractors = additionalExtractors + RuntimeDetailsExtractor.create(context.applicationContext)
+        CrashReporter(openTelemetry, extractors).install()
     }
 }

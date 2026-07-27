@@ -153,6 +153,23 @@ class CrashReporterTest {
     }
 
     @Test
+    fun `a custom extractor cannot override the crash event name`() {
+        val reporter = CrashReporter(
+            sdk,
+            listOf(
+                CrashAttributesExtractor { attributes, _ ->
+                    attributes.put(AttributeKey.stringKey("event.name"), "custom.event")
+                }
+            )
+        )
+
+        reporter.report(CrashDetails(Thread.currentThread(), RuntimeException("boom")))
+
+        val log = exportedLogs.single()
+        assertEquals(CrashReporter.CRASH_EVENT_NAME, log.attributes.get(EVENT_NAME_KEY))
+    }
+
+    @Test
     fun `install registers a handler that reports the crash and chains the previous handler`() {
         var delegatedThread: Thread? = null
         var delegatedThrowable: Throwable? = null
