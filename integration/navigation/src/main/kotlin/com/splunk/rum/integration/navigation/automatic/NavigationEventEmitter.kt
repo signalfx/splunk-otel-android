@@ -16,10 +16,10 @@
 
 package com.splunk.rum.integration.navigation.automatic
 
-import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.utils.extensions.forEachFast
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.navigation.RumConstant
 import io.opentelemetry.api.common.Attributes

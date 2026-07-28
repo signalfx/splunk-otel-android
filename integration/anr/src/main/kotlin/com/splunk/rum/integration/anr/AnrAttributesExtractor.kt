@@ -2,20 +2,19 @@ package com.splunk.rum.integration.anr
 
 import android.app.Application
 import android.content.Context
-import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.common.utils.AppStateObserver
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context as OtelContext
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 
 internal class AnrAttributesExtractor(context: Context) : AttributesExtractor<Array<StackTraceElement>, Void> {
 
-    private val appStateObserver = AppStateObserver()
     private var appState: String? = null
 
     init {
-        appStateObserver.listener = AppStateObserverListener()
-        appStateObserver.attach(context.applicationContext as Application)
+        AppStateObserver.listeners += AppStateObserverListener()
+        AppStateObserver.attach(context.applicationContext as Application)
     }
 
     override fun onStart(

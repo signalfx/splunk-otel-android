@@ -35,8 +35,8 @@ dependencies {
 
     implementation(Dependencies.Otel.androidInstrumentation)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.utils)
 
     androidTestImplementation(Dependencies.Test.junit)
     androidTestImplementation(Dependencies.Test.androidXTestCore)

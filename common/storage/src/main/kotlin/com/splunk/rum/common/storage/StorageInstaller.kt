@@ -21,7 +21,7 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import com.splunk.android.common.utils.runOnBackgroundThread
+import com.splunk.rum.common.utils.runOnBackgroundThread
 
 internal class StorageInstaller : ContentProvider() {
 

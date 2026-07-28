@@ -21,10 +21,10 @@ import android.app.Application
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
-import com.splunk.android.common.utils.extensions.forEachFast
-import com.splunk.android.common.utils.extensions.rootView
+import com.splunk.rum.common.logger.Logger
+import com.splunk.rum.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.rum.common.utils.extensions.forEachFast
+import com.splunk.rum.common.utils.extensions.rootView
 import com.splunk.rum.startup.extension.doOnDraw
 import com.splunk.rum.startup.util.ProcessInfo
 import com.splunk.rum.utils.extensions.isStartedInForeground

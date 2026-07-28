@@ -17,8 +17,8 @@
 package com.splunk.rum.integration.sessionreplay.api
 
 import android.os.Build
-import com.splunk.android.common.logger.Logger
 import com.splunk.android.instrumentation.recording.core.api.SessionReplay as CommonSessionReplay
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.sessionreplay.SessionReplayModuleIntegration
 import com.splunk.rum.integration.sessionreplay.api.mapping.toCommon

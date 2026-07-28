@@ -18,11 +18,11 @@ package com.splunk.rum.common.otel.span
 
 import android.app.Application
 import android.content.Context
-import com.splunk.android.common.job.IJobManager
-import com.splunk.android.common.job.JobIdStorage
-import com.splunk.android.common.job.JobResult
-import com.splunk.android.common.utils.AppStateObserver
+import com.splunk.rum.common.job.IJobManager
+import com.splunk.rum.common.job.JobIdStorage
+import com.splunk.rum.common.job.JobResult
 import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.utils.AppStateObserver
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
@@ -40,12 +40,12 @@ internal class AndroidSpanExporter(
     private val deferredUntilForeground: Boolean,
     context: Context
 ) : SpanExporter {
-    private val appStateObserver = AppStateObserver()
+
     private var isForeground = false
 
     init {
-        appStateObserver.listener = AppStateObserverListener()
-        appStateObserver.attach(context.applicationContext as Application)
+        AppStateObserver.listeners += AppStateObserverListener()
+        AppStateObserver.attach(context.applicationContext as Application)
     }
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {

@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.utils
 
-import com.splunk.android.common.utils.extensions.toClass
+import com.splunk.rum.common.utils.extensions.toClass
 
 private val modifierClass = "androidx.compose.ui.draw.DrawModifier".toClass()
 

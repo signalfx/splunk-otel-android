@@ -18,11 +18,11 @@ package com.splunk.rum.integration.sessionreplay
 
 import android.content.Context
 import android.webkit.WebView
-import com.splunk.android.common.logger.Logger
 import com.splunk.android.instrumentation.recording.core.api.DataListener
 import com.splunk.android.instrumentation.recording.core.api.Metadata
 import com.splunk.android.instrumentation.recording.core.api.SessionReplay
 import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.containsAny
 import com.splunk.rum.common.otel.extensions.toInstant

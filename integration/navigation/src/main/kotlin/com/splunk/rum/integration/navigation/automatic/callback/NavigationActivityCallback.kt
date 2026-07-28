@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.navigation.automatic.callback
 
 import android.app.Activity
-import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.rum.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.integration.navigation.automatic.ScreenChangeDetector
 
 internal class NavigationActivityCallback(private val screenChangeDetector: ScreenChangeDetector) :

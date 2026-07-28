@@ -18,7 +18,6 @@ package com.splunk.rum.integration.interactions
 
 import android.app.Application
 import android.content.Context
-import com.splunk.android.common.logger.Logger
 import com.splunk.android.instrumentation.recording.capturer.FrameCapturer
 import com.splunk.android.instrumentation.recording.interactions.Interactions
 import com.splunk.android.instrumentation.recording.interactions.OnInteractionListener
@@ -28,6 +27,7 @@ import com.splunk.android.instrumentation.recording.interactions.model.LegacyDat
 import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.splunk.android.instrumentation.recording.wireframe.model.Wireframe
 import com.splunk.android.instrumentation.recording.wireframe.stats.WireframeStats
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration

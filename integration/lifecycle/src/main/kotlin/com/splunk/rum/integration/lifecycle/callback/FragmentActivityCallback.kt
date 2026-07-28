@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.lifecycle.callback
 
 import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
-import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.rum.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 
 internal interface FragmentActivityCallback : ActivityLifecycleCallbacksAdapter {
     val fragmentCallback: FragmentLifecycleCallbacks

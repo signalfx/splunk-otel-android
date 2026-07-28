@@ -17,19 +17,20 @@
 package com.splunk.rum.common.storage
 
 import android.content.Context
-import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.storage.Storage
-import com.splunk.android.common.storage.cache.FilePermanentCache
-import com.splunk.android.common.storage.cache.FileSimplePermanentCache
-import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
-import com.splunk.android.common.storage.filemanager.EncryptedFileManager
-import com.splunk.android.common.storage.filemanager.FileManagerFactory
-import com.splunk.android.common.storage.preferences.Preferences
-import com.splunk.android.common.utils.extensions.toJSONArray
-import com.splunk.android.common.utils.runOnBackgroundThread
+import android.os.StatFs
+import com.splunk.rum.common.logger.Logger
+import com.splunk.rum.common.storage.cache.FilePermanentCache
+import com.splunk.rum.common.storage.cache.FileSimplePermanentCache
 import com.splunk.rum.common.storage.extensions.MB
-import com.splunk.rum.common.storage.extensions.statFsFreeSpace
+import com.splunk.rum.common.storage.extensions.availableBlocksCompat
+import com.splunk.rum.common.storage.extensions.blockSizeCompat
+import com.splunk.rum.common.storage.extensions.noBackupFilesDirCompat
+import com.splunk.rum.common.storage.filemanager.EncryptedFileManager
+import com.splunk.rum.common.storage.filemanager.FileManagerFactory
 import com.splunk.rum.common.storage.policy.StoragePolicy
+import com.splunk.rum.common.storage.preferences.Preferences
+import com.splunk.rum.common.utils.extensions.toJSONArray
+import com.splunk.rum.common.utils.runOnBackgroundThread
 import java.io.File
 import org.json.JSONArray
 import org.json.JSONException
@@ -74,7 +75,11 @@ class AgentStorage(context: Context) : IAgentStorage {
 
     override val freeSpace: Long
         get() {
-            val freeSpace = rootDir.statFsFreeSpace
+            if (!rootDir.exists()) {
+                rootDir.mkdirs()
+            }
+
+            val freeSpace = StatFs(rootDir.path).run { availableBlocksCompat * blockSizeCompat }
             Logger.v(TAG) { "freeSpace: $freeSpace" }
             return freeSpace
         }

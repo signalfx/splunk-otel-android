@@ -16,7 +16,7 @@
 
 package com.splunk.rum.common.storage
 
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import org.json.JSONObject
 
 /**

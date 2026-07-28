@@ -19,9 +19,9 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import android.os.Build
 import android.webkit.WebView
-import com.splunk.android.common.logger.Log
-import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.logger.consumers.AndroidLogConsumer
+import com.splunk.rum.common.logger.Log
+import com.splunk.rum.common.logger.Logger
+import com.splunk.rum.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.common.storage.IAgentStorage

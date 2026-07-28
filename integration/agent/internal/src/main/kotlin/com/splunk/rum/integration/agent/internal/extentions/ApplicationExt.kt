@@ -2,7 +2,7 @@ package com.splunk.rum.integration.agent.internal.extentions
 
 import android.app.Application
 import android.content.pm.PackageManager
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.RumConstants
 
 private const val TAG = "ApplicationExt"

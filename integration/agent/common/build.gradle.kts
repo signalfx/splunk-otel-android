@@ -27,7 +27,7 @@ dependencies {
 
     api(Dependencies.Otel.api)
 
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.utils)
 
     testImplementation(Dependencies.Test.junit)
 }

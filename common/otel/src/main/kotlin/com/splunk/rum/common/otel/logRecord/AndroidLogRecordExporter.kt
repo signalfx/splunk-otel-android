@@ -16,9 +16,9 @@
 
 package com.splunk.rum.common.otel.logRecord
 
-import com.splunk.android.common.job.IJobManager
-import com.splunk.android.common.job.JobIdStorage
-import com.splunk.android.common.job.JobResult
+import com.splunk.rum.common.job.IJobManager
+import com.splunk.rum.common.job.JobIdStorage
+import com.splunk.rum.common.job.JobResult
 import com.splunk.rum.common.otel.RumConstants
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan

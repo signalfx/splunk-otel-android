@@ -19,7 +19,7 @@ package com.splunk.rum.common.storage
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
+import com.splunk.rum.common.storage.extensions.noBackupFilesDirCompat
 import java.io.File
 import org.junit.After
 import org.junit.Assert.assertEquals

@@ -33,6 +33,6 @@ dependencies {
 
     implementation(Dependencies.Otel.androidSlowRenderingInstrumentation)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.utils)
 }

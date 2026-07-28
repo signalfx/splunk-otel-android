@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.user
 
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.storage.IAgentStorage
 import com.splunk.rum.integration.agent.internal.id.UserId
 

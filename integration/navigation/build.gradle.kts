@@ -40,8 +40,8 @@ dependencies {
 
     compileOnly(Dependencies.Android.navigationRuntime)
 
-    implementation(Dependencies.SessionReplay.commonUtils)
-    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.Common.utils)
+    implementation(Dependencies.Common.logger)
 
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.mockito)

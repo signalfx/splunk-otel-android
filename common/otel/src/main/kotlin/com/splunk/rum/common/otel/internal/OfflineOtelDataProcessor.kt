@@ -17,17 +17,17 @@
 package com.splunk.rum.common.otel.internal
 
 import android.content.Context
-import com.splunk.android.common.job.IJobManager
-import com.splunk.android.common.job.JobIdStorage
-import com.splunk.android.common.job.JobManager
-import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.utils.extensions.forEachFast
-import com.splunk.android.common.utils.extensions.safeSubmit
+import com.splunk.rum.common.job.IJobManager
+import com.splunk.rum.common.job.JobIdStorage
+import com.splunk.rum.common.job.JobManager
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordData
 import com.splunk.rum.common.otel.logRecord.UploadSessionReplayData
 import com.splunk.rum.common.otel.span.UploadOtelSpanData
 import com.splunk.rum.common.storage.AgentStorage
 import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.utils.extensions.forEachFast
+import com.splunk.rum.common.utils.extensions.safeSubmit
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 

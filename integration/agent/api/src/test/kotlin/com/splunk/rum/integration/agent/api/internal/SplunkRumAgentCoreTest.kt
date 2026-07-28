@@ -19,9 +19,9 @@ package com.splunk.rum.integration.agent.api.internal
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.splunk.android.common.storage.extensions.noBackupFilesDirCompat
 import com.splunk.rum.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.common.storage.AgentStorage
+import com.splunk.rum.common.storage.extensions.noBackupFilesDirCompat
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes

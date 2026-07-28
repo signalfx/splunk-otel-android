@@ -16,8 +16,8 @@
 
 package com.splunk.rum.common.otel.http
 
-import com.splunk.android.common.http.model.Header
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.http.model.Header
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.storage.StoredEndpointConfig
 
 /**

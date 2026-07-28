@@ -26,5 +26,5 @@ android {
 dependencies {
     implementation(project(":integration:agent:api"))
     implementation(project(":common:otel"))
-    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.Common.logger)
 }

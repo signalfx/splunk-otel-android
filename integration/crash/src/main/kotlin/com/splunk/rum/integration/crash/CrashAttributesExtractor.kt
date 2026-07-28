@@ -2,8 +2,8 @@ package com.splunk.rum.integration.crash
 
 import android.app.Application
 import android.content.Context
-import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.common.utils.AppStateObserver
 import io.opentelemetry.android.instrumentation.crash.CrashDetails
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context as OtelContext
@@ -13,12 +13,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal class CrashAttributesExtractor(context: Context) : AttributesExtractor<CrashDetails, Void> {
 
     private val crashHappened = AtomicBoolean(false)
-    private val appStateObserver = AppStateObserver()
     private var appState: String? = null
 
     init {
-        appStateObserver.listener = AppStateObserverListener()
-        appStateObserver.attach(context.applicationContext as Application)
+        AppStateObserver.listeners += AppStateObserverListener()
+        AppStateObserver.attach(context.applicationContext as Application)
     }
 
     override fun onStart(attributes: AttributesBuilder, parentContext: OtelContext, crashDetails: CrashDetails) {

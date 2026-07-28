@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.navigation
 
 import androidx.navigation.NavController
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.navigation.automatic.ComposeNavigationTracker
 import io.opentelemetry.api.common.Attributes
 
