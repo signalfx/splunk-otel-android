@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.utils.extensions
+package com.splunk.rum.agent.utils.extensions
 
 import android.util.Base64
 import android.util.Base64.encodeToString

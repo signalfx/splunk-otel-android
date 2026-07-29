@@ -21,8 +21,8 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import com.splunk.rum.agent.utils.extensions.isStartedInForeground
 import com.splunk.rum.common.utils.AppStateObserver
-import com.splunk.rum.utils.extensions.isStartedInForeground
 import io.opentelemetry.api.OpenTelemetry
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory

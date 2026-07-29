@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.utils
+package com.splunk.rum.agent.utils
 
 import java.util.regex.Pattern
 

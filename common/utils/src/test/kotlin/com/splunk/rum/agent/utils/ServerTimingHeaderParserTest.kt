@@ -1,4 +1,4 @@
-package com.splunk.rum.utils
+package com.splunk.rum.agent.utils
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

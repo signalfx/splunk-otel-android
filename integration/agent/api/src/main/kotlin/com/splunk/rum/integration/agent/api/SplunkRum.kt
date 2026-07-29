@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api
 import android.app.Application
 import android.os.Build
 import android.webkit.WebView
+import com.splunk.rum.agent.utils.LegacyAPIReflectionUtils
 import com.splunk.rum.common.agent.storage.AgentStorage
 import com.splunk.rum.common.agent.storage.IAgentStorage
 import com.splunk.rum.common.logger.Log
@@ -42,7 +43,6 @@ import com.splunk.rum.integration.agent.internal.session.NoOpSplunkSessionManage
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.NoOpUserManager
 import com.splunk.rum.integration.agent.internal.user.UserManager
-import com.splunk.rum.utils.LegacyAPIReflectionUtils
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes

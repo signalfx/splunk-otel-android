@@ -1,4 +1,4 @@
-package com.splunk.rum.utils.extensions
+package com.splunk.rum.agent.utils.extensions
 
 import android.app.ActivityManager
 import android.app.Application

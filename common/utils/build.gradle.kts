@@ -2,7 +2,6 @@ import plugins.ConfigAndroidLibrary
 import plugins.ConfigPublish
 import utils.artifactIdProperty
 import utils.artifactPrefix
-import utils.commonPrefix
 import utils.versionProperty
 
 plugins {
@@ -15,12 +14,12 @@ apply<ConfigAndroidLibrary>()
 apply<ConfigPublish>()
 
 ext {
-    set(artifactIdProperty, "$artifactPrefix$commonPrefix${project.name}")
+    set(artifactIdProperty, "${artifactPrefix}agent-${project.name}")
     set(versionProperty, Configurations.sdkVersionName)
 }
 
 android {
-    namespace = "com.splunk.rum.common.utils"
+    namespace = "com.splunk.rum.agent.utils"
 }
 
 dependencies {
