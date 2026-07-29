@@ -28,10 +28,10 @@ dependencies {
 
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:otel"))
+    implementation(project(":instrumentation:runtime:slowrendering"))
 
-    implementation(Dependencies.Otel.instrumentationApi)
-
-    implementation(Dependencies.Otel.androidSlowRenderingInstrumentation)
+    implementation(Dependencies.Otel.androidInstrumentation)
+    implementation(Dependencies.Otel.api)
 
     implementation(Dependencies.Common.logger)
     implementation(Dependencies.Common.utils)

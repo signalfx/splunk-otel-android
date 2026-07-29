@@ -110,7 +110,5 @@ object Dependencies {
         const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation"
         const val androidNetworkMonitorInstrumentation = "io.opentelemetry.android.instrumentation:network"
         const val androidCrashInstrumentation = "io.opentelemetry.android.instrumentation:crash"
-        const val androidANRInstrumentation = "io.opentelemetry.android.instrumentation:anr"
-        const val androidSlowRenderingInstrumentation = "io.opentelemetry.android.instrumentation:slowrendering"
     }
 }
