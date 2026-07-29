@@ -17,7 +17,7 @@
 
 package com.splunk.rum.instrumentation.anr
 
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.StatusCode

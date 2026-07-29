@@ -17,7 +17,7 @@
 
 package com.splunk.rum.instrumentation.anr
 
-import com.splunk.android.common.utils.AppStateObserver
+import com.splunk.rum.common.utils.AppStateObserver
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit

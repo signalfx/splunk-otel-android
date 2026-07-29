@@ -31,8 +31,8 @@ dependencies {
     implementation(Dependencies.Otel.api)
     implementation(Dependencies.Otel.semConv)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.utils)
 
     testImplementation(platform(Dependencies.Otel.androidBom))
     testImplementation(Dependencies.Otel.sdk)

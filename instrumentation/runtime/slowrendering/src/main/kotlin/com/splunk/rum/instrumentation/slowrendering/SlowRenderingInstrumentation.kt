@@ -20,7 +20,7 @@ package com.splunk.rum.instrumentation.slowrendering
 import android.app.Application
 import android.content.Context
 import android.os.Build
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import io.opentelemetry.api.OpenTelemetry
 import java.time.Duration
 
