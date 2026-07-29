@@ -17,10 +17,10 @@
 package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
+import com.splunk.rum.common.agent.storage.AgentStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.common.otel.internal.OfflineOtelDataProcessor
-import com.splunk.rum.common.agent.storage.AgentStorage
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager

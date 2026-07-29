@@ -17,6 +17,8 @@
 package com.splunk.rum.common.otel.internal
 
 import android.content.Context
+import com.splunk.rum.common.agent.storage.AgentStorage
+import com.splunk.rum.common.agent.storage.IAgentStorage
 import com.splunk.rum.common.job.IJobManager
 import com.splunk.rum.common.job.JobIdStorage
 import com.splunk.rum.common.job.JobManager
@@ -24,8 +26,6 @@ import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordData
 import com.splunk.rum.common.otel.logRecord.UploadSessionReplayData
 import com.splunk.rum.common.otel.span.UploadOtelSpanData
-import com.splunk.rum.common.agent.storage.AgentStorage
-import com.splunk.rum.common.agent.storage.IAgentStorage
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.common.utils.extensions.safeSubmit
 import java.util.concurrent.Executors

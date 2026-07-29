@@ -16,9 +16,9 @@
 
 package com.splunk.rum.common.otel.http
 
+import com.splunk.rum.common.agent.storage.StoredEndpointConfig
 import com.splunk.rum.common.http.model.Header
 import com.splunk.rum.common.logger.Logger
-import com.splunk.rum.common.agent.storage.StoredEndpointConfig
 
 /**
  * Utility object for building HTTP headers with authentication for telemetry uploads.

@@ -16,8 +16,8 @@
 
 package com.splunk.rum.integration.agent.internal.user
 
-import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.agent.storage.IAgentStorage
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.agent.internal.id.UserId
 
 interface IUserManager {

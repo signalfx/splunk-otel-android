@@ -18,17 +18,17 @@ package com.splunk.rum.common.agent.storage
 
 import android.content.Context
 import android.os.StatFs
+import com.splunk.rum.common.agent.storage.extensions.MB
+import com.splunk.rum.common.agent.storage.extensions.availableBlocksCompat
+import com.splunk.rum.common.agent.storage.extensions.blockSizeCompat
+import com.splunk.rum.common.agent.storage.policy.StoragePolicy
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.storage.Storage
 import com.splunk.rum.common.storage.cache.FilePermanentCache
 import com.splunk.rum.common.storage.cache.FileSimplePermanentCache
-import com.splunk.rum.common.agent.storage.extensions.MB
-import com.splunk.rum.common.agent.storage.extensions.availableBlocksCompat
-import com.splunk.rum.common.agent.storage.extensions.blockSizeCompat
 import com.splunk.rum.common.storage.extensions.noBackupFilesDirCompat
 import com.splunk.rum.common.storage.filemanager.EncryptedFileManager
 import com.splunk.rum.common.storage.filemanager.FileManagerFactory
-import com.splunk.rum.common.agent.storage.policy.StoragePolicy
 import com.splunk.rum.common.storage.preferences.Preferences
 import com.splunk.rum.common.utils.extensions.toJSONArray
 import com.splunk.rum.common.utils.runOnBackgroundThread

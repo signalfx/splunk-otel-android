@@ -17,9 +17,9 @@
 package com.splunk.rum.integration.agent.api.configuration
 
 import android.content.Context
-import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.agent.storage.IAgentStorage
 import com.splunk.rum.common.agent.storage.StoredEndpointConfig
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 
 internal class ConfigurationManager private constructor(private val agentStorage: IAgentStorage) {
