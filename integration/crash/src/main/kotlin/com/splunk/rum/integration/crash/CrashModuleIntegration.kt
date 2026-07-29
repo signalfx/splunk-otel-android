@@ -18,7 +18,8 @@ package com.splunk.rum.integration.crash
 
 import android.content.Context
 import com.splunk.android.common.logger.Logger
-import com.splunk.rum.instrumentation.crash.CrashReporterInstrumentation
+import com.splunk.rum.instrumentation.crash.internal.CrashReporterInstrumentation
+import com.splunk.rum.instrumentation.crash.internal.extractor.RumCrashAttributesExtractor
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration

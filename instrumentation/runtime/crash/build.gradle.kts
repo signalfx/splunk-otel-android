@@ -26,14 +26,18 @@ dependencies {
     implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
+    implementation(project(":common:otel"))
+
     implementation(Dependencies.Otel.api)
     implementation(Dependencies.Otel.sdk)
     implementation(Dependencies.Otel.semConv)
     implementation(Dependencies.Otel.semConvIncubating)
 
     implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.commonUtils)
 
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.robolectric)
     testImplementation(Dependencies.Test.androidXTestCore)
+    testImplementation(Dependencies.Android.fragmentKtx)
 }

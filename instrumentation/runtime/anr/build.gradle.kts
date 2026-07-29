@@ -26,6 +26,7 @@ dependencies {
     implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
+    implementation(project(":common:otel"))
     implementation(project(":common:utils"))
 
     implementation(Dependencies.Otel.api)
@@ -40,4 +41,5 @@ dependencies {
     testImplementation(Dependencies.Test.robolectric)
     testImplementation(Dependencies.Test.androidXTestCore)
     testImplementation(Dependencies.Test.mockito)
+    testImplementation(Dependencies.Android.fragmentKtx)
 }
