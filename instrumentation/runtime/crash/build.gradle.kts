@@ -19,7 +19,7 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.rum.instrumentation.anr"
+    namespace = "com.splunk.rum.instrumentation.crash"
 }
 
 dependencies {
@@ -27,19 +27,17 @@ dependencies {
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":common:otel"))
-    implementation(project(":common:utils"))
 
     implementation(Dependencies.Otel.api)
+    implementation(Dependencies.Otel.sdk)
     implementation(Dependencies.Otel.semConv)
+    implementation(Dependencies.Otel.semConvIncubating)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
 
-    testImplementation(platform(Dependencies.Otel.androidBom))
-    testImplementation(Dependencies.Otel.sdk)
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.robolectric)
     testImplementation(Dependencies.Test.androidXTestCore)
-    testImplementation(Dependencies.Test.mockito)
     testImplementation(Dependencies.Android.fragmentKtx)
 }

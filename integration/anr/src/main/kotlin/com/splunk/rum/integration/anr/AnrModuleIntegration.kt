@@ -18,7 +18,8 @@ package com.splunk.rum.integration.anr
 
 import android.content.Context
 import com.splunk.android.common.logger.Logger
-import com.splunk.rum.instrumentation.anr.AnrReporterInstrumentation
+import com.splunk.rum.instrumentation.anr.internal.AnrReporterInstrumentation
+import com.splunk.rum.instrumentation.anr.internal.extractor.RumAnrAttributesExtractor
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacyAnrModuleConfiguration
