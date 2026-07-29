@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.storage.extensions
+package com.splunk.rum.common.agent.storage.extensions
 
 internal val Int.MB: Long
     get() = (this * 1024 * 1024).toLong()

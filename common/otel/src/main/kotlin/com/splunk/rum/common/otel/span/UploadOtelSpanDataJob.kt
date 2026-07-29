@@ -28,7 +28,7 @@ import com.splunk.rum.common.http.model.Response
 import com.splunk.rum.common.job.JobIdStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.otel.http.AuthHeaderBuilder
-import com.splunk.rum.common.storage.AgentStorage
+import com.splunk.rum.common.agent.storage.AgentStorage
 import com.splunk.rum.common.utils.extensions.safeSubmit
 import com.splunk.rum.common.utils.thread.NamedThreadFactory
 import java.net.UnknownHostException

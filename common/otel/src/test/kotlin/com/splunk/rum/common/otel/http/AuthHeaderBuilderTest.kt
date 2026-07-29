@@ -16,7 +16,7 @@
 
 package com.splunk.rum.common.otel.http
 
-import com.splunk.rum.common.storage.StoredEndpointConfig
+import com.splunk.rum.common.agent.storage.StoredEndpointConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

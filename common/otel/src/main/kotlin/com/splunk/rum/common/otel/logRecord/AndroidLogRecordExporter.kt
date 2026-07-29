@@ -23,7 +23,7 @@ import com.splunk.rum.common.otel.RumConstants
 import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
-import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.agent.storage.IAgentStorage
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.context.Context

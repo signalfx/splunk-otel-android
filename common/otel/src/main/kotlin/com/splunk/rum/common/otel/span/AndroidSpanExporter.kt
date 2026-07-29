@@ -21,7 +21,7 @@ import android.content.Context
 import com.splunk.rum.common.job.IJobManager
 import com.splunk.rum.common.job.JobIdStorage
 import com.splunk.rum.common.job.JobResult
-import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.agent.storage.IAgentStorage
 import com.splunk.rum.common.utils.AppStateObserver
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode

@@ -23,8 +23,8 @@ import com.splunk.rum.common.logger.Log
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.logger.consumers.AndroidLogConsumer
 import com.splunk.rum.common.otel.internal.OfflineOtelDataProcessor
-import com.splunk.rum.common.storage.AgentStorage
-import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.agent.storage.AgentStorage
+import com.splunk.rum.common.agent.storage.IAgentStorage
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.install
 import com.splunk.rum.integration.agent.api.SplunkRum.Companion.instance
 import com.splunk.rum.integration.agent.api.internal.SplunkRumAgentCore

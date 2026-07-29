@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.storage.extensions
+package com.splunk.rum.common.agent.storage.extensions
 
 import android.os.Build
 import android.os.StatFs

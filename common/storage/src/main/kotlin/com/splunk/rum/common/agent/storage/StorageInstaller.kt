@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.storage
+package com.splunk.rum.common.agent.storage
 
 import android.app.Application
 import android.content.ContentProvider

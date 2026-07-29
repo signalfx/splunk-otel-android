@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.storage
+package com.splunk.rum.common.agent.storage
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals

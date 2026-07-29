@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.storage
+package com.splunk.rum.common.agent.storage
 
 import com.splunk.rum.common.logger.Logger
 import org.json.JSONObject

@@ -24,8 +24,8 @@ import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordData
 import com.splunk.rum.common.otel.logRecord.UploadSessionReplayData
 import com.splunk.rum.common.otel.span.UploadOtelSpanData
-import com.splunk.rum.common.storage.AgentStorage
-import com.splunk.rum.common.storage.IAgentStorage
+import com.splunk.rum.common.agent.storage.AgentStorage
+import com.splunk.rum.common.agent.storage.IAgentStorage
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.common.utils.extensions.safeSubmit
 import java.util.concurrent.Executors

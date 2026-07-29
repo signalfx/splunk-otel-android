@@ -1,1 +1,1 @@
--repackageclasses 'com.splunk.rum.common.storage'
+-repackageclasses 'com.splunk.rum.common.agent.storage'

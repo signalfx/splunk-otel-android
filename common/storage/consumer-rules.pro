@@ -1,1 +1,1 @@
--keep public class com.splunk.rum.common.storage.StorageInstaller
+-keep public class com.splunk.rum.common.agent.storage.StorageInstaller

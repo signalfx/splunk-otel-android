@@ -24,7 +24,7 @@ import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.common.otel.internal.GlobalRumConstants.RUM_TRACER_NAME
 import com.splunk.rum.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
-import com.splunk.rum.common.storage.AgentStorage
+import com.splunk.rum.common.agent.storage.AgentStorage
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.model.Module

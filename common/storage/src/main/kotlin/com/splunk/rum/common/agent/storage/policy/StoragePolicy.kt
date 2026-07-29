@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.storage.policy
+package com.splunk.rum.common.agent.storage.policy
 
 import java.io.File
 import kotlin.math.min

@@ -22,7 +22,7 @@ import com.splunk.rum.common.job.JobManager
 import com.splunk.rum.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.rum.common.otel.span.AndroidSpanExporter
 import com.splunk.rum.common.otel.span.SpanInterceptorExporter
-import com.splunk.rum.common.storage.AgentStorage
+import com.splunk.rum.common.agent.storage.AgentStorage
 import io.opentelemetry.api.baggage.propagation.W3CBaggagePropagator
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator
 import io.opentelemetry.context.propagation.ContextPropagators

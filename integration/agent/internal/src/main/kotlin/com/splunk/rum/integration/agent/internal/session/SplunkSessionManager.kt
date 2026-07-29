@@ -19,8 +19,8 @@ package com.splunk.rum.integration.agent.internal.session
 import android.app.Application
 import android.content.Context
 import androidx.annotation.VisibleForTesting
-import com.splunk.rum.common.storage.IAgentStorage
-import com.splunk.rum.common.storage.SessionId as SessionIdStorageData
+import com.splunk.rum.common.agent.storage.IAgentStorage
+import com.splunk.rum.common.agent.storage.SessionId as SessionIdStorageData
 import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.common.utils.extensions.safeSchedule
