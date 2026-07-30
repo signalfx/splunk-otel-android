@@ -90,6 +90,7 @@ object Dependencies {
         const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
 
         const val api = "io.opentelemetry:opentelemetry-api"
+        const val apiIncubator = "io.opentelemetry:opentelemetry-api-incubator"
         const val sdk = "io.opentelemetry:opentelemetry-sdk"
         const val exporterOtlpCommon = "io.opentelemetry:opentelemetry-exporter-otlp-common"
         const val exporterOtlp = "io.opentelemetry:opentelemetry-exporter-otlp"
@@ -104,7 +105,6 @@ object Dependencies {
         const val androidServices = "io.opentelemetry.android:services"
         const val androidCommon = "io.opentelemetry.android:common"
         const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation"
-        const val androidNetworkMonitorInstrumentation = "io.opentelemetry.android.instrumentation:network"
         const val androidCrashInstrumentation = "io.opentelemetry.android.instrumentation:crash"
         const val androidANRInstrumentation = "io.opentelemetry.android.instrumentation:anr"
         const val androidSlowRenderingInstrumentation = "io.opentelemetry.android.instrumentation:slowrendering"
