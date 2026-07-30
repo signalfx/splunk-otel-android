@@ -18,7 +18,6 @@ package com.splunk.rum.integration.slowrendering
 
 import android.content.Context
 import com.splunk.rum.common.logger.Logger
-import com.splunk.rum.instrumentation.slowrendering.SlowRenderingInstrumentation
 import com.splunk.rum.instrumentation.slowrendering.internal.SlowRenderingInstrumentation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.find

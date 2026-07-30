@@ -20,7 +20,6 @@ import android.app.Application
 import android.content.Context
 import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.utils.AppStateObserver
-import com.splunk.rum.instrumentation.anr.AnrAttributesExtractor
 import io.opentelemetry.api.common.AttributesBuilder
 
 /**

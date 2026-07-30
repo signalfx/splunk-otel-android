@@ -25,7 +25,6 @@ import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import io.opentelemetry.android.instrumentation.InstallationContext
-import io.opentelemetry.android.instrumentation.crash.CrashReporterInstrumentation
 
 internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfiguration>(
     defaultModuleConfiguration = CrashModuleConfiguration()
