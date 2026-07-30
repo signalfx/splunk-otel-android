@@ -2,7 +2,7 @@ import plugins.ConfigAndroidLibrary
 import plugins.ConfigPublish
 import utils.artifactIdProperty
 import utils.artifactPrefix
-import utils.integrationPrefix
+import utils.instrumentationPrefix
 import utils.versionProperty
 
 plugins {
@@ -14,29 +14,32 @@ apply<ConfigAndroidLibrary>()
 apply<ConfigPublish>()
 
 ext {
-    set(artifactIdProperty, "$artifactPrefix$integrationPrefix${project.name}")
+    set(artifactIdProperty, "$artifactPrefix$instrumentationPrefix${project.name}")
     set(versionProperty, Configurations.sdkVersionName)
 }
 
 android {
-    namespace = "com.splunk.rum.integration.crash"
+    namespace = "com.splunk.rum.instrumentation.anr"
 }
 
 dependencies {
     implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
-    
-    implementation(project(":integration:agent:internal"))
-    implementation(project(":common:otel"))
-    implementation(project(":instrumentation:runtime:crash"))
 
-    implementation(Dependencies.Otel.androidInstrumentation)
+    implementation(project(":common:otel"))
+    implementation(project(":common:utils"))
+
     implementation(Dependencies.Otel.api)
+    implementation(Dependencies.Otel.semConv)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
 
+    testImplementation(platform(Dependencies.Otel.androidBom))
+    testImplementation(Dependencies.Otel.sdk)
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.robolectric)
     testImplementation(Dependencies.Test.androidXTestCore)
+    testImplementation(Dependencies.Test.mockito)
+    testImplementation(Dependencies.Android.fragmentKtx)
 }

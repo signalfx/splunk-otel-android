@@ -28,12 +28,16 @@ dependencies {
 
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:otel"))
+    implementation(project(":instrumentation:runtime:anr"))
 
-    implementation(Dependencies.Otel.androidANRInstrumentation)
-
-    implementation(Dependencies.Otel.instrumentationApi)
+    implementation(Dependencies.Otel.androidInstrumentation)
+    implementation(Dependencies.Otel.api)
 
     implementation(Dependencies.SessionReplay.commonLogger)
     implementation(Dependencies.SessionReplay.commonUtils)
+
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.robolectric)
+    testImplementation(Dependencies.Test.androidXTestCore)
 }
 
