@@ -24,16 +24,19 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Watches the UI thread for ANRs by posting a [Runnable] to the main thread on every poll. When the
- * main thread fails to respond to [MAX_MISSED_POLLS] consecutive polls (5 seconds with the default
- * 1-second poll), an ANR is reported via [onAnr] with the main thread's current stack trace.
+ * main thread fails to respond to [maxMissedPolls] consecutive polls, an ANR is reported via
+ * [onAnr] with the main thread's current stack trace.
  *
- * @property pollDurationNs how long to wait for the main thread to respond on each poll; exists for testing.
+ * @property pollDurationNs How long to wait for the main thread to respond on each poll.
+ * @property maxMissedPolls How many consecutive missed polls trigger an ANR report. With the
+ *           default 1-second poll duration the total detection threshold is `maxMissedPolls` seconds.
  */
 internal class AnrWatcher @JvmOverloads constructor(
     private val uiHandler: Handler,
     private val mainThread: Thread,
     private val onAnr: (Array<StackTraceElement>) -> Unit,
-    private val pollDurationNs: Long = DEFAULT_POLL_DURATION_NS
+    private val pollDurationNs: Long = DEFAULT_POLL_DURATION_NS,
+    private val maxMissedPolls: Int = DEFAULT_MAX_MISSED_POLLS
 ) : Runnable {
 
     private val anrCounter = AtomicInteger()
@@ -56,7 +59,7 @@ internal class AnrWatcher @JvmOverloads constructor(
             return
         }
 
-        if (anrCounter.incrementAndGet() >= MAX_MISSED_POLLS) {
+        if (anrCounter.incrementAndGet() >= maxMissedPolls) {
             onAnr(mainThread.stackTrace)
             // Only report once per ANR window.
             anrCounter.set(0)
@@ -65,6 +68,6 @@ internal class AnrWatcher @JvmOverloads constructor(
 
     companion object {
         val DEFAULT_POLL_DURATION_NS: Long = TimeUnit.SECONDS.toNanos(1)
-        private const val MAX_MISSED_POLLS = 5
+        const val DEFAULT_MAX_MISSED_POLLS = 5
     }
 }

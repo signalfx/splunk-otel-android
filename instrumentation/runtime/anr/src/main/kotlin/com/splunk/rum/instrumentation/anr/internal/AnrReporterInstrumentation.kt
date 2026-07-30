@@ -25,15 +25,18 @@ import com.splunk.android.common.utils.AppStateObserver
 import com.splunk.rum.instrumentation.anr.internal.extractor.AnrAttributesExtractor
 import com.splunk.rum.utils.extensions.isStartedInForeground
 import io.opentelemetry.api.OpenTelemetry
+import java.time.Duration
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import kotlin.math.max
 
 /**
  * Entry point for installing ANR (application not responding) detection.
  *
- * Register any additional [AnrAttributesExtractor]s via [addAttributesExtractor] before calling
- * [install]. Detection is foreground-only and backed by a daemon watchdog thread that is cancelled
- * whenever the app is backgrounded.
+ * Register any additional [AnrAttributesExtractor]s via [addAttributesExtractor] and optionally
+ * configure the detection threshold via [setPollingInterval] before calling [install]. Detection is
+ * foreground-only and backed by a daemon watchdog thread that is cancelled whenever the app is
+ * backgrounded.
  *
  * This class is internal and is hence not for public use. Its APIs are unstable and can change at
  * any time.
@@ -42,9 +45,22 @@ class AnrReporterInstrumentation {
 
     private val additionalExtractors = mutableListOf<AnrAttributesExtractor>()
 
+    @Suppress("NewApi") // Duration requires API 26 or core library desugaring
+    private var maxMissedPolls: Int = AnrWatcher.DEFAULT_MAX_MISSED_POLLS
+
     /** Adds an [AnrAttributesExtractor] that enriches emitted ANR events. */
     fun addAttributesExtractor(extractor: AnrAttributesExtractor): AnrReporterInstrumentation {
         additionalExtractors.add(extractor)
+        return this
+    }
+
+    /**
+     * Sets the ANR detection threshold. The detector polls the main thread every second; after
+     * [pollingInterval] seconds of consecutive unresponsiveness an ANR is reported.
+     */
+    @Suppress("NewApi") // Duration requires API 26 or core library desugaring
+    fun setPollingInterval(pollingInterval: Duration): AnrReporterInstrumentation {
+        maxMissedPolls = max(1, pollingInterval.seconds.toInt())
         return this
     }
 
@@ -54,7 +70,12 @@ class AnrReporterInstrumentation {
         val reporter = AnrReporter(openTelemetry, additionalExtractors.toList())
 
         val mainLooper = Looper.getMainLooper()
-        val watcher = AnrWatcher(Handler(mainLooper), mainLooper.thread, reporter::report)
+        val watcher = AnrWatcher(
+            Handler(mainLooper),
+            mainLooper.thread,
+            reporter::report,
+            maxMissedPolls = maxMissedPolls
+        )
 
         val watchdogScheduler = Executors.newScheduledThreadPool(1, daemonThreadFactory())
 

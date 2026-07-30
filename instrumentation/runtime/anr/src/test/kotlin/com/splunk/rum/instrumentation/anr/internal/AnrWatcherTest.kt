@@ -103,6 +103,37 @@ class AnrWatcherTest {
         assertEquals(2, reportedStackTraces.size)
     }
 
+    @Test
+    fun `reports after the configured number of missed polls`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        val customThreshold = 3
+        val watcher = AnrWatcher(handler, mainThread, onAnr, SHORT_POLL_NS, maxMissedPolls = customThreshold)
+
+        repeat(customThreshold - 1) { watcher.run() }
+        assertTrue(reportedStackTraces.isEmpty())
+
+        watcher.run()
+        assertEquals(1, reportedStackTraces.size)
+    }
+
+    @Test
+    fun `custom threshold resets after reporting`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        val customThreshold = 2
+        val watcher = AnrWatcher(handler, mainThread, onAnr, SHORT_POLL_NS, maxMissedPolls = customThreshold)
+
+        repeat(customThreshold) { watcher.run() }
+        assertEquals(1, reportedStackTraces.size)
+
+        watcher.run()
+        assertEquals(1, reportedStackTraces.size)
+
+        repeat(customThreshold) { watcher.run() }
+        assertEquals(2, reportedStackTraces.size)
+    }
+
     private companion object {
         private val SHORT_POLL_NS = TimeUnit.MILLISECONDS.toNanos(20)
     }

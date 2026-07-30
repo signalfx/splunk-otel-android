@@ -20,7 +20,14 @@
     <string name="crash_with_out_of_memory_error">Crash with Out of Memory Error</string>
     <string name="crash_with_chained_exceptions">Crash with Chained Exceptions</string>
     <string name="crash_reports_null">NullPointerException</string>
-    <string name="trigger_anr">Trigger ANR</string>
+    <!-- ANR -->
+    <string name="anr_title">ANR Detection</string>
+    <string name="anr_description">Block the main thread for various durations to test ANR detection. Default polling interval is 5s — an ANR is reported when the main thread is unresponsive for the configured interval.</string>
+    <string name="anr_block_3s">Block Main Thread 3s</string>
+    <string name="anr_block_5s">Block Main Thread 5s</string>
+    <string name="anr_block_6s">Block Main Thread 6s</string>
+    <string name="anr_block_10s">Block Main Thread 10s</string>
+    <string name="anr_block_15s">Block Main Thread 15s</string>
 
     <!-- Custom tracking -->
     <string name="custom_tracking_title">Custom Tracking</string>

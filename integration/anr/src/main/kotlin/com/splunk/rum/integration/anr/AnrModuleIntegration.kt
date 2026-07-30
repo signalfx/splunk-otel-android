@@ -41,11 +41,15 @@ internal object AnrModuleIntegration : ModuleIntegration<AnrModuleConfiguration>
 
         val isEnabled =
             moduleConfigurations.find<LegacyAnrModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
+        val pollingInterval =
+            moduleConfigurations.find<LegacyAnrModuleConfiguration>()?.pollingInterval
+                ?: moduleConfiguration.pollingInterval
 
         if (isEnabled) {
             Logger.d(TAG, "Installing ANR reporter")
             val anrReporterInstrumentation = AnrReporterInstrumentation()
             anrReporterInstrumentation.addAttributesExtractor(RumAnrAttributesExtractor(context))
+            anrReporterInstrumentation.setPollingInterval(pollingInterval)
             anrReporterInstrumentation.install(context, oTelInstallationContext.openTelemetry)
         } else {
             Logger.d(TAG, "ANR reporting is disabled")
