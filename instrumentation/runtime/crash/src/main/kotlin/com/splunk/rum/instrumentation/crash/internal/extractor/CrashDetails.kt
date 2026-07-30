@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Splunk Inc.
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +15,15 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.common.otel
+package com.splunk.rum.instrumentation.crash.internal.extractor
 
-internal object RumConstants {
-    const val CRASH_INSTRUMENTATION_SCOPE_NAME = "com.splunk.rum.crash"
-    const val DEFAULT_LOG_EVENT_NAME = "splunk.log"
-    const val LOG_BODY_ATTRIBUTE = "body"
-}
+/**
+ * Holds the details of an application crash.
+ *
+ * This class is internal and is hence not for public use. Its APIs are unstable and can change at
+ * any time.
+ *
+ * @property thread The thread that crashed.
+ * @property cause The throwable that caused the crash.
+ */
+data class CrashDetails(val thread: Thread, val cause: Throwable)

@@ -18,6 +18,8 @@ package com.splunk.rum.integration.crash
 
 import android.content.Context
 import com.splunk.rum.common.logger.Logger
+import com.splunk.rum.instrumentation.crash.internal.CrashReporterInstrumentation
+import com.splunk.rum.instrumentation.crash.internal.extractor.RumCrashAttributesExtractor
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
@@ -44,8 +46,8 @@ internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfigurat
         if (isEnabled) {
             Logger.d(TAG, "Installing crash reporter")
             val crashReporterInstrumentation = CrashReporterInstrumentation()
-            crashReporterInstrumentation.addAttributesExtractor(CrashAttributesExtractor(context))
-            crashReporterInstrumentation.install(oTelInstallationContext)
+            crashReporterInstrumentation.addAttributesExtractor(RumCrashAttributesExtractor(context))
+            crashReporterInstrumentation.install(context, oTelInstallationContext.openTelemetry)
         } else {
             Logger.d(TAG, "Crash reporting is disabled")
         }
