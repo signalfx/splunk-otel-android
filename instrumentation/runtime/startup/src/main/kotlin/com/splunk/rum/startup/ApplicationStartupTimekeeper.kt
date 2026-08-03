@@ -21,7 +21,7 @@ import android.app.Application
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import com.splunk.rum.agent.utils.extensions.isStartedInForeground
+import com.splunk.rum.agent.common.utils.extensions.isStartedInForeground
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.common.utils.extensions.forEachFast

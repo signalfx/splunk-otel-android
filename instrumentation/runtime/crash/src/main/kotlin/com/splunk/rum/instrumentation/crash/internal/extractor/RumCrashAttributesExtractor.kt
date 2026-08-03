@@ -18,7 +18,7 @@ package com.splunk.rum.instrumentation.crash.internal.extractor
 
 import android.app.Application
 import android.content.Context
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.utils.AppStateObserver
 import io.opentelemetry.api.common.AttributesBuilder
 import java.util.concurrent.atomic.AtomicBoolean

@@ -1,7 +1,7 @@
 package com.splunk.rum.integration.agent.internal.session
 
-import com.splunk.rum.common.agent.storage.IAgentStorage
-import com.splunk.rum.common.agent.storage.SessionId
+import com.splunk.rum.agent.common.storage.IAgentStorage
+import com.splunk.rum.agent.common.storage.SessionId
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull

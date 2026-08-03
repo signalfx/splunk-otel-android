@@ -27,9 +27,9 @@ import com.splunk.android.instrumentation.recording.interactions.model.LegacyDat
 import com.splunk.android.instrumentation.recording.wireframe.canvas.compose.SessionReplayDrawModifier
 import com.splunk.android.instrumentation.recording.wireframe.model.Wireframe
 import com.splunk.android.instrumentation.recording.wireframe.stats.WireframeStats
+import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.logger.Logger
-import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority

@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.api.session
 
-import com.splunk.rum.agent.utils.extensions.toBase64
+import com.splunk.rum.agent.common.utils.extensions.toBase64
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager

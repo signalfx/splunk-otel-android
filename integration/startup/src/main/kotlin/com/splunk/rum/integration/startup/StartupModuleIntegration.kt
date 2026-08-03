@@ -17,10 +17,10 @@
 package com.splunk.rum.integration.startup
 
 import android.content.Context
+import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.agent.common.otel.extensions.toInstant
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.logger.Logger
-import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.extensions.toInstant
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.toSplunkString

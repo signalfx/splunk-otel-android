@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.user
 
-import com.splunk.rum.common.agent.storage.IAgentStorage
+import com.splunk.rum.agent.common.storage.IAgentStorage
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull

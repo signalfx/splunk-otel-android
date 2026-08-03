@@ -17,9 +17,9 @@
 package com.splunk.rum.integration.agent.internal.processor
 
 import android.app.Application
-import com.splunk.rum.agent.utils.extensions.applicationId
-import com.splunk.rum.agent.utils.extensions.versionCode
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.utils.extensions.applicationId
+import com.splunk.rum.agent.common.utils.extensions.versionCode
 import com.splunk.rum.integration.agent.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.extentions.splunkBuildId
 import io.opentelemetry.context.Context

@@ -16,8 +16,8 @@
 
 package com.splunk.rum.integration.agent.api.exporter
 
+import com.splunk.rum.agent.common.otel.extensions.joinToString
 import com.splunk.rum.common.logger.Logger
-import com.splunk.rum.common.otel.extensions.joinToString
 import com.splunk.rum.common.utils.extensions.forEachFast
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.EventData

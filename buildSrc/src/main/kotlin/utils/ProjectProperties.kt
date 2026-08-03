@@ -5,6 +5,6 @@ const val artifactPrefix = "rum-"
 const val artifactIdProperty = "mavenArtifactId"
 const val versionProperty = "mavenVersion"
 
-const val commonPrefix = "common-"
+const val commonPrefix = "agent-common-"
 const val integrationPrefix = "integration-"
 const val instrumentationPrefix = "instrumentation-"

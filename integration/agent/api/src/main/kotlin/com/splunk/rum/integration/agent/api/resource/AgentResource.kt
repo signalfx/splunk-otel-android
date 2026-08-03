@@ -2,7 +2,7 @@ package com.splunk.rum.integration.agent.api.resource
 
 import android.content.Context
 import android.os.Build
-import com.splunk.rum.agent.utils.extensions.appVersion
+import com.splunk.rum.agent.common.utils.extensions.appVersion
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.BuildConfig
 import io.opentelemetry.sdk.resources.Resource

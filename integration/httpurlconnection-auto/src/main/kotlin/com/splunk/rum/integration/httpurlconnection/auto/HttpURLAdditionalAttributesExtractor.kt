@@ -16,8 +16,8 @@
 
 package com.splunk.rum.integration.httpurlconnection.auto
 
-import com.splunk.rum.agent.utils.ServerTimingHeaderParser
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.utils.ServerTimingHeaderParser
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor

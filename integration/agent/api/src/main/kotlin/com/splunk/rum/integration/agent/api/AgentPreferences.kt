@@ -16,8 +16,8 @@
 
 package com.splunk.rum.integration.agent.api
 
-import com.splunk.rum.common.agent.storage.IAgentStorage
-import com.splunk.rum.common.agent.storage.StoredEndpointConfig
+import com.splunk.rum.agent.common.storage.IAgentStorage
+import com.splunk.rum.agent.common.storage.StoredEndpointConfig
 import com.splunk.rum.common.logger.Logger
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.OpenTelemetrySdk

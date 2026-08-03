@@ -20,7 +20,7 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.rum.common.agent.storage"
+    namespace = "com.splunk.rum.agent.common.storage"
 }
 
 dependencies {

@@ -18,9 +18,9 @@ package com.splunk.rum.integration.applicationlifecycle
 
 import android.app.Application
 import android.content.Context
+import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.logger.Logger
-import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
