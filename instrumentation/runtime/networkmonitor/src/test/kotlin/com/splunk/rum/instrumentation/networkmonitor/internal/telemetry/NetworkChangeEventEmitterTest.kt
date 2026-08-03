@@ -20,7 +20,7 @@ package com.splunk.rum.instrumentation.networkmonitor.internal.telemetry
 import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
-import io.opentelemetry.api.incubator.logs.ExtendedLogRecordBuilder
+import io.opentelemetry.api.logs.LogRecordBuilder
 import io.opentelemetry.api.logs.Logger
 import org.junit.Test
 import org.mockito.Answers.RETURNS_SELF
@@ -31,7 +31,7 @@ import org.mockito.Mockito.`when`
 
 class NetworkChangeEventEmitterTest {
     private val logger = mock(Logger::class.java)
-    private val logRecordBuilder = mock(ExtendedLogRecordBuilder::class.java, RETURNS_SELF)
+    private val logRecordBuilder = mock(LogRecordBuilder::class.java, RETURNS_SELF)
     private val gate = NetworkApplicationStateGate()
     private val emitter = NetworkChangeEventEmitter(logger, gate)
     private val attributes = Attributes.of(AttributeKey.stringKey("network.connection.type"), "wifi")
@@ -44,8 +44,11 @@ class NetworkChangeEventEmitterTest {
     fun emitsNamedEventWithAttributesInForeground() {
         emitter.emit(attributes)
 
-        verify(logRecordBuilder).setEventName(NetworkChangeEventEmitter.EVENT_NAME)
         verify(logRecordBuilder).setAllAttributes(attributes)
+        verify(logRecordBuilder).setAttribute(
+            NetworkChangeEventEmitter.EVENT_NAME_KEY,
+            NetworkChangeEventEmitter.EVENT_NAME
+        )
         verify(logRecordBuilder).emit()
     }
 

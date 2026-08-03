@@ -20,7 +20,6 @@ package com.splunk.rum.instrumentation.networkmonitor.internal.telemetry
 import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
-import io.opentelemetry.api.incubator.logs.ExtendedLogRecordBuilder
 import io.opentelemetry.api.logs.Logger
 
 internal class NetworkChangeEventEmitter(
@@ -32,14 +31,15 @@ internal class NetworkChangeEventEmitter(
             return
         }
 
-        (logger.logRecordBuilder() as ExtendedLogRecordBuilder)
-            .setEventName(EVENT_NAME)
+        logger.logRecordBuilder()
             .setAllAttributes(attributes)
+            .setAttribute(EVENT_NAME_KEY, EVENT_NAME)
             .emit()
     }
 
     internal companion object {
         const val EVENT_NAME = "network.change"
+        val EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
         val NETWORK_STATUS: AttributeKey<String> = AttributeKey.stringKey("network.status")
     }
 }

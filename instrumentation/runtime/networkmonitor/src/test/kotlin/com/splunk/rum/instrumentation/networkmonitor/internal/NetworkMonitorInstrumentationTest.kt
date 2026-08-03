@@ -23,7 +23,7 @@ import com.splunk.rum.instrumentation.networkmonitor.internal.model.NetworkState
 import com.splunk.rum.instrumentation.networkmonitor.internal.network.CurrentNetworkProvider
 import com.splunk.rum.instrumentation.networkmonitor.internal.network.NetworkChangeListener
 import io.opentelemetry.api.OpenTelemetry
-import io.opentelemetry.api.incubator.logs.ExtendedLogRecordBuilder
+import io.opentelemetry.api.logs.LogRecordBuilder
 import io.opentelemetry.api.logs.Logger
 import io.opentelemetry.api.logs.LoggerProvider
 import io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CONNECTION_TYPE
@@ -48,7 +48,7 @@ class NetworkMonitorInstrumentationTest {
     private val openTelemetry = mock(OpenTelemetry::class.java)
     private val loggerProvider = mock(LoggerProvider::class.java)
     private val logger = mock(Logger::class.java)
-    private val logRecordBuilder = mock(ExtendedLogRecordBuilder::class.java, RETURNS_SELF)
+    private val logRecordBuilder = mock(LogRecordBuilder::class.java, RETURNS_SELF)
 
     init {
         `when`(openTelemetry.logsBridge).thenReturn(loggerProvider)

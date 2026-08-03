@@ -90,7 +90,6 @@ object Dependencies {
         const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
 
         const val api = "io.opentelemetry:opentelemetry-api"
-        const val apiIncubator = "io.opentelemetry:opentelemetry-api-incubator"
         const val sdk = "io.opentelemetry:opentelemetry-sdk"
         const val exporterOtlpCommon = "io.opentelemetry:opentelemetry-exporter-otlp-common"
         const val exporterOtlp = "io.opentelemetry:opentelemetry-exporter-otlp"

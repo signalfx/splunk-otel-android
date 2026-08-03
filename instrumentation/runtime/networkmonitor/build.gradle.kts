@@ -26,7 +26,6 @@ dependencies {
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(Dependencies.Otel.api)
-    implementation(Dependencies.Otel.apiIncubator)
     implementation(Dependencies.Otel.semConvIncubating)
     implementation(Dependencies.SessionReplay.commonUtils)
     compileOnly(Dependencies.Android.annotation)
