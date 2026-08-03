@@ -24,9 +24,7 @@ import java.time.Duration
  *
  * @property isEnabled Whether the module is enabled.
  * @property pollingInterval How long the main thread must be unresponsive before an ANR is reported.
- *                           The detector polls the main thread every second; after
- *                           [pollingInterval] seconds of consecutive unresponsiveness an ANR span
- *                           is emitted. Default is 5 seconds.
+ *                           Default is 5 seconds.
  */
 @Suppress("NewApi") // Duration requires API 26 or core library desugaring
 data class AnrModuleConfiguration @JvmOverloads constructor(
@@ -42,7 +40,7 @@ data class AnrModuleConfiguration @JvmOverloads constructor(
     )
 
     companion object {
-        /** Default ANR detection threshold: 5 seconds of main-thread unresponsiveness. */
+        /** Default ANR detection threshold. */
         val DEFAULT_POLLING_INTERVAL: Duration = Duration.ofSeconds(5)
     }
 }

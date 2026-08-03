@@ -28,6 +28,7 @@ import io.opentelemetry.api.OpenTelemetry
 import java.time.Duration
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import kotlin.math.ceil
 import kotlin.math.max
 
 /**
@@ -55,12 +56,13 @@ class AnrReporterInstrumentation {
     }
 
     /**
-     * Sets the ANR detection threshold. The detector polls the main thread every second; after
-     * [pollingInterval] seconds of consecutive unresponsiveness an ANR is reported.
+     * Sets the ANR detection threshold. An ANR is reported after the main thread is unresponsive
+     * for approximately [pollingInterval].
      */
     @Suppress("NewApi") // Duration requires API 26 or core library desugaring
     fun setPollingInterval(pollingInterval: Duration): AnrReporterInstrumentation {
-        maxMissedPolls = max(1, pollingInterval.seconds.toInt())
+        val effectiveCycleSeconds = POLL_AWAIT_SECONDS + SCHEDULER_DELAY_SECONDS
+        maxMissedPolls = max(1, ceil(pollingInterval.seconds.toDouble() / effectiveCycleSeconds).toInt())
         return this
     }
 
@@ -98,5 +100,7 @@ class AnrReporterInstrumentation {
 
     private companion object {
         private const val WATCHDOG_THREAD_NAME = "splunk-anr-watcher"
+        private const val POLL_AWAIT_SECONDS = 1L
+        private const val SCHEDULER_DELAY_SECONDS = 1L
     }
 }

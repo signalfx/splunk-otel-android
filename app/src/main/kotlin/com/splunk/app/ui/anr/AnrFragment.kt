@@ -40,10 +40,18 @@ class AnrFragment : BaseFragment<FragmentAnrBinding>() {
 
         with(viewBinding) {
             anrBlock3s.setOnClickListener { blockMainThread(3_000L) }
+            anrBlock4s.setOnClickListener { blockMainThread(4_000L) }
             anrBlock5s.setOnClickListener { blockMainThread(5_000L) }
             anrBlock6s.setOnClickListener { blockMainThread(6_000L) }
+            anrBlock7s.setOnClickListener { blockMainThread(7_000L) }
+            anrBlock8s.setOnClickListener { blockMainThread(8_000L) }
             anrBlock10s.setOnClickListener { blockMainThread(10_000L) }
+            anrBlock11s.setOnClickListener { blockMainThread(11_000L) }
+            anrBlock12s.setOnClickListener { blockMainThread(12_000L) }
             anrBlock15s.setOnClickListener { blockMainThread(15_000L) }
+            anrBlock16s.setOnClickListener { blockMainThread(16_000L) }
+            anrBlock18s.setOnClickListener { blockMainThread(18_000L) }
+            anrBlock20s.setOnClickListener { blockMainThread(20_000L) }
         }
     }
 

@@ -33,6 +33,17 @@
             app:layout_constraintTop_toBottomOf="@id/anr_description" />
 
         <TextView
+            android:id="@+id/anr_block_4s"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/anr_block_4s"
+            app:layout_constraintTop_toBottomOf="@id/anr_block_3s" />
+
+        <TextView
             android:id="@+id/anr_block_5s"
             style="@style/Button"
             android:layout_width="match_parent"
@@ -41,7 +52,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
             android:text="@string/anr_block_5s"
-            app:layout_constraintTop_toBottomOf="@id/anr_block_3s" />
+            app:layout_constraintTop_toBottomOf="@id/anr_block_4s" />
 
         <TextView
             android:id="@+id/anr_block_6s"
@@ -55,6 +66,28 @@
             app:layout_constraintTop_toBottomOf="@id/anr_block_5s" />
 
         <TextView
+            android:id="@+id/anr_block_7s"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/anr_block_7s"
+            app:layout_constraintTop_toBottomOf="@id/anr_block_6s" />
+
+        <TextView
+            android:id="@+id/anr_block_8s"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/anr_block_8s"
+            app:layout_constraintTop_toBottomOf="@id/anr_block_7s" />
+
+        <TextView
             android:id="@+id/anr_block_10s"
             style="@style/Button"
             android:layout_width="match_parent"
@@ -63,7 +96,29 @@
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
             android:text="@string/anr_block_10s"
-            app:layout_constraintTop_toBottomOf="@id/anr_block_6s" />
+            app:layout_constraintTop_toBottomOf="@id/anr_block_8s" />
+
+        <TextView
+            android:id="@+id/anr_block_11s"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/anr_block_11s"
+            app:layout_constraintTop_toBottomOf="@id/anr_block_10s" />
+
+        <TextView
+            android:id="@+id/anr_block_12s"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/anr_block_12s"
+            app:layout_constraintTop_toBottomOf="@id/anr_block_11s" />
 
         <TextView
             android:id="@+id/anr_block_15s"
@@ -74,7 +129,40 @@
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
             android:text="@string/anr_block_15s"
-            app:layout_constraintTop_toBottomOf="@id/anr_block_10s" />
+            app:layout_constraintTop_toBottomOf="@id/anr_block_12s" />
+
+        <TextView
+            android:id="@+id/anr_block_16s"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/anr_block_16s"
+            app:layout_constraintTop_toBottomOf="@id/anr_block_15s" />
+
+        <TextView
+            android:id="@+id/anr_block_18s"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/anr_block_18s"
+            app:layout_constraintTop_toBottomOf="@id/anr_block_16s" />
+
+        <TextView
+            android:id="@+id/anr_block_20s"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/anr_block_20s"
+            app:layout_constraintTop_toBottomOf="@id/anr_block_18s" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
