@@ -15,6 +15,7 @@ include ':common:otel',
 
 // Instrumentation modules
 include ':instrumentation:runtime:startup',
+        ':instrumentation:runtime:networkmonitor',
         ':instrumentation:runtime:okhttp3-common',
         ':instrumentation:runtime:okhttp3-manual',
         ':instrumentation:runtime:okhttp3-auto',

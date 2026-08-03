@@ -2,7 +2,7 @@ import plugins.ConfigAndroidLibrary
 import plugins.ConfigPublish
 import utils.artifactIdProperty
 import utils.artifactPrefix
-import utils.integrationPrefix
+import utils.instrumentationPrefix
 import utils.versionProperty
 
 plugins {
@@ -14,26 +14,23 @@ apply<ConfigAndroidLibrary>()
 apply<ConfigPublish>()
 
 ext {
-    set(artifactIdProperty, "$artifactPrefix$integrationPrefix${project.name}")
+    set(artifactIdProperty, "$artifactPrefix$instrumentationPrefix${project.name}")
     set(versionProperty, Configurations.sdkVersionName)
 }
 
 android {
-    namespace = "com.splunk.rum.integration.networkmonitor"
+    namespace = "com.splunk.rum.instrumentation.networkmonitor"
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
-    implementation(project(":integration:agent:internal"))
-    implementation(project(":instrumentation:runtime:networkmonitor"))
-
-    implementation(Dependencies.Otel.androidInstrumentation)
-
+    implementation(Dependencies.Otel.api)
     implementation(Dependencies.Otel.semConvIncubating)
-
-    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.SessionReplay.commonUtils)
+    compileOnly(Dependencies.Android.annotation)
 
     testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.mockito)
+    testImplementation(Dependencies.Test.robolectric)
 }
