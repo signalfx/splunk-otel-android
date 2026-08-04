@@ -20,7 +20,7 @@ import android.app.Application
 import android.app.Instrumentation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import io.opentelemetry.api.common.Attributes

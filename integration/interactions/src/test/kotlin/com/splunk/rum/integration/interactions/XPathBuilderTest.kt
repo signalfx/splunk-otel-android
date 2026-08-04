@@ -2,10 +2,10 @@ package com.splunk.rum.integration.interactions
 
 import android.graphics.Point
 import android.graphics.Rect
-import com.splunk.android.common.utils.Lock
 import com.splunk.android.instrumentation.recording.interactions.model.ElementNode
 import com.splunk.android.instrumentation.recording.interactions.model.Interaction
 import com.splunk.android.instrumentation.recording.wireframe.model.Wireframe
+import com.splunk.rum.common.utils.Lock
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 

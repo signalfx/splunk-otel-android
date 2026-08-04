@@ -16,7 +16,7 @@
 
 package com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle
 
-import com.splunk.android.common.utils.AppStateObserver
+import com.splunk.rum.common.utils.AppStateObserver
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class NetworkApplicationStateGate : AppStateObserver.Listener {

@@ -1,1 +1,1 @@
--repackageclasses 'com.splunk.rum.common.otel'
+-repackageclasses 'com.splunk.rum.agent.common.otel'

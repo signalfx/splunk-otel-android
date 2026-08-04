@@ -21,8 +21,8 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import androidx.fragment.app.FragmentActivity
-import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.rum.common.logger.Logger
+import com.splunk.rum.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.navigation.automatic.ComposeNavigationTracker

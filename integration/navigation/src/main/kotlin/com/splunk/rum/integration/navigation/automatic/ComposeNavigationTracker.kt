@@ -20,7 +20,7 @@ import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.navigation.NavigationEvent
 import com.splunk.rum.integration.navigation.NavigationEventProcessor
 import io.opentelemetry.api.common.AttributeKey

@@ -19,15 +19,13 @@ package com.splunk.rum.instrumentation.networkmonitor.internal
 
 import android.app.Application
 import android.util.Log
+import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
-import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateObserver
 import com.splunk.rum.instrumentation.networkmonitor.internal.network.CurrentNetworkProvider
-import com.splunk.rum.instrumentation.networkmonitor.internal.network.NetworkChangeListener
 import com.splunk.rum.instrumentation.networkmonitor.internal.telemetry.CurrentNetworkAttributes
 import com.splunk.rum.instrumentation.networkmonitor.internal.telemetry.NetworkChangeEventEmitter
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
-import java.io.Closeable
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -36,16 +34,12 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * This class is internal and not for public use. Its APIs are unstable and can change at any time.
  */
-class NetworkMonitorInstrumentation : Closeable {
+class NetworkMonitorInstrumentation {
     private val attributeListeners = CopyOnWriteArrayList<(Attributes) -> Unit>()
     private val installed = AtomicBoolean()
-    private var currentNetworkProvider: Closeable? = null
-    private var applicationStateObserver: Closeable? = null
 
     internal var currentNetworkProviderFactory: (Application) -> CurrentNetworkProvider? =
         { application -> CurrentNetworkProvider.create(application) }
-    internal var applicationStateObserverFactory: (Application, NetworkApplicationStateGate) -> Closeable =
-        ::NetworkApplicationStateObserver
 
     /**
      * Adds a listener that receives the complete network attributes whenever the active network changes.
@@ -70,58 +64,28 @@ class NetworkMonitorInstrumentation : Closeable {
         }
 
         val applicationStateGate = NetworkApplicationStateGate()
-        applicationStateObserver = try {
-            applicationStateObserverFactory(application, applicationStateGate)
-        } catch (exception: RuntimeException) {
-            Log.w(
-                TAG,
-                "Failed to observe application foreground/background state. Network change events will remain enabled.",
-                exception
-            )
-            null
-        }
+        AppStateObserver.listeners += applicationStateGate
+        AppStateObserver.attach(application)
 
         val eventEmitter = NetworkChangeEventEmitter(
             openTelemetry.logsBridge[INSTRUMENTATION_SCOPE],
             applicationStateGate
         )
-        currentNetworkProvider.addNetworkChangeListener(
-            NetworkChangeListener { currentNetwork ->
-                val attributes = CurrentNetworkAttributes.extract(currentNetwork)
-                attributeListeners.forEach { listener ->
-                    try {
-                        listener(attributes)
-                    } catch (exception: RuntimeException) {
-                        Log.w(TAG, "Network change listener failed.", exception)
-                    }
+        currentNetworkProvider.addNetworkChangeListener { currentNetwork ->
+            val attributes = CurrentNetworkAttributes.extract(currentNetwork)
+            attributeListeners.forEach { listener ->
+                try {
+                    listener(attributes)
+                } catch (exception: RuntimeException) {
+                    Log.w(TAG, "Network change listener failed.", exception)
                 }
-                eventEmitter.emit(attributes)
             }
-        )
-        this.currentNetworkProvider = currentNetworkProvider
-    }
-
-    /** Stops network and application-state callbacks. */
-    override fun close() {
-        if (!installed.compareAndSet(true, false)) {
-            return
-        }
-        closeSafely(currentNetworkProvider, "Failed to stop network monitoring.")
-        closeSafely(applicationStateObserver, "Failed to stop application-state monitoring.")
-        currentNetworkProvider = null
-        applicationStateObserver = null
-    }
-
-    private fun closeSafely(closeable: Closeable?, message: String) {
-        try {
-            closeable?.close()
-        } catch (exception: RuntimeException) {
-            Log.w(TAG, message, exception)
+            eventEmitter.emit(attributes)
         }
     }
 
     private companion object {
-        private const val TAG = "NetworkMonitor"
-        private const val INSTRUMENTATION_SCOPE = "com.splunk.rum.network"
+        const val TAG = "NetworkMonitor"
+        const val INSTRUMENTATION_SCOPE = "com.splunk.rum.network"
     }
 }

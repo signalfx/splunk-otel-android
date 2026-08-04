@@ -33,7 +33,7 @@ dependencies {
 
     implementation(Dependencies.Otel.semConvIncubating)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.Common.logger)
 
     testImplementation(Dependencies.Test.junit)
 }

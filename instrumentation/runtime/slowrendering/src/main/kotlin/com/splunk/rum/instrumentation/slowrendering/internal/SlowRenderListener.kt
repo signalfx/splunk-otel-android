@@ -26,7 +26,7 @@ import android.os.Looper
 import android.util.SparseIntArray
 import android.view.FrameMetrics
 import android.view.Window
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import io.opentelemetry.api.trace.Tracer
 import java.time.Duration
 import java.time.Instant

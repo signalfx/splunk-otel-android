@@ -33,6 +33,6 @@ dependencies {
     implementation(Dependencies.Otel.androidInstrumentation)
     implementation(Dependencies.Otel.api)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.utils)
 }

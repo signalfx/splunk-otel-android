@@ -19,7 +19,7 @@ package com.splunk.rum.integration.lifecycle.callback
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.lifecycle.LifecycleEventEmitter
 import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 

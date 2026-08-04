@@ -17,7 +17,7 @@
 
 package com.splunk.rum.instrumentation.crash.internal
 
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.crash.internal.extractor.CrashAttributesExtractor
 import com.splunk.rum.instrumentation.crash.internal.extractor.CrashDetails
 import io.opentelemetry.api.OpenTelemetry

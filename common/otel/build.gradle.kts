@@ -20,7 +20,7 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.rum.common.otel"
+    namespace = "com.splunk.rum.agent.common.otel"
 }
 
 dependencies {
@@ -37,11 +37,11 @@ dependencies {
     api(Dependencies.Otel.semConv)
     api(Dependencies.Otel.semConvIncubating)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonJob)
-    implementation(Dependencies.SessionReplay.commonHttp)
-    implementation(Dependencies.SessionReplay.commonStorage)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.job)
+    implementation(Dependencies.Common.http)
+    implementation(Dependencies.Common.storage)
+    implementation(Dependencies.Common.utils)
 
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.mockito)

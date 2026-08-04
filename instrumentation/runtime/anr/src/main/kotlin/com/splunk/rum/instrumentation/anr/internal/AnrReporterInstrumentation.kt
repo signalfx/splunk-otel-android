@@ -21,9 +21,9 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import com.splunk.android.common.utils.AppStateObserver
+import com.splunk.rum.agent.common.utils.extensions.isStartedInForeground
+import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.instrumentation.anr.internal.extractor.AnrAttributesExtractor
-import com.splunk.rum.utils.extensions.isStartedInForeground
 import io.opentelemetry.api.OpenTelemetry
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
@@ -59,9 +59,8 @@ class AnrReporterInstrumentation {
         val watchdogScheduler = Executors.newScheduledThreadPool(1, daemonThreadFactory())
 
         val toggler = AnrDetectorToggler(watcher, watchdogScheduler)
-        val observer = AppStateObserver()
-        observer.listener = toggler
-        observer.attach(application)
+        AppStateObserver.listeners += toggler
+        AppStateObserver.attach(application)
 
         // AppStateObserver only emits onAppForegrounded on a transition. If the app is already in the
         // foreground when we install (e.g. late/hybrid initialization after the first Activity

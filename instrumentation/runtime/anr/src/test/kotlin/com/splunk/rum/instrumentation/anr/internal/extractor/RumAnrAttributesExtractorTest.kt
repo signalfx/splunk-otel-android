@@ -18,7 +18,7 @@ package com.splunk.rum.instrumentation.anr.internal.extractor
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import io.opentelemetry.api.common.Attributes
 import org.junit.Assert.assertEquals
 import org.junit.Before
