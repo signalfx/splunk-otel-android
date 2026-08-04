@@ -17,6 +17,7 @@
 package com.splunk.rum.instrumentation.networkmonitor.internal
 
 import android.app.Application
+import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwork
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.NetworkState
@@ -27,7 +28,6 @@ import io.opentelemetry.api.logs.LogRecordBuilder
 import io.opentelemetry.api.logs.Logger
 import io.opentelemetry.api.logs.LoggerProvider
 import io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CONNECTION_TYPE
-import java.io.Closeable
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -36,7 +36,6 @@ import org.junit.runner.RunWith
 import org.mockito.Answers.RETURNS_SELF
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
-import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
@@ -80,17 +79,12 @@ class NetworkMonitorInstrumentationTest {
     @Test
     fun backgroundSuppressesEventButNotAttributeListener() {
         val provider = FakeCurrentNetworkProvider()
-        lateinit var gate: NetworkApplicationStateGate
         val observedTypes = mutableListOf<String?>()
-        val instrumentation = instrumentationWith(provider).apply {
-            applicationStateObserverFactory = { _, stateGate ->
-                gate = stateGate
-                Closeable {}
-            }
-            addNetworkChangeListener { observedTypes += it[NETWORK_CONNECTION_TYPE] }
-        }
+        val instrumentation = instrumentationWith(provider)
+            .addNetworkChangeListener { observedTypes += it[NETWORK_CONNECTION_TYPE] }
 
         instrumentation.install(application, openTelemetry)
+        val gate = AppStateObserver.listeners.filterIsInstance<NetworkApplicationStateGate>().last()
         gate.onAppBackgrounded()
         provider.publish(CurrentNetwork(NetworkState.TRANSPORT_CELLULAR))
 
@@ -107,7 +101,6 @@ class NetworkMonitorInstrumentationTest {
                 providerCreations++
                 provider
             }
-            applicationStateObserverFactory = { _, _ -> Closeable {} }
         }
 
         instrumentation.install(application, openTelemetry)
@@ -121,15 +114,10 @@ class NetworkMonitorInstrumentationTest {
     @Test
     fun unavailableConnectivityManagerSkipsInstallationAndLogsWarning() {
         var providerCreations = 0
-        var observerCreations = 0
         val instrumentation = NetworkMonitorInstrumentation().apply {
             currentNetworkProviderFactory = {
                 providerCreations++
                 null
-            }
-            applicationStateObserverFactory = { _, _ ->
-                observerCreations++
-                Closeable {}
             }
         }
 
@@ -137,117 +125,9 @@ class NetworkMonitorInstrumentationTest {
         instrumentation.install(application, openTelemetry)
 
         assertEquals(2, providerCreations)
-        assertEquals(0, observerCreations)
         assertTrue(
             ShadowLog.getLogsForTag("NetworkMonitor").any {
                 it.msg == "ConnectivityManager unavailable. Network monitoring will not be installed."
-            }
-        )
-    }
-
-    @Test
-    fun closeStopsProviderAndLifecycleObserver() {
-        val provider = FakeCurrentNetworkProvider()
-        var observerClosed = false
-        val instrumentation = instrumentationWith(provider).apply {
-            applicationStateObserverFactory = { _, _ ->
-                Closeable { observerClosed = true }
-            }
-        }
-
-        instrumentation.install(application, openTelemetry)
-        instrumentation.close()
-
-        assertEquals(1, provider.closeCount)
-        assertTrue(observerClosed)
-    }
-
-    @Test
-    fun closeBeforeInstallDoesNothing() {
-        var providerCreations = 0
-        val instrumentation = NetworkMonitorInstrumentation().apply {
-            currentNetworkProviderFactory = {
-                providerCreations++
-                FakeCurrentNetworkProvider()
-            }
-        }
-
-        instrumentation.close()
-
-        assertEquals(0, providerCreations)
-    }
-
-    @Test
-    fun repeatedCloseOnlyStopsResourcesOnce() {
-        val provider = FakeCurrentNetworkProvider()
-        var observerCloseCount = 0
-        val instrumentation = instrumentationWith(provider).apply {
-            applicationStateObserverFactory = { _, _ ->
-                Closeable { observerCloseCount++ }
-            }
-        }
-
-        instrumentation.install(application, openTelemetry)
-        instrumentation.close()
-        instrumentation.close()
-
-        assertEquals(1, provider.closeCount)
-        assertEquals(1, observerCloseCount)
-    }
-
-    @Test
-    fun canInstallAgainAfterClose() {
-        val provider = FakeCurrentNetworkProvider()
-        val instrumentation = instrumentationWith(provider)
-
-        instrumentation.install(application, openTelemetry)
-        provider.publish(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
-        instrumentation.close()
-        instrumentation.install(application, openTelemetry)
-        provider.publish(CurrentNetwork(NetworkState.TRANSPORT_VPN))
-
-        assertEquals(1, provider.closeCount)
-        verify(logRecordBuilder, times(2)).emit()
-    }
-
-    @Test
-    fun lifecycleObserverFailureLeavesNetworkEventsEnabled() {
-        val provider = FakeCurrentNetworkProvider()
-        val instrumentation = instrumentationWith(provider).apply {
-            applicationStateObserverFactory = { _, _ ->
-                throw IllegalStateException("observer unavailable")
-            }
-        }
-
-        instrumentation.install(application, openTelemetry)
-        provider.publish(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
-
-        verify(logRecordBuilder).emit()
-        assertTrue(
-            ShadowLog.getLogsForTag("NetworkMonitor").any {
-                it.msg ==
-                    "Failed to observe application foreground/background state. Network change events will remain enabled."
-            }
-        )
-    }
-
-    @Test
-    fun providerCloseFailureDoesNotPreventLifecycleObserverClose() {
-        val provider = FakeCurrentNetworkProvider(closeFailure = IllegalStateException("close failed"))
-        var observerClosed = false
-        val instrumentation = instrumentationWith(provider).apply {
-            applicationStateObserverFactory = { _, _ ->
-                Closeable { observerClosed = true }
-            }
-        }
-
-        instrumentation.install(application, openTelemetry)
-        instrumentation.close()
-
-        assertTrue(observerClosed)
-        assertTrue(
-            ShadowLog.getLogsForTag("NetworkMonitor").any {
-                it.msg == "Failed to stop network monitoring."
             }
         )
     }
@@ -274,14 +154,11 @@ class NetworkMonitorInstrumentationTest {
 
     private fun instrumentationWith(provider: FakeCurrentNetworkProvider) = NetworkMonitorInstrumentation().apply {
         currentNetworkProviderFactory = { provider }
-        applicationStateObserverFactory = { _, _ -> Closeable {} }
     }
 
-    private class FakeCurrentNetworkProvider(private val closeFailure: RuntimeException? = null) :
-        CurrentNetworkProvider {
+    private class FakeCurrentNetworkProvider : CurrentNetworkProvider {
         private val listeners = mutableListOf<NetworkChangeListener>()
         override var currentNetwork = CurrentNetworkProvider.UNKNOWN_NETWORK
-        var closeCount = 0
 
         override fun refreshNetworkStatus(): CurrentNetwork = currentNetwork
 
@@ -294,9 +171,7 @@ class NetworkMonitorInstrumentationTest {
         }
 
         override fun close() {
-            closeCount++
             listeners.clear()
-            closeFailure?.let { throw it }
         }
 
         fun publish(network: CurrentNetwork) {
