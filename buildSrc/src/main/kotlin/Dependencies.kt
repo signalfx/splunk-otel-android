@@ -108,6 +108,5 @@ object Dependencies {
         const val androidServices = "io.opentelemetry.android:services"
         const val androidCommon = "io.opentelemetry.android:common"
         const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation"
-        const val androidNetworkMonitorInstrumentation = "io.opentelemetry.android.instrumentation:network"
     }
 }
