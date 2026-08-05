@@ -72,14 +72,27 @@ internal class ComposeNavigationTracker(
         screenChangeDetector.clearComposeRoute()
     }
 
+    private var routeApiAvailable = true
+
     private fun handleDestinationChanged(destination: NavDestination, arguments: Bundle?) {
+        if (!routeApiAvailable) return
         if (destination is NavGraph) return
         if (destination.navigatorName == NAVIGATOR_NAME_DIALOG) return
 
-        val screenName = destination.route ?: return
+        val screenName = try {
+            destination.route
+        } catch (e: LinkageError) {
+            routeApiAvailable = false
+            Logger.w(TAG, "NavDestination.route not available, disabling Compose tracking: ${e.message}")
+            return
+        } ?: return
 
         val attrMap = extractArguments(arguments)
-        destination.parent?.route?.let { attrMap[ATTR_NAV_GRAPH] = it }
+        try {
+            destination.parent?.route?.let { attrMap[ATTR_NAV_GRAPH] = it }
+        } catch (_: LinkageError) {
+            // guarded by the flag above on next call
+        }
 
         if (processor != null) {
             val event = NavigationEvent(
