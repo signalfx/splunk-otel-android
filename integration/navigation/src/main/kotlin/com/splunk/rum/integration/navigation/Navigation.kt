@@ -66,15 +66,6 @@ class Navigation internal constructor() {
 
     private fun createTrackerIfConfigured(): ComposeNavigationTracker? {
         val detector = pendingDetector ?: return null
-        if (!isRouteApiAvailable) {
-            Logger.d(
-                TAG,
-                "NavDestination.getRoute() not available (requires navigation 2.4.0+), Compose tracking disabled"
-            )
-            pendingDetector = null
-            pendingProcessor = null
-            return null
-        }
         val tracker = ComposeNavigationTracker(
             screenChangeDetector = detector,
             processor = pendingProcessor
@@ -84,15 +75,6 @@ class Navigation internal constructor() {
         pendingProcessor = null
         Logger.d(TAG, "ComposeNavigationTracker initialized")
         return tracker
-    }
-
-    private val isRouteApiAvailable: Boolean by lazy {
-        try {
-            Class.forName("androidx.navigation.NavDestination").getMethod("getRoute")
-            true
-        } catch (_: Exception) {
-            false
-        }
     }
 
     /**
