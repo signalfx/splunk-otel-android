@@ -51,6 +51,15 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     private val emitter = NavigationEventEmitter()
     private var screenChangeDetector: ScreenChangeDetector? = null
 
+    private val isNavigationAvailable: Boolean by lazy {
+        try {
+            Class.forName("androidx.navigation.NavDestination")
+            true
+        } catch (_: ClassNotFoundException) {
+            false
+        }
+    }
+
     private val activityLifecycleCallbacksAdapter = object : ActivityLifecycleCallbacksAdapter {
         override fun onActivityResumed(activity: Activity) {
             currentActivityReference = WeakReference(activity)
@@ -106,7 +115,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             }
         }
 
-        if (isNavigationAvailable()) {
+        if (isNavigationAvailable) {
             Navigation.instance.composeTracker = ComposeNavigationTracker(
                 screenChangeDetector = detector,
                 processor = moduleConfiguration.navigationEventProcessor
@@ -115,7 +124,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         } else {
             Logger.d(
                 TAG,
-                "androidx.navigation.NavDestination.getRoute not found on classpath, Compose navigation tracking disabled: requires androidx.navigation 2.4.0+"
+                "androidx.navigation.NavDestination not found on classpath, Compose navigation tracking disabled: requires androidx.navigation 2.4.0+"
             )
         }
 
@@ -155,14 +164,6 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         }
 
         application.registerActivityLifecycleCallbacks(fragmentActivityCallback)
-    }
-
-    private fun isNavigationAvailable(): Boolean = try {
-        Class.forName("androidx.navigation.NavDestination")
-            .getMethod("getRoute")
-        true
-    } catch (_: Exception) {
-        false
     }
 
     private val navigationListener = object : Navigation.Listener {
