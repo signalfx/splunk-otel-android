@@ -29,8 +29,8 @@ dependencies {
     implementation(project(":common:otel"))
 
     implementation(Dependencies.Otel.androidInstrumentation)
-    implementation(Dependencies.SessionReplay.commonUtils)
-    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.Common.utils)
+    implementation(Dependencies.Common.logger)
     
     implementation(Dependencies.Android.fragmentKtx)
 }

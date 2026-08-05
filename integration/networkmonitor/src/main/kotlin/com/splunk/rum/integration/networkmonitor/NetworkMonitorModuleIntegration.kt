@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.networkmonitor
 
 import android.content.Context
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.networkmonitor.internal.NetworkMonitorInstrumentation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.find
@@ -34,6 +34,7 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
 ) {
 
     private const val TAG = "NetworkMonitorIntegration"
+
     override fun onInstall(
         context: Context,
         oTelInstallationContext: InstallationContext,

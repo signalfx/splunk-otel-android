@@ -33,7 +33,8 @@ dependencies {
 
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingCore)
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingInteractions)
-    implementation(Dependencies.SessionReplay.commonLogger)
+
+    implementation(Dependencies.Common.logger)
 
     compileOnly(Dependencies.Android.Compose.ui)
 

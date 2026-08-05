@@ -19,7 +19,7 @@ package com.splunk.rum.integration.lifecycle.callback
 import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 
 /**
  * Registers fragment lifecycle callbacks on FragmentActivity instances (API 21-28).

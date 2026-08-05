@@ -20,7 +20,7 @@ import android.os.Build
 import android.view.View
 import android.view.ViewTreeObserver
 
-// FIXME Compiler error. Use com.splunk.android.common.utils.extensions.doOnDraw once the issue is fixed.
+// FIXME Compiler error. Use com.splunk.rum.common.utils.extensions.doOnDraw once the issue is fixed.
 internal inline fun View.doOnDraw(crossinline action: () -> Unit) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         doOnDraw29(action)

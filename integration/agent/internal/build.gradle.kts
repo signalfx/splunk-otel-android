@@ -33,10 +33,10 @@ dependencies {
     implementation(Dependencies.Otel.androidSession)
     implementation(Dependencies.Otel.androidInstrumentation)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonHttp)
-    implementation(Dependencies.SessionReplay.commonStorage)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.http)
+    implementation(Dependencies.Common.storage)
+    implementation(Dependencies.Common.utils)
 
     compileOnly(Dependencies.Android.Compose.ui)
 

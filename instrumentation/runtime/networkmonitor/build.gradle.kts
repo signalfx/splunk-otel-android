@@ -27,7 +27,7 @@ dependencies {
 
     implementation(Dependencies.Otel.api)
     implementation(Dependencies.Otel.semConvIncubating)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.utils)
     compileOnly(Dependencies.Android.annotation)
 
     testImplementation(Dependencies.Test.junit)

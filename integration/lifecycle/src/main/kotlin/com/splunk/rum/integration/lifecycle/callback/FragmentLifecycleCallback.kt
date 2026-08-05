@@ -21,7 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.lifecycle.LifecycleEventEmitter
 import com.splunk.rum.integration.lifecycle.model.LifecycleAction
 

@@ -20,13 +20,13 @@ ext {
 }
 
 android {
-    namespace = "com.splunk.rum.common.storage"
+    namespace = "com.splunk.rum.agent.common.storage"
 }
 
 dependencies {
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonStorage)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.storage)
+    implementation(Dependencies.Common.utils)
 
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.androidXTestCore)

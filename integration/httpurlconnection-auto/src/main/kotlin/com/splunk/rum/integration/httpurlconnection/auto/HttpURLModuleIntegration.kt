@@ -17,7 +17,7 @@
 package com.splunk.rum.integration.httpurlconnection.auto
 
 import android.content.Context
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.httpurlconnection.auto.HttpUrlInstrumentation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration

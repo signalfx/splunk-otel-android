@@ -33,8 +33,8 @@ dependencies {
     implementation(Dependencies.Otel.semConv)
     implementation(Dependencies.Otel.semConvIncubating)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.utils)
 
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.robolectric)

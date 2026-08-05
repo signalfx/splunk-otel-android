@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.okhttp3.manual
 
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import okhttp3.Call
 import okhttp3.Call.Factory
 import okhttp3.OkHttpClient

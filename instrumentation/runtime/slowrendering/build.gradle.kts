@@ -28,7 +28,7 @@ dependencies {
 
     implementation(Dependencies.Otel.api)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.Common.logger)
 
     testImplementation(platform(Dependencies.Otel.androidBom))
     testImplementation(Dependencies.Otel.sdk)

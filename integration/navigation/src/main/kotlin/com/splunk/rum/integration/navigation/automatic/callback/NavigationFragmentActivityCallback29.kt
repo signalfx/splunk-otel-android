@@ -21,7 +21,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
-import com.splunk.android.common.utils.adapters.ActivityLifecycleCallbacksAdapter
+import com.splunk.rum.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 
 /**
  * Registers [NavigationFragmentCallback] for API 29+ (uses onActivityPreCreated).

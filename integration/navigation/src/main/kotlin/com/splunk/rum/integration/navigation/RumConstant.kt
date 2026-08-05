@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.navigation
 
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import io.opentelemetry.api.common.AttributeKey
 
 internal object RumConstant {
