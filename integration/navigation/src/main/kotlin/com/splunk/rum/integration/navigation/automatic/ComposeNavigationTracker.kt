@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.navigation.automatic
 
 import android.os.Bundle
+import androidx.annotation.VisibleForTesting
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
@@ -50,9 +51,9 @@ internal class ComposeNavigationTracker(
         val listener = NavController.OnDestinationChangedListener { _, destination, arguments ->
             handleDestinationChanged(destination, arguments)
         }
-        navController.addOnDestinationChangedListener(listener)
         registeredController = WeakReference(navController)
         activeListener = listener
+        navController.addOnDestinationChangedListener(listener)
         Logger.d(TAG, "Registered NavController for Compose navigation tracking")
     }
 
@@ -72,9 +73,12 @@ internal class ComposeNavigationTracker(
         screenChangeDetector.clearComposeRoute()
     }
 
-    private var routeApiAvailable = true
+    @VisibleForTesting
+    internal var routeApiAvailable = true
+        private set
 
-    private fun handleDestinationChanged(destination: NavDestination, arguments: Bundle?) {
+    @VisibleForTesting
+    internal fun handleDestinationChanged(destination: NavDestination, arguments: Bundle?) {
         if (!routeApiAvailable) return
         if (destination is NavGraph) return
         if (destination.navigatorName == NAVIGATOR_NAME_DIALOG) return
@@ -83,6 +87,7 @@ internal class ComposeNavigationTracker(
             destination.route
         } catch (e: LinkageError) {
             routeApiAvailable = false
+            clearRegistration()
             Logger.w(TAG, "NavDestination.route not available, disabling Compose tracking: ${e.message}")
             return
         } ?: return

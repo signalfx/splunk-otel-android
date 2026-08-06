@@ -71,8 +71,7 @@ class Navigation internal constructor() {
             processor = pendingProcessor
         )
         composeTracker = tracker
-        pendingDetector = null
-        pendingProcessor = null
+        clearTrackerConfig()
         Logger.d(TAG, "ComposeNavigationTracker initialized")
         return tracker
     }

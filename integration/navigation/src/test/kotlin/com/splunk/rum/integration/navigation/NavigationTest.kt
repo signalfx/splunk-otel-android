@@ -43,7 +43,7 @@ class NavigationTest {
     }
 
     @Test
-    fun `registerNavController without config does not crash and tracker remains null`() {
+    fun `registerNavController without install is a no-op`() {
         navigation.registerNavController(navController)
 
         assertNull(navigation.composeTracker)
@@ -79,20 +79,5 @@ class NavigationTest {
         navigation.registerNavController(navController)
 
         assertNull(navigation.composeTracker)
-    }
-
-    @Test
-    fun `pending config is cleared after tracker creation`() {
-        navigation.setTrackerConfig(detector, null)
-        navigation.registerNavController(navController)
-
-        val secondNavigation = Navigation()
-        secondNavigation.composeTracker = null
-
-        navigation.clearTrackerConfig()
-        val anotherController = mock(NavController::class.java)
-        navigation.registerNavController(anotherController)
-
-        assertNotNull(navigation.composeTracker)
     }
 }

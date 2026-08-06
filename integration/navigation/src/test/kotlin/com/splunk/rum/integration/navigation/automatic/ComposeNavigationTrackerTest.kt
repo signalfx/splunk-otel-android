@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.navigation.automatic
 
 import android.os.Looper
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
@@ -30,6 +29,7 @@ import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -82,58 +82,58 @@ class ComposeNavigationTrackerTest {
 
     @Test
     fun `destination change with route emits navigation event`() {
-        val navController = mock(NavController::class.java)
-        tracker.register(navController)
+        val destination = createDestination(route = "home")
 
-        val destination = createDestination(route = "home!")
-        simulateDestinationChanged(navController, destination)
+        tracker.handleDestinationChanged(destination, null)
+        shadowOf(Looper.getMainLooper()).idle()
 
         assertEquals(1, exportedLogs.size)
-        assertEquals("home!", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+        assertEquals("home", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
     }
 
+    /**
+     * Verifies the LinkageError catch guard works. We can't run against a real pre-2.4.0
+     * navigation library in unit tests, so Mockito simulates the NoSuchMethodError that the
+     * JVM would throw at the destination.route call site for that version mismatch.
+     */
     @Test
     fun `LinkageError on route access disables tracking without crash`() {
-        val navController = mock(NavController::class.java)
-        tracker.register(navController)
-
         val destination = mock(NavDestination::class.java)
         `when`(destination.navigatorName).thenReturn("composable")
         `when`(destination.route).thenThrow(NoSuchMethodError("getRoute"))
 
-        simulateDestinationChanged(navController, destination)
+        tracker.handleDestinationChanged(destination, null)
+        shadowOf(Looper.getMainLooper()).idle()
 
-        assertTrue("Should not crash, events should be empty", exportedLogs.isEmpty())
+        assertTrue("Events should be empty", exportedLogs.isEmpty())
+        assertFalse("routeApiAvailable should be false", tracker.routeApiAvailable)
     }
 
     @Test
     fun `subsequent destinations are skipped after LinkageError`() {
-        val navController = mock(NavController::class.java)
-        tracker.register(navController)
-
         val badDestination = mock(NavDestination::class.java)
         `when`(badDestination.navigatorName).thenReturn("composable")
         `when`(badDestination.route).thenThrow(NoSuchMethodError("getRoute"))
-        simulateDestinationChanged(navController, badDestination)
+        tracker.handleDestinationChanged(badDestination, null)
 
         val goodDestination = createDestination(route = "settings")
-        simulateDestinationChanged(navController, goodDestination)
+        tracker.handleDestinationChanged(goodDestination, null)
+        shadowOf(Looper.getMainLooper()).idle()
 
         assertTrue("No events should emit after LinkageError disabled tracking", exportedLogs.isEmpty())
     }
 
     @Test
     fun `IncompatibleClassChangeError is also caught`() {
-        val navController = mock(NavController::class.java)
-        tracker.register(navController)
-
         val destination = mock(NavDestination::class.java)
         `when`(destination.navigatorName).thenReturn("composable")
         `when`(destination.route).thenThrow(IncompatibleClassChangeError("test"))
 
-        simulateDestinationChanged(navController, destination)
+        tracker.handleDestinationChanged(destination, null)
+        shadowOf(Looper.getMainLooper()).idle()
 
         assertTrue("Should not crash", exportedLogs.isEmpty())
+        assertFalse("routeApiAvailable should be false", tracker.routeApiAvailable)
     }
 
     private fun createDestination(route: String): NavDestination {
@@ -142,13 +142,5 @@ class ComposeNavigationTrackerTest {
         `when`(destination.route).thenReturn(route)
         `when`(destination.parent).thenReturn(null)
         return destination
-    }
-
-    private fun simulateDestinationChanged(navController: NavController, destination: NavDestination) {
-        val listenerField = tracker.javaClass.getDeclaredField("activeListener")
-        listenerField.isAccessible = true
-        val listener = listenerField.get(tracker) as? NavController.OnDestinationChangedListener
-        listener?.onDestinationChanged(navController, destination, null)
-        shadowOf(Looper.getMainLooper()).idle()
     }
 }
