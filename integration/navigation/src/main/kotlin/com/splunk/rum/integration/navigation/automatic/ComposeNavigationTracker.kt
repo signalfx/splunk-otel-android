@@ -44,6 +44,7 @@ internal class ComposeNavigationTracker(
     private var activeListener: NavController.OnDestinationChangedListener? = null
 
     fun register(navController: NavController) {
+        if (!routeApiAvailable) return
         if (registeredController?.get() === navController) return
 
         clearRegistration()

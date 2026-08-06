@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.navigation.automatic
 
 import android.os.Looper
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
@@ -35,6 +36,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
@@ -134,6 +136,19 @@ class ComposeNavigationTrackerTest {
 
         assertTrue("Should not crash", exportedLogs.isEmpty())
         assertFalse("routeApiAvailable should be false", tracker.routeApiAvailable)
+    }
+
+    @Test
+    fun `register is rejected after LinkageError disables tracking`() {
+        val badDestination = mock(NavDestination::class.java)
+        `when`(badDestination.navigatorName).thenReturn("composable")
+        `when`(badDestination.route).thenThrow(NoSuchMethodError("getRoute"))
+        tracker.handleDestinationChanged(badDestination, null)
+
+        val navController = mock(NavController::class.java)
+        tracker.register(navController)
+
+        verifyNoInteractions(navController)
     }
 
     private fun createDestination(route: String): NavDestination {
