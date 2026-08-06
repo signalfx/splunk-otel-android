@@ -85,11 +85,11 @@ class ComposeNavigationTrackerTest {
         val navController = mock(NavController::class.java)
         tracker.register(navController)
 
-        val destination = createDestination(route = "home")
+        val destination = createDestination(route = "home!")
         simulateDestinationChanged(navController, destination)
 
         assertEquals(1, exportedLogs.size)
-        assertEquals("home", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
+        assertEquals("home!", exportedLogs[0].attributes.get(GlobalRumConstants.SCREEN_NAME_KEY))
     }
 
     @Test
