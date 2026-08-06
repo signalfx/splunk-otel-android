@@ -23,6 +23,7 @@ import android.os.Handler
 import android.os.Looper
 import com.splunk.rum.agent.common.utils.extensions.isStartedInForeground
 import com.splunk.rum.common.utils.AppStateObserver
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.anr.internal.extractor.AnrAttributesExtractor
 import io.opentelemetry.api.OpenTelemetry
 import java.time.Duration
@@ -61,6 +62,10 @@ class AnrReporterInstrumentation {
      */
     @Suppress("NewApi") // Duration requires API 26 or core library desugaring
     fun setPollingInterval(pollingInterval: Duration): AnrReporterInstrumentation {
+        if (pollingInterval.isZero || pollingInterval.isNegative) {
+            Logger.w(TAG, "Invalid pollingInterval ($pollingInterval), using default threshold")
+            return this
+        }
         val effectiveCycleSeconds = POLL_AWAIT_SECONDS + SCHEDULER_DELAY_SECONDS
         maxMissedPolls = max(1, ceil(pollingInterval.seconds.toDouble() / effectiveCycleSeconds).toInt())
         return this
@@ -98,6 +103,7 @@ class AnrReporterInstrumentation {
     }
 
     private companion object {
+        private const val TAG = "AnrReporterInstrumentation"
         private const val WATCHDOG_THREAD_NAME = "splunk-anr-watcher"
         private const val POLL_AWAIT_SECONDS = 1L
         private const val SCHEDULER_DELAY_SECONDS = 1L
