@@ -55,6 +55,12 @@ internal class ComposeNavigationTracker(
         registeredController = WeakReference(navController)
         activeListener = listener
         navController.addOnDestinationChangedListener(listener)
+        if (!routeApiAvailable) {
+            navController.removeOnDestinationChangedListener(listener)
+            registeredController = null
+            activeListener = null
+            return
+        }
         Logger.d(TAG, "Registered NavController for Compose navigation tracking")
     }
 
