@@ -24,24 +24,37 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
 import android.util.Log
+import com.splunk.rum.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwork
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 internal class CurrentNetworkProviderImpl(
     private val networkDetector: NetworkDetector,
     private val connectivityManager: ConnectivityManager,
-    createNetworkMonitoringRequest: () -> NetworkRequest = ::createNetworkMonitoringRequest
+    private val initialDetectionExecutor: ExecutorService = createInitialDetectionExecutor(),
+    private val createNetworkMonitoringRequest: () -> NetworkRequest = ::createNetworkMonitoringRequest
 ) : CurrentNetworkProvider {
-    @Volatile
-    override var currentNetwork: CurrentNetwork = CurrentNetworkProvider.UNKNOWN_NETWORK
-        private set
+    override val currentNetwork: CurrentNetwork
+        get() = networkSnapshot.get().network
 
     private val callbackRef = AtomicReference<NetworkCallback>()
     private val listeners = CopyOnWriteArrayList<NetworkChangeListener>()
+    private val started = AtomicBoolean()
+    private val closed = AtomicBoolean()
+    private val networkSnapshot = AtomicReference(
+        NetworkSnapshot(callbackObserved = false, network = CurrentNetworkProvider.UNKNOWN_NETWORK)
+    )
 
-    init {
-        refreshNetworkStatus()
+    override fun start(initialNetworkListener: NetworkChangeListener) {
+        if (!started.compareAndSet(false, true) || closed.get()) {
+            return
+        }
+
+        val initialSnapshot = networkSnapshot.get()
         try {
             registerNetworkCallbacks(createNetworkMonitoringRequest)
         } catch (exception: Exception) {
@@ -51,16 +64,21 @@ internal class CurrentNetworkProviderImpl(
                 exception
             )
         }
+        detectInitialNetwork(initialSnapshot, initialNetworkListener)
     }
 
     override fun refreshNetworkStatus(): CurrentNetwork {
-        currentNetwork = try {
-            networkDetector.detectCurrentNetwork()
-        } catch (exception: Exception) {
-            Log.w(TAG, "Failed to detect the current network.", exception)
-            CurrentNetworkProvider.UNKNOWN_NETWORK
-        }
-        return currentNetwork
+        val detectedNetwork = detectCurrentNetwork()
+        val currentSnapshot = networkSnapshot.get()
+        networkSnapshot.set(currentSnapshot.copy(network = detectedNetwork))
+        return detectedNetwork
+    }
+
+    private fun detectCurrentNetwork(): CurrentNetwork = try {
+        networkDetector.detectCurrentNetwork()
+    } catch (exception: Exception) {
+        Log.w(TAG, "Failed to detect the current network.", exception)
+        CurrentNetworkProvider.UNKNOWN_NETWORK
     }
 
     override fun addNetworkChangeListener(listener: NetworkChangeListener) {
@@ -72,6 +90,7 @@ internal class CurrentNetworkProviderImpl(
     }
 
     override fun close() {
+        closed.set(true)
         callbackRef.getAndSet(null)?.let { callback ->
             try {
                 connectivityManager.unregisterNetworkCallback(callback)
@@ -79,7 +98,43 @@ internal class CurrentNetworkProviderImpl(
                 Log.w(TAG, "Failed to unregister network callbacks.", exception)
             }
         }
+        initialDetectionExecutor.shutdownNow()
         listeners.clear()
+    }
+
+    private fun detectInitialNetwork(initialSnapshot: NetworkSnapshot, initialNetworkListener: NetworkChangeListener) {
+        initialDetectionExecutor.execute {
+            try {
+                if (closed.get() || networkSnapshot.get() !== initialSnapshot) {
+                    return@execute
+                }
+
+                val detectedNetwork = detectCurrentNetwork()
+                if (!closed.get()) {
+                    val initialStatePublished = networkSnapshot.compareAndSet(
+                        initialSnapshot,
+                        initialSnapshot.copy(network = detectedNetwork)
+                    )
+                    if (initialStatePublished) {
+                        initialNetworkListener.onNetworkChange(detectedNetwork)
+
+                        // A callback based network detection can happen immediately. Reapply its latest
+                        // state to attributes without emitting another network change event.
+                        val latestSnapshot = networkSnapshot.get()
+                        if (latestSnapshot.callbackObserved) {
+                            initialNetworkListener.onNetworkChange(latestSnapshot.network)
+                        }
+                    }
+                }
+            } finally {
+                initialDetectionExecutor.shutdown()
+            }
+        }
+    }
+
+    private fun invalidateInitialDetection() {
+        val currentSnapshot = networkSnapshot.get()
+        networkSnapshot.set(currentSnapshot.copy(callbackObserved = true))
     }
 
     private fun registerNetworkCallbacks(createNetworkMonitoringRequest: () -> NetworkRequest) {
@@ -98,14 +153,17 @@ internal class CurrentNetworkProviderImpl(
 
     private inner class ConnectionMonitor : NetworkCallback() {
         override fun onAvailable(network: Network) {
+            invalidateInitialDetection()
             val activeNetwork = refreshNetworkStatus()
             Log.d(TAG, "onAvailable: currentNetwork=$activeNetwork")
             notifyListeners(activeNetwork)
         }
 
         override fun onLost(network: Network) {
+            invalidateInitialDetection()
             val noNetwork = CurrentNetworkProvider.NO_NETWORK
-            currentNetwork = noNetwork
+            val currentSnapshot = networkSnapshot.get()
+            networkSnapshot.set(currentSnapshot.copy(network = noNetwork))
             Log.d(TAG, "onLost: currentNetwork=$noNetwork")
             notifyListeners(noNetwork)
         }
@@ -113,6 +171,9 @@ internal class CurrentNetworkProviderImpl(
 
     private companion object {
         private const val TAG = "CurrentNetworkProvider"
+
+        fun createInitialDetectionExecutor(): ExecutorService =
+            Executors.newSingleThreadExecutor(NamedThreadFactory("SplunkNetworkMonitor"))
 
         fun createNetworkMonitoringRequest(): NetworkRequest = NetworkRequest.Builder()
             .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
@@ -122,4 +183,6 @@ internal class CurrentNetworkProviderImpl(
             .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
             .build()
     }
+
+    private data class NetworkSnapshot(val callbackObserved: Boolean, val network: CurrentNetwork)
 }

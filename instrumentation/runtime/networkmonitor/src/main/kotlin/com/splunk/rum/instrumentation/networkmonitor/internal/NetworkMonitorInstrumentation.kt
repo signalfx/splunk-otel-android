@@ -73,14 +73,21 @@ class NetworkMonitorInstrumentation {
         )
         currentNetworkProvider.addNetworkChangeListener { currentNetwork ->
             val attributes = CurrentNetworkAttributes.extract(currentNetwork)
-            attributeListeners.forEach { listener ->
-                try {
-                    listener(attributes)
-                } catch (exception: RuntimeException) {
-                    Log.w(TAG, "Network change listener failed.", exception)
-                }
-            }
             eventEmitter.emit(attributes)
+            notifyAttributeListeners(attributes)
+        }
+        currentNetworkProvider.start { currentNetwork ->
+            notifyAttributeListeners(CurrentNetworkAttributes.extract(currentNetwork))
+        }
+    }
+
+    private fun notifyAttributeListeners(attributes: Attributes) {
+        attributeListeners.forEach { listener ->
+            try {
+                listener(attributes)
+            } catch (exception: RuntimeException) {
+                Log.w(TAG, "Network change listener failed.", exception)
+            }
         }
     }
 

@@ -69,13 +69,17 @@ internal class NetworkDetectorImpl(private val context: Context, private val con
             ConnectivityManager.TYPE_ETHERNET -> NetworkState.TRANSPORT_WIRED
             else -> return CurrentNetworkProvider.UNKNOWN_NETWORK
         }
-        return buildCurrentNetwork(state, carrierFinder.get(), activeNetwork.subtypeName)
+        return buildCurrentNetwork(
+            state,
+            if (state == NetworkState.TRANSPORT_CELLULAR) carrierFinder.get() else null,
+            activeNetwork.subtypeName
+        )
     }
 
     private fun buildNetwork(state: NetworkState, includeSubtype: Boolean = false): CurrentNetwork =
         buildCurrentNetwork(
             state,
-            carrierFinder.get(),
+            if (state == NetworkState.TRANSPORT_CELLULAR) carrierFinder.get() else null,
             if (includeSubtype) findSubtype() else null
         )
 

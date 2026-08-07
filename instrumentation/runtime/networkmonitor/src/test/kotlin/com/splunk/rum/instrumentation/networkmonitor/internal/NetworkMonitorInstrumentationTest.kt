@@ -77,6 +77,20 @@ class NetworkMonitorInstrumentationTest {
     }
 
     @Test
+    fun initialNetworkNotifiesAttributeListenerWithoutEmittingNetworkChange() {
+        val provider = FakeCurrentNetworkProvider()
+        val observedTypes = mutableListOf<String?>()
+        val instrumentation = instrumentationWith(provider)
+            .addNetworkChangeListener { observedTypes += it[NETWORK_CONNECTION_TYPE] }
+
+        instrumentation.install(application, openTelemetry)
+        provider.publishInitial(CurrentNetworkProvider.NO_NETWORK)
+
+        assertEquals(listOf("unavailable"), observedTypes)
+        verify(logRecordBuilder, never()).emit()
+    }
+
+    @Test
     fun backgroundSuppressesEventButNotAttributeListener() {
         val provider = FakeCurrentNetworkProvider()
         val observedTypes = mutableListOf<String?>()
@@ -158,7 +172,12 @@ class NetworkMonitorInstrumentationTest {
 
     private class FakeCurrentNetworkProvider : CurrentNetworkProvider {
         private val listeners = mutableListOf<NetworkChangeListener>()
+        private var initialNetworkListener = NetworkChangeListener {}
         override var currentNetwork = CurrentNetworkProvider.UNKNOWN_NETWORK
+
+        override fun start(initialNetworkListener: NetworkChangeListener) {
+            this.initialNetworkListener = initialNetworkListener
+        }
 
         override fun refreshNetworkStatus(): CurrentNetwork = currentNetwork
 
@@ -177,6 +196,11 @@ class NetworkMonitorInstrumentationTest {
         fun publish(network: CurrentNetwork) {
             currentNetwork = network
             listeners.forEach { it.onNetworkChange(network) }
+        }
+
+        fun publishInitial(network: CurrentNetwork) {
+            currentNetwork = network
+            initialNetworkListener.onNetworkChange(network)
         }
     }
 }

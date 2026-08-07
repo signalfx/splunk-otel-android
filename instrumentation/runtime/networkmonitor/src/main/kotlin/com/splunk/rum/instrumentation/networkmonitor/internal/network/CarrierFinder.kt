@@ -70,7 +70,6 @@ internal class CarrierFinder(private val context: Context, private val telephony
         val carrierName = manager.simCarrierIdName?.takeIf { it.isNotEmpty() }?.toString()
         val (mcc, mnc, iso) = getMccMncIso(manager)
         return Carrier(
-            id = manager.simCarrierId,
             name = carrierName,
             mobileCountryCode = mcc,
             mobileNetworkCode = mnc,
