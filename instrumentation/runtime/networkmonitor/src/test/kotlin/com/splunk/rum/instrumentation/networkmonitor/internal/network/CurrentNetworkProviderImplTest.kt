@@ -23,6 +23,7 @@ import android.net.NetworkRequest
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwork
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.NetworkState
 import java.util.concurrent.AbstractExecutorService
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -30,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
@@ -183,6 +185,29 @@ class CurrentNetworkProviderImplTest {
     }
 
     @Test
+    fun closeDuringRegistrationUnregistersCallbackAndDoesNotScheduleInitialDetection() {
+        val provider = CurrentNetworkProviderImpl(
+            detector,
+            connectivityManager,
+            initialDetectionExecutor
+        ) { request }
+        doAnswer {
+            provider.close()
+            null
+        }.`when`(connectivityManager).registerNetworkCallback(
+            any(NetworkRequest::class.java),
+            any(ConnectivityManager.NetworkCallback::class.java)
+        )
+
+        provider.start {}
+
+        verify(connectivityManager).unregisterNetworkCallback(
+            any(ConnectivityManager.NetworkCallback::class.java)
+        )
+        verify(detector, never()).detectCurrentNetwork()
+    }
+
+    @Test
     fun unregisterFailureIsLoggedAndDoesNotEscapeClose() {
         `when`(detector.detectCurrentNetwork()).thenReturn(CurrentNetworkProvider.UNKNOWN_NETWORK)
         val provider = createProvider()
@@ -298,7 +323,9 @@ class CurrentNetworkProviderImplTest {
         private var shutdown = false
 
         override fun execute(command: Runnable) {
-            check(!shutdown)
+            if (shutdown) {
+                throw RejectedExecutionException()
+            }
             tasks.addLast(command)
         }
 

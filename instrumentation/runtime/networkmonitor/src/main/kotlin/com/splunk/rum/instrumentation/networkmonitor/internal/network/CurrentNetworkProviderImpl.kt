@@ -29,6 +29,7 @@ import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwo
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
@@ -91,43 +92,43 @@ internal class CurrentNetworkProviderImpl(
 
     override fun close() {
         closed.set(true)
-        callbackRef.getAndSet(null)?.let { callback ->
-            try {
-                connectivityManager.unregisterNetworkCallback(callback)
-            } catch (exception: RuntimeException) {
-                Log.w(TAG, "Failed to unregister network callbacks.", exception)
-            }
-        }
+        callbackRef.getAndSet(null)?.let(::unregisterNetworkCallback)
         initialDetectionExecutor.shutdownNow()
         listeners.clear()
     }
 
     private fun detectInitialNetwork(initialSnapshot: NetworkSnapshot, initialNetworkListener: NetworkChangeListener) {
-        initialDetectionExecutor.execute {
-            try {
-                if (closed.get() || networkSnapshot.get() !== initialSnapshot) {
-                    return@execute
-                }
+        try {
+            initialDetectionExecutor.execute {
+                try {
+                    if (closed.get() || networkSnapshot.get() !== initialSnapshot) {
+                        return@execute
+                    }
 
-                val detectedNetwork = detectCurrentNetwork()
-                if (!closed.get()) {
-                    val initialStatePublished = networkSnapshot.compareAndSet(
-                        initialSnapshot,
-                        initialSnapshot.copy(network = detectedNetwork)
-                    )
-                    if (initialStatePublished) {
-                        initialNetworkListener.onNetworkChange(detectedNetwork)
+                    val detectedNetwork = detectCurrentNetwork()
+                    if (!closed.get()) {
+                        val initialStatePublished = networkSnapshot.compareAndSet(
+                            initialSnapshot,
+                            initialSnapshot.copy(network = detectedNetwork)
+                        )
+                        if (initialStatePublished) {
+                            initialNetworkListener.onNetworkChange(detectedNetwork)
 
-                        // A callback based network detection can happen immediately. Reapply its latest
-                        // state to attributes without emitting another network change event.
-                        val latestSnapshot = networkSnapshot.get()
-                        if (latestSnapshot.callbackObserved) {
-                            initialNetworkListener.onNetworkChange(latestSnapshot.network)
+                            // A callback based network detection can happen immediately. Reapply its latest
+                            // state to attributes without emitting another network change event.
+                            val latestSnapshot = networkSnapshot.get()
+                            if (latestSnapshot.callbackObserved) {
+                                initialNetworkListener.onNetworkChange(latestSnapshot.network)
+                            }
                         }
                     }
+                } finally {
+                    initialDetectionExecutor.shutdown()
                 }
-            } finally {
-                initialDetectionExecutor.shutdown()
+            }
+        } catch (exception: RejectedExecutionException) {
+            if (!closed.get()) {
+                Log.w(TAG, "Failed to schedule initial network detection.", exception)
             }
         }
     }
@@ -145,6 +146,17 @@ internal class CurrentNetworkProviderImpl(
             connectivityManager.registerNetworkCallback(createNetworkMonitoringRequest(), callback)
         }
         callbackRef.set(callback)
+        if (closed.get() && callbackRef.compareAndSet(callback, null)) {
+            unregisterNetworkCallback(callback)
+        }
+    }
+
+    private fun unregisterNetworkCallback(callback: NetworkCallback) {
+        try {
+            connectivityManager.unregisterNetworkCallback(callback)
+        } catch (exception: RuntimeException) {
+            Log.w(TAG, "Failed to unregister network callbacks.", exception)
+        }
     }
 
     private fun notifyListeners(activeNetwork: CurrentNetwork) {
