@@ -22,8 +22,8 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import com.splunk.rum.agent.common.utils.extensions.isStartedInForeground
-import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.common.logger.Logger
+import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.instrumentation.anr.internal.extractor.AnrAttributesExtractor
 import io.opentelemetry.api.OpenTelemetry
 import java.time.Duration
