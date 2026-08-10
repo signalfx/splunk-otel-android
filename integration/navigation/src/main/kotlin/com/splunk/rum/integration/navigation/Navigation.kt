@@ -19,12 +19,15 @@ package com.splunk.rum.integration.navigation
 import androidx.navigation.NavController
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.navigation.automatic.ComposeNavigationTracker
+import com.splunk.rum.integration.navigation.automatic.ScreenChangeDetector
 import io.opentelemetry.api.common.Attributes
 
 class Navigation internal constructor() {
 
     internal var listener: Listener? = null
     internal var composeTracker: ComposeNavigationTracker? = null
+    private var pendingDetector: ScreenChangeDetector? = null
+    private var pendingProcessor: NavigationEventProcessor? = null
 
     /**
      * Record a navigation to [screenName] with optional [attributes] (manual tracking).
@@ -44,12 +47,33 @@ class Navigation internal constructor() {
      * Call this after [NavController] is created (e.g. in your Activity's `setContent` block).
      */
     fun registerNavController(navController: NavController) {
-        val tracker = composeTracker
-        if (tracker == null) {
+        val tracker = composeTracker ?: createTrackerIfConfigured() ?: run {
             Logger.w(TAG, "Navigation module not installed. Cannot register NavController.")
             return
         }
         tracker.register(navController)
+    }
+
+    internal fun setTrackerConfig(detector: ScreenChangeDetector, processor: NavigationEventProcessor?) {
+        pendingDetector = detector
+        pendingProcessor = processor
+    }
+
+    internal fun clearTrackerConfig() {
+        pendingDetector = null
+        pendingProcessor = null
+    }
+
+    private fun createTrackerIfConfigured(): ComposeNavigationTracker? {
+        val detector = pendingDetector ?: return null
+        val tracker = ComposeNavigationTracker(
+            screenChangeDetector = detector,
+            processor = pendingProcessor
+        )
+        composeTracker = tracker
+        clearTrackerConfig()
+        Logger.d(TAG, "ComposeNavigationTracker initialized")
+        return tracker
     }
 
     /**

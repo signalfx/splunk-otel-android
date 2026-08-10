@@ -25,7 +25,6 @@ import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.adapters.ActivityLifecycleCallbacksAdapter
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import com.splunk.rum.integration.navigation.automatic.ComposeNavigationTracker
 import com.splunk.rum.integration.navigation.automatic.NavigationEventEmitter
 import com.splunk.rum.integration.navigation.automatic.ScreenChangeDetector
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationActivityCallback
@@ -74,6 +73,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         if (!moduleConfiguration.isEnabled) {
             Navigation.instance.listener = null
             Navigation.instance.composeTracker = null
+            Navigation.instance.clearTrackerConfig()
             emitter.clearCache()
             (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
             currentActivityReference = null
@@ -106,18 +106,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             }
         }
 
-        if (isNavigationAvailable()) {
-            Navigation.instance.composeTracker = ComposeNavigationTracker(
-                screenChangeDetector = detector,
-                processor = moduleConfiguration.navigationEventProcessor
-            )
-            Logger.d(TAG, "ComposeNavigationTracker initialized")
-        } else {
-            Logger.d(
-                TAG,
-                "androidx.navigation.NavDestination.getRoute not found on classpath, Compose navigation tracking disabled: requires androidx.navigation 2.4.0+"
-            )
-        }
+        Navigation.instance.setTrackerConfig(detector, moduleConfiguration.navigationEventProcessor)
 
         (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
         currentActivityReference = null
@@ -155,14 +144,6 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
         }
 
         application.registerActivityLifecycleCallbacks(fragmentActivityCallback)
-    }
-
-    private fun isNavigationAvailable(): Boolean = try {
-        Class.forName("androidx.navigation.NavDestination")
-            .getMethod("getRoute")
-        true
-    } catch (_: Exception) {
-        false
     }
 
     private val navigationListener = object : Navigation.Listener {

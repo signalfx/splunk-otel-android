@@ -26,6 +26,8 @@ import java.io.Closeable
 internal interface CurrentNetworkProvider : Closeable {
     val currentNetwork: CurrentNetwork
 
+    fun start(initialNetworkListener: NetworkChangeListener)
+
     fun refreshNetworkStatus(): CurrentNetwork
 
     fun addNetworkChangeListener(listener: NetworkChangeListener)

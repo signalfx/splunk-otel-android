@@ -49,18 +49,17 @@ class CarrierFinderTest {
 
     @Test
     fun extractsModernCarrierFields() {
-        `when`(telephonyManager.simCarrierId).thenReturn(123)
         `when`(telephonyManager.simCarrierIdName).thenReturn("Example")
         `when`(telephonyManager.simOperator).thenReturn("310260")
         `when`(telephonyManager.simCountryIso).thenReturn("us")
 
         val carrier = CarrierFinder(context, telephonyManager).get()
 
-        assertEquals(123, carrier?.id)
         assertEquals("Example", carrier?.name)
         assertEquals("310", carrier?.mobileCountryCode)
         assertEquals("260", carrier?.mobileNetworkCode)
         assertEquals("us", carrier?.isoCountryCode)
+        verify(telephonyManager, never()).simCarrierId
     }
 
     @Test
