@@ -22,7 +22,7 @@
     <string name="crash_reports_null">NullPointerException</string>
     <!-- ANR -->
     <string name="anr_title">ANR Detection</string>
-    <string name="anr_description">Block the main thread for various durations to test ANR detection. Configure the polling interval in App.kt, then verify which durations trigger detection.</string>
+    <string name="anr_description">Block the main thread for various durations to test ANR detection. Configure the polling interval in App.kt.</string>
     <string name="anr_block_3s">Block 3s</string>
     <string name="anr_block_4s">Block 4s</string>
     <string name="anr_block_5s">Block 5s</string>
