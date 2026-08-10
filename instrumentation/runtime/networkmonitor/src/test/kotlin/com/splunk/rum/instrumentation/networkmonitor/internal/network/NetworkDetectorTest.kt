@@ -72,6 +72,25 @@ class NetworkDetectorTest {
     }
 
     @Test
+    fun wifiDoesNotReadOrIncludeCellularCarrier() {
+        val (telephonyContext, telephonyManager) = contextWithTelephonyAccess()
+        `when`(telephonyManager.simCarrierIdName).thenReturn("Example")
+        val network = mock(Network::class.java)
+        val capabilities = mock(NetworkCapabilities::class.java)
+        `when`(connectivityManager.activeNetwork).thenReturn(network)
+        `when`(connectivityManager.getNetworkCapabilities(network)).thenReturn(capabilities)
+        `when`(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)).thenReturn(true)
+
+        val currentNetwork = NetworkDetector.create(telephonyContext, connectivityManager).detectCurrentNetwork()
+
+        assertEquals(NetworkState.TRANSPORT_WIFI, currentNetwork.state)
+        assertNull(currentNetwork.carrierName)
+        verify(telephonyManager, never()).simCarrierIdName
+        verify(telephonyManager, never()).simOperator
+        verify(telephonyManager, never()).simCountryIso
+    }
+
+    @Test
     fun unsupportedCapabilityTransportIsUnknown() {
         assertTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH, NetworkState.TRANSPORT_UNKNOWN)
     }
