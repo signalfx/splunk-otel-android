@@ -31,6 +31,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification
 import com.splunk.rum.integration.agent.internal.identification.ComposeElementIdentification.OrderPriority
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
+import com.splunk.rum.integration.agent.internal.sampling.SessionSampler
 import com.splunk.rum.integration.agent.internal.utils.runIfComposeUiExists
 import com.splunk.rum.integration.sessionreplay.api.SessionReplay as SplunkSessionReplay
 import com.splunk.rum.integration.sessionreplay.api.Status
@@ -45,12 +46,13 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 ) {
     private const val TAG = "SessionReplayIntegration"
 
+    private const val SESSION_SAMPLER_DOMAIN = "sessionReplay"
+
     private val isRecordingForSessions: MutableSet<String> = mutableSetOf()
 
     private var timeIndex: TimeIndex<Long> = TimeIndex()
 
     private var currentSessionId: String? = null
-    private var isPendingSessionChange = false
     private var isInstalled = false
     private val runtimeState = RuntimeState()
 
@@ -80,10 +82,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
         isInstalled = true
 
-        if (isPendingSessionChange) {
-            isPendingSessionChange = false
-            processSessionChange()
-        }
+        processSessionChange()
     }
 
     override fun onSessionChange(sessionId: String) {
@@ -98,11 +97,18 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
     private fun processSessionChange() {
         if (!isInstalled) {
-            isPendingSessionChange = true
             return
         }
 
-        val sampledOut = moduleConfiguration.samplingRate <= Math.random()
+        val sessionId = currentSessionId ?: sessionManager.sessionId
+        currentSessionId = sessionId
+
+        val sampledOut = !SessionSampler.shouldSample(
+            moduleConfiguration.samplingRate.toDouble(),
+            SESSION_SAMPLER_DOMAIN
+        ) {
+            sessionId
+        }
 
         if (sampledOut) {
             Logger.d(TAG) {

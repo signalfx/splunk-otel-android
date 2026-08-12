@@ -26,6 +26,7 @@ import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.sampling.SessionSampler
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import java.io.File
@@ -39,6 +40,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
 @RunWith(AndroidJUnit4::class)
@@ -164,6 +166,48 @@ class SplunkRumAgentCoreTest {
     }
 
     @Test
+    fun `install sampling decision is deterministic and stable across restarts for a reused session`() {
+        val sessionId = "abcdef0123456789abcdef0123456789"
+        `when`(mockSessionManager.sessionId).thenReturn(sessionId)
+        `when`(mockSessionManager.resolveSessionIdForSampling()).thenReturn(sessionId)
+        `when`(mockAgentConfig.session.samplingRate).thenReturn(0.5)
+
+        val expected = SessionSampler.shouldSample(0.5) { sessionId }
+
+        installSplunkRumAgent()
+        val firstDecision = SplunkRumAgentCore.isRunning
+
+        // Simulate a process restart that reuses the same session.
+        SplunkRumAgentCore.isRunning = false
+        AgentIntegration.modules.clear()
+
+        installSplunkRumAgent()
+        val secondDecision = SplunkRumAgentCore.isRunning
+
+        assertEquals("Decision must match the deterministic sampler", expected, firstDecision)
+        assertEquals("Decision must be stable across restarts for the same session", firstDecision, secondDecision)
+    }
+
+    @Test
+    fun `install attaches the session lifecycle observer even when sampled out`() {
+        `when`(mockAgentConfig.session.samplingRate).thenReturn(0.0)
+
+        installSplunkRumAgent()
+
+        verify(mockSessionManager).attachLifecycleObserver(application)
+    }
+
+    @Test
+    fun `install resolves the sampling session id without notifying listeners directly`() {
+        `when`(mockAgentConfig.session.samplingRate).thenReturn(0.5)
+        `when`(mockSessionManager.resolveSessionIdForSampling()).thenReturn("abcdef0123456789abcdef0123456789")
+
+        installSplunkRumAgent()
+
+        verify(mockSessionManager).resolveSessionIdForSampling()
+    }
+
+    @Test
     fun `configureContextStorageProvider() sets property to default when unset`() {
         SplunkRumAgentCore.configureContextStorageProvider()
 
@@ -214,7 +258,7 @@ class SplunkRumAgentCoreTest {
             val field = AgentStorage::class.java.getDeclaredField("instance")
             field.isAccessible = true
             field.set(null, null)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Ignore reflection errors in tests
         }
     }

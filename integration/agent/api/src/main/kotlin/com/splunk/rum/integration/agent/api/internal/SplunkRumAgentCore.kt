@@ -41,6 +41,7 @@ import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcesso
 import com.splunk.rum.integration.agent.internal.processor.SessionReplaySessionIdLogProcessor
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
 import com.splunk.rum.integration.agent.internal.processor.UserIdSpanProcessor
+import com.splunk.rum.integration.agent.internal.sampling.SessionSampler
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
@@ -64,11 +65,10 @@ internal object SplunkRumAgentCore {
         globalAttributes: MutableAttributes,
         offlineOtelDataProcessor: OfflineOtelDataProcessor
     ): OpenTelemetry {
-        // Sampling.
-        val shouldBeRunning = when (val samplingRate = agentConfiguration.session.samplingRate.coerceIn(0.0, 1.0)) {
-            0.0 -> false
-            1.0 -> true
-            else -> Math.random() < samplingRate
+        sessionManager.attachLifecycleObserver(application)
+
+        val shouldBeRunning = SessionSampler.shouldSample(agentConfiguration.session.samplingRate) {
+            sessionManager.resolveSessionIdForSampling()
         }
 
         if (!shouldBeRunning) return OpenTelemetry.noop()
@@ -78,8 +78,6 @@ internal object SplunkRumAgentCore {
         configureContextStorageProvider()
 
         Logger.d(TAG, "install(agentConfiguration: $agentConfiguration, moduleConfigurations: $moduleConfigurations)")
-
-        sessionManager.reset()
 
         val storage = AgentStorage.attach(application)
 

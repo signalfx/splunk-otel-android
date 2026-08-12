@@ -16,6 +16,7 @@ import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class SplunkSessionManagerTest {
@@ -139,6 +140,96 @@ class SplunkSessionManagerTest {
     }
 
     @Test
+    fun `install reuses existing valid session`() {
+        val now = System.currentTimeMillis()
+        val (storage, _) = storageMock(
+            sessionId = "existing-session",
+            sessionValidUntil = now + 60_000,
+            sessionValidUntilInBackground = now + 60_000,
+            sessionIds = listOf(SessionId("existing-session", now - 1_000))
+        )
+        val manager = SplunkSessionManager(storage)
+        var sessionChangedCount = 0
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                sessionChangedCount++
+            }
+        }
+
+        manager.install(RuntimeEnvironment.getApplication())
+
+        assertEquals("existing-session", manager.sessionId)
+        assertEquals(0, sessionChangedCount)
+    }
+
+    @Test
+    fun `resolveSessionIdForSampling creates and persists a session without notifying listeners`() {
+        val (storage, state) = storageMock()
+        val manager = SplunkSessionManager(storage)
+        var sessionChangedCount = 0
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                sessionChangedCount++
+            }
+        }
+
+        val resolvedId = manager.resolveSessionIdForSampling()
+
+        assertNotNull(resolvedId)
+        assertEquals(resolvedId, state.sessionId)
+        assertEquals("listener must not fire until the notification is flushed", 0, sessionChangedCount)
+    }
+
+    @Test
+    fun `install flushes a notification deferred by resolveSessionIdForSampling`() {
+        val (storage, _) = storageMock()
+        val manager = SplunkSessionManager(storage)
+
+        val resolvedId = manager.resolveSessionIdForSampling()
+
+        var notifiedSessionId: String? = null
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                notifiedSessionId = sessionId
+            }
+        }
+
+        manager.install(RuntimeEnvironment.getApplication())
+
+        assertEquals(resolvedId, notifiedSessionId)
+    }
+
+    @Test
+    fun `install does not re-flush a notification once delivered`() {
+        val (storage, _) = storageMock()
+        val manager = SplunkSessionManager(storage)
+        manager.resolveSessionIdForSampling()
+
+        var sessionChangedCount = 0
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                sessionChangedCount++
+            }
+        }
+
+        manager.install(RuntimeEnvironment.getApplication())
+        manager.install(RuntimeEnvironment.getApplication())
+
+        assertEquals(1, sessionChangedCount)
+    }
+
+    @Test
+    fun `attachLifecycleObserver can be called before and is safe to call again from install`() {
+        val (storage, _) = storageMock()
+        val manager = SplunkSessionManager(storage)
+
+        // Should not throw when called multiple times across the sampling and install paths.
+        manager.attachLifecycleObserver(RuntimeEnvironment.getApplication())
+        manager.resolveSessionIdForSampling()
+        manager.install(RuntimeEnvironment.getApplication())
+    }
+
+    @Test
     fun `sessionId returns correct id for timestamp`() {
         val storage = storageMock(
             sessionIds = listOf(
@@ -154,14 +245,57 @@ class SplunkSessionManagerTest {
         assertEquals("latest", manager.sessionId(1_000))
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `sessionId throws when no matching timestamp`() {
+    @Test
+    fun `sessionId falls back to earliest known session when timestamp precedes all history`() {
         val storage = storageMock(
-            sessionIds = listOf(SessionId("only", 500))
+            sessionIds = listOf(
+                SessionId("earliest", 500),
+                SessionId("later", 900)
+            )
         )
         val manager = SplunkSessionManager(storage.first)
 
-        manager.sessionId(100)
+        assertEquals("earliest", manager.sessionId(100))
+    }
+
+    @Test
+    fun `sessionId falls back to stored id when history is empty`() {
+        val storage = storageMock(
+            sessionId = "stored-session",
+            sessionIds = emptyList()
+        )
+        val manager = SplunkSessionManager(storage.first)
+
+        assertEquals("stored-session", manager.sessionId(100))
+    }
+
+    @Test
+    fun `sessionId returns empty string when no history and no stored id`() {
+        val storage = storageMock(sessionIds = emptyList())
+        val manager = SplunkSessionManager(storage.first)
+
+        assertEquals("", manager.sessionId(100))
+    }
+
+    @Test
+    fun `reusing a valid session backfills missing history so timestamp lookup does not throw`() {
+        val now = System.currentTimeMillis()
+        val validUntil = now + 60_000
+        val (storage, state) = storageMock(
+            sessionId = "legacy-session",
+            sessionValidUntil = validUntil,
+            sessionValidUntilInBackground = validUntil,
+            sessionIds = emptyList()
+        )
+        val manager = SplunkSessionManager(storage)
+
+        assertEquals("legacy-session", manager.sessionId)
+
+        assertEquals(1, state.sessionIds.size)
+        val backfilled = state.sessionIds.first()
+        assertEquals("legacy-session", backfilled.id)
+        assertEquals(validUntil - DEFAULT_SESSION_LENGTH, backfilled.validFrom)
+        assertEquals("legacy-session", manager.sessionId(now))
     }
 
     @Test
@@ -258,5 +392,9 @@ class SplunkSessionManagerTest {
         }.`when`(storage).writeSessionIds(org.mockito.ArgumentMatchers.anyList())
 
         return storage to state
+    }
+
+    private companion object {
+        const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L // 4h, mirrors SplunkSessionManager
     }
 }
