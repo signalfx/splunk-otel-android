@@ -17,10 +17,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added common repository module for shared internal utilities
 
 ##### Fixes:
-* Fixed ANR caused by navigation module performing reflection on the main thread during SDK install (#1673)
-* Moved initial network detection off the main thread to avoid blocking app startup (#1674)
-* Removed `simCarrierId` probe to reduce Binder IPC overhead during network detection
-* Fixed SAST scan findings
+* Deferred Compose navigation tracker creation until registration to reduce initialization work and improve compatibility with older AndroidX Navigation versions
+* Moved initial network detection to a background thread to reduce main thread work during SDK startup
 
 ### Version 2.3.2 - 2026-07-10
 
