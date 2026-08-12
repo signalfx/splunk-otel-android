@@ -23,15 +23,10 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
-
     api(project(":integration:agent:common"))
     implementation(project(":common:otel"))
     implementation(project(":common:storage"))
     implementation(project(":common:utils"))
-
-    implementation(Dependencies.Otel.androidSession)
-    implementation(Dependencies.Otel.androidInstrumentation)
 
     implementation(Dependencies.Common.logger)
     implementation(Dependencies.Common.http)

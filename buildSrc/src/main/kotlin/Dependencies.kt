@@ -89,9 +89,7 @@ object Dependencies {
 
     object Otel {
         private const val oTelInstrumentationBomAlpha = "2.15.0-alpha"
-        const val otelAndroidBomVersion = "0.11.0-alpha"
         const val instrumentationBomAlpha = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$oTelInstrumentationBomAlpha"
-        const val androidBom = "io.opentelemetry.android:opentelemetry-android-bom:$otelAndroidBomVersion"
 
         const val api = "io.opentelemetry:opentelemetry-api"
         const val sdk = "io.opentelemetry:opentelemetry-sdk"
@@ -103,10 +101,5 @@ object Dependencies {
         const val instrumentationApi = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api"
         const val instrumentationApiIncubator =
             "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator"
-
-        const val androidSession = "io.opentelemetry.android:session"
-        const val androidServices = "io.opentelemetry.android:services"
-        const val androidCommon = "io.opentelemetry.android:common"
-        const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation"
     }
 }

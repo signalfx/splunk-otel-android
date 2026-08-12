@@ -23,14 +23,12 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":integration:agent:internal"))
     implementation(project(":instrumentation:runtime:networkmonitor"))
 
-    implementation(Dependencies.Otel.androidInstrumentation)
-
+    implementation(Dependencies.Otel.api)
     implementation(Dependencies.Otel.semConvIncubating)
 
     implementation(Dependencies.Common.logger)

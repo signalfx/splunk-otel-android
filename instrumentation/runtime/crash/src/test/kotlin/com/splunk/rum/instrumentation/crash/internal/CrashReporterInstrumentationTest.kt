@@ -17,7 +17,7 @@
 
 package com.splunk.rum.instrumentation.crash.internal
 
-import android.content.Context
+import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import io.opentelemetry.api.OpenTelemetry
 import org.junit.After
@@ -31,7 +31,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class CrashReporterInstrumentationTest {
 
-    private val context: Context = ApplicationProvider.getApplicationContext()
+    private val application: Application = ApplicationProvider.getApplicationContext()
     private var originalHandler: Thread.UncaughtExceptionHandler? = null
 
     @Before
@@ -48,10 +48,10 @@ class CrashReporterInstrumentationTest {
     fun `install is idempotent and does not re-wrap the default handler`() {
         val instrumentation = CrashReporterInstrumentation()
 
-        instrumentation.install(context, OpenTelemetry.noop())
+        instrumentation.install(application, OpenTelemetry.noop())
         val afterFirst = Thread.getDefaultUncaughtExceptionHandler()
 
-        instrumentation.install(context, OpenTelemetry.noop())
+        instrumentation.install(application, OpenTelemetry.noop())
         val afterSecond = Thread.getDefaultUncaughtExceptionHandler()
 
         assertTrue(afterFirst is CrashReportingExceptionHandler)

@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+##### Enhancements:
+* Removed the OpenTelemetry Android runtime dependency
+
 ### Version 2.3.2 - 2026-07-10
 
 ##### New features:

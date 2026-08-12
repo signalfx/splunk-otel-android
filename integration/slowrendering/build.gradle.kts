@@ -23,14 +23,12 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:otel"))
     implementation(project(":instrumentation:runtime:slowrendering"))
 
-    implementation(Dependencies.Otel.androidInstrumentation)
     implementation(Dependencies.Otel.api)
 
     implementation(Dependencies.Common.logger)
