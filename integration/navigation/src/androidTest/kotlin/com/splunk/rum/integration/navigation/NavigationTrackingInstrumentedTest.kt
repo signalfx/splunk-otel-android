@@ -20,8 +20,8 @@ import android.app.Instrumentation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.navigation.automatic.NavigationEventEmitter
 import com.splunk.rum.integration.navigation.automatic.ScreenChangeDetector

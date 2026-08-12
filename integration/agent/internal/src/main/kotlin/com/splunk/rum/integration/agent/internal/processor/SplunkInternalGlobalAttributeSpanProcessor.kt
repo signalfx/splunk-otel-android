@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.context.Context
@@ -27,6 +27,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
 
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
+        val isNetworkEvent = span.name == NETWORK_CHANGE_EVENT_NAME
         attributes.forEach { key, value ->
             // screen.name is added onto every log record at emit time by
             // ScreenNameLogRecordProcessor. When those log records are later converted to
@@ -36,6 +37,12 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
             if (key == GlobalRumConstants.SCREEN_NAME_KEY &&
                 span.getAttribute(GlobalRumConstants.SCREEN_NAME_KEY) != null
             ) {
+                return@forEach
+            }
+            // Network change logs capture the complete network state when they are emitted.
+            // They can be converted to spans after the global network state has changed, so
+            // do not mix that later state into the event-time snapshot.
+            if (isNetworkEvent && key in NETWORK_ATTRIBUTE_KEYS) {
                 return@forEach
             }
             @Suppress("UNCHECKED_CAST")
@@ -51,6 +58,16 @@ class SplunkInternalGlobalAttributeSpanProcessor : SpanProcessor {
     override fun isEndRequired(): Boolean = true
 
     companion object {
+        private const val NETWORK_CHANGE_EVENT_NAME = "network.change"
+        private val NETWORK_ATTRIBUTE_KEYS = setOf(
+            AttributeKey.stringKey("network.connection.type"),
+            AttributeKey.stringKey("network.connection.subtype"),
+            AttributeKey.stringKey("network.carrier.name"),
+            AttributeKey.stringKey("network.carrier.mcc"),
+            AttributeKey.stringKey("network.carrier.mnc"),
+            AttributeKey.stringKey("network.carrier.icc")
+        )
+
         val attributes = MutableAttributes().apply {
             this[GlobalRumConstants.SCREEN_NAME_KEY] = GlobalRumConstants.DEFAULT_SCREEN_NAME
         }

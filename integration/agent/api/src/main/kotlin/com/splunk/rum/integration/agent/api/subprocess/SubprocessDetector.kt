@@ -18,8 +18,8 @@ package com.splunk.rum.integration.agent.api.subprocess
 
 import android.app.Application
 import android.os.Build
-import com.splunk.android.common.utils.extensions.invoke
-import com.splunk.android.common.utils.extensions.toKClass
+import com.splunk.rum.common.utils.extensions.invoke
+import com.splunk.rum.common.utils.extensions.toKClass
 
 internal object SubprocessDetector {
     fun isSubprocess(applicationId: String?): Boolean {

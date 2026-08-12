@@ -37,5 +37,5 @@ dependencies {
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okio)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.Common.logger)
 }

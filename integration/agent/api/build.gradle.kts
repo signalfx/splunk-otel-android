@@ -35,9 +35,9 @@ dependencies {
 
     implementation(Dependencies.Otel.semConv)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonStorage)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.storage)
+    implementation(Dependencies.Common.utils)
 
     compileOnly(Dependencies.Android.Compose.ui)
 

@@ -27,13 +27,13 @@ dependencies {
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":integration:agent:internal"))
+    implementation(project(":instrumentation:runtime:httpurlconnection-auto"))
     implementation(project(":common:otel"))
     implementation(project(":common:utils"))
 
+    implementation(Dependencies.Otel.androidInstrumentation)
     implementation(Dependencies.Otel.instrumentationApi)
 
-    implementation(Dependencies.Otel.androidHttpUrlLibrary)
-
-    implementation(Dependencies.SessionReplay.commonLogger)
-    implementation(Dependencies.SessionReplay.commonUtils)
+    implementation(Dependencies.Common.logger)
+    implementation(Dependencies.Common.utils)
 }

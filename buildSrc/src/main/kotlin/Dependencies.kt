@@ -69,14 +69,18 @@ object Dependencies {
         }
     }
 
-    object SessionReplay {
-        private const val version = "1.1.5"
+    object Common {
+        private const val version = "1.0.1"
 
-        const val commonHttp = "com.splunk.android:sr-common-http:$version"
-        const val commonJob = "com.splunk.android:sr-common-job:$version"
-        const val commonStorage = "com.splunk.android:sr-common-storage:$version"
-        const val commonUtils = "com.splunk.android:sr-common-utils:$version"
-        const val commonLogger = "com.splunk.android:sr-common-logger:$version"
+        const val http = "com.splunk:rum-common-http:$version"
+        const val job = "com.splunk:rum-common-job:$version"
+        const val storage = "com.splunk:rum-common-storage:$version"
+        const val utils = "com.splunk:rum-common-utils:$version"
+        const val logger = "com.splunk:rum-common-logger:$version"
+    }
+
+    object SessionReplay {
+        private const val version = "1.1.6"
 
         const val instrumentationSessionRecordingCore = "com.splunk.android:sr-instrumentation-session-recording-core:$version"
         const val instrumentationSessionRecordingFrameCapturer = "com.splunk.android:sr-instrumentation-session-recording-frame-capturer:$version"
@@ -104,10 +108,5 @@ object Dependencies {
         const val androidServices = "io.opentelemetry.android:services"
         const val androidCommon = "io.opentelemetry.android:common"
         const val androidInstrumentation = "io.opentelemetry.android.instrumentation:android-instrumentation"
-        const val androidHttpUrlLibrary = "io.opentelemetry.android.instrumentation:httpurlconnection-library"
-        const val androidNetworkMonitorInstrumentation = "io.opentelemetry.android.instrumentation:network"
-        const val androidCrashInstrumentation = "io.opentelemetry.android.instrumentation:crash"
-        const val androidANRInstrumentation = "io.opentelemetry.android.instrumentation:anr"
-        const val androidSlowRenderingInstrumentation = "io.opentelemetry.android.instrumentation:slowrendering"
     }
 }

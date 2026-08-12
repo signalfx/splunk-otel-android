@@ -18,11 +18,11 @@ package com.splunk.rum.integration.applicationlifecycle
 
 import android.app.Application
 import android.content.Context
-import com.splunk.android.common.logger.Logger
-import com.splunk.android.common.utils.AppStateObserver
-import com.splunk.android.common.utils.extensions.forEachFast
-import com.splunk.rum.common.otel.SplunkOpenTelemetrySdk
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.common.logger.Logger
+import com.splunk.rum.common.utils.AppStateObserver
+import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.applicationlifecycle.model.AppState
@@ -36,14 +36,13 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
 
     private const val TAG = "ApplicationLifecycleModuleIntegration"
 
-    private val appStateObserver = AppStateObserver()
     private var canReport: Boolean? = null
     private val cache: MutableList<ApplicationLifecycleData> = mutableListOf()
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach() called")
-        appStateObserver.listener = appStateListener
-        appStateObserver.attach(context as Application)
+        AppStateObserver.listeners += appStateListener
+        AppStateObserver.attach(context as Application)
     }
 
     override fun onInstall(

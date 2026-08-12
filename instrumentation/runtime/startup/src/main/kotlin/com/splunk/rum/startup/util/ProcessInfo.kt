@@ -21,7 +21,7 @@ import android.os.Process
 import android.os.SystemClock
 import android.system.Os
 import android.system.OsConstants
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import java.io.BufferedReader
 import java.io.FileReader
 

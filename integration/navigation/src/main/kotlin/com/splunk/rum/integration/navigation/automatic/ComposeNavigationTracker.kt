@@ -17,10 +17,11 @@
 package com.splunk.rum.integration.navigation.automatic
 
 import android.os.Bundle
+import androidx.annotation.VisibleForTesting
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
-import com.splunk.android.common.logger.Logger
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.navigation.NavigationEvent
 import com.splunk.rum.integration.navigation.NavigationEventProcessor
 import io.opentelemetry.api.common.AttributeKey
@@ -43,6 +44,7 @@ internal class ComposeNavigationTracker(
     private var activeListener: NavController.OnDestinationChangedListener? = null
 
     fun register(navController: NavController) {
+        if (!routeApiAvailable) return
         if (registeredController?.get() === navController) return
 
         clearRegistration()
@@ -50,9 +52,15 @@ internal class ComposeNavigationTracker(
         val listener = NavController.OnDestinationChangedListener { _, destination, arguments ->
             handleDestinationChanged(destination, arguments)
         }
-        navController.addOnDestinationChangedListener(listener)
         registeredController = WeakReference(navController)
         activeListener = listener
+        navController.addOnDestinationChangedListener(listener)
+        if (!routeApiAvailable) {
+            navController.removeOnDestinationChangedListener(listener)
+            registeredController = null
+            activeListener = null
+            return
+        }
         Logger.d(TAG, "Registered NavController for Compose navigation tracking")
     }
 
@@ -72,14 +80,31 @@ internal class ComposeNavigationTracker(
         screenChangeDetector.clearComposeRoute()
     }
 
-    private fun handleDestinationChanged(destination: NavDestination, arguments: Bundle?) {
+    @VisibleForTesting
+    internal var routeApiAvailable = true
+        private set
+
+    @VisibleForTesting
+    internal fun handleDestinationChanged(destination: NavDestination, arguments: Bundle?) {
+        if (!routeApiAvailable) return
         if (destination is NavGraph) return
         if (destination.navigatorName == NAVIGATOR_NAME_DIALOG) return
 
-        val screenName = destination.route ?: return
+        val screenName = try {
+            destination.route
+        } catch (e: LinkageError) {
+            routeApiAvailable = false
+            clearRegistration()
+            Logger.w(TAG, "NavDestination.route not available, disabling Compose tracking: ${e.message}")
+            return
+        } ?: return
 
         val attrMap = extractArguments(arguments)
-        destination.parent?.route?.let { attrMap[ATTR_NAV_GRAPH] = it }
+        try {
+            destination.parent?.route?.let { attrMap[ATTR_NAV_GRAPH] = it }
+        } catch (_: LinkageError) {
+            // guarded by the flag above on next call
+        }
 
         if (processor != null) {
             val event = NavigationEvent(

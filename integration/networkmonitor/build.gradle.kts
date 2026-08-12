@@ -27,15 +27,13 @@ dependencies {
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":integration:agent:internal"))
+    implementation(project(":instrumentation:runtime:networkmonitor"))
 
-    implementation(Dependencies.Otel.androidNetworkMonitorInstrumentation) {
-        exclude(group = "io.opentelemetry", module = "opentelemetry-sdk-extension-incubator")
-    }
-    implementation(Dependencies.Otel.androidServices)
-    implementation(Dependencies.Otel.androidCommon)
+    implementation(Dependencies.Otel.androidInstrumentation)
 
     implementation(Dependencies.Otel.semConvIncubating)
 
-    implementation(Dependencies.SessionReplay.commonLogger)
+    implementation(Dependencies.Common.logger)
 
+    testImplementation(Dependencies.Test.junit)
 }

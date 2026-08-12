@@ -19,11 +19,11 @@ package com.splunk.rum.integration.agent.internal.session
 import android.app.Application
 import android.content.Context
 import androidx.annotation.VisibleForTesting
-import com.splunk.android.common.utils.AppStateObserver
-import com.splunk.android.common.utils.extensions.forEachFast
-import com.splunk.android.common.utils.extensions.safeSchedule
-import com.splunk.rum.common.storage.IAgentStorage
-import com.splunk.rum.common.storage.SessionId as SessionIdStorageData
+import com.splunk.rum.agent.common.storage.IAgentStorage
+import com.splunk.rum.agent.common.storage.SessionId as SessionIdStorageData
+import com.splunk.rum.common.utils.AppStateObserver
+import com.splunk.rum.common.utils.extensions.forEachFast
+import com.splunk.rum.common.utils.extensions.safeSchedule
 import com.splunk.rum.integration.agent.internal.id.SessionId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
 import java.util.concurrent.Executors
@@ -59,7 +59,7 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
 
 class SplunkSessionManager internal constructor(private val agentStorage: IAgentStorage) : ISplunkSessionManager {
     private val executor = Executors.newSingleThreadScheduledExecutor()
-    private val appStateObserver = AppStateObserver()
+    private val appStateObserver = AppStateObserver
 
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
 
@@ -106,7 +106,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
     override fun install(context: Context) {
         createNewSessionIfNeeded()
 
-        appStateObserver.listener = AppStateObserverListener()
+        appStateObserver.listeners.add(AppStateObserverListener())
         appStateObserver.attach(context.applicationContext as Application)
     }
 

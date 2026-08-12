@@ -1,1 +1,1 @@
--repackageclasses 'com.splunk.rum.common.utils'
+-repackageclasses 'com.splunk.rum.agent.common.utils'

@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
-import com.splunk.rum.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
@@ -31,6 +31,8 @@ import org.mockito.Mockito.`when`
 class SplunkInternalGlobalAttributeSpanProcessorTest {
 
     private val processor = SplunkInternalGlobalAttributeSpanProcessor()
+    private val connectionType = AttributeKey.stringKey("network.connection.type")
+    private val carrierName = AttributeKey.stringKey("network.carrier.name")
 
     @Before
     fun setup() {
@@ -41,6 +43,8 @@ class SplunkInternalGlobalAttributeSpanProcessorTest {
     fun teardown() {
         SplunkInternalGlobalAttributeSpanProcessor.attributes[GlobalRumConstants.SCREEN_NAME_KEY] =
             GlobalRumConstants.DEFAULT_SCREEN_NAME
+        SplunkInternalGlobalAttributeSpanProcessor.attributes.remove(connectionType)
+        SplunkInternalGlobalAttributeSpanProcessor.attributes.remove(carrierName)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -93,6 +97,30 @@ class SplunkInternalGlobalAttributeSpanProcessorTest {
             GlobalRumConstants.SCREEN_NAME_KEY as AttributeKey<Any>,
             "CurrentScreen" as Any
         )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    @Test
+    fun `does not mix current network globals into network event snapshot`() {
+        SplunkInternalGlobalAttributeSpanProcessor.attributes[connectionType] = "wifi"
+        SplunkInternalGlobalAttributeSpanProcessor.attributes[carrierName] = "Example"
+        val span = mockSpan(name = "network.change", existingScreenName = null)
+
+        processor.onStart(Context.root(), span)
+
+        verify(span, never()).setAttribute(connectionType as AttributeKey<Any>, "wifi" as Any)
+        verify(span, never()).setAttribute(carrierName as AttributeKey<Any>, "Example" as Any)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    @Test
+    fun `applies current network globals to ordinary spans`() {
+        SplunkInternalGlobalAttributeSpanProcessor.attributes[connectionType] = "wifi"
+        val span = mockSpan(name = "HTTP GET", existingScreenName = null)
+
+        processor.onStart(Context.root(), span)
+
+        verify(span).setAttribute(connectionType as AttributeKey<Any>, "wifi" as Any)
     }
 
     @Test
