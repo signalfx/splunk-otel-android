@@ -16,7 +16,7 @@
 
 package com.splunk.rum.instrumentation.crash.internal.extractor
 
-import android.content.Context
+import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import io.opentelemetry.api.common.Attributes
@@ -33,8 +33,8 @@ class RumCrashAttributesExtractorTest {
 
     @Before
     fun setUp() {
-        val context: Context = ApplicationProvider.getApplicationContext()
-        extractor = RumCrashAttributesExtractor(context)
+        val application: Application = ApplicationProvider.getApplicationContext()
+        extractor = RumCrashAttributesExtractor(application)
     }
 
     @Test

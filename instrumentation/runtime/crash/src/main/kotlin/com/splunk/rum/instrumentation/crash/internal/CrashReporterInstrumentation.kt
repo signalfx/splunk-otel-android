@@ -17,7 +17,7 @@
 
 package com.splunk.rum.instrumentation.crash.internal
 
-import android.content.Context
+import android.app.Application
 import com.splunk.rum.instrumentation.crash.internal.extractor.CrashAttributesExtractor
 import com.splunk.rum.instrumentation.crash.internal.extractor.RuntimeDetailsExtractor
 import io.opentelemetry.api.OpenTelemetry
@@ -43,11 +43,11 @@ class CrashReporterInstrumentation {
     }
 
     /** Installs the crash reporting uncaught exception handler. No-ops if already installed. */
-    fun install(context: Context, openTelemetry: OpenTelemetry) {
+    fun install(application: Application, openTelemetry: OpenTelemetry) {
         if (!installed.compareAndSet(false, true)) {
             return
         }
-        val extractors = additionalExtractors + RuntimeDetailsExtractor.create(context.applicationContext)
+        val extractors = additionalExtractors + RuntimeDetailsExtractor.create(application)
         CrashReporter(openTelemetry, extractors).install()
     }
 }

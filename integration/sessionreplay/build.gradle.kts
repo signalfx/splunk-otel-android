@@ -23,13 +23,9 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
-
     implementation(project(":integration:agent:api"))
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:otel"))
-
-    implementation(Dependencies.Otel.androidInstrumentation)
 
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingCore)
     implementation(Dependencies.SessionReplay.instrumentationSessionRecordingInteractions)

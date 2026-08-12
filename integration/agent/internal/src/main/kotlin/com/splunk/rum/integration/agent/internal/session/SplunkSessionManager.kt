@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.internal.session
 
 import android.app.Application
-import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.agent.common.storage.SessionId as SessionIdStorageData
@@ -37,7 +36,7 @@ interface ISplunkSessionManager {
     val previousSessionId: String?
     val sessionListeners: MutableSet<SessionListener>
 
-    fun install(context: Context)
+    fun install(application: Application)
     fun trackSessionActivity()
     fun reset()
     fun sessionId(timestamp: Long): String
@@ -50,7 +49,7 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
     override val sessionStart: Long = 0L
     override val sessionLastActivity: Long = 0L
     override val sessionListeners: MutableSet<SessionListener> = mutableSetOf()
-    override fun install(context: Context) = Unit
+    override fun install(application: Application) = Unit
     override fun trackSessionActivity() = Unit
     override fun reset() = Unit
 
@@ -103,11 +102,11 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
     private var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
 
-    override fun install(context: Context) {
+    override fun install(application: Application) {
         createNewSessionIfNeeded()
 
         appStateObserver.listeners.add(AppStateObserverListener())
-        appStateObserver.attach(context.applicationContext as Application)
+        appStateObserver.attach(application)
     }
 
     override fun reset() {

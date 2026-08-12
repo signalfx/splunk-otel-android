@@ -79,7 +79,7 @@ Add the Splunk RUM agent library to your app module's `build.gradle` file depend
 implementation("com.splunk:splunk-otel-android:2.3.3")
 ```
 
-**Important:** Remove the following line from your dependencies if present, as the upstream OpenTelemetry Android repo is already linked in our SDK:
+The Splunk RUM SDK does not require the OpenTelemetry Android instrumentation artifact. Remove the following dependency if you previously added it only for this SDK:
 ```
 implementation("io.opentelemetry.android:instrumentation:2.0.0")
 ```
