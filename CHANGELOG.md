@@ -7,6 +7,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.3.3 - 2026-08-12
+
+##### Enhancements:
+* Ported crash reporting, ANR detection, slow rendering, network monitor, and HttpURLConnection instrumentation from upstream opentelemetry-android repository into the SDK
+
+##### Fixes:
+* Deferred Compose navigation tracker creation until registration to reduce initialization work and improve compatibility with older AndroidX Navigation versions
+* Moved initial network detection to a background thread to reduce main thread work during SDK startup
+
 ### Version 2.3.2 - 2026-07-10
 
 ##### New features:
@@ -14,6 +23,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added interaction preferences
 
 ##### Enhancements:
+* Ported OkHttp3 auto and manual instrumentation from upstream opentelemetry-android repository into the SDK
 * Renamed the `deployment.environment` resource attribute to `deployment.environment.name`
 * Remove unused dependency to eliminate vulnerable transitive dependencies on Jackson libraries
 
