@@ -7,6 +7,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.3.3 - 2026-08-12
+
+##### Enhancements:
+* Ported crash reporting instrumentation from upstream OpenTelemetry into the SDK
+* Ported ANR detection instrumentation from upstream OpenTelemetry into the SDK
+* Ported slow rendering instrumentation from upstream OpenTelemetry into the SDK
+* Ported network monitor instrumentation from upstream OpenTelemetry into the SDK
+* Added common repository module for shared internal utilities
+
+##### Fixes:
+* Fixed ANR caused by navigation module performing reflection on the main thread during SDK install (#1673)
+* Moved initial network detection off the main thread to avoid blocking app startup (#1674)
+* Removed `simCarrierId` probe to reduce Binder IPC overhead during network detection
+* Fixed SAST scan findings
+
 ### Version 2.3.2 - 2026-07-10
 
 ##### New features:
