@@ -16,12 +16,12 @@
 
 package com.splunk.rum.integration.httpurlconnection.auto
 
-import android.content.Context
+import android.app.Application
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.httpurlconnection.auto.HttpUrlInstrumentation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 
 internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfiguration>(
     defaultModuleConfiguration = HttpURLModuleConfiguration()
@@ -30,8 +30,8 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
     private const val TAG = "HttpURLIntegration"
 
     override fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
@@ -49,7 +49,7 @@ internal object HttpURLModuleIntegration : ModuleIntegration<HttpURLModuleConfig
                     .takeIf { it.isNotEmpty() }
                     ?.let { capturedResponseHeaders = it }
 
-                install(oTelInstallationContext.openTelemetry)
+                install(openTelemetry)
             }
         }
     }

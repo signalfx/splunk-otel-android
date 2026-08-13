@@ -23,14 +23,12 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":integration:agent:internal"))
     implementation(project(":common:otel"))
     implementation(project(":instrumentation:runtime:anr"))
 
-    implementation(Dependencies.Otel.androidInstrumentation)
     implementation(Dependencies.Otel.api)
 
     implementation(Dependencies.Common.logger)
@@ -40,4 +38,3 @@ dependencies {
     testImplementation(Dependencies.Test.robolectric)
     testImplementation(Dependencies.Test.androidXTestCore)
 }
-

@@ -23,13 +23,9 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
-
     implementation(project(":integration:agent:api"))
     implementation(project(":integration:agent:internal"))
     implementation(project(":instrumentation:runtime:okhttp3-manual"))
-
-    implementation(Dependencies.Otel.androidInstrumentation)
 
     /**
      * Okio must be explicitly included since a newer version is being enforced than what is transitively used by OkHttp.

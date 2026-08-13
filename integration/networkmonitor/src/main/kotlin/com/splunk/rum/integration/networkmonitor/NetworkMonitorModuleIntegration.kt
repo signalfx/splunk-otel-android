@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.networkmonitor
 
-import android.content.Context
+import android.app.Application
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.networkmonitor.internal.NetworkMonitorInstrumentation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
@@ -24,7 +24,7 @@ import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacyNetworkMonitorModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.agent.internal.processor.SplunkInternalGlobalAttributeSpanProcessor
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NETWORK_CONNECTION_TYPE
 import io.opentelemetry.semconv.incubating.NetworkIncubatingAttributes.NetworkConnectionTypeIncubatingValues.UNKNOWN
@@ -36,8 +36,8 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
     private const val TAG = "NetworkMonitorIntegration"
 
     override fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
@@ -59,7 +59,7 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
                         attributes
                     )
                 }
-                install(oTelInstallationContext.application, oTelInstallationContext.openTelemetry)
+                install(application, openTelemetry)
             }
         }
     }

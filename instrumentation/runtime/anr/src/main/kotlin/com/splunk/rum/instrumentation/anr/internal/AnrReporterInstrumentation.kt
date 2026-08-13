@@ -18,7 +18,6 @@
 package com.splunk.rum.instrumentation.anr.internal
 
 import android.app.Application
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import com.splunk.rum.agent.common.utils.extensions.isStartedInForeground
@@ -72,8 +71,7 @@ class AnrReporterInstrumentation {
     }
 
     /** Installs the ANR watchdog and starts foreground-only detection. */
-    fun install(context: Context, openTelemetry: OpenTelemetry) {
-        val application = context.applicationContext as Application
+    fun install(application: Application, openTelemetry: OpenTelemetry) {
         val reporter = AnrReporter(openTelemetry, additionalExtractors.toList())
 
         val mainLooper = Looper.getMainLooper()

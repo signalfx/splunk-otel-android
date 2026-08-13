@@ -23,14 +23,12 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(Dependencies.Otel.api)
 
     implementation(Dependencies.Common.logger)
 
-    testImplementation(platform(Dependencies.Otel.androidBom))
     testImplementation(Dependencies.Otel.sdk)
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.robolectric)
