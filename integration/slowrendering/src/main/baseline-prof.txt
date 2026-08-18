@@ -1,0 +1,15 @@
+Lcom/splunk/rum/integration/slowrendering/SlowRenderingModuleConfiguration;
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleConfiguration;-><init>(ZLj$/time/Duration;)V
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleConfiguration;-><init>(ZLj$/time/Duration;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleConfiguration;->getAttributes()Ljava/util/List;
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleConfiguration;->getInterval()Lj$/time/Duration;
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleConfiguration;->getName()Ljava/lang/String;
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleConfiguration;->isEnabled()Z
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleConfiguration;->toString()Ljava/lang/String;
+Lcom/splunk/rum/integration/slowrendering/SlowRenderingModuleInstaller;
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleInstaller;-><init>()V
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleInstaller;->onInstall(Landroid/content/Context;)V
+Lcom/splunk/rum/integration/slowrendering/SlowRenderingModuleIntegration;
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleIntegration;-><clinit>()V
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleIntegration;-><init>()V
+HSPLcom/splunk/rum/integration/slowrendering/SlowRenderingModuleIntegration;->onInstall(Landroid/app/Application;Lio/opentelemetry/api/OpenTelemetry;Ljava/util/List;)V

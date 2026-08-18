@@ -1,0 +1,17 @@
+Lcom/splunk/rum/integration/agent/common/attributes/MutableAttributes;
+HSPLcom/splunk/rum/integration/agent/common/attributes/MutableAttributes;-><init>(Lio/opentelemetry/api/common/Attributes;)V
+HSPLcom/splunk/rum/integration/agent/common/attributes/MutableAttributes;-><init>(Lio/opentelemetry/api/common/Attributes;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+HSPLcom/splunk/rum/integration/agent/common/attributes/MutableAttributes;->forEach(Ljava/util/function/BiConsumer;)V
+HSPLcom/splunk/rum/integration/agent/common/attributes/MutableAttributes;->set(Lio/opentelemetry/api/common/AttributeKey;Ljava/lang/Object;)V
+HSPLcom/splunk/rum/integration/agent/common/attributes/MutableAttributes;->set(Ljava/lang/String;J)V
+HSPLcom/splunk/rum/integration/agent/common/attributes/MutableAttributes;->set(Ljava/lang/String;Ljava/lang/String;)V
+HSPLcom/splunk/rum/integration/agent/common/attributes/MutableAttributes;->set(Ljava/lang/String;Z)V
+HSPLcom/splunk/rum/integration/agent/common/attributes/MutableAttributes;->update(Lkotlin/jvm/functions/Function1;)V
+Lcom/splunk/rum/integration/agent/common/attributes/MutableAttributes$StopException;
+Lcom/splunk/rum/integration/agent/common/module/ModuleConfiguration;
+Lcom/splunk/rum/integration/agent/common/module/ModuleConfigurationExtKt;
+HSPLcom/splunk/rum/integration/agent/common/module/ModuleConfigurationExtKt;->toSplunkString(Lcom/splunk/rum/integration/agent/common/module/ModuleConfiguration;)Ljava/lang/String;
+Lcom/splunk/rum/integration/agent/common/module/ModuleConfigurationExtKt$toSplunkString$1;
+HSPLcom/splunk/rum/integration/agent/common/module/ModuleConfigurationExtKt$toSplunkString$1;-><init>(Lcom/splunk/rum/integration/agent/common/module/ModuleConfiguration;)V
+HSPLcom/splunk/rum/integration/agent/common/module/ModuleConfigurationExtKt$toSplunkString$1;->invoke(Ljava/lang/Object;)Ljava/lang/Object;
+HSPLcom/splunk/rum/integration/agent/common/module/ModuleConfigurationExtKt$toSplunkString$1;->invoke(Lkotlin/Pair;)Ljava/lang/CharSequence;
