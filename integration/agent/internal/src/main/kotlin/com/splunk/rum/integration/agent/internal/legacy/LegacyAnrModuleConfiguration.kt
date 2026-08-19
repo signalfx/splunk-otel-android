@@ -21,10 +21,8 @@ import java.time.Duration
 
 @Suppress("NewApi") // Duration requires API 26 or core library desugaring
 @Deprecated("Only to support legacy API, can be removed with legacy API.")
-class LegacyAnrModuleConfiguration(
-    val isEnabled: Boolean = true,
-    val threshold: Duration = Duration.ofSeconds(5)
-) : ModuleConfiguration {
+class LegacyAnrModuleConfiguration(val isEnabled: Boolean = true, val threshold: Duration = Duration.ofSeconds(5)) :
+    ModuleConfiguration {
 
     override val name: String = "anr"
 
