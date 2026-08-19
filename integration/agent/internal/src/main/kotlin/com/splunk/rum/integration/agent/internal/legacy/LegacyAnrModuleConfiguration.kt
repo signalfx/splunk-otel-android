@@ -23,13 +23,13 @@ import java.time.Duration
 @Deprecated("Only to support legacy API, can be removed with legacy API.")
 class LegacyAnrModuleConfiguration(
     val isEnabled: Boolean = true,
-    val pollingInterval: Duration = Duration.ofSeconds(5)
+    val threshold: Duration = Duration.ofSeconds(5)
 ) : ModuleConfiguration {
 
     override val name: String = "anr"
 
     override val attributes: List<Pair<String, String>> = listOf(
         "enabled" to isEnabled.toString(),
-        "pollingInterval" to pollingInterval.toString()
+        "threshold" to threshold.toString()
     )
 }

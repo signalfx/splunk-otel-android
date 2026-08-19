@@ -35,7 +35,7 @@ import kotlin.math.max
  * Entry point for installing ANR (application not responding) detection.
  *
  * Register any additional [AnrAttributesExtractor]s via [addAttributesExtractor] and optionally
- * configure the detection threshold via [setPollingInterval] before calling [install]. Detection is
+ * configure the detection threshold via [setThreshold] before calling [install]. Detection is
  * foreground-only and backed by a daemon watchdog thread that is cancelled whenever the app is
  * backgrounded.
  *
@@ -57,16 +57,16 @@ class AnrReporterInstrumentation {
 
     /**
      * Sets the ANR detection threshold. An ANR is reported after the main thread is unresponsive
-     * for approximately [pollingInterval].
+     * for approximately [threshold].
      */
     @Suppress("NewApi") // Duration requires API 26 or core library desugaring
-    fun setPollingInterval(pollingInterval: Duration): AnrReporterInstrumentation {
-        if (pollingInterval.isZero || pollingInterval.isNegative) {
-            Logger.w(TAG, "Invalid pollingInterval ($pollingInterval), using default threshold")
+    fun setThreshold(threshold: Duration): AnrReporterInstrumentation {
+        if (threshold.isZero || threshold.isNegative) {
+            Logger.w(TAG, "Invalid threshold ($threshold), using default threshold")
             return this
         }
         val effectiveCycleSeconds = POLL_AWAIT_SECONDS + SCHEDULER_DELAY_SECONDS
-        maxMissedPolls = max(1, ceil(pollingInterval.seconds.toDouble() / effectiveCycleSeconds).toInt())
+        maxMissedPolls = max(1, ceil(threshold.seconds.toDouble() / effectiveCycleSeconds).toInt())
         return this
     }
 

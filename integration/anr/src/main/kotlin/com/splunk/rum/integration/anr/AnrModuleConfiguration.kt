@@ -23,24 +23,24 @@ import java.time.Duration
  * ANR module configuration.
  *
  * @property isEnabled Whether the module is enabled.
- * @property pollingInterval How long the main thread must be unresponsive before an ANR is reported.
- *                           Default is 5 seconds.
+ * @property threshold How long the main thread must be unresponsive before an ANR is reported.
+ *                     Default is 5 seconds.
  */
 @Suppress("NewApi") // Duration requires API 26 or core library desugaring
 data class AnrModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
-    val pollingInterval: Duration = DEFAULT_POLLING_INTERVAL
+    val threshold: Duration = DEFAULT_THRESHOLD
 ) : ModuleConfiguration {
 
     override val name: String = "anr"
 
     override val attributes: List<Pair<String, String>> = listOf(
         "enabled" to isEnabled.toString(),
-        "pollingInterval" to pollingInterval.toString()
+        "threshold" to threshold.toString()
     )
 
     companion object {
         /** Default ANR detection threshold. */
-        val DEFAULT_POLLING_INTERVAL: Duration = Duration.ofSeconds(5)
+        val DEFAULT_THRESHOLD: Duration = Duration.ofSeconds(5)
     }
 }

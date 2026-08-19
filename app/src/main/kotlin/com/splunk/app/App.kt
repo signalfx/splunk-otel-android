@@ -130,7 +130,7 @@ class App : Application() {
 
     private val anrModuleConfiguration = AnrModuleConfiguration(
         isEnabled = true,
-        pollingInterval = Duration.ofSeconds(5)
+        threshold = Duration.ofSeconds(5)
     )
 
     private val slowRenderingModuleConfiguration = SlowRenderingModuleConfiguration(
