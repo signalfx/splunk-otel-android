@@ -64,7 +64,12 @@ class AnrReporterInstrumentation {
             Logger.w(TAG, "Invalid threshold ($threshold), using default threshold")
             return this
         }
-        thresholdNs = threshold.toNanos()
+        thresholdNs = try {
+            threshold.toNanos()
+        } catch (_: ArithmeticException) {
+            Logger.w(TAG, "Threshold ($threshold) overflows nanosecond range, using default threshold")
+            AnrWatcher.DEFAULT_THRESHOLD_NS
+        }
         return this
     }
 
