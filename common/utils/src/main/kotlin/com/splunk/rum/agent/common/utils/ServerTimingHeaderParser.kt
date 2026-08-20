@@ -29,14 +29,14 @@ data class ServerTraceContext(val traceId: String, val spanId: String)
 object ServerTimingHeaderParser {
 
     private val HEADER_PATTERN: Pattern = Pattern.compile(
-        """traceparent;desc=['"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['"]"""
+        """traceparent;desc=['"]00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9a-f]{2}['"]"""
     )
 
     /**
      * Parses the server-timing header to extract the trace ID and span ID.
      *
      * @param header A header string in the form:
-     *     traceparent;desc="00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-01"
+     *     traceparent;desc="00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-03"
      * @return A ServerTraceContext object containing TraceId and SpanId, or null if parsing fails.
      *      <p>This will also consider single-quotes valid for delimiting the "desc" section, even
      *      though it's not to spec.
