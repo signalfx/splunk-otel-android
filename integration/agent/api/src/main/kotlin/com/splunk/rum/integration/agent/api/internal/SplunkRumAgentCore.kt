@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
-import android.os.SystemClock
 import com.splunk.rum.agent.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.agent.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.agent.common.storage.AgentStorage
@@ -73,9 +72,6 @@ internal object SplunkRumAgentCore {
         }
 
         if (!shouldBeRunning) return OpenTelemetry.noop()
-
-        val installStartTimestamp = System.currentTimeMillis()
-        val installStartElapsed = SystemClock.elapsedRealtime()
 
         // Configure the OTel Context API only once we are committed to running RUM, so no-op
         // install paths do not mutate this process-wide JVM property for unrelated host-app code.
@@ -136,14 +132,7 @@ internal object SplunkRumAgentCore {
             }
         }
 
-        agentIntegration.install(
-            application,
-            openTelemetry,
-            moduleConfigurations,
-            globalAttributes,
-            installStartTimestamp,
-            installStartElapsed
-        )
+        agentIntegration.install(application, openTelemetry, moduleConfigurations, globalAttributes)
 
         installTimestamp = System.currentTimeMillis()
         if (agentConfiguration.endpoint != null) {

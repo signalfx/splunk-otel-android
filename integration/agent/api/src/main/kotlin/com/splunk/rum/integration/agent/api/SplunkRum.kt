@@ -377,7 +377,7 @@ class SplunkRum private constructor(
             return instance
         }
 
-        private fun emitInstallSpan(openTelemetry: OpenTelemetry, startMillis: Long, startElapsedNanos: Long) {
+        internal fun emitInstallSpan(openTelemetry: OpenTelemetry, startMillis: Long, startElapsedNanos: Long) {
             try {
                 val endElapsedNanos = SystemClock.elapsedRealtimeNanos()
                 val durationNanos = endElapsedNanos - startElapsedNanos
