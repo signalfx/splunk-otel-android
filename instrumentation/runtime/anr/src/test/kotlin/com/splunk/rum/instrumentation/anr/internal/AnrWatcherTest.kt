@@ -190,6 +190,30 @@ class AnrWatcherTest {
     }
 
     @Test
+    fun `reports ANR when main thread recovers past deadline but watchdog was delayed`() {
+        var heartbeatCallback: Runnable? = null
+        `when`(handler.post(any())).thenAnswer { invocation ->
+            heartbeatCallback = invocation.getArgument(0) as Runnable
+            true
+        }
+
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, clock)
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(6)
+        heartbeatCallback?.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+        assertEquals(
+            "Should still report ANR even though main thread recovered",
+            1,
+            reportedStackTraces.size
+        )
+    }
+
+    @Test
     fun `does not false-report when threshold near Long MAX_VALUE overflows deadline`() {
         `when`(handler.post(any())).thenReturn(true)
 
