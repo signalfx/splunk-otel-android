@@ -18,53 +18,65 @@
 package com.splunk.rum.instrumentation.anr.internal
 
 import android.os.Handler
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 /**
- * Watches the UI thread for ANRs by posting a [Runnable] to the main thread on every poll. When the
- * main thread fails to respond to [MAX_MISSED_POLLS] consecutive polls (5 seconds with the default
- * 1-second poll), an ANR is reported via [onAnr] with the main thread's current stack trace.
+ * Watches the UI thread for ANRs by posting a heartbeat [Runnable] to the main thread. When the
+ * main thread fails to process the heartbeat within [thresholdNs] wall-clock nanoseconds, an ANR
+ * is reported via [onAnr] with the main thread's current stack trace.
  *
- * @property pollDurationNs how long to wait for the main thread to respond on each poll; exists for testing.
+ * Only one ANR is reported per stall. A new report is only emitted after the main thread recovers
+ * and subsequently stalls again.
+ *
+ * @property thresholdNs Wall-clock time in nanoseconds that the main thread must be unresponsive
+ *           before an ANR is reported.
+ * @property clock Monotonic clock source; injectable for testing.
  */
-internal class AnrWatcher @JvmOverloads constructor(
+internal class AnrWatcher(
     private val uiHandler: Handler,
     private val mainThread: Thread,
     private val onAnr: (Array<StackTraceElement>) -> Unit,
-    private val pollDurationNs: Long = DEFAULT_POLL_DURATION_NS
+    private val thresholdNs: Long = DEFAULT_THRESHOLD_NS,
+    private val clock: () -> Long = { System.nanoTime() }
 ) : Runnable {
 
-    private val anrCounter = AtomicInteger()
+    private val heartbeatOutstanding = AtomicBoolean(false)
+    private val nextReportAtNs = AtomicLong(Long.MAX_VALUE)
+    private val lateRecovery = AtomicBoolean(false)
 
     override fun run() {
-        val response = CountDownLatch(1)
-        if (!uiHandler.post { response.countDown() }) {
-            // The main thread is probably shutting down. Ignore and return.
+        val nowNs = clock()
+
+        if (heartbeatOutstanding.compareAndSet(false, true)) {
+            val deadline = if (nowNs > Long.MAX_VALUE - thresholdNs) Long.MAX_VALUE else nowNs + thresholdNs
+            nextReportAtNs.set(deadline)
+
+            if (!uiHandler.post {
+                    if (clock() < nextReportAtNs.get()) {
+                        heartbeatOutstanding.set(false)
+                    } else {
+                        lateRecovery.set(true)
+                    }
+                }
+            ) {
+                heartbeatOutstanding.set(false)
+            }
             return
         }
 
-        val responded = try {
-            response.await(pollDurationNs, TimeUnit.NANOSECONDS)
-        } catch (e: InterruptedException) {
-            return
-        }
-
-        if (responded) {
-            anrCounter.set(0)
-            return
-        }
-
-        if (anrCounter.incrementAndGet() >= MAX_MISSED_POLLS) {
+        if (nowNs >= nextReportAtNs.get()) {
             onAnr(mainThread.stackTrace)
-            // Only report once per ANR window.
-            anrCounter.set(0)
+            nextReportAtNs.set(Long.MAX_VALUE)
+        }
+
+        if (lateRecovery.compareAndSet(true, false)) {
+            heartbeatOutstanding.set(false)
         }
     }
 
     companion object {
-        val DEFAULT_POLL_DURATION_NS: Long = TimeUnit.SECONDS.toNanos(1)
-        private const val MAX_MISSED_POLLS = 5
+        val DEFAULT_THRESHOLD_NS: Long = TimeUnit.SECONDS.toNanos(5)
     }
 }

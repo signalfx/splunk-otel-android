@@ -31,13 +31,33 @@
 			app:layout_constraintTop_toBottomOf="@id/crash_title" />
 
 		<TextView
+			android:id="@+id/anr_title"
+			style="@style/Heading"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="30dp"
+			android:text="@string/anr_title"
+			app:layout_constraintTop_toBottomOf="@id/crash_reports" />
+
+		<TextView
+			android:id="@+id/anr_demo"
+			style="@style/Button"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="20dp"
+			android:layout_marginTop="20dp"
+			android:layout_marginRight="20dp"
+			android:text="@string/anr_title"
+			app:layout_constraintTop_toBottomOf="@id/anr_title" />
+
+		<TextView
 			android:id="@+id/network_request_title"
 			style="@style/Heading"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="30dp"
 			android:text="@string/menu_network_request_title"
-			app:layout_constraintTop_toBottomOf="@id/crash_reports" />
+			app:layout_constraintTop_toBottomOf="@id/anr_demo" />
 
 		<TextView
 			android:id="@+id/okhttp_sample_calls"

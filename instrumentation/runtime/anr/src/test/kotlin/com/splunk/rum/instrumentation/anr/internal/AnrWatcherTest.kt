@@ -36,20 +36,27 @@ class AnrWatcherTest {
     private lateinit var mainThread: Thread
     private val reportedStackTraces = mutableListOf<Array<StackTraceElement>>()
     private val onAnr: (Array<StackTraceElement>) -> Unit = { reportedStackTraces.add(it) }
+    private var fakeTimeNs = 0L
+    private val clock: () -> Long = { fakeTimeNs }
 
     @Before
     fun setUp() {
         handler = mock(Handler::class.java)
         mainThread = Thread.currentThread()
         reportedStackTraces.clear()
+        fakeTimeNs = 0L
     }
 
     @Test
     fun `does not report when the main thread handler rejects the post`() {
         `when`(handler.post(any())).thenReturn(false)
 
-        val watcher = AnrWatcher(handler, mainThread, onAnr, SHORT_POLL_NS)
-        repeat(6) { watcher.run() }
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, clock)
+
+        repeat(6) {
+            fakeTimeNs += TimeUnit.SECONDS.toNanos(2)
+            watcher.run()
+        }
 
         assertTrue(reportedStackTraces.isEmpty())
     }
@@ -61,49 +68,181 @@ class AnrWatcherTest {
             true
         }
 
-        val watcher = AnrWatcher(handler, mainThread, onAnr, SHORT_POLL_NS)
-        repeat(6) { watcher.run() }
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, clock)
+
+        repeat(10) {
+            fakeTimeNs += TimeUnit.SECONDS.toNanos(2)
+            watcher.run()
+        }
 
         assertTrue(reportedStackTraces.isEmpty())
     }
 
     @Test
-    fun `does not report a temporary pause shorter than the threshold`() {
-        var poll = 0
+    fun `does not report when stall is shorter than threshold`() {
+        var callCount = 0
         `when`(handler.post(any())).thenAnswer { invocation ->
-            // Miss a single poll, then recover.
-            if (poll != 3) {
+            callCount++
+            if (callCount == 1) {
+                true
+            } else {
                 (invocation.getArgument(0) as Runnable).run()
+                true
             }
-            poll++
+        }
+
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, clock)
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(3)
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+
+        assertTrue(reportedStackTraces.isEmpty())
+    }
+
+    @Test
+    fun `reports when stall reaches threshold`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, clock)
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(4)
+        watcher.run()
+        assertTrue(reportedStackTraces.isEmpty())
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+        assertEquals(1, reportedStackTraces.size)
+    }
+
+    @Test
+    fun `does not report again during the same continuous stall`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, clock)
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(5)
+        watcher.run()
+        assertEquals(1, reportedStackTraces.size)
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(5)
+        watcher.run()
+        assertEquals(1, reportedStackTraces.size)
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(10)
+        watcher.run()
+        assertEquals(1, reportedStackTraces.size)
+    }
+
+    @Test
+    fun `resets after main thread recovers`() {
+        var heartbeatCallback: Runnable? = null
+        `when`(handler.post(any())).thenAnswer { invocation ->
+            heartbeatCallback = invocation.getArgument(0) as Runnable
             true
         }
 
-        val watcher = AnrWatcher(handler, mainThread, onAnr, SHORT_POLL_NS)
-        repeat(6) { watcher.run() }
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, clock)
 
-        assertTrue(reportedStackTraces.isEmpty())
-    }
-
-    @Test
-    fun `reports once after five consecutive missed polls then resets`() {
-        // Post is accepted but the callback never runs, so every poll times out.
-        `when`(handler.post(any())).thenReturn(true)
-
-        val watcher = AnrWatcher(handler, mainThread, onAnr, SHORT_POLL_NS)
-
-        repeat(5) { watcher.run() }
+        watcher.run()
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(5)
+        watcher.run()
         assertEquals(1, reportedStackTraces.size)
 
-        // No second report until another five misses accumulate.
-        repeat(4) { watcher.run() }
+        heartbeatCallback?.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(4)
+        watcher.run()
         assertEquals(1, reportedStackTraces.size)
 
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
         watcher.run()
         assertEquals(2, reportedStackTraces.size)
     }
 
+    @Test
+    fun `works with custom threshold`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        val customThresholdNs = TimeUnit.SECONDS.toNanos(3)
+        val watcher = AnrWatcher(handler, mainThread, onAnr, customThresholdNs, clock)
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(2)
+        watcher.run()
+        assertTrue(reportedStackTraces.isEmpty())
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+        assertEquals(1, reportedStackTraces.size)
+    }
+
+    @Test
+    fun `reports ANR when main thread recovers past deadline but watchdog was delayed`() {
+        var heartbeatCallback: Runnable? = null
+        `when`(handler.post(any())).thenAnswer { invocation ->
+            heartbeatCallback = invocation.getArgument(0) as Runnable
+            true
+        }
+
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, clock)
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(6)
+        heartbeatCallback?.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+        assertEquals(
+            "Should still report ANR even though main thread recovered",
+            1,
+            reportedStackTraces.size
+        )
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(5)
+        watcher.run()
+        assertEquals(
+            "Detection must re-arm after late-recovery ANR is reported",
+            2,
+            reportedStackTraces.size
+        )
+    }
+
+    @Test
+    fun `does not false-report when threshold near Long MAX_VALUE overflows deadline`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        fakeTimeNs = TimeUnit.SECONDS.toNanos(100)
+        val watcher = AnrWatcher(handler, mainThread, onAnr, Long.MAX_VALUE, clock)
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+        assertTrue("Should not false-report due to deadline overflow", reportedStackTraces.isEmpty())
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(10)
+        watcher.run()
+        assertTrue("Should still not report with extreme threshold", reportedStackTraces.isEmpty())
+    }
+
     private companion object {
-        private val SHORT_POLL_NS = TimeUnit.MILLISECONDS.toNanos(20)
+        private val THRESHOLD_NS = TimeUnit.SECONDS.toNanos(5)
     }
 }
