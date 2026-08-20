@@ -28,16 +28,15 @@ import io.opentelemetry.api.OpenTelemetry
 import java.time.Duration
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
-import kotlin.math.ceil
-import kotlin.math.max
 
 /**
  * Entry point for installing ANR (application not responding) detection.
  *
  * Register any additional [AnrAttributesExtractor]s via [addAttributesExtractor] and optionally
- * configure the detection threshold via [setThreshold] before calling [install]. Detection is
- * foreground-only and backed by a daemon watchdog thread that is cancelled whenever the app is
- * backgrounded.
+ * configure the detection threshold via [setThreshold] before calling [install]. The threshold
+ * specifies the wall-clock duration the main thread must be unresponsive before an ANR is reported.
+ * Detection is foreground-only and backed by a daemon watchdog thread that is cancelled whenever the
+ * app is backgrounded.
  *
  * This class is internal and is hence not for public use. Its APIs are unstable and can change at
  * any time.
@@ -47,7 +46,7 @@ class AnrReporterInstrumentation {
     private val additionalExtractors = mutableListOf<AnrAttributesExtractor>()
 
     @Suppress("NewApi") // Duration requires API 26 or core library desugaring
-    private var maxMissedPolls: Int = AnrWatcher.DEFAULT_MAX_MISSED_POLLS
+    private var thresholdNs: Long = AnrWatcher.DEFAULT_THRESHOLD_NS
 
     /** Adds an [AnrAttributesExtractor] that enriches emitted ANR events. */
     fun addAttributesExtractor(extractor: AnrAttributesExtractor): AnrReporterInstrumentation {
@@ -57,7 +56,7 @@ class AnrReporterInstrumentation {
 
     /**
      * Sets the ANR detection threshold. An ANR is reported after the main thread is unresponsive
-     * for approximately [threshold].
+     * for [threshold] wall-clock time.
      */
     @Suppress("NewApi") // Duration requires API 26 or core library desugaring
     fun setThreshold(threshold: Duration): AnrReporterInstrumentation {
@@ -65,8 +64,7 @@ class AnrReporterInstrumentation {
             Logger.w(TAG, "Invalid threshold ($threshold), using default threshold")
             return this
         }
-        val effectiveCycleSeconds = POLL_AWAIT_SECONDS + SCHEDULER_DELAY_SECONDS
-        maxMissedPolls = max(1, ceil(threshold.seconds.toDouble() / effectiveCycleSeconds).toInt())
+        thresholdNs = threshold.toNanos()
         return this
     }
 
@@ -79,7 +77,7 @@ class AnrReporterInstrumentation {
             Handler(mainLooper),
             mainLooper.thread,
             reporter::report,
-            maxMissedPolls = maxMissedPolls
+            thresholdNs = thresholdNs
         )
 
         val watchdogScheduler = Executors.newScheduledThreadPool(1, daemonThreadFactory())
@@ -103,7 +101,5 @@ class AnrReporterInstrumentation {
     private companion object {
         private const val TAG = "AnrReporterInstrumentation"
         private const val WATCHDOG_THREAD_NAME = "splunk-anr-watcher"
-        private const val POLL_AWAIT_SECONDS = 1L
-        private const val SCHEDULER_DELAY_SECONDS = 1L
     }
 }
