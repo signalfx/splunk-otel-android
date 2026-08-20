@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.api
 
 import android.app.Application
 import android.os.Build
+import android.os.SystemClock
 import android.webkit.WebView
 import com.splunk.rum.agent.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.agent.common.storage.AgentStorage
@@ -48,6 +49,7 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.api.trace.Span
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import okhttp3.Call
@@ -243,6 +245,8 @@ class SplunkRum private constructor(
         )
         private var instanceInternal: SplunkRum? = null
         private const val TAG = "SplunkRum"
+        private const val INSTALL_SPAN_TRACER_NAME = "SplunkRum"
+        private const val INSTALL_SPAN_NAME = "SplunkRum.install"
 
         /**
          * Provides access to the initialized instance of [SplunkRum].
@@ -274,6 +278,9 @@ class SplunkRum private constructor(
             if (instanceInternal != null) {
                 return instance
             }
+
+            val installStartMillis = System.currentTimeMillis()
+            val installStartElapsedNanos = SystemClock.elapsedRealtimeNanos()
 
             Logger.consumers += AndroidLogConsumer()
             Logger.logLevel = if (agentConfiguration.enableDebugLogging) Log.Level.DEBUG else Log.Level.WARN
@@ -365,7 +372,28 @@ class SplunkRum private constructor(
                 }
             )
 
+            emitInstallSpan(openTelemetry, installStartMillis, installStartElapsedNanos)
+
             return instance
+        }
+
+        private fun emitInstallSpan(openTelemetry: OpenTelemetry, startMillis: Long, startElapsedNanos: Long) {
+            try {
+                val endElapsedNanos = SystemClock.elapsedRealtimeNanos()
+                val durationNanos = endElapsedNanos - startElapsedNanos
+                val endMillis = startMillis + TimeUnit.NANOSECONDS.toMillis(durationNanos)
+
+                val span = openTelemetry
+                    .getTracer(INSTALL_SPAN_TRACER_NAME)
+                    .spanBuilder(INSTALL_SPAN_NAME)
+                    .setNoParent()
+                    .setStartTimestamp(startMillis, TimeUnit.MILLISECONDS)
+                    .startSpan()
+
+                span.end(endMillis, TimeUnit.MILLISECONDS)
+            } catch (e: Exception) {
+                Logger.w(TAG, "Failed to emit install span: ${e.message}")
+            }
         }
 
         /**

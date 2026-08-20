@@ -50,11 +50,13 @@ class AgentIntegration private constructor(context: Context) {
         application: Application,
         openTelemetry: OpenTelemetrySdk,
         moduleConfigurations: List<ModuleConfiguration>,
-        globalAttributes: Attributes
+        globalAttributes: Attributes,
+        installStartTimestamp: Long = System.currentTimeMillis(),
+        installStartElapsed: Long = SystemClock.elapsedRealtime()
     ) {
         this.globalAttributes = globalAttributes
 
-        registerModuleInitializationStart(MODULE_NAME)
+        registerModuleInitializationStart(MODULE_NAME, installStartTimestamp, installStartElapsed)
 
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
@@ -120,7 +122,11 @@ class AgentIntegration private constructor(context: Context) {
             return instanceInternal!!
         }
 
-        fun registerModuleInitializationStart(name: String) {
+        fun registerModuleInitializationStart(
+            name: String,
+            startTimestamp: Long = System.currentTimeMillis(),
+            startElapsed: Long = SystemClock.elapsedRealtime()
+        ) {
             val module = modules[name] ?: Module(name)
 
             if (module.initialization != null) {
@@ -129,8 +135,8 @@ class AgentIntegration private constructor(context: Context) {
 
             modules[name] = module.copy(
                 initialization = Module.Initialization(
-                    startTimestamp = System.currentTimeMillis(),
-                    startElapsed = SystemClock.elapsedRealtime(),
+                    startTimestamp = startTimestamp,
+                    startElapsed = startElapsed,
                     endElapsed = null
                 )
             )

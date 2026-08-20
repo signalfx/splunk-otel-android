@@ -34,6 +34,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -151,6 +152,27 @@ class SplunkRumAgentCoreTest {
         installSplunkRumAgent()
 
         assertEquals("default", System.getProperty(contextStorageProviderProperty))
+    }
+
+    @Test
+    fun `install captures agent module start timestamp before OTel setup`() {
+        val beforeInstall = System.currentTimeMillis()
+
+        installSplunkRumAgent()
+
+        val agentModule = AgentIntegration.modules["agent"]
+        assertNotNull("Agent module should be registered", agentModule)
+        assertNotNull("Agent module initialization should exist", agentModule!!.initialization)
+
+        val startTimestamp = agentModule.initialization!!.startTimestamp
+        assertTrue(
+            "Agent module startTimestamp ($startTimestamp) should be >= time before install ($beforeInstall)",
+            startTimestamp >= beforeInstall
+        )
+        assertTrue(
+            "Agent module startTimestamp should be earlier than installTimestamp (end of install)",
+            startTimestamp <= SplunkRumAgentCore.installTimestamp
+        )
     }
 
     @Test

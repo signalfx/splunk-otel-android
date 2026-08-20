@@ -124,6 +124,35 @@ class StartupTrackingInstrumentedTest {
         assertEquals(coldStart.spanId, initializationSpans.single().parentSpanId)
     }
 
+    @Test
+    fun initializeSpanUsesEarlyTimestampsWhenProvided() {
+        val earlyTimestamp = System.currentTimeMillis() - 500L
+        val earlyElapsed = android.os.SystemClock.elapsedRealtime() - 500L
+
+        reportColdStart()
+
+        val application = instrumentation.targetContext.applicationContext as Application
+        AgentIntegration.instance.install(
+            application,
+            SplunkOpenTelemetrySdk.instance!!,
+            listOf(StartupModuleConfiguration()),
+            Attributes.empty(),
+            installStartTimestamp = earlyTimestamp,
+            installStartElapsed = earlyElapsed
+        )
+
+        waitForIdle()
+
+        val initSpan = exportedSpans.single { it.name == RumConstants.APP_START_INITIALIZE_SPAN_NAME }
+        val spanStartMillis = TimeUnit.NANOSECONDS.toMillis(initSpan.startEpochNanos)
+
+        assertEquals(
+            "Initialize span start should reflect the early timestamp passed from SplunkRumAgentCore",
+            earlyTimestamp,
+            spanStartMillis
+        )
+    }
+
     private fun reportColdStart() {
         val endTimestamp = System.currentTimeMillis()
         val startTimestamp = endTimestamp - START_DURATION_MILLIS
