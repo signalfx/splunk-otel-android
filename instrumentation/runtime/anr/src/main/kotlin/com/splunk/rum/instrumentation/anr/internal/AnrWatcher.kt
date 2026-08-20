@@ -44,6 +44,7 @@ internal class AnrWatcher(
 
     private val heartbeatOutstanding = AtomicBoolean(false)
     private val nextReportAtNs = AtomicLong(Long.MAX_VALUE)
+    private val lateRecovery = AtomicBoolean(false)
 
     override fun run() {
         val nowNs = clock()
@@ -55,6 +56,8 @@ internal class AnrWatcher(
             if (!uiHandler.post {
                     if (clock() < nextReportAtNs.get()) {
                         heartbeatOutstanding.set(false)
+                    } else {
+                        lateRecovery.set(true)
                     }
                 }
             ) {
@@ -66,6 +69,10 @@ internal class AnrWatcher(
         if (nowNs >= nextReportAtNs.get()) {
             onAnr(mainThread.stackTrace)
             nextReportAtNs.set(Long.MAX_VALUE)
+        }
+
+        if (lateRecovery.compareAndSet(true, false)) {
+            heartbeatOutstanding.set(false)
         }
     }
 

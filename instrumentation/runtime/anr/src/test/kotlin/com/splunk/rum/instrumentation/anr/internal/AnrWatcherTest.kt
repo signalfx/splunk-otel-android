@@ -211,6 +211,17 @@ class AnrWatcherTest {
             1,
             reportedStackTraces.size
         )
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(5)
+        watcher.run()
+        assertEquals(
+            "Detection must re-arm after late-recovery ANR is reported",
+            2,
+            reportedStackTraces.size
+        )
     }
 
     @Test
