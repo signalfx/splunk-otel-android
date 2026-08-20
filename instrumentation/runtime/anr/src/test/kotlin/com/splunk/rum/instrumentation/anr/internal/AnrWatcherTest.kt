@@ -189,6 +189,24 @@ class AnrWatcherTest {
         assertEquals(1, reportedStackTraces.size)
     }
 
+    @Test
+    fun `does not false-report when threshold near Long MAX_VALUE overflows deadline`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        fakeTimeNs = TimeUnit.SECONDS.toNanos(100)
+        val watcher = AnrWatcher(handler, mainThread, onAnr, Long.MAX_VALUE, clock)
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+        assertTrue("Should not false-report due to deadline overflow", reportedStackTraces.isEmpty())
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(10)
+        watcher.run()
+        assertTrue("Should still not report with extreme threshold", reportedStackTraces.isEmpty())
+    }
+
     private companion object {
         private val THRESHOLD_NS = TimeUnit.SECONDS.toNanos(5)
     }

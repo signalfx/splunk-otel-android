@@ -49,7 +49,8 @@ internal class AnrWatcher(
         val nowNs = clock()
 
         if (heartbeatOutstanding.compareAndSet(false, true)) {
-            nextReportAtNs.set(nowNs + thresholdNs)
+            val deadline = if (nowNs > Long.MAX_VALUE - thresholdNs) Long.MAX_VALUE else nowNs + thresholdNs
+            nextReportAtNs.set(deadline)
 
             if (!uiHandler.post { heartbeatOutstanding.set(false) }) {
                 heartbeatOutstanding.set(false)
