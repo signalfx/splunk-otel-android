@@ -1,0 +1,12 @@
+Lcom/splunk/rum/integration/crash/CrashModuleConfiguration;
+HSPLcom/splunk/rum/integration/crash/CrashModuleConfiguration;-><init>(Z)V
+HSPLcom/splunk/rum/integration/crash/CrashModuleConfiguration;-><init>(ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+HSPLcom/splunk/rum/integration/crash/CrashModuleConfiguration;->getName()Ljava/lang/String;
+HSPLcom/splunk/rum/integration/crash/CrashModuleConfiguration;->isEnabled()Z
+Lcom/splunk/rum/integration/crash/CrashModuleInstaller;
+HSPLcom/splunk/rum/integration/crash/CrashModuleInstaller;-><init>()V
+HSPLcom/splunk/rum/integration/crash/CrashModuleInstaller;->onInstall(Landroid/content/Context;)V
+Lcom/splunk/rum/integration/crash/CrashModuleIntegration;
+HSPLcom/splunk/rum/integration/crash/CrashModuleIntegration;-><clinit>()V
+HSPLcom/splunk/rum/integration/crash/CrashModuleIntegration;-><init>()V
+HSPLcom/splunk/rum/integration/crash/CrashModuleIntegration;->onInstall(Landroid/app/Application;Lio/opentelemetry/api/OpenTelemetry;Ljava/util/List;)V

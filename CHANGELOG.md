@@ -9,6 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ##### Enhancements:
 * Removed the OpenTelemetry Android runtime dependency
+* Added baseline profiles to the SDK modules so that host apps AOT compile the agent's startup path on first launch
 
 ### Version 2.3.3 - 2026-08-12
 

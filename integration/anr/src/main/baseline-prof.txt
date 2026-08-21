@@ -1,0 +1,12 @@
+Lcom/splunk/rum/integration/anr/AnrModuleConfiguration;
+HSPLcom/splunk/rum/integration/anr/AnrModuleConfiguration;-><init>(Z)V
+HSPLcom/splunk/rum/integration/anr/AnrModuleConfiguration;-><init>(ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+HSPLcom/splunk/rum/integration/anr/AnrModuleConfiguration;->getName()Ljava/lang/String;
+HSPLcom/splunk/rum/integration/anr/AnrModuleConfiguration;->isEnabled()Z
+Lcom/splunk/rum/integration/anr/AnrModuleInstaller;
+HSPLcom/splunk/rum/integration/anr/AnrModuleInstaller;-><init>()V
+HSPLcom/splunk/rum/integration/anr/AnrModuleInstaller;->onInstall(Landroid/content/Context;)V
+Lcom/splunk/rum/integration/anr/AnrModuleIntegration;
+HSPLcom/splunk/rum/integration/anr/AnrModuleIntegration;-><clinit>()V
+HSPLcom/splunk/rum/integration/anr/AnrModuleIntegration;-><init>()V
+HSPLcom/splunk/rum/integration/anr/AnrModuleIntegration;->onInstall(Landroid/app/Application;Lio/opentelemetry/api/OpenTelemetry;Ljava/util/List;)V

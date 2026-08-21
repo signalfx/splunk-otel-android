@@ -1,0 +1,6 @@
+Lcom/splunk/rum/agent/common/utils/extensions/ApplicationExtKt;
+HSPLcom/splunk/rum/agent/common/utils/extensions/ApplicationExtKt;->getApplicationId(Landroid/app/Application;)Ljava/lang/String;
+HSPLcom/splunk/rum/agent/common/utils/extensions/ApplicationExtKt;->isStartedInForeground(Landroid/app/Application;)Z
+Lcom/splunk/rum/agent/common/utils/extensions/ContextExtKt;
+HSPLcom/splunk/rum/agent/common/utils/extensions/ContextExtKt;->getPackageInfo(Landroid/content/Context;)Landroid/content/pm/PackageInfo;
+HSPLcom/splunk/rum/agent/common/utils/extensions/ContextExtKt;->getVersionCode(Landroid/content/Context;)Ljava/lang/String;

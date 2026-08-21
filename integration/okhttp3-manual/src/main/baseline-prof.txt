@@ -1,0 +1,15 @@
+Lcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleConfiguration;
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleConfiguration;-><init>(Ljava/util/List;Ljava/util/List;)V
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleConfiguration;-><init>(Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleConfiguration;->getAttributes()Ljava/util/List;
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleConfiguration;->getCapturedRequestHeaders()Ljava/util/List;
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleConfiguration;->getCapturedResponseHeaders()Ljava/util/List;
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleConfiguration;->getName()Ljava/lang/String;
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleConfiguration;->toString()Ljava/lang/String;
+Lcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleInstaller;
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleInstaller;-><init>()V
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleInstaller;->onInstall(Landroid/content/Context;)V
+Lcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleIntegration;
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleIntegration;-><clinit>()V
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleIntegration;-><init>()V
+HSPLcom/splunk/rum/integration/okhttp3/manual/OkHttp3ManualModuleIntegration;->onInstall(Landroid/app/Application;Lio/opentelemetry/api/OpenTelemetry;Ljava/util/List;)V
