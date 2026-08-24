@@ -37,4 +37,5 @@ dependencies {
     implementation(Dependencies.Otel.instrumentationApiIncubator)
 
     testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Otel.sdk)
 }

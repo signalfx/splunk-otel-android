@@ -26,7 +26,6 @@ import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.Scope
 import io.opentelemetry.instrumentation.api.incubator.builder.internal.DefaultHttpClientInstrumenterBuilder
-import io.opentelemetry.instrumentation.api.incubator.semconv.net.PeerServiceAttributesExtractor
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientRequestResendCount
@@ -56,15 +55,15 @@ object OkHttpSingletons {
                 .setCapturedResponseHeaders(instrumentation.capturedResponseHeaders)
                 .setKnownMethods(instrumentation.knownMethods)
                 // TODO: Do we really need to set the known methods on the span name extractor as well?
-                .setSpanNameExtractor {
+                .setSpanNameExtractorCustomizer {
                     HttpSpanNameExtractor.builder(OkHttpAttributesGetter.INSTANCE)
                         .setKnownMethods(instrumentation.knownMethods)
                         .build()
                 }
                 .addAttributesExtractor(
-                    PeerServiceAttributesExtractor.create(
+                    PeerServiceAttributesExtractor(
                         OkHttpAttributesGetter.INSTANCE,
-                        instrumentation.newPeerServiceResolver()
+                        instrumentation.peerServiceMapping()
                     )
                 )
                 .setEmitExperimentalHttpClientTelemetry(

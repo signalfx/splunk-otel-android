@@ -27,4 +27,7 @@ dependencies {
 
     implementation(Dependencies.Otel.instrumentationApi)
     implementation(Dependencies.Otel.instrumentationApiIncubator)
+
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Otel.sdk)
 }

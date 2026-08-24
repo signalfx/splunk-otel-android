@@ -31,7 +31,6 @@ import io.opentelemetry.exporter.internal.otlp.logs.LogsRequestMarshaler
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
-import io.opentelemetry.sdk.logs.data.internal.ExtendedLogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.ReadableSpan
 import java.io.ByteArrayOutputStream
@@ -89,14 +88,14 @@ internal class AndroidLogRecordExporter(
              * Determines the name of the span to be created from the log record.
              *
              * The resolution order is as follows:
-             * 1. Use the `eventName` property from `ExtendedLogRecordData` if available.
+             * 1. Use the stable `eventName` property from [LogRecordData] if available.
              * 2. Otherwise, fall back to the [GlobalRumConstants.LOG_EVENT_NAME_KEY] attribute in the log's attributes.
              * 3. If neither is present, default to the name [GlobalRumConstants.DEFAULT_LOG_EVENT_NAME].
              *
              * This ensures that the span always has a meaningful or fallback name, even when
              * the source log record lacks explicit naming metadata.
              */
-            val spanName = (log as ExtendedLogRecordData).eventName
+            val spanName = log.eventName
                 ?: log.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY)
                 ?: RumConstants.DEFAULT_LOG_EVENT_NAME
 

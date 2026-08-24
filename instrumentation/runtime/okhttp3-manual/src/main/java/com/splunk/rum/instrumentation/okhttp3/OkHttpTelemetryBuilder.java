@@ -16,6 +16,7 @@
 
 package com.splunk.rum.instrumentation.okhttp3;
 
+import android.annotation.SuppressLint;
 import com.splunk.rum.instrumentation.okhttp3.internal.Experimental;
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpClientInstrumenterBuilderFactory;
 import io.opentelemetry.api.OpenTelemetry;
@@ -92,10 +93,12 @@ public final class OkHttpTelemetryBuilder {
   }
 
   /** Sets custom {@link SpanNameExtractor} via transform function. */
+  @SuppressLint("NewApi") // This existing java.util.function API requires consumer desugaring.
   public OkHttpTelemetryBuilder setSpanNameExtractor(
       Function<SpanNameExtractor<Interceptor.Chain>, SpanNameExtractor<Interceptor.Chain>>
           spanNameExtractorTransformer) {
-    builder.setSpanNameExtractor(spanNameExtractorTransformer);
+    builder.setSpanNameExtractorCustomizer(
+        spanNameExtractor -> spanNameExtractorTransformer.apply(spanNameExtractor));
     return this;
   }
 

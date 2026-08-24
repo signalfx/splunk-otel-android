@@ -1,6 +1,5 @@
 /*
  * Copyright 2026 Splunk Inc.
- * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.instrumentation.okhttp3.auto
+package com.splunk.rum.instrumentation.httpurlconnection.auto
 
-import com.splunk.rum.instrumentation.okhttp3.auto.internal.OkHttpSingletons
+import com.splunk.rum.instrumentation.httpurlconnection.auto.internal.HttpUrlConnectionSingletons
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.StatusCode
+import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.ContextPropagators
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.common.CompletableResultCode
@@ -28,21 +28,15 @@ import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.TimeUnit
-import okhttp3.Call
-import okhttp3.Connection
-import okhttp3.Interceptor
-import okhttp3.Protocol
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 
-class OkHttpInstrumentationTest {
+class HttpUrlInstrumentationTest {
     private val exportedSpans = mutableListOf<SpanData>()
     private lateinit var tracerProvider: SdkTracerProvider
 
@@ -66,10 +60,10 @@ class OkHttpInstrumentationTest {
             .setPropagators(ContextPropagators.noop())
             .build()
 
-        OkHttpInstrumentation().apply {
+        HttpUrlInstrumentation().apply {
             capturedRequestHeaders = listOf("x-request-id")
             capturedResponseHeaders = listOf("x-response-id")
-            setPeerServiceMapping(mapOf("api.example.test:8443" to "checkout-service"))
+            setPeerServiceMapping(mapOf("api.example.test:8443/orders" to "orders-service"))
             install(openTelemetry)
         }
     }
@@ -80,24 +74,15 @@ class OkHttpInstrumentationTest {
     }
 
     @Test
-    fun validateDefaultHttpMethods() {
-        val instrumentation = OkHttpInstrumentation()
-        assertEquals(
-            setOf("CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"),
-            instrumentation.knownMethods
+    fun `records the network span attribute matrix and path peer mapping`() {
+        val connection = StubHttpURLConnection(
+            URL("https://api.example.test:8443/orders/42"),
+            requestMethod = "POST",
+            requestHeaders = mapOf("x-request-id" to "request-123"),
+            responseHeaders = mapOf("x-response-id" to "response-456")
         )
-    }
 
-    @Test
-    fun `records the network span attribute matrix and peer mapping`() {
-        val request = Request.Builder()
-            .url("https://api.example.test:8443/orders")
-            .post(byteArrayOf().toRequestBody())
-            .header("x-request-id", "request-123")
-            .build()
-        val chain = FakeChain(request, responseCode = 503, responseHeader = "response-456")
-
-        OkHttpSingletons.tracingInterceptor.intercept(chain)
+        endSpan(connection, responseCode = 503)
 
         val span = exportedSpans.single()
         assertEquals("POST", span.name)
@@ -113,64 +98,49 @@ class OkHttpInstrumentationTest {
             listOf("response-456"),
             span.attributes.get(AttributeKey.stringArrayKey("http.response.header.x-response-id"))
         )
-        assertEquals("checkout-service", span.attributes.get(AttributeKey.stringKey("peer.service")))
+        assertEquals("orders-service", span.attributes.get(AttributeKey.stringKey("peer.service")))
         assertEquals("503", span.attributes.get(AttributeKey.stringKey("error.type")))
         assertEquals(StatusCode.ERROR, span.status.statusCode)
     }
 
     @Test
-    fun `records request failures and rethrows the original error`() {
-        val expected = IOException("connection failed")
-        val chain = FakeChain(
-            Request.Builder().url("https://api.example.test:8443/orders").build(),
-            error = expected
-        )
+    fun `records connection errors`() {
+        val error = IOException("connection failed")
+        val connection = StubHttpURLConnection(URL("https://api.example.test:8443/orders/42"))
 
-        val actual = assertThrows(IOException::class.java) {
-            OkHttpSingletons.tracingInterceptor.intercept(chain)
-        }
+        endSpan(connection, responseCode = -1, error = error)
 
-        assertEquals(expected, actual)
         val span = exportedSpans.single()
         assertEquals(StatusCode.ERROR, span.status.statusCode)
         assertEquals(IOException::class.java.name, span.attributes.get(AttributeKey.stringKey("error.type")))
         assertEquals(IOException::class.java.name, span.events.single().attributes.get(EXCEPTION_TYPE))
     }
 
-    private class FakeChain(
-        private val originalRequest: Request,
-        private val responseCode: Int = 200,
-        private val responseHeader: String? = null,
-        private val error: IOException? = null
-    ) : Interceptor.Chain {
-        override fun request(): Request = originalRequest
+    private fun endSpan(connection: HttpURLConnection, responseCode: Int, error: Throwable? = null) {
+        val instrumenter = checkNotNull(HttpUrlConnectionSingletons.instrumenter())
+        val context = instrumenter.start(Context.root(), connection)
+        instrumenter.end(context, connection, responseCode, error)
+    }
 
-        override fun proceed(request: Request): Response {
-            error?.let { throw it }
-            return Response.Builder()
-                .request(request)
-                .protocol(Protocol.HTTP_1_1)
-                .code(responseCode)
-                .message("test response")
-                .apply { responseHeader?.let { header("x-response-id", it) } }
-                .build()
+    private class StubHttpURLConnection(
+        url: URL,
+        requestMethod: String = "GET",
+        private val requestHeaders: Map<String, String> = emptyMap(),
+        private val responseHeaders: Map<String, String> = emptyMap()
+    ) : HttpURLConnection(url) {
+        init {
+            method = requestMethod
         }
 
-        override fun connection(): Connection? = null
+        override fun connect() = Unit
 
-        override fun call(): Call = throw UnsupportedOperationException()
+        override fun disconnect() = Unit
 
-        override fun connectTimeoutMillis(): Int = 0
+        override fun usingProxy(): Boolean = false
 
-        override fun withConnectTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain = this
+        override fun getRequestProperty(key: String): String? = requestHeaders[key]
 
-        override fun readTimeoutMillis(): Int = 0
-
-        override fun withReadTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain = this
-
-        override fun writeTimeoutMillis(): Int = 0
-
-        override fun withWriteTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain = this
+        override fun getHeaderField(name: String): String? = responseHeaders[name]
     }
 
     private companion object {
