@@ -21,6 +21,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.splunk.rum.agent.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.agent.common.storage.AgentStorage
+import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.storage.extensions.noBackupFilesDirCompat
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
@@ -29,6 +30,7 @@ import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import java.io.File
+import java.util.concurrent.atomic.AtomicReference
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -39,6 +41,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
 @RunWith(AndroidJUnit4::class)
@@ -154,6 +158,17 @@ class SplunkRumAgentCoreTest {
     }
 
     @Test
+    fun `install uses the supplied storage instance`() {
+        val suppliedStorage = mock(IAgentStorage::class.java)
+        `when`(suppliedStorage.readAppInstallationId()).thenReturn("existing-installation-id")
+
+        installSplunkRumAgent(suppliedStorage)
+
+        verify(suppliedStorage).readAppInstallationId()
+        verify(suppliedStorage, never()).writeAppInstallationId(org.mockito.ArgumentMatchers.anyString())
+    }
+
+    @Test
     fun `install does not configure context storage provider when sampled out`() {
         `when`(mockAgentConfig.session.samplingRate).thenReturn(0.0)
         assertNull(System.getProperty(contextStorageProviderProperty))
@@ -189,12 +204,13 @@ class SplunkRumAgentCoreTest {
         assertEquals(custom, System.getProperty(contextStorageProviderProperty))
     }
 
-    private fun installSplunkRumAgent() {
+    private fun installSplunkRumAgent(agentStorage: IAgentStorage = storage) {
         SplunkRumAgentCore.install(
             application,
             mockAgentConfig,
             mockUserManager,
             mockSessionManager,
+            agentStorage,
             emptyList(),
             MutableAttributes(),
             mockOfflineOtelDataProcessor
@@ -202,20 +218,27 @@ class SplunkRumAgentCoreTest {
     }
 
     private fun cleanupStorage() {
+        resetAgentStorageSingleton()
+
         if (testStorageDir.exists()) {
             testStorageDir.deleteRecursively()
         }
-
-        resetAgentStorageSingleton()
     }
 
     private fun resetAgentStorageSingleton() {
-        try {
-            val field = AgentStorage::class.java.getDeclaredField("instance")
-            field.isAccessible = true
-            field.set(null, null)
-        } catch (e: Exception) {
-            // Ignore reflection errors in tests
-        }
+        val storageField = AgentStorage::class.java.getDeclaredField("instance")
+        storageField.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
+        val storageInstance = storageField.get(null) as AtomicReference<Any?>
+        storageInstance.set(null)
+
+        val preferencesStoreClass = Class.forName(
+            "com.splunk.rum.agent.common.storage.AgentPreferencesStore"
+        )
+        val preferencesStore = preferencesStoreClass.getField("INSTANCE").get(null)
+        val preferencesField = preferencesStoreClass.getDeclaredField("instance")
+        preferencesField.isAccessible = true
+        (preferencesField.get(preferencesStore) as? AutoCloseable)?.close()
+        preferencesField.set(preferencesStore, null)
     }
 }

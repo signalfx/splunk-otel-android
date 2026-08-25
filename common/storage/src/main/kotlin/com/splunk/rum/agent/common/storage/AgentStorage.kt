@@ -17,7 +17,9 @@
 package com.splunk.rum.agent.common.storage
 
 import android.content.Context
+import android.os.Looper
 import android.os.StatFs
+import android.util.Log
 import com.splunk.rum.agent.common.storage.extensions.MB
 import com.splunk.rum.agent.common.storage.extensions.availableBlocksCompat
 import com.splunk.rum.agent.common.storage.extensions.blockSizeCompat
@@ -25,14 +27,12 @@ import com.splunk.rum.agent.common.storage.policy.StoragePolicy
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.storage.Storage
 import com.splunk.rum.common.storage.cache.FilePermanentCache
-import com.splunk.rum.common.storage.cache.FileSimplePermanentCache
-import com.splunk.rum.common.storage.extensions.noBackupFilesDirCompat
-import com.splunk.rum.common.storage.filemanager.EncryptedFileManager
 import com.splunk.rum.common.storage.filemanager.FileManagerFactory
 import com.splunk.rum.common.storage.preferences.Preferences
 import com.splunk.rum.common.utils.extensions.toJSONArray
 import com.splunk.rum.common.utils.runOnBackgroundThread
 import java.io.File
+import java.util.concurrent.atomic.AtomicReference
 import org.json.JSONArray
 import org.json.JSONException
 
@@ -49,25 +49,21 @@ import org.json.JSONException
  *           ├─spans/
  *           └─session_replay/
  */
-class AgentStorage(context: Context) : IAgentStorage {
-
-    private val preferencesFileManager = FileManagerFactory.createPlainFileManager()
+class AgentStorage private constructor(
+    context: Context,
     private val preferences: Preferences
+) : IAgentStorage {
 
     private val internalStorage =
         Storage(FilePermanentCache(FileManagerFactory.createPlainFileManager()))
 
-    private val rootDir = File(context.noBackupFilesDirCompat, "agent")
-    private val agentVersionDir =
-        File(rootDir, "$VERSION${if (preferencesFileManager is EncryptedFileManager) "e" else ""}")
-    private val preferencesFile = File(agentVersionDir, "preferences/preferences.dat")
+    private val rootDir = AgentStorageFiles.rootDir(context)
+    private val agentVersionDir = AgentStorageFiles.versionDir(rootDir)
     private val logDir = File(agentVersionDir, "logs")
     private val spanDir = File(agentVersionDir, "spans")
     private val sessionReplayDir = File(agentVersionDir, "session_replay")
 
     init {
-        preferences = Preferences(FileSimplePermanentCache(preferencesFile, preferencesFileManager))
-
         agentVersionDir.mkdirs()
         logDir.mkdirs()
         spanDir.mkdirs()
@@ -431,22 +427,35 @@ class AgentStorage(context: Context) : IAgentStorage {
         private const val SESSION_REPLAY_IDS_KEY = "BUFFERED_SESSION_REPLAY_IDS"
 
         private const val TAG = "AgentStorage"
-        private val lock = Any()
         private val migrationLock = Any()
 
-        /**
-         * If storage model changes this version needs to be changed. This will ensure data consistency.
-         * The storage will wipe all the legacy data (older version than this one).
-         */
-        private const val VERSION = 1
+        private val instance = AtomicReference<IAgentStorage?>()
 
-        private var instance: IAgentStorage? = null
+        fun attach(context: Context): IAgentStorage {
+            instance.get()?.let { return it }
 
-        fun attach(context: Context): IAgentStorage = synchronized(lock) {
-            instance ?: AgentStorage(context).also {
-                instance = it
-                Logger.v(TAG, "attach(): AgentStorage attached.")
+            // Callers never wait for storage initialization. A rare race may build two candidates;
+            // only the first published instance is retained. Candidates share the process Preferences owner,
+            // so discarding a candidate does not create or cancel another preference load.
+            val applicationContext = context.applicationContext ?: context
+            val candidate = AgentStorage(applicationContext, AgentPreferencesStore.obtain(applicationContext))
+            val initializationThread = Thread.currentThread()
+            val threadType = if (initializationThread === Looper.getMainLooper().thread) "main" else "background"
+            if (instance.compareAndSet(null, candidate)) {
+                Log.d(TAG, "attach(): AgentStorage initialized on $threadType thread '${initializationThread.name}'.")
+                return candidate
             }
+
+            Log.d(
+                TAG,
+                "attach(): AgentStorage candidate initialized on $threadType thread '${initializationThread.name}' " +
+                    "and discarded because another thread published the singleton."
+            )
+            return instance.get() ?: candidate
+        }
+
+        internal fun resetForTest() {
+            instance.set(null)
         }
     }
 }
