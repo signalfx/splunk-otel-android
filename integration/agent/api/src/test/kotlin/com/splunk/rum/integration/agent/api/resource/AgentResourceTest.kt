@@ -21,7 +21,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.sdk.resources.Resource
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
@@ -64,5 +66,30 @@ class AgentResourceTest {
             resource.getAttribute(AttributeKey.stringKey("deployment.environment.name"))
         )
         assertNull(resource.getAttribute(AttributeKey.stringKey("deployment.environment")))
+    }
+
+    @Test
+    fun `allResource includes default OTel SDK resource attributes`() {
+        val mockAgentConfig = mock(AgentConfiguration::class.java)
+
+        val resource = AgentResource.allResource(context, "test-id", mockAgentConfig)
+
+        assertNotNull(resource.getAttribute(AttributeKey.stringKey("telemetry.sdk.name")))
+        assertNotNull(resource.getAttribute(AttributeKey.stringKey("telemetry.sdk.language")))
+        assertNotNull(resource.getAttribute(AttributeKey.stringKey("telemetry.sdk.version")))
+    }
+
+    @Test
+    fun `allResource merged with empty produces same result as merged with getDefault`() {
+        val mockAgentConfig = mock(AgentConfiguration::class.java)
+        `when`(mockAgentConfig.appName).thenReturn("test-app")
+        `when`(mockAgentConfig.deploymentEnvironment).thenReturn("test")
+
+        val allResource = AgentResource.allResource(context, "test-id", mockAgentConfig)
+
+        val fromEmpty = Resource.empty().merge(allResource)
+        val fromDefault = Resource.getDefault().merge(allResource)
+
+        assertEquals(fromDefault.attributes, fromEmpty.attributes)
     }
 }
