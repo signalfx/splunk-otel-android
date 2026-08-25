@@ -18,6 +18,7 @@
 package com.splunk.rum.instrumentation.httpurlconnection.auto.internal
 
 import com.splunk.rum.instrumentation.httpurlconnection.auto.HttpUrlInstrumentation
+import com.splunk.rum.instrumentation.httpurlconnection.auto.BuildConfig
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpClientExperimentalMetrics
 import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpExperimentalAttributesExtractor
@@ -63,6 +64,7 @@ internal object HttpUrlConnectionSingletons {
                 INSTRUMENTATION_NAME,
                 httpSpanNameExtractor
             )
+                .setInstrumentationVersion(BuildConfig.VERSION_NAME)
                 .setSpanStatusExtractor(HttpSpanStatusExtractor.create(httpAttributesGetter))
                 .addAttributesExtractor(httpClientAttributesExtractor)
                 .addAttributesExtractor(httpClientPeerServiceAttributesExtractor)

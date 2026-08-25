@@ -86,6 +86,7 @@ class HttpUrlInstrumentationTest {
 
         val span = exportedSpans.single()
         assertEquals("POST", span.name)
+        assertEquals(BuildConfig.VERSION_NAME, span.instrumentationScopeInfo.version)
         assertEquals("POST", span.attributes.get(AttributeKey.stringKey("http.request.method")))
         assertEquals(503L, span.attributes.get(AttributeKey.longKey("http.response.status_code")))
         assertEquals("api.example.test", span.attributes.get(AttributeKey.stringKey("server.address")))
