@@ -85,6 +85,9 @@ class StartupTrackingInstrumentedTest {
     @After
     fun tearDown() {
         SplunkOpenTelemetrySdk.instance = null
+        AgentIntegration.installStartTimestamp = null
+        AgentIntegration.installStartElapsed = null
+        AgentIntegration.installEndElapsed = null
         tracerProvider.shutdown().join(5, TimeUnit.SECONDS)
     }
 
@@ -118,10 +121,59 @@ class StartupTrackingInstrumentedTest {
         )
 
         val initializationSpans = exportedSpans.filter {
-            it.name == RumConstants.APP_START_INITIALIZE_SPAN_NAME
+            it.name == RumConstants.APP_START_INSTALL_SPAN_NAME
         }
-        assertEquals("Initialization should only be reported once", 1, initializationSpans.size)
+        assertEquals("Install span should only be reported once", 1, initializationSpans.size)
         assertEquals(coldStart.spanId, initializationSpans.single().parentSpanId)
+    }
+
+    @Test
+    fun coldStartWithInstallTimestampsUsesFullInstallDuration() {
+        val installStart = System.currentTimeMillis() - 150
+        val installStartElapsed = android.os.SystemClock.elapsedRealtime() - 150
+        val installEndElapsed = android.os.SystemClock.elapsedRealtime() - 50
+
+        AgentIntegration.installStartTimestamp = installStart
+        AgentIntegration.installStartElapsed = installStartElapsed
+        AgentIntegration.installEndElapsed = installEndElapsed
+
+        val application = instrumentation.targetContext.applicationContext as Application
+        AgentIntegration.instance.install(
+            application,
+            SplunkOpenTelemetrySdk.instance!!,
+            listOf(StartupModuleConfiguration()),
+            Attributes.empty()
+        )
+
+        reportColdStart()
+        waitForIdle()
+
+        val appStart = appStartSpans().single()
+        val installSpans = exportedSpans.filter {
+            it.name == RumConstants.APP_START_INSTALL_SPAN_NAME
+        }
+
+        assertEquals("Expected one install span", 1, installSpans.size)
+
+        val installSpan = installSpans.single()
+
+        assertEquals(
+            "SplunkRum.install should be child of AppStart",
+            appStart.spanId,
+            installSpan.parentSpanId
+        )
+
+        val spanStartMillis = TimeUnit.NANOSECONDS.toMillis(installSpan.startEpochNanos)
+        assertEquals(
+            "Install span should use the early install start timestamp",
+            installStart,
+            spanStartMillis
+        )
+
+        assertTrue(
+            "Install span should have per-module events",
+            installSpan.events.isNotEmpty()
+        )
     }
 
     private fun reportColdStart() {
