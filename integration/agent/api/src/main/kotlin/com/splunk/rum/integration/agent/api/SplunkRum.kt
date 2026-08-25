@@ -344,6 +344,9 @@ class SplunkRum private constructor(
             // GlobalAttributeSpanProcessor and the public SplunkRum.globalAttributes API
             val globalAttributes = MutableAttributes(agentConfiguration.globalAttributes)
 
+            AgentIntegration.installStartTimestamp = installStartMillis
+            AgentIntegration.installStartElapsed = installStartElapsed
+
             val openTelemetry = SplunkRumAgentCore.install(
                 application,
                 agentConfiguration,
@@ -369,8 +372,6 @@ class SplunkRum private constructor(
                 }
             )
 
-            AgentIntegration.installStartTimestamp = installStartMillis
-            AgentIntegration.installStartElapsed = installStartElapsed
             AgentIntegration.installEndElapsed = SystemClock.elapsedRealtime()
 
             return instance
