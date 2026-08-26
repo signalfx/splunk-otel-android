@@ -171,12 +171,23 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             modules.maxByOrNull { it.initialization?.endElapsed ?: Long.MIN_VALUE }?.initialization
                 ?: throw IllegalStateException("Module initialization did not complete")
 
-        val installStartTimestamp = AgentIntegration.installStartTimestamp
-            ?: firstInitialization.startTimestamp
-        val installStartElapsed = AgentIntegration.installStartElapsed
-            ?: firstInitialization.startElapsed
-        val installEndElapsed = AgentIntegration.installEndElapsed
-            ?: lastInitialization.endElapsed!!
+        val storedStart = AgentIntegration.installStartTimestamp
+        val storedStartElapsed = AgentIntegration.installStartElapsed
+        val storedEnd = AgentIntegration.installEndElapsed
+
+        val installStartTimestamp: Long
+        val installStartElapsed: Long
+        val installEndElapsed: Long
+
+        if (storedStart != null && storedStartElapsed != null && storedEnd != null) {
+            installStartTimestamp = storedStart
+            installStartElapsed = storedStartElapsed
+            installEndElapsed = storedEnd
+        } else {
+            installStartTimestamp = firstInitialization.startTimestamp
+            installStartElapsed = firstInitialization.startElapsed
+            installEndElapsed = lastInitialization.endElapsed!!
+        }
 
         val installEndTimestamp = installStartTimestamp + (installEndElapsed - installStartElapsed)
 
