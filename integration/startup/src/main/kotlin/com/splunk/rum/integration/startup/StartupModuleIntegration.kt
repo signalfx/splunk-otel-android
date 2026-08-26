@@ -32,6 +32,7 @@ import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.trace.Span
+import io.opentelemetry.context.Context as OtelContext
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import java.util.concurrent.TimeUnit
 
@@ -198,7 +199,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
         val installSpan = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
             .spanBuilder(RumConstants.APP_START_INSTALL_SPAN_NAME)
-            .setParent(io.opentelemetry.context.Context.current().with(appStartSpan))
+            .setParent(OtelContext.current().with(appStartSpan))
             .setStartTimestamp(installStartTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
