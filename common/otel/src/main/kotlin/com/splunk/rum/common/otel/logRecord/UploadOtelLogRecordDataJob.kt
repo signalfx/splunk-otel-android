@@ -17,7 +17,10 @@
 package com.splunk.rum.common.otel.logRecord
 
 /**
- * Compatibility entry point for log-record upload jobs scheduled by SDK versions before 2.3.3.
+ * Compatibility entry point for old log-record upload jobs.
+ *
+ * The old component name remains available because JobScheduler may already be dispatching a
+ * persisted job while offline data migration is canceling and rescheduling it.
  *
  * The implementation is inherited so persisted jobs can complete without creating a second
  * upload job or changing their JobScheduler ID.

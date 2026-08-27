@@ -58,6 +58,9 @@ class OfflineOtelDataProcessor internal constructor(
     }
 
     private fun startProcessingLocalData(olderThan: Long) {
+        // Cancellation is not atomic with JobScheduler dispatch. Legacy service entry points must
+        // remain available in case Android has already started an old component while migration
+        // is canceling and rescheduling the job.
         agentStorage.getLogs(olderThan).forEachFast {
             val id = it.nameWithoutExtension
             cancelJob(id)

@@ -17,12 +17,10 @@
 package com.splunk.rum.common.otel.span
 
 /**
- * Compatibility entry point for old span upload jobs.
+ * Compatibility entry point for Session Replay jobs scheduled before the service moved from the
+ * span package to the logRecord package.
  *
  * The old component name remains available because JobScheduler may already be dispatching a
  * persisted job while offline data migration is canceling and rescheduling it.
- *
- * The implementation is inherited so persisted jobs can complete without creating a second
- * upload job or changing their JobScheduler ID.
  */
-internal class UploadOtelSpanDataJob : com.splunk.rum.agent.common.otel.span.UploadOtelSpanDataJob()
+internal class UploadSessionReplayDataJob : com.splunk.rum.agent.common.otel.logRecord.UploadSessionReplayDataJob()

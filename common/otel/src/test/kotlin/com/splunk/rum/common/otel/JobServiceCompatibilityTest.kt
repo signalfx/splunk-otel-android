@@ -23,6 +23,7 @@ import com.splunk.rum.agent.common.otel.span.UploadOtelSpanDataJob as CurrentUpl
 import com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordDataJob
 import com.splunk.rum.common.otel.logRecord.UploadSessionReplayDataJob
 import com.splunk.rum.common.otel.span.UploadOtelSpanDataJob
+import com.splunk.rum.common.otel.span.UploadSessionReplayDataJob as OldUploadSessionReplayDataJob
 import java.lang.reflect.Modifier
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -66,6 +67,11 @@ class JobServiceCompatibilityTest {
             LegacyService(
                 "com.splunk.rum.common.otel.logRecord.UploadSessionReplayDataJob",
                 UploadSessionReplayDataJob::class.java,
+                CurrentUploadSessionReplayDataJob::class.java
+            ),
+            LegacyService(
+                "com.splunk.rum.common.otel.span.UploadSessionReplayDataJob",
+                OldUploadSessionReplayDataJob::class.java,
                 CurrentUploadSessionReplayDataJob::class.java
             )
         )

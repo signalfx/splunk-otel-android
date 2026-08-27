@@ -11,7 +11,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Removed the OpenTelemetry Android runtime dependency
 
 ##### Fixes:
-* Preserved pre-2.3.3 JobScheduler service entry points so scheduled uploads survive SDK package renames
+* Preserved old JobScheduler service entry points so in-flight upload jobs remain runnable when component names change during an SDK upgrade
 
 ### Version 2.3.3 - 2026-08-12
 
