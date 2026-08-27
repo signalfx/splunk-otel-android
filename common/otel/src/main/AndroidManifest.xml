@@ -4,6 +4,19 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
+        <!--
+            Keep the pre-2.3.3 service names for jobs persisted across an app update.
+            JobScheduler can attempt to instantiate these components.
+        -->
+        <service
+            android:name="com.splunk.rum.common.otel.span.UploadOtelSpanDataJob"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name="com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordDataJob"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name="com.splunk.rum.common.otel.logRecord.UploadSessionReplayDataJob"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name="com.splunk.rum.agent.common.otel.span.UploadOtelSpanDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -11,7 +24,7 @@
             android:name="com.splunk.rum.agent.common.otel.logRecord.UploadOtelLogRecordDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
-            android:name=".logRecord.UploadSessionReplayDataJob"
+            android:name="com.splunk.rum.agent.common.otel.logRecord.UploadSessionReplayDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
