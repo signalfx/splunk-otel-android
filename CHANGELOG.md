@@ -10,7 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Version 2.3.4 - 2026-08-27
 
 ##### Enhancements:
-* Removed the OpenTelemetry Android runtime dependency
+* Removed the OpenTelemetry Android runtime dependency, which also removes the transitively declared `READ_PHONE_STATE` permission
 * Reduced SDK initialization work by no longer building the default OpenTelemetry resource separately
 
 ##### Fixes:
