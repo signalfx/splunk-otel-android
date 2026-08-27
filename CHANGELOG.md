@@ -10,6 +10,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ##### Enhancements:
 * Removed the OpenTelemetry Android runtime dependency
 
+##### Fixes:
+* Preserved old JobScheduler service entry points so in-flight upload jobs remain runnable when component names change during an SDK upgrade
+
 ### Version 2.3.3 - 2026-08-12
 
 ##### Enhancements:
