@@ -21,8 +21,5 @@ package com.splunk.rum.common.otel.logRecord
  *
  * The old component name remains available because JobScheduler may already be dispatching a
  * persisted job while offline data migration is canceling and rescheduling it.
- *
- * The implementation is inherited so persisted jobs can complete without creating a second
- * upload job or changing their JobScheduler ID.
  */
 internal class UploadSessionReplayDataJob : com.splunk.rum.agent.common.otel.logRecord.UploadSessionReplayDataJob()
