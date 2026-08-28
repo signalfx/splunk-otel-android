@@ -27,11 +27,8 @@ import java.util.concurrent.atomic.AtomicLong
  * main thread fails to process the heartbeat within [thresholdNs] of monotonic elapsed time, an
  * ANR is reported via [onAnr] with the main thread's stalled stack trace.
  *
- * Only one ANR is reported per stall. A new report is only emitted after the main thread recovers
- * and subsequently stalls again.
- *
- * The heartbeat only records when it ran; the watchdog thread owns every state transition. That
- * keeps main-thread work minimal and lets a watchdog run delayed past recovery still see the stall.
+ * Only one ANR is reported per stall. The heartbeat just records when it ran; the watchdog thread
+ * owns every state transition, so a run delayed past recovery still sees the stall.
  *
  * @property thresholdNs Monotonic elapsed time in nanoseconds that the main thread must be
  *           unresponsive before an ANR is reported.
@@ -50,7 +47,7 @@ internal class AnrWatcher(
     private val heartbeatCompletedAtNs = AtomicLong(NOT_COMPLETED)
     private val reported = AtomicBoolean(false)
 
-    /** Bumped by [reset] so a run already in flight can tell its observations are stale. */
+    /** Bumped by [reset] so an in-flight run can tell its observations are stale. */
     private val generation = AtomicLong(0)
 
     /** Sampled while the main thread was still stalled, in case it recovers before the next run. */
@@ -65,10 +62,7 @@ internal class AnrWatcher(
         startHeartbeat(cycle)
     }
 
-    /**
-     * Drops in-flight state so a stall cannot be reported against a later detection period. Safe to
-     * call while a run is executing; that run discards its work once it sees the new generation.
-     */
+    /** Drops in-flight state so a stall cannot be reported against a later detection period. */
     fun reset() {
         generation.incrementAndGet()
         heartbeatCompletedAtNs.set(NOT_COMPLETED)
@@ -80,15 +74,19 @@ internal class AnrWatcher(
     /** Returns true once the heartbeat is accounted for and a new cycle can start. */
     private fun resolveOutstandingHeartbeat(cycle: Long): Boolean {
         val startedAtNs = heartbeatStartedAtNs.get()
+
+        // Clock before completion stamp: a stale clock only undercounts the stall, while a stale
+        // completion stamp would let an on-time heartbeat look like an ANR.
+        val nowNs = clock()
         val completedAtNs = heartbeatCompletedAtNs.get()
 
         // A completion stamped before this cycle began belongs to an earlier heartbeat.
         val responded = completedAtNs != NOT_COMPLETED && completedAtNs - startedAtNs >= 0
 
         // Subtraction stays correct across nanoTime wraparound.
-        val elapsedNs = if (responded) completedAtNs - startedAtNs else clock() - startedAtNs
+        val elapsedNs = if (responded) completedAtNs - startedAtNs else nowNs - startedAtNs
 
-        // A reset since these reads means they describe a cancelled period and may be inconsistent.
+        // Reads taken before a reset describe a cancelled period.
         if (generation.get() != cycle) {
             return false
         }
@@ -99,8 +97,7 @@ internal class AnrWatcher(
                 reported.set(true)
                 stalledStack = null
             } else if (!responded && stalledStack == null) {
-                // One sample per stall; refreshing every poll would scale stack walks with the
-                // configured threshold, and a stall this long sits in a single blocking call.
+                // One sample per stall; refreshing every poll would scale stack walks with the threshold.
                 stalledStack = mainThread.stackTrace
             }
         }
@@ -121,8 +118,8 @@ internal class AnrWatcher(
         heartbeatCompletedAtNs.set(NOT_COMPLETED)
         heartbeatStartedAtNs.set(clock())
 
+        // Reset landed mid-start; leave detection disarmed.
         if (generation.get() != cycle) {
-            // Reset landed while this cycle was starting; leave detection disarmed.
             heartbeatOutstanding.set(false)
             return
         }

@@ -282,8 +282,7 @@ class AnrWatcherTest {
             true
         }
 
-        // Recovers the main thread past the threshold while the watchdog is between reading the
-        // clock and acting on it, so the run decides using a below-threshold reading.
+        // Recovers the main thread past the threshold while the watchdog is mid-run.
         var interleaveRecovery = false
         val racingClock: () -> Long = {
             val observed = fakeTimeNs
@@ -308,6 +307,39 @@ class AnrWatcherTest {
             "A heartbeat that expired while the watchdog was mid-run must still be reported",
             1,
             reportedStackTraces.size
+        )
+    }
+
+    @Test
+    fun `does not report a heartbeat that completed within the threshold mid watchdog run`() {
+        var heartbeatCallback: Runnable? = null
+        `when`(handler.post(any())).thenAnswer { invocation ->
+            heartbeatCallback = invocation.getArgument(0) as Runnable
+            true
+        }
+
+        // Completes the heartbeat on time mid-run, then lets the watchdog's clock land past the threshold.
+        var interleaveOnTimeCompletion = false
+        val racingClock: () -> Long = {
+            if (interleaveOnTimeCompletion) {
+                interleaveOnTimeCompletion = false
+                fakeTimeNs = THRESHOLD_NS - 1
+                heartbeatCallback?.run()
+                fakeTimeNs = THRESHOLD_NS + 1
+            }
+            fakeTimeNs
+        }
+
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, racingClock)
+
+        watcher.run()
+
+        interleaveOnTimeCompletion = true
+        watcher.run()
+
+        assertTrue(
+            "A heartbeat that completed within the threshold must not be reported",
+            reportedStackTraces.isEmpty()
         )
     }
 

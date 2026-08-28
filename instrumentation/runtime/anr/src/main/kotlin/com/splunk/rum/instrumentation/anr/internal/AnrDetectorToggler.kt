@@ -48,8 +48,7 @@ internal class AnrDetectorToggler(private val anrWatcher: AnrWatcher, private va
     override fun onAppBackgrounded() {
         future?.cancel(true)
         future = null
-        // Cancelling leaves any in-flight heartbeat unresolved, which would otherwise be reported
-        // against the next foreground period.
+        // Cancelling leaves an in-flight heartbeat unresolved, which would leak into the next foreground.
         anrWatcher.reset()
     }
 
