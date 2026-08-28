@@ -24,14 +24,17 @@ import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Watches the UI thread for ANRs by posting a heartbeat [Runnable] to the main thread. When the
- * main thread fails to process the heartbeat within [thresholdNs] wall-clock nanoseconds, an ANR
- * is reported via [onAnr] with the main thread's current stack trace.
+ * main thread fails to process the heartbeat within [thresholdNs] of monotonic elapsed time, an
+ * ANR is reported via [onAnr] with the main thread's stalled stack trace.
  *
  * Only one ANR is reported per stall. A new report is only emitted after the main thread recovers
  * and subsequently stalls again.
  *
- * @property thresholdNs Wall-clock time in nanoseconds that the main thread must be unresponsive
- *           before an ANR is reported.
+ * The heartbeat only records when it ran; the watchdog thread owns every state transition. That
+ * keeps main-thread work minimal and lets a watchdog run delayed past recovery still see the stall.
+ *
+ * @property thresholdNs Monotonic elapsed time in nanoseconds that the main thread must be
+ *           unresponsive before an ANR is reported.
  * @property clock Monotonic clock source; injectable for testing.
  */
 internal class AnrWatcher(
@@ -43,40 +46,74 @@ internal class AnrWatcher(
 ) : Runnable {
 
     private val heartbeatOutstanding = AtomicBoolean(false)
-    private val nextReportAtNs = AtomicLong(Long.MAX_VALUE)
-    private val lateRecovery = AtomicBoolean(false)
+    private val heartbeatStartedAtNs = AtomicLong(0)
+    private val heartbeatCompletedAtNs = AtomicLong(NOT_COMPLETED)
+    private val reported = AtomicBoolean(false)
+
+    /** Sampled while the main thread was still stalled, in case it recovers before the next run. */
+    @Volatile
+    private var stalledStack: Array<StackTraceElement>? = null
 
     override fun run() {
-        val nowNs = clock()
-
-        if (heartbeatOutstanding.compareAndSet(false, true)) {
-            val deadline = if (nowNs > Long.MAX_VALUE - thresholdNs) Long.MAX_VALUE else nowNs + thresholdNs
-            nextReportAtNs.set(deadline)
-
-            if (!uiHandler.post {
-                    if (clock() < nextReportAtNs.get()) {
-                        heartbeatOutstanding.set(false)
-                    } else {
-                        lateRecovery.set(true)
-                    }
-                }
-            ) {
-                heartbeatOutstanding.set(false)
-            }
+        if (heartbeatOutstanding.get() && !resolveOutstandingHeartbeat()) {
             return
         }
+        startHeartbeat()
+    }
 
-        if (nowNs >= nextReportAtNs.get()) {
-            onAnr(mainThread.stackTrace)
-            nextReportAtNs.set(Long.MAX_VALUE)
+    /** Drops in-flight state so a stall cannot be reported against a later detection period. */
+    fun reset() {
+        heartbeatCompletedAtNs.set(NOT_COMPLETED)
+        reported.set(false)
+        stalledStack = null
+        heartbeatOutstanding.set(false)
+    }
+
+    /** Returns true once the heartbeat is accounted for and a new cycle can start. */
+    private fun resolveOutstandingHeartbeat(): Boolean {
+        val startedAtNs = heartbeatStartedAtNs.get()
+        val completedAtNs = heartbeatCompletedAtNs.get()
+
+        // A completion stamped before this cycle began belongs to an earlier heartbeat.
+        val responded = completedAtNs != NOT_COMPLETED && completedAtNs - startedAtNs >= 0
+
+        // Subtraction stays correct across nanoTime wraparound.
+        val elapsedNs = if (responded) completedAtNs - startedAtNs else clock() - startedAtNs
+
+        if (!reported.get()) {
+            if (elapsedNs >= thresholdNs) {
+                onAnr(if (responded) stalledStack ?: mainThread.stackTrace else mainThread.stackTrace)
+                reported.set(true)
+                stalledStack = null
+            } else if (!responded) {
+                stalledStack = mainThread.stackTrace
+            }
         }
 
-        if (lateRecovery.compareAndSet(true, false)) {
+        if (!responded) {
+            return false
+        }
+        heartbeatOutstanding.set(false)
+        return true
+    }
+
+    private fun startHeartbeat() {
+        if (!heartbeatOutstanding.compareAndSet(false, true)) {
+            return
+        }
+        reported.set(false)
+        stalledStack = null
+        heartbeatCompletedAtNs.set(NOT_COMPLETED)
+        heartbeatStartedAtNs.set(clock())
+
+        if (!uiHandler.post { heartbeatCompletedAtNs.set(clock()) }) {
+            // The main thread is probably shutting down. Retry on the next run.
             heartbeatOutstanding.set(false)
         }
     }
 
     companion object {
         val DEFAULT_THRESHOLD_NS: Long = TimeUnit.SECONDS.toNanos(5)
+        private const val NOT_COMPLETED = Long.MIN_VALUE
     }
 }

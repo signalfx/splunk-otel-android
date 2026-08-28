@@ -34,7 +34,8 @@ import java.util.concurrent.ThreadFactory
  *
  * Register any additional [AnrAttributesExtractor]s via [addAttributesExtractor] and optionally
  * configure the detection threshold via [setThreshold] before calling [install]. The threshold
- * specifies the wall-clock duration the main thread must be unresponsive before an ANR is reported.
+ * specifies how long the main thread must be unresponsive before an ANR is reported, measured as
+ * monotonic elapsed time.
  * Detection is foreground-only and backed by a daemon watchdog thread that is cancelled whenever the
  * app is backgrounded.
  *
@@ -56,7 +57,7 @@ class AnrReporterInstrumentation {
 
     /**
      * Sets the ANR detection threshold. An ANR is reported after the main thread is unresponsive
-     * for [threshold] wall-clock time.
+     * for [threshold] of monotonic elapsed time.
      */
     @Suppress("NewApi") // Duration requires API 26 or core library desugaring
     fun setThreshold(threshold: Duration): AnrReporterInstrumentation {
