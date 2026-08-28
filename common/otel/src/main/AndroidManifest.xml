@@ -4,6 +4,23 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
+        <!--
+            Keep the old service names for jobs persisted or already being dispatched across an
+            app update. Offline job migration can cancel and reschedule a job, but cancellation is
+            not atomic with JobScheduler service startup.
+        -->
+        <service
+            android:name="com.splunk.rum.common.otel.span.UploadOtelSpanDataJob"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name="com.splunk.rum.common.otel.logRecord.UploadOtelLogRecordDataJob"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name="com.splunk.rum.common.otel.logRecord.UploadSessionReplayDataJob"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name="com.splunk.rum.common.otel.span.UploadSessionReplayDataJob"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name="com.splunk.rum.agent.common.otel.span.UploadOtelSpanDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -11,7 +28,7 @@
             android:name="com.splunk.rum.agent.common.otel.logRecord.UploadOtelLogRecordDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
-            android:name=".logRecord.UploadSessionReplayDataJob"
+            android:name="com.splunk.rum.agent.common.otel.logRecord.UploadSessionReplayDataJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
