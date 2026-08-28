@@ -24,6 +24,7 @@ import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.Tracer
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class CustomTracking internal constructor() {
 
@@ -97,10 +98,18 @@ class CustomTracking internal constructor() {
      * @param type The error type.
      * @param message The error message.
      * @param stacktrace The error stacktrace, if available.
+     * @param timestamp The timestamp of the error in milliseconds since the Unix epoch. If `null`,
+     * the current time will be used.
      * @param attributes Any [Attributes] to associate with the event.
      */
     @JvmOverloads
-    fun trackError(type: String, message: String, stacktrace: String?, attributes: Attributes = Attributes.empty()) {
+    fun trackError(
+        type: String,
+        message: String,
+        stacktrace: String?,
+        timestamp: Long? = null,
+        attributes: Attributes = Attributes.empty()
+    ) {
         val tracer = getTracer() ?: return
         val spanBuilder = tracer.spanBuilder(type)
             .setAllAttributes(attributes)
@@ -113,7 +122,11 @@ class CustomTracking internal constructor() {
             spanBuilder.setAttribute(GlobalRumConstants.EXCEPTION_STACKTRACE_KEY, it)
         }
 
-        spanBuilder.createZeroLengthSpan()
+        if (timestamp == null) {
+            spanBuilder.createZeroLengthSpan()
+        } else {
+            spanBuilder.createZeroLengthSpan(timestamp, TimeUnit.MILLISECONDS)
+        }
     }
 
     /**
