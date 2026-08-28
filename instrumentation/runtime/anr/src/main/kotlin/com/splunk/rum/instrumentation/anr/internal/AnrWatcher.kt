@@ -50,19 +50,27 @@ internal class AnrWatcher(
     private val heartbeatCompletedAtNs = AtomicLong(NOT_COMPLETED)
     private val reported = AtomicBoolean(false)
 
+    /** Bumped by [reset] so a run already in flight can tell its observations are stale. */
+    private val generation = AtomicLong(0)
+
     /** Sampled while the main thread was still stalled, in case it recovers before the next run. */
     @Volatile
     private var stalledStack: Array<StackTraceElement>? = null
 
     override fun run() {
-        if (heartbeatOutstanding.get() && !resolveOutstandingHeartbeat()) {
+        val cycle = generation.get()
+        if (heartbeatOutstanding.get() && !resolveOutstandingHeartbeat(cycle)) {
             return
         }
-        startHeartbeat()
+        startHeartbeat(cycle)
     }
 
-    /** Drops in-flight state so a stall cannot be reported against a later detection period. */
+    /**
+     * Drops in-flight state so a stall cannot be reported against a later detection period. Safe to
+     * call while a run is executing; that run discards its work once it sees the new generation.
+     */
     fun reset() {
+        generation.incrementAndGet()
         heartbeatCompletedAtNs.set(NOT_COMPLETED)
         reported.set(false)
         stalledStack = null
@@ -70,7 +78,7 @@ internal class AnrWatcher(
     }
 
     /** Returns true once the heartbeat is accounted for and a new cycle can start. */
-    private fun resolveOutstandingHeartbeat(): Boolean {
+    private fun resolveOutstandingHeartbeat(cycle: Long): Boolean {
         val startedAtNs = heartbeatStartedAtNs.get()
         val completedAtNs = heartbeatCompletedAtNs.get()
 
@@ -80,12 +88,19 @@ internal class AnrWatcher(
         // Subtraction stays correct across nanoTime wraparound.
         val elapsedNs = if (responded) completedAtNs - startedAtNs else clock() - startedAtNs
 
+        // A reset since these reads means they describe a cancelled period and may be inconsistent.
+        if (generation.get() != cycle) {
+            return false
+        }
+
         if (!reported.get()) {
             if (elapsedNs >= thresholdNs) {
                 onAnr(if (responded) stalledStack ?: mainThread.stackTrace else mainThread.stackTrace)
                 reported.set(true)
                 stalledStack = null
-            } else if (!responded) {
+            } else if (!responded && stalledStack == null) {
+                // One sample per stall; refreshing every poll would scale stack walks with the
+                // configured threshold, and a stall this long sits in a single blocking call.
                 stalledStack = mainThread.stackTrace
             }
         }
@@ -97,7 +112,7 @@ internal class AnrWatcher(
         return true
     }
 
-    private fun startHeartbeat() {
+    private fun startHeartbeat(cycle: Long) {
         if (!heartbeatOutstanding.compareAndSet(false, true)) {
             return
         }
@@ -105,6 +120,12 @@ internal class AnrWatcher(
         stalledStack = null
         heartbeatCompletedAtNs.set(NOT_COMPLETED)
         heartbeatStartedAtNs.set(clock())
+
+        if (generation.get() != cycle) {
+            // Reset landed while this cycle was starting; leave detection disarmed.
+            heartbeatOutstanding.set(false)
+            return
+        }
 
         if (!uiHandler.post { heartbeatCompletedAtNs.set(clock()) }) {
             // The main thread is probably shutting down. Retry on the next run.

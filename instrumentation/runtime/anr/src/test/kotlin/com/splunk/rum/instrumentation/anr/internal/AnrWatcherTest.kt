@@ -20,6 +20,7 @@ package com.splunk.rum.instrumentation.anr.internal
 import android.os.Handler
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -387,6 +388,92 @@ class AnrWatcherTest {
     }
 
     @Test
+    fun `samples the stalled stack at most once per stall`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        val worker = CountingStackThread()
+        worker.start()
+        worker.ready.await()
+
+        try {
+            val watcher = AnrWatcher(handler, worker, onAnr, TimeUnit.SECONDS.toNanos(60), clock)
+
+            watcher.run()
+
+            repeat(30) {
+                fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+                watcher.run()
+            }
+
+            assertTrue(reportedStackTraces.isEmpty())
+            assertEquals(
+                "Stack sampling must not scale with the configured threshold",
+                1,
+                worker.stackTraceCalls.get()
+            )
+        } finally {
+            worker.release.countDown()
+            worker.join(TimeUnit.SECONDS.toMillis(5))
+        }
+    }
+
+    @Test
+    fun `a reset during a run discards that run's report`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        var target: AnrWatcher? = null
+        var resetDuringRun = false
+        val racingClock: () -> Long = {
+            if (resetDuringRun) {
+                resetDuringRun = false
+                target?.reset()
+            }
+            fakeTimeNs
+        }
+
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, racingClock)
+        target = watcher
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(10)
+        resetDuringRun = true
+        watcher.run()
+
+        assertTrue(
+            "A cancelled detection period must not emit an ANR",
+            reportedStackTraces.isEmpty()
+        )
+    }
+
+    @Test
+    fun `a reset while starting a heartbeat leaves detection disarmed`() {
+        var postCount = 0
+        `when`(handler.post(any())).thenAnswer {
+            postCount++
+            true
+        }
+
+        var target: AnrWatcher? = null
+        var resetDuringStart = false
+        val racingClock: () -> Long = {
+            if (resetDuringStart) {
+                resetDuringStart = false
+                target?.reset()
+            }
+            fakeTimeNs
+        }
+
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, racingClock)
+        target = watcher
+
+        resetDuringStart = true
+        watcher.run()
+
+        assertEquals("A cancelled period must not leave a heartbeat in flight", 0, postCount)
+    }
+
+    @Test
     fun `reset discards a pending late recovery`() {
         var heartbeatCallback: Runnable? = null
         `when`(handler.post(any())).thenAnswer { invocation ->
@@ -407,6 +494,23 @@ class AnrWatcherTest {
         fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
         watcher.run()
         assertTrue("A pending late recovery must not survive a reset", reportedStackTraces.isEmpty())
+    }
+
+    private class CountingStackThread : Thread("anr-watcher-test-counting") {
+
+        val ready = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val stackTraceCalls = AtomicInteger()
+
+        override fun getStackTrace(): Array<StackTraceElement> {
+            stackTraceCalls.incrementAndGet()
+            return super.getStackTrace()
+        }
+
+        override fun run() {
+            ready.countDown()
+            release.await()
+        }
     }
 
     private class StallingThread : Thread("anr-watcher-test-main") {
