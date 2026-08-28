@@ -27,14 +27,10 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
-
     implementation(project(":integration:agent:internal"))
     implementation(project(":integration:agent:api"))
     implementation(project(":common:utils"))
     implementation(project(":common:otel"))
-
-    implementation(Dependencies.Otel.androidInstrumentation)
 
     implementation(Dependencies.Android.fragmentKtx)
 

@@ -35,8 +35,5 @@ dependencies {
 
     compileOnly(Dependencies.Android.Compose.ui)
 
-    implementation(platform(Dependencies.Otel.androidBom))
-    implementation(Dependencies.Otel.androidInstrumentation)
-
     testImplementation(Dependencies.Test.junit)
 }

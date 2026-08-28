@@ -17,7 +17,6 @@
 package com.splunk.rum.instrumentation.anr.internal.extractor
 
 import android.app.Application
-import android.content.Context
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.utils.AppStateObserver
 import io.opentelemetry.api.common.AttributesBuilder
@@ -28,13 +27,13 @@ import io.opentelemetry.api.common.AttributesBuilder
  * This class is internal and is hence not for public use. Its APIs are unstable and can change at
  * any time.
  */
-class RumAnrAttributesExtractor(context: Context) : AnrAttributesExtractor {
+class RumAnrAttributesExtractor(application: Application) : AnrAttributesExtractor {
 
     private var appState: String? = null
 
     init {
         AppStateObserver.listeners += AppStateObserverListener()
-        AppStateObserver.attach(context.applicationContext as Application)
+        AppStateObserver.attach(application)
     }
 
     override fun extract(attributes: AttributesBuilder, stackTrace: Array<StackTraceElement>) {

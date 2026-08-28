@@ -21,6 +21,17 @@ class ServerTimingHeaderParserTest {
     }
 
     @Test
+    fun `parse valid header with any two-digit hex trace flags`() {
+        val expected = ServerTraceContext("9499195c502eb217c448a68bfe0f967c", "fe16eca542cd5d86")
+
+        listOf("00", "02", "03", "ff").forEach { flags ->
+            val header =
+                """traceparent;desc="00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-$flags""""
+            assertEquals("flags: $flags", expected, ServerTimingHeaderParser.parse(header))
+        }
+    }
+
+    @Test
     fun `parse invalid header - incorrect format`() {
         val header = "invalid-header-format"
         assertNull(ServerTimingHeaderParser.parse(header))
@@ -48,6 +59,15 @@ class ServerTimingHeaderParserTest {
     fun `parse invalid header - incorrect spanId format`() {
         val header = """traceparent;desc="00-9499195c502eb217c448a68bfe0f967c-INVALIDSPANID-01""""
         assertNull(ServerTimingHeaderParser.parse(header))
+    }
+
+    @Test
+    fun `parse invalid header - malformed trace flags`() {
+        listOf("0", "000", "0g", "GG").forEach { flags ->
+            val header =
+                """traceparent;desc="00-9499195c502eb217c448a68bfe0f967c-fe16eca542cd5d86-$flags""""
+            assertNull("flags: $flags", ServerTimingHeaderParser.parse(header))
+        }
     }
 
     @Test

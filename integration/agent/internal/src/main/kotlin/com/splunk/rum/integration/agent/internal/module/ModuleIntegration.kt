@@ -16,12 +16,13 @@
 
 package com.splunk.rum.integration.agent.internal.module
 
+import android.app.Application
 import android.content.Context
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
 
 abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultModuleConfiguration: T) {
@@ -47,8 +48,8 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     protected open fun onAttach(context: Context) {}
 
     protected abstract fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     )
 
@@ -60,16 +61,16 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
 
     private val installationListener = object : AgentIntegration.Listener {
         override fun onInstall(
-            context: Context,
-            oTelInstallationContext: InstallationContext,
+            application: Application,
+            openTelemetry: OpenTelemetry,
             moduleConfigurations: List<ModuleConfiguration>
         ) {
             val clazz = defaultModuleConfiguration::class
 
             moduleConfiguration = moduleConfigurations.find { it::class == clazz } as? T ?: defaultModuleConfiguration
-            this@ModuleIntegration.globalAttributes = AgentIntegration.obtainInstance(context).globalAttributes
+            this@ModuleIntegration.globalAttributes = AgentIntegration.obtainInstance(application).globalAttributes
             AgentIntegration.registerModuleInitializationStart(defaultModuleConfiguration.name)
-            this@ModuleIntegration.onInstall(context, oTelInstallationContext, moduleConfigurations)
+            this@ModuleIntegration.onInstall(application, openTelemetry, moduleConfigurations)
             AgentIntegration.registerModuleInitializationEnd(defaultModuleConfiguration.name)
         }
 

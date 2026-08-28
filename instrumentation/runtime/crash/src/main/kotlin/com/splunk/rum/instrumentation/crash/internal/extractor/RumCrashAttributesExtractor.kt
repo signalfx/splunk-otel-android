@@ -17,7 +17,6 @@
 package com.splunk.rum.instrumentation.crash.internal.extractor
 
 import android.app.Application
-import android.content.Context
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.utils.AppStateObserver
 import io.opentelemetry.api.common.AttributesBuilder
@@ -29,14 +28,14 @@ import java.util.concurrent.atomic.AtomicBoolean
  * This class is internal and is hence not for public use. Its APIs are unstable and can change at
  * any time.
  */
-class RumCrashAttributesExtractor(context: Context) : CrashAttributesExtractor {
+class RumCrashAttributesExtractor(application: Application) : CrashAttributesExtractor {
 
     private val crashHappened = AtomicBoolean(false)
     private var appState: String? = null
 
     init {
         AppStateObserver.listeners += AppStateObserverListener()
-        AppStateObserver.attach(context.applicationContext as Application)
+        AppStateObserver.attach(application)
     }
 
     override fun extract(attributes: AttributesBuilder, crashDetails: CrashDetails) {

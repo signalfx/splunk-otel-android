@@ -18,7 +18,6 @@
 package com.splunk.rum.instrumentation.slowrendering.internal
 
 import android.app.Application
-import android.content.Context
 import android.os.Build
 import com.splunk.rum.common.logger.Logger
 import io.opentelemetry.api.OpenTelemetry
@@ -47,7 +46,7 @@ class SlowRenderingInstrumentation {
     }
 
     /** Registers the frame-metrics listeners and starts polling. No-op below API 24. */
-    fun install(context: Context, openTelemetry: OpenTelemetry) {
+    fun install(application: Application, openTelemetry: OpenTelemetry) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             Logger.w(
                 TAG,
@@ -56,7 +55,6 @@ class SlowRenderingInstrumentation {
             return
         }
 
-        val application = context.applicationContext as Application
         val detector = SlowRenderListener(
             openTelemetry.getTracer(INSTRUMENTATION_SCOPE_NAME),
             slowRenderingDetectionPollInterval
