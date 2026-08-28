@@ -7,8 +7,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.3.4 - 2026-08-27
+
 ##### Enhancements:
-* Removed the OpenTelemetry Android runtime dependency
+* Removed the OpenTelemetry Android runtime dependency, which also removes the transitively declared `READ_PHONE_STATE` permission
+* Reduced SDK initialization work by no longer building the default OpenTelemetry resource separately
+
+##### Fixes:
+* Preserved old JobScheduler service entry points so upload jobs scheduled before 2.3.3 remain runnable after upgrading
+* Fixed `Server-Timing` header parsing to accept any trace flags value, not just `01`
 
 ### Version 2.3.3 - 2026-08-12
 
