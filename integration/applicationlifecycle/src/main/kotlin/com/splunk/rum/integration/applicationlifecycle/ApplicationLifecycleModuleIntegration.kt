@@ -87,14 +87,9 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     }
 
     private fun reportEvent(applicationLifecycleData: ApplicationLifecycleData) {
-        if (canReport == false) {
-            Logger.i(TAG, "Cannot report event, module disabled.")
-            return
-        }
-
         val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider
 
-        if (logger == null || canReport == null) {
+        if (logger == null || canReport != true) {
             Logger.i(TAG, "Tracer provider not ready or reporting status unknown. Caching event")
             cache += applicationLifecycleData
             return
