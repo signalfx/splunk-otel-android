@@ -23,6 +23,8 @@ android {
 }
 
 dependencies {
+    implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
+
     implementation(project(":integration:agent:internal"))
     implementation(project(":instrumentation:runtime:okhttp3-auto"))
 
