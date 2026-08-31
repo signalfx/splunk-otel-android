@@ -41,7 +41,9 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach() called")
-        AppStateObserver.listeners += appStateListener
+        if (appStateListener !in AppStateObserver.listeners) {
+            AppStateObserver.listeners += appStateListener
+        }
         AppStateObserver.attach(context as Application)
     }
 
@@ -66,7 +68,8 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     internal fun disableAndRemoveListener() {
         Logger.w(TAG, "Module is disabled. Removing AppState listener.")
         canReport = false
-        AppStateObserver.listeners -= appStateListener
+        AppStateObserver.listeners.removeAll { it === appStateListener }
+        cache.clear()
     }
 
     internal val appStateListenerReference: AppStateObserver.Listener get() = appStateListener

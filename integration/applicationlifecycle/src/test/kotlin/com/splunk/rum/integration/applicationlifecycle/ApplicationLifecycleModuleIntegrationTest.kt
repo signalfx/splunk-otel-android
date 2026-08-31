@@ -92,15 +92,16 @@ class ApplicationLifecycleModuleIntegrationTest {
     }
 
     @Test
-    fun disableRemovesOnlyOneInstanceEvenIfDuplicatelyRegistered() {
+    fun disableRemovesAllInstancesIfDuplicatelyRegistered() {
         AppStateObserver.listeners += moduleListener
         AppStateObserver.listeners += moduleListener
+        assertEquals(2, AppStateObserver.listeners.count { it === moduleListener })
 
         ApplicationLifecycleModuleIntegration.disableAndRemoveListener()
 
         assertEquals(
-            "Only one instance should be removed per disable call (MutableList -= semantics)",
-            1,
+            "All instances of the module listener should be removed",
+            0,
             AppStateObserver.listeners.count { it === moduleListener }
         )
     }
