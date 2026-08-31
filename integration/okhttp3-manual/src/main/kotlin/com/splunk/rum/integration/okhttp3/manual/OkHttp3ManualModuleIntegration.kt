@@ -16,12 +16,12 @@
 
 package com.splunk.rum.integration.okhttp3.manual
 
-import android.content.Context
+import android.app.Application
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.okhttp3.OkHttpTelemetry
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 
 internal object OkHttp3ManualModuleIntegration : ModuleIntegration<OkHttp3ManualModuleConfiguration>(
     defaultModuleConfiguration = OkHttp3ManualModuleConfiguration()
@@ -32,14 +32,14 @@ internal object OkHttp3ManualModuleIntegration : ModuleIntegration<OkHttp3Manual
         private set
 
     override fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
 
         // Setup OkHttp3 manual instrumentation
-        okHttpTelemetry = OkHttpTelemetry.builder(oTelInstallationContext.openTelemetry)
+        okHttpTelemetry = OkHttpTelemetry.builder(openTelemetry)
             .apply {
                 moduleConfiguration.capturedRequestHeaders.takeIf { it.isNotEmpty() }
                     ?.let { setCapturedRequestHeaders(it) }

@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.anr
 
-import android.content.Context
+import android.app.Application
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.anr.internal.AnrReporterInstrumentation
 import com.splunk.rum.instrumentation.anr.internal.extractor.RumAnrAttributesExtractor
@@ -24,7 +24,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacyAnrModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 
 internal object AnrModuleIntegration : ModuleIntegration<AnrModuleConfiguration>(
     defaultModuleConfiguration = AnrModuleConfiguration()
@@ -33,8 +33,8 @@ internal object AnrModuleIntegration : ModuleIntegration<AnrModuleConfiguration>
     private const val TAG = "AnrIntegration"
 
     override fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
@@ -45,8 +45,8 @@ internal object AnrModuleIntegration : ModuleIntegration<AnrModuleConfiguration>
         if (isEnabled) {
             Logger.d(TAG, "Installing ANR reporter")
             val anrReporterInstrumentation = AnrReporterInstrumentation()
-            anrReporterInstrumentation.addAttributesExtractor(RumAnrAttributesExtractor(context))
-            anrReporterInstrumentation.install(context, oTelInstallationContext.openTelemetry)
+            anrReporterInstrumentation.addAttributesExtractor(RumAnrAttributesExtractor(application))
+            anrReporterInstrumentation.install(application, openTelemetry)
         } else {
             Logger.d(TAG, "ANR reporting is disabled")
         }

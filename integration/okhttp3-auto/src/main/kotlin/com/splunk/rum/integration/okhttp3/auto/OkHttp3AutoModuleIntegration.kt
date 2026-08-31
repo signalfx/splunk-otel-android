@@ -16,12 +16,12 @@
 
 package com.splunk.rum.integration.okhttp3.auto
 
-import android.content.Context
+import android.app.Application
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.okhttp3.auto.OkHttpInstrumentation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 
 internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModuleConfiguration>(
     defaultModuleConfiguration = OkHttp3AutoModuleConfiguration()
@@ -30,8 +30,8 @@ internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModu
     private const val TAG = "OkHttp3Integration"
 
     override fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
@@ -47,7 +47,7 @@ internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModu
                     .takeIf { it.isNotEmpty() }
                     ?.let { capturedResponseHeaders = it }
 
-                install(oTelInstallationContext.openTelemetry)
+                install(openTelemetry)
             }
         }
     }

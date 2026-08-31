@@ -31,7 +31,7 @@ import com.splunk.rum.integration.navigation.automatic.callback.NavigationActivi
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentActivityCallback21
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentActivityCallback29
 import com.splunk.rum.integration.navigation.automatic.callback.NavigationFragmentCallback
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
 import java.lang.ref.WeakReference
 
@@ -65,8 +65,8 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
     }
 
     override fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall")
@@ -75,7 +75,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
             Navigation.instance.composeTracker = null
             Navigation.instance.clearTrackerConfig()
             emitter.clearCache()
-            (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
+            application.unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
             currentActivityReference = null
             return
         }
@@ -85,8 +85,6 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
         if (moduleConfiguration.isAutomatedTrackingEnabled) {
             Logger.d(TAG, "Navigation module automated tracking enabled. Registering navigation callbacks.")
-
-            val application = context.applicationContext as Application
 
             registerActivityLifecycle(application, detector)
             registerFragmentLifecycle(application, detector)
@@ -108,7 +106,7 @@ internal object NavigationModuleIntegration : ModuleIntegration<NavigationModule
 
         Navigation.instance.setTrackerConfig(detector, moduleConfiguration.navigationEventProcessor)
 
-        (context as Application).unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
+        application.unregisterActivityLifecycleCallbacks(activityLifecycleCallbacksAdapter)
         currentActivityReference = null
     }
 

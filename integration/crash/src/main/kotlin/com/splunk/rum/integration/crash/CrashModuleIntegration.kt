@@ -16,7 +16,7 @@
 
 package com.splunk.rum.integration.crash
 
-import android.content.Context
+import android.app.Application
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.crash.internal.CrashReporterInstrumentation
 import com.splunk.rum.instrumentation.crash.internal.extractor.RumCrashAttributesExtractor
@@ -24,7 +24,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.find
 import com.splunk.rum.integration.agent.internal.legacy.LegacyCrashModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 
 internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfiguration>(
     defaultModuleConfiguration = CrashModuleConfiguration()
@@ -33,8 +33,8 @@ internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfigurat
     private const val TAG = "CrashIntegration"
 
     override fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
@@ -45,8 +45,8 @@ internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfigurat
         if (isEnabled) {
             Logger.d(TAG, "Installing crash reporter")
             val crashReporterInstrumentation = CrashReporterInstrumentation()
-            crashReporterInstrumentation.addAttributesExtractor(RumCrashAttributesExtractor(context))
-            crashReporterInstrumentation.install(context, oTelInstallationContext.openTelemetry)
+            crashReporterInstrumentation.addAttributesExtractor(RumCrashAttributesExtractor(application))
+            crashReporterInstrumentation.install(application, openTelemetry)
         } else {
             Logger.d(TAG, "Crash reporting is disabled")
         }

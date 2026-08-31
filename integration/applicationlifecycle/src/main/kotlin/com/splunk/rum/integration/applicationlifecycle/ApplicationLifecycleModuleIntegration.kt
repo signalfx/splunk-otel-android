@@ -27,7 +27,7 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.applicationlifecycle.model.AppState
 import com.splunk.rum.integration.applicationlifecycle.model.ApplicationLifecycleData
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 import java.util.concurrent.TimeUnit
 
 internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<ApplicationLifecycleModuleConfiguration>(
@@ -46,8 +46,8 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     }
 
     override fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")

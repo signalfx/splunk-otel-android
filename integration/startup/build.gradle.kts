@@ -27,13 +27,9 @@ android {
 }
 
 dependencies {
-    implementation(platform(Dependencies.Otel.androidBom))
-
     implementation(project(":integration:agent:internal"))
     implementation(project(":instrumentation:runtime:startup"))
     implementation(project(":common:otel"))
-
-    implementation(Dependencies.Otel.androidInstrumentation)
 
     implementation(Dependencies.Common.logger)
     implementation(Dependencies.Common.utils)

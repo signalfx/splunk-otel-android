@@ -17,7 +17,6 @@
 package com.splunk.rum.integration.lifecycle
 
 import android.app.Application
-import android.content.Context
 import android.os.Build
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
@@ -26,7 +25,7 @@ import com.splunk.rum.integration.lifecycle.callback.ActivityLifecycleCallback
 import com.splunk.rum.integration.lifecycle.callback.FragmentActivityCallback21
 import com.splunk.rum.integration.lifecycle.callback.FragmentActivityCallback29
 import com.splunk.rum.integration.lifecycle.callback.FragmentLifecycleCallback
-import io.opentelemetry.android.instrumentation.InstallationContext
+import io.opentelemetry.api.OpenTelemetry
 
 /**
  * Module integration for capturing UI lifecycle events (Activity and Fragment lifecycle transitions).
@@ -42,8 +41,8 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
     private var emitter: LifecycleEventEmitter? = null
 
     override fun onInstall(
-        context: Context,
-        oTelInstallationContext: InstallationContext,
+        application: Application,
+        openTelemetry: OpenTelemetry,
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall() called")
@@ -55,7 +54,6 @@ internal object LifecycleModuleIntegration : ModuleIntegration<LifecycleModuleCo
 
         Logger.d(TAG, "Lifecycle module is enabled. Registering lifecycle callbacks.")
 
-        val application = context.applicationContext as Application
         val lifecycleEmitter = LifecycleEventEmitter(moduleConfiguration.allowedEvents)
         emitter = lifecycleEmitter
 
