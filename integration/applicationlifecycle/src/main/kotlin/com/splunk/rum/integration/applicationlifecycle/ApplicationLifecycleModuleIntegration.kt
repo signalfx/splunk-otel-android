@@ -57,12 +57,19 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
             canReport = true
             cache.forEachFast { reportEvent(it) }
         } else {
-            Logger.w(TAG, "Module is disabled.")
-            canReport = false
+            disableAndRemoveListener()
         }
 
         cache.clear()
     }
+
+    internal fun disableAndRemoveListener() {
+        Logger.w(TAG, "Module is disabled. Removing AppState listener.")
+        canReport = false
+        AppStateObserver.listeners -= appStateListener
+    }
+
+    internal val appStateListenerReference: AppStateObserver.Listener get() = appStateListener
 
     private val appStateListener = object : AppStateObserver.Listener {
 

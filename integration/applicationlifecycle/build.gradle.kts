@@ -31,4 +31,7 @@ dependencies {
     implementation(Dependencies.Otel.androidInstrumentation)
     implementation(Dependencies.Common.utils)
     implementation(Dependencies.Common.logger)
+
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.robolectric)
 }
