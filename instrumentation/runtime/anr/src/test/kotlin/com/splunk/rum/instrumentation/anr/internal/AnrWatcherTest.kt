@@ -506,6 +506,63 @@ class AnrWatcherTest {
     }
 
     @Test
+    fun `a heartbeat callback queued before a reset cannot complete a later heartbeat`() {
+        val heartbeatCallbacks = mutableListOf<Runnable>()
+        `when`(handler.post(any())).thenAnswer { invocation ->
+            heartbeatCallbacks.add(invocation.getArgument(0) as Runnable)
+            true
+        }
+
+        val watcher = AnrWatcher(handler, mainThread, onAnr, THRESHOLD_NS, clock)
+
+        watcher.run()
+        watcher.reset()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        watcher.run()
+        assertEquals(2, heartbeatCallbacks.size)
+
+        // The abandoned callback finally drains, after the new heartbeat started.
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(1)
+        heartbeatCallbacks.first().run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(6)
+        watcher.run()
+
+        assertEquals(
+            "A stale callback must not mark the active heartbeat complete",
+            1,
+            reportedStackTraces.size
+        )
+    }
+
+    @Test
+    fun `a reset during the stack capture discards the report`() {
+        `when`(handler.post(any())).thenReturn(true)
+
+        var target: AnrWatcher? = null
+        val stalled = object : Thread("anr-watcher-test-hooked") {
+            override fun getStackTrace(): Array<StackTraceElement> {
+                target?.reset()
+                return emptyArray()
+            }
+        }
+
+        val watcher = AnrWatcher(handler, stalled, onAnr, THRESHOLD_NS, clock)
+        target = watcher
+
+        watcher.run()
+
+        fakeTimeNs += TimeUnit.SECONDS.toNanos(6)
+        watcher.run()
+
+        assertTrue(
+            "A reset during the stack capture must discard the report",
+            reportedStackTraces.isEmpty()
+        )
+    }
+
+    @Test
     fun `reset discards a pending late recovery`() {
         var heartbeatCallback: Runnable? = null
         `when`(handler.post(any())).thenAnswer { invocation ->

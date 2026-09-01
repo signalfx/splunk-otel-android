@@ -44,58 +44,65 @@ internal class AnrWatcher(
 
     private val heartbeatOutstanding = AtomicBoolean(false)
     private val heartbeatStartedAtNs = AtomicLong(0)
-    private val heartbeatCompletedAtNs = AtomicLong(NOT_COMPLETED)
+    private val heartbeatCompletedAtNs = AtomicLong(NOT_COMPLETED_SENTINEL)
     private val reported = AtomicBoolean(false)
 
     /** Bumped by [reset] so an in-flight run can tell its observations are stale. */
-    private val generation = AtomicLong(0)
+    private val latestWatcherVersion = AtomicLong(0)
+
+    /** Identifies the active heartbeat so an abandoned callback cannot complete a later one. */
+    private val heartbeatToken = AtomicLong(0)
 
     /** Sampled while the main thread was still stalled, in case it recovers before the next run. */
     @Volatile
     private var stalledStack: Array<StackTraceElement>? = null
 
     override fun run() {
-        val cycle = generation.get()
-        if (heartbeatOutstanding.get() && !resolveOutstandingHeartbeat(cycle)) {
+        val watcherVersion = latestWatcherVersion.get()
+        if (heartbeatOutstanding.get() && !resolveOutstandingHeartbeat(watcherVersion)) {
             return
         }
-        startHeartbeat(cycle)
+        startHeartbeat(watcherVersion)
     }
 
     /** Drops in-flight state so a stall cannot be reported against a later detection period. */
     fun reset() {
-        generation.incrementAndGet()
-        heartbeatCompletedAtNs.set(NOT_COMPLETED)
+        latestWatcherVersion.incrementAndGet()
+        heartbeatToken.incrementAndGet()
+        heartbeatCompletedAtNs.set(NOT_COMPLETED_SENTINEL)
         reported.set(false)
         stalledStack = null
         heartbeatOutstanding.set(false)
     }
 
     /** Returns true once the heartbeat is accounted for and a new cycle can start. */
-    private fun resolveOutstandingHeartbeat(cycle: Long): Boolean {
+    private fun resolveOutstandingHeartbeat(watcherVersion: Long): Boolean {
         val startedAtNs = heartbeatStartedAtNs.get()
 
-        // Clock before completion stamp: a stale clock only undercounts the stall, while a stale
-        // completion stamp would let an on-time heartbeat look like an ANR.
+        // Clock before completion stamp: a stale clock undercounts the stall; a stale stamp fakes an ANR.
         val nowNs = clock()
         val completedAtNs = heartbeatCompletedAtNs.get()
 
         // A completion stamped before this cycle began belongs to an earlier heartbeat.
-        val responded = completedAtNs != NOT_COMPLETED && completedAtNs - startedAtNs >= 0
+        val responded = completedAtNs != NOT_COMPLETED_SENTINEL && completedAtNs - startedAtNs >= 0
 
         // Subtraction stays correct across nanoTime wraparound.
         val elapsedNs = if (responded) completedAtNs - startedAtNs else nowNs - startedAtNs
 
         // Reads taken before a reset describe a cancelled period.
-        if (generation.get() != cycle) {
+        if (latestWatcherVersion.get() != watcherVersion) {
             return false
         }
 
         if (!reported.get()) {
             if (elapsedNs >= thresholdNs) {
-                onAnr(if (responded) stalledStack ?: mainThread.stackTrace else mainThread.stackTrace)
-                reported.set(true)
-                stalledStack = null
+                val stack = if (responded) stalledStack ?: mainThread.stackTrace else mainThread.stackTrace
+
+                // Recheck after the stack walk, which dominates the gap, then claim the report.
+                if (latestWatcherVersion.get() == watcherVersion && reported.compareAndSet(false, true)) {
+                    stalledStack = null
+                    onAnr(stack)
+                }
             } else if (!responded && stalledStack == null) {
                 // One sample per stall; refreshing every poll would scale stack walks with the threshold.
                 stalledStack = mainThread.stackTrace
@@ -109,22 +116,28 @@ internal class AnrWatcher(
         return true
     }
 
-    private fun startHeartbeat(cycle: Long) {
+    private fun startHeartbeat(watcherVersion: Long) {
         if (!heartbeatOutstanding.compareAndSet(false, true)) {
             return
         }
         reported.set(false)
         stalledStack = null
-        heartbeatCompletedAtNs.set(NOT_COMPLETED)
+        heartbeatCompletedAtNs.set(NOT_COMPLETED_SENTINEL)
+        val token = heartbeatToken.incrementAndGet()
         heartbeatStartedAtNs.set(clock())
 
         // Reset landed mid-start; leave detection disarmed.
-        if (generation.get() != cycle) {
+        if (latestWatcherVersion.get() != watcherVersion) {
             heartbeatOutstanding.set(false)
             return
         }
 
-        if (!uiHandler.post { heartbeatCompletedAtNs.set(clock()) }) {
+        val posted = uiHandler.post {
+            if (heartbeatToken.get() == token) {
+                heartbeatCompletedAtNs.set(clock())
+            }
+        }
+        if (!posted) {
             // The main thread is probably shutting down. Retry on the next run.
             heartbeatOutstanding.set(false)
         }
@@ -132,6 +145,6 @@ internal class AnrWatcher(
 
     companion object {
         val DEFAULT_THRESHOLD_NS: Long = TimeUnit.SECONDS.toNanos(5)
-        private const val NOT_COMPLETED = Long.MIN_VALUE
+        private const val NOT_COMPLETED_SENTINEL = Long.MIN_VALUE
     }
 }
