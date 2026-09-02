@@ -17,14 +17,16 @@
 package com.splunk.rum.instrumentation.okhttp3;
 
 import android.annotation.SuppressLint;
-import com.splunk.rum.instrumentation.okhttp3.internal.Experimental;
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpClientInstrumenterBuilderFactory;
+import com.splunk.rum.instrumentation.okhttp3.internal.Experimental;
+import com.splunk.rum.instrumentation.okhttp3.internal.PeerServiceAttributesExtractor;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.api.incubator.builder.internal.DefaultHttpClientInstrumenterBuilder;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.instrumentation.api.instrumenter.SpanNameExtractor;
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractorBuilder;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.Function;
 import okhttp3.Interceptor;
 import okhttp3.Response;
@@ -39,6 +41,7 @@ public final class OkHttpTelemetryBuilder {
 
   private final DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder;
   private final OpenTelemetry openTelemetry;
+  private Map<String, String> peerServiceMapping = java.util.Collections.emptyMap();
 
   OkHttpTelemetryBuilder(OpenTelemetry openTelemetry) {
     builder = OkHttpClientInstrumenterBuilderFactory.create(openTelemetry);
@@ -92,6 +95,14 @@ public final class OkHttpTelemetryBuilder {
     return this;
   }
 
+  /**
+   * Configures the extractor of the {@code peer.service} span attribute.
+   */
+  public OkHttpTelemetryBuilder setPeerServiceMapping(Map<String, String> peerServiceMapping) {
+    this.peerServiceMapping = new java.util.HashMap<>(peerServiceMapping);
+    return this;
+  }
+
   /** Sets custom {@link SpanNameExtractor} via transform function. */
   @SuppressLint("NewApi") // This existing java.util.function API requires consumer desugaring.
   public OkHttpTelemetryBuilder setSpanNameExtractor(
@@ -104,6 +115,10 @@ public final class OkHttpTelemetryBuilder {
 
   /** Returns a new instance with the configured settings. */
   public OkHttpTelemetry build() {
+    builder.addAttributesExtractor(
+        new PeerServiceAttributesExtractor(
+            com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter.INSTANCE,
+            peerServiceMapping));
     return new OkHttpTelemetry(builder.build(), openTelemetry.getPropagators());
   }
 }

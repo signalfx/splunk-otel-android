@@ -82,7 +82,7 @@ class CrashReporterTest {
 
         val log = exportedLogs.single()
         assertEquals(CrashReporter.CRASH_INSTRUMENTATION_SCOPE_NAME, log.instrumentationScopeInfo.name)
-        assertEquals(CrashReporter.CRASH_EVENT_NAME, log.attributes.get(EVENT_NAME_KEY))
+        assertEquals(CrashReporter.CRASH_EVENT_NAME, log.eventName)
         assertEquals(thread.id, log.attributes.get(THREAD_ID_KEY))
         assertEquals(thread.name, log.attributes.get(THREAD_NAME_KEY))
         assertEquals(IllegalStateException::class.java.name, log.attributes.get(EXCEPTION_TYPE_KEY))
@@ -151,7 +151,7 @@ class CrashReporterTest {
 
         val log = exportedLogs.single()
         assertEquals("yes", log.attributes.get(AttributeKey.stringKey("survivor")))
-        assertEquals(CrashReporter.CRASH_EVENT_NAME, log.attributes.get(EVENT_NAME_KEY))
+        assertEquals(CrashReporter.CRASH_EVENT_NAME, log.eventName)
     }
 
     @Test
@@ -160,7 +160,7 @@ class CrashReporterTest {
             sdk,
             listOf(
                 CrashAttributesExtractor { attributes, _ ->
-                    attributes.put(AttributeKey.stringKey("event.name"), "custom.event")
+                    attributes.put(AttributeKey.stringKey("user.name"), "testUser")
                 }
             )
         )
@@ -168,7 +168,7 @@ class CrashReporterTest {
         reporter.report(CrashDetails(Thread.currentThread(), RuntimeException("boom")))
 
         val log = exportedLogs.single()
-        assertEquals(CrashReporter.CRASH_EVENT_NAME, log.attributes.get(EVENT_NAME_KEY))
+        assertEquals(CrashReporter.CRASH_EVENT_NAME, log.eventName)
     }
 
     @Test
@@ -190,13 +190,12 @@ class CrashReporterTest {
         val throwable = RuntimeException("boom")
         installed!!.uncaughtException(thread, throwable)
 
-        assertEquals(CrashReporter.CRASH_EVENT_NAME, exportedLogs.single().attributes.get(EVENT_NAME_KEY))
+        assertEquals(CrashReporter.CRASH_EVENT_NAME, exportedLogs.single().eventName)
         assertSame(thread, delegatedThread)
         assertSame(throwable, delegatedThrowable)
     }
 
     private companion object {
-        val EVENT_NAME_KEY = AttributeKey.stringKey("event.name")
         val THREAD_ID_KEY = AttributeKey.longKey("thread.id")
         val THREAD_NAME_KEY = AttributeKey.stringKey("thread.name")
         val EXCEPTION_TYPE_KEY = AttributeKey.stringKey("exception.type")

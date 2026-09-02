@@ -295,8 +295,7 @@ class NavigationTrackingInstrumentedTest {
     }
 
     private fun navigationLogs(): List<LogRecordData> = exportedLogs.filter {
-        it.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY) ==
-            GlobalRumConstants.NAVIGATION_EVENT_NAME
+        it.eventName.equals(GlobalRumConstants.NAVIGATION_EVENT_NAME)
     }
 
     private fun LogRecordData.screenName(): String? = attributes.get(GlobalRumConstants.SCREEN_NAME_KEY)

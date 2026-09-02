@@ -106,7 +106,6 @@ class AndroidLogRecordExporterTest {
             setTimestamp(123_456L, TimeUnit.NANOSECONDS)
             setEventName("stable.event")
             setBody("log body")
-            setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, "legacy.event")
             setAttribute(AttributeKey.stringKey("empty.value"), "")
         }
 
@@ -116,18 +115,15 @@ class AndroidLogRecordExporterTest {
         assertEquals("stable.event", span.name)
         assertEquals(span.startEpochNanos, span.endEpochNanos)
         assertEquals("", span.attributes.get(AttributeKey.stringKey("empty.value")))
-        assertFalse(span.attributes.asMap().containsKey(GlobalRumConstants.LOG_EVENT_NAME_KEY))
     }
 
     @Test
-    fun `falls back to the event name attribute for existing producers`() {
-        val log = createLog("general-scope") {
-            setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, "legacy.event")
-        }
+    fun `falls back to the default event name attribute for existing producers`() {
+        val log = createLog("general-scope") {}
 
         exporter.export(mutableListOf(log))
 
-        assertEquals("legacy.event", exportedSpans.single().name)
+        assertEquals("splunk.log", exportedSpans.single().name)
     }
 
     @Test

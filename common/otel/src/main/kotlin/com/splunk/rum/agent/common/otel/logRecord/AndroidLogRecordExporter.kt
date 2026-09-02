@@ -89,14 +89,12 @@ internal class AndroidLogRecordExporter(
              *
              * The resolution order is as follows:
              * 1. Use the stable `eventName` property from [LogRecordData] if available.
-             * 2. Otherwise, fall back to the [GlobalRumConstants.LOG_EVENT_NAME_KEY] attribute in the log's attributes.
-             * 3. If neither is present, default to the name [GlobalRumConstants.DEFAULT_LOG_EVENT_NAME].
+             * 2. Otherwise, fallback to the name [GlobalRumConstants.DEFAULT_LOG_EVENT_NAME].
              *
              * This ensures that the span always has a meaningful or fallback name, even when
              * the source log record lacks explicit naming metadata.
              */
             val spanName = log.eventName
-                ?: log.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY)
                 ?: RumConstants.DEFAULT_LOG_EVENT_NAME
 
             // traceId and spanId should be inside the context already from global OTel instance
@@ -118,10 +116,6 @@ internal class AndroidLogRecordExporter(
                 }
 
                 log.attributes.asMap().forEach attrs@{ (key, value) ->
-                    if (key.key == GlobalRumConstants.LOG_EVENT_NAME_KEY.key) {
-                        return@attrs
-                    }
-
                     when (value) {
                         is String -> spanBuilder.setAttribute(key.key, value)
                         is Long -> spanBuilder.setAttribute(key.key, value)

@@ -49,7 +49,6 @@ object GlobalRumConstants {
     /**
      * Event and common attribute keys.
      */
-    val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
     val COMPONENT_KEY: AttributeKey<String> = AttributeKey.stringKey("component")
     val APP_STATE_KEY: AttributeKey<String> = AttributeKey.stringKey("android.app.state")
 

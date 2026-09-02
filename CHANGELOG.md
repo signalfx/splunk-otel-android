@@ -19,7 +19,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ##### Fixes:
 * Preserved old JobScheduler service entry points so upload jobs scheduled before 2.3.3 remain runnable after upgrading
 * Fixed `Server-Timing` header parsing to accept any trace flags value, not just `01`
-* Removed the OpenTelemetry Android runtime dependency
 
 ### Version 2.3.3 - 2026-08-12
 

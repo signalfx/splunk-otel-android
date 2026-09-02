@@ -44,4 +44,13 @@ class OkHttpTelemetryBuilderTest {
             knownMethods
         )
     }
+
+    @Test
+    fun setPeerServiceMapping_buildsSuccessfully() {
+        val telemetry = OkHttpTelemetry.builder(OpenTelemetry.noop())
+            .setPeerServiceMapping(mapOf("api.example.test:8443" to "checkout-service"))
+            .build()
+
+        assertNotNull(telemetry)
+    }
 }
