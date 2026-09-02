@@ -45,6 +45,7 @@ import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import java.util.UUID
@@ -117,6 +118,7 @@ internal object SplunkRumAgentCore {
                 .addLogRecordProcessor(SimpleLogRecordProcessor.create(LoggerLogRecordExporter()))
         }
 
+        disableOpenTelemetryInstrumentationSpis()
         val openTelemetry = initializer.build()
 
         isRunning = true
@@ -157,6 +159,15 @@ internal object SplunkRumAgentCore {
                     "skipping default override (StrictMode SPI walk may still occur)"
             )
         }
+    }
+
+    /**
+     * Disables the process-wide OpenTelemetry instrumentation extension lookup before any
+     * instrumenters are built. OpenTelemetry's default ServiceLoader lookup scans classpath
+     * resources and can trigger Android StrictMode disk-read violations on the main thread.
+     */
+    internal fun disableOpenTelemetryInstrumentationSpis() {
+        ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
     }
 
     private const val CONTEXT_STORAGE_PROVIDER_PROPERTY = "io.opentelemetry.context.contextStorageProvider"
