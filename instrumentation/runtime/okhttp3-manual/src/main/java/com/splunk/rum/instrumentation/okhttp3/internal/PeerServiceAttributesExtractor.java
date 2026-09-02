@@ -23,6 +23,7 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.instrumentation.api.semconv.network.ServerAttributesGetter;
+import java.net.URI;
 import java.util.Map;
 import okhttp3.Interceptor;
 import okhttp3.Response;
@@ -54,13 +55,25 @@ public final class PeerServiceAttributesExtractor
       Interceptor.Chain request,
       Response response,
       Throwable error) {
+    if (resolver.isEmpty()) {
+      return;
+    }
+
     String serviceName =
         resolver.resolve(
             attributesGetter.getServerAddress(request),
             attributesGetter.getServerPort(request),
-            null);
+            getPath(request));
     if (serviceName != null) {
       attributes.put(PEER_SERVICE, serviceName);
+    }
+  }
+
+  private static String getPath(Interceptor.Chain request) {
+    try {
+      return new URI(request.request().url().toString()).getPath();
+    } catch (java.net.URISyntaxException ignored) {
+      return null;
     }
   }
 }

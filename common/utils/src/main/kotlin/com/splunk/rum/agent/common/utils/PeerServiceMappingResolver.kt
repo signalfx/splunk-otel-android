@@ -31,6 +31,9 @@ class PeerServiceMappingResolver(peerServiceMapping: Map<String, String>) {
             .mapNotNull { (peer, serviceName) -> Mapping.parse(peer, serviceName) }
             .groupBy(Mapping::host)
 
+    /** Returns true when the mapping contains no valid entries. */
+    fun isEmpty(): Boolean = mappingsByHost.isEmpty()
+
     /** Returns the most specific matching service name, or null when no mapping matches. */
     fun resolve(host: String?, port: Int?, path: String?): String? {
         if (host == null) {
@@ -50,8 +53,16 @@ class PeerServiceMappingResolver(peerServiceMapping: Map<String, String>) {
                 return false
             }
 
-            if (!path.isNullOrEmpty() && (requestPath == null || !requestPath.startsWith(path))) {
-                return false
+            if (!path.isNullOrEmpty()) {
+                if (requestPath == null || !requestPath.startsWith(path)) {
+                    return false
+                }
+
+                // Preserve the upstream resolver's behavior: a path-qualified mapping without
+                // a port only applies when the request also has no port.
+                if (requestPort != null) {
+                    return requestPort == port
+                }
             }
 
             return true

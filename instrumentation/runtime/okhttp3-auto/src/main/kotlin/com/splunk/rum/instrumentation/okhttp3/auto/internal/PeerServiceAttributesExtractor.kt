@@ -23,6 +23,7 @@ import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.api.semconv.network.ServerAttributesGetter
+import java.net.URI
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -42,10 +43,14 @@ internal class PeerServiceAttributesExtractor(
         response: Response?,
         error: Throwable?
     ) {
+        if (resolver.isEmpty()) {
+            return
+        }
+
         val serviceName = resolver.resolve(
             attributesGetter.getServerAddress(request),
             attributesGetter.getServerPort(request),
-            null
+            runCatching { URI(request.request().url.toString()).path }.getOrNull()
         ) ?: return
 
         attributes.put(PEER_SERVICE, serviceName)

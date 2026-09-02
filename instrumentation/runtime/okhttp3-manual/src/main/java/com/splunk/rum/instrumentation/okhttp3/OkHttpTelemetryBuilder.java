@@ -25,7 +25,9 @@ import io.opentelemetry.instrumentation.api.incubator.builder.internal.DefaultHt
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
 import io.opentelemetry.instrumentation.api.instrumenter.SpanNameExtractor;
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractorBuilder;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import okhttp3.Interceptor;
@@ -36,15 +38,21 @@ public final class OkHttpTelemetryBuilder {
 
   static {
     Experimental.internalSetEmitExperimentalTelemetry(
-        (builder, emit) -> builder.builder.setEmitExperimentalHttpClientTelemetry(emit));
+        (builder, emit) -> builder.emitExperimentalHttpClientTelemetry = emit);
   }
 
-  private final DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder;
   private final OpenTelemetry openTelemetry;
+  private final List<AttributesExtractor<Interceptor.Chain, Response>> additionalExtractors =
+      new ArrayList<>();
+  private Collection<String> capturedRequestHeaders;
+  private Collection<String> capturedResponseHeaders;
+  private Collection<String> knownMethods;
+  private Function<SpanNameExtractor<Interceptor.Chain>, SpanNameExtractor<Interceptor.Chain>>
+      spanNameExtractorTransformer = spanNameExtractor -> spanNameExtractor;
   private Map<String, String> peerServiceMapping = java.util.Collections.emptyMap();
+  private boolean emitExperimentalHttpClientTelemetry;
 
   OkHttpTelemetryBuilder(OpenTelemetry openTelemetry) {
-    builder = OkHttpClientInstrumenterBuilderFactory.create(openTelemetry);
     this.openTelemetry = openTelemetry;
   }
 
@@ -54,7 +62,7 @@ public final class OkHttpTelemetryBuilder {
    */
   public OkHttpTelemetryBuilder addAttributesExtractor(
       AttributesExtractor<Interceptor.Chain, Response> attributesExtractor) {
-    builder.addAttributesExtractor(attributesExtractor);
+    additionalExtractors.add(attributesExtractor);
     return this;
   }
 
@@ -64,7 +72,7 @@ public final class OkHttpTelemetryBuilder {
    * @param requestHeaders HTTP header names to capture.
    */
   public OkHttpTelemetryBuilder setCapturedRequestHeaders(Collection<String> requestHeaders) {
-    builder.setCapturedRequestHeaders(requestHeaders);
+    capturedRequestHeaders = new ArrayList<>(requestHeaders);
     return this;
   }
 
@@ -74,7 +82,7 @@ public final class OkHttpTelemetryBuilder {
    * @param responseHeaders HTTP header names to capture.
    */
   public OkHttpTelemetryBuilder setCapturedResponseHeaders(Collection<String> responseHeaders) {
-    builder.setCapturedResponseHeaders(responseHeaders);
+    capturedResponseHeaders = new ArrayList<>(responseHeaders);
     return this;
   }
 
@@ -91,7 +99,7 @@ public final class OkHttpTelemetryBuilder {
    * @see HttpClientAttributesExtractorBuilder#setKnownMethods(Collection)
    */
   public OkHttpTelemetryBuilder setKnownMethods(Collection<String> knownMethods) {
-    builder.setKnownMethods(knownMethods);
+    this.knownMethods = new ArrayList<>(knownMethods);
     return this;
   }
 
@@ -108,13 +116,29 @@ public final class OkHttpTelemetryBuilder {
   public OkHttpTelemetryBuilder setSpanNameExtractor(
       Function<SpanNameExtractor<Interceptor.Chain>, SpanNameExtractor<Interceptor.Chain>>
           spanNameExtractorTransformer) {
-    builder.setSpanNameExtractorCustomizer(
-        spanNameExtractor -> spanNameExtractorTransformer.apply(spanNameExtractor));
+    this.spanNameExtractorTransformer = spanNameExtractorTransformer;
     return this;
   }
 
   /** Returns a new instance with the configured settings. */
   public OkHttpTelemetry build() {
+    DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder =
+        OkHttpClientInstrumenterBuilderFactory.create(openTelemetry);
+    for (AttributesExtractor<Interceptor.Chain, Response> extractor : additionalExtractors) {
+      builder.addAttributesExtractor(extractor);
+    }
+    if (capturedRequestHeaders != null) {
+      builder.setCapturedRequestHeaders(capturedRequestHeaders);
+    }
+    if (capturedResponseHeaders != null) {
+      builder.setCapturedResponseHeaders(capturedResponseHeaders);
+    }
+    if (knownMethods != null) {
+      builder.setKnownMethods(knownMethods);
+    }
+    builder.setSpanNameExtractorCustomizer(
+        spanNameExtractor -> spanNameExtractorTransformer.apply(spanNameExtractor));
+    builder.setEmitExperimentalHttpClientTelemetry(emitExperimentalHttpClientTelemetry);
     builder.addAttributesExtractor(
         new PeerServiceAttributesExtractor(
             com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter.INSTANCE,

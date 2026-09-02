@@ -16,6 +16,7 @@
 
 package com.splunk.rum.instrumentation.okhttp3
 
+import com.splunk.rum.instrumentation.okhttp3.internal.PeerServiceAttributesExtractor
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.instrumentation.api.internal.HttpConstants
 import org.junit.Assert.assertEquals
@@ -52,5 +53,25 @@ class OkHttpTelemetryBuilderTest {
             .build()
 
         assertNotNull(telemetry)
+    }
+
+    @Test
+    fun build_doesNotAccumulatePeerServiceExtractors() {
+        val builder = OkHttpTelemetry.builder(OpenTelemetry.noop())
+            .setPeerServiceMapping(mapOf("api.example.test:8443" to "checkout-service"))
+        builder.build()
+
+        val rebuiltTelemetry = builder
+            .setPeerServiceMapping(mapOf("api.example.test:8443" to "payments-service"))
+            .build()
+
+        val instrumenterField = OkHttpTelemetry::class.java.getDeclaredField("instrumenter")
+        instrumenterField.isAccessible = true
+        val instrumenter = instrumenterField.get(rebuiltTelemetry)
+        val extractorsField = instrumenter.javaClass.getDeclaredField("attributesExtractors")
+        extractorsField.isAccessible = true
+        val extractors = extractorsField.get(instrumenter) as Array<*>
+
+        assertEquals(1, extractors.count { it is PeerServiceAttributesExtractor })
     }
 }
