@@ -30,7 +30,6 @@ import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import java.io.File
-import java.util.ServiceLoader
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -95,7 +94,7 @@ class SplunkRumAgentCoreTest {
             null -> System.clearProperty(contextStorageProviderProperty)
             else -> System.setProperty(contextStorageProviderProperty, previous)
         }
-        ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+        ServiceLoaderUtil.setLoadFunction { serviceType -> java.util.ServiceLoader.load(serviceType) }
     }
 
     @Test
@@ -194,10 +193,18 @@ class SplunkRumAgentCoreTest {
     }
 
     @Test
-    fun `disableOpenTelemetryInstrumentationSpis() installs an empty service loader`() {
-        ServiceLoaderUtil.setLoadFunction { listOf("provider") }
+    fun `install restores the default service loader after module installation`() {
+        ServiceLoaderUtil.setLoadFunction { listOf("host-provider") }
 
-        SplunkRumAgentCore.disableOpenTelemetryInstrumentationSpis()
+        SplunkRumAgentCore.install(
+            application,
+            mockAgentConfig,
+            mockUserManager,
+            mockSessionManager,
+            emptyList(),
+            MutableAttributes(),
+            mockOfflineOtelDataProcessor
+        )
 
         assertFalse(ServiceLoaderUtil.load(String::class.java).iterator().hasNext())
     }

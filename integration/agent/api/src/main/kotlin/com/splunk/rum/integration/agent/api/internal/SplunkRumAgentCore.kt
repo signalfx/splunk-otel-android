@@ -48,6 +48,7 @@ import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
+import java.util.ServiceLoader
 import java.util.UUID
 
 internal object SplunkRumAgentCore {
@@ -118,7 +119,6 @@ internal object SplunkRumAgentCore {
                 .addLogRecordProcessor(SimpleLogRecordProcessor.create(LoggerLogRecordExporter()))
         }
 
-        disableOpenTelemetryInstrumentationSpis()
         val openTelemetry = initializer.build()
 
         isRunning = true
@@ -134,7 +134,15 @@ internal object SplunkRumAgentCore {
             }
         }
 
-        agentIntegration.install(application, openTelemetry, moduleConfigurations, globalAttributes)
+        // OpenTelemetry's instrumentation SPI is not used by Splunk's instrumenters. Keep the
+        // lookup disabled only while Splunk constructs its instrumenters, then restore the
+        // default loader so other instrumentation in the host app is unaffected.
+        ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
+        try {
+            agentIntegration.install(application, openTelemetry, moduleConfigurations, globalAttributes)
+        } finally {
+            ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+        }
 
         installTimestamp = System.currentTimeMillis()
         if (agentConfiguration.endpoint != null) {
@@ -159,15 +167,6 @@ internal object SplunkRumAgentCore {
                     "skipping default override (StrictMode SPI walk may still occur)"
             )
         }
-    }
-
-    /**
-     * Disables the process-wide OpenTelemetry instrumentation extension lookup before any
-     * instrumenters are built. OpenTelemetry's default ServiceLoader lookup scans classpath
-     * resources and can trigger Android StrictMode disk-read violations on the main thread.
-     */
-    internal fun disableOpenTelemetryInstrumentationSpis() {
-        ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
     }
 
     private const val CONTEXT_STORAGE_PROVIDER_PROPERTY = "io.opentelemetry.context.contextStorageProvider"
