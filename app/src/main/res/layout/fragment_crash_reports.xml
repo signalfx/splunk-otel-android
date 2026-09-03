@@ -98,16 +98,5 @@
             android:text="@string/crash_reports_null"
             app:layout_constraintTop_toBottomOf="@id/crash_reports_with_chained_exceptions" />
 
-        <TextView
-            android:id="@+id/anr_event"
-            style="@style/Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="20dp"
-            android:text="@string/trigger_anr"
-            app:layout_constraintTop_toBottomOf="@id/crash_reports_null" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
