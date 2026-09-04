@@ -21,18 +21,23 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import com.splunk.rum.agent.common.utils.extensions.isStartedInForeground
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.instrumentation.anr.internal.extractor.AnrAttributesExtractor
 import io.opentelemetry.api.OpenTelemetry
+import java.time.Duration
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 
 /**
  * Entry point for installing ANR (application not responding) detection.
  *
- * Register any additional [AnrAttributesExtractor]s via [addAttributesExtractor] before calling
- * [install]. Detection is foreground-only and backed by a daemon watchdog thread that is cancelled
- * whenever the app is backgrounded.
+ * Register any additional [AnrAttributesExtractor]s via [addAttributesExtractor] and optionally
+ * configure the detection threshold via [setThreshold] before calling [install]. The threshold
+ * specifies how long the main thread must be unresponsive before an ANR is reported, measured as
+ * monotonic elapsed time.
+ * Detection is foreground-only and backed by a daemon watchdog thread that is cancelled whenever the
+ * app is backgrounded.
  *
  * This class is internal and is hence not for public use. Its APIs are unstable and can change at
  * any time.
@@ -41,9 +46,31 @@ class AnrReporterInstrumentation {
 
     private val additionalExtractors = mutableListOf<AnrAttributesExtractor>()
 
+    @Suppress("NewApi") // Duration requires API 26 or core library desugaring
+    private var thresholdNs: Long = AnrWatcher.DEFAULT_THRESHOLD_NS
+
     /** Adds an [AnrAttributesExtractor] that enriches emitted ANR events. */
     fun addAttributesExtractor(extractor: AnrAttributesExtractor): AnrReporterInstrumentation {
         additionalExtractors.add(extractor)
+        return this
+    }
+
+    /**
+     * Sets the ANR detection threshold. An ANR is reported after the main thread is unresponsive
+     * for [threshold] of monotonic elapsed time.
+     */
+    @Suppress("NewApi") // Duration requires API 26 or core library desugaring
+    fun setThreshold(threshold: Duration): AnrReporterInstrumentation {
+        if (threshold.isZero || threshold.isNegative) {
+            Logger.w(TAG, "Invalid threshold ($threshold), using default threshold")
+            return this
+        }
+        thresholdNs = try {
+            threshold.toNanos()
+        } catch (_: ArithmeticException) {
+            Logger.w(TAG, "Threshold ($threshold) overflows nanosecond range, using default threshold")
+            AnrWatcher.DEFAULT_THRESHOLD_NS
+        }
         return this
     }
 
@@ -52,7 +79,12 @@ class AnrReporterInstrumentation {
         val reporter = AnrReporter(openTelemetry, additionalExtractors.toList())
 
         val mainLooper = Looper.getMainLooper()
-        val watcher = AnrWatcher(Handler(mainLooper), mainLooper.thread, reporter::report)
+        val watcher = AnrWatcher(
+            Handler(mainLooper),
+            mainLooper.thread,
+            reporter::report,
+            thresholdNs = thresholdNs
+        )
 
         val watchdogScheduler = Executors.newScheduledThreadPool(1, daemonThreadFactory())
 
@@ -73,6 +105,7 @@ class AnrReporterInstrumentation {
     }
 
     private companion object {
+        private const val TAG = "AnrReporterInstrumentation"
         private const val WATCHDOG_THREAD_NAME = "splunk-anr-watcher"
     }
 }

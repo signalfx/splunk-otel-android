@@ -29,14 +29,14 @@ import org.mockito.Mockito.`when`
 
 class AnrDetectorTogglerTest {
 
-    private lateinit var anrWatcher: Runnable
+    private lateinit var anrWatcher: AnrWatcher
     private lateinit var scheduler: ScheduledExecutorService
     private lateinit var future: ScheduledFuture<*>
     private lateinit var toggler: AnrDetectorToggler
 
     @Before
     fun setUp() {
-        anrWatcher = mock(Runnable::class.java)
+        anrWatcher = mock(AnrWatcher::class.java)
         scheduler = mock(ScheduledExecutorService::class.java)
         future = mock(ScheduledFuture::class.java)
         `when`(scheduler.scheduleWithFixedDelay(anrWatcher, 1L, 1L, TimeUnit.SECONDS)).thenReturn(future)
@@ -70,5 +70,23 @@ class AnrDetectorTogglerTest {
         toggler.onAppForegrounded()
 
         verify(scheduler, times(2)).scheduleWithFixedDelay(anrWatcher, 1L, 1L, TimeUnit.SECONDS)
+    }
+
+    @Test
+    fun `resets watcher state when backgrounded so a stall cannot leak into the next foreground`() {
+        toggler.onAppForegrounded()
+
+        toggler.onAppBackgrounded()
+
+        verify(anrWatcher, times(1)).reset()
+    }
+
+    @Test
+    fun `resets watcher state when the app closes`() {
+        toggler.onAppForegrounded()
+
+        toggler.onAppClosed()
+
+        verify(anrWatcher, times(1)).reset()
     }
 }

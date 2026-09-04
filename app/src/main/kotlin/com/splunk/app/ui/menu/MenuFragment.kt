@@ -27,6 +27,7 @@ import com.splunk.app.databinding.FragmentMenuBinding
 import com.splunk.app.extension.showToast
 import com.splunk.app.restart.TerminationWatcherService
 import com.splunk.app.ui.BaseFragment
+import com.splunk.app.ui.anr.AnrFragment
 import com.splunk.app.ui.compose.ComposeNavigationActivity
 import com.splunk.app.ui.crashreports.CrashReportsFragment
 import com.splunk.app.ui.customtracking.CustomTrackingFragment
@@ -56,6 +57,9 @@ class MenuFragment : BaseFragment<FragmentMenuBinding>() {
 
             crashReports.setOnClickListener {
                 navigateTo(CrashReportsFragment(), FragmentAnimation.FADE)
+            }
+            anrDemo.setOnClickListener {
+                navigateTo(AnrFragment(), FragmentAnimation.FADE)
             }
             okhttpSampleCalls.setOnClickListener {
                 navigateTo(OkHttpFragment(), FragmentAnimation.FADE)

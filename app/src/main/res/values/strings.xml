@@ -20,7 +20,22 @@
     <string name="crash_with_out_of_memory_error">Crash with Out of Memory Error</string>
     <string name="crash_with_chained_exceptions">Crash with Chained Exceptions</string>
     <string name="crash_reports_null">NullPointerException</string>
-    <string name="trigger_anr">Trigger ANR</string>
+    <!-- ANR -->
+    <string name="anr_title">ANR Detection</string>
+    <string name="anr_description">Block the main thread for various durations to test ANR detection. Configure the polling interval in App.kt.</string>
+    <string name="anr_block_3s">Block 3s</string>
+    <string name="anr_block_4s">Block 4s</string>
+    <string name="anr_block_5s">Block 5s</string>
+    <string name="anr_block_6s">Block 6s</string>
+    <string name="anr_block_7s">Block 7s</string>
+    <string name="anr_block_8s">Block 8s</string>
+    <string name="anr_block_10s">Block 10s</string>
+    <string name="anr_block_11s">Block 11s</string>
+    <string name="anr_block_12s">Block 12s</string>
+    <string name="anr_block_15s">Block 15s</string>
+    <string name="anr_block_16s">Block 16s</string>
+    <string name="anr_block_18s">Block 18s</string>
+    <string name="anr_block_20s">Block 20s</string>
 
     <!-- Custom tracking -->
     <string name="custom_tracking_title">Custom Tracking</string>
