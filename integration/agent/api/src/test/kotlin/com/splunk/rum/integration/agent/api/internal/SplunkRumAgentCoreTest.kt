@@ -28,9 +28,11 @@ import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
+import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import java.io.File
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -92,6 +94,7 @@ class SplunkRumAgentCoreTest {
             null -> System.clearProperty(contextStorageProviderProperty)
             else -> System.setProperty(contextStorageProviderProperty, previous)
         }
+        ServiceLoaderUtil.setLoadFunction { serviceType -> java.util.ServiceLoader.load(serviceType) }
     }
 
     @Test
@@ -187,6 +190,23 @@ class SplunkRumAgentCoreTest {
         SplunkRumAgentCore.configureContextStorageProvider()
 
         assertEquals(custom, System.getProperty(contextStorageProviderProperty))
+    }
+
+    @Test
+    fun `install restores the default service loader after module installation`() {
+        ServiceLoaderUtil.setLoadFunction { listOf("host-provider") }
+
+        SplunkRumAgentCore.install(
+            application,
+            mockAgentConfig,
+            mockUserManager,
+            mockSessionManager,
+            emptyList(),
+            MutableAttributes(),
+            mockOfflineOtelDataProcessor
+        )
+
+        assertFalse(ServiceLoaderUtil.load(String::class.java).iterator().hasNext())
     }
 
     private fun installSplunkRumAgent() {

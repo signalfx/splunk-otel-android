@@ -45,8 +45,10 @@ import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
+import java.util.ServiceLoader
 import java.util.UUID
 
 internal object SplunkRumAgentCore {
@@ -132,7 +134,15 @@ internal object SplunkRumAgentCore {
             }
         }
 
-        agentIntegration.install(application, openTelemetry, moduleConfigurations, globalAttributes)
+        // OpenTelemetry's instrumentation SPI is not used by Splunk's instrumenters. Keep the
+        // lookup disabled only while Splunk constructs its instrumenters, then restore the
+        // default loader so other instrumentation in the host app is unaffected.
+        ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
+        try {
+            agentIntegration.install(application, openTelemetry, moduleConfigurations, globalAttributes)
+        } finally {
+            ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+        }
 
         installTimestamp = System.currentTimeMillis()
         if (agentConfiguration.endpoint != null) {

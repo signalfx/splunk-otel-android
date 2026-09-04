@@ -17,10 +17,10 @@
 
 package com.splunk.rum.instrumentation.httpurlconnection.auto.internal
 
+import com.splunk.rum.instrumentation.httpurlconnection.auto.BuildConfig
 import com.splunk.rum.instrumentation.httpurlconnection.auto.HttpUrlInstrumentation
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpClientExperimentalMetrics
-import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpClientPeerServiceAttributesExtractor
 import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpExperimentalAttributesExtractor
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractor
@@ -51,9 +51,9 @@ internal object HttpUrlConnectionSingletons {
                 .build()
 
         val httpClientPeerServiceAttributesExtractor =
-            HttpClientPeerServiceAttributesExtractor.create(
+            PeerServiceAttributesExtractor(
                 httpAttributesGetter,
-                instrumentation.newPeerServiceResolver()
+                instrumentation.peerServiceMapping()
             )
 
         openTelemetryInstance = openTelemetry
@@ -64,6 +64,7 @@ internal object HttpUrlConnectionSingletons {
                 INSTRUMENTATION_NAME,
                 httpSpanNameExtractor
             )
+                .setInstrumentationVersion(BuildConfig.VERSION_NAME)
                 .setSpanStatusExtractor(HttpSpanStatusExtractor.create(httpAttributesGetter))
                 .addAttributesExtractor(httpClientAttributesExtractor)
                 .addAttributesExtractor(httpClientPeerServiceAttributesExtractor)

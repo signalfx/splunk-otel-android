@@ -153,7 +153,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
             val log = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
                 .logRecordBuilder()
                 .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.INTERACTIONS_EVENT_NAME)
+                .setEventName(RumConstants.INTERACTIONS_EVENT_NAME)
                 .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_INTERACTIONS)
                 .setAttribute(RumConstants.INTERACTIONS_ACTION_NAME_KEY, actionName)
                 .setAttribute(RumConstants.INTERACTIONS_TARGET_TYPE_KEY, targetType.orEmpty())
@@ -188,7 +188,7 @@ internal object InteractionsModuleIntegration : ModuleIntegration<InteractionsMo
                 logger.get(GlobalRumConstants.RUM_TRACER_NAME)
                     .logRecordBuilder()
                     .setTimestamp(interaction.timestamp, TimeUnit.MILLISECONDS)
-                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.FRUSTRATIONS_EVENT_NAME)
+                    .setEventName(RumConstants.FRUSTRATIONS_EVENT_NAME)
                     .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_FRUSTRATIONS)
                     .setAttribute(RumConstants.FRUSTRATIONS_TYPE, RumConstants.FRUSTRATION_TYPE_RAGE)
                     .setAttribute(

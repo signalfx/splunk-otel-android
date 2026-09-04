@@ -117,7 +117,7 @@ class NavigationEventEmitterTest {
         val log = exportedLogs.single()
         assertEquals(
             RumConstant.NAVIGATION_LOG_EVENT_NAME,
-            log.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY)
+            log.eventName
         )
         assertEquals(
             RumConstant.COMPONENT_NAVIGATION,

@@ -97,7 +97,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         logger.get(GlobalRumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)
-            .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.APP_LIFECYCLE_LOG_NAME)
+            .setEventName(RumConstants.APP_LIFECYCLE_LOG_NAME)
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_LIFECYCLE)
             .setAttribute(GlobalRumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
             .emit()
