@@ -25,12 +25,14 @@ import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.toSplunkString
+import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.AgentIntegration.Companion.modules
 import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.startup.model.StartupData
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.trace.Span
+import io.opentelemetry.context.Context as OtelContext
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import java.util.concurrent.TimeUnit
 
@@ -146,7 +148,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             .startSpan()
 
         if (shouldReportInitialization) {
-            reportInitializeSpan(span, provider)
+            reportInstallSpan(span, provider)
         }
 
         // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
@@ -160,7 +162,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         Logger.d(TAG) { "reportEventInternal() - span sent successfully for: $name" }
     }
 
-    private fun reportInitializeSpan(span: Span, provider: SdkTracerProvider, asSibling: Boolean = false) {
+    private fun reportInstallSpan(appStartSpan: Span, provider: SdkTracerProvider) {
         val modules = modules.values
 
         val firstInitialization =
@@ -170,21 +172,38 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             modules.maxByOrNull { it.initialization?.endElapsed ?: Long.MIN_VALUE }?.initialization
                 ?: throw IllegalStateException("Module initialization did not complete")
 
-        val initEndTimestamp =
-            firstInitialization.startTimestamp + (lastInitialization.endElapsed!! - firstInitialization.startElapsed)
+        val storedStart = AgentIntegration.installStartTimestamp
+        val storedStartElapsed = AgentIntegration.installStartElapsed
+        val storedEnd = AgentIntegration.installEndElapsed
 
-        Logger.d(TAG) {
-            "reportAppStart() initStartTimestamp: ${firstInitialization.startTimestamp}, " +
-                "initEndTimestamp: $initEndTimestamp, duration: ${initEndTimestamp - firstInitialization.startTimestamp}ms"
+        val installStartTimestamp: Long
+        val installStartElapsed: Long
+        val installEndElapsed: Long
+
+        if (storedStart != null && storedStartElapsed != null && storedEnd != null) {
+            installStartTimestamp = storedStart
+            installStartElapsed = storedStartElapsed
+            installEndElapsed = storedEnd
+        } else {
+            installStartTimestamp = firstInitialization.startTimestamp
+            installStartElapsed = firstInitialization.startElapsed
+            installEndElapsed = lastInitialization.endElapsed!!
         }
 
-        val initSpan = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
-            .spanBuilder(RumConstants.APP_START_INITIALIZE_SPAN_NAME)
-            .setParent(io.opentelemetry.context.Context.current().with(span))
-            .setStartTimestamp(firstInitialization.startTimestamp.toInstant())
+        val installEndTimestamp = installStartTimestamp + (installEndElapsed - installStartElapsed)
+
+        Logger.d(TAG) {
+            "reportInstallSpan() startTimestamp: $installStartTimestamp, " +
+                "endTimestamp: $installEndTimestamp, duration: ${installEndTimestamp - installStartTimestamp}ms"
+        }
+
+        val installSpan = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
+            .spanBuilder(RumConstants.APP_START_INSTALL_SPAN_NAME)
+            .setParent(OtelContext.current().with(appStartSpan))
+            .setStartTimestamp(installStartTimestamp, TimeUnit.MILLISECONDS)
             .startSpan()
 
-        initSpan.setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_START)
+        installSpan.setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_START)
             .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, GlobalRumConstants.DEFAULT_SCREEN_NAME)
 
         val resources = modules.joinToString(",", "[", "]") {
@@ -192,7 +211,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
                 ?: "${it.name}.enabled:true"
         }
 
-        initSpan.setAttribute(RumConstants.APP_START_CONFIG_SETTINGS_KEY, resources)
+        installSpan.setAttribute(RumConstants.APP_START_CONFIG_SETTINGS_KEY, resources)
 
         for (module in modules) {
             if (module.initialization == null) {
@@ -203,7 +222,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
                 throw IllegalStateException("Module '${module.name}' is not initialized")
             }
 
-            initSpan.addEvent(
+            installSpan.addEvent(
                 "${module.name}_initialized",
                 module.initialization!!.run {
                     endElapsed!! - startElapsed
@@ -212,6 +231,6 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             )
         }
 
-        initSpan.end(initEndTimestamp.toInstant())
+        installSpan.end(installEndTimestamp, TimeUnit.MILLISECONDS)
     }
 }
