@@ -21,10 +21,15 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.splunk.rum.common.storage.extensions.noBackupFilesDirCompat
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,14 +44,82 @@ class AgentStorageTest {
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
-        storage = AgentStorage(context)
         testStorageDir = File(context.noBackupFilesDirCompat, "agent")
+        resetProcessStorage()
+        storage = AgentStorage.attach(context) as AgentStorage
     }
 
     @After
     fun tearDown() {
+        resetProcessStorage()
         if (testStorageDir.exists()) {
             testStorageDir.deleteRecursively()
+        }
+    }
+
+    @Test
+    fun `attach returns the same published instance to concurrent callers`() {
+        resetProcessStorage()
+        val callerCount = 8
+        val executor = Executors.newFixedThreadPool(callerCount)
+        val ready = CountDownLatch(callerCount)
+        val start = CountDownLatch(1)
+
+        try {
+            val results = (1..callerCount).map {
+                executor.submit<IAgentStorage> {
+                    ready.countDown()
+                    start.await()
+                    AgentStorage.attach(context)
+                }
+            }
+
+            assertTrue(ready.await(5, TimeUnit.SECONDS))
+            start.countDown()
+            val instances = results.map { it.get(5, TimeUnit.SECONDS) }
+
+            instances.forEach { assertSame(instances.first(), it) }
+        } finally {
+            executor.shutdownNow()
+        }
+    }
+
+    @Test
+    fun `attach candidates use the process preferences owner`() {
+        resetProcessStorage()
+        AgentPreferencesStore.preload(context)
+
+        val attachedStorage = AgentStorage.attach(context)
+        val preferencesField = AgentStorage::class.java.getDeclaredField("preferences")
+        preferencesField.isAccessible = true
+
+        assertSame(AgentPreferencesStore.obtain(context), preferencesField.get(attachedStorage))
+    }
+
+    @Test
+    fun `preference store returns one owner to concurrent callers`() {
+        resetProcessStorage()
+        val callerCount = 8
+        val executor = Executors.newFixedThreadPool(callerCount)
+        val ready = CountDownLatch(callerCount)
+        val start = CountDownLatch(1)
+
+        try {
+            val results = (1..callerCount).map {
+                executor.submit {
+                    ready.countDown()
+                    start.await()
+                    AgentPreferencesStore.obtain(context)
+                }
+            }
+
+            assertTrue(ready.await(5, TimeUnit.SECONDS))
+            start.countDown()
+            val preferences = results.map { it.get(5, TimeUnit.SECONDS) }
+
+            preferences.forEach { assertSame(preferences.first(), it) }
+        } finally {
+            executor.shutdownNow()
         }
     }
 
@@ -85,7 +158,8 @@ class AgentStorageTest {
         storage.writeAppInstallationId(testId)
         storage.commit()
 
-        val newStorage = AgentStorage(context)
+        resetProcessStorage()
+        val newStorage = AgentStorage.attach(context)
         val result = newStorage.readAppInstallationId()
 
         assertEquals(testId, result)
@@ -141,7 +215,8 @@ class AgentStorageTest {
         storage.writeEndpointConfig(config)
         storage.commit()
 
-        val newStorage = AgentStorage(context)
+        resetProcessStorage()
+        val newStorage = AgentStorage.attach(context)
         assertEquals(config, newStorage.readEndpointConfig())
     }
 
@@ -193,5 +268,10 @@ class AgentStorageTest {
         storage.writeEndpointConfig(config)
 
         assertEquals(config, storage.readEndpointConfig())
+    }
+
+    private fun resetProcessStorage() {
+        AgentStorage.resetForTest()
+        AgentPreferencesStore.resetForTest()
     }
 }

@@ -20,7 +20,7 @@ import android.app.Application
 import com.splunk.rum.agent.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.rum.agent.common.otel.span.AndroidSpanExporter
 import com.splunk.rum.agent.common.otel.span.SpanInterceptorExporter
-import com.splunk.rum.agent.common.storage.AgentStorage
+import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.job.JobIdStorage
 import com.splunk.rum.common.job.JobManager
 import io.opentelemetry.api.baggage.propagation.W3CBaggagePropagator
@@ -39,6 +39,7 @@ import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
 
 class OpenTelemetryInitializer(
     application: Application,
+    agentStorage: IAgentStorage,
     deferredUntilForeground: Boolean,
     spanInterceptor: ((SpanData) -> SpanData?)? = null
 ) {
@@ -48,7 +49,6 @@ class OpenTelemetryInitializer(
     private val logRecordProcessors: MutableList<LogRecordProcessor> = mutableListOf()
 
     init {
-        val agentStorage = AgentStorage.attach(application)
         val jobManager = JobManager.attach(application)
         val jobIdStorage = JobIdStorage.init(application, isEncrypted = false)
 
