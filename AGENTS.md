@@ -63,6 +63,7 @@ Review findings in this order. Lead with customer impact, not style.
 - Block or request measurement for avoidable overhead in customer apps at scale.
 - Watch hot paths: SDK init, lifecycle callbacks, UI instrumentation, ANR/crash handling, network interceptors, span/log/event creation, processors, exporters, and background work.
 - Flag any `throw`, `error`, `require`, forced unwrap, unchecked cast, or non-null assertion in SDK runtime paths when the state can predictably happen in production.
+- Treat SDK ContentProvider startup and static/class initialization before explicit SDK initialization as host-app critical paths. Guard platform calls that may fail in these paths; expected failures must not escape and crash the host app.
 - Flag repeated allocations, reflection, regex parsing, per-signal encoder/formatter creation, disk/network I/O, locks, O(n) scans over growing data, retained `Context`/`Activity`, and large retained objects.
 - Flag unbounded queues, retries, timers, listeners, observers, or background work that grows with sessions, spans, events, logs, screens, requests, or lifecycle churn.
 - Consider aggregate parent-app impact, not just local method cost. Ask for benchmarks, profiling, limits, or a safer design when cost is unclear.
@@ -70,6 +71,7 @@ Review findings in this order. Lead with customer impact, not style.
 ### P2 - Public API and Compatibility
 
 - Public API changes must be backward compatible unless the PR clearly states an intentional breaking change.
+- Review upgrades and process restarts where new SDK code encounters state or OS-scheduled work from an older SDK version, including references to renamed or removed classes or components. Ensure these are handled compatibly without crashes, duplication, corruption, or disabled SDK behavior; migrate or safely cancel obsolete work.
 - Treat transitive `api(...)` dependencies as public API, including public symbols in `common/otel/` and `integration/agent/common/` exposed by `integration/agent/api`.
 - Treat published Gradle plugin IDs, extensions such as `splunkRum`, DSL properties, task names, task behavior, and defaults as customer-facing API.
 - Surface removed/renamed symbols, changed signatures/defaults/visibility, new thrown exceptions, behavior changes, constants, schemas, exported data classes, and telemetry semantics.
