@@ -1,0 +1,14 @@
+pluginManagement {
+    apply from: '../gradle/repositories.gradle'
+
+    repositories commonRepositories
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    apply from: '../gradle/repositories.gradle'
+
+    repositories commonRepositories
+}

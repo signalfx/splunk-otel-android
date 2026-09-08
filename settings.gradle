@@ -1,11 +1,22 @@
 // Plugin management configuration
 pluginManagement {
+    apply from: 'gradle/repositories.gradle'
+
+    repositories commonRepositories
     repositories {
         gradlePluginPortal()
         //uncomment to look for plugins in local maven (.m2) folder
         mavenLocal()
-        google() // needed for Android Gradle Plugin
     }
+}
+
+dependencyResolutionManagement {
+    apply from: 'gradle/repositories.gradle'
+
+    repositories {
+        mavenLocal()
+    }
+    repositories commonRepositories
 }
 
 // Common modules
