@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+##### Fixes:
+* Fixed a host app crash when the `Choreographer` instance could not be obtained
+* Fixed `NoClassDefFoundError` when resolving optional classes by name
+
 ### Version 2.3.4 - 2026-08-27
 
 ##### Enhancements:
