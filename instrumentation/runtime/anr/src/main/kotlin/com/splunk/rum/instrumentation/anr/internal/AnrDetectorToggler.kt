@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
  * the app is foregrounded and cancelled when it is backgrounded, so the watchdog never runs in the
  * background where the OS does not raise ANRs.
  */
-internal class AnrDetectorToggler(private val anrWatcher: Runnable, private val scheduler: ScheduledExecutorService) :
+internal class AnrDetectorToggler(private val anrWatcher: AnrWatcher, private val scheduler: ScheduledExecutorService) :
     AppStateObserver.Listener {
 
     private var future: ScheduledFuture<*>? = null
@@ -48,6 +48,8 @@ internal class AnrDetectorToggler(private val anrWatcher: Runnable, private val 
     override fun onAppBackgrounded() {
         future?.cancel(true)
         future = null
+        // Cancelling leaves an in-flight heartbeat unresolved, which would leak into the next foreground.
+        anrWatcher.reset()
     }
 
     override fun onAppStarted() = Unit

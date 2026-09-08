@@ -25,9 +25,9 @@ import com.splunk.app.databinding.FragmentCrashReportsBinding
 import com.splunk.app.ui.BaseFragment
 
 /**
- * A fragment for simulating various types of crashes and ANR (Application Not Responding) events.
+ * A fragment for simulating various types of crashes.
  *
- * Each button in the UI triggers a specific crash or ANR scenario.
+ * Each button in the UI triggers a specific crash scenario.
  */
 class CrashReportsFragment : BaseFragment<FragmentCrashReportsBinding>() {
 
@@ -48,7 +48,6 @@ class CrashReportsFragment : BaseFragment<FragmentCrashReportsBinding>() {
             crashReportsOutOfMemoryError.setOnClickListener { triggerOutOfMemoryCrash() }
             crashReportsWithChainedExceptions.setOnClickListener { triggerChainedExceptionCrash() }
             crashReportsNull.setOnClickListener { triggerNullPointerCrash() }
-            anrEvent.setOnClickListener { simulateAnrEvent() }
         }
     }
 
@@ -112,24 +111,4 @@ class CrashReportsFragment : BaseFragment<FragmentCrashReportsBinding>() {
      * Throws a [NullPointerException] with a custom message.
      */
     private fun triggerNullPointerCrash(): Unit = throw NullPointerException("I am null!")
-
-    /**
-     * Simulates an Application Not Responding (ANR) event by blocking the main thread
-     * for [ANR_TIMEOUT_DURATION] milliseconds using [Thread.sleep].
-     */
-    private fun simulateAnrEvent() {
-        try {
-            Thread.sleep(ANR_TIMEOUT_DURATION)
-        } catch (e: InterruptedException) {
-            throw RuntimeException(e)
-        }
-    }
-
-    companion object {
-        /**
-         * Duration in milliseconds to block the main thread for ANR simulation.
-         * The default value is 6000ms (6 seconds).
-         */
-        private const val ANR_TIMEOUT_DURATION = 6_000L
-    }
 }

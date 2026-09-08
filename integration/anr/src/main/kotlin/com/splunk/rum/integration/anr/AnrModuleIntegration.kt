@@ -41,11 +41,15 @@ internal object AnrModuleIntegration : ModuleIntegration<AnrModuleConfiguration>
 
         val isEnabled =
             moduleConfigurations.find<LegacyAnrModuleConfiguration>()?.isEnabled ?: moduleConfiguration.isEnabled
+        val threshold =
+            moduleConfigurations.find<LegacyAnrModuleConfiguration>()?.threshold
+                ?: moduleConfiguration.threshold
 
         if (isEnabled) {
             Logger.d(TAG, "Installing ANR reporter")
             val anrReporterInstrumentation = AnrReporterInstrumentation()
             anrReporterInstrumentation.addAttributesExtractor(RumAnrAttributesExtractor(application))
+            anrReporterInstrumentation.setThreshold(threshold)
             anrReporterInstrumentation.install(application, openTelemetry)
         } else {
             Logger.d(TAG, "ANR reporting is disabled")

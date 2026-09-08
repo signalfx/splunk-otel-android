@@ -17,17 +17,30 @@
 package com.splunk.rum.integration.anr
 
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import java.time.Duration
 
 /**
  * ANR module configuration.
  *
  * @property isEnabled Whether the module is enabled.
+ * @property threshold How long the main thread must be unresponsive before an ANR is reported.
+ *                     Default is 5 seconds.
  */
-data class AnrModuleConfiguration @JvmOverloads constructor(val isEnabled: Boolean = true) : ModuleConfiguration {
+@Suppress("NewApi") // Duration requires API 26 or core library desugaring
+data class AnrModuleConfiguration @JvmOverloads constructor(
+    val isEnabled: Boolean = true,
+    val threshold: Duration = DEFAULT_THRESHOLD
+) : ModuleConfiguration {
 
     override val name: String = "anr"
 
     override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to isEnabled.toString()
+        "enabled" to isEnabled.toString(),
+        "threshold" to threshold.toString()
     )
+
+    companion object {
+        /** Default ANR detection threshold. */
+        val DEFAULT_THRESHOLD: Duration = Duration.ofSeconds(5)
+    }
 }

@@ -29,6 +29,7 @@ import com.splunk.rum.integration.agent.api.spaninterceptor.toMutableSpanData
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import com.splunk.rum.integration.agent.api.user.UserTrackingMode
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
+import com.splunk.rum.integration.anr.AnrModuleConfiguration
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
 import com.splunk.rum.integration.lifecycle.LifecycleModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
@@ -127,6 +128,11 @@ class App : Application() {
         capturedResponseHeaders = listOf("Server", "Content-Type", "Content-Length")
     )
 
+    private val anrModuleConfiguration = AnrModuleConfiguration(
+        isEnabled = true,
+        threshold = Duration.ofSeconds(5)
+    )
+
     private val slowRenderingModuleConfiguration = SlowRenderingModuleConfiguration(
         isEnabled = true,
         interval = Duration.ofMillis(500)
@@ -158,6 +164,7 @@ class App : Application() {
         }
 
         val moduleConfigurations = arrayOf(
+            anrModuleConfiguration,
             httpURLModuleConfiguration,
             okHttp3AutoModuleConfiguration,
             okHttp3ManualModuleConfiguration,
