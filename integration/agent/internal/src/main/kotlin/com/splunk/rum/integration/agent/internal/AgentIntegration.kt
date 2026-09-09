@@ -23,7 +23,7 @@ import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.RUM_TRACER_NAME
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
-import com.splunk.rum.agent.common.storage.AgentStorage
+import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
@@ -35,20 +35,15 @@ import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import java.util.concurrent.TimeUnit
 
-class AgentIntegration private constructor(context: Context) {
-    val sessionManager: ISplunkSessionManager
+class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context: Context) {
     internal val listeners: MutableSet<Listener> = HashSet()
     var globalAttributes: Attributes = Attributes.empty()
         private set
 
-    init {
-        val storage = AgentStorage.attach(context)
-        sessionManager = SplunkSessionManager(storage)
-    }
-
     fun install(
         application: Application,
         openTelemetry: OpenTelemetrySdk,
+        sessionManager: ISplunkSessionManager,
         moduleConfigurations: List<ModuleConfiguration>,
         globalAttributes: Attributes
     ) {
@@ -56,6 +51,7 @@ class AgentIntegration private constructor(context: Context) {
 
         registerModuleInitializationStart(MODULE_NAME)
 
+        listeners.forEachFast { it.onSessionManagerReady(sessionManager) }
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME)
@@ -86,7 +82,11 @@ class AgentIntegration private constructor(context: Context) {
         listeners.forEachFast { it.onPostInstall() }
     }
 
+    fun createSessionManager(agentStorage: IAgentStorage): ISplunkSessionManager = SplunkSessionManager(agentStorage)
+
     internal interface Listener {
+        fun onSessionManagerReady(sessionManager: ISplunkSessionManager)
+
         fun onInstall(
             application: Application,
             openTelemetry: OpenTelemetry,

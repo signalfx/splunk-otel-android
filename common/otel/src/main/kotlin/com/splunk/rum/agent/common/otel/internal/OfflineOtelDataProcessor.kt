@@ -20,7 +20,6 @@ import android.content.Context
 import com.splunk.rum.agent.common.otel.logRecord.UploadOtelLogRecordData
 import com.splunk.rum.agent.common.otel.logRecord.UploadSessionReplayData
 import com.splunk.rum.agent.common.otel.span.UploadOtelSpanData
-import com.splunk.rum.agent.common.storage.AgentStorage
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.job.IJobManager
 import com.splunk.rum.common.job.JobIdStorage
@@ -93,9 +92,8 @@ class OfflineOtelDataProcessor internal constructor(
 
         private var instance: OfflineOtelDataProcessor? = null
 
-        fun attach(context: Context): OfflineOtelDataProcessor = synchronized(lock) {
+        fun attach(context: Context, agentStorage: IAgentStorage): OfflineOtelDataProcessor = synchronized(lock) {
             instance ?: run {
-                val agentStorage = AgentStorage.attach(context)
                 val jobManager = JobManager.attach(context)
                 val jobIdStorage = JobIdStorage.init(context, isEncrypted = false)
 

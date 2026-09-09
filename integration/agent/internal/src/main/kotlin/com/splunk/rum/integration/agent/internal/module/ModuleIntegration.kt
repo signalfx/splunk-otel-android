@@ -36,11 +36,11 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     protected lateinit var sessionManager: ISplunkSessionManager
         private set
 
+    protected open val observesSessionChanges: Boolean = false
+
     fun attach(context: Context) {
         val agentIntegration = AgentIntegration.obtainInstance(context)
         agentIntegration.listeners += installationListener
-        sessionManager = agentIntegration.sessionManager
-        agentIntegration.sessionManager.sessionListeners += sessionChangeListener
 
         onAttach(context)
     }
@@ -60,6 +60,13 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     }
 
     private val installationListener = object : AgentIntegration.Listener {
+        override fun onSessionManagerReady(sessionManager: ISplunkSessionManager) {
+            this@ModuleIntegration.sessionManager = sessionManager
+            if (observesSessionChanges) {
+                sessionManager.sessionListeners += sessionChangeListener
+            }
+        }
+
         override fun onInstall(
             application: Application,
             openTelemetry: OpenTelemetry,
