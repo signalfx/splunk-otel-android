@@ -19,11 +19,13 @@ package com.splunk.rum.instrumentation.okhttp3.auto
 
 import com.splunk.rum.instrumentation.okhttp3.auto.internal.OkHttpSingletons
 import com.splunk.rum.instrumentation.okhttp3.auto.internal.PeerServiceAttributesExtractor
+import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.ContextPropagators
+import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import io.opentelemetry.instrumentation.api.semconv.network.ServerAttributesGetter
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.common.CompletableResultCode
@@ -32,6 +34,7 @@ import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.io.IOException
+import java.util.ServiceLoader
 import java.util.concurrent.TimeUnit
 import okhttp3.Call
 import okhttp3.Connection
@@ -42,6 +45,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
@@ -87,6 +91,16 @@ class OkHttpInstrumentationTest {
     @After
     fun tearDown() {
         tracerProvider.shutdown().join(10, TimeUnit.SECONDS)
+        ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+    }
+
+    @Test
+    fun `configure restores the default service loader after instrumenter construction`() {
+        ServiceLoaderUtil.setLoadFunction { listOf("host-provider") }
+
+        OkHttpInstrumentation().install(OpenTelemetry.noop())
+
+        assertFalse(ServiceLoaderUtil.load(String::class.java).iterator().hasNext())
     }
 
     @Test
@@ -124,7 +138,7 @@ class OkHttpInstrumentationTest {
             listOf("response-456"),
             span.attributes.get(AttributeKey.stringArrayKey("http.response.header.x-response-id"))
         )
-        assertEquals("orders-service", span.attributes.get(AttributeKey.stringKey("peer.service")))
+        assertEquals("checkout-service", span.attributes.get(AttributeKey.stringKey("peer.service")))
         assertEquals("503", span.attributes.get(AttributeKey.stringKey("error.type")))
         assertEquals(StatusCode.ERROR, span.status.statusCode)
     }

@@ -23,6 +23,7 @@ import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesGetter
+import java.net.URI
 import java.net.URLConnection
 
 /** Extracts the configured `peer.service` mapping for HttpURLConnection requests. */
@@ -48,7 +49,7 @@ internal class PeerServiceAttributesExtractor(
         val serviceName = resolver.resolve(
             attributesGetter.getServerAddress(request),
             attributesGetter.getServerPort(request),
-            request.url.path
+            runCatching { URI(request.url.toString()).path }.getOrNull()
         ) ?: return
 
         attributes.put(PEER_SERVICE, serviceName)

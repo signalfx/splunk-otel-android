@@ -40,9 +40,11 @@ class PeerServiceMappingResolver(peerServiceMapping: Map<String, String>) {
             return null
         }
 
+        val requestPort = port?.takeIf { it >= 0 }
+
         return mappingsByHost[host]
             ?.asSequence()
-            ?.filter { it.matches(port, path) }
+            ?.filter { it.matches(requestPort, path) }
             ?.maxWithOrNull(MAPPING_SPECIFICITY)
             ?.serviceName
     }

@@ -23,11 +23,13 @@ import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpClientExperimentalMetrics
 import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpExperimentalAttributesExtractor
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter
+import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractor
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientMetrics
 import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanNameExtractor
 import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanStatusExtractor
 import java.net.URLConnection
+import java.util.ServiceLoader
 
 internal object HttpUrlConnectionSingletons {
     private const val INSTRUMENTATION_NAME = "com.splunk.rum.http-url-connection"
@@ -80,7 +82,14 @@ internal object HttpUrlConnectionSingletons {
                 .addOperationMetrics(HttpClientExperimentalMetrics.get())
         }
 
-        instrumenter = builder.buildClientInstrumenter(RequestPropertySetter)
+        // Avoid the instrumenter SPI lookup's one-time disk read, which trips Android StrictMode
+        // (see open-telemetry/opentelemetry-java-instrumentation#19954).
+        ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
+        try {
+            instrumenter = builder.buildClientInstrumenter(RequestPropertySetter)
+        } finally {
+            ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+        }
     }
 
     fun instrumenter(): Instrumenter<URLConnection, Int>? = instrumenter

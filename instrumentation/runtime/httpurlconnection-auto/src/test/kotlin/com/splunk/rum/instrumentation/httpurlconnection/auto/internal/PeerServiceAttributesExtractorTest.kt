@@ -72,6 +72,44 @@ class PeerServiceAttributesExtractorTest {
     }
 
     @Test
+    fun `matches a portless path mapping when the URL has no explicit port`() {
+        val extractor = PeerServiceAttributesExtractor(
+            HttpUrlHttpAttributesGetter,
+            mapOf("api.example.test/orders" to "orders-service")
+        )
+        val attributes = Attributes.builder()
+
+        extractor.onEnd(
+            attributes,
+            Context.root(),
+            StubHttpURLConnection(URL("https://api.example.test/orders/42")),
+            200,
+            null
+        )
+
+        assertEquals("orders-service", attributes.build().get(PEER_SERVICE))
+    }
+
+    @Test
+    fun `decodes URL paths before matching`() {
+        val extractor = PeerServiceAttributesExtractor(
+            HttpUrlHttpAttributesGetter,
+            mapOf("api.example.test:8443/orders%20archive" to "orders-service")
+        )
+        val attributes = Attributes.builder()
+
+        extractor.onEnd(
+            attributes,
+            Context.root(),
+            StubHttpURLConnection(URL("https://api.example.test:8443/orders%20archive/42")),
+            200,
+            null
+        )
+
+        assertEquals("orders-service", attributes.build().get(PEER_SERVICE))
+    }
+
+    @Test
     fun `ignores malformed and nonmatching mappings without throwing`() {
         val extractor = PeerServiceAttributesExtractor(
             HttpUrlHttpAttributesGetter,

@@ -21,6 +21,7 @@ import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.ContextPropagators
+import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.SdkTracerProvider
@@ -30,9 +31,11 @@ import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.ServiceLoader
 import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 
@@ -71,6 +74,19 @@ class HttpUrlInstrumentationTest {
     @After
     fun tearDown() {
         tracerProvider.shutdown().join(10, TimeUnit.SECONDS)
+        ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+    }
+
+    @Test
+    fun `configure restores the default service loader after instrumenter construction`() {
+        ServiceLoaderUtil.setLoadFunction { listOf("host-provider") }
+
+        HttpUrlConnectionSingletons.configure(
+            HttpUrlInstrumentation(),
+            checkNotNull(HttpUrlConnectionSingletons.openTelemetryInstance())
+        )
+
+        assertFalse(ServiceLoaderUtil.load(String::class.java).iterator().hasNext())
     }
 
     @Test

@@ -28,8 +28,10 @@ import io.opentelemetry.context.Scope
 import io.opentelemetry.instrumentation.api.incubator.builder.internal.DefaultHttpClientInstrumenterBuilder
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter
+import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientRequestResendCount
 import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanNameExtractor
+import java.util.ServiceLoader
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
@@ -74,7 +76,15 @@ object OkHttpSingletons {
             instrumenterBuilder = instrumenterBuilder.addAttributesExtractor(extractor)
         }
 
-        val instrumenter: Instrumenter<Interceptor.Chain, Response> = instrumenterBuilder.build()
+        // Avoid the instrumenter SPI lookup's one-time disk read, which trips Android StrictMode
+        // (see open-telemetry/opentelemetry-java-instrumentation#19954).
+        val instrumenter: Instrumenter<Interceptor.Chain, Response>
+        ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
+        try {
+            instrumenter = instrumenterBuilder.build()
+        } finally {
+            ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+        }
 
         connectionErrorInterceptor = ConnectionErrorSpanInterceptor(instrumenter)
         tracingInterceptor = TracingInterceptor(instrumenter, openTelemetry.propagators)

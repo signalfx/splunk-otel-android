@@ -23,12 +23,16 @@ import com.splunk.rum.instrumentation.okhttp3.internal.PeerServiceAttributesExtr
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.api.incubator.builder.internal.DefaultHttpClientInstrumenterBuilder;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
+import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
 import io.opentelemetry.instrumentation.api.instrumenter.SpanNameExtractor;
+import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil;
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractorBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.function.Function;
 import okhttp3.Interceptor;
 import okhttp3.Response;
@@ -47,8 +51,9 @@ public final class OkHttpTelemetryBuilder {
   private Collection<String> capturedRequestHeaders;
   private Collection<String> capturedResponseHeaders;
   private Collection<String> knownMethods;
+  // Null unless the caller opts in via setSpanNameExtractor().
   private Function<SpanNameExtractor<Interceptor.Chain>, SpanNameExtractor<Interceptor.Chain>>
-      spanNameExtractorTransformer = spanNameExtractor -> spanNameExtractor;
+      spanNameExtractorTransformer;
   private Map<String, String> peerServiceMapping = java.util.Collections.emptyMap();
   private boolean emitExperimentalHttpClientTelemetry;
 
@@ -136,13 +141,37 @@ public final class OkHttpTelemetryBuilder {
     if (knownMethods != null) {
       builder.setKnownMethods(knownMethods);
     }
-    builder.setSpanNameExtractorCustomizer(
-        spanNameExtractor -> spanNameExtractorTransformer.apply(spanNameExtractor));
+    if (spanNameExtractorTransformer != null) {
+      applySpanNameExtractorCustomizer(builder, spanNameExtractorTransformer);
+    }
     builder.setEmitExperimentalHttpClientTelemetry(emitExperimentalHttpClientTelemetry);
     builder.addAttributesExtractor(
         new PeerServiceAttributesExtractor(
             com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter.INSTANCE,
             peerServiceMapping));
-    return new OkHttpTelemetry(builder.build(), openTelemetry.getPropagators());
+    return new OkHttpTelemetry(buildInstrumenter(builder), openTelemetry.getPropagators());
+  }
+
+  // Avoid the instrumenter SPI lookup's one-time disk read, which trips Android StrictMode
+  // (see open-telemetry/opentelemetry-java-instrumentation#19954).
+  private static Instrumenter<Interceptor.Chain, Response> buildInstrumenter(
+      DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder) {
+    ServiceLoaderUtil.setLoadFunction(clazz -> Collections.emptyList());
+    try {
+      return builder.build();
+    } finally {
+      ServiceLoaderUtil.setLoadFunction(ServiceLoader::load);
+    }
+  }
+
+  // Isolated so Function#apply (requires API 24 or desugaring) only runs when a caller opts in
+  // via setSpanNameExtractor(), not on every build() call.
+  @SuppressLint("NewApi") // This existing java.util.function API requires consumer desugaring.
+  private static void applySpanNameExtractorCustomizer(
+      DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder,
+      Function<SpanNameExtractor<Interceptor.Chain>, SpanNameExtractor<Interceptor.Chain>>
+          spanNameExtractorTransformer) {
+    builder.setSpanNameExtractorCustomizer(
+        spanNameExtractor -> spanNameExtractorTransformer.apply(spanNameExtractor));
   }
 }

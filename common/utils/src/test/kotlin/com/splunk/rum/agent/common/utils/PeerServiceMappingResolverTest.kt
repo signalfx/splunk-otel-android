@@ -62,6 +62,15 @@ class PeerServiceMappingResolverTest {
     }
 
     @Test
+    fun `normalizes the absent port sentinel`() {
+        val resolver = PeerServiceMappingResolver(
+            mapOf("api.example.test/orders" to "orders-service")
+        )
+
+        assertEquals("orders-service", resolver.resolve("api.example.test", -1, "/orders/42"))
+    }
+
+    @Test
     fun `ignores malformed and nonmatching mappings without throwing`() {
         val resolver = PeerServiceMappingResolver(
             mapOf(

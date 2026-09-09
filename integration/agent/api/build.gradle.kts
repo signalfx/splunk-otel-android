@@ -33,7 +33,6 @@ dependencies {
     implementation(project(":common:utils"))
 
     implementation(Dependencies.Otel.semConv)
-    implementation(Dependencies.Otel.instrumentationApi)
 
     implementation(Dependencies.Common.logger)
     implementation(Dependencies.Common.storage)
