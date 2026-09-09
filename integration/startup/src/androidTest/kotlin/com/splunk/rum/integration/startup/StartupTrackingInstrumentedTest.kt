@@ -137,6 +137,14 @@ class StartupTrackingInstrumentedTest {
             spanStartMillis
         )
 
+        val expectedEndMillis = installStart + (installEndElapsed - installStartElapsed)
+        val spanEndMillis = TimeUnit.NANOSECONDS.toMillis(installSpan.endEpochNanos)
+        assertEquals(
+            "Install span should use the computed install end timestamp",
+            expectedEndMillis,
+            spanEndMillis
+        )
+
         assertTrue(
             "Install span should have per-module events",
             installSpan.events.isNotEmpty()
