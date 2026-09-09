@@ -7,9 +7,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.3.5 - 2026-09-08
+
+##### Enhancements:
+* Added a configurable ANR detection threshold through `AnrModuleConfiguration.threshold`, defaulting to 5 seconds
+* Reworked ANR detection to measure elapsed time against the threshold, which changes when ANRs are reported
+
+##### Breaking changes:
+* **Binary compatibility: `AnrModuleConfiguration`**: adding `threshold` to the primary constructor changes the Kotlin-generated constructor and `copy()` JVM signatures. Applications built entirely from source remain source compatible and need no changes. Separately compiled libraries or wrapper AARs that construct or call `copy()` on `AnrModuleConfiguration` must be rebuilt against this release, otherwise they may throw `NoSuchMethodError` at runtime. Rebuilding is sufficient; no source changes are required.
+
 ##### Fixes:
-* Fixed a host app crash when the `Choreographer` instance could not be obtained
+* Fixed a host app crash during SDK startup when the `Choreographer` instance could not be obtained
 * Fixed `NoClassDefFoundError` when resolving optional classes by name
+* Fixed a single ANR stall being reported repeatedly; one ANR is now reported per stall
 
 ### Version 2.3.4 - 2026-08-27
 
