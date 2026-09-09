@@ -35,6 +35,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
 ) {
 
     private const val TAG = "ApplicationLifecycleModuleIntegration"
+    private const val MAX_CACHE_SIZE = 10
 
     private var canReport: Boolean? = null
     private val cache: MutableList<ApplicationLifecycleData> = mutableListOf()
@@ -90,11 +91,14 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     }
 
     private fun reportEvent(applicationLifecycleData: ApplicationLifecycleData) {
+        if (canReport == false) return
+
         val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider
 
-        if (logger == null || canReport != true) {
-            Logger.i(TAG, "Tracer provider not ready or reporting status unknown. Caching event")
-            cache += applicationLifecycleData
+        if (logger == null || canReport == null) {
+            if (cache.size < MAX_CACHE_SIZE) {
+                cache += applicationLifecycleData
+            }
             return
         }
 
