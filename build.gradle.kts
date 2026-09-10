@@ -1,16 +1,3 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        google()
-    }
-
-    dependencies {
-        classpath(Dependencies.gradle)
-        classpath(Dependencies.kotlin)
-        classpath(Dependencies.jacoco)
-    }
-}
-
 plugins {
     id(Dependencies.nexusPublishPluginId) version Dependencies.nexusPublishPluginVersion
 }
@@ -26,12 +13,6 @@ allprojects {
             force("androidx.core:core:1.13.1")
             force("androidx.core:core-ktx:1.13.1")
         }
-    }
-
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        google()
     }
 
     afterEvaluate {

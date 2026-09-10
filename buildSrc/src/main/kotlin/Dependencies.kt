@@ -70,7 +70,7 @@ object Dependencies {
     }
 
     object Common {
-        private const val version = "1.0.1"
+        private const val version = "1.0.2"
 
         const val http = "com.splunk:rum-common-http:$version"
         const val job = "com.splunk:rum-common-job:$version"
