@@ -117,6 +117,9 @@ class AgentIntegration private constructor(context: Context) {
         @Volatile
         var installEndElapsed: Long? = null
 
+        @Volatile
+        var onInstallTimingComplete: (() -> Unit)? = null
+
         val instance: AgentIntegration
             get() = instanceInternal
                 ?: throw IllegalStateException("Instance is not created, call createInstance() first")

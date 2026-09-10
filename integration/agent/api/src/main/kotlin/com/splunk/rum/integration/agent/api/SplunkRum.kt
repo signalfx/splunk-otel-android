@@ -374,6 +374,9 @@ class SplunkRum private constructor(
 
             AgentIntegration.installEndElapsed = SystemClock.elapsedRealtime()
 
+            AgentIntegration.onInstallTimingComplete?.invoke()
+            AgentIntegration.onInstallTimingComplete = null
+
             return instance
         }
 

@@ -88,6 +88,7 @@ class StartupTrackingInstrumentedTest {
         AgentIntegration.installStartTimestamp = null
         AgentIntegration.installStartElapsed = null
         AgentIntegration.installEndElapsed = null
+        AgentIntegration.onInstallTimingComplete = null
         tracerProvider.shutdown().join(5, TimeUnit.SECONDS)
     }
 

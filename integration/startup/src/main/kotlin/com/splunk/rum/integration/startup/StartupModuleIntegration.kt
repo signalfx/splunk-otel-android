@@ -163,6 +163,15 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
     }
 
     private fun reportInstallSpan(appStartSpan: Span, provider: SdkTracerProvider) {
+        if (AgentIntegration.installEndElapsed == null) {
+            AgentIntegration.onInstallTimingComplete = { emitInstallSpan(appStartSpan, provider) }
+            Logger.d(TAG) { "reportInstallSpan() - installEndElapsed not yet available, deferring" }
+            return
+        }
+        emitInstallSpan(appStartSpan, provider)
+    }
+
+    private fun emitInstallSpan(appStartSpan: Span, provider: SdkTracerProvider) {
         val modules = modules.values
 
         val firstInitialization =
