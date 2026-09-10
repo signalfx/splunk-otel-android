@@ -42,9 +42,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach() called")
-        if (appStateListener !in AppStateObserver.listeners) {
-            AppStateObserver.listeners += appStateListener
-        }
+        registerAppStateListener()
         AppStateObserver.attach(context as Application)
     }
 
@@ -58,12 +56,20 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         if (moduleConfiguration.isEnabled) {
             Logger.d(TAG, "Module is enabled. Reporting events.")
             canReport = true
+            // A previous skipped install may have removed the listener.
+            registerAppStateListener()
             cache.forEachFast { reportEvent(it) }
         } else {
             disableAndRemoveListener()
         }
 
         cache.clear()
+    }
+
+    private fun registerAppStateListener() {
+        if (appStateListener !in AppStateObserver.listeners) {
+            AppStateObserver.listeners += appStateListener
+        }
     }
 
     public override fun onInstallSkipped() {
