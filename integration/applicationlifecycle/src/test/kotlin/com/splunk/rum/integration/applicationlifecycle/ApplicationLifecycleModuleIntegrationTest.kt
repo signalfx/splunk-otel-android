@@ -69,6 +69,35 @@ class ApplicationLifecycleModuleIntegrationTest {
     }
 
     @Test
+    fun skippedInstallRemovesModuleListenerFromAppStateObserver() {
+        AppStateObserver.listeners += moduleListener
+
+        ApplicationLifecycleModuleIntegration.onInstallSkipped()
+
+        assertFalse(
+            "Module listener should be removed when installation is skipped",
+            AppStateObserver.listeners.contains(moduleListener)
+        )
+    }
+
+    @Test
+    fun skippedInstallDoesNotAffectOtherModuleListeners() {
+        val sessionManagerListener = object : AppStateObserver.Listener {}
+
+        AppStateObserver.listeners += sessionManagerListener
+        AppStateObserver.listeners += moduleListener
+
+        ApplicationLifecycleModuleIntegration.onInstallSkipped()
+
+        assertFalse(AppStateObserver.listeners.contains(moduleListener))
+        assertTrue(
+            "Other module listeners should remain when installation is skipped",
+            AppStateObserver.listeners.contains(sessionManagerListener)
+        )
+        assertEquals(1, AppStateObserver.listeners.size)
+    }
+
+    @Test
     fun disableDoesNotAffectOtherModuleListeners() {
         val sessionManagerListener = object : AppStateObserver.Listener {}
         val crashListener = object : AppStateObserver.Listener {}

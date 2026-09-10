@@ -71,7 +71,10 @@ internal object SplunkRumAgentCore {
             else -> Math.random() < samplingRate
         }
 
-        if (!shouldBeRunning) return OpenTelemetry.noop()
+        if (!shouldBeRunning) {
+            AgentIntegration.notifyInstallSkipped()
+            return OpenTelemetry.noop()
+        }
 
         // Configure the OTel Context API only once we are committed to running RUM, so no-op
         // install paths do not mutate this process-wide JVM property for unrelated host-app code.

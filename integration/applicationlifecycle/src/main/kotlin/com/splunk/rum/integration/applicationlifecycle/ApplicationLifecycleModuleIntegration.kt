@@ -66,8 +66,17 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         cache.clear()
     }
 
+    public override fun onInstallSkipped() {
+        Logger.d(TAG, "Install skipped. Removing AppState listener.")
+        removeListenerAndClearCache()
+    }
+
     internal fun disableAndRemoveListener() {
         Logger.w(TAG, "Module is disabled. Removing AppState listener.")
+        removeListenerAndClearCache()
+    }
+
+    private fun removeListenerAndClearCache() {
         canReport = false
         AppStateObserver.listeners.removeAll { it === appStateListener }
         cache.clear()
