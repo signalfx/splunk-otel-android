@@ -17,6 +17,7 @@
 package com.splunk.rum.instrumentation.okhttp3;
 
 import android.annotation.SuppressLint;
+import com.splunk.rum.agent.common.utils.InstrumenterBuildUtils;
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpClientInstrumenterBuilderFactory;
 import com.splunk.rum.instrumentation.okhttp3.internal.Experimental;
 import com.splunk.rum.instrumentation.okhttp3.internal.PeerServiceAttributesExtractor;
@@ -129,6 +130,10 @@ public final class OkHttpTelemetryBuilder {
   public OkHttpTelemetry build() {
     DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder =
         OkHttpClientInstrumenterBuilderFactory.create(openTelemetry);
+    builder.addAttributesExtractor(
+        new PeerServiceAttributesExtractor(
+            com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter.INSTANCE,
+            peerServiceMapping));
     for (AttributesExtractor<Interceptor.Chain, Response> extractor : additionalExtractors) {
       builder.addAttributesExtractor(extractor);
     }
@@ -145,10 +150,6 @@ public final class OkHttpTelemetryBuilder {
       applySpanNameExtractorCustomizer(builder, spanNameExtractorTransformer);
     }
     builder.setEmitExperimentalHttpClientTelemetry(emitExperimentalHttpClientTelemetry);
-    builder.addAttributesExtractor(
-        new PeerServiceAttributesExtractor(
-            com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter.INSTANCE,
-            peerServiceMapping));
     return new OkHttpTelemetry(buildInstrumenter(builder), openTelemetry.getPropagators());
   }
 
@@ -156,12 +157,15 @@ public final class OkHttpTelemetryBuilder {
   // (see open-telemetry/opentelemetry-java-instrumentation#19954).
   private static Instrumenter<Interceptor.Chain, Response> buildInstrumenter(
       DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder) {
-    ServiceLoaderUtil.setLoadFunction(clazz -> Collections.emptyList());
-    try {
-      return builder.build();
-    } finally {
-      ServiceLoaderUtil.setLoadFunction(ServiceLoader::load);
-    }
+    return InstrumenterBuildUtils.synchronizedInstrumenterBuild(
+        () -> {
+          ServiceLoaderUtil.setLoadFunction(clazz -> Collections.emptyList());
+          try {
+            return builder.build();
+          } finally {
+            ServiceLoaderUtil.setLoadFunction(ServiceLoader::load);
+          }
+        });
   }
 
   // Isolated so Function#apply (requires API 24 or desugaring) only runs when a caller opts in

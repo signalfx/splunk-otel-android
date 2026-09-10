@@ -17,6 +17,7 @@
 
 package com.splunk.rum.instrumentation.httpurlconnection.auto.internal
 
+import com.splunk.rum.agent.common.utils.InstrumenterBuildUtils
 import com.splunk.rum.instrumentation.httpurlconnection.auto.BuildConfig
 import com.splunk.rum.instrumentation.httpurlconnection.auto.HttpUrlInstrumentation
 import io.opentelemetry.api.OpenTelemetry
@@ -84,11 +85,13 @@ internal object HttpUrlConnectionSingletons {
 
         // Avoid the instrumenter SPI lookup's one-time disk read, which trips Android StrictMode
         // (see open-telemetry/opentelemetry-java-instrumentation#19954).
-        ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
-        try {
-            instrumenter = builder.buildClientInstrumenter(RequestPropertySetter)
-        } finally {
-            ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+        instrumenter = InstrumenterBuildUtils.synchronizedInstrumenterBuild {
+            ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
+            try {
+                builder.buildClientInstrumenter(RequestPropertySetter)
+            } finally {
+                ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+            }
         }
     }
 

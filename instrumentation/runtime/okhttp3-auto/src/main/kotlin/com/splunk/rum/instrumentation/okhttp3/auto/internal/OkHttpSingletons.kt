@@ -17,6 +17,7 @@
 
 package com.splunk.rum.instrumentation.okhttp3.auto.internal
 
+import com.splunk.rum.agent.common.utils.InstrumenterBuildUtils
 import com.splunk.rum.instrumentation.okhttp3.auto.OkHttpInstrumentation
 import com.splunk.rum.instrumentation.okhttp3.common.internal.ConnectionErrorSpanInterceptor
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter
@@ -78,12 +79,13 @@ object OkHttpSingletons {
 
         // Avoid the instrumenter SPI lookup's one-time disk read, which trips Android StrictMode
         // (see open-telemetry/opentelemetry-java-instrumentation#19954).
-        val instrumenter: Instrumenter<Interceptor.Chain, Response>
-        ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
-        try {
-            instrumenter = instrumenterBuilder.build()
-        } finally {
-            ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+        val instrumenter = InstrumenterBuildUtils.synchronizedInstrumenterBuild {
+            ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
+            try {
+                instrumenterBuilder.build()
+            } finally {
+                ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+            }
         }
 
         connectionErrorInterceptor = ConnectionErrorSpanInterceptor(instrumenter)

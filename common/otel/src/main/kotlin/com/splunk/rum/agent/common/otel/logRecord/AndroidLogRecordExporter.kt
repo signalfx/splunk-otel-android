@@ -95,6 +95,7 @@ internal class AndroidLogRecordExporter(
              * the source log record lacks explicit naming metadata.
              */
             val spanName = log.eventName
+                ?: log.attributes.get(GlobalRumConstants.LOG_EVENT_NAME_KEY)
                 ?: RumConstants.DEFAULT_LOG_EVENT_NAME
 
             // traceId and spanId should be inside the context already from global OTel instance

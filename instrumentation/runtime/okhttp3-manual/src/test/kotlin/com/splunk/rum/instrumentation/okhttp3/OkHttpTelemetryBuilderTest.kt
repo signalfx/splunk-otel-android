@@ -18,13 +18,19 @@ package com.splunk.rum.instrumentation.okhttp3
 
 import com.splunk.rum.instrumentation.okhttp3.internal.PeerServiceAttributesExtractor
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.common.AttributesBuilder
+import io.opentelemetry.context.Context
+import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.api.internal.HttpConstants
 import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import java.util.ServiceLoader
+import okhttp3.Interceptor
+import okhttp3.Response
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class OkHttpTelemetryBuilderTest {
@@ -106,5 +112,39 @@ class OkHttpTelemetryBuilderTest {
         val extractors = extractorsField.get(instrumenter) as Array<*>
 
         assertEquals(1, extractors.count { it is PeerServiceAttributesExtractor })
+    }
+
+    @Test
+    fun build_registersPeerServiceExtractorBeforeAdditionalExtractors() {
+        val additionalExtractor = object : AttributesExtractor<Interceptor.Chain, Response> {
+            override fun onStart(attributes: AttributesBuilder, parentContext: Context, request: Interceptor.Chain) =
+                Unit
+
+            override fun onEnd(
+                attributes: AttributesBuilder,
+                context: Context,
+                request: Interceptor.Chain,
+                response: Response?,
+                error: Throwable?
+            ) = Unit
+        }
+
+        val telemetry = OkHttpTelemetry.builder(OpenTelemetry.noop())
+            .setPeerServiceMapping(mapOf("api.example.test:8443" to "checkout-service"))
+            .addAttributesExtractor(additionalExtractor)
+            .build()
+
+        val instrumenterField = OkHttpTelemetry::class.java.getDeclaredField("instrumenter")
+        instrumenterField.isAccessible = true
+        val instrumenter = instrumenterField.get(telemetry)
+        val extractorsField = instrumenter.javaClass.getDeclaredField("attributesExtractors")
+        extractorsField.isAccessible = true
+        val extractors = extractorsField.get(instrumenter) as Array<*>
+        val peerServiceIndex = extractors.indexOfFirst { it is PeerServiceAttributesExtractor }
+        val additionalExtractorIndex = extractors.indexOfFirst { it === additionalExtractor }
+
+        assertTrue(peerServiceIndex >= 0)
+        assertTrue(additionalExtractorIndex >= 0)
+        assertTrue(peerServiceIndex < additionalExtractorIndex)
     }
 }
