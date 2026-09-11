@@ -17,7 +17,6 @@
 
 package com.splunk.rum.instrumentation.okhttp3.common.internal
 
-import com.splunk.rum.instrumentation.okhttp3.common.BuildConfig
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.instrumentation.api.incubator.builder.internal.DefaultHttpClientInstrumenterBuilder
 import okhttp3.Interceptor
@@ -40,8 +39,5 @@ class OkHttpClientInstrumenterBuilderFactory private constructor() {
                 OkHttpAttributesGetter.INSTANCE
             )
                 .addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
-                .setBuilderCustomizer { builder ->
-                    builder.setInstrumentationVersion(BuildConfig.VERSION_NAME)
-                }
     }
 }
