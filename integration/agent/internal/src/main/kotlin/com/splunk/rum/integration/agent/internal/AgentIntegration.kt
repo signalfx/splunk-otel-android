@@ -94,6 +94,8 @@ class AgentIntegration private constructor(context: Context) {
         )
 
         fun onPostInstall()
+
+        fun onInstallSkipped() {}
     }
 
     companion object {
@@ -130,6 +132,14 @@ class AgentIntegration private constructor(context: Context) {
             }
 
             return instanceInternal!!
+        }
+
+        /** No-ops when no module has attached, so the instance is not created on a no-op install path. */
+        fun notifyInstallSkipped() {
+            val instance = instanceInternal ?: return
+
+            Logger.d(TAG, "notifyInstallSkipped()")
+            instance.listeners.forEachFast { it.onInstallSkipped() }
         }
 
         fun registerModuleInitializationStart(name: String) {

@@ -296,6 +296,7 @@ class SplunkRum private constructor(
 
             if (Build.VERSION.SDK_INT < lowestApiLevel) {
                 Logger.w(TAG, "install() - Unsupported Android version")
+                AgentIntegration.notifyInstallSkipped()
 
                 return SplunkRum(
                     agentStorage = null,
@@ -316,6 +317,7 @@ class SplunkRum private constructor(
 
             if (isSubprocess && agentConfiguration.instrumentedProcessName != null) {
                 Logger.d(TAG, "install() - Subprocess detected exiting")
+                AgentIntegration.notifyInstallSkipped()
 
                 return SplunkRum(
                     agentStorage = null,
