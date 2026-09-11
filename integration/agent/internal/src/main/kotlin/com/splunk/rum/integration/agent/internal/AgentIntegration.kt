@@ -110,6 +110,18 @@ class AgentIntegration private constructor(context: Context) {
 
         var lowestApiLevel: Int = Constants.LOWEST_RUNTIME_API_LEVEL
 
+        @Volatile
+        var installStartTimestamp: Long? = null
+
+        @Volatile
+        var installStartElapsed: Long? = null
+
+        @Volatile
+        var installEndElapsed: Long? = null
+
+        @Volatile
+        var onInstallTimingComplete: (() -> Unit)? = null
+
         val instance: AgentIntegration
             get() = instanceInternal
                 ?: throw IllegalStateException("Instance is not created, call createInstance() first")
