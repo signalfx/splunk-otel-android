@@ -26,6 +26,7 @@ dependencies {
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
     implementation(project(":instrumentation:runtime:okhttp3-common"))
+    implementation(project(":common:utils"))
 
     implementation(Dependencies.okhttp)
     /**

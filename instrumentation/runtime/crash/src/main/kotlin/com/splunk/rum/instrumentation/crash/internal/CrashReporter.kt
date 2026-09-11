@@ -75,12 +75,10 @@ internal class CrashReporter(
             }
         }
 
-        // Set last so a custom extractor cannot override device.crash.
-        attributes.put(LOG_EVENT_NAME_KEY, CRASH_EVENT_NAME)
-
         openTelemetry.logsBridge
             .get(CRASH_INSTRUMENTATION_SCOPE_NAME)
             .logRecordBuilder()
+            .setEventName(CRASH_EVENT_NAME)
             .setAllAttributes(attributes.build())
             .emit()
     }
@@ -97,7 +95,5 @@ internal class CrashReporter(
 
         const val CRASH_INSTRUMENTATION_SCOPE_NAME = "com.splunk.rum.crash"
         const val CRASH_EVENT_NAME = "device.crash"
-
-        private val LOG_EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
     }
 }

@@ -129,7 +129,7 @@ internal class LifecycleEventEmitter(private val allowedEvents: Set<LifecycleAct
         logger.get(GlobalRumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
-            .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.UI_LIFECYCLE_LOG_NAME)
+            .setEventName(RumConstants.UI_LIFECYCLE_LOG_NAME)
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_UI_LIFECYCLE)
             .setAttribute(RumConstants.ELEMENT_TYPE_KEY, elementType)
             .setAttribute(RumConstants.ELEMENT_NAME_KEY, elementName)

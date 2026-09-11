@@ -45,8 +45,7 @@ class NetworkChangeEventEmitterTest {
         emitter.emit(attributes)
 
         verify(logRecordBuilder).setAllAttributes(attributes)
-        verify(logRecordBuilder).setAttribute(
-            NetworkChangeEventEmitter.EVENT_NAME_KEY,
+        verify(logRecordBuilder).setEventName(
             NetworkChangeEventEmitter.EVENT_NAME
         )
         verify(logRecordBuilder).emit()

@@ -19,7 +19,6 @@ package com.splunk.rum.integration.agent.internal
 import android.app.Application
 import android.content.Context
 import android.os.SystemClock
-import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.RUM_TRACER_NAME
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
@@ -60,7 +59,7 @@ class AgentIntegration private constructor(context: Context) {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME)
                     .logRecordBuilder()
-                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_START_EVENT_NAME)
+                    .setEventName(RumConstants.SESSION_START_EVENT_NAME)
                     .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
                     .setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
                     .setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)

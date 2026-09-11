@@ -33,13 +33,12 @@ internal class NetworkChangeEventEmitter(
 
         logger.logRecordBuilder()
             .setAllAttributes(attributes)
-            .setAttribute(EVENT_NAME_KEY, EVENT_NAME)
+            .setEventName(EVENT_NAME)
             .emit()
     }
 
     internal companion object {
         const val EVENT_NAME = "network.change"
-        val EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
         val NETWORK_STATUS: AttributeKey<String> = AttributeKey.stringKey("network.status")
     }
 }

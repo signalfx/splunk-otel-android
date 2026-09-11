@@ -88,7 +88,7 @@ object Dependencies {
     }
 
     object Otel {
-        private const val oTelInstrumentationBomAlpha = "2.15.0-alpha"
+        private const val oTelInstrumentationBomAlpha = "2.30.0-alpha"
         const val instrumentationBomAlpha = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:$oTelInstrumentationBomAlpha"
 
         const val api = "io.opentelemetry:opentelemetry-api"

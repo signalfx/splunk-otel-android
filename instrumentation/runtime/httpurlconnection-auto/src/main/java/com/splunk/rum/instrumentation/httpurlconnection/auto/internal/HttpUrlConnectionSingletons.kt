@@ -17,17 +17,20 @@
 
 package com.splunk.rum.instrumentation.httpurlconnection.auto.internal
 
+import com.splunk.rum.agent.common.utils.InstrumenterBuildUtils
+import com.splunk.rum.instrumentation.httpurlconnection.auto.BuildConfig
 import com.splunk.rum.instrumentation.httpurlconnection.auto.HttpUrlInstrumentation
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpClientExperimentalMetrics
-import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpClientPeerServiceAttributesExtractor
 import io.opentelemetry.instrumentation.api.incubator.semconv.http.HttpExperimentalAttributesExtractor
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter
+import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExtractor
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientMetrics
 import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanNameExtractor
 import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanStatusExtractor
 import java.net.URLConnection
+import java.util.ServiceLoader
 
 internal object HttpUrlConnectionSingletons {
     private const val INSTRUMENTATION_NAME = "com.splunk.rum.http-url-connection"
@@ -51,9 +54,9 @@ internal object HttpUrlConnectionSingletons {
                 .build()
 
         val httpClientPeerServiceAttributesExtractor =
-            HttpClientPeerServiceAttributesExtractor.create(
+            PeerServiceAttributesExtractor(
                 httpAttributesGetter,
-                instrumentation.newPeerServiceResolver()
+                instrumentation.peerServiceMapping()
             )
 
         openTelemetryInstance = openTelemetry
@@ -79,7 +82,18 @@ internal object HttpUrlConnectionSingletons {
                 .addOperationMetrics(HttpClientExperimentalMetrics.get())
         }
 
-        instrumenter = builder.buildClientInstrumenter(RequestPropertySetter)
+        // Avoid the instrumenter SPI lookup's one-time disk read, which trips Android StrictMode
+        // (see open-telemetry/opentelemetry-java-instrumentation issue #19954). ServiceLoaderUtil
+        // has no getter, so the reset below restores ServiceLoader::load rather than any custom
+        // process-wide loader that may have been installed by the host application.
+        instrumenter = InstrumenterBuildUtils.synchronizedInstrumenterBuild(
+            configureSpiLookup = { ServiceLoaderUtil.setLoadFunction { emptyList<Any>() } },
+            restoreSpiLookup = {
+                ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
+            },
+            build = { builder.buildClientInstrumenter(RequestPropertySetter) },
+            fallbackBuild = { builder.buildClientInstrumenter(RequestPropertySetter) }
+        )
     }
 
     fun instrumenter(): Instrumenter<URLConnection, Int>? = instrumenter

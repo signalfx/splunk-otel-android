@@ -164,7 +164,6 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
             metadataJson.put("displayWireframe", shouldDisplayWireframe(globalAttributes))
 
             val attributes = Attributes.of(
-                GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_REPLAY_DATA_EVENT_NAME,
                 RumConstants.SESSION_REPLAY_TOTAL_CHUNKS_KEY, 1.0,
                 RumConstants.SESSION_REPLAY_CHUNK_KEY, 1.0,
                 RumConstants.SESSION_REPLAY_EVENT_INDEX_KEY, index,
@@ -179,6 +178,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             sessionReplayDataBuilder.setBody(Value.of(data))
                 .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
+                .setEventName(RumConstants.SESSION_REPLAY_DATA_EVENT_NAME)
                 .setAllAttributes(attributes)
                 .emit()
 
@@ -190,10 +190,7 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                     .get(GlobalRumConstants.RUM_TRACER_NAME)
                     .logRecordBuilder()
                     .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
-                    .setAttribute(
-                        GlobalRumConstants.LOG_EVENT_NAME_KEY,
-                        RumConstants.SESSION_REPLAY_IS_RECORDING_EVENT_NAME
-                    )
+                    .setEventName(RumConstants.SESSION_REPLAY_IS_RECORDING_EVENT_NAME)
                     .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_SESSION_REPLAY)
                     .setAttribute(RumConstants.SESSION_REPLAY_KEY, RumConstants.SESSION_REPLAY_PROVIDER)
                     .setAttribute(GlobalRumConstants.SESSION_ID_KEY, sessionId)
