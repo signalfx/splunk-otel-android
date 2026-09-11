@@ -35,6 +35,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -48,8 +50,9 @@ import org.junit.runner.RunWith
  * the direct detector seeding in NavigationTrackingInstrumentedTest while exercising the real
  * startup listener, deferred cache, module installation, OpenTelemetry SDK, and span exporter.
  *
- * Cold and hot starts are intentionally exercised in a single test because startup tracking
- * maintains process-wide state.
+ * The whole sequence runs in a single test because startup tracking maintains process-wide state:
+ * the install span is reported at most once per process, so a second test method would assert
+ * against a startup module that has already reported.
  */
 @RunWith(AndroidJUnit4::class)
 class StartupTrackingInstrumentedTest {
@@ -93,14 +96,15 @@ class StartupTrackingInstrumentedTest {
     }
 
     @Test
-    fun coldStartWithInstallTimestampsAndSubsequentHotStart() {
+    fun coldStartDefersInstallSpanUntilInstallTimingCompletes() {
         val installStart = System.currentTimeMillis() - 150
         val installStartElapsed = android.os.SystemClock.elapsedRealtime() - 150
         val installEndElapsed = android.os.SystemClock.elapsedRealtime() - 50
 
+        // SplunkRum.install() records the start timestamps before installing the agent, and only
+        // records installEndElapsed once it returns.
         AgentIntegration.installStartTimestamp = installStart
         AgentIntegration.installStartElapsed = installStartElapsed
-        AgentIntegration.installEndElapsed = installEndElapsed
 
         reportColdStart()
 
@@ -119,9 +123,24 @@ class StartupTrackingInstrumentedTest {
         val coldStart = appStartSpans().single()
         assertEquals(RumConstants.APP_START_TYPE_COLD, coldStart.startType())
 
-        val installSpans = exportedSpans.filter {
-            it.name == RumConstants.APP_START_INSTALL_SPAN_NAME
-        }
+        assertTrue(
+            "Install span should not be emitted before install timing completes",
+            installSpans().isEmpty()
+        )
+        assertNotNull(
+            "Install span emission should be deferred until install timing completes",
+            AgentIntegration.onInstallTimingComplete
+        )
+
+        completeInstallTiming(installEndElapsed)
+        waitForIdle()
+
+        assertNull(
+            "Deferred callback should be cleared once invoked",
+            AgentIntegration.onInstallTimingComplete
+        )
+
+        val installSpans = installSpans()
         assertEquals("Install span should only be reported once", 1, installSpans.size)
 
         val installSpan = installSpans.single()
@@ -161,10 +180,14 @@ class StartupTrackingInstrumentedTest {
             appStarts.map { it.startType() }
         )
 
-        val installSpansAfterHot = exportedSpans.filter {
-            it.name == RumConstants.APP_START_INSTALL_SPAN_NAME
-        }
-        assertEquals("Install span should still only be reported once after hot start", 1, installSpansAfterHot.size)
+        assertEquals("Install span should still only be reported once after hot start", 1, installSpans().size)
+    }
+
+    /** Mirrors the tail of [com.splunk.rum.integration.agent.api.SplunkRum.install]. */
+    private fun completeInstallTiming(installEndElapsed: Long) {
+        AgentIntegration.installEndElapsed = installEndElapsed
+        AgentIntegration.onInstallTimingComplete?.invoke()
+        AgentIntegration.onInstallTimingComplete = null
     }
 
     private fun reportColdStart() {
@@ -192,6 +215,10 @@ class StartupTrackingInstrumentedTest {
 
     private fun appStartSpans(): List<SpanData> = exportedSpans.filter {
         it.name == RumConstants.APP_START_SPAN_NAME
+    }
+
+    private fun installSpans(): List<SpanData> = exportedSpans.filter {
+        it.name == RumConstants.APP_START_INSTALL_SPAN_NAME
     }
 
     private fun SpanData.startType(): String? = attributes.get(RumConstants.APP_START_TYPE_KEY)
