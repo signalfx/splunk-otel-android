@@ -56,6 +56,10 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     protected open fun onPostInstall() {
     }
 
+    /** Called instead of [onInstall] when the agent does not install, such as a sampled out session. */
+    protected open fun onInstallSkipped() {
+    }
+
     protected open fun onSessionChange(sessionId: String) {
     }
 
@@ -76,6 +80,10 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
 
         override fun onPostInstall() {
             this@ModuleIntegration.onPostInstall()
+        }
+
+        override fun onInstallSkipped() {
+            this@ModuleIntegration.onInstallSkipped()
         }
     }
 
