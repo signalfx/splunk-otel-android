@@ -20,10 +20,11 @@ package com.splunk.rum.agent.common.utils
 import java.net.URI
 
 /**
- * Resolves a peer service name from a host, port, and optional request path.
+ * Resolves a peer service name from a host and port.
  *
- * Mapping keys use the form `host[:port][/path]`. A path mapping matches request paths by prefix.
- * Invalid mappings are ignored so that a configuration error does not affect network requests.
+ * Mapping keys use the form `host[:port]`. Path-qualified mappings are ignored because peer-service
+ * resolution is based only on the server address and port across supported HTTP clients. Invalid
+ * mappings are ignored so that a configuration error does not affect network requests.
  */
 class PeerServiceMappingResolver(peerServiceMapping: Map<String, String>) {
     private val mappingsByHost: Map<String, List<Mapping>> =
@@ -35,7 +36,7 @@ class PeerServiceMappingResolver(peerServiceMapping: Map<String, String>) {
     fun isEmpty(): Boolean = mappingsByHost.isEmpty()
 
     /** Returns the most specific matching service name, or null when no mapping matches. */
-    fun resolve(host: String?, port: Int?, path: String?): String? {
+    fun resolve(host: String?, port: Int?): String? {
         if (host == null) {
             return null
         }
@@ -44,29 +45,16 @@ class PeerServiceMappingResolver(peerServiceMapping: Map<String, String>) {
 
         return mappingsByHost[host]
             ?.asSequence()
-            ?.filter { it.matches(requestPort, path) }
+            ?.filter { it.matches(requestPort) }
             ?.maxWithOrNull(MAPPING_SPECIFICITY)
             ?.serviceName
     }
 
-    private data class Mapping(val host: String, val port: Int?, val path: String?, val serviceName: String) {
-        fun matches(requestPort: Int?, requestPath: String?): Boolean {
+    private data class Mapping(val host: String, val port: Int?, val serviceName: String) {
+        fun matches(requestPort: Int?): Boolean {
             if (port != null && port != requestPort) {
                 return false
             }
-
-            if (!path.isNullOrEmpty()) {
-                if (requestPath == null || !requestPath.startsWith(path)) {
-                    return false
-                }
-
-                // Preserve the upstream resolver's behavior: a path-qualified mapping without
-                // a port only applies when the request also has no port.
-                if (requestPort != null) {
-                    return requestPort == port
-                }
-            }
-
             return true
         }
 
@@ -76,20 +64,14 @@ class PeerServiceMappingResolver(peerServiceMapping: Map<String, String>) {
                 Mapping(
                     host = uri.host ?: return null,
                     port = uri.port.takeIf { it >= 0 },
-                    path = uri.path,
                     serviceName = serviceName
-                )
+                ).takeIf { uri.path.isNullOrEmpty() }
             }.getOrNull()
         }
     }
 
     companion object {
-        /** Returns the path component of a URL, or null when the URL is absent or malformed. */
-        @JvmStatic
-        fun extractPath(url: String?): String? = url?.let { runCatching { URI(it).path }.getOrNull() }
-
         private val MAPPING_SPECIFICITY =
             compareBy<Mapping, Int?>(nullsFirst(naturalOrder())) { it.port }
-                .thenBy(nullsFirst(naturalOrder())) { it.path }
     }
 }

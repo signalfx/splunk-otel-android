@@ -47,13 +47,12 @@ class PeerServiceAttributesExtractorTest {
     }
 
     @Test
-    fun `uses the most specific host port and path mapping`() {
+    fun `uses the most specific host and port mapping`() {
         val extractor = PeerServiceAttributesExtractor(
             HttpUrlHttpAttributesGetter,
             mapOf(
                 "api.example.test" to "host-service",
-                "api.example.test:8443" to "port-service",
-                "api.example.test:8443/orders" to "orders-service"
+                "api.example.test:8443" to "orders-service"
             )
         )
         val attributes = Attributes.builder()
@@ -68,7 +67,7 @@ class PeerServiceAttributesExtractorTest {
     }
 
     @Test
-    fun `matches a portless path mapping when the URL has no explicit port`() {
+    fun `ignores path-qualified mappings`() {
         val extractor = PeerServiceAttributesExtractor(
             HttpUrlHttpAttributesGetter,
             mapOf("api.example.test/orders" to "orders-service")
@@ -81,24 +80,30 @@ class PeerServiceAttributesExtractorTest {
             StubHttpURLConnection(URL("https://api.example.test/orders/42"))
         )
 
-        assertEquals("orders-service", attributes.build().get(PEER_SERVICE))
+        assertNull(attributes.build().get(PEER_SERVICE))
     }
 
     @Test
-    fun `decodes URL paths before matching`() {
+    fun `refreshes peer service after a redirect`() {
         val extractor = PeerServiceAttributesExtractor(
             HttpUrlHttpAttributesGetter,
-            mapOf("api.example.test:8443/orders%20archive" to "orders-service")
+            mapOf(
+                "api.example.test:8443" to "original-service",
+                "redirected.example.test:9443" to "redirected-service"
+            )
         )
         val attributes = Attributes.builder()
+        val connection = StubHttpURLConnection(URL("https://api.example.test:8443/orders/42"))
 
         extractor.onStart(
             attributes,
             Context.root(),
-            StubHttpURLConnection(URL("https://api.example.test:8443/orders%20archive/42"))
+            connection
         )
+        connection.redirectTo(URL("https://redirected.example.test:9443/final"))
+        extractor.onEnd(attributes, Context.root(), connection, 200, null)
 
-        assertEquals("orders-service", attributes.build().get(PEER_SERVICE))
+        assertEquals("redirected-service", attributes.build().get(PEER_SERVICE))
     }
 
     @Test
@@ -122,6 +127,10 @@ class PeerServiceAttributesExtractorTest {
     }
 
     private class StubHttpURLConnection(url: URL) : HttpURLConnection(url) {
+        fun redirectTo(url: URL) {
+            this.url = url
+        }
+
         override fun connect() = Unit
 
         override fun disconnect() = Unit

@@ -89,8 +89,8 @@ internal class AndroidLogRecordExporter(
              *
              * The resolution order is as follows:
              * 1. Use the stable `eventName` property from [LogRecordData] if available.
-             * 2. Otherwise, fallback to the name [GlobalRumConstants.DEFAULT_LOG_EVENT_NAME].
-             *
+             * 2. Otherwise, fall back to the [GlobalRumConstants.LOG_EVENT_NAME_KEY] attribute in the log's attributes.
+             * 3. If neither is present, default to the name [GlobalRumConstants.DEFAULT_LOG_EVENT_NAME].
              * This ensures that the span always has a meaningful or fallback name, even when
              * the source log record lacks explicit naming metadata.
              */

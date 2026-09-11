@@ -37,7 +37,6 @@ class OkHttpClientInstrumenterBuilderFactory private constructor() {
                 INSTRUMENTATION_NAME,
                 openTelemetry,
                 OkHttpAttributesGetter.INSTANCE
-            )
-                .addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
+            ).addAttributesExtractor(OkHttp3AdditionalAttributesExtractor())
     }
 }

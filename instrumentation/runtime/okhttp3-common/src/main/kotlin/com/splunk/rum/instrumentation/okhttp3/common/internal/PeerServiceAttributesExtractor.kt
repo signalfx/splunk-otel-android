@@ -40,8 +40,7 @@ class PeerServiceAttributesExtractor(
 
         val serviceName = resolver.resolve(
             attributesGetter.getServerAddress(request),
-            attributesGetter.getServerPort(request),
-            PeerServiceMappingResolver.extractPath(attributesGetter.getUrlFull(request))
+            attributesGetter.getServerPort(request)
         ) ?: return
 
         attributes.put(PEER_SERVICE, serviceName)

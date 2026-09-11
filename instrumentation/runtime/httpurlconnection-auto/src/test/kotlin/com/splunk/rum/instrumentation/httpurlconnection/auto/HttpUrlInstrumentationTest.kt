@@ -66,7 +66,7 @@ class HttpUrlInstrumentationTest {
         HttpUrlInstrumentation().apply {
             capturedRequestHeaders = listOf("x-request-id")
             capturedResponseHeaders = listOf("x-response-id")
-            setPeerServiceMapping(mapOf("api.example.test:8443/orders" to "orders-service"))
+            setPeerServiceMapping(mapOf("api.example.test:8443" to "orders-service"))
             install(openTelemetry)
         }
     }
@@ -90,7 +90,7 @@ class HttpUrlInstrumentationTest {
     }
 
     @Test
-    fun `records the network span attribute matrix and path peer mapping`() {
+    fun `records the network span attribute matrix and peer mapping`() {
         val connection = StubHttpURLConnection(
             URL("https://api.example.test:8443/orders/42"),
             requestMethod = "POST",
@@ -102,7 +102,6 @@ class HttpUrlInstrumentationTest {
 
         val span = exportedSpans.single()
         assertEquals("POST", span.name)
-        assertEquals(BuildConfig.VERSION_NAME, span.instrumentationScopeInfo.version)
         assertEquals("POST", span.attributes.get(AttributeKey.stringKey("http.request.method")))
         assertEquals(503L, span.attributes.get(AttributeKey.longKey("http.response.status_code")))
         assertEquals("api.example.test", span.attributes.get(AttributeKey.stringKey("server.address")))

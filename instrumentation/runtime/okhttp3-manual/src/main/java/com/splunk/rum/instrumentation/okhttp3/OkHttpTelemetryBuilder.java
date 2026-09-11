@@ -176,7 +176,7 @@ public final class OkHttpTelemetryBuilder {
 
   // Isolated so Function#apply (requires API 24 or desugaring) only runs when a caller opts in
   // via setSpanNameExtractor(), not on every build() call.
-  @SuppressLint("NewApi") // This existing java.util.function API requires consumer desugaring.
+  @SuppressLint("NewApi") // Requires API 24 or core library desugaring.
   private static void applySpanNameExtractorCustomizer(
       DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder,
       Function<SpanNameExtractor<Interceptor.Chain>, SpanNameExtractor<Interceptor.Chain>>

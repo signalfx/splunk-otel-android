@@ -33,17 +33,7 @@ internal class PeerServiceAttributesExtractor(
     private val resolver = PeerServiceMappingResolver(peerServiceMapping)
 
     override fun onStart(attributes: AttributesBuilder, parentContext: Context, request: URLConnection) {
-        if (resolver.isEmpty()) {
-            return
-        }
-
-        val serviceName = resolver.resolve(
-            attributesGetter.getServerAddress(request),
-            attributesGetter.getServerPort(request),
-            PeerServiceMappingResolver.extractPath(attributesGetter.getUrlFull(request))
-        ) ?: return
-
-        attributes.put(PEER_SERVICE, serviceName)
+        updatePeerService(attributes, request)
     }
 
     override fun onEnd(
@@ -52,7 +42,26 @@ internal class PeerServiceAttributesExtractor(
         request: URLConnection,
         response: Int?,
         error: Throwable?
-    ) = Unit
+    ) {
+        updatePeerService(attributes, request)
+    }
+
+    private fun updatePeerService(attributes: AttributesBuilder, request: URLConnection) {
+        if (resolver.isEmpty()) {
+            return
+        }
+
+        val serviceName = resolver.resolve(
+            attributesGetter.getServerAddress(request),
+            attributesGetter.getServerPort(request)
+        )
+
+        if (serviceName == null) {
+            attributes.remove(PEER_SERVICE)
+        } else {
+            attributes.put(PEER_SERVICE, serviceName)
+        }
+    }
 
     private companion object {
         private val PEER_SERVICE = AttributeKey.stringKey("peer.service")

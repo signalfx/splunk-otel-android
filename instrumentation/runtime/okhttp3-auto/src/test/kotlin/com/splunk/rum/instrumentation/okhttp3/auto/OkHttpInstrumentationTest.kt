@@ -82,7 +82,7 @@ class OkHttpInstrumentationTest {
                 mapOf(
                     "api.example.test" to "host-service",
                     "api.example.test:8443" to "checkout-service",
-                    "api.example.test:8443/orders" to "orders-service"
+                    "api.example.test:8443" to "orders-service"
                 )
             )
             install(openTelemetry)
@@ -167,10 +167,10 @@ class OkHttpInstrumentationTest {
     }
 
     @Test
-    fun `uses the request path for peer service mapping`() {
+    fun `uses the host and port for peer service mapping`() {
         val extractor = PeerServiceAttributesExtractor(
             OkHttpAttributesGetter.INSTANCE,
-            mapOf("api.example.test:8443/orders" to "orders-service")
+            mapOf("api.example.test:8443" to "orders-service")
         )
         val attributes = Attributes.builder()
 
@@ -184,10 +184,10 @@ class OkHttpInstrumentationTest {
     }
 
     @Test
-    fun `falls back to host and port mapping when full URL is unavailable`() {
+    fun `uses host and port mapping without reading the full URL`() {
         val getter =
             object : HttpClientAttributesGetter<Interceptor.Chain, Response> by OkHttpAttributesGetter.INSTANCE {
-                override fun getUrlFull(request: Interceptor.Chain): String? = null
+                override fun getUrlFull(request: Interceptor.Chain): String = error("must not be called")
             }
         val extractor = PeerServiceAttributesExtractor(
             getter,

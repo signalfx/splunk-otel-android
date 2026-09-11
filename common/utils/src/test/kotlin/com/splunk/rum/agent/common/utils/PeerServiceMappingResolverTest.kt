@@ -23,65 +23,34 @@ import org.junit.Test
 class PeerServiceMappingResolverTest {
 
     @Test
-    fun `extracts path from full URL`() {
-        assertEquals(
-            "/orders/42",
-            PeerServiceMappingResolver.extractPath("https://api.example.test/orders/42?verbose=true")
-        )
-    }
-
-    @Test
-    fun `returns null for absent or malformed full URL`() {
-        assertNull(PeerServiceMappingResolver.extractPath(null))
-        assertNull(PeerServiceMappingResolver.extractPath("not a URL"))
-    }
-
-    @Test
-    fun `uses the most specific host port and path mapping`() {
+    fun `uses the most specific host and port mapping`() {
         val resolver = PeerServiceMappingResolver(
             mapOf(
                 "api.example.test" to "host-service",
-                "api.example.test:8443" to "port-service",
-                "api.example.test:8443/orders" to "orders-service"
+                "api.example.test:8443" to "port-service"
             )
         )
 
-        assertEquals(
-            "orders-service",
-            resolver.resolve("api.example.test", 8443, "/orders/42")
-        )
+        assertEquals("port-service", resolver.resolve("api.example.test", 8443))
     }
 
     @Test
-    fun `matches host and port mappings when no request path is available`() {
-        val resolver = PeerServiceMappingResolver(
-            mapOf(
-                "api.example.test" to "host-service",
-                "api.example.test:8443" to "port-service",
-                "api.example.test:8443/orders" to "orders-service"
-            )
-        )
-
-        assertEquals("port-service", resolver.resolve("api.example.test", 8443, null))
-    }
-
-    @Test
-    fun `does not match a portless path mapping for a request with an explicit port`() {
+    fun `ignores path-qualified mappings`() {
         val resolver = PeerServiceMappingResolver(
             mapOf("api.example.test/orders" to "orders-service")
         )
 
-        assertNull(resolver.resolve("api.example.test", 8443, "/orders/42"))
-        assertEquals("orders-service", resolver.resolve("api.example.test", null, "/orders/42"))
+        assertNull(resolver.resolve("api.example.test", 8443))
+        assertNull(resolver.resolve("api.example.test", null))
     }
 
     @Test
     fun `normalizes the absent port sentinel`() {
         val resolver = PeerServiceMappingResolver(
-            mapOf("api.example.test/orders" to "orders-service")
+            mapOf("api.example.test" to "orders-service")
         )
 
-        assertEquals("orders-service", resolver.resolve("api.example.test", -1, "/orders/42"))
+        assertEquals("orders-service", resolver.resolve("api.example.test", -1))
     }
 
     @Test
@@ -89,10 +58,10 @@ class PeerServiceMappingResolverTest {
         val resolver = PeerServiceMappingResolver(
             mapOf(
                 "not a valid host" to "invalid",
-                "other.example.test:8443/orders" to "other-service"
+                "other.example.test:8443" to "other-service"
             )
         )
 
-        assertNull(resolver.resolve("api.example.test", 8443, "/orders/42"))
+        assertNull(resolver.resolve("api.example.test", 8443))
     }
 }
