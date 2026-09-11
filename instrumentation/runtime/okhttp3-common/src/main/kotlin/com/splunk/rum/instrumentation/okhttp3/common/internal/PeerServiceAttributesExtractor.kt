@@ -15,33 +15,25 @@
  * limitations under the License.
  */
 
-package com.splunk.rum.instrumentation.okhttp3.auto.internal
+package com.splunk.rum.instrumentation.okhttp3.common.internal
 
 import com.splunk.rum.agent.common.utils.PeerServiceMappingResolver
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
-import io.opentelemetry.instrumentation.api.semconv.network.ServerAttributesGetter
+import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesGetter
 import okhttp3.Interceptor
 import okhttp3.Response
 
-/** Extracts the configured `peer.service` mapping for auto-instrumented OkHttp requests. */
-internal class PeerServiceAttributesExtractor(
-    private val attributesGetter: ServerAttributesGetter<Interceptor.Chain>,
+/** Extracts the configured `peer.service` mapping for OkHttp requests. */
+class PeerServiceAttributesExtractor(
+    private val attributesGetter: HttpClientAttributesGetter<Interceptor.Chain, Response>,
     peerServiceMapping: Map<String, String>
 ) : AttributesExtractor<Interceptor.Chain, Response> {
     private val resolver = PeerServiceMappingResolver(peerServiceMapping)
 
-    override fun onStart(attributes: AttributesBuilder, parentContext: Context, request: Interceptor.Chain) = Unit
-
-    override fun onEnd(
-        attributes: AttributesBuilder,
-        context: Context,
-        request: Interceptor.Chain,
-        response: Response?,
-        error: Throwable?
-    ) {
+    override fun onStart(attributes: AttributesBuilder, parentContext: Context, request: Interceptor.Chain) {
         if (resolver.isEmpty()) {
             return
         }
@@ -49,11 +41,19 @@ internal class PeerServiceAttributesExtractor(
         val serviceName = resolver.resolve(
             attributesGetter.getServerAddress(request),
             attributesGetter.getServerPort(request),
-            null
+            PeerServiceMappingResolver.extractPath(attributesGetter.getUrlFull(request))
         ) ?: return
 
         attributes.put(PEER_SERVICE, serviceName)
     }
+
+    override fun onEnd(
+        attributes: AttributesBuilder,
+        context: Context,
+        request: Interceptor.Chain,
+        response: Response?,
+        error: Throwable?
+    ) = Unit
 
     private companion object {
         private val PEER_SERVICE = AttributeKey.stringKey("peer.service")

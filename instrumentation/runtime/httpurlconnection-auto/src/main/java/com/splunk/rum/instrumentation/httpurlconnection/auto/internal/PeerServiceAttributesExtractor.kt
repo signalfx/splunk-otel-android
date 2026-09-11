@@ -23,7 +23,6 @@ import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesGetter
-import java.net.URI
 import java.net.URLConnection
 
 /** Extracts the configured `peer.service` mapping for HttpURLConnection requests. */
@@ -33,15 +32,7 @@ internal class PeerServiceAttributesExtractor(
 ) : AttributesExtractor<URLConnection, Int> {
     private val resolver = PeerServiceMappingResolver(peerServiceMapping)
 
-    override fun onStart(attributes: AttributesBuilder, parentContext: Context, request: URLConnection) = Unit
-
-    override fun onEnd(
-        attributes: AttributesBuilder,
-        context: Context,
-        request: URLConnection,
-        response: Int?,
-        error: Throwable?
-    ) {
+    override fun onStart(attributes: AttributesBuilder, parentContext: Context, request: URLConnection) {
         if (resolver.isEmpty()) {
             return
         }
@@ -49,11 +40,19 @@ internal class PeerServiceAttributesExtractor(
         val serviceName = resolver.resolve(
             attributesGetter.getServerAddress(request),
             attributesGetter.getServerPort(request),
-            runCatching { URI(request.url.toString()).path }.getOrNull()
+            PeerServiceMappingResolver.extractPath(attributesGetter.getUrlFull(request))
         ) ?: return
 
         attributes.put(PEER_SERVICE, serviceName)
     }
+
+    override fun onEnd(
+        attributes: AttributesBuilder,
+        context: Context,
+        request: URLConnection,
+        response: Int?,
+        error: Throwable?
+    ) = Unit
 
     private companion object {
         private val PEER_SERVICE = AttributeKey.stringKey("peer.service")

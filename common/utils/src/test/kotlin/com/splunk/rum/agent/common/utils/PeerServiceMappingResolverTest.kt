@@ -23,6 +23,20 @@ import org.junit.Test
 class PeerServiceMappingResolverTest {
 
     @Test
+    fun `extracts path from full URL`() {
+        assertEquals(
+            "/orders/42",
+            PeerServiceMappingResolver.extractPath("https://api.example.test/orders/42?verbose=true")
+        )
+    }
+
+    @Test
+    fun `returns null for absent or malformed full URL`() {
+        assertNull(PeerServiceMappingResolver.extractPath(null))
+        assertNull(PeerServiceMappingResolver.extractPath("not a URL"))
+    }
+
+    @Test
     fun `uses the most specific host port and path mapping`() {
         val resolver = PeerServiceMappingResolver(
             mapOf(

@@ -37,12 +37,10 @@ class PeerServiceAttributesExtractorTest {
         )
         val attributes = Attributes.builder()
 
-        extractor.onEnd(
+        extractor.onStart(
             attributes,
             Context.root(),
-            StubHttpURLConnection(URL("https://api.example.test/orders/42")),
-            200,
-            null
+            StubHttpURLConnection(URL("https://api.example.test/orders/42"))
         )
 
         assertEquals(Attributes.empty(), attributes.build())
@@ -60,12 +58,10 @@ class PeerServiceAttributesExtractorTest {
         )
         val attributes = Attributes.builder()
 
-        extractor.onEnd(
+        extractor.onStart(
             attributes,
             Context.root(),
-            StubHttpURLConnection(URL("https://api.example.test:8443/orders/42")),
-            200,
-            null
+            StubHttpURLConnection(URL("https://api.example.test:8443/orders/42"))
         )
 
         assertEquals("orders-service", attributes.build().get(PEER_SERVICE))
@@ -79,12 +75,10 @@ class PeerServiceAttributesExtractorTest {
         )
         val attributes = Attributes.builder()
 
-        extractor.onEnd(
+        extractor.onStart(
             attributes,
             Context.root(),
-            StubHttpURLConnection(URL("https://api.example.test/orders/42")),
-            200,
-            null
+            StubHttpURLConnection(URL("https://api.example.test/orders/42"))
         )
 
         assertEquals("orders-service", attributes.build().get(PEER_SERVICE))
@@ -98,12 +92,10 @@ class PeerServiceAttributesExtractorTest {
         )
         val attributes = Attributes.builder()
 
-        extractor.onEnd(
+        extractor.onStart(
             attributes,
             Context.root(),
-            StubHttpURLConnection(URL("https://api.example.test:8443/orders%20archive/42")),
-            200,
-            null
+            StubHttpURLConnection(URL("https://api.example.test:8443/orders%20archive/42"))
         )
 
         assertEquals("orders-service", attributes.build().get(PEER_SERVICE))
@@ -120,12 +112,10 @@ class PeerServiceAttributesExtractorTest {
         )
         val attributes = Attributes.builder()
 
-        extractor.onEnd(
+        extractor.onStart(
             attributes,
             Context.root(),
-            StubHttpURLConnection(URL("https://api.example.test:8443/orders/42")),
-            200,
-            null
+            StubHttpURLConnection(URL("https://api.example.test:8443/orders/42"))
         )
 
         assertNull(attributes.build().get(PEER_SERVICE))

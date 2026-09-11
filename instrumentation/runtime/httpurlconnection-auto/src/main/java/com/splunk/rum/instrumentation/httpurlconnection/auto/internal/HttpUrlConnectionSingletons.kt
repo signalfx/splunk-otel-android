@@ -84,15 +84,17 @@ internal object HttpUrlConnectionSingletons {
         }
 
         // Avoid the instrumenter SPI lookup's one-time disk read, which trips Android StrictMode
-        // (see open-telemetry/opentelemetry-java-instrumentation#19954).
-        instrumenter = InstrumenterBuildUtils.synchronizedInstrumenterBuild {
-            ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
-            try {
-                builder.buildClientInstrumenter(RequestPropertySetter)
-            } finally {
+        // (see open-telemetry/opentelemetry-java-instrumentation issue #19954). ServiceLoaderUtil
+        // has no getter, so the reset below restores ServiceLoader::load rather than any custom
+        // process-wide loader that may have been installed by the host application.
+        instrumenter = InstrumenterBuildUtils.synchronizedInstrumenterBuild(
+            configureSpiLookup = { ServiceLoaderUtil.setLoadFunction { emptyList<Any>() } },
+            restoreSpiLookup = {
                 ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
-            }
-        }
+            },
+            build = { builder.buildClientInstrumenter(RequestPropertySetter) },
+            fallbackBuild = { builder.buildClientInstrumenter(RequestPropertySetter) }
+        )
     }
 
     fun instrumenter(): Instrumenter<URLConnection, Int>? = instrumenter

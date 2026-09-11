@@ -22,13 +22,12 @@ import com.splunk.rum.instrumentation.okhttp3.auto.OkHttpInstrumentation
 import com.splunk.rum.instrumentation.okhttp3.common.internal.ConnectionErrorSpanInterceptor
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpClientInstrumenterBuilderFactory
+import com.splunk.rum.instrumentation.okhttp3.common.internal.PeerServiceAttributesExtractor
 import com.splunk.rum.instrumentation.okhttp3.common.internal.TracingInterceptor
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.Scope
 import io.opentelemetry.instrumentation.api.incubator.builder.internal.DefaultHttpClientInstrumenterBuilder
-import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
-import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter
 import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
 import io.opentelemetry.instrumentation.api.semconv.http.HttpClientRequestResendCount
 import io.opentelemetry.instrumentation.api.semconv.http.HttpSpanNameExtractor
@@ -78,15 +77,17 @@ object OkHttpSingletons {
         }
 
         // Avoid the instrumenter SPI lookup's one-time disk read, which trips Android StrictMode
-        // (see open-telemetry/opentelemetry-java-instrumentation#19954).
-        val instrumenter = InstrumenterBuildUtils.synchronizedInstrumenterBuild {
-            ServiceLoaderUtil.setLoadFunction { emptyList<Any>() }
-            try {
-                instrumenterBuilder.build()
-            } finally {
+        // (see open-telemetry/opentelemetry-java-instrumentation issue #19954). ServiceLoaderUtil
+        // has no getter, so the reset below restores ServiceLoader::load rather than any custom
+        // process-wide loader that may have been installed by the host application.
+        val instrumenter = InstrumenterBuildUtils.synchronizedInstrumenterBuild(
+            configureSpiLookup = { ServiceLoaderUtil.setLoadFunction { emptyList<Any>() } },
+            restoreSpiLookup = {
                 ServiceLoaderUtil.setLoadFunction { serviceType -> ServiceLoader.load(serviceType) }
-            }
-        }
+            },
+            build = { instrumenterBuilder.build() },
+            fallbackBuild = { instrumenterBuilder.build() }
+        )
 
         connectionErrorInterceptor = ConnectionErrorSpanInterceptor(instrumenter)
         tracingInterceptor = TracingInterceptor(instrumenter, openTelemetry.propagators)

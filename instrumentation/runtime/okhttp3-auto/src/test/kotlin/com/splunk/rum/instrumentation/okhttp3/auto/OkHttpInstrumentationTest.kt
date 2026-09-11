@@ -18,7 +18,8 @@
 package com.splunk.rum.instrumentation.okhttp3.auto
 
 import com.splunk.rum.instrumentation.okhttp3.auto.internal.OkHttpSingletons
-import com.splunk.rum.instrumentation.okhttp3.auto.internal.PeerServiceAttributesExtractor
+import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter
+import com.splunk.rum.instrumentation.okhttp3.common.internal.PeerServiceAttributesExtractor
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -26,7 +27,7 @@ import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.ContextPropagators
 import io.opentelemetry.instrumentation.api.internal.ServiceLoaderUtil
-import io.opentelemetry.instrumentation.api.semconv.network.ServerAttributesGetter
+import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesGetter
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.SdkTracerProvider
@@ -138,7 +139,7 @@ class OkHttpInstrumentationTest {
             listOf("response-456"),
             span.attributes.get(AttributeKey.stringArrayKey("http.response.header.x-response-id"))
         )
-        assertEquals("checkout-service", span.attributes.get(AttributeKey.stringKey("peer.service")))
+        assertEquals("orders-service", span.attributes.get(AttributeKey.stringKey("peer.service")))
         assertEquals("503", span.attributes.get(AttributeKey.stringKey("error.type")))
         assertEquals(StatusCode.ERROR, span.status.statusCode)
     }
@@ -146,24 +147,62 @@ class OkHttpInstrumentationTest {
     @Test
     fun `does not read request attributes when peer service mapping is empty`() {
         val extractor = PeerServiceAttributesExtractor(
-            object : ServerAttributesGetter<Interceptor.Chain> {
+            object : HttpClientAttributesGetter<Interceptor.Chain, Response> by OkHttpAttributesGetter.INSTANCE {
                 override fun getServerAddress(request: Interceptor.Chain): String = error("must not be called")
 
                 override fun getServerPort(request: Interceptor.Chain): Int = error("must not be called")
+
+                override fun getUrlFull(request: Interceptor.Chain): String = error("must not be called")
             },
             emptyMap()
         )
         val attributes = Attributes.builder()
 
-        extractor.onEnd(
+        extractor.onStart(
             attributes,
             Context.root(),
-            FakeChain(Request.Builder().url("https://api.example.test/orders").build()),
-            null,
-            null
+            FakeChain(Request.Builder().url("https://api.example.test/orders").build())
         )
 
         assertEquals(Attributes.empty(), attributes.build())
+    }
+
+    @Test
+    fun `uses the request path for peer service mapping`() {
+        val extractor = PeerServiceAttributesExtractor(
+            OkHttpAttributesGetter.INSTANCE,
+            mapOf("api.example.test:8443/orders" to "orders-service")
+        )
+        val attributes = Attributes.builder()
+
+        extractor.onStart(
+            attributes,
+            Context.root(),
+            FakeChain(Request.Builder().url("https://api.example.test:8443/orders/42").build())
+        )
+
+        assertEquals("orders-service", attributes.build().get(AttributeKey.stringKey("peer.service")))
+    }
+
+    @Test
+    fun `falls back to host and port mapping when full URL is unavailable`() {
+        val getter =
+            object : HttpClientAttributesGetter<Interceptor.Chain, Response> by OkHttpAttributesGetter.INSTANCE {
+                override fun getUrlFull(request: Interceptor.Chain): String? = null
+            }
+        val extractor = PeerServiceAttributesExtractor(
+            getter,
+            mapOf("api.example.test:8443" to "checkout-service")
+        )
+        val attributes = Attributes.builder()
+
+        extractor.onStart(
+            attributes,
+            Context.root(),
+            FakeChain(Request.Builder().url("https://api.example.test:8443/orders").build())
+        )
+
+        assertEquals("checkout-service", attributes.build().get(AttributeKey.stringKey("peer.service")))
     }
 
     @Test

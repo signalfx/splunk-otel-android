@@ -132,9 +132,6 @@ internal object SplunkRumAgentCore {
             }
         }
 
-        // HttpUrlConnectionSingletons and OkHttpSingletons disable the instrumenter SPI lookup
-        // around their own instrumenter construction; scoped there instead of here so it doesn't
-        // affect the rest of this multi-module install().
         agentIntegration.install(application, openTelemetry, moduleConfigurations, globalAttributes)
 
         installTimestamp = System.currentTimeMillis()

@@ -16,7 +16,7 @@
 
 package com.splunk.rum.instrumentation.okhttp3
 
-import com.splunk.rum.instrumentation.okhttp3.internal.PeerServiceAttributesExtractor
+import com.splunk.rum.instrumentation.okhttp3.common.internal.PeerServiceAttributesExtractor
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.AttributesBuilder
 import io.opentelemetry.context.Context

@@ -83,7 +83,11 @@ class PeerServiceMappingResolver(peerServiceMapping: Map<String, String>) {
         }
     }
 
-    private companion object {
+    companion object {
+        /** Returns the path component of a URL, or null when the URL is absent or malformed. */
+        @JvmStatic
+        fun extractPath(url: String?): String? = url?.let { runCatching { URI(it).path }.getOrNull() }
+
         private val MAPPING_SPECIFICITY =
             compareBy<Mapping, Int?>(nullsFirst(naturalOrder())) { it.port }
                 .thenBy(nullsFirst(naturalOrder())) { it.path }

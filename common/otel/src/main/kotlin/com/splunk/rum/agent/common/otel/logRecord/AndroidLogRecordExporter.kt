@@ -117,6 +117,9 @@ internal class AndroidLogRecordExporter(
                 }
 
                 log.attributes.asMap().forEach attrs@{ (key, value) ->
+                    if (key.key == GlobalRumConstants.LOG_EVENT_NAME_KEY.key) {
+                        return@attrs
+                    }
                     when (value) {
                         is String -> spanBuilder.setAttribute(key.key, value)
                         is Long -> spanBuilder.setAttribute(key.key, value)

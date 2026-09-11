@@ -18,9 +18,10 @@ package com.splunk.rum.instrumentation.okhttp3;
 
 import android.annotation.SuppressLint;
 import com.splunk.rum.agent.common.utils.InstrumenterBuildUtils;
+import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter;
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpClientInstrumenterBuilderFactory;
+import com.splunk.rum.instrumentation.okhttp3.common.internal.PeerServiceAttributesExtractor;
 import com.splunk.rum.instrumentation.okhttp3.internal.Experimental;
-import com.splunk.rum.instrumentation.okhttp3.internal.PeerServiceAttributesExtractor;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.api.incubator.builder.internal.DefaultHttpClientInstrumenterBuilder;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
@@ -31,6 +32,7 @@ import io.opentelemetry.instrumentation.api.semconv.http.HttpClientAttributesExt
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -55,7 +57,7 @@ public final class OkHttpTelemetryBuilder {
   // Null unless the caller opts in via setSpanNameExtractor().
   private Function<SpanNameExtractor<Interceptor.Chain>, SpanNameExtractor<Interceptor.Chain>>
       spanNameExtractorTransformer;
-  private Map<String, String> peerServiceMapping = java.util.Collections.emptyMap();
+  private Map<String, String> peerServiceMapping = Collections.emptyMap();
   private boolean emitExperimentalHttpClientTelemetry;
 
   OkHttpTelemetryBuilder(OpenTelemetry openTelemetry) {
@@ -113,7 +115,7 @@ public final class OkHttpTelemetryBuilder {
    * Configures the extractor of the {@code peer.service} span attribute.
    */
   public OkHttpTelemetryBuilder setPeerServiceMapping(Map<String, String> peerServiceMapping) {
-    this.peerServiceMapping = new java.util.HashMap<>(peerServiceMapping);
+    this.peerServiceMapping = new HashMap<>(peerServiceMapping);
     return this;
   }
 
@@ -132,7 +134,7 @@ public final class OkHttpTelemetryBuilder {
         OkHttpClientInstrumenterBuilderFactory.create(openTelemetry);
     builder.addAttributesExtractor(
         new PeerServiceAttributesExtractor(
-            com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter.INSTANCE,
+            OkHttpAttributesGetter.INSTANCE,
             peerServiceMapping));
     for (AttributesExtractor<Interceptor.Chain, Response> extractor : additionalExtractors) {
       builder.addAttributesExtractor(extractor);
@@ -154,18 +156,22 @@ public final class OkHttpTelemetryBuilder {
   }
 
   // Avoid the instrumenter SPI lookup's one-time disk read, which trips Android StrictMode
-  // (see open-telemetry/opentelemetry-java-instrumentation#19954).
+  // (see open-telemetry/opentelemetry-java-instrumentation issue #19954). ServiceLoaderUtil has no
+  // getter, so the reset below restores ServiceLoader::load rather than any custom process-wide
+  // loader that may have been installed by the host application.
   private static Instrumenter<Interceptor.Chain, Response> buildInstrumenter(
       DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder) {
     return InstrumenterBuildUtils.synchronizedInstrumenterBuild(
         () -> {
           ServiceLoaderUtil.setLoadFunction(clazz -> Collections.emptyList());
-          try {
-            return builder.build();
-          } finally {
-            ServiceLoaderUtil.setLoadFunction(ServiceLoader::load);
-          }
-        });
+          return kotlin.Unit.INSTANCE;
+        },
+        () -> {
+          ServiceLoaderUtil.setLoadFunction(ServiceLoader::load);
+          return kotlin.Unit.INSTANCE;
+        },
+        builder::build,
+        builder::build);
   }
 
   // Isolated so Function#apply (requires API 24 or desugaring) only runs when a caller opts in
