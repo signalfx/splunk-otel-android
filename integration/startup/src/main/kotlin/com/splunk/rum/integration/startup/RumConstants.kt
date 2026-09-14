@@ -22,7 +22,7 @@ internal object RumConstants {
 
     const val COMPONENT_APP_START = "appstart"
     const val APP_START_SPAN_NAME = "AppStart"
-    const val APP_START_INITIALIZE_SPAN_NAME = "SplunkRum.initialize"
+    const val APP_START_INSTALL_SPAN_NAME = "SplunkRum.install"
 
     // Application start type
     const val APP_START_TYPE_COLD = "cold"
