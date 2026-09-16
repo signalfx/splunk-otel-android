@@ -50,13 +50,11 @@ internal object AgentPreferencesStore {
         }
     }
 
-    private fun createPreferences(context: Context): Preferences {
-        return Preferences.create {
-            FileSimplePermanentCache(
-                AgentStorageFiles.preferencesFile(context),
-                FileManagerFactory.createPlainFileManager()
-            )
-        }
+    private fun createPreferences(context: Context): Preferences = Preferences.create {
+        FileSimplePermanentCache(
+            AgentStorageFiles.preferencesFile(context),
+            FileManagerFactory.createPlainFileManager()
+        )
     }
 }
 
@@ -67,7 +65,5 @@ internal object AgentStorageFiles {
 
     fun versionDir(rootDir: File): File = File(rootDir, "$VERSION")
 
-    fun preferencesFile(context: Context): File {
-        return File(versionDir(rootDir(context)), "preferences/preferences.dat")
-    }
+    fun preferencesFile(context: Context): File = File(versionDir(rootDir(context)), "preferences/preferences.dat")
 }

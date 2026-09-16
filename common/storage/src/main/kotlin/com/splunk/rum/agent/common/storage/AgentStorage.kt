@@ -49,10 +49,7 @@ import org.json.JSONException
  *           ├─spans/
  *           └─session_replay/
  */
-class AgentStorage private constructor(
-    context: Context,
-    private val preferences: Preferences
-) : IAgentStorage {
+class AgentStorage private constructor(context: Context, private val preferences: Preferences) : IAgentStorage {
 
     private val internalStorage =
         Storage(FilePermanentCache(FileManagerFactory.createPlainFileManager()))
