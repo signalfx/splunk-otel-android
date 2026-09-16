@@ -3,11 +3,20 @@ package plugins
 import Configurations
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.withType
 
 class ConfigAndroidLibrary : Plugin<Project> by local plugin {
     apply<ConfigLint>()
     apply<ConfigJacoco>()
+
+    tasks.withType<Test> {
+        systemProperty(
+            "robolectric.dependency.repo.url",
+            "https://maven-central.storage-download.googleapis.com/maven2"
+        )
+    }
 
     android {
         buildFeatures {

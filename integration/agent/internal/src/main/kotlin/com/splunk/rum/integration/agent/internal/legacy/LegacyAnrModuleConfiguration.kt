@@ -17,13 +17,17 @@
 package com.splunk.rum.integration.agent.internal.legacy
 
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import java.time.Duration
 
+@Suppress("NewApi") // Duration requires API 26 or core library desugaring
 @Deprecated("Only to support legacy API, can be removed with legacy API.")
-class LegacyAnrModuleConfiguration(val isEnabled: Boolean = true) : ModuleConfiguration {
+class LegacyAnrModuleConfiguration(val isEnabled: Boolean = true, val threshold: Duration = Duration.ofSeconds(5)) :
+    ModuleConfiguration {
 
     override val name: String = "anr"
 
     override val attributes: List<Pair<String, String>> = listOf(
-        "enabled" to isEnabled.toString()
+        "enabled" to isEnabled.toString(),
+        "threshold" to threshold.toString()
     )
 }

@@ -1,0 +1,8 @@
+ext.commonRepositories = {
+    maven {
+        name = 'mavenCentralMirror'
+        url = 'https://maven-central.storage-download.googleapis.com/maven2/'
+    }
+    google()
+    mavenCentral()
+}

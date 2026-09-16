@@ -94,6 +94,8 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
         )
 
         fun onPostInstall()
+
+        fun onInstallSkipped() {}
     }
 
     companion object {
@@ -108,6 +110,18 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
 
         var lowestApiLevel: Int = Constants.LOWEST_RUNTIME_API_LEVEL
 
+        @Volatile
+        var installStartTimestamp: Long? = null
+
+        @Volatile
+        var installStartElapsed: Long? = null
+
+        @Volatile
+        var installEndElapsed: Long? = null
+
+        @Volatile
+        var onInstallTimingComplete: (() -> Unit)? = null
+
         val instance: AgentIntegration
             get() = instanceInternal
                 ?: throw IllegalStateException("Instance is not created, call createInstance() first")
@@ -118,6 +132,14 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
             }
 
             return instanceInternal!!
+        }
+
+        /** No-ops when no module has attached, so the instance is not created on a no-op install path. */
+        fun notifyInstallSkipped() {
+            val instance = instanceInternal ?: return
+
+            Logger.d(TAG, "notifyInstallSkipped()")
+            instance.listeners.forEachFast { it.onInstallSkipped() }
         }
 
         fun registerModuleInitializationStart(name: String) {

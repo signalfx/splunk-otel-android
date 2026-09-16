@@ -35,7 +35,7 @@ import java.net.UnknownHostException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-internal class UploadOtelSpanDataJob : JobService() {
+internal open class UploadOtelSpanDataJob : JobService() {
 
     private val storage by lazy { AgentStorage.attach(application) }
     private val jobIdStorage by lazy { JobIdStorage.init(application, isEncrypted = false) }

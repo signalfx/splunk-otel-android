@@ -52,7 +52,7 @@ class OpenTelemetryInitializer(
         val jobManager = JobManager.attach(application)
         val jobIdStorage = JobIdStorage.init(application, isEncrypted = false)
 
-        resource = Resource.getDefault()
+        resource = Resource.empty()
 
         val spanExporter = SpanInterceptorExporter(
             AndroidSpanExporter(

@@ -35,13 +35,14 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
 ) {
 
     private const val TAG = "ApplicationLifecycleModuleIntegration"
+    private const val MAX_CACHE_SIZE = 10
 
     private var canReport: Boolean? = null
     private val cache: MutableList<ApplicationLifecycleData> = mutableListOf()
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach() called")
-        AppStateObserver.listeners += appStateListener
+        registerAppStateListener()
         AppStateObserver.attach(context as Application)
     }
 
@@ -55,14 +56,39 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         if (moduleConfiguration.isEnabled) {
             Logger.d(TAG, "Module is enabled. Reporting events.")
             canReport = true
+            // A previous skipped install may have removed the listener.
+            registerAppStateListener()
             cache.forEachFast { reportEvent(it) }
         } else {
-            Logger.w(TAG, "Module is disabled.")
-            canReport = false
+            disableAndRemoveListener()
         }
 
         cache.clear()
     }
+
+    private fun registerAppStateListener() {
+        if (appStateListener !in AppStateObserver.listeners) {
+            AppStateObserver.listeners += appStateListener
+        }
+    }
+
+    public override fun onInstallSkipped() {
+        Logger.d(TAG, "Install skipped. Removing AppState listener.")
+        removeListenerAndClearCache()
+    }
+
+    internal fun disableAndRemoveListener() {
+        Logger.w(TAG, "Module is disabled. Removing AppState listener.")
+        removeListenerAndClearCache()
+    }
+
+    private fun removeListenerAndClearCache() {
+        canReport = false
+        AppStateObserver.listeners.removeAll { it === appStateListener }
+        cache.clear()
+    }
+
+    internal val appStateListenerReference: AppStateObserver.Listener get() = appStateListener
 
     private val appStateListener = object : AppStateObserver.Listener {
 
@@ -80,16 +106,14 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     }
 
     private fun reportEvent(applicationLifecycleData: ApplicationLifecycleData) {
-        if (canReport == false) {
-            Logger.i(TAG, "Cannot report event, module disabled.")
-            return
-        }
+        if (canReport == false) return
 
         val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider
 
         if (logger == null || canReport == null) {
-            Logger.i(TAG, "Tracer provider not ready or reporting status unknown. Caching event")
-            cache += applicationLifecycleData
+            if (cache.size < MAX_CACHE_SIZE) {
+                cache += applicationLifecycleData
+            }
             return
         }
 

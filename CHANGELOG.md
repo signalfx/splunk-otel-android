@@ -7,8 +7,29 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.3.5 - 2026-09-08
+
 ##### Enhancements:
-* Removed the OpenTelemetry Android runtime dependency
+* Added a configurable ANR detection threshold through `AnrModuleConfiguration.threshold`, defaulting to 5 seconds
+* Reworked ANR detection to measure elapsed time against the threshold, which changes when ANRs are reported
+
+##### Breaking changes:
+* **Binary compatibility: `AnrModuleConfiguration`**: adding `threshold` to the primary constructor changes the Kotlin-generated constructor and `copy()` JVM signatures. Applications built entirely from source remain source compatible and need no changes. Separately compiled libraries or wrapper AARs that construct or call `copy()` on `AnrModuleConfiguration` must be rebuilt against this release, otherwise they may throw `NoSuchMethodError` at runtime. Rebuilding is sufficient; no source changes are required.
+
+##### Fixes:
+* Fixed a host app crash during SDK startup when the `Choreographer` instance could not be obtained
+* Fixed `NoClassDefFoundError` when resolving optional classes by name
+* Fixed a single ANR stall being reported repeatedly; one ANR is now reported per stall
+
+### Version 2.3.4 - 2026-08-27
+
+##### Enhancements:
+* Removed the OpenTelemetry Android runtime dependency, which also removes the transitively declared `READ_PHONE_STATE` permission
+* Reduced SDK initialization work by no longer building the default OpenTelemetry resource separately
+
+##### Fixes:
+* Preserved old JobScheduler service entry points so upload jobs scheduled before 2.3.3 remain runnable after upgrading
+* Fixed `Server-Timing` header parsing to accept any trace flags value, not just `01`
 
 ### Version 2.3.3 - 2026-08-12
 

@@ -334,7 +334,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         executeGetRequest(
             "https://httpbin.org/response-headers" +
                 "?Server-Timing=traceparent;desc=\"00-00000000000000000000000000000001-0000000000000001-01\"" +
-                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-01\""
+                "&Server-Timing=traceparent;desc=\"00-00000000000000000000000000000002-0000000000000002-03\""
         )
 
         showDoneToast(R.string.server_timing_header_in_response)

@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.api
 
 import android.app.Application
 import android.os.Build
+import android.os.SystemClock
 import android.webkit.WebView
 import com.splunk.rum.agent.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.agent.common.storage.AgentStorage
@@ -275,6 +276,9 @@ class SplunkRum private constructor(
                 return instance
             }
 
+            val installStartMillis = System.currentTimeMillis()
+            val installStartElapsed = SystemClock.elapsedRealtime()
+
             Logger.consumers += AndroidLogConsumer()
             Logger.logLevel = if (agentConfiguration.enableDebugLogging) Log.Level.DEBUG else Log.Level.WARN
 
@@ -292,6 +296,7 @@ class SplunkRum private constructor(
 
             if (Build.VERSION.SDK_INT < lowestApiLevel) {
                 Logger.w(TAG, "install() - Unsupported Android version")
+                AgentIntegration.notifyInstallSkipped()
 
                 return SplunkRum(
                     agentStorage = null,
@@ -312,6 +317,7 @@ class SplunkRum private constructor(
 
             if (isSubprocess && agentConfiguration.instrumentedProcessName != null) {
                 Logger.d(TAG, "install() - Subprocess detected exiting")
+                AgentIntegration.notifyInstallSkipped()
 
                 return SplunkRum(
                     agentStorage = null,
@@ -341,6 +347,9 @@ class SplunkRum private constructor(
             // GlobalAttributeSpanProcessor and the public SplunkRum.globalAttributes API
             val globalAttributes = MutableAttributes(agentConfiguration.globalAttributes)
 
+            AgentIntegration.installStartTimestamp = installStartMillis
+            AgentIntegration.installStartElapsed = installStartElapsed
+
             val openTelemetry = SplunkRumAgentCore.install(
                 application,
                 agentConfiguration,
@@ -366,6 +375,11 @@ class SplunkRum private constructor(
                     offlineOtelDataProcessor.start(SplunkRumAgentCore.installTimestamp)
                 }
             )
+
+            AgentIntegration.installEndElapsed = SystemClock.elapsedRealtime()
+
+            AgentIntegration.onInstallTimingComplete?.invoke()
+            AgentIntegration.onInstallTimingComplete = null
 
             return instance
         }
