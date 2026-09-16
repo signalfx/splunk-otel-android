@@ -23,6 +23,8 @@ jobs:
           java-version: 17
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
+        with:
+          cache-provider: basic
 
       - name: Build and test
         run: touch ./local.properties; ./gradlew build javadoc assemble
