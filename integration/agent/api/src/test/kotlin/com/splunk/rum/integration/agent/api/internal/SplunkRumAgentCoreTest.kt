@@ -238,7 +238,6 @@ class SplunkRumAgentCoreTest {
         val preferencesStore = preferencesStoreClass.getField("INSTANCE").get(null)
         val preferencesField = preferencesStoreClass.getDeclaredField("instance")
         preferencesField.isAccessible = true
-        (preferencesField.get(preferencesStore) as? AutoCloseable)?.close()
         preferencesField.set(preferencesStore, null)
     }
 }

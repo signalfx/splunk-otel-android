@@ -46,7 +46,6 @@ internal object AgentPreferencesStore {
 
     internal fun resetForTest() {
         synchronized(lock) {
-            instance?.close()
             instance = null
         }
     }
