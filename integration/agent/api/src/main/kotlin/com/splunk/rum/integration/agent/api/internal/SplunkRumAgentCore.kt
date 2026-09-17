@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.api.internal
 
 import android.app.Application
 import com.splunk.rum.agent.common.otel.OpenTelemetryInitializer
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.agent.common.storage.AgentStorage
 import com.splunk.rum.common.logger.Logger
@@ -46,6 +47,7 @@ import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
+import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
 import java.util.UUID
 
@@ -95,10 +97,20 @@ internal object SplunkRumAgentCore {
 
         val agentIntegration = AgentIntegration.obtainInstance(application)
 
+        // Release session.start only after a span survives the customer interceptor. This avoids
+        // creating a session containing only session.start when the first span is filtered out.
+        val acceptedTelemetryInterceptor: (SpanData) -> SpanData? = { spanData ->
+            val acceptedSpan = agentConfiguration.spanInterceptor?.invoke(spanData) ?: spanData
+            if (acceptedSpan.attributes.get(SESSION_ID_KEY) != null) {
+                agentIntegration.emitSessionStartIfPending()
+            }
+            acceptedSpan
+        }
+
         val initializer = OpenTelemetryInitializer(
             application,
             agentConfiguration.deferredUntilForeground,
-            agentConfiguration.spanInterceptor
+            acceptedTelemetryInterceptor
         )
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
@@ -113,7 +125,11 @@ internal object SplunkRumAgentCore {
             .addLogRecordProcessor(ScreenNameLogRecordProcessor(ScreenNameTracker))
             .addLogRecordProcessor(SessionActivityLogProcessor(sessionManager))
             // Session Replay module is special case of Log Records that are NOT converted to Spans.
-            .addLogRecordProcessor(SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager))
+            .addLogRecordProcessor(
+                SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager) {
+                    agentIntegration.emitSessionStartIfPending()
+                }
+            )
 
         if (agentConfiguration.enableDebugLogging) {
             initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())

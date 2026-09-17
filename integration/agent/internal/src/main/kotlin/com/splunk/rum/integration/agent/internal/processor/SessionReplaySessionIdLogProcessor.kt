@@ -23,7 +23,10 @@ import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord
 
-class SessionReplaySessionIdLogProcessor(private val sessionManager: ISplunkSessionManager) : LogRecordProcessor {
+class SessionReplaySessionIdLogProcessor(
+    private val sessionManager: ISplunkSessionManager,
+    private val onSessionSignal: () -> Unit = {}
+) : LogRecordProcessor {
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
         val logRecordData = logRecord.toLogRecordData()
         if (logRecordData.instrumentationScopeInfo.name ==
@@ -33,6 +36,7 @@ class SessionReplaySessionIdLogProcessor(private val sessionManager: ISplunkSess
             logRecord.setAttribute(GlobalRumConstants.SESSION_ID_KEY, id)
                 .setAttribute(RumConstants.SESSION_RUM_ID_KEY, id)
                 .setAttribute(RumConstants.SCRIPT_INSTANCE_KEY, id.take(SCRIPT_ID_LENGTH))
+            onSessionSignal()
         }
     }
 
