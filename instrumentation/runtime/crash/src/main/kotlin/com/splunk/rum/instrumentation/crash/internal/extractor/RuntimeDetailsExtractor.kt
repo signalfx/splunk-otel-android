@@ -24,14 +24,13 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.AttributesBuilder
-import java.io.File
 
 /**
  * Captures details about the runtime environment (free storage, free heap, battery level) at the
  * time of a crash. The battery level is kept up to date via a broadcast receiver so it can be read
  * cheaply while the process is terminating.
  */
-internal class RuntimeDetailsExtractor private constructor(private val filesDir: File) :
+internal class RuntimeDetailsExtractor private constructor(private val context: Context) :
     BroadcastReceiver(),
     CrashAttributesExtractor {
 
@@ -45,7 +44,7 @@ internal class RuntimeDetailsExtractor private constructor(private val filesDir:
     }
 
     override fun extract(attributes: AttributesBuilder, crashDetails: CrashDetails) {
-        attributes.put(STORAGE_SPACE_FREE_KEY, filesDir.freeSpace)
+        attributes.put(STORAGE_SPACE_FREE_KEY, context.filesDir.freeSpace)
         attributes.put(HEAP_FREE_KEY, Runtime.getRuntime().freeMemory())
         batteryPercent?.let { attributes.put(BATTERY_PERCENT_KEY, it) }
     }
@@ -53,7 +52,7 @@ internal class RuntimeDetailsExtractor private constructor(private val filesDir:
     companion object {
         fun create(context: Context): RuntimeDetailsExtractor {
             val batteryChangedFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-            val runtimeDetails = RuntimeDetailsExtractor(context.filesDir)
+            val runtimeDetails = RuntimeDetailsExtractor(context.applicationContext)
             context.registerReceiver(runtimeDetails, batteryChangedFilter)
             return runtimeDetails
         }

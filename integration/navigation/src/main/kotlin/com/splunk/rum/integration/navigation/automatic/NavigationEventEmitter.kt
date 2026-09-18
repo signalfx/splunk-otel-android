@@ -76,7 +76,7 @@ internal class NavigationEventEmitter {
             .logRecordBuilder()
             .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
             .setAllAttributes(attributes)
-            .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstant.NAVIGATION_LOG_EVENT_NAME)
+            .setEventName(RumConstant.NAVIGATION_LOG_EVENT_NAME)
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstant.COMPONENT_NAVIGATION)
             .setAttribute(RumConstant.NAVIGATION_NAME_KEY, screenName)
             .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, screenName)

@@ -19,7 +19,6 @@ package com.splunk.rum.instrumentation.okhttp3.auto
 
 import com.splunk.rum.instrumentation.okhttp3.auto.internal.OkHttpSingletons
 import io.opentelemetry.api.OpenTelemetry
-import io.opentelemetry.instrumentation.api.incubator.semconv.net.PeerServiceResolver
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.api.internal.HttpConstants
 import okhttp3.Interceptor
@@ -78,7 +77,7 @@ class OkHttpInstrumentation {
 
     fun emitExperimentalHttpClientTelemetry(): Boolean = emitExperimentalHttpClientTelemetry
 
-    fun newPeerServiceResolver(): PeerServiceResolver = PeerServiceResolver.create(peerServiceMapping)
+    internal fun peerServiceMapping(): Map<String, String> = peerServiceMapping
 
     fun install(openTelemetry: OpenTelemetry) {
         OkHttpSingletons.configure(this, openTelemetry)

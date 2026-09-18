@@ -25,6 +25,11 @@ android {
 dependencies {
     implementation(platform(Dependencies.Otel.instrumentationBomAlpha))
 
+    implementation(project(":common:utils"))
+
     implementation(Dependencies.Otel.instrumentationApi)
     implementation(Dependencies.Otel.instrumentationApiIncubator)
+
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Otel.sdk)
 }

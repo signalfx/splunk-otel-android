@@ -18,9 +18,12 @@
 package com.splunk.rum.instrumentation.crash.internal.extractor
 
 import android.content.Context
+import android.content.ContextWrapper
 import androidx.test.core.app.ApplicationProvider
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
+import java.io.File
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -29,6 +32,27 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class RuntimeDetailsExtractorTest {
+
+    @Test
+    fun `defers files directory access until extraction`() {
+        var filesDirAccessed = false
+        val context = object : ContextWrapper(ApplicationProvider.getApplicationContext()) {
+            override fun getFilesDir(): File {
+                filesDirAccessed = true
+                return super.getFilesDir()
+            }
+
+            override fun getApplicationContext(): Context = this
+        }
+
+        val extractor = RuntimeDetailsExtractor.create(context)
+
+        assertFalse(filesDirAccessed)
+
+        extractor.extract(Attributes.builder(), CrashDetails(Thread.currentThread(), RuntimeException("boom")))
+
+        assertTrue(filesDirAccessed)
+    }
 
     @Test
     fun `adds storage and heap attributes`() {

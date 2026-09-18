@@ -19,7 +19,6 @@ package com.splunk.rum.instrumentation.httpurlconnection.auto
 
 import com.splunk.rum.instrumentation.httpurlconnection.auto.internal.HttpUrlConnectionSingletons
 import io.opentelemetry.api.OpenTelemetry
-import io.opentelemetry.instrumentation.api.incubator.semconv.net.PeerServiceResolver
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor
 import io.opentelemetry.instrumentation.api.internal.HttpConstants
 import java.net.URLConnection
@@ -59,7 +58,7 @@ class HttpUrlInstrumentation {
         this.peerServiceMapping = peerServiceMapping.toMap()
     }
 
-    fun newPeerServiceResolver(): PeerServiceResolver = PeerServiceResolver.create(peerServiceMapping)
+    internal fun peerServiceMapping(): Map<String, String> = peerServiceMapping
 
     /** When enabled, emits experimental HTTP client metrics. */
     fun setEmitExperimentalHttpClientMetrics(emitExperimentalHttpClientMetrics: Boolean) {
