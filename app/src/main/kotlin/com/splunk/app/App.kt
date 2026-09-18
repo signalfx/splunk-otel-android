@@ -19,11 +19,13 @@ package com.splunk.app
 import android.app.Application
 import android.os.Build
 import android.os.StrictMode
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.Status
 import com.splunk.rum.integration.agent.api.session.SessionConfiguration
 import com.splunk.rum.integration.agent.api.spaninterceptor.toMutableSpanData
 import com.splunk.rum.integration.agent.api.user.UserConfiguration
@@ -188,7 +190,13 @@ class App : Application() {
 
         val agent = SplunkRum.install(this, agentConfiguration, *moduleConfigurations)
 
-        configureAndStartSessionReplay(agent.sessionReplay)
+        if (agent.state.status == Status.Running) {
+            try {
+                configureAndStartSessionReplay(agent.sessionReplay)
+            } catch (exception: Exception) {
+                Log.w(TAG, "Unable to configure Session Replay", exception)
+            }
+        }
     }
 
     private fun configureAndStartSessionReplay(sessionReplay: SessionReplay) {
@@ -224,6 +232,7 @@ class App : Application() {
     }
 
     private companion object {
+        const val TAG = "SplunkApp"
         const val APP_NAME = "Splunk OTel Android"
         const val APP_VERSION = "1.0.0-test"
         const val DEPLOYMENT_ENVIRONMENT = "test"

@@ -51,6 +51,15 @@ import org.json.JSONException
  */
 class AgentStorage private constructor(context: Context, private val preferences: Preferences) : IAgentStorage {
 
+    /**
+     * Returns whether the shared preferences have completed their asynchronous initial load.
+     *
+     * This query never waits. Preference access through the storage methods retains its existing
+     * behavior and may wait for the load barrier.
+     */
+    val isPreferencesReady: Boolean
+        get() = preferences.isReady
+
     private val internalStorage =
         Storage(FilePermanentCache(FileManagerFactory.createPlainFileManager()))
 
