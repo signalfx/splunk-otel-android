@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.internal.processor
 
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
+import com.splunk.rum.integration.agent.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
@@ -29,10 +30,13 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
         if (span.attributes.get(SESSION_ID_KEY) == null) {
             span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
         }
-        if (span.attributes.get(PREVIOUS_SESSION_ID_KEY) == null) {
-            sessionManager.previousSessionId?.let {
-                span.setAttribute(PREVIOUS_SESSION_ID_KEY, it)
-            }
+        // Delayed session.start spans carry the previous session ID captured when their session
+        // was created. Ordinary spans must continue to use the SDK-managed value so a customer
+        // global attribute cannot override session ancestry.
+        if (span.name != RumConstants.SESSION_START_EVENT_NAME ||
+            span.attributes.get(PREVIOUS_SESSION_ID_KEY) == null
+        ) {
+            span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
         }
     }
 

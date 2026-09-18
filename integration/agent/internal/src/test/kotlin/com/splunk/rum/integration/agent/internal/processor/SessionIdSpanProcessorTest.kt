@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.internal.processor
 
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
+import com.splunk.rum.integration.agent.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.context.Context
@@ -34,7 +35,7 @@ class SessionIdSpanProcessorTest {
     private val processor = SessionIdSpanProcessor(sessionManager)
 
     @Test
-    fun `preserves a previous session id already attached to the span`() {
+    fun `preserves the captured previous session id on session start`() {
         val span = mockSpan(
             Attributes.of(
                 SESSION_ID_KEY,
@@ -43,6 +44,7 @@ class SessionIdSpanProcessorTest {
                 "session-before"
             )
         )
+        `when`(span.name).thenReturn(RumConstants.SESSION_START_EVENT_NAME)
         `when`(sessionManager.previousSessionId).thenReturn("session-a")
 
         processor.onStart(Context.root(), span)
@@ -53,6 +55,23 @@ class SessionIdSpanProcessorTest {
     @Test
     fun `adds the current previous session id when the span has none`() {
         val span = mockSpan(Attributes.of(SESSION_ID_KEY, "session-a"))
+        `when`(sessionManager.previousSessionId).thenReturn("session-before")
+
+        processor.onStart(Context.root(), span)
+
+        verify(span).setAttribute(PREVIOUS_SESSION_ID_KEY, "session-before")
+    }
+
+    @Test
+    fun `overwrites a customer previous session id on ordinary spans`() {
+        val span = mockSpan(
+            Attributes.of(
+                SESSION_ID_KEY,
+                "session-a",
+                PREVIOUS_SESSION_ID_KEY,
+                "customer-value"
+            )
+        )
         `when`(sessionManager.previousSessionId).thenReturn("session-before")
 
         processor.onStart(Context.root(), span)
