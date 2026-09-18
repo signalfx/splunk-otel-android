@@ -16,8 +16,10 @@
 
 package com.splunk.rum.integration.agent.internal.session
 
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.DEFAULT_SCREEN_NAME
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.LOG_EVENT_NAME_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SCREEN_NAME_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.RumConstants
 import io.opentelemetry.api.logs.Logger
@@ -46,8 +48,13 @@ internal class SessionStartEmitter {
      * Holds the `session.start` event of [sessionId]. An event still held for an earlier session is
      * dropped, because that session produced no telemetry to own it.
      */
-    fun onSessionCreated(sessionId: String, previousSessionId: String?, timestamp: Long) {
-        val event = PendingSessionStart(sessionId, previousSessionId, timestamp)
+    fun onSessionCreated(
+        sessionId: String,
+        previousSessionId: String?,
+        timestamp: Long,
+        screenName: String = DEFAULT_SCREEN_NAME
+    ) {
+        val event = PendingSessionStart(sessionId, previousSessionId, timestamp, screenName)
         pending.set(event)
     }
 
@@ -77,9 +84,15 @@ internal class SessionStartEmitter {
             .setAttribute(LOG_EVENT_NAME_KEY, RumConstants.SESSION_START_EVENT_NAME)
             .setTimestamp(event.timestamp, TimeUnit.MILLISECONDS)
             .setAttribute(SESSION_ID_KEY, event.sessionId)
+            .setAttribute(SCREEN_NAME_KEY, event.screenName)
             .apply { event.previousSessionId?.let { setAttribute(PREVIOUS_SESSION_ID_KEY, it) } }
             .emit()
     }
 
-    private class PendingSessionStart(val sessionId: String, val previousSessionId: String?, val timestamp: Long)
+    private class PendingSessionStart(
+        val sessionId: String,
+        val previousSessionId: String?,
+        val timestamp: Long,
+        val screenName: String
+    )
 }

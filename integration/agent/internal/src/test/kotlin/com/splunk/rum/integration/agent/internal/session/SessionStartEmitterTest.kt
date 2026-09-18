@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.internal.session
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.LOG_EVENT_NAME_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.RUM_TRACER_NAME
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SCREEN_NAME_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.RumConstants
 import io.opentelemetry.sdk.common.CompletableResultCode
@@ -57,7 +58,12 @@ class SessionStartEmitterTest {
 
     @Test
     fun `emits the held event once the session produces a signal`() {
-        emitter.onSessionCreated("session-a", previousSessionId = "session-before", timestamp = 1_000L)
+        emitter.onSessionCreated(
+            "session-a",
+            previousSessionId = "session-before",
+            timestamp = 1_000L,
+            screenName = "Home"
+        )
 
         emitter.emitIfPending()
 
@@ -65,6 +71,7 @@ class SessionStartEmitterTest {
         assertEquals(RumConstants.SESSION_START_EVENT_NAME, record.attributes.get(LOG_EVENT_NAME_KEY))
         assertEquals("session-a", record.attributes.get(SESSION_ID_KEY))
         assertEquals("session-before", record.attributes.get(PREVIOUS_SESSION_ID_KEY))
+        assertEquals("Home", record.attributes.get(SCREEN_NAME_KEY))
     }
 
     @Test

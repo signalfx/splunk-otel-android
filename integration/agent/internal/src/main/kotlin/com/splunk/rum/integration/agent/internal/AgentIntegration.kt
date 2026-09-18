@@ -24,6 +24,7 @@ import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.agent.internal.model.Module
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.session.SessionStartEmitter
@@ -54,7 +55,12 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
         listeners.forEachFast { it.onSessionManagerReady(sessionManager) }
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
-                sessionStartEmitter.onSessionCreated(sessionId, sessionManager.previousSessionId, timestamp)
+                sessionStartEmitter.onSessionCreated(
+                    sessionId,
+                    sessionManager.previousSessionId,
+                    timestamp,
+                    ScreenNameTracker.screenName
+                )
             }
         }
         sessionManager.install(application)
