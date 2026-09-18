@@ -125,8 +125,8 @@ internal object SplunkRumAgentCore {
             .addLogRecordProcessor(SessionActivityLogProcessor(sessionManager))
             // Session Replay module is special case of Log Records that are NOT converted to Spans.
             .addLogRecordProcessor(
-                SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager) {
-                    sessionId -> agentIntegration.emitSessionStartIfPending(sessionId)
+                SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager) { sessionId ->
+                    agentIntegration.emitSessionStartIfPending(sessionId)
                 }
             )
 
