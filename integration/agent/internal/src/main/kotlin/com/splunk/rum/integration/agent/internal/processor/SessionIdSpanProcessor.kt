@@ -29,7 +29,11 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
         if (span.attributes.get(SESSION_ID_KEY) == null) {
             span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
         }
-        span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
+        if (span.attributes.get(PREVIOUS_SESSION_ID_KEY) == null) {
+            sessionManager.previousSessionId?.let {
+                span.setAttribute(PREVIOUS_SESSION_ID_KEY, it)
+            }
+        }
     }
 
     override fun isStartRequired(): Boolean = true
