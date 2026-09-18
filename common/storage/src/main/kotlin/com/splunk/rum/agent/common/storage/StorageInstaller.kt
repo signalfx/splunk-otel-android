@@ -27,7 +27,12 @@ internal class StorageInstaller : ContentProvider() {
 
     override fun onCreate(): Boolean {
         val application = context?.applicationContext as Application
-        runOnBackgroundThread {
+
+        // Only the lightweight owner is published here. The cache path, cache object, file read, and
+        // deserialization are performed by the Preferences worker.
+        AgentPreferencesStore.preload(application)
+
+        runOnBackgroundThread(name = "SplunkStorageBackgroundInit") {
             AgentStorage.attach(application)
         }
         return true

@@ -339,8 +339,9 @@ class SplunkRum private constructor(
                 storage
             )
 
-            val sessionManager = AgentIntegration.obtainInstance(application).sessionManager
-            val offlineOtelDataProcessor = OfflineOtelDataProcessor.attach(application)
+            val agentIntegration = AgentIntegration.obtainInstance(application)
+            val sessionManager = agentIntegration.createSessionManager(storage)
+            val offlineOtelDataProcessor = OfflineOtelDataProcessor.attach(application, storage)
 
             // The shared MutableAttributes instance used by both
             // GlobalAttributeSpanProcessor and the public SplunkRum.globalAttributes API
@@ -354,6 +355,7 @@ class SplunkRum private constructor(
                 agentConfiguration,
                 userManager,
                 sessionManager,
+                storage,
                 moduleConfigurations.toList(),
                 globalAttributes,
                 offlineOtelDataProcessor

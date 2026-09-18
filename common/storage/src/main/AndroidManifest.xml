@@ -5,6 +5,7 @@
             android:name=".StorageInstaller"
             android:authorities="${applicationId}.StorageInstaller"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:initOrder="1" />
     </application>
 </manifest>
