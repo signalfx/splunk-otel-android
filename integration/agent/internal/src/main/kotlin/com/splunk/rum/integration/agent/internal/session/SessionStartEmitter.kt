@@ -57,11 +57,17 @@ internal class SessionStartEmitter {
      * Clearing the slot before emitting keeps the emitted record from re-entering here through the
      * processors that call this and emitting the event twice.
      */
-    fun emitIfPending() {
+    fun emitIfPending(sessionId: String? = null) {
         if (logger == null) return
-        val event = pending.getAndSet(null) ?: return
 
-        emit(event)
+        while (true) {
+            val event = pending.get() ?: return
+            if (sessionId != null && event.sessionId != sessionId) return
+            if (pending.compareAndSet(event, null)) {
+                emit(event)
+                return
+            }
+        }
     }
 
     private fun emit(event: PendingSessionStart) {

@@ -100,10 +100,9 @@ internal object SplunkRumAgentCore {
         // Release session.start only after a span survives the customer interceptor. This avoids
         // creating a session containing only session.start when the first span is filtered out.
         val acceptedTelemetryInterceptor: (SpanData) -> SpanData? = { spanData ->
-            val acceptedSpan = agentConfiguration.spanInterceptor?.invoke(spanData) ?: spanData
-            if (acceptedSpan.attributes.get(SESSION_ID_KEY) != null) {
-                agentIntegration.emitSessionStartIfPending()
-            }
+            val interceptor = agentConfiguration.spanInterceptor
+            val acceptedSpan = if (interceptor == null) spanData else interceptor(spanData)
+            acceptedSpan?.attributes?.get(SESSION_ID_KEY)?.let(agentIntegration::emitSessionStartIfPending)
             acceptedSpan
         }
 
@@ -127,7 +126,7 @@ internal object SplunkRumAgentCore {
             // Session Replay module is special case of Log Records that are NOT converted to Spans.
             .addLogRecordProcessor(
                 SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager) {
-                    agentIntegration.emitSessionStartIfPending()
+                    sessionId -> agentIntegration.emitSessionStartIfPending(sessionId)
                 }
             )
 

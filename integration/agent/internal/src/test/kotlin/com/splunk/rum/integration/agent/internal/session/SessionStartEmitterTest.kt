@@ -97,6 +97,24 @@ class SessionStartEmitterTest {
     }
 
     @Test
+    fun `does not release a pending event for a different session`() {
+        emitter.onSessionCreated("session-a", previousSessionId = null, timestamp = 1_000L)
+
+        emitter.emitIfPending("session-before")
+
+        assertTrue(exporter.records.isEmpty())
+    }
+
+    @Test
+    fun `releases a pending event when the signal belongs to that session`() {
+        emitter.onSessionCreated("session-a", previousSessionId = null, timestamp = 1_000L)
+
+        emitter.emitIfPending("session-a")
+
+        assertEquals("session-a", exporter.records.single().attributes.get(SESSION_ID_KEY))
+    }
+
+    @Test
     fun `drops the held event of a session that produced nothing before the next one started`() {
         emitter.onSessionCreated("session-a", previousSessionId = null, timestamp = 1_000L)
         emitter.onSessionCreated("session-b", previousSessionId = "session-a", timestamp = 2_000L)

@@ -81,8 +81,8 @@ class AgentIntegration private constructor(context: Context) {
     }
 
     /** Emits the pending session.start after application telemetry has been accepted. */
-    fun emitSessionStartIfPending() {
-        sessionStartEmitter.emitIfPending()
+    fun emitSessionStartIfPending(sessionId: String? = null) {
+        sessionStartEmitter.emitIfPending(sessionId)
     }
 
     internal interface Listener {
