@@ -20,7 +20,7 @@ import android.app.Application
 import com.splunk.rum.agent.common.otel.OpenTelemetryInitializer
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.OfflineOtelDataProcessor
-import com.splunk.rum.agent.common.storage.AgentStorage
+import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.api.AgentConfiguration
@@ -62,6 +62,7 @@ internal object SplunkRumAgentCore {
         agentConfiguration: AgentConfiguration,
         userManager: IUserManager,
         sessionManager: ISplunkSessionManager,
+        storage: IAgentStorage,
         moduleConfigurations: List<ModuleConfiguration>,
         globalAttributes: MutableAttributes,
         offlineOtelDataProcessor: OfflineOtelDataProcessor
@@ -86,8 +87,6 @@ internal object SplunkRumAgentCore {
 
         sessionManager.reset()
 
-        val storage = AgentStorage.attach(application)
-
         val appInstallationID = storage.readAppInstallationId() ?: UUID.randomUUID().toString().replace("-", "").also {
             storage.writeAppInstallationId(it)
         }
@@ -108,6 +107,7 @@ internal object SplunkRumAgentCore {
 
         val initializer = OpenTelemetryInitializer(
             application,
+            storage,
             agentConfiguration.deferredUntilForeground,
             acceptedTelemetryInterceptor
         )
@@ -119,13 +119,13 @@ internal object SplunkRumAgentCore {
             .joinResources(AgentResource.allResource(application, appInstallationID, finalConfiguration))
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
-            .addSpanProcessor(SessionIdSpanProcessor(agentIntegration.sessionManager))
+            .addSpanProcessor(SessionIdSpanProcessor(sessionManager))
             .addSpanProcessor(SplunkInternalGlobalAttributeSpanProcessor())
             .addLogRecordProcessor(ScreenNameLogRecordProcessor(ScreenNameTracker))
             .addLogRecordProcessor(SessionActivityLogProcessor(sessionManager))
             // Session Replay module is special case of Log Records that are NOT converted to Spans.
             .addLogRecordProcessor(
-                SessionReplaySessionIdLogProcessor(agentIntegration.sessionManager) { sessionId ->
+                SessionReplaySessionIdLogProcessor(sessionManager) { sessionId ->
                     agentIntegration.emitSessionStartIfPending(sessionId)
                 }
             )
@@ -150,7 +150,7 @@ internal object SplunkRumAgentCore {
             }
         }
 
-        agentIntegration.install(application, openTelemetry, moduleConfigurations, globalAttributes)
+        agentIntegration.install(application, openTelemetry, sessionManager, moduleConfigurations, globalAttributes)
 
         installTimestamp = System.currentTimeMillis()
         if (agentConfiguration.endpoint != null) {

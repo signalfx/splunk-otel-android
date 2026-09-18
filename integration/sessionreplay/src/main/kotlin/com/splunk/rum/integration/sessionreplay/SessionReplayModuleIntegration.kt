@@ -55,6 +55,8 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
     private var isInstalled = false
     private val runtimeState = RuntimeState()
 
+    override val observesSessionChanges: Boolean = true
+
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach()")
 

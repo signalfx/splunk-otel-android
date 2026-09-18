@@ -20,7 +20,7 @@ import android.app.Application
 import android.content.Context
 import android.os.SystemClock
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.RUM_TRACER_NAME
-import com.splunk.rum.agent.common.storage.AgentStorage
+import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
@@ -32,21 +32,16 @@ import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.OpenTelemetrySdk
 
-class AgentIntegration private constructor(context: Context) {
-    val sessionManager: ISplunkSessionManager
+class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context: Context) {
     internal val sessionStartEmitter = SessionStartEmitter()
     internal val listeners: MutableSet<Listener> = HashSet()
     var globalAttributes: Attributes = Attributes.empty()
         private set
 
-    init {
-        val storage = AgentStorage.attach(context)
-        sessionManager = SplunkSessionManager(storage)
-    }
-
     fun install(
         application: Application,
         openTelemetry: OpenTelemetrySdk,
+        sessionManager: ISplunkSessionManager,
         moduleConfigurations: List<ModuleConfiguration>,
         globalAttributes: Attributes
     ) {
@@ -56,6 +51,7 @@ class AgentIntegration private constructor(context: Context) {
 
         sessionStartEmitter.attach(openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME))
 
+        listeners.forEachFast { it.onSessionManagerReady(sessionManager) }
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 sessionStartEmitter.onSessionCreated(sessionId, sessionManager.previousSessionId, timestamp)
@@ -85,7 +81,11 @@ class AgentIntegration private constructor(context: Context) {
         sessionStartEmitter.emitIfPending(sessionId)
     }
 
+    fun createSessionManager(agentStorage: IAgentStorage): ISplunkSessionManager = SplunkSessionManager(agentStorage)
+
     internal interface Listener {
+        fun onSessionManagerReady(sessionManager: ISplunkSessionManager)
+
         fun onInstall(
             application: Application,
             openTelemetry: OpenTelemetry,
