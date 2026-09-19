@@ -30,9 +30,9 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
         if (span.attributes.get(SESSION_ID_KEY) == null) {
             span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
         }
-        // Delayed session.start spans carry the previous session ID captured when their session
-        // was created. Ordinary spans must continue to use the SDK-managed value so a customer
-        // global attribute cannot override session ancestry.
+        // session.start keeps the previous session ID from when that session was created.
+        // Other spans should always use the SDK's current value so customer attributes
+        // cannot change which previous session the span is associated with.
         if (span.name != RumConstants.SESSION_START_EVENT_NAME ||
             span.attributes.get(PREVIOUS_SESSION_ID_KEY) == null
         ) {
