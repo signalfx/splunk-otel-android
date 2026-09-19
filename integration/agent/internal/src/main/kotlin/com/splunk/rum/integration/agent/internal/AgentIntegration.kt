@@ -19,23 +19,22 @@ package com.splunk.rum.integration.agent.internal
 import android.app.Application
 import android.content.Context
 import android.os.SystemClock
-import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
-import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.RUM_TRACER_NAME
-import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.agent.internal.model.Module
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.session.SessionStartEmitter
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.OpenTelemetrySdk
-import java.util.concurrent.TimeUnit
 
 class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context: Context) {
+    internal val sessionStartEmitter = SessionStartEmitter()
     internal val listeners: MutableSet<Listener> = HashSet()
     var globalAttributes: Attributes = Attributes.empty()
         private set
@@ -51,16 +50,17 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
 
         registerModuleInitializationStart(MODULE_NAME)
 
+        sessionStartEmitter.attach(openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME))
+
         listeners.forEachFast { it.onSessionManagerReady(sessionManager) }
         sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
-                openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME)
-                    .logRecordBuilder()
-                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_START_EVENT_NAME)
-                    .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
-                    .setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
-                    .setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
-                    .emit()
+                sessionStartEmitter.onSessionCreated(
+                    sessionId,
+                    sessionManager.previousSessionId,
+                    timestamp,
+                    ScreenNameTracker.screenName
+                )
             }
         }
         sessionManager.install(application)
@@ -80,6 +80,11 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
         registerModuleInitializationEnd(MODULE_NAME)
 
         listeners.forEachFast { it.onPostInstall() }
+    }
+
+    /** Emits the pending session.start after application telemetry has been accepted. */
+    fun emitSessionStartIfPending(sessionId: String? = null) {
+        sessionStartEmitter.emitIfPending(sessionId)
     }
 
     fun createSessionManager(agentStorage: IAgentStorage): ISplunkSessionManager = SplunkSessionManager(agentStorage)
