@@ -69,6 +69,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * **Screen Name Log Processor**: Added `ScreenNameLogRecordProcessor` to snapshot `screen.name` at log emit time
 
 
+### Version 2.2.2 - 2026-04-16
+
+##### Enhancements:
+* Updated ANR span attributes to the latest data model
+* Updated ingest endpoint URLs to use the `observability.splunkcloud.com` domain
+
+### Version 2.2.1 - 2026-04-09
+
+##### Enhancements:
+* Persisted anonymous user IDs across application runs
+* Updated user ID generation to follow the user ID specification
+* Updated Session Replay
+
+### Version 2.2.0 - 2026-03-30
+
+##### New features:
+* Added Android Gradle Plugin 9+ support to the mapping file upload plugin
+
+##### Enhancements:
+* Updated the session metadata API
+* Updated Session Replay
+
+##### Fixes:
+* Fixed upload jobs being rejected during executor shutdown
+
+
 ### Version 2.1.8 - 2026-03-09
 * Fixed IllegalStateException when rumAccessToken was missing but endpoint URL existed during OTEL span uploads
 * Added SessionMetadata API for custom session metadata
