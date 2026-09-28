@@ -88,6 +88,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added Android Gradle Plugin 9+ support to the mapping file upload plugin
 
 ##### Enhancements:
+* Reintroduced the public `SessionMetadata` data class; `SessionState.metadata` remains removed, and session metadata is exposed through `ISession.metadata` as a Base64-encoded JSON string
 * Updated Session Replay
 
 
