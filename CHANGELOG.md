@@ -72,8 +72,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Version 2.2.2 - 2026-04-16
 
 ##### Enhancements:
-* Updated ANR span attributes to the latest data model
-* Updated ingest endpoint URLs to use the `observability.splunkcloud.com` domain
+* Updated ANR span attributes from `component=error` to `component=anr` for ANR metrics derivation
+* Updated ingest and mapping-file upload endpoint URLs to use the `observability.splunkcloud.com` domain
 
 ### Version 2.2.1 - 2026-04-09
 
@@ -88,8 +88,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added Android Gradle Plugin 9+ support to the mapping file upload plugin
 
 ##### Enhancements:
-* Updated the session metadata API
 * Updated Session Replay
+
+
+
+### Version 2.1.9 - 2026-03-20
+
+##### Breaking changes:
+* Removed `SessionMetadata` and `SessionState.metadata`. Replace `session.state.metadata` access with `ISession.metadata`, a Base64-encoded JSON string containing the JSON fields `sessionId`, `anonymousUserId`, `sessionStart`, and `sessionLastActivity`; decode the string before parsing the JSON.
 
 ##### Fixes:
 * Fixed upload jobs being rejected during executor shutdown
