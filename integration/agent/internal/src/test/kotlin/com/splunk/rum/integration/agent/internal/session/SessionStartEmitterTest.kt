@@ -22,6 +22,7 @@ import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.RUM_TRACER_N
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SCREEN_NAME_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.RumConstants
+import io.opentelemetry.api.logs.Logger
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.SdkLoggerProvider
 import io.opentelemetry.sdk.logs.data.LogRecordData
@@ -34,6 +35,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
 class SessionStartEmitterTest {
 
@@ -143,6 +146,20 @@ class SessionStartEmitterTest {
         detachedEmitter.emitIfPending()
 
         assertEquals("session-a", exporter.records.single().attributes.get(SESSION_ID_KEY))
+    }
+
+    @Test
+    fun `logger failure does not escape or retry the pending event`() {
+        val failingLogger = mock(Logger::class.java)
+        `when`(failingLogger.logRecordBuilder()).thenThrow(IllegalStateException("simulated failure"))
+        emitter.attach(failingLogger)
+        emitter.onSessionCreated("session-a", previousSessionId = null, timestamp = 1_000L)
+
+        emitter.emitIfPending("session-a")
+
+        emitter.attach(loggerProvider.get(RUM_TRACER_NAME))
+        emitter.emitIfPending("session-a")
+        assertTrue(exporter.records.isEmpty())
     }
 
     private class CollectingLogRecordExporter : LogRecordExporter {

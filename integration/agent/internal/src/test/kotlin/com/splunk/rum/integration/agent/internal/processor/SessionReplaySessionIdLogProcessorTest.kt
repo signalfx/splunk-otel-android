@@ -19,6 +19,8 @@ package com.splunk.rum.integration.agent.internal.processor
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.integration.agent.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.session.SessionStartEmitter
+import io.opentelemetry.api.logs.Logger
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.common.InstrumentationScopeInfo
 import io.opentelemetry.sdk.logs.ReadWriteLogRecord
@@ -55,5 +57,31 @@ class SessionReplaySessionIdLogProcessorTest {
         verify(logRecord).setAttribute(GlobalRumConstants.SESSION_ID_KEY, "session-a")
         verify(logRecord).setAttribute(RumConstants.SESSION_RUM_ID_KEY, "session-a")
         assertEquals("session-a", signaledSessionId)
+    }
+
+    @Test
+    fun `failed session start does not interrupt replay log processing`() {
+        val logRecord = mock(ReadWriteLogRecord::class.java, RETURNS_SELF)
+        val logRecordData = mock(LogRecordData::class.java)
+        `when`(logRecordData.instrumentationScopeInfo).thenReturn(
+            InstrumentationScopeInfo.builder(
+                GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME
+            ).build()
+        )
+        `when`(logRecordData.timestampEpochNanos).thenReturn(1_000_000_000L)
+        `when`(logRecord.toLogRecordData()).thenReturn(logRecordData)
+        `when`(sessionManager.sessionId(1_000L)).thenReturn("session-a")
+        val failingLogger = mock(Logger::class.java)
+        `when`(failingLogger.logRecordBuilder()).thenThrow(IllegalStateException("simulated failure"))
+        val emitter = SessionStartEmitter()
+        emitter.attach(failingLogger)
+        emitter.onSessionCreated("session-a", previousSessionId = null, timestamp = 1_000L)
+        val processor = SessionReplaySessionIdLogProcessor(sessionManager, emitter::emitIfPending)
+
+        processor.onEmit(Context.root(), logRecord)
+
+        verify(logRecord).setAttribute(GlobalRumConstants.SESSION_ID_KEY, "session-a")
+        verify(logRecord).setAttribute(RumConstants.SESSION_RUM_ID_KEY, "session-a")
+        verify(logRecord).setAttribute(RumConstants.SCRIPT_INSTANCE_KEY, "session-a".take(16))
     }
 }

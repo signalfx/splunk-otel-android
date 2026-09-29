@@ -21,6 +21,7 @@ import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.LOG_EVENT_NA
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SCREEN_NAME_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
+import com.splunk.rum.common.logger.Logger as InternalLogger
 import com.splunk.rum.integration.agent.internal.RumConstants
 import io.opentelemetry.api.logs.Logger
 import java.util.concurrent.TimeUnit
@@ -62,7 +63,8 @@ internal class SessionStartEmitter {
      * Emits the held event, if there is one, with the timestamp of the session it belongs to.
      *
      * Clearing the slot before emitting keeps the emitted record from re-entering here through the
-     * processors that call this and emitting the event twice.
+     * processors that call this and emitting the event twice. If emission fails, we cannot safely
+     * retry: the record may already have been queued before the failure.
      */
     fun emitIfPending(sessionId: String? = null) {
         if (logger == null) return
@@ -71,7 +73,11 @@ internal class SessionStartEmitter {
             val event = pending.get() ?: return
             if (sessionId != null && event.sessionId != sessionId) return
             if (pending.compareAndSet(event, null)) {
-                emit(event)
+                try {
+                    emit(event)
+                } catch (e: Exception) {
+                    runCatching { InternalLogger.e(TAG, "Failed to emit session.start", e) }
+                }
                 return
             }
         }
@@ -95,4 +101,8 @@ internal class SessionStartEmitter {
         val timestamp: Long,
         val screenName: String
     )
+
+    private companion object {
+        const val TAG = "SessionStartEmitter"
+    }
 }
