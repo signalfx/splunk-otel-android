@@ -56,7 +56,10 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
     override fun sessionId(timestamp: Long): String = ""
 }
 
-class SplunkSessionManager internal constructor(private val agentStorage: IAgentStorage) : ISplunkSessionManager {
+class SplunkSessionManager internal constructor(
+    private val agentStorage: IAgentStorage,
+    private val onSessionCreated: (String, String?, Long) -> Unit = { _, _, _ -> }
+) : ISplunkSessionManager {
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val appStateObserver = AppStateObserver
 
@@ -149,6 +152,7 @@ class SplunkSessionManager internal constructor(private val agentStorage: IAgent
 
         val newSessionId = SessionId.generate()
         sessionId = newSessionId
+        onSessionCreated(newSessionId, previousSessionId, now)
         sessionIds.add(SessionIdStorageData(newSessionId, now))
         agentStorage.writeSessionIds(sessionIds)
         sessionListeners.forEachFast { it.onSessionChanged(newSessionId, now) }

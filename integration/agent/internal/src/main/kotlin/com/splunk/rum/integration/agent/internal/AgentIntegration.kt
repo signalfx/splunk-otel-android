@@ -53,16 +53,6 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
         sessionStartEmitter.attach(openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME))
 
         listeners.forEachFast { it.onSessionManagerReady(sessionManager) }
-        sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
-            override fun onSessionChanged(sessionId: String, timestamp: Long) {
-                sessionStartEmitter.onSessionCreated(
-                    sessionId,
-                    sessionManager.previousSessionId,
-                    timestamp,
-                    ScreenNameTracker.screenName
-                )
-            }
-        }
         sessionManager.install(application)
 
         val seenConfigurationNames = mutableSetOf<String>()
@@ -87,7 +77,15 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
         sessionStartEmitter.emitIfPending(sessionId)
     }
 
-    fun createSessionManager(agentStorage: IAgentStorage): ISplunkSessionManager = SplunkSessionManager(agentStorage)
+    fun createSessionManager(agentStorage: IAgentStorage): ISplunkSessionManager =
+        SplunkSessionManager(agentStorage) { sessionId, previousSessionId, timestamp ->
+            sessionStartEmitter.onSessionCreated(
+                sessionId,
+                previousSessionId,
+                timestamp,
+                ScreenNameTracker.screenName
+            )
+        }
 
     internal interface Listener {
         fun onSessionManagerReady(sessionManager: ISplunkSessionManager)
