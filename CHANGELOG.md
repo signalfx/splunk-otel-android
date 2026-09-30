@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+##### New features:
+* Added a bounded, synchronous local-persistence API and conditional native-crash suppression for React Native fatal JavaScript errors
+
 ### Version 2.3.5 - 2026-09-08
 
 ##### Enhancements:

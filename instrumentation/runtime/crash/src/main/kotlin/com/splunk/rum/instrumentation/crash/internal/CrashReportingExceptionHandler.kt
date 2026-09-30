@@ -17,6 +17,7 @@
 
 package com.splunk.rum.instrumentation.crash.internal
 
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.crash.internal.extractor.CrashDetails
 import io.opentelemetry.sdk.logs.SdkLoggerProvider
 import java.util.concurrent.TimeUnit
@@ -28,15 +29,27 @@ import java.util.concurrent.TimeUnit
 internal class CrashReportingExceptionHandler(
     private val crashSender: (CrashDetails) -> Unit,
     private val sdkLoggerProvider: SdkLoggerProvider?,
-    private val existingHandler: Thread.UncaughtExceptionHandler?
+    private val existingHandler: Thread.UncaughtExceptionHandler?,
+    private val suppressionPredicate: CrashSuppressionPredicate = NO_OP_CRASH_SUPPRESSION
 ) : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(thread: Thread, throwable: Throwable) {
         try {
-            crashSender(CrashDetails(thread, throwable))
+            val shouldSuppress = try {
+                suppressionPredicate.shouldSuppress(thread, throwable)
+            } catch (t: Throwable) {
+                Logger.e(TAG, "Crash suppression predicate failed open", t)
+                false
+            }
 
-            // Do our best to make sure the crash makes it out of the VM before it dies.
-            sdkLoggerProvider?.forceFlush()?.join(FLUSH_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            if (!shouldSuppress) {
+                crashSender(CrashDetails(thread, throwable))
+
+                // Do our best to make sure the crash makes it out of the VM before it dies.
+                sdkLoggerProvider?.forceFlush()?.join(FLUSH_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            } else {
+                Logger.d(TAG, "Suppressed duplicate React Native fatal crash event")
+            }
         } finally {
             // Always delegate, even if reporting/flushing threw (e.g. OutOfMemoryError).
             existingHandler?.uncaughtException(thread, throwable)
@@ -44,6 +57,7 @@ internal class CrashReportingExceptionHandler(
     }
 
     private companion object {
+        private const val TAG = "CrashReportingExceptionHandler"
         private const val FLUSH_TIMEOUT_SECONDS = 10L
     }
 }

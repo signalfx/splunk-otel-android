@@ -34,7 +34,8 @@ import java.io.StringWriter
  */
 internal class CrashReporter(
     private val openTelemetry: OpenTelemetry,
-    private val additionalExtractors: List<CrashAttributesExtractor>
+    private val additionalExtractors: List<CrashAttributesExtractor>,
+    private val suppressionPredicate: CrashSuppressionPredicate = NO_OP_CRASH_SUPPRESSION
 ) {
 
     /** Installs the crash reporting uncaught exception handler. */
@@ -42,7 +43,7 @@ internal class CrashReporter(
         val existingHandler = Thread.getDefaultUncaughtExceptionHandler()
         val sdkLoggerProvider = (openTelemetry as? OpenTelemetrySdk)?.sdkLoggerProvider
         Thread.setDefaultUncaughtExceptionHandler(
-            CrashReportingExceptionHandler(::report, sdkLoggerProvider, existingHandler)
+            CrashReportingExceptionHandler(::report, sdkLoggerProvider, existingHandler, suppressionPredicate)
         )
     }
 
