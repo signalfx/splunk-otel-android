@@ -22,6 +22,7 @@ import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.job.IJobManager
 import com.splunk.rum.common.job.JobIdStorage
 import com.splunk.rum.common.job.JobResult
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.AppStateObserver
 import io.opentelemetry.exporter.internal.otlp.traces.TraceRequestMarshaler
 import io.opentelemetry.sdk.common.CompletableResultCode
@@ -51,13 +52,24 @@ internal class AndroidSpanExporter(
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {
         if (spans.isEmpty()) return CompletableResultCode.ofSuccess()
 
-        val exportRequest = TraceRequestMarshaler.create(spans)
+        val spanBatch = spans.toList()
+        val exportRequest = TraceRequestMarshaler.create(spanBatch)
         val spansID = UUID.randomUUID().toString()
 
         // Save data to our storage.
-        ByteArrayOutputStream().use {
-            exportRequest.writeBinaryTo(it)
-            agentStorage.writeOtelSpanData(spansID, it.toByteArray())
+        val writeSucceeded = try {
+            ByteArrayOutputStream().use {
+                exportRequest.writeBinaryTo(it)
+                agentStorage.writeOtelSpanData(spansID, it.toByteArray())
+            }
+        } catch (t: Throwable) {
+            Logger.e(TAG, "Failed to persist span batch", t)
+            false
+        }
+
+        DurableSpanPersistenceCoordinator.complete(spanBatch, writeSucceeded)
+        if (!writeSucceeded) {
+            return CompletableResultCode.ofFailure()
         }
 
         val hasConfig = agentStorage.readEndpointConfig() != null
@@ -117,5 +129,9 @@ internal class AndroidSpanExporter(
         override fun onAppClosed() {
             isForeground = false
         }
+    }
+
+    private companion object {
+        private const val TAG = "AndroidSpanExporter"
     }
 }

@@ -25,6 +25,7 @@ import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import java.util.Collections
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -136,5 +137,39 @@ class CrashReportingExceptionHandlerTest {
         assertEquals(listOf("report", "existing"), callOrder)
 
         loggerProvider.shutdown()
+    }
+
+    @Test
+    fun `suppression skips only Splunk reporting and still delegates`() {
+        var reported = false
+        var delegated = false
+        val handler = CrashReportingExceptionHandler(
+            crashSender = { reported = true },
+            sdkLoggerProvider = null,
+            existingHandler = Thread.UncaughtExceptionHandler { _, _ -> delegated = true },
+            suppressionPredicate = CrashSuppressionPredicate { _, _ -> true }
+        )
+
+        handler.uncaughtException(Thread.currentThread(), RuntimeException("boom"))
+
+        assertFalse(reported)
+        assertTrue(delegated)
+    }
+
+    @Test
+    fun `suppression predicate failure fails open`() {
+        var reported = false
+        var delegated = false
+        val handler = CrashReportingExceptionHandler(
+            crashSender = { reported = true },
+            sdkLoggerProvider = null,
+            existingHandler = Thread.UncaughtExceptionHandler { _, _ -> delegated = true },
+            suppressionPredicate = CrashSuppressionPredicate { _, _ -> error("predicate failed") }
+        )
+
+        handler.uncaughtException(Thread.currentThread(), RuntimeException("boom"))
+
+        assertTrue(reported)
+        assertTrue(delegated)
     }
 }

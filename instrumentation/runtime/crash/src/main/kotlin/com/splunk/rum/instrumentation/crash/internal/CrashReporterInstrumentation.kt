@@ -35,10 +35,17 @@ class CrashReporterInstrumentation {
 
     private val additionalExtractors = mutableListOf<CrashAttributesExtractor>()
     private val installed = AtomicBoolean(false)
+    private var suppressionPredicate: CrashSuppressionPredicate = NO_OP_CRASH_SUPPRESSION
 
     /** Adds a [CrashAttributesExtractor] that enriches emitted crash events. */
     fun addAttributesExtractor(extractor: CrashAttributesExtractor): CrashReporterInstrumentation {
         additionalExtractors.add(extractor)
+        return this
+    }
+
+    /** Configures an internal predicate that can suppress only Splunk's duplicate crash event. */
+    fun setSuppressionPredicate(predicate: CrashSuppressionPredicate): CrashReporterInstrumentation {
+        suppressionPredicate = predicate
         return this
     }
 
@@ -48,6 +55,6 @@ class CrashReporterInstrumentation {
             return
         }
         val extractors = additionalExtractors + RuntimeDetailsExtractor.create(application)
-        CrashReporter(openTelemetry, extractors).install()
+        CrashReporter(openTelemetry, extractors, suppressionPredicate).install()
     }
 }

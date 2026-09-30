@@ -46,6 +46,7 @@ internal object CrashModuleIntegration : ModuleIntegration<CrashModuleConfigurat
             Logger.d(TAG, "Installing crash reporter")
             val crashReporterInstrumentation = CrashReporterInstrumentation()
             crashReporterInstrumentation.addAttributesExtractor(RumCrashAttributesExtractor(application))
+            crashReporterInstrumentation.setSuppressionPredicate(ReactNativeCrashSuppressionPredicate())
             crashReporterInstrumentation.install(application, openTelemetry)
         } else {
             Logger.d(TAG, "Crash reporting is disabled")
