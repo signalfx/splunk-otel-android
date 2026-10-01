@@ -19,6 +19,7 @@ package com.splunk.rum.instrumentation.networkmonitor.internal.network
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.util.Log
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwork
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.NetworkState
 import java.io.Closeable
@@ -26,9 +27,7 @@ import java.io.Closeable
 internal interface CurrentNetworkProvider : Closeable {
     val currentNetwork: CurrentNetwork
 
-    fun start(initialNetworkListener: NetworkChangeListener)
-
-    fun refreshNetworkStatus(): CurrentNetwork
+    fun start(initialNetworkStateListener: NetworkChangeListener)
 
     fun addNetworkChangeListener(listener: NetworkChangeListener)
 
@@ -39,14 +38,21 @@ internal interface CurrentNetworkProvider : Closeable {
         val UNKNOWN_NETWORK: CurrentNetwork = CurrentNetwork(NetworkState.TRANSPORT_UNKNOWN)
 
         fun create(context: Context): CurrentNetworkProvider? {
-            val applicationContext = context.applicationContext ?: context
-            val connectivityManager =
-                applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
-                    ?: return null
-            return CurrentNetworkProviderImpl(
-                NetworkDetector.create(applicationContext, connectivityManager),
-                connectivityManager
-            )
+            return try {
+                val applicationContext = context.applicationContext ?: context
+                val connectivityManager =
+                    applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+                        ?: return null
+                CurrentNetworkProviderImpl(
+                    NetworkDetector.create(applicationContext, connectivityManager),
+                    connectivityManager
+                )
+            } catch (exception: RuntimeException) {
+                Log.w(TAG, "Failed to create current network provider.", exception)
+                null
+            }
         }
+
+        private const val TAG = "CurrentNetworkProvider"
     }
 }

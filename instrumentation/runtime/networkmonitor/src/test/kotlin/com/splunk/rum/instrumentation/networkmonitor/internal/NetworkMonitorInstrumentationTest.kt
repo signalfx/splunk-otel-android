@@ -17,6 +17,7 @@
 package com.splunk.rum.instrumentation.networkmonitor.internal
 
 import android.app.Application
+import com.splunk.rum.common.logger.Logger as SdkLogger
 import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwork
@@ -39,7 +40,6 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.shadows.ShadowLog
 
 @RunWith(RobolectricTestRunner::class)
 class NetworkMonitorInstrumentationTest {
@@ -50,6 +50,7 @@ class NetworkMonitorInstrumentationTest {
     private val logRecordBuilder = mock(LogRecordBuilder::class.java, RETURNS_SELF)
 
     init {
+        SdkLogger.clearLogs()
         `when`(openTelemetry.logsBridge).thenReturn(loggerProvider)
         `when`(loggerProvider.get("com.splunk.rum.network")).thenReturn(logger)
         `when`(logger.logRecordBuilder()).thenReturn(logRecordBuilder)
@@ -77,6 +78,20 @@ class NetworkMonitorInstrumentationTest {
     }
 
     @Test
+    fun backgroundProcessDoesNotEmitNetworkChangeBeforeAnActivityStarts() {
+        val provider = FakeCurrentNetworkProvider()
+        val observedTypes = mutableListOf<String?>()
+        val instrumentation = instrumentationWith(provider, applicationInForeground = false)
+            .addNetworkChangeListener { observedTypes += it[NETWORK_CONNECTION_TYPE] }
+
+        instrumentation.install(application, openTelemetry)
+        provider.publish(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
+
+        assertEquals(listOf("wifi"), observedTypes)
+        verify(logRecordBuilder, never()).emit()
+    }
+
+    @Test
     fun initialNetworkNotifiesAttributeListenerWithoutEmittingNetworkChange() {
         val provider = FakeCurrentNetworkProvider()
         val observedTypes = mutableListOf<String?>()
@@ -87,6 +102,23 @@ class NetworkMonitorInstrumentationTest {
         provider.publishInitial(CurrentNetworkProvider.NO_NETWORK)
 
         assertEquals(listOf("unavailable"), observedTypes)
+        verify(logRecordBuilder, never()).emit()
+    }
+
+    @Test
+    fun backgroundInitialNetworkDoesNotEmitWhenTheAppReturnsToForeground() {
+        val provider = FakeCurrentNetworkProvider()
+        val observedTypes = mutableListOf<String?>()
+        val instrumentation = instrumentationWith(provider)
+            .addNetworkChangeListener { observedTypes += it[NETWORK_CONNECTION_TYPE] }
+
+        instrumentation.install(application, openTelemetry)
+        val gate = AppStateObserver.listeners.filterIsInstance<NetworkApplicationStateGate>().last()
+        gate.onAppBackgrounded()
+        provider.publishInitial(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
+        gate.onAppForegrounded()
+
+        assertEquals(listOf("wifi"), observedTypes)
         verify(logRecordBuilder, never()).emit()
     }
 
@@ -115,6 +147,7 @@ class NetworkMonitorInstrumentationTest {
                 providerCreations++
                 provider
             }
+            applicationForegroundProvider = { true }
         }
 
         instrumentation.install(application, openTelemetry)
@@ -140,8 +173,9 @@ class NetworkMonitorInstrumentationTest {
 
         assertEquals(2, providerCreations)
         assertTrue(
-            ShadowLog.getLogsForTag("NetworkMonitor").any {
-                it.msg == "ConnectivityManager unavailable. Network monitoring will not be installed."
+            SdkLogger.logs.any {
+                it.tag == "NetworkMonitor" &&
+                    it.message == "ConnectivityManager unavailable. Network monitoring will not be installed."
             }
         )
     }
@@ -160,26 +194,43 @@ class NetworkMonitorInstrumentationTest {
         assertEquals(listOf("vpn"), observed)
         verify(logRecordBuilder).emit()
         assertTrue(
-            ShadowLog.getLogsForTag("NetworkMonitor").any {
-                it.msg == "Network change listener failed."
+            SdkLogger.logs.any {
+                it.tag == "NetworkMonitor" && it.message == "Network change listener failed."
             }
         )
     }
 
-    private fun instrumentationWith(provider: FakeCurrentNetworkProvider) = NetworkMonitorInstrumentation().apply {
-        currentNetworkProviderFactory = { provider }
+    @Test
+    fun providerCreationFailureDoesNotEscapeInstallation() {
+        val instrumentation = NetworkMonitorInstrumentation().apply {
+            currentNetworkProviderFactory = {
+                throw IllegalStateException("provider unavailable")
+            }
+        }
+
+        instrumentation.install(application, openTelemetry)
+
+        assertTrue(
+            SdkLogger.logs.any {
+                it.tag == "NetworkMonitor" && it.message == "Failed to install network monitoring."
+            }
+        )
     }
+
+    private fun instrumentationWith(provider: FakeCurrentNetworkProvider, applicationInForeground: Boolean = true) =
+        NetworkMonitorInstrumentation().apply {
+            currentNetworkProviderFactory = { provider }
+            applicationForegroundProvider = { applicationInForeground }
+        }
 
     private class FakeCurrentNetworkProvider : CurrentNetworkProvider {
         private val listeners = mutableListOf<NetworkChangeListener>()
-        private var initialNetworkListener = NetworkChangeListener {}
+        private var initialNetworkStateListener = NetworkChangeListener {}
         override var currentNetwork = CurrentNetworkProvider.UNKNOWN_NETWORK
 
-        override fun start(initialNetworkListener: NetworkChangeListener) {
-            this.initialNetworkListener = initialNetworkListener
+        override fun start(initialNetworkStateListener: NetworkChangeListener) {
+            this.initialNetworkStateListener = initialNetworkStateListener
         }
-
-        override fun refreshNetworkStatus(): CurrentNetwork = currentNetwork
 
         override fun addNetworkChangeListener(listener: NetworkChangeListener) {
             listeners += listener
@@ -200,7 +251,7 @@ class NetworkMonitorInstrumentationTest {
 
         fun publishInitial(network: CurrentNetwork) {
             currentNetwork = network
-            initialNetworkListener.onNetworkChange(network)
+            initialNetworkStateListener.onNetworkChange(network)
         }
     }
 }
