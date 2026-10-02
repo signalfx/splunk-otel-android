@@ -47,19 +47,24 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
                 ?: moduleConfiguration.isEnabled
 
         if (isEnabled) {
-            // Seed an indeterminate state before callbacks can update it with a detected network.
-            NetworkGlobalAttributesUpdater.update(
-                SplunkInternalGlobalAttributeSpanProcessor.attributes,
-                Attributes.of(NETWORK_CONNECTION_TYPE, UNKNOWN)
-            )
-            NetworkMonitorInstrumentation().apply {
-                addNetworkChangeListener { attributes ->
-                    NetworkGlobalAttributesUpdater.update(
-                        SplunkInternalGlobalAttributeSpanProcessor.attributes,
-                        attributes
-                    )
+            try {
+                // Seed an indeterminate state before callbacks can update it with a detected network.
+                NetworkGlobalAttributesUpdater.update(
+                    SplunkInternalGlobalAttributeSpanProcessor.attributes,
+                    Attributes.of(NETWORK_CONNECTION_TYPE, UNKNOWN)
+                )
+                NetworkMonitorInstrumentation().apply {
+                    addNetworkChangeListener { attributes ->
+                        NetworkGlobalAttributesUpdater.update(
+                            SplunkInternalGlobalAttributeSpanProcessor.attributes,
+                            attributes
+                        )
+                    }
+                    install(application, openTelemetry)
                 }
-                install(application, openTelemetry)
+            } catch (exception: Exception) {
+                // Network monitoring is optional and must not prevent the host app or agent from starting.
+                Logger.w(TAG, "Failed to install network monitoring; continuing without it.")
             }
         }
     }

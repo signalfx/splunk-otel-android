@@ -27,6 +27,8 @@ dependencies {
 
     implementation(Dependencies.Otel.api)
     implementation(Dependencies.Otel.semConvIncubating)
+    implementation(Dependencies.Common.logger)
+    implementation(project(":common:utils"))
     implementation(Dependencies.Common.utils)
     compileOnly(Dependencies.Android.annotation)
 

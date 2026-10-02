@@ -26,9 +26,11 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkInfo
 import android.telephony.TelephonyManager
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.NetworkState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,7 +40,6 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowLog
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [30])
@@ -47,11 +48,19 @@ class NetworkDetectorTest {
     private val connectivityManager = mock(ConnectivityManager::class.java)
     private val detector = NetworkDetector.create(context, connectivityManager)
 
+    init {
+        Logger.clearLogs()
+    }
+
     @Test
     fun noActiveNetworkIsUnavailable() {
         `when`(connectivityManager.activeNetwork).thenReturn(null)
 
-        assertEquals(NetworkState.NO_NETWORK_AVAILABLE, detector.detectCurrentNetwork().state)
+        val observation = detector.detectNetwork()
+
+        assertEquals(NetworkState.NO_NETWORK_AVAILABLE, observation.currentNetwork.state)
+        assertNull(observation.activeNetworkIdentity)
+        assertTrue(observation.activeNetworkIdentityKnown)
     }
 
     @Test
@@ -60,7 +69,43 @@ class NetworkDetectorTest {
         `when`(connectivityManager.activeNetwork).thenReturn(network)
         `when`(connectivityManager.getNetworkCapabilities(network)).thenReturn(null)
 
-        assertEquals(NetworkState.TRANSPORT_UNKNOWN, detector.detectCurrentNetwork().state)
+        val observation = detector.detectNetwork()
+
+        assertEquals(NetworkState.TRANSPORT_UNKNOWN, observation.currentNetwork.state)
+        assertSame(network, observation.activeNetworkIdentity)
+        assertTrue(observation.activeNetworkIdentityKnown)
+    }
+
+    @Test
+    fun callbackObservationUsesTheCallbackNetworkAndCapabilitiesTogether() {
+        val network = mock(Network::class.java)
+        val capabilities = mock(NetworkCapabilities::class.java)
+        `when`(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)).thenReturn(true)
+
+        val observation = detector.observeNetwork(network, capabilities)
+
+        assertEquals(NetworkState.TRANSPORT_WIFI, observation.currentNetwork.state)
+        assertSame(network, observation.activeNetworkIdentity)
+        assertTrue(observation.activeNetworkIdentityKnown)
+        verify(connectivityManager, never()).activeNetwork
+        verify(connectivityManager, never()).getNetworkCapabilities(network)
+    }
+
+    @Test
+    @Config(sdk = [24])
+    fun detectsCallbackNetworkFromCapabilitiesOnApi24() {
+        val network = mock(Network::class.java)
+        val capabilities = mock(NetworkCapabilities::class.java)
+        `when`(connectivityManager.getNetworkCapabilities(network)).thenReturn(capabilities)
+        `when`(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)).thenReturn(true)
+
+        val observation = detector.detectNetwork(network)
+
+        assertEquals(NetworkState.TRANSPORT_WIFI, observation.currentNetwork.state)
+        assertSame(network, observation.activeNetworkIdentity)
+        assertTrue(observation.activeNetworkIdentityKnown)
+        verify(connectivityManager).getNetworkCapabilities(network)
+        verify(connectivityManager, never()).activeNetwork
     }
 
     @Test
@@ -81,9 +126,12 @@ class NetworkDetectorTest {
         `when`(connectivityManager.getNetworkCapabilities(network)).thenReturn(capabilities)
         `when`(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)).thenReturn(true)
 
-        val currentNetwork = NetworkDetector.create(telephonyContext, connectivityManager).detectCurrentNetwork()
+        val observation = NetworkDetector.create(telephonyContext, connectivityManager)
+            .detectNetwork()
+        val currentNetwork = observation.currentNetwork
 
         assertEquals(NetworkState.TRANSPORT_WIFI, currentNetwork.state)
+        assertSame(network, observation.activeNetworkIdentity)
         assertNull(currentNetwork.carrierName)
         verify(telephonyManager, never()).simCarrierIdName
         verify(telephonyManager, never()).simOperator
@@ -115,7 +163,7 @@ class NetworkDetectorTest {
         val currentNetwork = detectCellular(telephonyContext)
 
         assertNull(currentNetwork.subType)
-        assertLogContains("Cannot determine network subtype: telephony feature unavailable.")
+        assertLogContains("Cannot determine network subtype: telephony radio access feature unavailable.")
     }
 
     @Test
@@ -176,9 +224,11 @@ class NetworkDetectorTest {
         `when`(connectivityManager.getNetworkCapabilities(network)).thenReturn(capabilities)
         `when`(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)).thenReturn(true)
 
-        val currentNetwork = detector.detectCurrentNetwork()
+        val observation = detector.detectNetwork()
+        val currentNetwork = observation.currentNetwork
 
         assertEquals(NetworkState.TRANSPORT_WIFI, currentNetwork.state)
+        assertSame(network, observation.activeNetworkIdentity)
         verify(connectivityManager, never()).activeNetworkInfo
     }
 
@@ -187,7 +237,7 @@ class NetworkDetectorTest {
     fun legacyApiReportsNoNetworkWhenNetworkInfoIsMissing() {
         `when`(connectivityManager.activeNetworkInfo).thenReturn(null)
 
-        assertEquals(NetworkState.NO_NETWORK_AVAILABLE, detector.detectCurrentNetwork().state)
+        assertEquals(NetworkState.NO_NETWORK_AVAILABLE, detector.detectNetwork().currentNetwork.state)
     }
 
     @Test
@@ -195,10 +245,11 @@ class NetworkDetectorTest {
     fun legacyApiDetectsMobileNetworkAndSubtype() {
         val networkInfo = mock(NetworkInfo::class.java)
         `when`(connectivityManager.activeNetworkInfo).thenReturn(networkInfo)
+        `when`(networkInfo.isConnected).thenReturn(true)
         `when`(networkInfo.type).thenReturn(ConnectivityManager.TYPE_MOBILE)
         `when`(networkInfo.subtypeName).thenReturn("HSPA")
 
-        val network = detector.detectCurrentNetwork()
+        val network = detector.detectNetwork().currentNetwork
 
         assertEquals(NetworkState.TRANSPORT_CELLULAR, network.state)
         assertEquals("HSPA", network.subType)
@@ -206,12 +257,28 @@ class NetworkDetectorTest {
 
     @Test
     @Config(sdk = [22])
+    fun legacyApiReportsNoNetworkWhenNetworkInfoIsDisconnected() {
+        val networkInfo = mock(NetworkInfo::class.java)
+        `when`(connectivityManager.activeNetworkInfo).thenReturn(networkInfo)
+        `when`(networkInfo.isConnected).thenReturn(false)
+        `when`(networkInfo.type).thenReturn(ConnectivityManager.TYPE_MOBILE)
+        `when`(networkInfo.subtypeName).thenReturn("")
+
+        val observation = detector.detectNetwork()
+
+        assertEquals(NetworkState.NO_NETWORK_AVAILABLE, observation.currentNetwork.state)
+        assertTrue(!observation.activeNetworkIdentityKnown)
+    }
+
+    @Test
+    @Config(sdk = [22])
     fun legacyUnsupportedTransportIsUnknown() {
         val networkInfo = mock(NetworkInfo::class.java)
         `when`(connectivityManager.activeNetworkInfo).thenReturn(networkInfo)
+        `when`(networkInfo.isConnected).thenReturn(true)
         `when`(networkInfo.type).thenReturn(ConnectivityManager.TYPE_BLUETOOTH)
 
-        assertEquals(NetworkState.TRANSPORT_UNKNOWN, detector.detectCurrentNetwork().state)
+        assertEquals(NetworkState.TRANSPORT_UNKNOWN, detector.detectNetwork().currentNetwork.state)
     }
 
     private fun assertTransport(transport: Int, expected: NetworkState) {
@@ -221,7 +288,7 @@ class NetworkDetectorTest {
         `when`(connectivityManager.getNetworkCapabilities(network)).thenReturn(capabilities)
         `when`(capabilities.hasTransport(transport)).thenReturn(true)
 
-        assertEquals(expected, detector.detectCurrentNetwork().state)
+        assertEquals(expected, detector.detectNetwork().currentNetwork.state)
     }
 
     private fun detectCellular(detectorContext: Context) =
@@ -231,7 +298,7 @@ class NetworkDetectorTest {
             `when`(connectivityManager.activeNetwork).thenReturn(network)
             `when`(connectivityManager.getNetworkCapabilities(network)).thenReturn(capabilities)
             `when`(capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)).thenReturn(true)
-            detectCurrentNetwork()
+            detectNetwork().currentNetwork
         }
 
     private fun contextWithTelephonyAccess(): Pair<Context, TelephonyManager> {
@@ -249,7 +316,7 @@ class NetworkDetectorTest {
     private fun assertLogContains(message: String) {
         assertTrue(
             "Expected log message: $message",
-            ShadowLog.getLogsForTag("NetworkDetector").any { it.msg == message }
+            Logger.logs.any { it.tag == "NetworkDetector" && it.message == message }
         )
     }
 }

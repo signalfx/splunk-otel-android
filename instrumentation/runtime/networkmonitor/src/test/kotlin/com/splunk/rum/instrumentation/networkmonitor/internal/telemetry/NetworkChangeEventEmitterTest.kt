@@ -17,26 +17,32 @@
 
 package com.splunk.rum.instrumentation.networkmonitor.internal.telemetry
 
+import com.splunk.rum.common.logger.Logger as SdkLogger
 import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.logs.LogRecordBuilder
 import io.opentelemetry.api.logs.Logger
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Answers.RETURNS_SELF
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class NetworkChangeEventEmitterTest {
     private val logger = mock(Logger::class.java)
     private val logRecordBuilder = mock(LogRecordBuilder::class.java, RETURNS_SELF)
-    private val gate = NetworkApplicationStateGate()
+    private val gate = NetworkApplicationStateGate(initiallyForeground = true)
     private val emitter = NetworkChangeEventEmitter(logger, gate)
     private val attributes = Attributes.of(AttributeKey.stringKey("network.connection.type"), "wifi")
 
     init {
+        SdkLogger.clearLogs()
         `when`(logger.logRecordBuilder()).thenReturn(logRecordBuilder)
     }
 
@@ -70,5 +76,18 @@ class NetworkChangeEventEmitterTest {
         emitter.emit(attributes)
 
         verify(logRecordBuilder).emit()
+    }
+
+    @Test
+    fun loggerFailureDoesNotEscapeNetworkChangeEmission() {
+        `when`(logger.logRecordBuilder()).thenThrow(IllegalStateException("logger unavailable"))
+
+        emitter.emit(attributes)
+
+        assertTrue(
+            SdkLogger.logs.any {
+                it.tag == "NetworkChangeEmitter" && it.message == "Failed to emit network change event."
+            }
+        )
     }
 }

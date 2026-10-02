@@ -20,6 +20,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
@@ -27,6 +28,7 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.shadows.ShadowLog
 
 @RunWith(RobolectricTestRunner::class)
 class CurrentNetworkProviderTest {
@@ -55,5 +57,18 @@ class CurrentNetworkProviderTest {
         val provider = CurrentNetworkProvider.create(context)
 
         assertNull(provider)
+    }
+
+    @Test
+    fun providerCreationFailureReturnsNoProvider() {
+        val context = mock(Context::class.java)
+        `when`(context.applicationContext).thenThrow(IllegalStateException("context unavailable"))
+
+        assertNull(CurrentNetworkProvider.create(context))
+        assertTrue(
+            ShadowLog.getLogsForTag("CurrentNetworkProvider").any {
+                it.msg == "Failed to create current network provider."
+            }
+        )
     }
 }

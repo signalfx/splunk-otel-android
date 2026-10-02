@@ -17,6 +17,7 @@
 
 package com.splunk.rum.instrumentation.networkmonitor.internal.telemetry
 
+import com.splunk.rum.common.logger.Logger as SdkLogger
 import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
@@ -31,15 +32,21 @@ internal class NetworkChangeEventEmitter(
             return
         }
 
-        logger.logRecordBuilder()
-            .setAllAttributes(attributes)
-            .setAttribute(EVENT_NAME_KEY, EVENT_NAME)
-            .emit()
+        try {
+            logger.logRecordBuilder()
+                .setAllAttributes(attributes)
+                .setAttribute(EVENT_NAME_KEY, EVENT_NAME)
+                .emit()
+        } catch (exception: RuntimeException) {
+            // Telemetry failures must not escape into the network callback or host app code.
+            SdkLogger.w(TAG, "Failed to emit network change event.", exception)
+        }
     }
 
     internal companion object {
         const val EVENT_NAME = "network.change"
         val EVENT_NAME_KEY: AttributeKey<String> = AttributeKey.stringKey("event.name")
         val NETWORK_STATUS: AttributeKey<String> = AttributeKey.stringKey("network.status")
+        private const val TAG = "NetworkChangeEmitter"
     }
 }

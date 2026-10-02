@@ -18,9 +18,11 @@
 package com.splunk.rum.instrumentation.networkmonitor.internal
 
 import android.app.Application
-import android.util.Log
+import com.splunk.rum.agent.common.utils.extensions.isStartedInForeground
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
+import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwork
 import com.splunk.rum.instrumentation.networkmonitor.internal.network.CurrentNetworkProvider
 import com.splunk.rum.instrumentation.networkmonitor.internal.telemetry.CurrentNetworkAttributes
 import com.splunk.rum.instrumentation.networkmonitor.internal.telemetry.NetworkChangeEventEmitter
@@ -41,6 +43,9 @@ class NetworkMonitorInstrumentation {
     internal var currentNetworkProviderFactory: (Application) -> CurrentNetworkProvider? =
         { application -> CurrentNetworkProvider.create(application) }
 
+    internal var applicationForegroundProvider: (Application) -> Boolean =
+        { application -> application.isStartedInForeground }
+
     /**
      * Adds a listener that receives the complete network attributes whenever the active network changes.
      *
@@ -56,29 +61,52 @@ class NetworkMonitorInstrumentation {
             return
         }
 
-        val currentNetworkProvider = currentNetworkProviderFactory(application)
-        if (currentNetworkProvider == null) {
-            Log.w(TAG, "ConnectivityManager unavailable. Network monitoring will not be installed.")
+        var currentNetworkProvider: CurrentNetworkProvider? = null
+        var applicationStateGate: NetworkApplicationStateGate? = null
+        try {
+            currentNetworkProvider = currentNetworkProviderFactory(application)
+            if (currentNetworkProvider == null) {
+                Logger.w(TAG, "ConnectivityManager unavailable. Network monitoring will not be installed.")
+                installed.set(false)
+                return
+            }
+
+            applicationStateGate = NetworkApplicationStateGate(
+                initiallyForeground = applicationForegroundProvider(application)
+            )
+            AppStateObserver.listeners += applicationStateGate
+            AppStateObserver.attach(application)
+
+            val eventEmitter = NetworkChangeEventEmitter(
+                openTelemetry.logsBridge[INSTRUMENTATION_SCOPE],
+                applicationStateGate
+            )
+            currentNetworkProvider.addNetworkChangeListener { currentNetwork ->
+                notifyNetworkChange(currentNetwork, eventEmitter)
+            }
+            currentNetworkProvider.start { currentNetwork ->
+                notifyInitialNetworkState(currentNetwork)
+            }
+        } catch (exception: Exception) {
+            Logger.w(TAG, "Failed to install network monitoring.", exception)
+            applicationStateGate?.let { AppStateObserver.listeners.remove(it) }
+            try {
+                currentNetworkProvider?.close()
+            } catch (cleanupException: RuntimeException) {
+                Logger.w(TAG, "Failed to clean up network monitoring after installation failure.", cleanupException)
+            }
             installed.set(false)
-            return
         }
+    }
 
-        val applicationStateGate = NetworkApplicationStateGate()
-        AppStateObserver.listeners += applicationStateGate
-        AppStateObserver.attach(application)
+    private fun notifyNetworkChange(currentNetwork: CurrentNetwork, eventEmitter: NetworkChangeEventEmitter) {
+        val attributes = CurrentNetworkAttributes.extract(currentNetwork)
+        eventEmitter.emit(attributes)
+        notifyAttributeListeners(attributes)
+    }
 
-        val eventEmitter = NetworkChangeEventEmitter(
-            openTelemetry.logsBridge[INSTRUMENTATION_SCOPE],
-            applicationStateGate
-        )
-        currentNetworkProvider.addNetworkChangeListener { currentNetwork ->
-            val attributes = CurrentNetworkAttributes.extract(currentNetwork)
-            eventEmitter.emit(attributes)
-            notifyAttributeListeners(attributes)
-        }
-        currentNetworkProvider.start { currentNetwork ->
-            notifyAttributeListeners(CurrentNetworkAttributes.extract(currentNetwork))
-        }
+    private fun notifyInitialNetworkState(currentNetwork: CurrentNetwork) {
+        notifyAttributeListeners(CurrentNetworkAttributes.extract(currentNetwork))
     }
 
     private fun notifyAttributeListeners(attributes: Attributes) {
@@ -86,7 +114,7 @@ class NetworkMonitorInstrumentation {
             try {
                 listener(attributes)
             } catch (exception: RuntimeException) {
-                Log.w(TAG, "Network change listener failed.", exception)
+                Logger.w(TAG, "Network change listener failed.", exception)
             }
         }
     }

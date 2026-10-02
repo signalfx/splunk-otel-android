@@ -24,11 +24,6 @@ class NetworkApplicationStateGateTest {
     private val gate = NetworkApplicationStateGate()
 
     @Test
-    fun startsEnabled() {
-        assertTrue(gate.canEmit)
-    }
-
-    @Test
     fun disablesOnBackgroundAndEnablesOnForeground() {
         gate.onAppBackgrounded()
         assertFalse(gate.canEmit)
@@ -38,11 +33,22 @@ class NetworkApplicationStateGateTest {
     }
 
     @Test
-    fun disablesOnCloseAndEnablesOnStart() {
+    fun appStartDoesNotEnableEmission() {
+        gate.onAppStarted()
+        assertFalse(gate.canEmit)
+    }
+
+    @Test
+    fun disablesOnCloseAndEnablesOnForeground() {
         gate.onAppClosed()
         assertFalse(gate.canEmit)
 
-        gate.onAppStarted()
+        gate.onAppForegrounded()
         assertTrue(gate.canEmit)
+    }
+
+    @Test
+    fun canStartEnabledForLateInstallation() {
+        assertTrue(NetworkApplicationStateGate(initiallyForeground = true).canEmit)
     }
 }
