@@ -1,7 +1,12 @@
 package com.splunk.rum.integration.agent.internal.session
 
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.agent.common.storage.SessionId
+import io.opentelemetry.api.logs.LogRecordBuilder
+import io.opentelemetry.api.logs.Logger
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
@@ -10,10 +15,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Answers.RETURNS_SELF
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 
@@ -123,6 +130,35 @@ class SplunkSessionManagerTest {
         assertEquals("expired-session", manager.previousSessionId)
         assertEquals(2, state.sessionIds.size)
         assertEquals(newId, state.sessionIds.last().id)
+    }
+
+    @Test
+    fun `pending start is ready before session listeners produce telemetry`() {
+        val now = System.currentTimeMillis()
+        val (storage, state) = storageMock(
+            sessionId = "expired-session",
+            sessionValidUntil = now - 1_000,
+            sessionIds = listOf(SessionId("expired-session", now - 2_000))
+        )
+        val recordBuilder = mock(LogRecordBuilder::class.java, RETURNS_SELF)
+        val logger = mock(Logger::class.java)
+        `when`(logger.logRecordBuilder()).thenReturn(recordBuilder)
+        val emitter = SessionStartEmitter().apply { attach(logger) }
+        val manager = SplunkSessionManager(storage) { id, previousId, timestamp ->
+            emitter.onSessionCreated(id, previousId, timestamp)
+        }
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                emitter.emitIfPending(sessionId)
+            }
+        }
+
+        val newId = manager.sessionId
+
+        verify(recordBuilder).setAttribute(SESSION_ID_KEY, newId)
+        verify(recordBuilder).setAttribute(PREVIOUS_SESSION_ID_KEY, "expired-session")
+        verify(recordBuilder).setTimestamp(state.sessionIds.last().validFrom, TimeUnit.MILLISECONDS)
+        verify(recordBuilder).emit()
     }
 
     @Test

@@ -16,6 +16,8 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.LOG_EVENT_NAME_KEY
+import com.splunk.rum.integration.agent.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.logs.LogRecordProcessor
@@ -23,6 +25,13 @@ import io.opentelemetry.sdk.logs.ReadWriteLogRecord
 
 class SessionActivityLogProcessor(private val sessionManager: ISplunkSessionManager) : LogRecordProcessor {
     override fun onEmit(context: Context, logRecord: ReadWriteLogRecord) {
-        sessionManager.trackSessionActivity()
+        // session.start records when the session began, but may be processed later after the first
+        // real signal. That signal already updated lastActivity, so session.start should not move
+        // it forward based on its later processing time.
+        if (logRecord.toLogRecordData().attributes.get(LOG_EVENT_NAME_KEY) !=
+            RumConstants.SESSION_START_EVENT_NAME
+        ) {
+            sessionManager.trackSessionActivity()
+        }
     }
 }
