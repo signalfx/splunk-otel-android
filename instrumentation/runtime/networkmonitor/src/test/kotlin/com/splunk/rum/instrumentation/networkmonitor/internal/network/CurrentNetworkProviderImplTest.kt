@@ -591,7 +591,7 @@ class CurrentNetworkProviderImplTest {
         val observedInitialNetworks = mutableListOf<CurrentNetwork>()
         val observedChanges = mutableListOf<CurrentNetwork>()
         `when`(detector.detectNetwork())
-            .thenReturn(observation(cellular), observation(cellular), observation(CurrentNetworkProvider.NO_NETWORK))
+            .thenReturn(observation(cellular), observation(CurrentNetworkProvider.NO_NETWORK))
         val provider = createProvider { observedInitialNetworks += it }
         provider.addNetworkChangeListener { observedChanges += it }
         val callback = registeredCallback()
@@ -602,12 +602,12 @@ class CurrentNetworkProviderImplTest {
         assertEquals(cellular, provider.currentNetwork)
         assertEquals(listOf(cellular), observedInitialNetworks)
         assertEquals(emptyList<CurrentNetwork>(), observedChanges)
-        verify(detector, times(2)).detectNetwork()
+        verify(detector, times(1)).detectNetwork()
 
         callback.onLost(mock(Network::class.java))
 
         assertEquals(listOf(CurrentNetworkProvider.NO_NETWORK), observedChanges)
-        verify(detector, times(3)).detectNetwork()
+        verify(detector, times(2)).detectNetwork()
     }
 
     @Test

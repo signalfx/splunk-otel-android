@@ -48,6 +48,10 @@ internal class CurrentNetworkProviderImpl(
     private val callbackRef = AtomicReference<NetworkCallback>()
     private val listeners = CopyOnWriteArrayList<NetworkChangeListener>()
     private val initialNetworkStateListenerRef = AtomicReference<NetworkChangeListener>()
+
+    // A callback observed before the initial query publishes invalidates that query. The callback
+    // path then owns baseline publication, even if its observation is later dropped by the bound.
+    private val initialDetectionInvalidated = AtomicBoolean()
     private val started = AtomicBoolean()
     private val closed = AtomicBoolean()
 
@@ -114,6 +118,9 @@ internal class CurrentNetworkProviderImpl(
     // One-time initialization establishes the baseline without emitting a network-change event.
     private fun detectInitialNetwork(initialNetworkStateListener: NetworkChangeListener) {
         try {
+            if (closed.get() || initialDetectionInvalidated.get()) {
+                return
+            }
             initialDetectionExecutor.execute { runInitialNetworkDetection(initialNetworkStateListener) }
         } catch (exception: RuntimeException) {
             if (!closed.get()) {
@@ -124,7 +131,7 @@ internal class CurrentNetworkProviderImpl(
 
     private fun runInitialNetworkDetection(initialNetworkStateListener: NetworkChangeListener) {
         try {
-            if (closed.get()) {
+            if (closed.get() || initialDetectionInvalidated.get()) {
                 return
             }
 
@@ -157,7 +164,7 @@ internal class CurrentNetworkProviderImpl(
 
     private fun publishInitialObservation(observation: NetworkObservation): Boolean =
         synchronized(networkSnapshotLock) {
-            if (networkSnapshot.isInitialNetworkStateEstablished) {
+            if (initialDetectionInvalidated.get() || networkSnapshot.isInitialNetworkStateEstablished) {
                 return@synchronized false
             }
             networkSnapshot = networkSnapshot.copy(
@@ -195,6 +202,7 @@ internal class CurrentNetworkProviderImpl(
     /** Converts framework callbacks into background observations without doing synchronous reads. */
     private inner class ConnectionMonitor : NetworkCallback() {
         override fun onAvailable(network: Network) {
+            initialDetectionInvalidated.set(true)
             Logger.d(TAG, "onAvailable: network=$network")
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                 enqueueLegacyNetworkObservation()
@@ -219,6 +227,7 @@ internal class CurrentNetworkProviderImpl(
         }
 
         override fun onLost(network: Network) {
+            initialDetectionInvalidated.set(true)
             Logger.d(TAG, "onLost: network=$network")
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                 enqueueLegacyNetworkObservation()
