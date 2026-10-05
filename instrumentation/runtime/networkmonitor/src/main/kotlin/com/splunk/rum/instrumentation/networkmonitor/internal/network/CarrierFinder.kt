@@ -61,10 +61,10 @@ internal class CarrierFinder(private val context: Context, private val telephony
             manager.simCarrierIdName?.takeIf { it.isNotEmpty() }?.toString()
         } catch (exception: SecurityException) {
             Logger.w(TAG, "SecurityException when accessing modern carrier name; trying legacy lookup.", exception)
-            getLegacyCarrierName(manager) ?: return null
+            getLegacyCarrierName(manager)
         } catch (exception: RuntimeException) {
             Logger.w(TAG, "Failed to access modern carrier name; trying legacy lookup.", exception)
-            getLegacyCarrierName(manager) ?: return null
+            getLegacyCarrierName(manager)
         }
         val (mcc, mnc, iso) = getMccMncIso(manager)
         return Carrier(

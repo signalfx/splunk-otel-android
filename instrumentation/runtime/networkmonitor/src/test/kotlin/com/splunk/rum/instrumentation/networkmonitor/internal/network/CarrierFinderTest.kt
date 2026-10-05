@@ -134,6 +134,23 @@ class CarrierFinderTest {
     }
 
     @Test
+    fun securityFailureWithNoLegacyNamePreservesOtherFields() {
+        `when`(telephonyManager.simCarrierIdName).thenThrow(SecurityException("denied"))
+        `when`(telephonyManager.simOperatorName).thenReturn("")
+        `when`(telephonyManager.networkOperatorName).thenReturn("")
+        `when`(telephonyManager.simOperator).thenReturn("310260")
+        `when`(telephonyManager.simCountryIso).thenReturn("us")
+
+        val carrier = CarrierFinder(context, telephonyManager).get()
+
+        assertNull(carrier?.name)
+        assertEquals("310", carrier?.mobileCountryCode)
+        assertEquals("260", carrier?.mobileNetworkCode)
+        assertEquals("us", carrier?.isoCountryCode)
+        assertLogContains("SecurityException when accessing modern carrier name; trying legacy lookup.")
+    }
+
+    @Test
     fun runtimeFailureWithLegacyFailureReturnsNoCarrier() {
         `when`(telephonyManager.simCarrierIdName).thenThrow(IllegalStateException("unavailable"))
         `when`(telephonyManager.simOperatorName).thenThrow(IllegalStateException("legacy unavailable"))
