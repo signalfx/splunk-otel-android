@@ -27,11 +27,9 @@ import java.io.Closeable
 internal interface CurrentNetworkProvider : Closeable {
     val currentNetwork: CurrentNetwork
 
-    fun start(initialNetworkStateListener: NetworkChangeListener)
+    fun start(attributeListener: (CurrentNetwork) -> Unit, isAppForegroundedProvider: () -> Boolean)
 
     fun addNetworkChangeListener(listener: NetworkChangeListener)
-
-    fun removeNetworkChangeListener(listener: NetworkChangeListener)
 
     companion object {
         val NO_NETWORK: CurrentNetwork = CurrentNetwork(NetworkState.NO_NETWORK_AVAILABLE)

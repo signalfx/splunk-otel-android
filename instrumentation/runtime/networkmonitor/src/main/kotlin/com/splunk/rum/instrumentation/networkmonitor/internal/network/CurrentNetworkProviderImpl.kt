@@ -46,8 +46,8 @@ internal class CurrentNetworkProviderImpl(
         get() = networkSnapshot.currentNetwork
 
     private val callbackRef = AtomicReference<NetworkCallback>()
-    private val listeners = CopyOnWriteArrayList<NetworkChangeListener>()
-    private val initialNetworkStateListenerRef = AtomicReference<NetworkChangeListener>()
+    private val transitionListeners = CopyOnWriteArrayList<NetworkChangeListener>()
+    private val attributeListenerRef = AtomicReference<(CurrentNetwork) -> Unit>()
 
     // A callback observed before the initial query publishes invalidates that query. The callback
     // path then owns baseline publication, even if its observation is later dropped by the bound.
@@ -66,7 +66,12 @@ internal class CurrentNetworkProviderImpl(
     // API 26+ guarantees the first capabilities callback after onAvailable. The default-network
     // callback represents one active network at a time, so one atomic reference is sufficient to
     // identify the network still waiting for that callback.
-    private val pendingCapabilityNetworkRef = AtomicReference<Network>()
+    private val pendingCapabilityNetworkRef = AtomicReference<PendingCapabilityNetwork>()
+
+    // Read on the framework callback thread so event eligibility reflects the state when the
+    // transition occurred, rather than the state when the background observation is processed.
+    @Volatile
+    private var isAppForegroundedProvider: () -> Boolean = { true }
 
     @Volatile
     private var networkSnapshot = NetworkSnapshot(
@@ -77,12 +82,13 @@ internal class CurrentNetworkProviderImpl(
     )
 
     // Public lifecycle and listener API.
-    override fun start(initialNetworkStateListener: NetworkChangeListener) {
+    override fun start(attributeListener: (CurrentNetwork) -> Unit, isAppForegroundedProvider: () -> Boolean) {
         if (!started.compareAndSet(false, true) || closed.get()) {
             return
         }
 
-        initialNetworkStateListenerRef.set(initialNetworkStateListener)
+        this.isAppForegroundedProvider = isAppForegroundedProvider
+        attributeListenerRef.set(attributeListener)
         try {
             // Register before detecting so a network transition cannot be missed while detection runs.
             registerNetworkCallbacks(createNetworkMonitoringRequest)
@@ -93,15 +99,11 @@ internal class CurrentNetworkProviderImpl(
                 exception
             )
         }
-        detectInitialNetwork(initialNetworkStateListener)
+        detectInitialNetwork()
     }
 
     override fun addNetworkChangeListener(listener: NetworkChangeListener) {
-        listeners.add(listener)
-    }
-
-    override fun removeNetworkChangeListener(listener: NetworkChangeListener) {
-        listeners.remove(listener)
+        transitionListeners.add(listener)
     }
 
     override fun close() {
@@ -111,17 +113,17 @@ internal class CurrentNetworkProviderImpl(
         shutdownExecutor(networkObservationExecutor, "network observation")
         pendingCapabilityNetworkRef.set(null)
         pendingDefaultNetworkRef.set(null)
-        initialNetworkStateListenerRef.set(null)
-        listeners.clear()
+        attributeListenerRef.set(null)
+        transitionListeners.clear()
     }
 
     // One-time initialization establishes the baseline without emitting a network-change event.
-    private fun detectInitialNetwork(initialNetworkStateListener: NetworkChangeListener) {
+    private fun detectInitialNetwork() {
         try {
             if (closed.get() || initialDetectionInvalidated.get()) {
                 return
             }
-            initialDetectionExecutor.execute { runInitialNetworkDetection(initialNetworkStateListener) }
+            initialDetectionExecutor.execute { runInitialNetworkDetection() }
         } catch (exception: RuntimeException) {
             if (!closed.get()) {
                 Logger.w(TAG, "Failed to schedule initial network detection.", exception)
@@ -129,7 +131,7 @@ internal class CurrentNetworkProviderImpl(
         }
     }
 
-    private fun runInitialNetworkDetection(initialNetworkStateListener: NetworkChangeListener) {
+    private fun runInitialNetworkDetection() {
         try {
             if (closed.get() || initialDetectionInvalidated.get()) {
                 return
@@ -141,13 +143,13 @@ internal class CurrentNetworkProviderImpl(
             }
 
             // The first active state establishes attributes only; it is not a transition.
-            notifyListener(initialNetworkStateListener, observation.currentNetwork)
+            notifyAttributeListener(observation.currentNetwork)
 
-            // A callback may have completed while the initial listener ran. Reapply the latest
+            // A callback may have completed while the attribute listener ran. Reapply the latest
             // state so attributes cannot finish stale after a transition.
             val latestCurrentNetwork = networkSnapshot.currentNetwork
             if (latestCurrentNetwork != observation.currentNetwork) {
-                notifyListener(initialNetworkStateListener, latestCurrentNetwork)
+                notifyAttributeListener(latestCurrentNetwork)
             }
         } catch (exception: RuntimeException) {
             Logger.w(TAG, "Failed to process initial network detection.", exception)
@@ -202,47 +204,73 @@ internal class CurrentNetworkProviderImpl(
     /** Converts framework callbacks into background observations without doing synchronous reads. */
     private inner class ConnectionMonitor : NetworkCallback() {
         override fun onAvailable(network: Network) {
+            val networkChangeTimestampMillis = System.currentTimeMillis()
+            val isAppForegrounded = captureAppForegroundState()
             initialDetectionInvalidated.set(true)
             Logger.d(TAG, "onAvailable: network=$network")
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                enqueueLegacyNetworkObservation()
+                enqueueLegacyNetworkObservation(isAppForegrounded, networkChangeTimestampMillis)
                 return
             }
 
             pendingDefaultNetworkRef.set(network)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // registerDefaultNetworkCallback tracks only the current best network.
-                pendingCapabilityNetworkRef.set(network)
+                pendingCapabilityNetworkRef.set(
+                    PendingCapabilityNetwork(network, isAppForegrounded, networkChangeTimestampMillis)
+                )
             } else {
                 // API 24-25 do not guarantee a capability callback after onAvailable. Resolve
                 // the supplied network off the framework callback thread.
-                enqueueAvailableNetworkObservation(network)
+                enqueueAvailableNetworkObservation(network, isAppForegrounded, networkChangeTimestampMillis)
             }
         }
 
         override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && consumePendingCapabilityNetwork(network)) {
-                enqueueCallbackObservation(network, capabilities)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                consumePendingCapabilityNetwork(network)?.let { pendingNetwork ->
+                    enqueueCallbackObservation(
+                        network,
+                        capabilities,
+                        pendingNetwork.isAppForegrounded,
+                        pendingNetwork.networkChangeTimestampMillis
+                    )
+                }
             }
         }
 
         override fun onLost(network: Network) {
+            val networkChangeTimestampMillis = System.currentTimeMillis()
+            val isAppForegrounded = captureAppForegroundState()
             initialDetectionInvalidated.set(true)
             Logger.d(TAG, "onLost: network=$network")
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                enqueueLegacyNetworkObservation()
+                enqueueLegacyNetworkObservation(isAppForegrounded, networkChangeTimestampMillis)
                 return
             }
 
-            clearPendingNetwork(pendingCapabilityNetworkRef, network)
+            clearPendingCapabilityNetwork(network)
             clearPendingNetwork(pendingDefaultNetworkRef, network)
-            enqueueDefaultNetworkLoss(network)
+            enqueueDefaultNetworkLoss(network, isAppForegrounded, networkChangeTimestampMillis)
         }
     }
 
-    private fun consumePendingCapabilityNetwork(network: Network): Boolean {
+    private fun captureAppForegroundState(): Boolean = try {
+        isAppForegroundedProvider()
+    } catch (exception: RuntimeException) {
+        Logger.w(TAG, "Failed to capture network transition state.", exception)
+        false
+    }
+
+    private fun consumePendingCapabilityNetwork(network: Network): PendingCapabilityNetwork? {
         val pendingNetwork = pendingCapabilityNetworkRef.get()
-        return pendingNetwork == network && pendingCapabilityNetworkRef.compareAndSet(pendingNetwork, null)
+        return if (pendingNetwork?.network == network &&
+            pendingCapabilityNetworkRef.compareAndSet(pendingNetwork, null)
+        ) {
+            pendingNetwork
+        } else {
+            null
+        }
     }
 
     private fun clearPendingNetwork(reference: AtomicReference<Network>, network: Network) {
@@ -252,21 +280,67 @@ internal class CurrentNetworkProviderImpl(
         }
     }
 
+    private fun clearPendingCapabilityNetwork(network: Network) {
+        val pendingNetwork = pendingCapabilityNetworkRef.get()
+        if (pendingNetwork?.network == network) {
+            pendingCapabilityNetworkRef.compareAndSet(pendingNetwork, null)
+        }
+    }
+
     // Background observation queue and processing.
-    private fun enqueueLegacyNetworkObservation() {
-        enqueueObservation(PendingObservation(network = null))
+    private fun enqueueLegacyNetworkObservation(isAppForegrounded: Boolean, networkChangeTimestampMillis: Long) {
+        enqueueObservation(
+            PendingObservation(
+                network = null,
+                isAppForegrounded = isAppForegrounded,
+                networkChangeTimestampMillis = networkChangeTimestampMillis
+            )
+        )
     }
 
-    private fun enqueueCallbackObservation(network: Network, capabilities: NetworkCapabilities) {
-        enqueueObservation(PendingObservation(network = network, capabilities = capabilities))
+    private fun enqueueCallbackObservation(
+        network: Network,
+        capabilities: NetworkCapabilities,
+        isAppForegrounded: Boolean,
+        networkChangeTimestampMillis: Long
+    ) {
+        enqueueObservation(
+            PendingObservation(
+                network = network,
+                capabilities = capabilities,
+                isAppForegrounded = isAppForegrounded,
+                networkChangeTimestampMillis = networkChangeTimestampMillis
+            )
+        )
     }
 
-    private fun enqueueAvailableNetworkObservation(network: Network) {
-        enqueueObservation(PendingObservation(network = network))
+    private fun enqueueAvailableNetworkObservation(
+        network: Network,
+        isAppForegrounded: Boolean,
+        networkChangeTimestampMillis: Long
+    ) {
+        enqueueObservation(
+            PendingObservation(
+                network = network,
+                isAppForegrounded = isAppForegrounded,
+                networkChangeTimestampMillis = networkChangeTimestampMillis
+            )
+        )
     }
 
-    private fun enqueueDefaultNetworkLoss(network: Network) {
-        enqueueObservation(PendingObservation(network = network, isNetworkLost = true))
+    private fun enqueueDefaultNetworkLoss(
+        network: Network,
+        isAppForegrounded: Boolean,
+        networkChangeTimestampMillis: Long
+    ) {
+        enqueueObservation(
+            PendingObservation(
+                network = network,
+                isNetworkLost = true,
+                isAppForegrounded = isAppForegrounded,
+                networkChangeTimestampMillis = networkChangeTimestampMillis
+            )
+        )
     }
 
     private fun enqueueObservation(observation: PendingObservation) {
@@ -292,7 +366,13 @@ internal class CurrentNetworkProviderImpl(
 
     private fun processPendingObservation(pendingObservation: PendingObservation) {
         if (pendingObservation.isNetworkLost) {
-            pendingObservation.network?.let(::processDefaultNetworkLoss)
+            pendingObservation.network?.let {
+                processDefaultNetworkLoss(
+                    it,
+                    pendingObservation.isAppForegrounded,
+                    pendingObservation.networkChangeTimestampMillis
+                )
+            }
             return
         }
 
@@ -311,10 +391,19 @@ internal class CurrentNetworkProviderImpl(
         }
 
         val publication = publishNetworkObservation(observation)
-        notifyListeners(observation.currentNetwork, publication)
+        notifyListeners(
+            observation.currentNetwork,
+            publication,
+            pendingObservation.isAppForegrounded,
+            pendingObservation.networkChangeTimestampMillis
+        )
     }
 
-    private fun processDefaultNetworkLoss(network: Network) {
+    private fun processDefaultNetworkLoss(
+        network: Network,
+        isAppForegrounded: Boolean,
+        networkChangeTimestampMillis: Long
+    ) {
         val pendingDefaultNetwork = pendingDefaultNetworkRef.get()
         if (closed.get() || (pendingDefaultNetwork != null && pendingDefaultNetwork != network)) {
             return
@@ -339,7 +428,7 @@ internal class CurrentNetworkProviderImpl(
         }
 
         val publication = publishNetworkObservation(observation)
-        notifyListeners(observation.currentNetwork, publication)
+        notifyListeners(observation.currentNetwork, publication, isAppForegrounded, networkChangeTimestampMillis)
     }
 
     // Detection is kept off the Android callback thread.
@@ -396,7 +485,7 @@ internal class CurrentNetworkProviderImpl(
                 previousSnapshot.currentNetwork != observation.currentNetwork
             }
             val currentNetworkChanged = previousSnapshot.currentNetwork != observation.currentNetwork
-            val shouldEmitEvent = previousSnapshot.isInitialNetworkStateEstablished && activeNetworkChanged
+            val isNetworkTransition = previousSnapshot.isInitialNetworkStateEstablished && activeNetworkChanged
             networkSnapshot = previousSnapshot.copy(
                 isInitialNetworkStateEstablished = true,
                 activeNetworkIdentityKnown = observation.activeNetworkIdentityKnown,
@@ -404,7 +493,7 @@ internal class CurrentNetworkProviderImpl(
                 currentNetwork = observation.currentNetwork
             )
             Publication(
-                emitEventAndNotifyAttributes = shouldEmitEvent,
+                emitEventAndNotifyAttributes = isNetworkTransition,
                 // The initial state must be applied once. After that, notify only when either
                 // the active identity or the attributes changed.
                 notifyAttributes = !previousSnapshot.isInitialNetworkStateEstablished ||
@@ -413,22 +502,40 @@ internal class CurrentNetworkProviderImpl(
             )
         }
 
-    private fun notifyListeners(currentNetwork: CurrentNetwork, publication: Publication) {
+    private fun notifyListeners(
+        currentNetwork: CurrentNetwork,
+        publication: Publication,
+        isAppForegrounded: Boolean,
+        networkChangeTimestampMillis: Long
+    ) {
         when {
             publication.emitEventAndNotifyAttributes ->
-                listeners.forEach { listener -> notifyListener(listener, currentNetwork) }
-            publication.notifyAttributes ->
-                initialNetworkStateListenerRef.get()?.let { listener ->
-                    notifyListener(listener, currentNetwork)
-                }
+                notifyTransitionListeners(currentNetwork, isAppForegrounded, networkChangeTimestampMillis)
+            publication.notifyAttributes -> notifyAttributeListener(currentNetwork)
         }
     }
 
-    private fun notifyListener(listener: NetworkChangeListener, currentNetwork: CurrentNetwork) {
-        try {
-            listener.onNetworkChange(currentNetwork)
-        } catch (exception: RuntimeException) {
-            Logger.w(TAG, "Network change listener failed.", exception)
+    private fun notifyTransitionListeners(
+        currentNetwork: CurrentNetwork,
+        isAppForegrounded: Boolean,
+        networkChangeTimestampMillis: Long
+    ) {
+        transitionListeners.forEach { listener ->
+            try {
+                listener.onNetworkChange(currentNetwork, isAppForegrounded, networkChangeTimestampMillis)
+            } catch (exception: RuntimeException) {
+                Logger.w(TAG, "Network transition listener failed.", exception)
+            }
+        }
+    }
+
+    private fun notifyAttributeListener(currentNetwork: CurrentNetwork) {
+        attributeListenerRef.get()?.let { listener ->
+            try {
+                listener(currentNetwork)
+            } catch (exception: RuntimeException) {
+                Logger.w(TAG, "Network change listener failed.", exception)
+            }
         }
     }
 
@@ -479,6 +586,14 @@ internal class CurrentNetworkProviderImpl(
     private data class PendingObservation(
         val network: Network?,
         val capabilities: NetworkCapabilities? = null,
-        val isNetworkLost: Boolean = false
+        val isNetworkLost: Boolean = false,
+        val isAppForegrounded: Boolean,
+        val networkChangeTimestampMillis: Long
+    )
+
+    private data class PendingCapabilityNetwork(
+        val network: Network,
+        val isAppForegrounded: Boolean,
+        val networkChangeTimestampMillis: Long
     )
 }

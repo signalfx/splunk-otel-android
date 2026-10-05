@@ -19,10 +19,10 @@ package com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle
 import com.splunk.rum.common.utils.AppStateObserver
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal class NetworkApplicationStateGate(initiallyForeground: Boolean = false) : AppStateObserver.Listener {
-    private val foreground = AtomicBoolean(initiallyForeground)
+internal class NetworkApplicationStateGate : AppStateObserver.Listener {
+    private val foreground = AtomicBoolean(false)
 
-    val canEmit: Boolean
+    val isAppForegrounded: Boolean
         get() = foreground.get()
 
     override fun onAppStarted() = Unit

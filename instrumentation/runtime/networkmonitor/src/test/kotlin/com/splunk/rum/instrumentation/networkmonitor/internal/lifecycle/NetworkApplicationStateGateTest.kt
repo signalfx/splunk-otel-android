@@ -26,29 +26,24 @@ class NetworkApplicationStateGateTest {
     @Test
     fun disablesOnBackgroundAndEnablesOnForeground() {
         gate.onAppBackgrounded()
-        assertFalse(gate.canEmit)
+        assertFalse(gate.isAppForegrounded)
 
         gate.onAppForegrounded()
-        assertTrue(gate.canEmit)
+        assertTrue(gate.isAppForegrounded)
     }
 
     @Test
     fun appStartDoesNotEnableEmission() {
         gate.onAppStarted()
-        assertFalse(gate.canEmit)
+        assertFalse(gate.isAppForegrounded)
     }
 
     @Test
     fun disablesOnCloseAndEnablesOnForeground() {
         gate.onAppClosed()
-        assertFalse(gate.canEmit)
+        assertFalse(gate.isAppForegrounded)
 
         gate.onAppForegrounded()
-        assertTrue(gate.canEmit)
-    }
-
-    @Test
-    fun canStartEnabledForLateInstallation() {
-        assertTrue(NetworkApplicationStateGate(initiallyForeground = true).canEmit)
+        assertTrue(gate.isAppForegrounded)
     }
 }

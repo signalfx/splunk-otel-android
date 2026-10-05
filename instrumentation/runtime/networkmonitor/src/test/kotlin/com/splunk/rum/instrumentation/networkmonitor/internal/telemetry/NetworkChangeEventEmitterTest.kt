@@ -18,15 +18,17 @@
 package com.splunk.rum.instrumentation.networkmonitor.internal.telemetry
 
 import com.splunk.rum.common.logger.Logger as SdkLogger
-import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.logs.LogRecordBuilder
 import io.opentelemetry.api.logs.Logger
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Answers.RETURNS_SELF
+import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -37,8 +39,7 @@ import org.robolectric.RobolectricTestRunner
 class NetworkChangeEventEmitterTest {
     private val logger = mock(Logger::class.java)
     private val logRecordBuilder = mock(LogRecordBuilder::class.java, RETURNS_SELF)
-    private val gate = NetworkApplicationStateGate(initiallyForeground = true)
-    private val emitter = NetworkChangeEventEmitter(logger, gate)
+    private val emitter = NetworkChangeEventEmitter(logger)
     private val attributes = Attributes.of(AttributeKey.stringKey("network.connection.type"), "wifi")
 
     init {
@@ -48,32 +49,30 @@ class NetworkChangeEventEmitterTest {
 
     @Test
     fun emitsNamedEventWithAttributesInForeground() {
-        emitter.emit(attributes)
+        emitter.emit(attributes, isAppForegrounded = true, networkChangeTimestampMillis = 1234L)
 
         verify(logRecordBuilder).setAllAttributes(attributes)
         verify(logRecordBuilder).setAttribute(
             NetworkChangeEventEmitter.EVENT_NAME_KEY,
             NetworkChangeEventEmitter.EVENT_NAME
         )
+        verify(logRecordBuilder).setTimestamp(1234L, TimeUnit.MILLISECONDS)
+        verify(logRecordBuilder).setObservedTimestamp(anyLong(), eq(TimeUnit.MILLISECONDS))
         verify(logRecordBuilder).emit()
     }
 
     @Test
     fun doesNotBuildEventInBackground() {
-        gate.onAppBackgrounded()
-
-        emitter.emit(attributes)
+        emitter.emit(attributes, isAppForegrounded = false, networkChangeTimestampMillis = 1234L)
 
         verify(logger, never()).logRecordBuilder()
     }
 
     @Test
     fun resumesEmissionAfterReturningToForeground() {
-        gate.onAppBackgrounded()
-        emitter.emit(attributes)
-        gate.onAppForegrounded()
+        emitter.emit(attributes, isAppForegrounded = false, networkChangeTimestampMillis = 1234L)
 
-        emitter.emit(attributes)
+        emitter.emit(attributes, isAppForegrounded = true, networkChangeTimestampMillis = 1234L)
 
         verify(logRecordBuilder).emit()
     }
@@ -82,7 +81,7 @@ class NetworkChangeEventEmitterTest {
     fun loggerFailureDoesNotEscapeNetworkChangeEmission() {
         `when`(logger.logRecordBuilder()).thenThrow(IllegalStateException("logger unavailable"))
 
-        emitter.emit(attributes)
+        emitter.emit(attributes, isAppForegrounded = true, networkChangeTimestampMillis = 1234L)
 
         assertTrue(
             SdkLogger.logs.any {

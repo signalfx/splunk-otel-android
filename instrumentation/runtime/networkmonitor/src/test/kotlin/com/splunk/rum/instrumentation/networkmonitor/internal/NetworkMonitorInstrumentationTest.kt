@@ -71,6 +71,7 @@ class NetworkMonitorInstrumentationTest {
             .addNetworkChangeListener { observedTypes += it[NETWORK_CONNECTION_TYPE] }
 
         instrumentation.install(application, openTelemetry)
+        foreground()
         provider.publish(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
 
         assertEquals(listOf("wifi"), observedTypes)
@@ -81,7 +82,7 @@ class NetworkMonitorInstrumentationTest {
     fun backgroundProcessDoesNotEmitNetworkChangeBeforeAnActivityStarts() {
         val provider = FakeCurrentNetworkProvider()
         val observedTypes = mutableListOf<String?>()
-        val instrumentation = instrumentationWith(provider, applicationInForeground = false)
+        val instrumentation = instrumentationWith(provider)
             .addNetworkChangeListener { observedTypes += it[NETWORK_CONNECTION_TYPE] }
 
         instrumentation.install(application, openTelemetry)
@@ -139,6 +140,25 @@ class NetworkMonitorInstrumentationTest {
     }
 
     @Test
+    fun usesCapturedLifecycleStateInsteadOfCurrentStateWhenEmitting() {
+        val provider = FakeCurrentNetworkProvider()
+        val observedTypes = mutableListOf<String?>()
+        val instrumentation = instrumentationWith(provider)
+            .addNetworkChangeListener { observedTypes += it[NETWORK_CONNECTION_TYPE] }
+
+        instrumentation.install(application, openTelemetry)
+        val gate = AppStateObserver.listeners.filterIsInstance<NetworkApplicationStateGate>().last()
+        gate.onAppForegrounded()
+        provider.publish(
+            CurrentNetwork(NetworkState.TRANSPORT_WIFI),
+            isAppForegrounded = false
+        )
+
+        assertEquals(listOf("wifi"), observedTypes)
+        verify(logRecordBuilder, never()).emit()
+    }
+
+    @Test
     fun repeatedInstallIsIdempotent() {
         val provider = FakeCurrentNetworkProvider()
         var providerCreations = 0
@@ -147,11 +167,11 @@ class NetworkMonitorInstrumentationTest {
                 providerCreations++
                 provider
             }
-            applicationForegroundProvider = { true }
         }
 
         instrumentation.install(application, openTelemetry)
         instrumentation.install(application, openTelemetry)
+        foreground()
         provider.publish(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
 
         assertEquals(1, providerCreations)
@@ -189,6 +209,7 @@ class NetworkMonitorInstrumentationTest {
             .addNetworkChangeListener { observed += it[NETWORK_CONNECTION_TYPE] }
 
         instrumentation.install(application, openTelemetry)
+        foreground()
         provider.publish(CurrentNetwork(NetworkState.TRANSPORT_VPN))
 
         assertEquals(listOf("vpn"), observed)
@@ -217,41 +238,64 @@ class NetworkMonitorInstrumentationTest {
         )
     }
 
-    private fun instrumentationWith(provider: FakeCurrentNetworkProvider, applicationInForeground: Boolean = true) =
-        NetworkMonitorInstrumentation().apply {
-            currentNetworkProviderFactory = { provider }
-            applicationForegroundProvider = { applicationInForeground }
-        }
+    @Test
+    fun foregroundTransitionBeforeAgentInstallIsPreserved() {
+        val provider = FakeCurrentNetworkProvider()
+        val instrumentation = instrumentationWith(provider)
+            .addNetworkChangeListener {}
+
+        foreground()
+        instrumentation.install(application, openTelemetry)
+        provider.publish(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
+
+        verify(logRecordBuilder).emit()
+    }
+
+    private fun foreground() {
+        AppStateObserver.listeners
+            .filterIsInstance<NetworkApplicationStateGate>()
+            .last()
+            .onAppForegrounded()
+    }
+
+    private fun instrumentationWith(provider: FakeCurrentNetworkProvider) = NetworkMonitorInstrumentation().apply {
+        currentNetworkProviderFactory = { provider }
+        attachApplicationStateGate(application)
+    }
 
     private class FakeCurrentNetworkProvider : CurrentNetworkProvider {
-        private val listeners = mutableListOf<NetworkChangeListener>()
-        private var initialNetworkStateListener = NetworkChangeListener {}
+        private val transitionListeners = mutableListOf<NetworkChangeListener>()
+        private var attributeListener: (CurrentNetwork) -> Unit = {}
+        private var isAppForegroundedProvider = { true }
         override var currentNetwork = CurrentNetworkProvider.UNKNOWN_NETWORK
 
-        override fun start(initialNetworkStateListener: NetworkChangeListener) {
-            this.initialNetworkStateListener = initialNetworkStateListener
+        override fun start(attributeListener: (CurrentNetwork) -> Unit, isAppForegroundedProvider: () -> Boolean) {
+            this.attributeListener = attributeListener
+            this.isAppForegroundedProvider = isAppForegroundedProvider
         }
 
         override fun addNetworkChangeListener(listener: NetworkChangeListener) {
-            listeners += listener
-        }
-
-        override fun removeNetworkChangeListener(listener: NetworkChangeListener) {
-            listeners -= listener
+            transitionListeners += listener
         }
 
         override fun close() {
-            listeners.clear()
+            transitionListeners.clear()
         }
 
         fun publish(network: CurrentNetwork) {
+            publish(network, isAppForegroundedProvider())
+        }
+
+        fun publish(network: CurrentNetwork, isAppForegrounded: Boolean) {
             currentNetwork = network
-            listeners.forEach { it.onNetworkChange(network) }
+            transitionListeners.forEach {
+                it.onNetworkChange(network, isAppForegrounded, System.currentTimeMillis())
+            }
         }
 
         fun publishInitial(network: CurrentNetwork) {
             currentNetwork = network
-            initialNetworkStateListener.onNetworkChange(network)
+            attributeListener(network)
         }
     }
 }

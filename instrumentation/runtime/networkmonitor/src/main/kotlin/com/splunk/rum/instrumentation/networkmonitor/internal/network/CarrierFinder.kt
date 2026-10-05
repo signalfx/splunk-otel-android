@@ -56,8 +56,16 @@ internal class CarrierFinder(private val context: Context, private val telephony
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
-    private fun getCarrierPostApi28(manager: TelephonyManager): Carrier {
-        val carrierName = manager.simCarrierIdName?.takeIf { it.isNotEmpty() }?.toString()
+    private fun getCarrierPostApi28(manager: TelephonyManager): Carrier? {
+        val carrierName = try {
+            manager.simCarrierIdName?.takeIf { it.isNotEmpty() }?.toString()
+        } catch (exception: SecurityException) {
+            Logger.w(TAG, "SecurityException when accessing modern carrier name; trying legacy lookup.", exception)
+            getLegacyCarrierName(manager) ?: return null
+        } catch (exception: RuntimeException) {
+            Logger.w(TAG, "Failed to access modern carrier name; trying legacy lookup.", exception)
+            getLegacyCarrierName(manager) ?: return null
+        }
         val (mcc, mnc, iso) = getMccMncIso(manager)
         return Carrier(
             name = carrierName,
@@ -68,8 +76,7 @@ internal class CarrierFinder(private val context: Context, private val telephony
     }
 
     private fun getCarrierPreApi28(manager: TelephonyManager): Carrier {
-        val carrierName = manager.simOperatorName?.takeIf { it.isNotEmpty() }
-            ?: manager.networkOperatorName?.takeIf { it.isNotEmpty() }
+        val carrierName = getLegacyCarrierName(manager)
         val (mcc, mnc, iso) = getMccMncIso(manager)
         return Carrier(
             name = carrierName,
@@ -78,6 +85,10 @@ internal class CarrierFinder(private val context: Context, private val telephony
             isoCountryCode = iso
         )
     }
+
+    private fun getLegacyCarrierName(manager: TelephonyManager): String? =
+        manager.simOperatorName?.takeIf { it.isNotEmpty() }
+            ?: manager.networkOperatorName?.takeIf { it.isNotEmpty() }
 
     private fun getMccMncIso(manager: TelephonyManager): Triple<String?, String?, String?> {
         val simOperator = manager.simOperator

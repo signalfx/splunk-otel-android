@@ -18,24 +18,24 @@
 package com.splunk.rum.instrumentation.networkmonitor.internal.telemetry
 
 import com.splunk.rum.common.logger.Logger as SdkLogger
-import com.splunk.rum.instrumentation.networkmonitor.internal.lifecycle.NetworkApplicationStateGate
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.logs.Logger
+import java.util.concurrent.TimeUnit
 
-internal class NetworkChangeEventEmitter(
-    private val logger: Logger,
-    private val applicationStateGate: NetworkApplicationStateGate
-) {
-    fun emit(attributes: Attributes) {
-        if (!applicationStateGate.canEmit) {
+internal class NetworkChangeEventEmitter(private val logger: Logger) {
+    fun emit(attributes: Attributes, isAppForegrounded: Boolean, networkChangeTimestampMillis: Long) {
+        if (!isAppForegrounded) {
             return
         }
 
         try {
+            val observedTimestampMillis = System.currentTimeMillis()
             logger.logRecordBuilder()
                 .setAllAttributes(attributes)
                 .setAttribute(EVENT_NAME_KEY, EVENT_NAME)
+                .setTimestamp(networkChangeTimestampMillis, TimeUnit.MILLISECONDS)
+                .setObservedTimestamp(observedTimestampMillis, TimeUnit.MILLISECONDS)
                 .emit()
         } catch (exception: RuntimeException) {
             // Telemetry failures must not escape into the network callback or host app code.

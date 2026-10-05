@@ -118,18 +118,28 @@ class CarrierFinderTest {
     }
 
     @Test
-    fun securityFailureReturnsNoCarrier() {
+    fun securityFailureFallsBackToLegacyNameAndPreservesOtherFields() {
         `when`(telephonyManager.simCarrierIdName).thenThrow(SecurityException("denied"))
+        `when`(telephonyManager.simOperatorName).thenReturn("Legacy")
+        `when`(telephonyManager.simOperator).thenReturn("310260")
+        `when`(telephonyManager.simCountryIso).thenReturn("us")
 
-        assertNull(CarrierFinder(context, telephonyManager).get())
-        assertLogContains("SecurityException when accessing carrier info.")
+        val carrier = CarrierFinder(context, telephonyManager).get()
+
+        assertEquals("Legacy", carrier?.name)
+        assertEquals("310", carrier?.mobileCountryCode)
+        assertEquals("260", carrier?.mobileNetworkCode)
+        assertEquals("us", carrier?.isoCountryCode)
+        assertLogContains("SecurityException when accessing modern carrier name; trying legacy lookup.")
     }
 
     @Test
-    fun runtimeFailureReturnsNoCarrier() {
+    fun runtimeFailureWithLegacyFailureReturnsNoCarrier() {
         `when`(telephonyManager.simCarrierIdName).thenThrow(IllegalStateException("unavailable"))
+        `when`(telephonyManager.simOperatorName).thenThrow(IllegalStateException("legacy unavailable"))
 
         assertNull(CarrierFinder(context, telephonyManager).get())
+        assertLogContains("Failed to access modern carrier name; trying legacy lookup.")
         assertLogContains("Failed to access carrier info.")
     }
 
