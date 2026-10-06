@@ -85,6 +85,34 @@ class NetworkUtilsTest {
     }
 
     @Test
+    @Config(sdk = [32])
+    fun subscriptionFeatureFallsBackToGeneralTelephonyBeforeApi33() {
+        val context = mock(Context::class.java)
+        val packageManager = mock(PackageManager::class.java)
+        `when`(context.packageManager).thenReturn(packageManager)
+        `when`(packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)).thenReturn(true)
+
+        assertTrue(hasTelephonySubscriptionFeature(context))
+        assertTrue(hasTelephonyRadioAccessFeature(context))
+    }
+
+    @Test
+    @Config(sdk = [33])
+    fun splitTelephonyFeaturesAreCheckedOnApi33AndNewer() {
+        val context = mock(Context::class.java)
+        val packageManager = mock(PackageManager::class.java)
+        `when`(context.packageManager).thenReturn(packageManager)
+        `when`(packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)).thenReturn(true)
+        `when`(packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY_SUBSCRIPTION))
+            .thenReturn(false)
+        `when`(packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY_RADIO_ACCESS))
+            .thenReturn(true)
+
+        assertFalse(hasTelephonySubscriptionFeature(context))
+        assertTrue(hasTelephonyRadioAccessFeature(context))
+    }
+
+    @Test
     fun missingPackageManagerDoesNotReportTelephonyFeature() {
         val context = mock(Context::class.java)
         `when`(context.packageManager).thenReturn(null)

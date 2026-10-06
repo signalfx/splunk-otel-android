@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+##### Fixes:
+* Refined network telemetry so the initial network state updates attributes without emitting a `network.change` event, while subsequent network transitions emit telemetry.
+* Improved network callback resilience with bounded asynchronous processing and platform-aware carrier and network subtype detection.
+
 ### Version 2.3.5 - 2026-09-08
 
 ##### Enhancements:

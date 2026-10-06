@@ -20,54 +20,52 @@ package com.splunk.rum.instrumentation.networkmonitor.internal.network
 import android.content.Context
 import android.os.Build
 import android.telephony.TelephonyManager
-import android.util.Log
 import androidx.annotation.RequiresApi
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.Carrier
 
 internal class CarrierFinder(private val context: Context, private val telephonyManager: TelephonyManager?) {
     fun get(): Carrier? {
         val manager = telephonyManager
         if (manager == null) {
-            Log.w(
+            Logger.w(
                 TAG,
                 "Cannot determine carrier details: telephony service unavailable."
             )
             return null
         }
-        if (!hasTelephonyFeature(context)) {
-            Log.w(
-                TAG,
-                "Cannot determine carrier details: telephony feature missing."
-            )
-            return null
-        }
-
         return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                if (hasPhoneStatePermission(context)) {
-                    getCarrierPostApi28(manager)
-                } else {
-                    Log.w(
-                        TAG,
-                        "Missing read phone state permission, using legacy carrier methods."
-                    )
-                    getCarrierPreApi28(manager)
-                }
+            if (!hasTelephonySubscriptionFeature(context)) {
+                Logger.w(
+                    TAG,
+                    "Cannot determine carrier details: telephony subscription feature missing."
+                )
+                null
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                getCarrierPostApi28(manager)
             } else {
                 getCarrierPreApi28(manager)
             }
         } catch (exception: SecurityException) {
-            Log.w(TAG, "SecurityException when accessing carrier info.", exception)
+            Logger.w(TAG, "SecurityException when accessing carrier info.", exception)
             null
         } catch (exception: RuntimeException) {
-            Log.w(TAG, "Failed to access carrier info.", exception)
+            Logger.w(TAG, "Failed to access carrier info.", exception)
             null
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
-    private fun getCarrierPostApi28(manager: TelephonyManager): Carrier {
-        val carrierName = manager.simCarrierIdName?.takeIf { it.isNotEmpty() }?.toString()
+    private fun getCarrierPostApi28(manager: TelephonyManager): Carrier? {
+        val carrierName = try {
+            manager.simCarrierIdName?.takeIf { it.isNotEmpty() }?.toString()
+        } catch (exception: SecurityException) {
+            Logger.w(TAG, "SecurityException when accessing modern carrier name; trying legacy lookup.", exception)
+            getLegacyCarrierName(manager)
+        } catch (exception: RuntimeException) {
+            Logger.w(TAG, "Failed to access modern carrier name; trying legacy lookup.", exception)
+            getLegacyCarrierName(manager)
+        }
         val (mcc, mnc, iso) = getMccMncIso(manager)
         return Carrier(
             name = carrierName,
@@ -78,8 +76,7 @@ internal class CarrierFinder(private val context: Context, private val telephony
     }
 
     private fun getCarrierPreApi28(manager: TelephonyManager): Carrier {
-        val carrierName = manager.simOperatorName?.takeIf { it.isNotEmpty() }
-            ?: manager.networkOperatorName?.takeIf { it.isNotEmpty() }
+        val carrierName = getLegacyCarrierName(manager)
         val (mcc, mnc, iso) = getMccMncIso(manager)
         return Carrier(
             name = carrierName,
@@ -88,6 +85,10 @@ internal class CarrierFinder(private val context: Context, private val telephony
             isoCountryCode = iso
         )
     }
+
+    private fun getLegacyCarrierName(manager: TelephonyManager): String? =
+        manager.simOperatorName?.takeIf { it.isNotEmpty() }
+            ?: manager.networkOperatorName?.takeIf { it.isNotEmpty() }
 
     private fun getMccMncIso(manager: TelephonyManager): Triple<String?, String?, String?> {
         val simOperator = manager.simOperator
