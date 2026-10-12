@@ -23,6 +23,10 @@ import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
+import io.opentelemetry.sdk.trace.ReadableSpan
+import io.opentelemetry.sdk.trace.SdkTracerProvider
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
@@ -50,6 +54,24 @@ class SessionIdSpanProcessorTest {
         processor.onStart(Context.root(), span)
 
         verify(span, never()).setAttribute(PREVIOUS_SESSION_ID_KEY, "session-a")
+    }
+
+    @Test
+    fun `first session start keeps no previous session after rollover`() {
+        `when`(sessionManager.sessionId).thenReturn("session-b")
+        `when`(sessionManager.previousSessionId).thenReturn("session-a")
+
+        SdkTracerProvider.builder().addSpanProcessor(processor).build().use { provider ->
+            val span = provider.get("test")
+                .spanBuilder(RumConstants.SESSION_START_EVENT_NAME)
+                .setAttribute(SESSION_ID_KEY, "session-a")
+                .startSpan()
+            span.end()
+
+            val spanData = (span as ReadableSpan).toSpanData()
+            assertEquals("session-a", spanData.attributes.get(SESSION_ID_KEY))
+            assertNull(spanData.attributes.get(PREVIOUS_SESSION_ID_KEY))
+        }
     }
 
     @Test
