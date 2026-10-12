@@ -30,7 +30,8 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
         if (span.attributes.get(SESSION_ID_KEY) == null) {
             span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
         }
-        // session.start keeps the previous session ID captured at creation, including its absence.
+        // session.start keeps the previous session ID from when that session was created.
+        // If there was no previous session ID, it stays absent.
         // Other spans should always use the SDK's current value so customer attributes
         // cannot change which previous session the span is associated with.
         if (span.name != RumConstants.SESSION_START_EVENT_NAME) {
