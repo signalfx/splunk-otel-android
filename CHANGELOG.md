@@ -12,19 +12,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ##### Enhancements:
 
 * Delayed `session.start` dispatch until a span passes `spanInterceptor` or native Session Replay data is produced, preserving the original session ID and start time.
-* Suppressed initial and duplicate `network.change` events. Background network changes update attributes without emitting these events.
-* Improved network callback handling and carrier detection. On Android 9 (API 28) and later, carrier names may differ or be unavailable.
+* Refined network telemetry so the initial network state updates attributes without emitting a `network.change` event, while subsequent foreground network transitions emit telemetry. Background network changes continue updating attributes.
+* Improved network callback resilience with bounded asynchronous processing and platform-aware carrier and network subtype detection.
 * Improved storage initialization and preference persistence.
 * Cleaned up application-lifecycle listeners and cached events when instrumentation is disabled or installation is skipped. Limited pre-install caching to ten events.
-
-##### Upgrade notes:
-
-* Update the SDK dependency to 2.4.0 and rebuild your app. Standard `SplunkRum.install` initialization requires no code changes.
 * Renamed the startup child span from `SplunkRum.initialize` to `SplunkRum.install` and expanded its timing to include more installation work. Update affected queries and filters; reported durations may increase.
-
-##### Breaking changes for direct helper integrations:
-
-* Direct callers of `OpenTelemetryInitializer` or `OfflineOtelDataProcessor.attach` must now supply an `IAgentStorage` argument. Update these calls and rebuild any separately compiled integrations that use them to avoid `NoSuchMethodError`.
 
 ### Version 2.3.5 - 2026-09-08
 
