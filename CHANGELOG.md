@@ -16,7 +16,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Improved network callback resilience with bounded asynchronous processing and platform-aware carrier and network subtype detection.
 * Improved storage initialization and preference persistence.
 * Cleaned up application-lifecycle listeners and cached events when instrumentation is disabled or installation is skipped. Limited pre-install caching to ten events.
-* Renamed the startup child span from `SplunkRum.initialize` to `SplunkRum.install` and expanded its timing to include more installation work. Update affected queries and filters; reported durations may increase.
+* Renamed the startup child span from `SplunkRum.initialize` to `SplunkRum.install` and expanded its timing to include more installation work. Update affected queries and filters; reported durations may increase
 
 ### Version 2.3.5 - 2026-09-08
 
