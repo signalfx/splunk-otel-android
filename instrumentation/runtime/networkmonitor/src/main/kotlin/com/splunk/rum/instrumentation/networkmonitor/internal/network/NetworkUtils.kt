@@ -38,6 +38,33 @@ internal fun hasPhoneStatePermission(context: Context): Boolean {
 internal fun hasTelephonyFeature(context: Context): Boolean =
     context.packageManager?.hasSystemFeature(PackageManager.FEATURE_TELEPHONY) == true
 
+/**
+ * Checks for subscription APIs where the platform exposes the split feature. Before API 33 the
+ * split feature constants were not available, so the general telephony feature is the narrowest
+ * check available to this SDK.
+ */
+internal fun hasTelephonySubscriptionFeature(context: Context): Boolean = hasTelephonyFeatureForApi(
+    context,
+    feature = "android.hardware.telephony.subscription"
+)
+
+/**
+ * Checks for radio-access APIs where the platform exposes the split feature. Before API 33 the
+ * split feature constants were not available, so the general telephony feature is the narrowest
+ * check available to this SDK.
+ */
+internal fun hasTelephonyRadioAccessFeature(context: Context): Boolean = hasTelephonyFeatureForApi(
+    context,
+    feature = "android.hardware.telephony.radio.access"
+)
+
+private fun hasTelephonyFeatureForApi(context: Context, feature: String): Boolean =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        context.packageManager?.hasSystemFeature(feature) == true
+    } else {
+        hasTelephonyFeature(context)
+    }
+
 @Suppress("DEPRECATION")
 internal fun getNetworkTypeName(networkType: Int): String = when (networkType) {
     // GSM and UMTS family.

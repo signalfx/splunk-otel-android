@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.networkmonitor
 
 import android.app.Application
+import android.content.Context
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.networkmonitor.internal.NetworkMonitorInstrumentation
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
@@ -35,6 +36,12 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
 
     private const val TAG = "NetworkMonitorIntegration"
 
+    private var networkMonitorInstrumentation: NetworkMonitorInstrumentation? = null
+
+    override fun onAttach(context: Context) {
+        setupInstrumentation(context as Application)
+    }
+
     override fun onInstall(
         application: Application,
         openTelemetry: OpenTelemetry,
@@ -47,20 +54,43 @@ internal object NetworkMonitorModuleIntegration : ModuleIntegration<NetworkMonit
                 ?: moduleConfiguration.isEnabled
 
         if (isEnabled) {
-            // Seed an indeterminate state before callbacks can update it with a detected network.
-            NetworkGlobalAttributesUpdater.update(
-                SplunkInternalGlobalAttributeSpanProcessor.attributes,
-                Attributes.of(NETWORK_CONNECTION_TYPE, UNKNOWN)
-            )
-            NetworkMonitorInstrumentation().apply {
-                addNetworkChangeListener { attributes ->
-                    NetworkGlobalAttributesUpdater.update(
-                        SplunkInternalGlobalAttributeSpanProcessor.attributes,
-                        attributes
-                    )
+            try {
+                // Seed an indeterminate state before callbacks can update it with a detected network.
+                NetworkGlobalAttributesUpdater.update(
+                    SplunkInternalGlobalAttributeSpanProcessor.attributes,
+                    Attributes.of(NETWORK_CONNECTION_TYPE, UNKNOWN)
+                )
+                setupInstrumentation(application).apply {
+                    addNetworkChangeListener { attributes ->
+                        NetworkGlobalAttributesUpdater.update(
+                            SplunkInternalGlobalAttributeSpanProcessor.attributes,
+                            attributes
+                        )
+                    }
+                    install(application, openTelemetry)
                 }
-                install(application, openTelemetry)
+            } catch (exception: Exception) {
+                // Network monitoring is optional and must not prevent the host app or agent from starting.
+                Logger.w(TAG, "Failed to install network monitoring; continuing without it.")
+                cleanupInstrumentation()
             }
+        } else {
+            cleanupInstrumentation()
         }
+    }
+
+    override fun onInstallSkipped() {
+        cleanupInstrumentation()
+    }
+
+    private fun setupInstrumentation(application: Application): NetworkMonitorInstrumentation =
+        networkMonitorInstrumentation ?: NetworkMonitorInstrumentation().also {
+            it.attachApplicationStateGate(application)
+            networkMonitorInstrumentation = it
+        }
+
+    private fun cleanupInstrumentation() {
+        networkMonitorInstrumentation?.detachApplicationStateGate()
+        networkMonitorInstrumentation = null
     }
 }

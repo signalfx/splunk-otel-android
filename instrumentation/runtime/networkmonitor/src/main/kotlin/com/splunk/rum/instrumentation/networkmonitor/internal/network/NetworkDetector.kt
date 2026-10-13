@@ -19,10 +19,26 @@ package com.splunk.rum.instrumentation.networkmonitor.internal.network
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwork
 
+/** A single network read containing both its telemetry data and runtime identity. */
+internal data class NetworkObservation(
+    val currentNetwork: CurrentNetwork,
+    val activeNetworkIdentity: Network?,
+    // True means null is a known "no active network"; false means this API cannot provide identity.
+    val activeNetworkIdentityKnown: Boolean
+)
+
 internal interface NetworkDetector {
-    fun detectCurrentNetwork(): CurrentNetwork
+    fun detectNetwork(): NetworkObservation
+
+    /** Reads capabilities for a callback-provided network off the framework callback thread. */
+    fun detectNetwork(network: Network): NetworkObservation
+
+    /** Builds an observation from callback data for one specific network. */
+    fun observeNetwork(network: Network, capabilities: NetworkCapabilities): NetworkObservation
 
     companion object {
         fun create(context: Context, connectivityManager: ConnectivityManager): NetworkDetector =

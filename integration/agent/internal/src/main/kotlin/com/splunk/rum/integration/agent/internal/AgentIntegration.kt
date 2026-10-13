@@ -19,36 +19,30 @@ package com.splunk.rum.integration.agent.internal
 import android.app.Application
 import android.content.Context
 import android.os.SystemClock
-import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
-import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.RUM_TRACER_NAME
-import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
-import com.splunk.rum.agent.common.storage.AgentStorage
+import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.agent.internal.attributes.ScreenNameTracker
 import com.splunk.rum.integration.agent.internal.model.Module
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.session.SessionStartEmitter
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.OpenTelemetrySdk
-import java.util.concurrent.TimeUnit
 
-class AgentIntegration private constructor(context: Context) {
-    val sessionManager: ISplunkSessionManager
+class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context: Context) {
+    internal val sessionStartEmitter = SessionStartEmitter()
     internal val listeners: MutableSet<Listener> = HashSet()
     var globalAttributes: Attributes = Attributes.empty()
         private set
 
-    init {
-        val storage = AgentStorage.attach(context)
-        sessionManager = SplunkSessionManager(storage)
-    }
-
     fun install(
         application: Application,
         openTelemetry: OpenTelemetrySdk,
+        sessionManager: ISplunkSessionManager,
         moduleConfigurations: List<ModuleConfiguration>,
         globalAttributes: Attributes
     ) {
@@ -56,17 +50,9 @@ class AgentIntegration private constructor(context: Context) {
 
         registerModuleInitializationStart(MODULE_NAME)
 
-        sessionManager.sessionListeners += object : SplunkSessionManager.SessionListener {
-            override fun onSessionChanged(sessionId: String, timestamp: Long) {
-                openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME)
-                    .logRecordBuilder()
-                    .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.SESSION_START_EVENT_NAME)
-                    .setTimestamp(timestamp, TimeUnit.MILLISECONDS)
-                    .setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
-                    .setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
-                    .emit()
-            }
-        }
+        sessionStartEmitter.attach(openTelemetry.sdkLoggerProvider.get(RUM_TRACER_NAME))
+
+        listeners.forEachFast { it.onSessionManagerReady(sessionManager) }
         sessionManager.install(application)
 
         val seenConfigurationNames = mutableSetOf<String>()
@@ -86,7 +72,24 @@ class AgentIntegration private constructor(context: Context) {
         listeners.forEachFast { it.onPostInstall() }
     }
 
+    /** Emits the pending session.start after application telemetry has been accepted. */
+    fun emitSessionStartIfPending(sessionId: String? = null) {
+        sessionStartEmitter.emitIfPending(sessionId)
+    }
+
+    fun createSessionManager(agentStorage: IAgentStorage): ISplunkSessionManager =
+        SplunkSessionManager(agentStorage) { sessionId, previousSessionId, timestamp ->
+            sessionStartEmitter.onSessionCreated(
+                sessionId,
+                previousSessionId,
+                timestamp,
+                ScreenNameTracker.screenName
+            )
+        }
+
     internal interface Listener {
+        fun onSessionManagerReady(sessionManager: ISplunkSessionManager)
+
         fun onInstall(
             application: Application,
             openTelemetry: OpenTelemetry,
@@ -94,6 +97,8 @@ class AgentIntegration private constructor(context: Context) {
         )
 
         fun onPostInstall()
+
+        fun onInstallSkipped() {}
     }
 
     companion object {
@@ -108,6 +113,18 @@ class AgentIntegration private constructor(context: Context) {
 
         var lowestApiLevel: Int = Constants.LOWEST_RUNTIME_API_LEVEL
 
+        @Volatile
+        var installStartTimestamp: Long? = null
+
+        @Volatile
+        var installStartElapsed: Long? = null
+
+        @Volatile
+        var installEndElapsed: Long? = null
+
+        @Volatile
+        var onInstallTimingComplete: (() -> Unit)? = null
+
         val instance: AgentIntegration
             get() = instanceInternal
                 ?: throw IllegalStateException("Instance is not created, call createInstance() first")
@@ -118,6 +135,14 @@ class AgentIntegration private constructor(context: Context) {
             }
 
             return instanceInternal!!
+        }
+
+        /** No-ops when no module has attached, so the instance is not created on a no-op install path. */
+        fun notifyInstallSkipped() {
+            val instance = instanceInternal ?: return
+
+            Logger.d(TAG, "notifyInstallSkipped()")
+            instance.listeners.forEachFast { it.onInstallSkipped() }
         }
 
         fun registerModuleInitializationStart(name: String) {

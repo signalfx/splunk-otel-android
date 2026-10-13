@@ -25,6 +25,15 @@
       "enabled": false
     },
     {
+      "description": "Monthly OpenTelemetry instrumentation BOM updates",
+      "matchManagers": ["gradle"],
+      "matchPackageNames": [
+        "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha"
+      ],
+      "ignoreUnstable": false,
+      "extends": ["schedule:monthly"]
+    },
+    {
       "description": "Quarterly updates for app/**",
       "matchPaths": ["app/**"],
       "extends": ["schedule:quarterly"]

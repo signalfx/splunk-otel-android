@@ -20,6 +20,7 @@ package com.splunk.rum.instrumentation.networkmonitor.internal.network
 import android.content.Context
 import android.content.pm.PackageManager
 import android.telephony.TelephonyManager
+import com.splunk.rum.common.logger.Logger
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -31,7 +32,6 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowLog
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [28])
@@ -41,6 +41,7 @@ class CarrierFinderTest {
     private val telephonyManager = mock(TelephonyManager::class.java)
 
     init {
+        Logger.clearLogs()
         `when`(context.packageManager).thenReturn(packageManager)
         `when`(packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)).thenReturn(true)
         `when`(context.checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE))
@@ -92,7 +93,7 @@ class CarrierFinderTest {
         `when`(packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)).thenReturn(false)
 
         assertNull(CarrierFinder(context, telephonyManager).get())
-        assertLogContains("Cannot determine carrier details: telephony feature missing.")
+        assertLogContains("Cannot determine carrier details: telephony subscription feature missing.")
     }
 
     @Test
@@ -102,42 +103,67 @@ class CarrierFinderTest {
     }
 
     @Test
-    fun missingPhoneStatePermissionUsesPermissionFreeCarrierFields() {
+    fun missingPhoneStatePermissionStillUsesModernCarrierFields() {
         `when`(context.checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE))
             .thenReturn(PackageManager.PERMISSION_DENIED)
-        `when`(telephonyManager.simOperatorName).thenReturn("Fallback")
+        `when`(telephonyManager.simCarrierIdName).thenReturn("Modern")
         `when`(telephonyManager.simOperator).thenReturn("310260")
 
         val carrier = CarrierFinder(context, telephonyManager).get()
 
-        assertEquals(-1, carrier?.id)
-        assertEquals("Fallback", carrier?.name)
+        assertEquals("Modern", carrier?.name)
         assertEquals("310", carrier?.mobileCountryCode)
         assertEquals("260", carrier?.mobileNetworkCode)
-        verify(telephonyManager, never()).simCarrierId
-        assertLogContains("Missing read phone state permission, using legacy carrier methods.")
+        verify(telephonyManager).simCarrierIdName
     }
 
     @Test
-    fun securityFailureReturnsNoCarrier() {
+    fun securityFailureFallsBackToLegacyNameAndPreservesOtherFields() {
         `when`(telephonyManager.simCarrierIdName).thenThrow(SecurityException("denied"))
+        `when`(telephonyManager.simOperatorName).thenReturn("Legacy")
+        `when`(telephonyManager.simOperator).thenReturn("310260")
+        `when`(telephonyManager.simCountryIso).thenReturn("us")
 
-        assertNull(CarrierFinder(context, telephonyManager).get())
-        assertLogContains("SecurityException when accessing carrier info.")
+        val carrier = CarrierFinder(context, telephonyManager).get()
+
+        assertEquals("Legacy", carrier?.name)
+        assertEquals("310", carrier?.mobileCountryCode)
+        assertEquals("260", carrier?.mobileNetworkCode)
+        assertEquals("us", carrier?.isoCountryCode)
+        assertLogContains("SecurityException when accessing modern carrier name; trying legacy lookup.")
     }
 
     @Test
-    fun runtimeFailureReturnsNoCarrier() {
+    fun securityFailureWithNoLegacyNamePreservesOtherFields() {
+        `when`(telephonyManager.simCarrierIdName).thenThrow(SecurityException("denied"))
+        `when`(telephonyManager.simOperatorName).thenReturn("")
+        `when`(telephonyManager.networkOperatorName).thenReturn("")
+        `when`(telephonyManager.simOperator).thenReturn("310260")
+        `when`(telephonyManager.simCountryIso).thenReturn("us")
+
+        val carrier = CarrierFinder(context, telephonyManager).get()
+
+        assertNull(carrier?.name)
+        assertEquals("310", carrier?.mobileCountryCode)
+        assertEquals("260", carrier?.mobileNetworkCode)
+        assertEquals("us", carrier?.isoCountryCode)
+        assertLogContains("SecurityException when accessing modern carrier name; trying legacy lookup.")
+    }
+
+    @Test
+    fun runtimeFailureWithLegacyFailureReturnsNoCarrier() {
         `when`(telephonyManager.simCarrierIdName).thenThrow(IllegalStateException("unavailable"))
+        `when`(telephonyManager.simOperatorName).thenThrow(IllegalStateException("legacy unavailable"))
 
         assertNull(CarrierFinder(context, telephonyManager).get())
+        assertLogContains("Failed to access modern carrier name; trying legacy lookup.")
         assertLogContains("Failed to access carrier info.")
     }
 
     private fun assertLogContains(message: String) {
         assertTrue(
             "Expected log message: $message",
-            ShadowLog.getLogsForTag("CarrierFinder").any { it.msg == message }
+            Logger.logs.any { it.tag == "CarrierFinder" && it.message == message }
         )
     }
 }

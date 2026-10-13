@@ -17,11 +17,21 @@
 package com.splunk.rum.integration.networkmonitor
 
 import android.content.Context
+import android.util.Log
 import com.splunk.rum.integration.agent.internal.module.ModuleInstaller
 
 internal class NetworkMonitorModuleInstaller : ModuleInstaller() {
 
     override fun onInstall(context: Context) {
-        NetworkMonitorModuleIntegration.attach(context)
+        try {
+            NetworkMonitorModuleIntegration.attach(context)
+        } catch (exception: Exception) {
+            // A failed optional module must not abort ContentProvider startup or the host app.
+            Log.w(TAG, "Failed to attach network monitoring; continuing without it.", exception)
+        }
+    }
+
+    private companion object {
+        private const val TAG = "NetworkMonitorInstaller"
     }
 }

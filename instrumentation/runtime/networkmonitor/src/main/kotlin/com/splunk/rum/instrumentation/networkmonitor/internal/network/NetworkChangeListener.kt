@@ -19,6 +19,7 @@ package com.splunk.rum.instrumentation.networkmonitor.internal.network
 
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwork
 
+/** Receives an actual network transition and its callback-time emission context. */
 internal fun interface NetworkChangeListener {
-    fun onNetworkChange(currentNetwork: CurrentNetwork)
+    fun onNetworkChange(currentNetwork: CurrentNetwork, isAppForegrounded: Boolean, networkChangeTimestampMillis: Long)
 }

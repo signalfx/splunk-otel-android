@@ -19,7 +19,9 @@ package com.splunk.rum.instrumentation.networkmonitor.internal.network
 
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.CurrentNetwork
 import com.splunk.rum.instrumentation.networkmonitor.internal.model.NetworkState
 import java.util.concurrent.AbstractExecutorService
@@ -40,7 +42,6 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowLog
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [23])
@@ -49,17 +50,22 @@ class CurrentNetworkProviderImplTest {
     private val connectivityManager = mock(ConnectivityManager::class.java)
     private val request = mock(NetworkRequest::class.java)
     private val initialDetectionExecutor = QueuingExecutorService()
+    private val networkObservationExecutor = ImmediateExecutorService()
+
+    init {
+        Logger.clearLogs()
+    }
 
     @Test
     fun detectsInitialNetworkOffTheCallingThreadAndRegistersCallback() {
         val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
         val observedInitialNetworks = mutableListOf<CurrentNetwork>()
-        `when`(detector.detectCurrentNetwork()).thenReturn(wifi)
+        `when`(detector.detectNetwork()).thenReturn(observation(wifi))
 
         val provider = createProvider { observedInitialNetworks += it }
 
         assertEquals(CurrentNetworkProvider.UNKNOWN_NETWORK, provider.currentNetwork)
-        verify(detector, never()).detectCurrentNetwork()
+        verify(detector, never()).detectNetwork()
         verify(connectivityManager).registerNetworkCallback(
             any(NetworkRequest::class.java),
             any(ConnectivityManager.NetworkCallback::class.java)
@@ -69,24 +75,26 @@ class CurrentNetworkProviderImplTest {
 
         assertEquals(wifi, provider.currentNetwork)
         assertEquals(listOf(wifi), observedInitialNetworks)
-        verify(detector).detectCurrentNetwork()
+        verify(detector).detectNetwork()
     }
 
     @Test
     @Config(sdk = [24])
     fun usesDefaultNetworkCallbackOnApi24AndNewer() {
-        `when`(detector.detectCurrentNetwork()).thenReturn(CurrentNetworkProvider.UNKNOWN_NETWORK)
+        `when`(detector.detectNetwork()).thenReturn(observation(CurrentNetworkProvider.UNKNOWN_NETWORK))
         var requestCreations = 0
 
         val provider = CurrentNetworkProviderImpl(
             detector,
             connectivityManager,
-            initialDetectionExecutor
-        ) {
-            requestCreations++
-            request
-        }
-        provider.start {}
+            initialDetectionExecutor,
+            {
+                requestCreations++
+                request
+            },
+            networkObservationExecutor
+        )
+        provider.start({}, { true })
 
         verify(connectivityManager).registerDefaultNetworkCallback(
             any(ConnectivityManager.NetworkCallback::class.java)
@@ -99,14 +107,294 @@ class CurrentNetworkProviderImplTest {
     }
 
     @Test
-    fun refreshesAndNotifiesListenerWhenNetworkBecomesAvailable() {
-        val unknown = CurrentNetworkProvider.UNKNOWN_NETWORK
-        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType = "LTE")
-        `when`(detector.detectCurrentNetwork()).thenReturn(unknown, cellular)
+    fun repeatedInitialCallbacksForTheSameActiveNetworkDoNotEmitEvents() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val activeNetwork = mock(Network::class.java)
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi, activeNetwork, activeNetworkIdentityKnown = true))
+        `when`(connectivityManager.activeNetwork).thenReturn(activeNetwork)
         val provider = createProvider()
         initialDetectionExecutor.runAll()
         val observed = mutableListOf<CurrentNetwork>()
-        provider.addNetworkChangeListener { observed += it }
+        provider.observeTransitions(observed)
+        val callback = registeredCallback()
+
+        callback.onAvailable(mock(Network::class.java))
+        callback.onAvailable(mock(Network::class.java))
+
+        assertEquals(emptyList<CurrentNetwork>(), observed)
+    }
+
+    @Test
+    @Config(sdk = [22])
+    fun legacyCallbacksUseNetworkDetailsToDetectARealTransition() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType = "LTE")
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi), observation(wifi), observation(cellular))
+        val provider = createProvider()
+        initialDetectionExecutor.runAll()
+        val observed = mutableListOf<CurrentNetwork>()
+        provider.observeTransitions(observed)
+        val callback = registeredCallback()
+
+        callback.onAvailable(mock(Network::class.java))
+        callback.onAvailable(mock(Network::class.java))
+
+        assertEquals(listOf(cellular), observed)
+    }
+
+    @Test
+    @Config(sdk = [24])
+    fun laterDefaultNetworkCallbackEmitsOnlyForAnActiveNetworkTransition() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType = "LTE")
+        val initialNetwork = mock(Network::class.java)
+        val laterNetwork = mock(Network::class.java)
+        val initialCapabilities = mock(NetworkCapabilities::class.java)
+        val laterCapabilities = mock(NetworkCapabilities::class.java)
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.detectNetwork(initialNetwork))
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(initialNetwork, initialCapabilities))
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.detectNetwork(laterNetwork))
+            .thenReturn(observation(cellular, laterNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(laterNetwork, laterCapabilities))
+            .thenReturn(observation(cellular, laterNetwork, activeNetworkIdentityKnown = true))
+        val provider = createProvider()
+        initialDetectionExecutor.runAll()
+        val observed = mutableListOf<CurrentNetwork>()
+        provider.observeTransitions(observed)
+        val callback = registeredDefaultCallback()
+
+        callback.onAvailable(initialNetwork)
+        callback.onCapabilitiesChanged(initialNetwork, initialCapabilities)
+        callback.onAvailable(laterNetwork)
+        callback.onCapabilitiesChanged(laterNetwork, laterCapabilities)
+
+        assertEquals(listOf(cellular), observed)
+        verify(detector, times(1)).detectNetwork()
+        verify(detector, never()).observeNetwork(laterNetwork, laterCapabilities)
+    }
+
+    @Test
+    @Config(sdk = [26])
+    fun repeatedCapabilityCallbacksForOneNetworkProcessOnlyTheFirstObservation() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val activeNetwork = mock(Network::class.java)
+        val firstCapabilities = mock(NetworkCapabilities::class.java)
+        val latestCapabilities = mock(NetworkCapabilities::class.java)
+        val observationExecutor = QueuingExecutorService()
+        val observedInitialNetworks = mutableListOf<CurrentNetwork>()
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi, activeNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(activeNetwork, firstCapabilities))
+            .thenReturn(observation(wifi, activeNetwork, activeNetworkIdentityKnown = true))
+        val provider = CurrentNetworkProviderImpl(
+            detector,
+            connectivityManager,
+            initialDetectionExecutor,
+            { request },
+            observationExecutor
+        )
+        provider.start({ observedInitialNetworks += it }, { true })
+        initialDetectionExecutor.runAll()
+        val callback = registeredDefaultCallback()
+
+        callback.onAvailable(activeNetwork)
+        callback.onCapabilitiesChanged(activeNetwork, firstCapabilities)
+        callback.onCapabilitiesChanged(activeNetwork, latestCapabilities)
+        observationExecutor.runAll()
+
+        verify(detector).observeNetwork(activeNetwork, firstCapabilities)
+        verify(detector, never()).observeNetwork(activeNetwork, latestCapabilities)
+        assertEquals(listOf(wifi), observedInitialNetworks)
+    }
+
+    @Test
+    @Config(sdk = [26])
+    fun capabilityDataChangeForTheSameNetworkUpdatesAttributesWithoutEmittingEvent() {
+        val initialCellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType = "LTE")
+        val updatedCellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType = "NR")
+        val activeNetwork = mock(Network::class.java)
+        val capabilities = mock(NetworkCapabilities::class.java)
+        val observedInitialNetworks = mutableListOf<CurrentNetwork>()
+        val observedChanges = mutableListOf<CurrentNetwork>()
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(initialCellular, activeNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(activeNetwork, capabilities))
+            .thenReturn(observation(updatedCellular, activeNetwork, activeNetworkIdentityKnown = true))
+        val provider = createProvider { observedInitialNetworks += it }
+        provider.observeTransitions(observedChanges)
+        initialDetectionExecutor.runAll()
+
+        val callback = registeredDefaultCallback()
+        callback.onAvailable(activeNetwork)
+        callback.onCapabilitiesChanged(activeNetwork, capabilities)
+
+        assertEquals(listOf(initialCellular, updatedCellular), observedInitialNetworks)
+        assertEquals(emptyList<CurrentNetwork>(), observedChanges)
+    }
+
+    @Test
+    @Config(sdk = [26])
+    fun capturesTransitionMetadataOnAvailableUntilCapabilitiesAreProcessed() {
+        val initialNetwork = mock(Network::class.java)
+        val replacementNetwork = mock(Network::class.java)
+        val capabilities = mock(NetworkCapabilities::class.java)
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR)
+        var isAppForegrounded = true
+        var observedTimestampMillis = 0L
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(replacementNetwork, capabilities))
+            .thenReturn(observation(cellular, replacementNetwork, activeNetworkIdentityKnown = true))
+        val provider = CurrentNetworkProviderImpl(
+            detector,
+            connectivityManager,
+            initialDetectionExecutor,
+            { request },
+            networkObservationExecutor
+        )
+        provider.addNetworkChangeListener { _, callbackIsAppForegrounded, networkChangeTimestampMillis ->
+            isAppForegrounded = callbackIsAppForegrounded
+            observedTimestampMillis = networkChangeTimestampMillis
+        }
+        provider.start({}, { false })
+        initialDetectionExecutor.runAll()
+
+        val callback = registeredDefaultCallback()
+        callback.onAvailable(replacementNetwork)
+        callback.onCapabilitiesChanged(replacementNetwork, capabilities)
+
+        assertEquals(false, isAppForegrounded)
+        assertTrue(observedTimestampMillis > 0L)
+    }
+
+    @Test
+    @Config(sdk = [26])
+    fun pendingObservationsForDifferentNetworksRemainOrdered() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR)
+        val initialNetwork = mock(Network::class.java)
+        val replacementNetwork = mock(Network::class.java)
+        val initialCapabilities = mock(NetworkCapabilities::class.java)
+        val replacementCapabilities = mock(NetworkCapabilities::class.java)
+        val observationExecutor = QueuingExecutorService()
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(initialNetwork, initialCapabilities))
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(replacementNetwork, replacementCapabilities))
+            .thenReturn(observation(cellular, replacementNetwork, activeNetworkIdentityKnown = true))
+        val provider = CurrentNetworkProviderImpl(
+            detector,
+            connectivityManager,
+            initialDetectionExecutor,
+            { request },
+            observationExecutor
+        )
+        provider.start({}, { true })
+        initialDetectionExecutor.runAll()
+        val observed = mutableListOf<CurrentNetwork>()
+        provider.observeTransitions(observed)
+        val callback = registeredDefaultCallback()
+
+        callback.onAvailable(initialNetwork)
+        callback.onCapabilitiesChanged(initialNetwork, initialCapabilities)
+        callback.onAvailable(replacementNetwork)
+        callback.onCapabilitiesChanged(replacementNetwork, replacementCapabilities)
+        observationExecutor.runAll()
+
+        assertEquals(listOf(cellular), observed)
+        verify(detector).observeNetwork(initialNetwork, initialCapabilities)
+        verify(detector).observeNetwork(replacementNetwork, replacementCapabilities)
+    }
+
+    @Test
+    @Config(sdk = [26])
+    fun pendingNetworkLossIsNotCoalescedWithItsNetworkObservation() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR)
+        val initialNetwork = mock(Network::class.java)
+        val replacementNetwork = mock(Network::class.java)
+        val replacementCapabilities = mock(NetworkCapabilities::class.java)
+        val observationExecutor = QueuingExecutorService()
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(replacementNetwork, replacementCapabilities))
+            .thenReturn(observation(cellular, replacementNetwork, activeNetworkIdentityKnown = true))
+        val provider = CurrentNetworkProviderImpl(
+            detector,
+            connectivityManager,
+            initialDetectionExecutor,
+            { request },
+            observationExecutor
+        )
+        provider.start({}, { true })
+        initialDetectionExecutor.runAll()
+        val observed = mutableListOf<CurrentNetwork>()
+        provider.observeTransitions(observed)
+        val callback = registeredDefaultCallback()
+
+        callback.onAvailable(replacementNetwork)
+        callback.onCapabilitiesChanged(replacementNetwork, replacementCapabilities)
+        callback.onLost(replacementNetwork)
+        observationExecutor.runAll()
+
+        assertEquals(listOf(cellular, CurrentNetworkProvider.NO_NETWORK), observed)
+    }
+
+    @Test
+    @Config(sdk = [26])
+    fun api26LosingThePreviousDefaultDoesNotPublishNoNetworkBeforeReplacementCapabilities() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR)
+        val initialNetwork = mock(Network::class.java)
+        val replacementNetwork = mock(Network::class.java)
+        val initialCapabilities = mock(NetworkCapabilities::class.java)
+        val replacementCapabilities = mock(NetworkCapabilities::class.java)
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.detectNetwork(initialNetwork))
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(initialNetwork, initialCapabilities))
+            .thenReturn(observation(wifi, initialNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.detectNetwork(replacementNetwork))
+            .thenReturn(observation(cellular, replacementNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(replacementNetwork, replacementCapabilities))
+            .thenReturn(observation(cellular, replacementNetwork, activeNetworkIdentityKnown = true))
+        val provider = createProvider()
+        initialDetectionExecutor.runAll()
+        val observed = mutableListOf<CurrentNetwork>()
+        provider.observeTransitions(observed)
+        val callback = registeredDefaultCallback()
+
+        callback.onAvailable(initialNetwork)
+        callback.onCapabilitiesChanged(initialNetwork, initialCapabilities)
+        callback.onAvailable(replacementNetwork)
+        callback.onLost(initialNetwork)
+
+        assertEquals(emptyList<CurrentNetwork>(), observed)
+
+        callback.onCapabilitiesChanged(replacementNetwork, replacementCapabilities)
+
+        assertEquals(listOf(cellular), observed)
+        assertEquals(cellular, provider.currentNetwork)
+    }
+
+    @Test
+    fun refreshesAndNotifiesListenerWhenNetworkBecomesAvailable() {
+        val unknown = CurrentNetworkProvider.UNKNOWN_NETWORK
+        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType = "LTE")
+        `when`(detector.detectNetwork()).thenReturn(observation(unknown), observation(cellular))
+        val provider = createProvider()
+        initialDetectionExecutor.runAll()
+        val observed = mutableListOf<CurrentNetwork>()
+        provider.observeTransitions(observed)
 
         registeredCallback().onAvailable(mock(Network::class.java))
 
@@ -116,12 +404,15 @@ class CurrentNetworkProviderImplTest {
 
     @Test
     fun publishesNoNetworkWhenActiveNetworkIsLost() {
-        `when`(detector.detectCurrentNetwork())
-            .thenReturn(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
+        `when`(detector.detectNetwork())
+            .thenReturn(
+                observation(CurrentNetwork(NetworkState.TRANSPORT_WIFI)),
+                observation(CurrentNetworkProvider.NO_NETWORK)
+            )
         val provider = createProvider()
         initialDetectionExecutor.runAll()
         val observed = mutableListOf<CurrentNetwork>()
-        provider.addNetworkChangeListener { observed += it }
+        provider.observeTransitions(observed)
 
         registeredCallback().onLost(mock(Network::class.java))
 
@@ -131,7 +422,7 @@ class CurrentNetworkProviderImplTest {
 
     @Test
     fun detectorFailureFallsBackToUnknownNetwork() {
-        `when`(detector.detectCurrentNetwork()).thenThrow(IllegalStateException("unavailable"))
+        `when`(detector.detectNetwork()).thenThrow(IllegalStateException("unavailable"))
 
         val provider = createProvider()
         initialDetectionExecutor.runAll()
@@ -140,29 +431,13 @@ class CurrentNetworkProviderImplTest {
     }
 
     @Test
-    fun removedListenerIsNotNotified() {
-        `when`(detector.detectCurrentNetwork())
-            .thenReturn(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
+    fun closeUnregistersCallbackAndClearsTransitionListeners() {
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(CurrentNetwork(NetworkState.TRANSPORT_WIFI)))
         val provider = createProvider()
         initialDetectionExecutor.runAll()
         val observed = mutableListOf<CurrentNetwork>()
-        val listener = NetworkChangeListener { observed += it }
-        provider.addNetworkChangeListener(listener)
-        provider.removeNetworkChangeListener(listener)
-
-        registeredCallback().onLost(mock(Network::class.java))
-
-        assertEquals(emptyList<CurrentNetwork>(), observed)
-    }
-
-    @Test
-    fun closeUnregistersCallbackAndClearsListeners() {
-        `when`(detector.detectCurrentNetwork())
-            .thenReturn(CurrentNetwork(NetworkState.TRANSPORT_WIFI))
-        val provider = createProvider()
-        initialDetectionExecutor.runAll()
-        val observed = mutableListOf<CurrentNetwork>()
-        provider.addNetworkChangeListener { observed += it }
+        provider.observeTransitions(observed)
         val callback = registeredCallback()
 
         provider.close()
@@ -174,7 +449,7 @@ class CurrentNetworkProviderImplTest {
 
     @Test
     fun repeatedCloseOnlyUnregistersCallbackOnce() {
-        `when`(detector.detectCurrentNetwork()).thenReturn(CurrentNetworkProvider.UNKNOWN_NETWORK)
+        `when`(detector.detectNetwork()).thenReturn(observation(CurrentNetworkProvider.UNKNOWN_NETWORK))
         val provider = createProvider()
         val callback = registeredCallback()
 
@@ -189,8 +464,10 @@ class CurrentNetworkProviderImplTest {
         val provider = CurrentNetworkProviderImpl(
             detector,
             connectivityManager,
-            initialDetectionExecutor
-        ) { request }
+            initialDetectionExecutor,
+            { request },
+            networkObservationExecutor
+        )
         doAnswer {
             provider.close()
             null
@@ -199,17 +476,44 @@ class CurrentNetworkProviderImplTest {
             any(ConnectivityManager.NetworkCallback::class.java)
         )
 
-        provider.start {}
+        provider.start({}, { true })
 
         verify(connectivityManager).unregisterNetworkCallback(
             any(ConnectivityManager.NetworkCallback::class.java)
         )
-        verify(detector, never()).detectCurrentNetwork()
+        verify(detector, never()).detectNetwork()
+    }
+
+    @Test
+    @Config(sdk = [26])
+    fun observationCompletedAfterCloseIsNotPublishedOrNotified() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR)
+        val activeNetwork = mock(Network::class.java)
+        val capabilities = mock(NetworkCapabilities::class.java)
+        lateinit var provider: CurrentNetworkProviderImpl
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi, activeNetwork, activeNetworkIdentityKnown = true))
+        `when`(detector.observeNetwork(activeNetwork, capabilities)).thenAnswer {
+            provider.close()
+            observation(cellular, activeNetwork, activeNetworkIdentityKnown = true)
+        }
+        provider = createProvider()
+        initialDetectionExecutor.runAll()
+        val observedChanges = mutableListOf<CurrentNetwork>()
+        provider.observeTransitions(observedChanges)
+
+        val callback = registeredDefaultCallback()
+        callback.onAvailable(activeNetwork)
+        callback.onCapabilitiesChanged(activeNetwork, capabilities)
+
+        assertEquals(wifi, provider.currentNetwork)
+        assertEquals(emptyList<CurrentNetwork>(), observedChanges)
     }
 
     @Test
     fun unregisterFailureIsLoggedAndDoesNotEscapeClose() {
-        `when`(detector.detectCurrentNetwork()).thenReturn(CurrentNetworkProvider.UNKNOWN_NETWORK)
+        `when`(detector.detectNetwork()).thenReturn(observation(CurrentNetworkProvider.UNKNOWN_NETWORK))
         val provider = createProvider()
         initialDetectionExecutor.runAll()
         val callback = registeredCallback()
@@ -220,8 +524,30 @@ class CurrentNetworkProviderImplTest {
         provider.close()
 
         assertTrue(
-            ShadowLog.getLogsForTag("CurrentNetworkProvider").any {
-                it.msg == "Failed to unregister network callbacks."
+            Logger.logs.any {
+                it.tag == "CurrentNetworkProvider" && it.message == "Failed to unregister network callbacks."
+            }
+        )
+    }
+
+    @Test
+    fun failingTransitionListenerDoesNotBlockOtherListeners() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR)
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi), observation(cellular))
+        val provider = createProvider()
+        initialDetectionExecutor.runAll()
+        val observed = mutableListOf<CurrentNetwork>()
+        provider.addNetworkChangeListener { _, _, _ -> throw IllegalStateException("listener failure") }
+        provider.observeTransitions(observed)
+
+        registeredCallback().onAvailable(mock(Network::class.java))
+
+        assertEquals(listOf(cellular), observed)
+        assertTrue(
+            Logger.logs.any {
+                it.tag == "CurrentNetworkProvider" && it.message == "Network transition listener failed."
             }
         )
     }
@@ -229,7 +555,7 @@ class CurrentNetworkProviderImplTest {
     @Test
     fun failedRegistrationDoesNotPreventCurrentNetworkAccess() {
         val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
-        `when`(detector.detectCurrentNetwork()).thenReturn(wifi)
+        `when`(detector.detectNetwork()).thenReturn(observation(wifi))
         doThrow(SecurityException("denied"))
             .`when`(connectivityManager)
             .registerNetworkCallback(
@@ -249,50 +575,107 @@ class CurrentNetworkProviderImplTest {
     }
 
     @Test
+    fun rejectedObservationDoesNotEscapeAndLaterObservationCanBeProcessed() {
+        val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(CurrentNetworkProvider.UNKNOWN_NETWORK), observation(wifi))
+        val observed = mutableListOf<CurrentNetwork>()
+        val provider = CurrentNetworkProviderImpl(
+            detector,
+            connectivityManager,
+            initialDetectionExecutor,
+            { request },
+            ImmediateExecutorService(rejectNext = true)
+        )
+        provider.start({}, { true })
+        initialDetectionExecutor.runAll()
+        provider.observeTransitions(observed)
+
+        val callback = registeredCallback()
+        callback.onAvailable(mock(Network::class.java))
+        callback.onAvailable(mock(Network::class.java))
+
+        assertEquals(listOf(wifi), observed)
+        assertTrue(
+            Logger.logs.any {
+                it.tag == "CurrentNetworkProvider" &&
+                    it.message == "Dropped network observation because it could not be queued."
+            }
+        )
+        provider.close()
+    }
+
+    @Test
     fun callbackBeforeInitialDetectionPreventsTheInitialNetworkTrip() {
         val cellular = CurrentNetwork(NetworkState.TRANSPORT_CELLULAR, subType = "LTE")
-        `when`(detector.detectCurrentNetwork()).thenReturn(cellular)
-        val provider = createProvider()
+        val observedInitialNetworks = mutableListOf<CurrentNetwork>()
+        val observedChanges = mutableListOf<CurrentNetwork>()
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(cellular), observation(CurrentNetworkProvider.NO_NETWORK))
+        val provider = createProvider { observedInitialNetworks += it }
+        provider.observeTransitions(observedChanges)
+        val callback = registeredCallback()
 
-        registeredCallback().onAvailable(mock(Network::class.java))
+        callback.onAvailable(mock(Network::class.java))
         initialDetectionExecutor.runAll()
 
         assertEquals(cellular, provider.currentNetwork)
-        verify(detector, times(1)).detectCurrentNetwork()
+        assertEquals(listOf(cellular), observedInitialNetworks)
+        assertEquals(emptyList<CurrentNetwork>(), observedChanges)
+        verify(detector, times(1)).detectNetwork()
+
+        callback.onLost(mock(Network::class.java))
+
+        assertEquals(listOf(CurrentNetworkProvider.NO_NETWORK), observedChanges)
+        verify(detector, times(2)).detectNetwork()
     }
 
     @Test
     fun callbackDuringInitialDetectionPreventsItsResultFromReplacingCallbackState() {
         val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
-        val provider = createProvider()
+        var detectionCount = 0
+        val observedInitialNetworks = mutableListOf<CurrentNetwork>()
+        val observedChanges = mutableListOf<CurrentNetwork>()
+        val provider = createProvider { observedInitialNetworks += it }
+        provider.observeTransitions(observedChanges)
         val callback = registeredCallback()
-        `when`(detector.detectCurrentNetwork()).thenAnswer {
-            callback.onLost(mock(Network::class.java))
-            wifi
+        `when`(detector.detectNetwork()).thenAnswer {
+            detectionCount++
+            if (detectionCount == 1) {
+                callback.onLost(mock(Network::class.java))
+                observation(wifi)
+            } else {
+                observation(CurrentNetworkProvider.NO_NETWORK)
+            }
         }
 
         initialDetectionExecutor.runAll()
 
         assertEquals(CurrentNetworkProvider.NO_NETWORK, provider.currentNetwork)
+        assertEquals(listOf(CurrentNetworkProvider.NO_NETWORK), observedInitialNetworks)
+        assertEquals(emptyList<CurrentNetwork>(), observedChanges)
     }
 
     @Test
     fun callbackAfterInitialCommitReconcilesInitialAttributesToTheLatestState() {
         val wifi = CurrentNetwork(NetworkState.TRANSPORT_WIFI)
-        `when`(detector.detectCurrentNetwork()).thenReturn(wifi)
+        `when`(detector.detectNetwork())
+            .thenReturn(observation(wifi), observation(CurrentNetworkProvider.NO_NETWORK))
         val provider = CurrentNetworkProviderImpl(
             detector,
             connectivityManager,
-            initialDetectionExecutor
-        ) { request }
+            initialDetectionExecutor,
+            { request },
+            networkObservationExecutor
+        )
         val observedInitialNetworks = mutableListOf<CurrentNetwork>()
         lateinit var callback: ConnectivityManager.NetworkCallback
-        provider.start { network ->
+        provider.start({ network ->
             observedInitialNetworks += network
             if (observedInitialNetworks.size == 1) {
                 callback.onLost(mock(Network::class.java))
             }
-        }
+        }, { true })
         callback = registeredCallback()
 
         initialDetectionExecutor.runAll()
@@ -304,17 +687,34 @@ class CurrentNetworkProviderImplTest {
         assertEquals(CurrentNetworkProvider.NO_NETWORK, provider.currentNetwork)
     }
 
-    private fun createProvider(
-        initialNetworkListener: NetworkChangeListener = NetworkChangeListener {}
-    ): CurrentNetworkProviderImpl = CurrentNetworkProviderImpl(
-        detector,
-        connectivityManager,
-        initialDetectionExecutor
-    ) { request }.also { provider -> provider.start(initialNetworkListener) }
+    private fun createProvider(attributeListener: (CurrentNetwork) -> Unit = {}): CurrentNetworkProviderImpl =
+        CurrentNetworkProviderImpl(
+            detector,
+            connectivityManager,
+            initialDetectionExecutor,
+            { request },
+            networkObservationExecutor
+        ).also { provider -> provider.start(attributeListener, { true }) }
+
+    private fun observation(
+        currentNetwork: CurrentNetwork,
+        activeNetworkIdentity: Network? = null,
+        activeNetworkIdentityKnown: Boolean = false
+    ) = NetworkObservation(currentNetwork, activeNetworkIdentity, activeNetworkIdentityKnown)
+
+    private fun CurrentNetworkProviderImpl.observeTransitions(observed: MutableList<CurrentNetwork>) {
+        addNetworkChangeListener { currentNetwork, _, _ -> observed += currentNetwork }
+    }
 
     private fun registeredCallback(): ConnectivityManager.NetworkCallback {
         val captor = ArgumentCaptor.forClass(ConnectivityManager.NetworkCallback::class.java)
         verify(connectivityManager).registerNetworkCallback(any(NetworkRequest::class.java), captor.capture())
+        return captor.value
+    }
+
+    private fun registeredDefaultCallback(): ConnectivityManager.NetworkCallback {
+        val captor = ArgumentCaptor.forClass(ConnectivityManager.NetworkCallback::class.java)
+        verify(connectivityManager).registerDefaultNetworkCallback(captor.capture())
         return captor.value
     }
 
@@ -353,5 +753,35 @@ class CurrentNetworkProviderImplTest {
                 tasks.removeFirst().run()
             }
         }
+    }
+
+    private class ImmediateExecutorService(private var rejectNext: Boolean = false) : AbstractExecutorService() {
+        private var shutdown = false
+
+        override fun execute(command: Runnable) {
+            if (shutdown) {
+                throw RejectedExecutionException()
+            }
+            if (rejectNext) {
+                rejectNext = false
+                throw RejectedExecutionException("queue full")
+            }
+            command.run()
+        }
+
+        override fun shutdown() {
+            shutdown = true
+        }
+
+        override fun shutdownNow(): List<Runnable> {
+            shutdown = true
+            return emptyList()
+        }
+
+        override fun isShutdown(): Boolean = shutdown
+
+        override fun isTerminated(): Boolean = shutdown
+
+        override fun awaitTermination(timeout: Long, unit: TimeUnit): Boolean = shutdown
     }
 }

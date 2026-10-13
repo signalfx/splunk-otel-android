@@ -36,11 +36,11 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     protected lateinit var sessionManager: ISplunkSessionManager
         private set
 
+    protected open val observesSessionChanges: Boolean = false
+
     fun attach(context: Context) {
         val agentIntegration = AgentIntegration.obtainInstance(context)
         agentIntegration.listeners += installationListener
-        sessionManager = agentIntegration.sessionManager
-        agentIntegration.sessionManager.sessionListeners += sessionChangeListener
 
         onAttach(context)
     }
@@ -56,10 +56,21 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
     protected open fun onPostInstall() {
     }
 
+    /** Called instead of [onInstall] when the agent does not install, such as a sampled out session. */
+    protected open fun onInstallSkipped() {
+    }
+
     protected open fun onSessionChange(sessionId: String) {
     }
 
     private val installationListener = object : AgentIntegration.Listener {
+        override fun onSessionManagerReady(sessionManager: ISplunkSessionManager) {
+            this@ModuleIntegration.sessionManager = sessionManager
+            if (observesSessionChanges) {
+                sessionManager.sessionListeners += sessionChangeListener
+            }
+        }
+
         override fun onInstall(
             application: Application,
             openTelemetry: OpenTelemetry,
@@ -76,6 +87,10 @@ abstract class ModuleIntegration<T : ModuleConfiguration>(protected val defaultM
 
         override fun onPostInstall() {
             this@ModuleIntegration.onPostInstall()
+        }
+
+        override fun onInstallSkipped() {
+            this@ModuleIntegration.onInstallSkipped()
         }
     }
 

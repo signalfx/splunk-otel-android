@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
+import com.splunk.rum.integration.agent.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
@@ -24,7 +25,12 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 
 class SessionActivitySpanProcessor(private val sessionManager: ISplunkSessionManager) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        sessionManager.trackSessionActivity()
+        // session.start records when the session began, but may be processed later after the first
+        // real signal. That signal already updated lastActivity, so session.start should not move
+        // it forward based on its later processing time.
+        if (span.name != RumConstants.SESSION_START_EVENT_NAME) {
+            sessionManager.trackSessionActivity()
+        }
     }
 
     override fun isStartRequired(): Boolean = true

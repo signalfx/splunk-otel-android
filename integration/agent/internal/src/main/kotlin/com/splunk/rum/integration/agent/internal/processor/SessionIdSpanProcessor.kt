@@ -18,6 +18,7 @@ package com.splunk.rum.integration.agent.internal.processor
 
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
+import com.splunk.rum.integration.agent.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
@@ -29,7 +30,14 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
         if (span.attributes.get(SESSION_ID_KEY) == null) {
             span.setAttribute(SESSION_ID_KEY, sessionManager.sessionId)
         }
-        span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
+        // session.start keeps the previous session ID from when that session was created.
+        // Other spans should always use the SDK's current value so customer attributes
+        // cannot change which previous session the span is associated with.
+        if (span.name != RumConstants.SESSION_START_EVENT_NAME ||
+            span.attributes.get(PREVIOUS_SESSION_ID_KEY) == null
+        ) {
+            span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
+        }
     }
 
     override fun isStartRequired(): Boolean = true
