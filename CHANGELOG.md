@@ -7,9 +7,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+### Version 2.4.0 - 2026-10-13
+
+##### Enhancements:
+* Delayed `session.start` until a span passes `spanInterceptor` or native Session Replay data is produced, including qualifying background telemetry. The start retains the original session ID and creation timestamp. ([#1699](https://github.com/signalfx/splunk-otel-android/pull/1699))
+* Improved storage initialization by sharing one process-wide preferences loader and reducing initialization contention. Updated Splunk common libraries from 1.0.2 to 1.0.3, including preference-loading and persistence fixes. ([#1684](https://github.com/signalfx/splunk-otel-android/pull/1684))
+
 ##### Fixes:
-* Refined network telemetry so the initial network state updates attributes without emitting a `network.change` event, while subsequent network transitions emit telemetry.
-* Improved network callback resilience with bounded asynchronous processing and platform-aware carrier and network subtype detection.
+* Suppressed initial and duplicate `network.change` events. Foreground default-network transitions remain eligible for events, while background observations continue updating network attributes. ([#1703](https://github.com/signalfx/splunk-otel-android/pull/1703))
+* Improved network callback resilience with bounded asynchronous processing and Android-specific carrier/subtype detection. On API 28+, carrier names prefer Android's carrier-ID lookup and may differ from previous SIM/operator names or be unavailable. ([#1703](https://github.com/signalfx/splunk-otel-android/pull/1703))
+* Removed listeners and cached events when application-lifecycle instrumentation is disabled or installation is skipped. Limited pre-install lifecycle caching to ten events. ([#1689](https://github.com/signalfx/splunk-otel-android/pull/1689))
+
+##### Upgrade notes:
+* **Startup telemetry:** renamed the startup child span from `SplunkRum.initialize` to `SplunkRum.install` and expanded it to measure the synchronous SDK installation interval. Update span-name queries and filters; reported installation durations may increase because more initialization work is measured. The `SplunkRum.install` signature is unchanged. ([#1682](https://github.com/signalfx/splunk-otel-android/pull/1682))
+
+##### Breaking changes for low-level integrations:
+* **Source and binary break in low-level OpenTelemetry helpers:** `OpenTelemetryInitializer(application, deferredUntilForeground, spanInterceptor)` now requires `agentStorage` after `application`; `OfflineOtelDataProcessor.attach(context)` now requires `agentStorage` after `context`. Direct callers must supply an `IAgentStorage` instance, update their source, and rebuild custom integrations or separately compiled wrapper AARs. Calls compiled against the old signatures can throw `NoSuchMethodError`. Applications using `SplunkRum.install` require no initialization API changes. ([#1684](https://github.com/signalfx/splunk-otel-android/pull/1684))
+  * Migration for direct helper integrations: expose `com.splunk:rum-agent-common-storage:2.4.0` on the integration's compile classpath and use `com.splunk.rum.agent.common.storage.AgentStorage.attach(application)` for shared storage, or supply your own `IAgentStorage` implementation. The storage module is not exposed on the agent's public compile classpath, and `SplunkRum` has no storage getter.
 
 ### Version 2.3.5 - 2026-09-08
 

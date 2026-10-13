@@ -76,7 +76,7 @@ allprojects {
 
 Add the Splunk RUM agent library to your app module's `build.gradle` file dependencies:
 ```
-implementation("com.splunk:splunk-otel-android:2.3.5")
+implementation("com.splunk:splunk-otel-android:2.4.0")
 ```
 
 The Splunk RUM SDK does not require the OpenTelemetry Android instrumentation artifact. Remove the following dependency if you previously added it only for this SDK:
@@ -123,6 +123,13 @@ class AppTest: Application() {
 Add the following Gradle Plugins for automatic network request tracking:
 - `com.splunk.rum-okhttp3-auto-plugin`
 - `com.splunk.rum-httpurlconnection-auto-plugin`
+
+## Upgrade notes for 2.4.0
+
+- `session.start` is delayed until a span passes `spanInterceptor` or native Session Replay data is produced. Background telemetry can qualify. The start retains the session's original ID and creation timestamp and may arrive after the triggering telemetry. Crash-only telemetry and delayed telemetry crossing session rollover can arrive without a corresponding start.
+- The startup child span is now named `SplunkRum.install` and measures the broader synchronous SDK installation interval. Update queries and filters that use `SplunkRum.initialize`; reported durations may increase because the measurement includes more initialization work.
+- Network monitoring suppresses initial and duplicate `network.change` events. Foreground transitions remain eligible for events, while background observations continue updating network attributes. On API 28+, carrier names prefer Android's carrier-ID lookup and can differ from previous SIM/operator names or be unavailable.
+- **Low-level helper compatibility:** `OpenTelemetryInitializer` and `OfflineOtelDataProcessor.attach` now require an `IAgentStorage` argument. Direct callers must supply storage, update their source, and rebuild separately compiled integrations or wrapper AARs; old compiled calls can throw `NoSuchMethodError`. Applications using `SplunkRum.install` require no initialization API changes. See the [changelog](CHANGELOG.md#version-240---2026-10-13) for the changed signatures.
 
 ## Sample Application
 
