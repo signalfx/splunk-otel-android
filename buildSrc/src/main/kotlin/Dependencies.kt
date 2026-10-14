@@ -80,7 +80,7 @@ object Dependencies {
     }
 
     object SessionReplay {
-        private const val version = "1.1.6"
+        private const val version = "1.1.7"
 
         const val instrumentationSessionRecordingCore = "com.splunk.android:sr-instrumentation-session-recording-core:$version"
         const val instrumentationSessionRecordingFrameCapturer = "com.splunk.android:sr-instrumentation-session-recording-frame-capturer:$version"
