@@ -19,20 +19,36 @@ package com.splunk.rum.integration.agent.api.internal
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.agent.common.storage.AgentStorage
 import com.splunk.rum.agent.common.storage.IAgentStorage
+import com.splunk.rum.agent.common.storage.SessionId
+import com.splunk.rum.common.storage.cache.FileSimplePermanentCache
 import com.splunk.rum.common.storage.extensions.noBackupFilesDirCompat
+import com.splunk.rum.common.storage.filemanager.FileManagerFactory
+import com.splunk.rum.common.storage.preferences.Preferences
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
+import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.session.Session
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.sdk.OpenTelemetrySdk
+import io.opentelemetry.sdk.trace.data.SpanData
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -90,6 +106,7 @@ class SplunkRumAgentCoreTest {
     @After
     fun tearDown() {
         cleanupStorage()
+        resetSplunkRumInstance()
         SplunkRumAgentCore.isRunning = false
         AgentIntegration.modules.clear()
         when (val previous = previousContextStorageProviderValue) {
@@ -160,12 +177,97 @@ class SplunkRumAgentCoreTest {
     @Test
     fun `install uses the supplied storage instance`() {
         val suppliedStorage = mock(IAgentStorage::class.java)
-        `when`(suppliedStorage.readAppInstallationId()).thenReturn("existing-installation-id")
+        `when`(suppliedStorage.readOrCreateAppInstallationId()).thenReturn("existing-installation-id")
 
         installSplunkRumAgent(suppliedStorage)
 
-        verify(suppliedStorage).readAppInstallationId()
+        verify(suppliedStorage).readOrCreateAppInstallationId()
         verify(suppliedStorage, never()).writeAppInstallationId(org.mockito.ArgumentMatchers.anyString())
+    }
+
+    @Test
+    fun `install reads the app installation id on the storage executor`() {
+        val suppliedStorage = mock(IAgentStorage::class.java)
+        val storageExecutor = QueuedExecutor()
+
+        installSplunkRumAgent(suppliedStorage, storageExecutor)
+
+        verify(suppliedStorage, never()).readOrCreateAppInstallationId()
+
+        storageExecutor.runQueuedTasks()
+
+        verify(suppliedStorage).readOrCreateAppInstallationId()
+    }
+
+    @Test
+    fun `install does not read the app installation id when sampled out`() {
+        `when`(mockAgentConfig.session.samplingRate).thenReturn(0.0)
+        val suppliedStorage = mock(IAgentStorage::class.java)
+        val storageExecutor = QueuedExecutor()
+
+        installSplunkRumAgent(suppliedStorage, storageExecutor)
+        storageExecutor.runQueuedTasks()
+
+        verify(suppliedStorage, never()).readOrCreateAppInstallationId()
+    }
+
+    @Test
+    fun `install and startup telemetry do not wait for stored preferences`() {
+        cleanupStorage()
+        val previousSession = SessionId("previous-session", 1_000L)
+        AgentStorage.attach(application).apply {
+            writeAppInstallationId("stored-installation-id")
+            writeAnonymousUserId("stored-user-id")
+            writeSessionIds(listOf(previousSession))
+            commit()
+        }
+        resetAgentStorageSingleton()
+
+        val allowPreferencesLoad = CountDownLatch(1)
+        val preferencesLoadFinished = AtomicBoolean(false)
+        val preferencesFile = File(testStorageDir, "1/preferences/preferences.dat")
+        setAgentPreferences(
+            Preferences.create {
+                allowPreferencesLoad.await(10, TimeUnit.SECONDS)
+                preferencesLoadFinished.set(true)
+                FileSimplePermanentCache(preferencesFile, FileManagerFactory.createPlainFileManager())
+            }
+        )
+        val exportedSpans = CopyOnWriteArrayList<SpanData>()
+        val configuration = AgentConfiguration(
+            endpoint = EndpointConfiguration("test", "test-token"),
+            appName = "test-app",
+            deploymentEnvironment = "test",
+            spanInterceptor = { span ->
+                exportedSpans += span
+                span
+            }
+        )
+
+        val splunkRum = SplunkRum.install(application, configuration)
+        val sessionId = splunkRum.session.state.id
+        splunkRum.openTelemetry.getTracer("test").spanBuilder("startup").startSpan().end()
+
+        assertFalse("install waited for stored preferences", preferencesLoadFinished.get())
+
+        allowPreferencesLoad.countDown()
+        (splunkRum.openTelemetry as OpenTelemetrySdk).sdkTracerProvider.forceFlush().join(10, TimeUnit.SECONDS)
+
+        val span = exportedSpans.single { it.name == "startup" }
+        assertEquals(
+            "stored-installation-id",
+            span.resource.getAttribute(AttributeKey.stringKey("app.installation.id"))
+        )
+        assertEquals("stored-user-id", span.attributes.get(AttributeKey.stringKey("user.anonymous_id")))
+        assertEquals(sessionId, span.attributes.get(SESSION_ID_KEY))
+
+        val agentStorage = AgentStorage.attach(application)
+        assertEquals("stored-installation-id", agentStorage.readAppInstallationId())
+        assertEquals("stored-user-id", agentStorage.readAnonymousUserId())
+
+        val sessionManager = (splunkRum.session as Session).sessionManager
+        assertEquals(previousSession.id, sessionManager.sessionId(previousSession.validFrom))
+        assertEquals(sessionId, sessionManager.sessionId(System.currentTimeMillis()))
     }
 
     @Test
@@ -204,7 +306,10 @@ class SplunkRumAgentCoreTest {
         assertEquals(custom, System.getProperty(contextStorageProviderProperty))
     }
 
-    private fun installSplunkRumAgent(agentStorage: IAgentStorage = storage) {
+    private fun installSplunkRumAgent(
+        agentStorage: IAgentStorage = storage,
+        storageExecutor: Executor = Executor { it.run() }
+    ) {
         SplunkRumAgentCore.install(
             application,
             mockAgentConfig,
@@ -213,8 +318,33 @@ class SplunkRumAgentCoreTest {
             agentStorage,
             emptyList(),
             MutableAttributes(),
-            mockOfflineOtelDataProcessor
+            mockOfflineOtelDataProcessor,
+            storageExecutor
         )
+    }
+
+    private fun setAgentPreferences(preferences: Preferences) {
+        val preferencesStoreClass = Class.forName(
+            "com.splunk.rum.agent.common.storage.AgentPreferencesStore"
+        )
+        val preferencesStore = preferencesStoreClass.getField("INSTANCE").get(null)
+        val preferencesField = preferencesStoreClass.getDeclaredField("instance")
+        preferencesField.isAccessible = true
+        preferencesField.set(preferencesStore, preferences)
+    }
+
+    private class QueuedExecutor : Executor {
+        private val tasks = ArrayDeque<Runnable>()
+
+        override fun execute(command: Runnable) {
+            tasks.addLast(command)
+        }
+
+        fun runQueuedTasks() {
+            while (tasks.isNotEmpty()) {
+                tasks.removeFirst().run()
+            }
+        }
     }
 
     private fun cleanupStorage() {
@@ -223,6 +353,12 @@ class SplunkRumAgentCoreTest {
         if (testStorageDir.exists()) {
             testStorageDir.deleteRecursively()
         }
+    }
+
+    private fun resetSplunkRumInstance() {
+        val instanceField = SplunkRum::class.java.getDeclaredField("instanceInternal")
+        instanceField.isAccessible = true
+        instanceField.set(null, null)
     }
 
     private fun resetAgentStorageSingleton() {

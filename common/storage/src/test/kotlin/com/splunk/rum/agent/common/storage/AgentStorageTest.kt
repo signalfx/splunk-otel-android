@@ -165,6 +165,39 @@ class AgentStorageTest {
         assertEquals(testId, result)
     }
 
+    @Test
+    fun `readOrCreateAppInstallationId creates and stores a value once`() {
+        val createdId = storage.readOrCreateAppInstallationId()
+
+        assertEquals(32, createdId.length)
+        assertEquals(createdId, storage.readAppInstallationId())
+        assertEquals(createdId, storage.readOrCreateAppInstallationId())
+    }
+
+    @Test
+    fun `readOrCreateAppInstallationId returns one value to concurrent callers`() {
+        val callerCount = 8
+        val executor = Executors.newFixedThreadPool(callerCount)
+        val start = CountDownLatch(1)
+
+        try {
+            val results = (1..callerCount).map {
+                executor.submit<String> {
+                    start.await()
+                    storage.readOrCreateAppInstallationId()
+                }
+            }
+
+            start.countDown()
+            val ids = results.map { it.get(5, TimeUnit.SECONDS) }
+
+            assertEquals(1, ids.toSet().size)
+            assertEquals(ids.first(), storage.readAppInstallationId())
+        } finally {
+            executor.shutdownNow()
+        }
+    }
+
     // --- Atomic endpoint config tests ---
 
     @Test
@@ -268,6 +301,17 @@ class AgentStorageTest {
         storage.writeEndpointConfig(config)
 
         assertEquals(config, storage.readEndpointConfig())
+    }
+
+    // --- Session ID history tests ---
+
+    @Test
+    fun `readSessionIds returns stored history`() {
+        val sessionIds = listOf(SessionId("first", 100), SessionId("second", 200))
+
+        storage.writeSessionIds(sessionIds)
+
+        assertEquals(sessionIds, storage.readSessionIds())
     }
 
     private fun resetProcessStorage() {

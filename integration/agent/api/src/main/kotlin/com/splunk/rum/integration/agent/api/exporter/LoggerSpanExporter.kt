@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api.exporter
 import com.splunk.rum.agent.common.otel.extensions.joinToString
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
+import com.splunk.rum.integration.agent.api.internal.StoredIdentityAttributes
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.EventData
 import io.opentelemetry.sdk.trace.data.LinkData
@@ -26,7 +27,7 @@ import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal class LoggerSpanExporter : SpanExporter {
+internal class LoggerSpanExporter(private val storedIdentity: StoredIdentityAttributes) : SpanExporter {
 
     private val isShutdown = AtomicBoolean(false)
 
@@ -37,6 +38,8 @@ internal class LoggerSpanExporter : SpanExporter {
 
         spans.forEachFast { span ->
             val instrumentationScopeInfo = span.instrumentationScopeInfo
+            val resourceAttributes = storedIdentity.resourceAttributesIfRead(span.resource)
+            val attributes = storedIdentity.spanAttributesIfRead(span.attributes)
 
             Logger.i(TAG) {
                 buildString {
@@ -50,8 +53,8 @@ internal class LoggerSpanExporter : SpanExporter {
                     append("durationNanos=${span.endEpochNanos - span.startEpochNanos}, ")
                     append("status.code=${span.status.statusCode}, ")
                     append("status.description=${span.status.description}, ")
-                    append("resources=${span.resource.attributes.joinToString(", ", "[", "]")}, ")
-                    append("attributes=${span.attributes.joinToString(", ", "[", "]")}, ")
+                    append("resources=${resourceAttributes.joinToString(", ", "[", "]")}, ")
+                    append("attributes=${attributes.joinToString(", ", "[", "]")}, ")
                     append("totalAttributeCount=${span.totalAttributeCount}, ")
                     append("events=${formatEvents(span.events)}, ")
                     append("totalRecordedEvents=${span.totalRecordedEvents}, ")

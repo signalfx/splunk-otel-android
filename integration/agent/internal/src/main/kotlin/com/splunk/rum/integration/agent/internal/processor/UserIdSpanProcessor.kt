@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
+import android.os.Looper
 import com.splunk.rum.integration.agent.internal.RumConstants
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import io.opentelemetry.context.Context
@@ -23,9 +24,12 @@ import io.opentelemetry.sdk.trace.ReadWriteSpan
 import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SpanProcessor
 
-class UserIdSpanProcessor(private val userManager: IUserManager) : SpanProcessor {
+class UserIdSpanProcessor(
+    private val userManager: IUserManager,
+    private val isMainThread: () -> Boolean = { Looper.myLooper() == Looper.getMainLooper() }
+) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        val userId = userManager.userId ?: return
+        val userId = (if (isMainThread()) userManager.telemetryUserId else userManager.userId) ?: return
         span.setAttribute(RumConstants.USER_ID_KEY, userId)
     }
 

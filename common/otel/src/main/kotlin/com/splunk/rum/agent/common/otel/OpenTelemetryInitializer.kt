@@ -62,7 +62,8 @@ class OpenTelemetryInitializer(
                 deferredUntilForeground = deferredUntilForeground,
                 context = application.applicationContext
             ),
-            spanInterceptor
+            spanInterceptor,
+            agentStorage
         )
 
         spanProcessors += BatchSpanProcessor.builder(spanExporter).build()
