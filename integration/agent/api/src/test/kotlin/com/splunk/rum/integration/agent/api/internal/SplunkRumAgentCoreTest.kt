@@ -31,6 +31,7 @@ import com.splunk.rum.common.storage.preferences.Preferences
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
 import com.splunk.rum.integration.agent.api.SplunkRum
+import com.splunk.rum.integration.agent.api.resource.AgentResource
 import com.splunk.rum.integration.agent.api.session.Session
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.AgentIntegration
@@ -256,7 +257,7 @@ class SplunkRumAgentCoreTest {
         val span = exportedSpans.single { it.name == "startup" }
         assertEquals(
             "stored-installation-id",
-            span.resource.getAttribute(AttributeKey.stringKey("app.installation.id"))
+            span.resource.getAttribute(AttributeKey.stringKey(AgentResource.KEY_APP_INSTALLATION_ID))
         )
         assertEquals("stored-user-id", span.attributes.get(AttributeKey.stringKey("user.anonymous_id")))
         assertEquals(sessionId, span.attributes.get(SESSION_ID_KEY))

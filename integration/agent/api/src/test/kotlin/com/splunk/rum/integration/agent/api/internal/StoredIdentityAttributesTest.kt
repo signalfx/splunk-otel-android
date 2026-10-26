@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.agent.api.internal
 
 import com.splunk.rum.agent.common.storage.IAgentStorage
+import com.splunk.rum.integration.agent.api.resource.AgentResource
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import com.splunk.rum.integration.agent.internal.user.InternalUserTrackingMode
 import io.opentelemetry.api.common.AttributeKey
@@ -98,7 +99,7 @@ class StoredIdentityAttributesTest {
     }
 
     private companion object {
-        val APP_INSTALLATION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("app.installation.id")
+        val APP_INSTALLATION_ID_KEY = AttributeKey.stringKey(AgentResource.KEY_APP_INSTALLATION_ID)
         val USER_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("user.anonymous_id")
     }
 }
