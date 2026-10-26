@@ -32,6 +32,7 @@ import com.splunk.rum.common.storage.preferences.Preferences
 import com.splunk.rum.common.utils.extensions.toJSONArray
 import com.splunk.rum.common.utils.runOnBackgroundThread
 import java.io.File
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
 import org.json.JSONArray
 import org.json.JSONException
@@ -162,6 +163,10 @@ class AgentStorage private constructor(context: Context, private val preferences
     }
 
     override fun readAppInstallationId(): String? = preferences.getString(APP_INSTALLATION_ID)
+
+    override fun readOrCreateAppInstallationId(): String = synchronized(appInstallationIdLock) {
+        readAppInstallationId() ?: UUID.randomUUID().toString().replace("-", "").also { writeAppInstallationId(it) }
+    }
 
     override fun writeSessionId(value: String) {
         preferences.putString(SESSION_ID, value)
@@ -425,6 +430,7 @@ class AgentStorage private constructor(context: Context, private val preferences
 
         private const val TAG = "AgentStorage"
         private val migrationLock = Any()
+        private val appInstallationIdLock = Any()
 
         private val instance = AtomicReference<IAgentStorage?>()
 

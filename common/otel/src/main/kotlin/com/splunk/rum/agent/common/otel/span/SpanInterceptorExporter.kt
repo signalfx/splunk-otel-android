@@ -16,21 +16,25 @@
 
 package com.splunk.rum.agent.common.otel.span
 
+import com.splunk.rum.agent.common.otel.internal.withAppInstallationId
+import com.splunk.rum.agent.common.storage.IAgentStorage
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SpanExporter
 
 internal class SpanInterceptorExporter(
     private val delegate: SpanExporter,
-    private val interceptor: ((SpanData) -> SpanData?)?
+    private val interceptor: ((SpanData) -> SpanData?)?,
+    private val agentStorage: IAgentStorage
 ) : SpanExporter {
 
     override fun export(spans: MutableCollection<SpanData>): CompletableResultCode {
         val modifiedSpans = spans.mapNotNull {
+            val span = it.withAppInstallationId(agentStorage)
             if (interceptor != null) {
-                interceptor.invoke(it)
+                interceptor.invoke(span)
             } else {
-                it
+                span
             }
         }
         return delegate.export(modifiedSpans)

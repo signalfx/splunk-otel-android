@@ -33,6 +33,9 @@ interface IAgentStorage {
     fun writeAppInstallationId(value: String)
     fun readAppInstallationId(): String?
 
+    /** Returns the stored app installation ID, creating and storing one first if there is none. */
+    fun readOrCreateAppInstallationId(): String
+
     fun writeSessionId(value: String)
     fun readSessionId(): String?
     fun deleteSessionId()
@@ -86,4 +89,8 @@ interface IAgentStorage {
     fun getSessionReplayData(olderThan: Long): List<File>
 
     fun commit()
+
+    companion object {
+        const val PENDING_APP_INSTALLATION_ID = "splunk.internal.pendingAppInstallationId"
+    }
 }
