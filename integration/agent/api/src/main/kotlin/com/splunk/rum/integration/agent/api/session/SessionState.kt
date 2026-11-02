@@ -26,25 +26,27 @@ class SessionState internal constructor(
     private val sessionManager: ISplunkSessionManager
 ) {
     /**
-     * Unique identifier of the current session.
+     * Unique identifier of the current session, or null before the first foreground session or
+     * after a session expires without a replacement.
      */
-    val id: String
+    val id: String?
         get() = sessionManager.sessionId
 
     /**
-     * Session start time as a Unix timestamp in milliseconds.
+     * Session start time as a Unix timestamp in milliseconds, or null without a session.
      */
-    val start: Long
+    val start: Long?
         get() = sessionManager.sessionStart
 
     /**
-     * Time of the last recorded session activity as a Unix timestamp in milliseconds.
+     * Time of the last recorded session activity as a Unix timestamp in milliseconds, or null
+     * without a session.
      */
-    val lastActivity: Long
+    val lastActivity: Long?
         get() = sessionManager.sessionLastActivity
 
     /**
-     * Sampling rate applied to the current session.
+     * Sampling rate configured for this SDK installation.
      */
     val samplingRate: Double
         get() = sessionConfiguration.samplingRate

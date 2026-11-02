@@ -28,11 +28,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Holds the `session.start` event of a newly created session until that session produces its first
- * other signal.
- *
- * A process that never produces telemetry, such as a headless start from a job, receiver or push
- * handler, therefore exports nothing at all and no session materializes for it.
+ * Holds a new session's `session.start` event until it is emitted. Compatibility mode waits for
+ * the first accepted signal; foreground-aware mode emits it as soon as the session is created.
  */
 internal class SessionStartEmitter {
 
@@ -47,7 +44,7 @@ internal class SessionStartEmitter {
 
     /**
      * Holds the `session.start` event of [sessionId]. An event still held for an earlier session is
-     * dropped, because that session produced no telemetry to own it.
+     * dropped when the new session replaces it.
      */
     fun onSessionCreated(
         sessionId: String,

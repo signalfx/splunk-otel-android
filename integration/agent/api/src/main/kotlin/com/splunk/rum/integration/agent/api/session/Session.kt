@@ -30,9 +30,9 @@ class Session internal constructor(
 
     override val state: SessionState = SessionState(sessionConfiguration, sessionManager)
 
-    override val metadata: String
-        get(): String {
-            val snapshot = sessionManager.sessionSnapshot
+    override val metadata: String?
+        get() {
+            val snapshot = sessionManager.sessionSnapshot ?: return null
             val json = JSONObject().apply {
                 put("sessionId", snapshot.sessionId)
                 put("anonymousUserId", userManager.userId)

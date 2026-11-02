@@ -85,8 +85,8 @@ class SplunkRum private constructor(
         onEndpointConfigured = onEndpointConfigured
     )
 
-    @Deprecated("Use property session.state.sessionId", ReplaceWith("session.state.sessionId"))
-    fun getRumSessionId(): String = session.state.id
+    @Deprecated("Use nullable property session.state.id", ReplaceWith("session.state.id"))
+    fun getRumSessionId(): String? = session.state.id
 
     /**
      * Set an attribute in the global attributes that will be appended to every span and event.
@@ -340,7 +340,10 @@ class SplunkRum private constructor(
             )
 
             val agentIntegration = AgentIntegration.obtainInstance(application)
-            val sessionManager = agentIntegration.createSessionManager(storage)
+            val sessionManager = agentIntegration.createSessionManager(
+                storage,
+                agentConfiguration.session.includeBackgroundOnlySessions
+            )
             val offlineOtelDataProcessor = OfflineOtelDataProcessor.attach(application, storage)
 
             // The shared MutableAttributes instance used by both
