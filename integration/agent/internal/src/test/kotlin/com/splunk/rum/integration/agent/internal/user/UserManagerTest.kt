@@ -50,7 +50,7 @@ class UserManagerTest {
 
         assertEquals(InternalUserTrackingMode.NO_TRACKING, userManager.trackingMode)
         assertNull(userManager.userId)
-        assertNull(userManager.telemetryUserId)
+        assertNull(userManager.userIdOrPending)
         assertNull(state.anonymousUserId)
     }
 
@@ -61,7 +61,7 @@ class UserManagerTest {
 
         assertEquals(InternalUserTrackingMode.ANONYMOUS_TRACKING, userManager.trackingMode)
         assertEquals("persisted-user-id", userManager.userId)
-        assertEquals("persisted-user-id", userManager.telemetryUserId)
+        assertEquals("persisted-user-id", userManager.userIdOrPending)
     }
 
     @Test
@@ -84,7 +84,7 @@ class UserManagerTest {
 
         assertEquals(InternalUserTrackingMode.NO_TRACKING, userManager.trackingMode)
         assertNull(userManager.userId)
-        assertNull(userManager.telemetryUserId)
+        assertNull(userManager.userIdOrPending)
         assertNull(state.anonymousUserId)
     }
 
@@ -125,12 +125,12 @@ class UserManagerTest {
         val userManager = UserManager(InternalUserTrackingMode.ANONYMOUS_TRACKING, storage, executor)
 
         verify(storage, never()).readAnonymousUserId()
-        assertEquals(PENDING_USER_ID, userManager.telemetryUserId)
+        assertEquals(PENDING_USER_ID, userManager.userIdOrPending)
         assertNull(userManager.pendingUserId(wait = false))
 
         executor.runQueuedTasks()
 
-        assertEquals("persisted-user-id", userManager.telemetryUserId)
+        assertEquals("persisted-user-id", userManager.userIdOrPending)
         assertEquals("persisted-user-id", userManager.pendingUserId(wait = false))
         assertEquals("persisted-user-id", userManager.userId)
     }
@@ -165,10 +165,10 @@ class UserManagerTest {
         val userManager = UserManager(InternalUserTrackingMode.ANONYMOUS_TRACKING, storage, executor)
 
         userManager.trackingMode = InternalUserTrackingMode.NO_TRACKING
-        assertNull(userManager.telemetryUserId)
+        assertNull(userManager.userIdOrPending)
 
         userManager.trackingMode = InternalUserTrackingMode.ANONYMOUS_TRACKING
-        val newUserId = userManager.telemetryUserId
+        val newUserId = userManager.userIdOrPending
         assertNotNull(newUserId)
         assertNotEquals(PENDING_USER_ID, newUserId)
 

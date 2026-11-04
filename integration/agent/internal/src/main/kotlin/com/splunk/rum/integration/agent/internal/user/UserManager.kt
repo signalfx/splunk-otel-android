@@ -37,7 +37,7 @@ interface IUserManager {
     val userId: String?
 
     /** Never waits. Returns [PENDING_USER_ID] instead of a user ID that is still being read. */
-    val telemetryUserId: String?
+    val userIdOrPending: String?
         get() = userId
 
     /** The user ID that [PENDING_USER_ID] stands for. Returns null instead of waiting when [wait] is false. */
@@ -49,7 +49,8 @@ internal const val PENDING_USER_ID = "splunk.internal.pendingUserId"
 
 /**
  * Replaces [PENDING_USER_ID] with the user ID it stands for. Without a value, the attribute is removed when
- * [wait] is true and kept when it is false.
+ * [wait] is true and kept when it is false. Only debug logging passes false, because it must not block the
+ * thread that ends the span.
  */
 fun IUserManager.resolvePendingUserId(attributes: Attributes, wait: Boolean): Attributes {
     if (attributes.get(RumConstants.USER_ID_KEY) != PENDING_USER_ID) {
@@ -93,7 +94,7 @@ class UserManager(
     override val userId: String?
         get() = currentUserId?.await()
 
-    override val telemetryUserId: String?
+    override val userIdOrPending: String?
         get() = currentUserId?.let { if (it.isDone) it.await() else PENDING_USER_ID }
 
     override fun pendingUserId(wait: Boolean): String? =

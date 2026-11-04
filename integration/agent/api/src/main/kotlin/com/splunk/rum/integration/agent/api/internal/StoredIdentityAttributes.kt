@@ -34,7 +34,7 @@ internal class StoredIdentityAttributes(
 ) {
 
     /** Resolves the pending user ID of a span being exported. May wait for storage. */
-    fun applyTo(span: SpanData): SpanData {
+    fun withResolvedUserId(span: SpanData): SpanData {
         val attributes = userManager.resolvePendingUserId(span.attributes, wait = true)
 
         return if (attributes === span.attributes) {
@@ -46,7 +46,7 @@ internal class StoredIdentityAttributes(
         }
     }
 
-    /** Never waits, so a value that is not read yet stays pending. */
+    /** For debug logging only. Never waits, so a value that is not read yet stays pending. */
     fun resourceAttributesIfRead(resource: Resource): Attributes {
         val attributes = resource.attributes
         if (attributes.get(APP_INSTALLATION_ID_KEY) != IAgentStorage.PENDING_APP_INSTALLATION_ID) {
@@ -57,7 +57,7 @@ internal class StoredIdentityAttributes(
         return attributes.toBuilder().put(APP_INSTALLATION_ID_KEY, id).build()
     }
 
-    /** Never waits, so a value that is not read yet stays pending. */
+    /** For debug logging only. Never waits, so a value that is not read yet stays pending. */
     fun spanAttributesIfRead(attributes: Attributes): Attributes =
         userManager.resolvePendingUserId(attributes, wait = false)
 

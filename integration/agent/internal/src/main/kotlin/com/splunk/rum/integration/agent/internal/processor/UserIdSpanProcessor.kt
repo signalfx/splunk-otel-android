@@ -29,7 +29,7 @@ class UserIdSpanProcessor(
     private val isMainThread: () -> Boolean = { Looper.myLooper() == Looper.getMainLooper() }
 ) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
-        val userId = (if (isMainThread()) userManager.telemetryUserId else userManager.userId) ?: return
+        val userId = (if (isMainThread()) userManager.userIdOrPending else userManager.userId) ?: return
         span.setAttribute(RumConstants.USER_ID_KEY, userId)
     }
 

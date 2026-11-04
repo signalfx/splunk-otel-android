@@ -100,10 +100,11 @@ internal object SplunkRumAgentCore {
 
         val agentIntegration = AgentIntegration.obtainInstance(application)
 
-        // Release session.start only after a span survives the customer interceptor. This avoids
-        // creating a session containing only session.start when the first span is filtered out.
-        val acceptedTelemetryInterceptor: (SpanData) -> SpanData? = { exportedSpan ->
-            val spanData = storedIdentity.applyTo(exportedSpan)
+        // Resolve the pending user ID before the customer interceptor sees the span. Release session.start
+        // only after a span survives the customer interceptor. This avoids creating a session containing
+        // only session.start when the first span is filtered out.
+        val userIdAndSessionStartInterceptor: (SpanData) -> SpanData? = { exportedSpan ->
+            val spanData = storedIdentity.withResolvedUserId(exportedSpan)
             val interceptor = agentConfiguration.spanInterceptor
             val acceptedSpan = if (interceptor == null) spanData else interceptor(spanData)
             acceptedSpan?.attributes?.get(SESSION_ID_KEY)?.let(agentIntegration::emitSessionStartIfPending)
@@ -114,7 +115,7 @@ internal object SplunkRumAgentCore {
             application,
             storage,
             agentConfiguration.deferredUntilForeground,
-            acceptedTelemetryInterceptor
+            userIdAndSessionStartInterceptor
         )
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.

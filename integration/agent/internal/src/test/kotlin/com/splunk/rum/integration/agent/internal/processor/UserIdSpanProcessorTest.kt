@@ -31,7 +31,7 @@ class UserIdSpanProcessorTest {
     @Test
     fun `main thread sets the pending user id without waiting for the user id`() {
         val span = mock(ReadWriteSpan::class.java)
-        val userManager = FakeUserManager(telemetryUserId = PENDING_USER_ID, waitedUserId = null)
+        val userManager = FakeUserManager(userIdOrPending = PENDING_USER_ID, waitedUserId = null)
 
         UserIdSpanProcessor(userManager, isMainThread = { true }).onStart(Context.root(), span)
 
@@ -41,7 +41,7 @@ class UserIdSpanProcessorTest {
     @Test
     fun `other threads wait for the user id`() {
         val span = mock(ReadWriteSpan::class.java)
-        val userManager = FakeUserManager(telemetryUserId = null, waitedUserId = "user-id")
+        val userManager = FakeUserManager(userIdOrPending = null, waitedUserId = "user-id")
 
         UserIdSpanProcessor(userManager, isMainThread = { false }).onStart(Context.root(), span)
 
@@ -49,7 +49,7 @@ class UserIdSpanProcessorTest {
     }
 
     /** [userId] is unavailable when [waitedUserId] is null, so a test fails if the processor waits for it. */
-    private class FakeUserManager(override val telemetryUserId: String?, private val waitedUserId: String?) :
+    private class FakeUserManager(override val userIdOrPending: String?, private val waitedUserId: String?) :
         IUserManager {
         override var trackingMode: InternalUserTrackingMode = InternalUserTrackingMode.ANONYMOUS_TRACKING
 

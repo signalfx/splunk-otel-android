@@ -43,7 +43,7 @@ class StoredIdentityAttributesTest {
         val attributes = StoredIdentityAttributes(AtomicReference(), FakeUserManager("user-id"))
         val span = span(Attributes.of(USER_ID_KEY, "splunk.internal.pendingUserId"))
 
-        val completed = attributes.applyTo(span)
+        val completed = attributes.withResolvedUserId(span)
 
         assertEquals("user-id", completed.attributes.get(USER_ID_KEY))
         assertEquals(span.name, completed.name)
