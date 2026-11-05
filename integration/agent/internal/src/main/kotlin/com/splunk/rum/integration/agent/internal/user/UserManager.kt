@@ -20,9 +20,9 @@ import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.integration.agent.internal.RumConstants
+import com.splunk.rum.integration.agent.internal.extentions.getOrNull
 import com.splunk.rum.integration.agent.internal.id.UserId
 import io.opentelemetry.api.common.Attributes
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
 import java.util.concurrent.Future
 import java.util.concurrent.FutureTask
@@ -136,6 +136,25 @@ class UserManager(
         return newUserId
     }
 
+    private fun Future<String>.await(): String? {
+        if (isDone) {
+            return getOrNull()
+        }
+
+        Logger.d(TAG, "Waiting for the anonymous user id to be read from storage.")
+        val waitStartNanos = System.nanoTime()
+        val userId = getOrNull()
+        Logger.d(TAG) {
+            val waitMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - waitStartNanos)
+            if (userId != null) {
+                "Anonymous user id read from storage after waiting $waitMillis ms."
+            } else {
+                "Stopped waiting for the anonymous user id after $waitMillis ms without a value."
+            }
+        }
+        return userId
+    }
+
     companion object {
         private const val TAG = "UserManager"
         private const val STORAGE_THREAD_KEEP_ALIVE_SECONDS = 5L
@@ -150,16 +169,6 @@ class UserManager(
             NamedThreadFactory("SplunkUserStorage")
         )
     }
-}
-
-/** Returns null when the value could not be read or the waiting thread was interrupted. */
-private fun Future<String>.await(): String? = try {
-    get()
-} catch (_: ExecutionException) {
-    null
-} catch (_: InterruptedException) {
-    Thread.currentThread().interrupt()
-    null
 }
 
 object NoOpUserManager : IUserManager {

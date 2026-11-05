@@ -17,6 +17,7 @@
 package com.splunk.rum.agent.common.otel.internal
 
 import com.splunk.rum.agent.common.storage.IAgentStorage
+import com.splunk.rum.common.logger.Logger
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.common.Value
@@ -29,12 +30,15 @@ import io.opentelemetry.sdk.logs.data.internal.ExtendedLogRecordData
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.data.DelegatingSpanData
 import io.opentelemetry.sdk.trace.data.SpanData
+import java.util.concurrent.TimeUnit
 
 /**
  * Replaces [IAgentStorage.PENDING_APP_INSTALLATION_ID] in a resource with the stored app installation ID.
  * May wait for storage, so it is used only on export threads.
  */
 internal object AppInstallationIdResource {
+
+    private const val TAG = "AppInstallationIdResource"
     private val APP_INSTALLATION_ID_KEY: AttributeKey<String> = AttributeKey.stringKey("app.installation.id")
 
     /** OTLP marshalers group telemetry by resource identity, so a resource is completed only once. */
@@ -51,8 +55,16 @@ internal object AppInstallationIdResource {
     private fun completed(resource: Resource, storage: IAgentStorage): Resource {
         lastCompleted?.let { if (it.source === resource) return it.completed }
 
+        Logger.d(TAG, "Reading the app installation id from storage.")
+        val readStartNanos = System.nanoTime()
+        val appInstallationId = storage.readOrCreateAppInstallationId()
+        Logger.d(TAG) {
+            val readMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - readStartNanos)
+            "App installation id read from storage after $readMillis ms."
+        }
+
         val completed = resource.toBuilder()
-            .put(APP_INSTALLATION_ID_KEY, storage.readOrCreateAppInstallationId())
+            .put(APP_INSTALLATION_ID_KEY, appInstallationId)
             .build()
         lastCompleted = CompletedResource(resource, completed)
         return completed
