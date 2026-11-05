@@ -25,6 +25,7 @@ class WebViewNativeBridge internal constructor() {
      * Session. It injects a JavaScript object named "SplunkRumNative" into your WebView which
      * exposes Android session APIs (session ID and session metadata) to browser-based RUM
      * JavaScript implementation.
+     * The session ID getter returns an empty string while no mobile session exists.
      *
      * @param webView The WebView to inject the JavaScript object into.
      */

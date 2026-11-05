@@ -58,7 +58,7 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
 
 class SplunkSessionManager internal constructor(
     private val agentStorage: IAgentStorage,
-    private val includeBackgroundOnlySessions: Boolean = true,
+    private val includeBackgroundOnlySessions: Boolean,
     private val onSessionCreated: (String, String?, Long) -> Unit = { _, _, _ -> }
 ) : ISplunkSessionManager {
     private val executor = Executors.newSingleThreadScheduledExecutor()

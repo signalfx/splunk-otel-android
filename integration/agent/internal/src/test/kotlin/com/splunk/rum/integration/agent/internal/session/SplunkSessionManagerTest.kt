@@ -43,7 +43,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `creates new session when none stored`() {
         val storage = storageMock()
-        val manager = SplunkSessionManager(storage.first)
+        val manager = SplunkSessionManager(storage.first, includeBackgroundOnlySessions = true)
 
         val createdId = manager.sessionId
 
@@ -66,7 +66,7 @@ class SplunkSessionManagerTest {
             sessionIds = listOf(SessionId("existing-session", now - 1_000))
         )
 
-        val manager = SplunkSessionManager(storage)
+        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
         val sessionId = manager.sessionId
 
         assertEquals("existing-session", sessionId)
@@ -86,7 +86,7 @@ class SplunkSessionManagerTest {
             sessionIds = listOf(SessionId("existing-session", expectedSessionStart))
         )
 
-        val manager = SplunkSessionManager(storage)
+        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
 
         assertEquals(expectedSessionStart, manager.sessionStart)
     }
@@ -103,7 +103,7 @@ class SplunkSessionManagerTest {
             sessionIds = listOf(SessionId("existing-session", expectedSessionStart))
         )
 
-        val manager = SplunkSessionManager(storage)
+        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
 
         assertEquals(expectedSessionStart, manager.sessionLastActivity)
     }
@@ -118,7 +118,7 @@ class SplunkSessionManagerTest {
             sessionValidUntilInBackground = now + 5_000,
             sessionIds = listOf(SessionId("existing-session", now - 1_000))
         )
-        val manager = SplunkSessionManager(storage)
+        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
         val before = System.currentTimeMillis()
 
         manager.trackSessionActivity()
@@ -136,7 +136,7 @@ class SplunkSessionManagerTest {
             sessionIds = listOf(SessionId("expired-session", now - 2_000))
         )
 
-        val manager = SplunkSessionManager(storage)
+        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
         val newId = requireNotNull(manager.sessionId)
 
         assertNotEquals("expired-session", newId)
@@ -157,7 +157,7 @@ class SplunkSessionManagerTest {
         val logger = mock(Logger::class.java)
         `when`(logger.logRecordBuilder()).thenReturn(recordBuilder)
         val emitter = SessionStartEmitter().apply { attach(logger) }
-        val manager = SplunkSessionManager(storage) { id, previousId, timestamp ->
+        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true) { id, previousId, timestamp ->
             emitter.onSessionCreated(id, previousId, timestamp)
         }
         manager.sessionListeners += object : SplunkSessionManager.SessionListener {
@@ -177,7 +177,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `reset clears stored session`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage)
+        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
         manager.sessionId // trigger creation
 
         manager.reset()
@@ -196,7 +196,7 @@ class SplunkSessionManagerTest {
                 SessionId("latest", 500)
             )
         )
-        val manager = SplunkSessionManager(storage.first)
+        val manager = SplunkSessionManager(storage.first, includeBackgroundOnlySessions = true)
 
         assertEquals("first", manager.sessionId(150))
         assertEquals("second", manager.sessionId(300))
@@ -208,7 +208,7 @@ class SplunkSessionManagerTest {
         val storage = storageMock(
             sessionIds = listOf(SessionId("only", 500))
         )
-        val manager = SplunkSessionManager(storage.first)
+        val manager = SplunkSessionManager(storage.first, includeBackgroundOnlySessions = true)
 
         assertNull(manager.sessionId(100))
     }
@@ -221,7 +221,7 @@ class SplunkSessionManagerTest {
             sessionValidUntil = now + 10_000,
             sessionIds = listOf(SessionId("active-session", now))
         )
-        val manager = SplunkSessionManager(storage)
+        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
         manager.sessionBackgroundTimeout = 10L
         manager.watchSessionInBackgroundValidity()
 
