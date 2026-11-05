@@ -30,6 +30,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
@@ -180,6 +181,75 @@ class UserManagerTest {
     }
 
     @Test
+    fun `tracking mode changes while the initial user id is read queue one storage update`() {
+        val (storage, state) = storageMock(anonymousUserId = "persisted-user-id")
+        val executor = QueuedExecutor()
+        val userManager = UserManager(InternalUserTrackingMode.ANONYMOUS_TRACKING, storage, executor)
+
+        repeat(1_000) {
+            userManager.trackingMode = InternalUserTrackingMode.NO_TRACKING
+            userManager.trackingMode = InternalUserTrackingMode.ANONYMOUS_TRACKING
+        }
+        userManager.trackingMode = InternalUserTrackingMode.NO_TRACKING
+
+        assertEquals(2, executor.size)
+
+        executor.runQueuedTasks()
+
+        assertEquals("persisted-user-id", userManager.pendingUserId(wait = true))
+        assertNull(userManager.userId)
+        assertNull(state.anonymousUserId)
+        verify(storage).deleteAnonymousUserId()
+        verify(storage, never()).writeAnonymousUserId(anyString())
+    }
+
+    @Test
+    fun `failed storage update does not block later updates`() {
+        val (storage, state) = storageMock(anonymousUserId = "persisted-user-id")
+        val executor = QueuedExecutor()
+        val userManager = UserManager(InternalUserTrackingMode.ANONYMOUS_TRACKING, storage, executor)
+        executor.runQueuedTasks()
+        doAnswer { throw IllegalStateException("storage failure") }.`when`(storage).deleteAnonymousUserId()
+
+        userManager.trackingMode = InternalUserTrackingMode.NO_TRACKING
+        assertThrows(IllegalStateException::class.java) { executor.runQueuedTasks() }
+        userManager.trackingMode = InternalUserTrackingMode.ANONYMOUS_TRACKING
+        executor.runQueuedTasks()
+
+        assertNotNull(userManager.userId)
+        assertEquals(userManager.userId, state.anonymousUserId)
+    }
+
+    @Test
+    fun `stored user id matches user id after concurrent tracking mode changes`() {
+        repeat(100) {
+            val (storage, state) = storageMock(anonymousUserId = "persisted-user-id")
+            val executor = Executors.newSingleThreadExecutor()
+            val userManager = UserManager(InternalUserTrackingMode.ANONYMOUS_TRACKING, storage, executor)
+            val start = CountDownLatch(1)
+            val threads = (1..4).map { thread ->
+                Thread {
+                    start.await()
+                    repeat(500) { change ->
+                        userManager.trackingMode = if ((change + thread) % 2 == 0) {
+                            InternalUserTrackingMode.NO_TRACKING
+                        } else {
+                            InternalUserTrackingMode.ANONYMOUS_TRACKING
+                        }
+                    }
+                }.apply { start() }
+            }
+
+            start.countDown()
+            threads.forEach { it.join() }
+            executor.submit {}.get(5, TimeUnit.SECONDS)
+            executor.shutdown()
+
+            assertEquals(userManager.userId, state.anonymousUserId)
+        }
+    }
+
+    @Test
     fun `pending user id in span attributes is replaced once the user id is read`() {
         val (storage, _) = storageMock(anonymousUserId = "persisted-user-id")
         val executor = QueuedExecutor()
@@ -213,6 +283,9 @@ class UserManagerTest {
 
     private class QueuedExecutor : Executor {
         private val tasks = ArrayDeque<Runnable>()
+
+        val size: Int
+            get() = tasks.size
 
         override fun execute(command: Runnable) {
             tasks.addLast(command)

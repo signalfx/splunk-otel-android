@@ -29,6 +29,7 @@ import java.util.concurrent.FutureTask
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
 interface IUserManager {
     var trackingMode: InternalUserTrackingMode
@@ -67,8 +68,9 @@ fun IUserManager.resolvePendingUserId(attributes: Attributes, wait: Boolean): At
 }
 
 /**
- * Storage operations run on [storageExecutor] in the requested order, so the user ID stored by an earlier
- * launch is read before a later tracking mode change deletes it.
+ * Storage operations run on [storageExecutor]. The user ID stored by an earlier launch is read first, so a later
+ * tracking mode change can't delete it before it is read. Tracking mode changes that are not applied yet are
+ * merged into one storage update, so the queue stays bounded while the initial read waits.
  */
 class UserManager(
     userTrackingMode: InternalUserTrackingMode,
@@ -81,6 +83,9 @@ class UserManager(
     /** Null while tracking is disabled. Only [initialUserId] can still be pending. */
     @Volatile
     private var currentUserId: Future<String>? = null
+
+    /** The latest tracking mode change not applied to storage yet. Declared before `init`, which may set it. */
+    private val pendingStorageUpdate = AtomicReference<Runnable?>()
 
     init {
         if (userTrackingMode == InternalUserTrackingMode.ANONYMOUS_TRACKING) {
@@ -112,14 +117,24 @@ class UserManager(
             InternalUserTrackingMode.NO_TRACKING -> {
                 Logger.d(TAG) { "User tracking disabled, deleting anonymous user id." }
                 currentUserId = null
-                storageExecutor.execute { agentStorage.deleteAnonymousUserId() }
+                updateStorage { agentStorage.deleteAnonymousUserId() }
             }
             InternalUserTrackingMode.ANONYMOUS_TRACKING -> if (currentUserId == null) {
                 val newUserId = UserId.generate()
                 currentUserId = FutureTask { newUserId }.apply { run() }
-                storageExecutor.execute { agentStorage.writeAnonymousUserId(newUserId) }
+                updateStorage { agentStorage.writeAnonymousUserId(newUserId) }
                 Logger.d(TAG) { "User tracking enabled. Generated new anonymous user id: $newUserId" }
             }
+        }
+    }
+
+    /**
+     * Replaces the pending storage update. Each update sets the whole stored state, so applying only the latest
+     * one leaves storage as applying all of them would.
+     */
+    private fun updateStorage(update: Runnable) {
+        if (pendingStorageUpdate.getAndSet(update) == null) {
+            storageExecutor.execute { pendingStorageUpdate.getAndSet(null)?.run() }
         }
     }
 
