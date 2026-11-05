@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+##### Enhancements:
+* Reduced SDK installation time by reading the stored anonymous user ID and app installation ID in the background instead of waiting for them during `install`.
+
 ##### Fixes:
 * Refined network telemetry so the initial network state updates attributes without emitting a `network.change` event, while subsequent network transitions emit telemetry.
 * Improved network callback resilience with bounded asynchronous processing and platform-aware carrier and network subtype detection.
