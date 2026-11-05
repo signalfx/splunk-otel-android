@@ -19,6 +19,7 @@ package com.splunk.rum.integration.agent.api.internal
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.LOG_EVENT_NAME_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.agent.common.storage.AgentStorage
@@ -47,12 +48,14 @@ import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -269,6 +272,58 @@ class SplunkRumAgentCoreTest {
         val sessionManager = (splunkRum.session as Session).sessionManager
         assertEquals(previousSession.id, sessionManager.sessionId(previousSession.validFrom))
         assertEquals(sessionId, sessionManager.sessionId(System.currentTimeMillis()))
+    }
+
+    @Test
+    fun `crash reported before stored identity is read is stored with the stored ids`() {
+        cleanupStorage()
+        AgentStorage.attach(application).apply {
+            writeAppInstallationId("stored-installation-id")
+            writeAnonymousUserId("stored-user-id")
+            commit()
+        }
+        resetAgentStorageSingleton()
+
+        val allowPreferencesLoad = CountDownLatch(1)
+        val preferencesFile = File(testStorageDir, "1/preferences/preferences.dat")
+        setAgentPreferences(
+            Preferences.create {
+                allowPreferencesLoad.await(10, TimeUnit.SECONDS)
+                FileSimplePermanentCache(preferencesFile, FileManagerFactory.createPlainFileManager())
+            }
+        )
+        val configuration = AgentConfiguration(
+            endpoint = EndpointConfiguration("test", "test-token"),
+            appName = "test-app",
+            deploymentEnvironment = "test"
+        )
+        val openTelemetry = SplunkRum.install(application, configuration).openTelemetry as OpenTelemetrySdk
+
+        openTelemetry.sdkLoggerProvider.get("com.splunk.rum.crash")
+            .logRecordBuilder()
+            .setAttribute(LOG_EVENT_NAME_KEY, "device.crash")
+            .emit()
+        val crashFlushed = CountDownLatch(1)
+        thread {
+            openTelemetry.sdkLoggerProvider.forceFlush().join(10, TimeUnit.SECONDS)
+            crashFlushed.countDown()
+        }
+
+        assertFalse("crash was stored before stored ids were read", crashFlushed.await(500, TimeUnit.MILLISECONDS))
+        allowPreferencesLoad.countDown()
+        assertTrue(crashFlushed.await(10, TimeUnit.SECONDS))
+
+        val crashPayloads = testStorageDir.walk()
+            .filter { it.isFile }
+            .map { String(it.readBytes(), Charsets.ISO_8859_1) }
+            .filter { it.contains("device.crash") }
+            .toList()
+        assertTrue(crashPayloads.isNotEmpty())
+        crashPayloads.forEach { payload ->
+            assertTrue(payload.contains("stored-installation-id"))
+            assertTrue(payload.contains("stored-user-id"))
+            assertFalse(payload.contains("splunk.internal.pending"))
+        }
     }
 
     @Test
