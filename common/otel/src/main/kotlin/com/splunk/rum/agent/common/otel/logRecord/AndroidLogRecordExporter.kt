@@ -62,9 +62,7 @@ internal class AndroidLogRecordExporter(
 
         // We need special handling of Session Replay data because of the current state of the backend implementation.
         if (sessionReplayLogs.isNotEmpty()) {
-            val exportRequest = LogsRequestMarshaler.create(
-                sessionReplayLogs.map { it.withAppInstallationId(agentStorage) }
-            )
+            val exportRequest = LogsRequestMarshaler.create(sessionReplayLogs)
             val id = UUID.randomUUID().toString()
 
             // Save data to our storage.

@@ -19,14 +19,6 @@ package com.splunk.rum.agent.common.otel.internal
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
 import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.api.common.Attributes
-import io.opentelemetry.api.common.Value
-import io.opentelemetry.api.logs.Severity
-import io.opentelemetry.api.trace.SpanContext
-import io.opentelemetry.sdk.common.InstrumentationScopeInfo
-import io.opentelemetry.sdk.logs.data.Body
-import io.opentelemetry.sdk.logs.data.LogRecordData
-import io.opentelemetry.sdk.logs.data.internal.ExtendedLogRecordData
 import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.data.DelegatingSpanData
 import io.opentelemetry.sdk.trace.data.SpanData
@@ -50,6 +42,10 @@ internal object AppInstallationIdResource {
         } else {
             resource
         }
+
+    fun remove(resource: Resource): Resource = resource.toBuilder()
+        .removeIf { it == APP_INSTALLATION_ID_KEY }
+        .build()
 
     @Synchronized
     private fun completed(resource: Resource, storage: IAgentStorage): Resource {
@@ -83,39 +79,4 @@ internal fun SpanData.withAppInstallationId(storage: IAgentStorage): SpanData {
             override fun getResource(): Resource = resource
         }
     }
-}
-
-internal fun LogRecordData.withAppInstallationId(storage: IAgentStorage): LogRecordData {
-    val resource = AppInstallationIdResource.complete(resource, storage)
-
-    return if (resource === this.resource) this else ResourceReplacingLogRecordData(this, resource)
-}
-
-private class ResourceReplacingLogRecordData(private val delegate: LogRecordData, private val resource: Resource) :
-    ExtendedLogRecordData {
-    override fun getResource(): Resource = resource
-
-    override fun getInstrumentationScopeInfo(): InstrumentationScopeInfo = delegate.instrumentationScopeInfo
-
-    override fun getTimestampEpochNanos(): Long = delegate.timestampEpochNanos
-
-    override fun getObservedTimestampEpochNanos(): Long = delegate.observedTimestampEpochNanos
-
-    override fun getSpanContext(): SpanContext = delegate.spanContext
-
-    override fun getSeverity(): Severity = delegate.severity
-
-    override fun getSeverityText(): String? = delegate.severityText
-
-    @Deprecated("Deprecated in LogRecordData", ReplaceWith("getBodyValue()"))
-    @Suppress("DEPRECATION")
-    override fun getBody(): Body = delegate.body
-
-    override fun getBodyValue(): Value<*>? = delegate.bodyValue
-
-    override fun getAttributes(): Attributes = delegate.attributes
-
-    override fun getTotalAttributeCount(): Int = delegate.totalAttributeCount
-
-    override fun getEventName(): String? = (delegate as? ExtendedLogRecordData)?.eventName
 }
