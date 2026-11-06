@@ -20,12 +20,13 @@ import com.splunk.rum.agent.common.otel.extensions.joinToString
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
+import com.splunk.rum.integration.agent.api.internal.StoredIdentityAttributes
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal class LoggerLogRecordExporter : LogRecordExporter {
+internal class LoggerLogRecordExporter(private val storedIdentity: StoredIdentityAttributes) : LogRecordExporter {
 
     private val isShutdown = AtomicBoolean(false)
 
@@ -50,6 +51,8 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
                 return@forEachFast
             }
 
+            val resourceAttributes = storedIdentity.resourceAttributesIfRead(log.resource)
+
             Logger.i(TAG) {
                 "severityText=${log.severityText}, " +
                     "severity=${log.severity}, " +
@@ -58,7 +61,7 @@ internal class LoggerLogRecordExporter : LogRecordExporter {
                     "traceId=${log.spanContext.traceId}, " +
                     "spanId=${log.spanContext.spanId}, " +
                     "traceFlags=${log.spanContext.traceFlags}, " +
-                    "resources=${log.resource.attributes.joinToString(", ", "[", "]")}, " +
+                    "resources=${resourceAttributes.joinToString(", ", "[", "]")}, " +
                     "attributes=${log.attributes.joinToString(", ", "[", "]")}, " +
                     "totalAttributeCount=${log.totalAttributeCount}, " +
                     "instrumentationScopeInfo.name=${instrumentationScopeInfo.name}, " +

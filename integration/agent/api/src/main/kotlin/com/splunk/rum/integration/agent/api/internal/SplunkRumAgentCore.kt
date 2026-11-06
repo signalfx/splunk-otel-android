@@ -23,6 +23,7 @@ import com.splunk.rum.agent.common.otel.internal.OfflineOtelDataProcessor
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.extensions.forEachFast
+import com.splunk.rum.common.utils.runOnBackgroundThread
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.configuration.ConfigurationManager
 import com.splunk.rum.integration.agent.api.exporter.LoggerLogRecordExporter
@@ -49,7 +50,8 @@ import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import io.opentelemetry.sdk.trace.data.SpanData
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
-import java.util.UUID
+import java.util.concurrent.Executor
+import java.util.concurrent.atomic.AtomicReference
 
 internal object SplunkRumAgentCore {
 
@@ -65,7 +67,9 @@ internal object SplunkRumAgentCore {
         storage: IAgentStorage,
         moduleConfigurations: List<ModuleConfiguration>,
         globalAttributes: MutableAttributes,
-        offlineOtelDataProcessor: OfflineOtelDataProcessor
+        offlineOtelDataProcessor: OfflineOtelDataProcessor,
+        storageExecutor: Executor =
+            Executor { runOnBackgroundThread(name = "SplunkAppInstallationId", block = it::run) }
     ): OpenTelemetry {
         // Sampling.
         val shouldBeRunning = when (val samplingRate = agentConfiguration.session.samplingRate.coerceIn(0.0, 1.0)) {
@@ -87,18 +91,20 @@ internal object SplunkRumAgentCore {
 
         sessionManager.reset()
 
-        val appInstallationID = storage.readAppInstallationId() ?: UUID.randomUUID().toString().replace("-", "").also {
-            storage.writeAppInstallationId(it)
-        }
+        val appInstallationId = AtomicReference<String>()
+        storageExecutor.execute { appInstallationId.set(storage.readOrCreateAppInstallationId()) }
+        val storedIdentity = StoredIdentityAttributes(appInstallationId, userManager)
 
         val finalConfiguration =
             ConfigurationManager.obtainInstance(storage).preProcessConfiguration(application, agentConfiguration)
 
         val agentIntegration = AgentIntegration.obtainInstance(application)
 
-        // Release session.start only after a span survives the customer interceptor. This avoids
-        // creating a session containing only session.start when the first span is filtered out.
-        val acceptedTelemetryInterceptor: (SpanData) -> SpanData? = { spanData ->
+        // Resolve the pending user ID before the customer interceptor sees the span. Release session.start
+        // only after a span survives the customer interceptor. This avoids creating a session containing
+        // only session.start when the first span is filtered out.
+        val userIdAndSessionStartInterceptor: (SpanData) -> SpanData? = { exportedSpan ->
+            val spanData = storedIdentity.withResolvedUserId(exportedSpan)
             val interceptor = agentConfiguration.spanInterceptor
             val acceptedSpan = if (interceptor == null) spanData else interceptor(spanData)
             acceptedSpan?.attributes?.get(SESSION_ID_KEY)?.let(agentIntegration::emitSessionStartIfPending)
@@ -109,14 +115,16 @@ internal object SplunkRumAgentCore {
             application,
             storage,
             agentConfiguration.deferredUntilForeground,
-            acceptedTelemetryInterceptor
+            userIdAndSessionStartInterceptor
         )
             // The GlobalAttributeSpanProcessor must be registered first to ensure that global attributes
             // do not override internal agent attributes required by the backend.
             .addSpanProcessor(GlobalAttributeSpanProcessor(globalAttributes))
             .addSpanProcessor(SessionActivitySpanProcessor(sessionManager))
             .addSpanProcessor(LastScreenNameSpanProcessor(ScreenNameTracker))
-            .joinResources(AgentResource.allResource(application, appInstallationID, finalConfiguration))
+            .joinResources(
+                AgentResource.allResource(application, IAgentStorage.PENDING_APP_INSTALLATION_ID, finalConfiguration)
+            )
             .addSpanProcessor(UserIdSpanProcessor(userManager))
             .addSpanProcessor(ErrorIdentifierAttributesSpanProcessor(application))
             .addSpanProcessor(SessionIdSpanProcessor(sessionManager))
@@ -131,8 +139,8 @@ internal object SplunkRumAgentCore {
             )
 
         if (agentConfiguration.enableDebugLogging) {
-            initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter()).build())
-                .addLogRecordProcessor(SimpleLogRecordProcessor.create(LoggerLogRecordExporter()))
+            initializer.addSpanProcessor(SimpleSpanProcessor.builder(LoggerSpanExporter(storedIdentity)).build())
+                .addLogRecordProcessor(SimpleLogRecordProcessor.create(LoggerLogRecordExporter(storedIdentity)))
         }
 
         val openTelemetry = initializer.build()

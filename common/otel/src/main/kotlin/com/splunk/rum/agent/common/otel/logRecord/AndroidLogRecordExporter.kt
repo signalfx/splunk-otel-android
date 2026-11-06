@@ -20,6 +20,7 @@ import com.splunk.rum.agent.common.otel.RumConstants
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.withAppInstallationId
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.job.IJobManager
 import com.splunk.rum.common.job.JobIdStorage
@@ -146,7 +147,9 @@ internal class AndroidLogRecordExporter(
 
                     if (spanData != null) {
                         val crashSpanId = UUID.randomUUID().toString()
-                        val exportRequest = TraceRequestMarshaler.create(listOf(spanData))
+                        val exportRequest = TraceRequestMarshaler.create(
+                            listOf(spanData.withAppInstallationId(agentStorage))
+                        )
 
                         ByteArrayOutputStream().use {
                             exportRequest.writeBinaryTo(it)
