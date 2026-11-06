@@ -144,8 +144,8 @@ internal class AndroidLogRecordExporter(
 
                 if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
                     val span = spanBuilder.setStartTimestamp(effectiveTimestamp, TimeUnit.NANOSECONDS).startSpan()
-                    val spanData = (span as? ReadableSpan)?.toSpanData()
                     span.end(effectiveTimestamp, TimeUnit.NANOSECONDS)
+                    val spanData = (span as? ReadableSpan)?.toSpanData()
 
                     if (spanData != null) {
                         val acceptedSpan = try {

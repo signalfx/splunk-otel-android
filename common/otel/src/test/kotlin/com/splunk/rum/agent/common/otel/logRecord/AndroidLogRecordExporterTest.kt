@@ -69,11 +69,13 @@ class AndroidLogRecordExporterTest {
     fun `crash payload contains attributes added by the span interceptor`() {
         val storage = mock(IAgentStorage::class.java)
         var storedPayload: ByteArray? = null
+        var interceptedSpan: SpanData? = null
         doAnswer { invocation ->
             storedPayload = invocation.getArgument(1)
             true
         }.`when`(storage).writeOtelSpanData(anyString(), anyByteArray())
         val interceptor: (SpanData) -> SpanData = { span ->
+            interceptedSpan = span
             object : DelegatingSpanData(span) {
                 override fun getAttributes(): Attributes = span.attributes.toBuilder()
                     .put(AttributeKey.stringKey("crash.interceptor.test"), "interceptor-applied")
@@ -89,6 +91,9 @@ class AndroidLogRecordExporterTest {
 
         exporter.export(mutableListOf(crashLog()))
 
+        val completedSpan = checkNotNull(interceptedSpan)
+        assertTrue(completedSpan.hasEnded())
+        assertEquals(completedSpan.startEpochNanos, completedSpan.endEpochNanos)
         val serialized = String(checkNotNull(storedPayload), Charsets.ISO_8859_1)
         assertTrue(serialized.contains("crash.interceptor.test"))
         assertTrue(serialized.contains("interceptor-applied"))
