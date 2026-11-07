@@ -72,7 +72,7 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
         listeners.forEachFast { it.onPostInstall() }
     }
 
-    /** Emits the pending session.start. Compatibility mode calls this after telemetry is accepted. */
+    /** Emits a pending session.start after accepted telemetry when allowBackgroundSessionCreation=true. */
     fun emitSessionStartIfPending(sessionId: String? = null) {
         sessionStartEmitter.emitIfPending(sessionId)
     }
@@ -89,6 +89,7 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
                 ScreenNameTracker.screenName
             )
             if (!allowBackgroundSessionCreation) {
+                // With false, emit session.start as soon as the foreground session is created.
                 sessionStartEmitter.emitIfPending(sessionId)
             }
         }

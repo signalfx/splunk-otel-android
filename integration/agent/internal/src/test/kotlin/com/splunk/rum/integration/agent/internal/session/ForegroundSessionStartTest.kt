@@ -68,7 +68,7 @@ class ForegroundSessionStartTest {
     }
 
     @Test
-    fun `compatibility mode still holds session start until telemetry is accepted`() {
+    fun `allowBackgroundSessionCreation true holds session start until telemetry is accepted`() {
         val application = RuntimeEnvironment.getApplication()
         val builder = mock(LogRecordBuilder::class.java, RETURNS_SELF)
         val logger = mock(Logger::class.java)

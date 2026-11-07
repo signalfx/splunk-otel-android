@@ -49,7 +49,7 @@ class SplunkSessionManagerTest {
 
         assertNotNull(createdId)
         assertEquals(createdId, storage.second.sessionId)
-        assertNotNull("session validity should be persisted", storage.second.sessionValidUntil)
+        assertNotNull("session validity should be persisted", storage.second.sessionLifetimeDeadline)
         assertEquals(1, storage.second.sessionIds.size)
         assertEquals(createdId, storage.second.sessionIds.first().id)
     }
@@ -61,8 +61,8 @@ class SplunkSessionManagerTest {
 
         val (storage, state) = storageMock(
             sessionId = "existing-session",
-            sessionValidUntil = now + 5_000,
-            sessionValidUntilInBackground = now + 5_000,
+            sessionLifetimeDeadline = now + 5_000,
+            backgroundGraceDeadline = now + 5_000,
             sessionIds = listOf(SessionId("existing-session", now - 1_000))
         )
 
@@ -81,8 +81,8 @@ class SplunkSessionManagerTest {
         val expectedSessionStart = now - 1_000
         val (storage, _) = storageMock(
             sessionId = "existing-session",
-            sessionValidUntil = now + 5_000,
-            sessionValidUntilInBackground = now + 5_000,
+            sessionLifetimeDeadline = now + 5_000,
+            backgroundGraceDeadline = now + 5_000,
             sessionIds = listOf(SessionId("existing-session", expectedSessionStart))
         )
 
@@ -98,8 +98,8 @@ class SplunkSessionManagerTest {
         val expectedSessionStart = now - 1_000
         val (storage, _) = storageMock(
             sessionId = "existing-session",
-            sessionValidUntil = now + 5_000,
-            sessionValidUntilInBackground = now + 5_000,
+            sessionLifetimeDeadline = now + 5_000,
+            backgroundGraceDeadline = now + 5_000,
             sessionIds = listOf(SessionId("existing-session", expectedSessionStart))
         )
 
@@ -114,8 +114,8 @@ class SplunkSessionManagerTest {
         val now = System.currentTimeMillis()
         val (storage, _) = storageMock(
             sessionId = "existing-session",
-            sessionValidUntil = now + 5_000,
-            sessionValidUntilInBackground = now + 5_000,
+            sessionLifetimeDeadline = now + 5_000,
+            backgroundGraceDeadline = now + 5_000,
             sessionIds = listOf(SessionId("existing-session", now - 1_000))
         )
         val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
@@ -132,7 +132,7 @@ class SplunkSessionManagerTest {
         val now = System.currentTimeMillis()
         val (storage, state) = storageMock(
             sessionId = "expired-session",
-            sessionValidUntil = now - 1_000,
+            sessionLifetimeDeadline = now - 1_000,
             sessionIds = listOf(SessionId("expired-session", now - 2_000))
         )
 
@@ -150,7 +150,7 @@ class SplunkSessionManagerTest {
         val now = System.currentTimeMillis()
         val (storage, state) = storageMock(
             sessionId = "expired-session",
-            sessionValidUntil = now - 1_000,
+            sessionLifetimeDeadline = now - 1_000,
             sessionIds = listOf(SessionId("expired-session", now - 2_000))
         )
         val recordBuilder = mock(LogRecordBuilder::class.java, RETURNS_SELF)
@@ -184,8 +184,8 @@ class SplunkSessionManagerTest {
         manager.reset()
 
         assertNull(state.sessionId)
-        assertNull(state.sessionValidUntil)
-        assertNull(state.sessionValidUntilInBackground)
+        assertNull(state.sessionLifetimeDeadline)
+        assertNull(state.backgroundGraceDeadline)
     }
 
     @Test
@@ -219,12 +219,12 @@ class SplunkSessionManagerTest {
         val now = System.currentTimeMillis()
         val (storage, state) = storageMock(
             sessionId = "active-session",
-            sessionValidUntil = now + 10_000,
+            sessionLifetimeDeadline = now + 10_000,
             sessionIds = listOf(SessionId("active-session", now))
         )
         val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
         manager.sessionBackgroundTimeout = 10L
-        manager.watchSessionInBackgroundValidity()
+        manager.scheduleBackgroundGraceExpiry()
 
         Thread.sleep(30) // allow scheduled task to fire
 
@@ -232,7 +232,7 @@ class SplunkSessionManagerTest {
         assertNotNull(newId)
         assertNotEquals("active-session", newId)
         assertEquals(2, state.sessionIds.size)
-        assertTrue("background validity should be cleared", state.sessionValidUntilInBackground == null)
+        assertTrue("background validity should be cleared", state.backgroundGraceDeadline == null)
     }
 
     @Test
@@ -298,15 +298,15 @@ class SplunkSessionManagerTest {
         val firstId = manager.sessionId
 
         activity.pause().stop()
-        val deadline = state.sessionValidUntilInBackground
+        val deadline = state.backgroundGraceDeadline
         assertNotNull(deadline)
         manager.trackSessionActivity()
-        assertEquals(deadline, state.sessionValidUntilInBackground)
+        assertEquals(deadline, state.backgroundGraceDeadline)
         activity.start().resume()
-        manager.expireSessionInBackground() // delayed task from the previous background period
+        manager.handleBackgroundGraceExpiry() // delayed task from the previous background period
 
         assertEquals(firstId, manager.sessionId)
-        assertNull(state.sessionValidUntilInBackground)
+        assertNull(state.backgroundGraceDeadline)
         assertEquals(1, state.sessionIds.size)
         activity.pause().stop().destroy()
     }
@@ -320,11 +320,11 @@ class SplunkSessionManagerTest {
         val activity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
 
         activity.pause().stop()
-        val deadline = state.sessionValidUntilInBackground
+        val deadline = state.backgroundGraceDeadline
         activity.destroy()
 
         assertNotNull(deadline)
-        assertEquals(deadline, state.sessionValidUntilInBackground)
+        assertEquals(deadline, state.backgroundGraceDeadline)
     }
 
     @Test
@@ -337,8 +337,8 @@ class SplunkSessionManagerTest {
         val firstId = manager.sessionId
 
         activity.pause().stop()
-        state.sessionValidUntilInBackground = System.currentTimeMillis() - 1
-        manager.expireSessionInBackground()
+        state.backgroundGraceDeadline = System.currentTimeMillis() - 1
+        manager.handleBackgroundGraceExpiry()
 
         assertNull(manager.sessionId)
         assertNull(state.sessionId)
@@ -359,7 +359,7 @@ class SplunkSessionManagerTest {
         manager.install(RuntimeEnvironment.getApplication())
         val activity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
         val firstId = requireNotNull(manager.sessionId)
-        state.sessionValidUntil = System.currentTimeMillis() - 1
+        state.sessionLifetimeDeadline = System.currentTimeMillis() - 1
 
         assertNull("an ID read cannot rotate the session", manager.sessionId)
         assertEquals(firstId, state.sessionId)
@@ -381,7 +381,7 @@ class SplunkSessionManagerTest {
         val firstId = requireNotNull(manager.sessionId)
 
         activity.pause().stop()
-        state.sessionValidUntil = System.currentTimeMillis() - 1
+        state.sessionLifetimeDeadline = System.currentTimeMillis() - 1
         manager.rotateSessionIfNeeded(firstId)
 
         assertNull(state.sessionId)
@@ -415,7 +415,7 @@ class SplunkSessionManagerTest {
     }
 
     @Test
-    fun `compatibility mode still creates a session at install without an Activity`() {
+    fun `allowBackgroundSessionCreation true creates a session at install without an Activity`() {
         val (storage, state) = storageMock()
         val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
 
@@ -426,23 +426,23 @@ class SplunkSessionManagerTest {
     }
     data class StorageState(
         var sessionId: String? = null,
-        var sessionValidUntil: Long? = null,
-        var sessionValidUntilInBackground: Long? = null,
+        var sessionLifetimeDeadline: Long? = null,
+        var backgroundGraceDeadline: Long? = null,
         var sessionLastActivity: Long? = null,
         var sessionIds: List<SessionId> = emptyList()
     )
 
     private fun storageMock(
         sessionId: String? = null,
-        sessionValidUntil: Long? = null,
-        sessionValidUntilInBackground: Long? = null,
+        sessionLifetimeDeadline: Long? = null,
+        backgroundGraceDeadline: Long? = null,
         sessionLastActivity: Long? = null,
         sessionIds: List<SessionId> = emptyList()
     ): Pair<IAgentStorage, StorageState> {
         val state = StorageState(
             sessionId = sessionId,
-            sessionValidUntil = sessionValidUntil,
-            sessionValidUntilInBackground = sessionValidUntilInBackground,
+            sessionLifetimeDeadline = sessionLifetimeDeadline,
+            backgroundGraceDeadline = backgroundGraceDeadline,
             sessionLastActivity = sessionLastActivity,
             sessionIds = sessionIds
         )
@@ -460,25 +460,25 @@ class SplunkSessionManagerTest {
             null
         }.`when`(storage).deleteSessionId()
 
-        `when`(storage.readSessionValidUntil()).thenAnswer { state.sessionValidUntil }
+        `when`(storage.readSessionLifetimeDeadline()).thenAnswer { state.sessionLifetimeDeadline }
         doAnswer { invocation ->
-            state.sessionValidUntil = invocation.getArgument(0)
+            state.sessionLifetimeDeadline = invocation.getArgument(0)
             null
-        }.`when`(storage).writeSessionValidUntil(anyLong())
+        }.`when`(storage).writeSessionLifetimeDeadline(anyLong())
         doAnswer {
-            state.sessionValidUntil = null
+            state.sessionLifetimeDeadline = null
             null
-        }.`when`(storage).deleteSessionValidUntil()
+        }.`when`(storage).deleteSessionLifetimeDeadline()
 
-        `when`(storage.readSessionValidUntilInBackground()).thenAnswer { state.sessionValidUntilInBackground }
+        `when`(storage.readBackgroundGraceDeadline()).thenAnswer { state.backgroundGraceDeadline }
         doAnswer { invocation ->
-            state.sessionValidUntilInBackground = invocation.getArgument(0)
+            state.backgroundGraceDeadline = invocation.getArgument(0)
             null
-        }.`when`(storage).writeSessionValidUntilInBackground(anyLong())
+        }.`when`(storage).writeBackgroundGraceDeadline(anyLong())
         doAnswer {
-            state.sessionValidUntilInBackground = null
+            state.backgroundGraceDeadline = null
             null
-        }.`when`(storage).deleteSessionValidUntilInBackground()
+        }.`when`(storage).deleteBackgroundGraceDeadline()
 
         `when`(storage.readSessionLastActivity()).thenAnswer { state.sessionLastActivity }
         doAnswer { invocation ->

@@ -96,8 +96,8 @@ internal object SplunkRumAgentCore {
 
         val agentIntegration = AgentIntegration.obtainInstance(application)
 
-        // Compatibility mode releases session.start after the first accepted span. In
-        // foreground-aware mode it was already emitted when the session was created.
+        // With allowBackgroundSessionCreation=true, session.start waits for an accepted span.
+        // With false, it was emitted when the foreground session was created.
         val acceptedTelemetryInterceptor: (SpanData) -> SpanData? = { spanData ->
             val interceptor = agentConfiguration.spanInterceptor
             val acceptedSpan = if (interceptor == null) spanData else interceptor(spanData)

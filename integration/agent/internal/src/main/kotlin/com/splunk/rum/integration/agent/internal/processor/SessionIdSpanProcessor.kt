@@ -31,8 +31,8 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
         if (capturedSessionId == null) {
             sessionManager.sessionId?.let { span.setAttribute(SESSION_ID_KEY, it) }
         }
-        // A delayed session.start keeps the ancestry captured when its session was created.
-        // Other spans use the current value, even if the caller supplied an attribute.
+        // Keep a delayed session.start's original session.previous_id.
+        // Other spans get session.previous_id from the session manager.
         val isDelayedSessionStart = span.name == RumConstants.SESSION_START_EVENT_NAME &&
             capturedSessionId != null && capturedSessionId != sessionManager.sessionId
         if (!isDelayedSessionStart) {

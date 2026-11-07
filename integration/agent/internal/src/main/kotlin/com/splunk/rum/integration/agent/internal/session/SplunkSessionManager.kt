@@ -64,7 +64,7 @@ class SplunkSessionManager internal constructor(
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val appStateObserver = AppStateObserver
 
-    private var sessionValidityWatcher: ScheduledFuture<*>? = null
+    private var backgroundGraceWatcher: ScheduledFuture<*>? = null
     private var sessionLengthWatcher: ScheduledFuture<*>? = null
     private var isForeground = false
 
@@ -118,7 +118,7 @@ class SplunkSessionManager internal constructor(
 
     @Synchronized
     override fun reset() {
-        cancelSessionWatcher()
+        cancelBackgroundGraceWatcher()
         cancelSessionLengthWatcher()
         isForeground = false
         previousSessionId = null
@@ -130,13 +130,13 @@ class SplunkSessionManager internal constructor(
         .maxByOrNull { it.validFrom }
         ?.id
 
-    /** Reads an existing session without creating one. A late timeout task cannot make an expired ID valid again. */
+    /** Returns a stored ID only while its deadlines are valid; never creates a session. */
     @Synchronized
     private fun readCurrentSessionId(): String? {
         val savedId = agentStorage.readSessionId() ?: return null
         val now = System.currentTimeMillis()
-        val backgroundDeadline = agentStorage.readSessionValidUntilInBackground()
-        val lengthDeadline = agentStorage.readSessionValidUntil()
+        val backgroundDeadline = agentStorage.readBackgroundGraceDeadline()
+        val lengthDeadline = agentStorage.readSessionLifetimeDeadline()
 
         if (backgroundDeadline != null && backgroundDeadline <= now) {
             endCurrentSession(now)
@@ -147,8 +147,7 @@ class SplunkSessionManager internal constructor(
             return null
         }
         if (lengthDeadline <= now) {
-            // A foreground session is rotated by the length watcher, not by an ID read.
-            // Keep its old ID internally until that watcher runs, but never return it.
+            // Let the watcher rotate a foreground session; reads must not return its expired ID.
             if (!isForeground || !appStateObserver.hasStartedActivity) {
                 endCurrentSession(now)
             }
@@ -157,38 +156,33 @@ class SplunkSessionManager internal constructor(
         return savedId
     }
 
+    /** Reuses a valid ID or creates one, including during background execution. */
     @Synchronized
     private fun createNewSessionIfNeeded(): String {
         val savedSessionId = agentStorage.readSessionId()
-        val sessionValidInBackgroundUntil = agentStorage.readSessionValidUntilInBackground()
-        val sessionValidUntil = agentStorage.readSessionValidUntil()
+        val backgroundGraceDeadline = agentStorage.readBackgroundGraceDeadline()
+        val sessionLifetimeDeadline = agentStorage.readSessionLifetimeDeadline()
         val now = System.currentTimeMillis()
 
-        val backgroundValidity = if (sessionValidInBackgroundUntil !=
-            null
-        ) {
-            sessionValidInBackgroundUntil > now
-        } else {
-            true
-        }
+        val withinBackgroundGrace = backgroundGraceDeadline == null || backgroundGraceDeadline > now
 
         val isCurrentSessionIdValid = savedSessionId != null &&
-            backgroundValidity &&
-            sessionValidUntil != null &&
-            sessionValidUntil > now
+            withinBackgroundGrace &&
+            sessionLifetimeDeadline != null &&
+            sessionLifetimeDeadline > now
 
         if (isCurrentSessionIdValid) {
             return requireNotNull(savedSessionId)
         }
 
-        deleteSessionInBackgroundValidationTime()
-        deleteSessionValidationTime()
+        clearBackgroundGraceDeadline()
+        clearSessionLifetimeDeadline()
         deleteSessionLastActivity()
 
         val newSessionId = SessionId.generate()
         previousSessionId = savedSessionId
         agentStorage.writeSessionId(newSessionId)
-        agentStorage.writeSessionValidUntil(now + maxSessionLength)
+        agentStorage.writeSessionLifetimeDeadline(now + maxSessionLength)
         onSessionCreated(newSessionId, previousSessionId, now)
         sessionIds.add(SessionIdStorageData(newSessionId, now))
         agentStorage.writeSessionIds(sessionIds)
@@ -207,12 +201,13 @@ class SplunkSessionManager internal constructor(
     }
 
     private fun clearLastSession() {
-        deleteSessionValidationTime()
-        deleteSessionInBackgroundValidationTime()
+        clearSessionLifetimeDeadline()
+        clearBackgroundGraceDeadline()
         deleteSessionLastActivity()
         agentStorage.deleteSessionId()
     }
 
+    /** Clears the current session and notifies listeners once. */
     @Synchronized
     private fun endCurrentSession(timestamp: Long) {
         if (agentStorage.readSessionId() == null) return
@@ -222,17 +217,17 @@ class SplunkSessionManager internal constructor(
         sessionListeners.forEachFast { it.onSessionEnded(timestamp) }
     }
 
+    /** Reuses a valid session or creates one when an Activity starts. */
     @Synchronized
     private fun enterForeground() {
         if (!appStateObserver.hasStartedActivity) return
 
-        // Check the deadline before clearing it. An Activity created after the grace period
-        // must not resurrect the old session.
+        // Check the deadline before clearing it so an expired session is not reused.
         val currentId = readCurrentSessionId()
         isForeground = true
-        cancelSessionWatcher()
+        cancelBackgroundGraceWatcher()
         if (currentId != null) {
-            deleteSessionInBackgroundValidationTime()
+            clearBackgroundGraceDeadline()
             return
         }
 
@@ -240,6 +235,7 @@ class SplunkSessionManager internal constructor(
         createForegroundSession(previousId = null)
     }
 
+    /** Creates a session and schedules rotation at its length limit. */
     @Synchronized
     private fun createForegroundSession(previousId: String?) {
         clearLastSession()
@@ -247,7 +243,7 @@ class SplunkSessionManager internal constructor(
         val newId = SessionId.generate()
         previousSessionId = previousId
         agentStorage.writeSessionId(newId)
-        agentStorage.writeSessionValidUntil(timestamp + maxSessionLength)
+        agentStorage.writeSessionLifetimeDeadline(timestamp + maxSessionLength)
         onSessionCreated(newId, previousId, timestamp)
         sessionIds.add(SessionIdStorageData(newId, timestamp))
         agentStorage.writeSessionIds(sessionIds)
@@ -262,12 +258,13 @@ class SplunkSessionManager internal constructor(
         }
     }
 
+    /** Ignores stale tasks, then rotates or ends an expired session based on Activity state. */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     @Synchronized
     internal fun rotateSessionIfNeeded(expectedId: String) {
         if (agentStorage.readSessionId() != expectedId) return
         val now = System.currentTimeMillis()
-        val deadline = agentStorage.readSessionValidUntil() ?: return
+        val deadline = agentStorage.readSessionLifetimeDeadline() ?: return
         if (deadline > now) {
             scheduleSessionLengthWatcher(expectedId, deadline - now)
             return
@@ -285,53 +282,55 @@ class SplunkSessionManager internal constructor(
         sessionLengthWatcher = null
     }
 
+    /** Saves the background grace deadline and schedules its timeout. */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     @Synchronized
-    internal fun watchSessionInBackgroundValidity() {
+    internal fun scheduleBackgroundGraceExpiry() {
         if (!allowBackgroundSessionCreation && readCurrentSessionId() == null) return
-        saveSessionInBackgroundValidationTime()
+        saveBackgroundGraceDeadline()
 
-        sessionValidityWatcher = executor.safeSchedule(sessionBackgroundTimeout) {
-            expireSessionInBackground()
+        backgroundGraceWatcher = executor.safeSchedule(sessionBackgroundTimeout) {
+            handleBackgroundGraceExpiry()
         }
     }
 
+    /** Enforces the grace deadline; only allowBackgroundSessionCreation=true creates a replacement. */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     @Synchronized
-    internal fun expireSessionInBackground() {
-        sessionValidityWatcher = null
+    internal fun handleBackgroundGraceExpiry() {
+        backgroundGraceWatcher = null
         if (allowBackgroundSessionCreation) {
-            deleteSessionInBackgroundValidationTime()
-            deleteSessionValidationTime()
+            clearBackgroundGraceDeadline()
+            clearSessionLifetimeDeadline()
             createNewSessionIfNeeded()
             return
         }
         if (isForeground) return
 
-        val deadline = agentStorage.readSessionValidUntilInBackground() ?: return
+        val deadline = agentStorage.readBackgroundGraceDeadline() ?: return
         val remaining = deadline - System.currentTimeMillis()
         if (remaining > 0) {
-            sessionValidityWatcher = executor.safeSchedule(remaining) { expireSessionInBackground() }
+            backgroundGraceWatcher = executor.safeSchedule(remaining) { handleBackgroundGraceExpiry() }
         } else {
             readCurrentSessionId()
         }
     }
 
-    private fun cancelSessionWatcher() {
-        sessionValidityWatcher?.cancel(false)
-        sessionValidityWatcher = null
+    private fun cancelBackgroundGraceWatcher() {
+        backgroundGraceWatcher?.cancel(false)
+        backgroundGraceWatcher = null
     }
 
-    private fun saveSessionInBackgroundValidationTime() {
-        agentStorage.writeSessionValidUntilInBackground(System.currentTimeMillis() + sessionBackgroundTimeout)
+    private fun saveBackgroundGraceDeadline() {
+        agentStorage.writeBackgroundGraceDeadline(System.currentTimeMillis() + sessionBackgroundTimeout)
     }
 
-    private fun deleteSessionInBackgroundValidationTime() {
-        agentStorage.deleteSessionValidUntilInBackground()
+    private fun clearBackgroundGraceDeadline() {
+        agentStorage.deleteBackgroundGraceDeadline()
     }
 
-    private fun deleteSessionValidationTime() {
-        agentStorage.deleteSessionValidUntil()
+    private fun clearSessionLifetimeDeadline() {
+        agentStorage.deleteSessionLifetimeDeadline()
     }
 
     interface SessionListener {
@@ -343,7 +342,7 @@ class SplunkSessionManager internal constructor(
     private inner class AppStateObserverListener : AppStateObserver.Listener {
 
         override fun onAppStarted() {
-            if (allowBackgroundSessionCreation) deleteSessionInBackgroundValidationTime()
+            if (allowBackgroundSessionCreation) clearBackgroundGraceDeadline()
         }
 
         override fun onAppBackgrounded() {
@@ -352,7 +351,7 @@ class SplunkSessionManager internal constructor(
 
         override fun onAppForegrounded() {
             if (allowBackgroundSessionCreation) {
-                cancelSessionWatcher()
+                cancelBackgroundGraceWatcher()
             } else {
                 enterForeground()
             }
@@ -360,8 +359,8 @@ class SplunkSessionManager internal constructor(
 
         override fun onAppClosed() {
             if (allowBackgroundSessionCreation) {
-                cancelSessionWatcher()
-                saveSessionInBackgroundValidationTime()
+                cancelBackgroundGraceWatcher()
+                saveBackgroundGraceDeadline()
             }
         }
     }
@@ -369,7 +368,7 @@ class SplunkSessionManager internal constructor(
     @Synchronized
     private fun backgroundApp() {
         isForeground = false
-        watchSessionInBackgroundValidity()
+        scheduleBackgroundGraceExpiry()
     }
 
     private companion object {

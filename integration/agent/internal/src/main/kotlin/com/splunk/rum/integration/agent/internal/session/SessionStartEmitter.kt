@@ -28,8 +28,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Holds a new session's `session.start` event until it is emitted. Compatibility mode waits for
- * the first accepted signal; foreground-aware mode emits it as soon as the session is created.
+ * Holds `session.start` until emission. With `allowBackgroundSessionCreation=true`, it waits for
+ * accepted telemetry. With `false`, it is emitted when the session is created.
  */
 internal class SessionStartEmitter {
 
@@ -42,10 +42,7 @@ internal class SessionStartEmitter {
         this.logger = logger
     }
 
-    /**
-     * Holds the `session.start` event of [sessionId]. An event still held for an earlier session is
-     * dropped when the new session replaces it.
-     */
+    /** Replaces any pending `session.start` from an earlier session. */
     fun onSessionCreated(
         sessionId: String,
         previousSessionId: String?,
@@ -57,11 +54,8 @@ internal class SessionStartEmitter {
     }
 
     /**
-     * Emits the held event, if there is one, with the timestamp of the session it belongs to.
-     *
-     * Clearing the slot before emitting keeps the emitted record from re-entering here through the
-     * processors that call this and emitting the event twice. If emission fails, we cannot safely
-     * retry: the record may already have been queued before the failure.
+     * Emits the matching event. Clears it first to prevent reentry from emitting it twice.
+     * A failed emit is not retried because it may already be queued.
      */
     fun emitIfPending(sessionId: String? = null) {
         if (logger == null) return
