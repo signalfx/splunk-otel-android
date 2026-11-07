@@ -58,7 +58,7 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
 
 class SplunkSessionManager internal constructor(
     private val agentStorage: IAgentStorage,
-    private val includeBackgroundOnlySessions: Boolean,
+    private val allowBackgroundSessionCreation: Boolean,
     private val onSessionCreated: (String, String?, Long) -> Unit = { _, _, _ -> }
 ) : ISplunkSessionManager {
     private val executor = Executors.newSingleThreadScheduledExecutor()
@@ -81,7 +81,7 @@ class SplunkSessionManager internal constructor(
         }
 
     override val sessionId: String?
-        @Synchronized get() = if (includeBackgroundOnlySessions) {
+        @Synchronized get() = if (allowBackgroundSessionCreation) {
             createNewSessionIfNeeded()
         } else {
             readCurrentSessionId()
@@ -105,13 +105,13 @@ class SplunkSessionManager internal constructor(
     internal var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
 
     override fun install(application: Application) {
-        if (includeBackgroundOnlySessions) {
+        if (allowBackgroundSessionCreation) {
             createNewSessionIfNeeded()
         }
         appStateObserver.listeners.add(AppStateObserverListener())
         appStateObserver.attach(application)
 
-        if (!includeBackgroundOnlySessions && appStateObserver.hasStartedActivity) {
+        if (!allowBackgroundSessionCreation && appStateObserver.hasStartedActivity) {
             enterForeground()
         }
     }
@@ -197,7 +197,7 @@ class SplunkSessionManager internal constructor(
     }
 
     override fun trackSessionActivity() {
-        if (includeBackgroundOnlySessions || sessionId != null) {
+        if (allowBackgroundSessionCreation || sessionId != null) {
             agentStorage.writeSessionLastActivity(System.currentTimeMillis())
         }
     }
@@ -288,7 +288,7 @@ class SplunkSessionManager internal constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     @Synchronized
     internal fun watchSessionInBackgroundValidity() {
-        if (!includeBackgroundOnlySessions && readCurrentSessionId() == null) return
+        if (!allowBackgroundSessionCreation && readCurrentSessionId() == null) return
         saveSessionInBackgroundValidationTime()
 
         sessionValidityWatcher = executor.safeSchedule(sessionBackgroundTimeout) {
@@ -300,7 +300,7 @@ class SplunkSessionManager internal constructor(
     @Synchronized
     internal fun expireSessionInBackground() {
         sessionValidityWatcher = null
-        if (includeBackgroundOnlySessions) {
+        if (allowBackgroundSessionCreation) {
             deleteSessionInBackgroundValidationTime()
             deleteSessionValidationTime()
             createNewSessionIfNeeded()
@@ -343,7 +343,7 @@ class SplunkSessionManager internal constructor(
     private inner class AppStateObserverListener : AppStateObserver.Listener {
 
         override fun onAppStarted() {
-            if (includeBackgroundOnlySessions) deleteSessionInBackgroundValidationTime()
+            if (allowBackgroundSessionCreation) deleteSessionInBackgroundValidationTime()
         }
 
         override fun onAppBackgrounded() {
@@ -351,7 +351,7 @@ class SplunkSessionManager internal constructor(
         }
 
         override fun onAppForegrounded() {
-            if (includeBackgroundOnlySessions) {
+            if (allowBackgroundSessionCreation) {
                 cancelSessionWatcher()
             } else {
                 enterForeground()
@@ -359,7 +359,7 @@ class SplunkSessionManager internal constructor(
         }
 
         override fun onAppClosed() {
-            if (includeBackgroundOnlySessions) {
+            if (allowBackgroundSessionCreation) {
                 cancelSessionWatcher()
                 saveSessionInBackgroundValidationTime()
             }

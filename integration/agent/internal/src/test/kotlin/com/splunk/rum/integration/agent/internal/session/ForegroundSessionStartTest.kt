@@ -55,7 +55,7 @@ class ForegroundSessionStartTest {
         integration.sessionStartEmitter.attach(logger)
         val storage = mock(IAgentStorage::class.java)
         `when`(storage.readSessionIds()).thenReturn(emptyList())
-        val manager = integration.createSessionManager(storage, includeBackgroundOnlySessions = false)
+        val manager = integration.createSessionManager(storage, allowBackgroundSessionCreation = false)
 
         manager.reset()
         manager.install(application)
@@ -77,7 +77,7 @@ class ForegroundSessionStartTest {
         integration.sessionStartEmitter.attach(logger)
         val storage = mock(IAgentStorage::class.java)
         `when`(storage.readSessionIds()).thenReturn(emptyList())
-        val manager = integration.createSessionManager(storage, includeBackgroundOnlySessions = true)
+        val manager = integration.createSessionManager(storage, allowBackgroundSessionCreation = true)
 
         manager.reset()
         manager.install(application)

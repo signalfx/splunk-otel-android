@@ -343,7 +343,7 @@ class SplunkRum private constructor(
             val agentIntegration = AgentIntegration.obtainInstance(application)
             val sessionManager = agentIntegration.createSessionManager(
                 storage,
-                agentConfiguration.session.includeBackgroundOnlySessions
+                agentConfiguration.session.allowBackgroundSessionCreation
             )
             val offlineOtelDataProcessor = OfflineOtelDataProcessor.attach(application, storage)
 

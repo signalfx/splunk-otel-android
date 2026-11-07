@@ -79,16 +79,16 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
 
     fun createSessionManager(
         agentStorage: IAgentStorage,
-        includeBackgroundOnlySessions: Boolean
+        allowBackgroundSessionCreation: Boolean
     ): ISplunkSessionManager =
-        SplunkSessionManager(agentStorage, includeBackgroundOnlySessions) { sessionId, previousSessionId, timestamp ->
+        SplunkSessionManager(agentStorage, allowBackgroundSessionCreation) { sessionId, previousSessionId, timestamp ->
             sessionStartEmitter.onSessionCreated(
                 sessionId,
                 previousSessionId,
                 timestamp,
                 ScreenNameTracker.screenName
             )
-            if (!includeBackgroundOnlySessions) {
+            if (!allowBackgroundSessionCreation) {
                 sessionStartEmitter.emitIfPending(sessionId)
             }
         }

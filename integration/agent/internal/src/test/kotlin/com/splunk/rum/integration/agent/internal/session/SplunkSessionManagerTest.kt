@@ -43,7 +43,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `creates new session when none stored`() {
         val storage = storageMock()
-        val manager = SplunkSessionManager(storage.first, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage.first, allowBackgroundSessionCreation = true)
 
         val createdId = manager.sessionId
 
@@ -66,7 +66,7 @@ class SplunkSessionManagerTest {
             sessionIds = listOf(SessionId("existing-session", now - 1_000))
         )
 
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
         val sessionId = manager.sessionId
 
         assertEquals("existing-session", sessionId)
@@ -86,7 +86,7 @@ class SplunkSessionManagerTest {
             sessionIds = listOf(SessionId("existing-session", expectedSessionStart))
         )
 
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
 
         assertEquals(expectedSessionStart, manager.sessionStart)
     }
@@ -103,7 +103,7 @@ class SplunkSessionManagerTest {
             sessionIds = listOf(SessionId("existing-session", expectedSessionStart))
         )
 
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
 
         assertEquals(expectedSessionStart, manager.sessionLastActivity)
     }
@@ -118,7 +118,7 @@ class SplunkSessionManagerTest {
             sessionValidUntilInBackground = now + 5_000,
             sessionIds = listOf(SessionId("existing-session", now - 1_000))
         )
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
         val before = System.currentTimeMillis()
 
         manager.trackSessionActivity()
@@ -136,7 +136,7 @@ class SplunkSessionManagerTest {
             sessionIds = listOf(SessionId("expired-session", now - 2_000))
         )
 
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
         val newId = requireNotNull(manager.sessionId)
 
         assertNotEquals("expired-session", newId)
@@ -157,7 +157,7 @@ class SplunkSessionManagerTest {
         val logger = mock(Logger::class.java)
         `when`(logger.logRecordBuilder()).thenReturn(recordBuilder)
         val emitter = SessionStartEmitter().apply { attach(logger) }
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true) { id, previousId, timestamp ->
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true) { id, previousId, timestamp ->
             emitter.onSessionCreated(id, previousId, timestamp)
         }
         manager.sessionListeners += object : SplunkSessionManager.SessionListener {
@@ -177,7 +177,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `reset clears stored session`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
         manager.sessionId // trigger creation
 
         manager.reset()
@@ -196,7 +196,7 @@ class SplunkSessionManagerTest {
                 SessionId("latest", 500)
             )
         )
-        val manager = SplunkSessionManager(storage.first, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage.first, allowBackgroundSessionCreation = true)
 
         assertEquals("first", manager.sessionId(150))
         assertEquals("second", manager.sessionId(300))
@@ -208,7 +208,7 @@ class SplunkSessionManagerTest {
         val storage = storageMock(
             sessionIds = listOf(SessionId("only", 500))
         )
-        val manager = SplunkSessionManager(storage.first, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage.first, allowBackgroundSessionCreation = true)
 
         assertNull(manager.sessionId(100))
     }
@@ -221,7 +221,7 @@ class SplunkSessionManagerTest {
             sessionValidUntil = now + 10_000,
             sessionIds = listOf(SessionId("active-session", now))
         )
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
         manager.sessionBackgroundTimeout = 10L
         manager.watchSessionInBackgroundValidity()
 
@@ -237,7 +237,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `foreground-aware mode stays sessionless during a headless start and ID reads`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
 
         manager.reset()
         manager.install(RuntimeEnvironment.getApplication())
@@ -254,7 +254,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `first started Activity creates one session and duplicate callbacks do not create another`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
         manager.reset()
         manager.install(RuntimeEnvironment.getApplication())
 
@@ -277,7 +277,7 @@ class SplunkSessionManagerTest {
         AppStateObserver.attach(application)
         val activity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
 
         manager.reset()
         manager.install(application)
@@ -290,7 +290,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `background deadline is fixed and returning before it keeps the session`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
         manager.reset()
         manager.install(RuntimeEnvironment.getApplication())
         val activity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
@@ -313,7 +313,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `destroying the last Activity does not extend the background deadline`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
         manager.reset()
         manager.install(RuntimeEnvironment.getApplication())
         val activity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
@@ -329,7 +329,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `expired background session is cleared without a replacement`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
         manager.reset()
         manager.install(RuntimeEnvironment.getApplication())
         val activity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
@@ -353,7 +353,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `four hour expiry rotates only while an Activity is started`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
         manager.reset()
         manager.install(RuntimeEnvironment.getApplication())
         val activity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
@@ -373,7 +373,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `four hour expiry in the background does not create a replacement`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
         manager.reset()
         manager.install(RuntimeEnvironment.getApplication())
         val activity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
@@ -392,7 +392,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `process restart clears the old ID and waits for the next foreground`() {
         val (storage, state) = storageMock()
-        val original = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val original = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
         original.reset()
         original.install(RuntimeEnvironment.getApplication())
         val firstActivity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
@@ -401,7 +401,7 @@ class SplunkSessionManagerTest {
         AppStateObserver.listeners.clear() // process death drops the previous manager and its listeners
         AppStateObserver.detach()
 
-        val restarted = SplunkSessionManager(storage, includeBackgroundOnlySessions = false)
+        val restarted = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
         restarted.reset()
         restarted.install(RuntimeEnvironment.getApplication())
         assertNull(restarted.sessionId)
@@ -416,7 +416,7 @@ class SplunkSessionManagerTest {
     @Test
     fun `compatibility mode still creates a session at install without an Activity`() {
         val (storage, state) = storageMock()
-        val manager = SplunkSessionManager(storage, includeBackgroundOnlySessions = true)
+        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true)
 
         manager.install(RuntimeEnvironment.getApplication())
 

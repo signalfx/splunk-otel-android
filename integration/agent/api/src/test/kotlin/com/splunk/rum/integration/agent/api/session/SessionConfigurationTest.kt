@@ -24,13 +24,13 @@ class SessionConfigurationTest {
 
     @Test
     fun `background-only sessions are disabled by default`() {
-        assertFalse(SessionConfiguration().includeBackgroundOnlySessions)
+        assertFalse(SessionConfiguration().allowBackgroundSessionCreation)
     }
 
     @Test
     fun `background-only sessions can be requested`() {
-        val configuration = SessionConfiguration(includeBackgroundOnlySessions = true)
+        val configuration = SessionConfiguration(allowBackgroundSessionCreation = true)
 
-        assertTrue(configuration.includeBackgroundOnlySessions)
+        assertTrue(configuration.allowBackgroundSessionCreation)
     }
 }
