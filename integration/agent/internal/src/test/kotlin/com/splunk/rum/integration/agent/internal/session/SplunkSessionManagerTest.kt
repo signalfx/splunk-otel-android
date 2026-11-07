@@ -157,9 +157,10 @@ class SplunkSessionManagerTest {
         val logger = mock(Logger::class.java)
         `when`(logger.logRecordBuilder()).thenReturn(recordBuilder)
         val emitter = SessionStartEmitter().apply { attach(logger) }
-        val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = true) { id, previousId, timestamp ->
-            emitter.onSessionCreated(id, previousId, timestamp)
-        }
+        val manager =
+            SplunkSessionManager(storage, allowBackgroundSessionCreation = true) { id, previousId, timestamp ->
+                emitter.onSessionCreated(id, previousId, timestamp)
+            }
         manager.sessionListeners += object : SplunkSessionManager.SessionListener {
             override fun onSessionChanged(sessionId: String, timestamp: Long) {
                 emitter.emitIfPending(sessionId)
