@@ -173,23 +173,23 @@ class AgentStorage private constructor(context: Context, private val preferences
         preferences.remove(SESSION_ID)
     }
 
-    override fun writeSessionValidUntil(value: Long) {
+    override fun writeSessionLifetimeDeadline(value: Long) {
         preferences.putLong(SESSION_VALID_UNTIL, value)
     }
 
-    override fun readSessionValidUntil(): Long? = preferences.getLong(SESSION_VALID_UNTIL)
+    override fun readSessionLifetimeDeadline(): Long? = preferences.getLong(SESSION_VALID_UNTIL)
 
-    override fun deleteSessionValidUntil() {
+    override fun deleteSessionLifetimeDeadline() {
         preferences.remove(SESSION_VALID_UNTIL)
     }
 
-    override fun writeSessionValidUntilInBackground(value: Long) {
+    override fun writeBackgroundGraceDeadline(value: Long) {
         preferences.putLong(SESSION_VALID_UNTIL_IN_BACKGROUND, value)
     }
 
-    override fun readSessionValidUntilInBackground(): Long? = preferences.getLong(SESSION_VALID_UNTIL_IN_BACKGROUND)
+    override fun readBackgroundGraceDeadline(): Long? = preferences.getLong(SESSION_VALID_UNTIL_IN_BACKGROUND)
 
-    override fun deleteSessionValidUntilInBackground() {
+    override fun deleteBackgroundGraceDeadline() {
         preferences.remove(SESSION_VALID_UNTIL_IN_BACKGROUND)
     }
 

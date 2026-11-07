@@ -72,19 +72,26 @@ class AgentIntegration private constructor(@Suppress("UNUSED_PARAMETER") context
         listeners.forEachFast { it.onPostInstall() }
     }
 
-    /** Emits the pending session.start after application telemetry has been accepted. */
+    /** Emits a pending session.start after accepted telemetry when allowBackgroundSessionCreation=true. */
     fun emitSessionStartIfPending(sessionId: String? = null) {
         sessionStartEmitter.emitIfPending(sessionId)
     }
 
-    fun createSessionManager(agentStorage: IAgentStorage): ISplunkSessionManager =
-        SplunkSessionManager(agentStorage) { sessionId, previousSessionId, timestamp ->
+    fun createSessionManager(
+        agentStorage: IAgentStorage,
+        allowBackgroundSessionCreation: Boolean
+    ): ISplunkSessionManager =
+        SplunkSessionManager(agentStorage, allowBackgroundSessionCreation) { sessionId, previousSessionId, timestamp ->
             sessionStartEmitter.onSessionCreated(
                 sessionId,
                 previousSessionId,
                 timestamp,
                 ScreenNameTracker.screenName
             )
+            if (!allowBackgroundSessionCreation) {
+                // With false, emit session.start as soon as the foreground session is created.
+                sessionStartEmitter.emitIfPending(sessionId)
+            }
         }
 
     internal interface Listener {
