@@ -24,11 +24,16 @@ import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.common.utils.extensions.safeSchedule
 import com.splunk.rum.common.utils.extensions.safeSubmit
+import com.splunk.rum.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.integration.agent.internal.id.SessionId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 interface ISplunkSessionManager {
     val sessionId: String
@@ -60,6 +65,7 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
 
 class SplunkSessionManager internal constructor(
     private val agentStorage: IAgentStorage,
+    private val storageExecutor: ExecutorService = newStorageExecutor(),
     private val executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor(),
     private val onSessionCreated: (String, String?, Long) -> Unit = { _, _, _ -> }
 ) : ISplunkSessionManager {
@@ -137,7 +143,7 @@ class SplunkSessionManager internal constructor(
         ?: persistedSessionIds.lastOrNull { it.id == id }?.validFrom
 
     private fun persistSessionIds() {
-        executor.safeSubmit {
+        storageExecutor.safeSubmit {
             val persisted = persistedSessionIds
             val created = synchronized(this@SplunkSessionManager) { createdSessionIds.toList() }
             agentStorage.writeSessionIds(persisted + created)
@@ -254,5 +260,16 @@ class SplunkSessionManager internal constructor(
     private companion object {
         const val DEFAULT_SESSION_BACKGROUND_TIMEOUT = 15L * 60L * 1000L // 15m
         const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L // 4h
+        const val STORAGE_THREAD_KEEP_ALIVE_SECONDS = 5L
+
+        /** Runs tasks in submission order on a single thread that ends when idle. */
+        fun newStorageExecutor(): ExecutorService = ThreadPoolExecutor(
+            0,
+            1,
+            STORAGE_THREAD_KEEP_ALIVE_SECONDS,
+            TimeUnit.SECONDS,
+            LinkedBlockingQueue(),
+            NamedThreadFactory("SplunkSessionStorage")
+        )
     }
 }

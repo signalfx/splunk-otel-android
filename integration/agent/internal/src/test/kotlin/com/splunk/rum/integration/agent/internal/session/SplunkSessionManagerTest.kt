@@ -7,8 +7,9 @@ import com.splunk.rum.agent.common.storage.SessionId
 import io.opentelemetry.api.logs.LogRecordBuilder
 import io.opentelemetry.api.logs.Logger
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -219,7 +220,7 @@ class SplunkSessionManagerTest {
             sessionIds = listOf(SessionId("active-session", now))
         )
         val executor = Executors.newSingleThreadScheduledExecutor()
-        val manager = SplunkSessionManager(storage, executor)
+        val manager = SplunkSessionManager(storage, executor, executor)
         manager.sessionBackgroundTimeout = 10L
         manager.watchSessionInBackgroundValidity()
 
@@ -272,6 +273,20 @@ class SplunkSessionManagerTest {
     }
 
     @Test
+    fun `creating a session does not start the background validity thread`() {
+        val (storage, state) = storageMock()
+        val storageExecutor = Executors.newSingleThreadExecutor()
+        val scheduler = ScheduledThreadPoolExecutor(1)
+        val manager = SplunkSessionManager(storage, storageExecutor, scheduler)
+
+        val createdId = manager.sessionId
+        storageExecutor.awaitQueuedTasks()
+
+        assertEquals(listOf(createdId), state.sessionIds.map { it.id })
+        assertEquals(0, scheduler.poolSize)
+    }
+
+    @Test
     fun `sessionId for timestamp covers persisted and created sessions`() {
         val (storage, _) = storageMock(sessionIds = listOf(SessionId("persisted", 100)))
         val manager = SplunkSessionManager(storage)
@@ -297,7 +312,7 @@ class SplunkSessionManagerTest {
         assertEquals(expectedSessionStart, manager.sessionStart)
     }
 
-    private fun ScheduledExecutorService.awaitQueuedTasks() {
+    private fun ExecutorService.awaitQueuedTasks() {
         submit {}.get(5, TimeUnit.SECONDS)
     }
 
