@@ -41,7 +41,7 @@ class StoredIdentityAttributesTest {
     @Test
     fun `span gets the user id that the pending user id stands for`() {
         val attributes = StoredIdentityAttributes(AtomicReference(), FakeUserManager("user-id"))
-        val span = span(Attributes.of(USER_ID_KEY, "splunk.internal.pendingUserId"))
+        val span = span(Attributes.of(USER_ID_KEY, "<pending initialization>"))
 
         val completed = attributes.withResolvedUserId(span)
 

@@ -322,7 +322,7 @@ class SplunkRumAgentCoreTest {
         crashPayloads.forEach { payload ->
             assertTrue(payload.contains("stored-installation-id"))
             assertTrue(payload.contains("stored-user-id"))
-            assertFalse(payload.contains("splunk.internal.pending"))
+            assertFalse(payload.contains("<pending initialization>"))
         }
     }
 

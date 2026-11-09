@@ -91,6 +91,6 @@ interface IAgentStorage {
     fun commit()
 
     companion object {
-        const val PENDING_APP_INSTALLATION_ID = "splunk.internal.pendingAppInstallationId"
+        const val PENDING_APP_INSTALLATION_ID = "<pending initialization>"
     }
 }

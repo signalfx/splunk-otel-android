@@ -46,7 +46,7 @@ interface IUserManager {
 }
 
 /** Value of the user ID span attribute until the user ID is read from storage. Never exported. */
-internal const val PENDING_USER_ID = "splunk.internal.pendingUserId"
+internal const val PENDING_USER_ID = "<pending initialization>"
 
 /**
  * Replaces [PENDING_USER_ID] with the user ID it stands for. Without a value, the attribute is removed when
