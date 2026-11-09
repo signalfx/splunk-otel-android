@@ -73,7 +73,8 @@ class OpenTelemetryInitializer(
             AndroidLogRecordExporter(
                 agentStorage = agentStorage,
                 jobManager = jobManager,
-                jobIdStorage = jobIdStorage
+                jobIdStorage = jobIdStorage,
+                spanInterceptor = spanInterceptor
             )
         ).build()
     }
