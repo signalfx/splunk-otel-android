@@ -334,6 +334,14 @@ class SplunkRum private constructor(
 
             val storage = AgentStorage.attach(application)
 
+            // UserManager reads preferences during construction. Do not allow that first preferences access to
+            // block the main thread while the asynchronous preferences load is still in progress
+            if (storage !is AgentStorage || !storage.isPreferencesReady) {
+                Logger.d(TAG, "install() - Preferences are still loading; returning a no-op instance")
+                AgentIntegration.notifyInstallSkipped()
+                return noop
+            }
+
             val userManager = UserManager(
                 agentConfiguration.user.trackingMode.toInternal(),
                 storage
