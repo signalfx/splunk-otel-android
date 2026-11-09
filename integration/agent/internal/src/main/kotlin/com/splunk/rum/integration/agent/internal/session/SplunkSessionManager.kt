@@ -132,12 +132,13 @@ class SplunkSessionManager internal constructor(
     override fun sessionId(timestamp: Long): String {
         val created = synchronized(this) { createdSessionIds.toList() }
 
-        return (persistedSessionIds + created)
-            .filter { it.validFrom <= timestamp }
-            .maxByOrNull { it.validFrom }
+        return (created.latestValidAt(timestamp) ?: persistedSessionIds.latestValidAt(timestamp))
             ?.id
             ?: throw IllegalArgumentException("No valid session for timestamp: $timestamp")
     }
+
+    private fun List<SessionIdStorageData>.latestValidAt(timestamp: Long): SessionIdStorageData? =
+        filter { it.validFrom <= timestamp }.maxByOrNull { it.validFrom }
 
     private fun findSessionStart(id: String): Long? = createdSessionIds.lastOrNull { it.id == id }?.validFrom
         ?: persistedSessionIds.lastOrNull { it.id == id }?.validFrom

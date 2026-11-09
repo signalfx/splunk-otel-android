@@ -298,6 +298,30 @@ class SplunkSessionManagerTest {
     }
 
     @Test
+    fun `sessionId for a timestamp in a created session does not wait for persisted session history`() {
+        val (storage, _) = storageMock()
+        val historyRead = CountDownLatch(1)
+        doAnswer {
+            historyRead.await(5, TimeUnit.SECONDS)
+            listOf(SessionId("persisted", 100))
+        }.`when`(storage).readSessionIds()
+        val storageExecutor = Executors.newSingleThreadExecutor()
+        val caller = Executors.newSingleThreadExecutor()
+        val manager = SplunkSessionManager(storage, storageExecutor)
+
+        try {
+            val createdId = manager.sessionId
+            val sessionId = caller.submit<String> { manager.sessionId(System.currentTimeMillis()) }
+
+            assertEquals(createdId, sessionId.get(1, TimeUnit.SECONDS))
+        } finally {
+            historyRead.countDown()
+            storageExecutor.awaitQueuedTasks()
+            caller.shutdown()
+        }
+    }
+
+    @Test
     fun `sessionStart of a session restored from storage comes from persisted history`() {
         val now = System.currentTimeMillis()
         val expectedSessionStart = now - 1_000
