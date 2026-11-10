@@ -270,6 +270,37 @@ class AgentStorageTest {
         assertEquals(config, storage.readEndpointConfig())
     }
 
+    @Test
+    fun `readSessionIds returns saved history`() {
+        val sessionIds = listOf(SessionId("first", 100L), SessionId("second", 200L))
+
+        storage.writeSessionIds(sessionIds)
+
+        assertEquals(sessionIds, storage.readSessionIds())
+    }
+
+    @Test
+    fun `readSessionIds ignores malformed stored array after restart`() {
+        AgentPreferencesStore.obtain(context).putString("SESSION_IDS", "[{\"id\":\"first\",\"validFrom\":100},")
+        storage.commit()
+
+        resetProcessStorage()
+        val restartedStorage = AgentStorage.attach(context)
+
+        assertEquals(emptyList<SessionId>(), restartedStorage.readSessionIds())
+    }
+
+    @Test
+    fun `readSessionIds ignores wrong stored type after restart`() {
+        AgentPreferencesStore.obtain(context).putLong("SESSION_IDS", 100L)
+        storage.commit()
+
+        resetProcessStorage()
+        val restartedStorage = AgentStorage.attach(context)
+
+        assertEquals(emptyList<SessionId>(), restartedStorage.readSessionIds())
+    }
+
     private fun resetProcessStorage() {
         AgentStorage.resetForTest()
         AgentPreferencesStore.resetForTest()

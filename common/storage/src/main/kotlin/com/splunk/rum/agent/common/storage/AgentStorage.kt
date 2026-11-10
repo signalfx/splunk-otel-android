@@ -269,15 +269,17 @@ class AgentStorage private constructor(context: Context, private val preferences
         file.delete()
     }
 
-    override fun readSessionIds(): List<SessionId> {
+    override fun readSessionIds(): List<SessionId> = runCatching {
         val value = preferences.getString(SESSION_IDS)
-        if (value.isNullOrBlank()) return emptyList()
-
-        val sessionIds = value.toJSONArray()
-        return runCatching {
+        if (value.isNullOrBlank()) {
+            emptyList()
+        } else {
+            val sessionIds = value.toJSONArray()
             (0 until sessionIds.length()).map { sessionIds.getJSONObject(it) }.map { SessionId.fromJSONObject(it) }
-        }.getOrElse { emptyList() }
-    }
+        }
+    }.onFailure {
+        Logger.w(TAG, "readSessionIds() stored session history is corrupted: ${it.javaClass.simpleName}")
+    }.getOrElse { emptyList() }
 
     override fun writeSessionIds(sessionIds: List<SessionId>) {
         val json = sessionIds.toJSONArray { array, item -> array.put(item.toJsonObject()) }.toString()
