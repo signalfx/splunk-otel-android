@@ -20,6 +20,7 @@ import com.splunk.rum.agent.common.otel.RumConstants
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.withAppInstallationId
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.job.IJobManager
 import com.splunk.rum.common.job.JobIdStorage
@@ -148,11 +149,12 @@ internal class AndroidLogRecordExporter(
                     val spanData = (span as? ReadableSpan)?.toSpanData()
 
                     if (spanData != null) {
+                        val completedSpan = spanData.withAppInstallationId(agentStorage)
                         val acceptedSpan = try {
                             if (spanInterceptor == null) {
-                                spanData
+                                completedSpan
                             } else {
-                                spanInterceptor.invoke(spanData)
+                                spanInterceptor.invoke(completedSpan)
                             }
                         } catch (e: Throwable) {
                             Logger.e(TAG, "Crash span interceptor failed; dropping direct crash payload", e)

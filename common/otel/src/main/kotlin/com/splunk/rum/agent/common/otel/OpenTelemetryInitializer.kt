@@ -17,6 +17,7 @@
 package com.splunk.rum.agent.common.otel
 
 import android.app.Application
+import com.splunk.rum.agent.common.otel.internal.AppInstallationIdResource
 import com.splunk.rum.agent.common.otel.logRecord.AndroidLogRecordExporter
 import com.splunk.rum.agent.common.otel.span.AndroidSpanExporter
 import com.splunk.rum.agent.common.otel.span.SpanInterceptorExporter
@@ -62,7 +63,8 @@ class OpenTelemetryInitializer(
                 deferredUntilForeground = deferredUntilForeground,
                 context = application.applicationContext
             ),
-            spanInterceptor
+            spanInterceptor,
+            agentStorage
         )
 
         spanProcessors += BatchSpanProcessor.builder(spanExporter).build()
@@ -116,7 +118,7 @@ class OpenTelemetryInitializer(
 
     private fun createLoggerProvider(): SdkLoggerProvider {
         val builder = SdkLoggerProvider.builder()
-            .setResource(resource)
+            .setResource(AppInstallationIdResource.remove(resource))
 
         logRecordProcessors.forEach { builder.addLogRecordProcessor(it) }
 

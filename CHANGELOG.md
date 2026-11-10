@@ -7,6 +7,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+##### Enhancements:
+* Reduced SDK installation time by reading the stored anonymous user ID and app installation ID in the background instead of waiting for them during `install`.
+
 ### Version 2.4.0 - 2026-10-13
 
 ##### Enhancements:

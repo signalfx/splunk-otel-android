@@ -18,11 +18,14 @@ package com.splunk.rum.agent.common.otel.logRecord
 
 import com.splunk.rum.agent.common.otel.RumConstants
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.job.IJobManager
 import com.splunk.rum.common.job.JobIdStorage
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.logs.Severity
+import io.opentelemetry.exporter.internal.otlp.logs.LogsRequestMarshaler
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.common.CompletableResultCode
 import io.opentelemetry.sdk.logs.SdkLoggerProvider
@@ -32,7 +35,9 @@ import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.data.DelegatingSpanData
 import io.opentelemetry.sdk.trace.data.SpanData
+import java.io.ByteArrayOutputStream
 import org.junit.After
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -63,6 +68,26 @@ class AndroidLogRecordExporterTest {
     fun tearDown() {
         SplunkOpenTelemetrySdk.instance = previousSdk
         sdk.shutdown()
+    }
+
+    @Test
+    fun `session replay data is stored unchanged`() {
+        var storedPayload = ByteArray(0)
+        val storage = mock(IAgentStorage::class.java)
+        doAnswer { invocation ->
+            storedPayload = invocation.getArgument(1)
+            true
+        }.`when`(storage).writeOtelSessionReplayData(anyString(), anyByteArray())
+        val exporter = AndroidLogRecordExporter(storage, mock(IJobManager::class.java), mock(JobIdStorage::class.java))
+        val log = sessionReplayLog()
+
+        exporter.export(mutableListOf(log))
+
+        val expectedPayload = ByteArrayOutputStream().use {
+            LogsRequestMarshaler.create(listOf(log)).writeBinaryTo(it)
+            it.toByteArray()
+        }
+        assertArrayEquals(expectedPayload, storedPayload)
     }
 
     @Test
@@ -153,7 +178,24 @@ class AndroidLogRecordExporterTest {
         verify(storage, times(1)).addBufferedSpanId(anyString())
     }
 
-    private fun crashLog(): LogRecordData {
+    private fun sessionReplayLog(): LogRecordData = captureLog { provider ->
+        provider.get(GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME)
+            .logRecordBuilder()
+            .setBody("recording")
+            .setSeverity(Severity.INFO)
+            .setSeverityText("INFO")
+            .setAttribute(AttributeKey.stringKey("event.name"), "session_replay_data")
+            .emit()
+    }
+
+    private fun crashLog(): LogRecordData = captureLog { provider ->
+        provider.get(RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME)
+            .logRecordBuilder()
+            .setAttribute(AttributeKey.stringKey("event.name"), "device.crash")
+            .emit()
+    }
+
+    private fun captureLog(emit: (SdkLoggerProvider) -> Unit): LogRecordData {
         val captured = mutableListOf<LogRecordData>()
         val captureExporter = object : LogRecordExporter {
             override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
@@ -168,10 +210,7 @@ class AndroidLogRecordExporterTest {
         val provider = SdkLoggerProvider.builder()
             .addLogRecordProcessor(SimpleLogRecordProcessor.create(captureExporter))
             .build()
-        provider.get(RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME)
-            .logRecordBuilder()
-            .setAttribute(AttributeKey.stringKey("event.name"), "device.crash")
-            .emit()
+        emit(provider)
         provider.shutdown()
         return captured.single()
     }

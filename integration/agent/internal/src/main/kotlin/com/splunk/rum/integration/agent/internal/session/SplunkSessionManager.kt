@@ -23,10 +23,17 @@ import com.splunk.rum.agent.common.storage.SessionId as SessionIdStorageData
 import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.common.utils.extensions.safeSchedule
+import com.splunk.rum.common.utils.extensions.safeSubmit
+import com.splunk.rum.common.utils.thread.NamedThreadFactory
 import com.splunk.rum.integration.agent.internal.id.SessionId
 import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager.SessionListener
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 interface ISplunkSessionManager {
     val sessionId: String
@@ -58,21 +65,27 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
 
 class SplunkSessionManager internal constructor(
     private val agentStorage: IAgentStorage,
+    private val storageExecutor: ExecutorService = newStorageExecutor(),
+    private val executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor(),
     private val onSessionCreated: (String, String?, Long) -> Unit = { _, _, _ -> }
 ) : ISplunkSessionManager {
-    private val executor = Executors.newSingleThreadScheduledExecutor()
     private val appStateObserver = AppStateObserver
 
     private var sessionValidityWatcher: ScheduledFuture<*>? = null
 
-    private val sessionIds: MutableList<SessionIdStorageData> by lazy {
-        agentStorage.readSessionIds().toMutableList()
-    }
+    /** Sessions created by this instance, in creation order. Guarded by this instance's monitor. */
+    private val createdSessionIds = mutableListOf<SessionIdStorageData>()
+
+    /**
+     * Session history written before this instance was created. It must be read before this instance
+     * writes the history for the first time, otherwise it would already contain [createdSessionIds].
+     */
+    private val persistedSessionIds: List<SessionIdStorageData> by lazy { agentStorage.readSessionIds() }
 
     override val sessionSnapshot: SessionSnapshot
         @Synchronized get() {
             val id = createNewSessionIfNeeded()
-            val start = sessionIds.lastOrNull { it.id == id }?.validFrom ?: System.currentTimeMillis()
+            val start = findSessionStart(id) ?: System.currentTimeMillis()
             val lastActivity = agentStorage.readSessionLastActivity() ?: start
             return SessionSnapshot(id, start, lastActivity)
         }
@@ -116,11 +129,27 @@ class SplunkSessionManager internal constructor(
         clearLastSession()
     }
 
-    override fun sessionId(timestamp: Long): String = sessionIds
-        .filter { it.validFrom <= timestamp }
-        .maxByOrNull { it.validFrom }
-        ?.id
-        ?: throw IllegalArgumentException("No valid session for timestamp: $timestamp")
+    override fun sessionId(timestamp: Long): String {
+        val created = synchronized(this) { createdSessionIds.toList() }
+
+        return (created.latestValidAt(timestamp) ?: persistedSessionIds.latestValidAt(timestamp))
+            ?.id
+            ?: throw IllegalArgumentException("No valid session for timestamp: $timestamp")
+    }
+
+    private fun List<SessionIdStorageData>.latestValidAt(timestamp: Long): SessionIdStorageData? =
+        filter { it.validFrom <= timestamp }.maxByOrNull { it.validFrom }
+
+    private fun findSessionStart(id: String): Long? = createdSessionIds.lastOrNull { it.id == id }?.validFrom
+        ?: persistedSessionIds.lastOrNull { it.id == id }?.validFrom
+
+    private fun persistSessionIds() {
+        storageExecutor.safeSubmit {
+            val persisted = persistedSessionIds
+            val created = synchronized(this@SplunkSessionManager) { createdSessionIds.toList() }
+            agentStorage.writeSessionIds(persisted + created)
+        }
+    }
 
     @Synchronized
     private fun createNewSessionIfNeeded(): String {
@@ -153,8 +182,8 @@ class SplunkSessionManager internal constructor(
         val newSessionId = SessionId.generate()
         sessionId = newSessionId
         onSessionCreated(newSessionId, previousSessionId, now)
-        sessionIds.add(SessionIdStorageData(newSessionId, now))
-        agentStorage.writeSessionIds(sessionIds)
+        createdSessionIds.add(SessionIdStorageData(newSessionId, now))
+        persistSessionIds()
         sessionListeners.forEachFast { it.onSessionChanged(newSessionId, now) }
         return newSessionId
     }
@@ -232,5 +261,16 @@ class SplunkSessionManager internal constructor(
     private companion object {
         const val DEFAULT_SESSION_BACKGROUND_TIMEOUT = 15L * 60L * 1000L // 15m
         const val DEFAULT_SESSION_LENGTH = 4L * 60L * 60L * 1000L // 4h
+        const val STORAGE_THREAD_KEEP_ALIVE_SECONDS = 5L
+
+        /** Runs tasks in submission order on a single thread that ends when idle. */
+        fun newStorageExecutor(): ExecutorService = ThreadPoolExecutor(
+            0,
+            1,
+            STORAGE_THREAD_KEEP_ALIVE_SECONDS,
+            TimeUnit.SECONDS,
+            LinkedBlockingQueue(),
+            NamedThreadFactory("SplunkSessionStorage")
+        )
     }
 }
