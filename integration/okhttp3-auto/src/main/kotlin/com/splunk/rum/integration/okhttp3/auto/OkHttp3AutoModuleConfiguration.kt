@@ -17,6 +17,7 @@
 package com.splunk.rum.integration.okhttp3.auto
 
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
+import com.splunk.rum.integration.http.common.api.IgnoreURLs
 
 /**
  * OkHttp module configuration.
@@ -24,11 +25,13 @@ import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
  * @property isEnabled Whether the module is enabled.
  * @property capturedRequestHeaders The list of request headers to capture.
  * @property capturedResponseHeaders The list of response headers to capture.
+ * @property ignoreURLs URLs to exclude from this module's instrumentation. Default is `null`.
  */
 data class OkHttp3AutoModuleConfiguration @JvmOverloads constructor(
     val isEnabled: Boolean = true,
     val capturedRequestHeaders: List<String> = emptyList(),
-    val capturedResponseHeaders: List<String> = emptyList()
+    val capturedResponseHeaders: List<String> = emptyList(),
+    val ignoreURLs: IgnoreURLs? = null
 ) : ModuleConfiguration {
 
     override val name: String = "okHttp3-auto"

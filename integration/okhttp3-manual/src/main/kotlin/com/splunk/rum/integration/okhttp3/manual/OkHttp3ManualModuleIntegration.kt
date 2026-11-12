@@ -41,6 +41,10 @@ internal object OkHttp3ManualModuleIntegration : ModuleIntegration<OkHttp3Manual
         // Setup OkHttp3 manual instrumentation
         okHttpTelemetry = OkHttpTelemetry.builder(openTelemetry)
             .apply {
+                moduleConfiguration.ignoreURLs?.takeUnless { it.isEmpty() }?.let { rules ->
+                    setUrlExclusionPredicate(rules::matches)
+                }
+
                 moduleConfiguration.capturedRequestHeaders.takeIf { it.isNotEmpty() }
                     ?.let { setCapturedRequestHeaders(it) }
 

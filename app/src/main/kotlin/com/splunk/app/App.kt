@@ -30,6 +30,7 @@ import com.splunk.rum.integration.agent.api.user.UserConfiguration
 import com.splunk.rum.integration.agent.api.user.UserTrackingMode
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.anr.AnrModuleConfiguration
+import com.splunk.rum.integration.http.common.api.IgnoreURLs
 import com.splunk.rum.integration.httpurlconnection.auto.HttpURLModuleConfiguration
 import com.splunk.rum.integration.lifecycle.LifecycleModuleConfiguration
 import com.splunk.rum.integration.navigation.NavigationModuleConfiguration
@@ -117,15 +118,19 @@ class App : Application() {
         capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
     )
 
+    private val okHttpIgnoreURLs = IgnoreURLs(setOf("^https://httpbin\\.org/anything/rum-ignored$"))
+
     private val okHttp3AutoModuleConfiguration = OkHttp3AutoModuleConfiguration(
         isEnabled = true,
         capturedRequestHeaders = listOf("User-Agent", "Accept"),
-        capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
+        capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length"),
+        ignoreURLs = okHttpIgnoreURLs
     )
 
     private val okHttp3ManualModuleConfiguration = OkHttp3ManualModuleConfiguration(
         capturedRequestHeaders = listOf("Content-Type", "Accept"),
-        capturedResponseHeaders = listOf("Server", "Content-Type", "Content-Length")
+        capturedResponseHeaders = listOf("Server", "Content-Type", "Content-Length"),
+        ignoreURLs = okHttpIgnoreURLs
     )
 
     private val anrModuleConfiguration = AnrModuleConfiguration(

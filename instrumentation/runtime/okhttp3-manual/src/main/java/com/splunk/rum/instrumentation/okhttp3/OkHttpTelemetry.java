@@ -18,6 +18,8 @@ package com.splunk.rum.instrumentation.okhttp3;
 
 import com.splunk.rum.instrumentation.okhttp3.common.internal.ConnectionErrorSpanInterceptor;
 import com.splunk.rum.instrumentation.okhttp3.common.internal.TracingInterceptor;
+import com.splunk.rum.instrumentation.okhttp3.common.internal.UrlExclusionPolicy;
+import kotlin.jvm.functions.Function1;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
@@ -31,6 +33,7 @@ import okhttp3.Response;
 public final class OkHttpTelemetry {
   private final Instrumenter<Interceptor.Chain, Response> instrumenter;
   private final ContextPropagators propagators;
+  private final UrlExclusionPolicy urlExclusions;
 
   /** Returns a new instance configured with the given {@link OpenTelemetry} instance. */
   public static OkHttpTelemetry create(OpenTelemetry openTelemetry) {
@@ -44,8 +47,17 @@ public final class OkHttpTelemetry {
 
   OkHttpTelemetry(
       Instrumenter<Interceptor.Chain, Response> instrumenter, ContextPropagators propagators) {
+    this(instrumenter, propagators, null);
+  }
+
+  OkHttpTelemetry(
+      Instrumenter<Interceptor.Chain, Response> instrumenter,
+      ContextPropagators propagators,
+      Function1<? super String, Boolean> urlExclusionPredicate) {
     this.instrumenter = instrumenter;
     this.propagators = propagators;
+    this.urlExclusions =
+        urlExclusionPredicate == null ? null : new UrlExclusionPolicy(urlExclusionPredicate);
   }
 
   /**
@@ -62,8 +74,8 @@ public final class OkHttpTelemetry {
     OkHttpClient.Builder builder = baseClient.newBuilder();
     // add our interceptors before other interceptors
     builder.interceptors().add(0, new ContextInterceptor());
-    builder.interceptors().add(1, new ConnectionErrorSpanInterceptor(instrumenter));
-    builder.networkInterceptors().add(0, new TracingInterceptor(instrumenter, propagators));
+    builder.interceptors().add(1, new ConnectionErrorSpanInterceptor(instrumenter, urlExclusions));
+    builder.networkInterceptors().add(0, new TracingInterceptor(instrumenter, propagators, urlExclusions));
     OkHttpClient tracingClient = builder.build();
     return new TracingCallFactory(tracingClient);
   }
