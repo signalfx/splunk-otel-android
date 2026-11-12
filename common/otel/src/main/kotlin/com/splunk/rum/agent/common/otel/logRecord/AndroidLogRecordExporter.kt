@@ -20,10 +20,12 @@ import com.splunk.rum.agent.common.otel.RumConstants
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.extensions.createZeroLengthSpan
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.withAppInstallationId
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.job.IJobManager
 import com.splunk.rum.common.job.JobIdStorage
 import com.splunk.rum.common.job.JobResult
+import com.splunk.rum.common.logger.Logger
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.context.Context
@@ -34,6 +36,7 @@ import io.opentelemetry.sdk.logs.data.LogRecordData
 import io.opentelemetry.sdk.logs.data.internal.ExtendedLogRecordData
 import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.trace.ReadableSpan
+import io.opentelemetry.sdk.trace.data.SpanData
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -44,7 +47,8 @@ import java.util.concurrent.TimeUnit
 internal class AndroidLogRecordExporter(
     private val agentStorage: IAgentStorage,
     private val jobManager: IJobManager,
-    private val jobIdStorage: JobIdStorage
+    private val jobIdStorage: JobIdStorage,
+    private val spanInterceptor: ((SpanData) -> SpanData?)? = null
 ) : LogRecordExporter {
 
     override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
@@ -141,21 +145,35 @@ internal class AndroidLogRecordExporter(
 
                 if (log.instrumentationScopeInfo.name == RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME) {
                     val span = spanBuilder.setStartTimestamp(effectiveTimestamp, TimeUnit.NANOSECONDS).startSpan()
-                    val spanData = (span as? ReadableSpan)?.toSpanData()
                     span.end(effectiveTimestamp, TimeUnit.NANOSECONDS)
+                    val spanData = (span as? ReadableSpan)?.toSpanData()
 
                     if (spanData != null) {
-                        val crashSpanId = UUID.randomUUID().toString()
-                        val exportRequest = TraceRequestMarshaler.create(listOf(spanData))
-
-                        ByteArrayOutputStream().use {
-                            exportRequest.writeBinaryTo(it)
-                            val success = agentStorage.writeOtelSpanData(crashSpanId, it.toByteArray())
-                            if (success) {
-                                agentStorage.addBufferedSpanId(crashSpanId)
+                        val completedSpan = spanData.withAppInstallationId(agentStorage)
+                        val acceptedSpan = try {
+                            if (spanInterceptor == null) {
+                                completedSpan
                             } else {
-                                SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.forceFlush()
-                                    ?.join(5, TimeUnit.SECONDS)
+                                spanInterceptor.invoke(completedSpan)
+                            }
+                        } catch (e: Throwable) {
+                            Logger.e(TAG, "Crash span interceptor failed; dropping direct crash payload", e)
+                            null
+                        }
+
+                        if (acceptedSpan != null) {
+                            val crashSpanId = UUID.randomUUID().toString()
+                            val exportRequest = TraceRequestMarshaler.create(listOf(acceptedSpan))
+
+                            ByteArrayOutputStream().use {
+                                exportRequest.writeBinaryTo(it)
+                                val success = agentStorage.writeOtelSpanData(crashSpanId, it.toByteArray())
+                                if (success) {
+                                    agentStorage.addBufferedSpanId(crashSpanId)
+                                } else {
+                                    SplunkOpenTelemetrySdk.instance?.sdkTracerProvider?.forceFlush()
+                                        ?.join(5, TimeUnit.SECONDS)
+                                }
                             }
                         }
                     }
@@ -188,5 +206,9 @@ internal class AndroidLogRecordExporter(
             }
         }
         agentStorage.setBufferedSessionReplayIds(failedIds)
+    }
+
+    private companion object {
+        private const val TAG = "AndroidLogRecordExporter"
     }
 }

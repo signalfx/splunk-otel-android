@@ -1,0 +1,222 @@
+/*
+ * Copyright 2026 Splunk Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.splunk.rum.agent.common.otel.logRecord
+
+import com.splunk.rum.agent.common.otel.RumConstants
+import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.storage.IAgentStorage
+import com.splunk.rum.common.job.IJobManager
+import com.splunk.rum.common.job.JobIdStorage
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.api.logs.Severity
+import io.opentelemetry.exporter.internal.otlp.logs.LogsRequestMarshaler
+import io.opentelemetry.sdk.OpenTelemetrySdk
+import io.opentelemetry.sdk.common.CompletableResultCode
+import io.opentelemetry.sdk.logs.SdkLoggerProvider
+import io.opentelemetry.sdk.logs.data.LogRecordData
+import io.opentelemetry.sdk.logs.export.LogRecordExporter
+import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
+import io.opentelemetry.sdk.trace.SdkTracerProvider
+import io.opentelemetry.sdk.trace.data.DelegatingSpanData
+import io.opentelemetry.sdk.trace.data.SpanData
+import java.io.ByteArrayOutputStream
+import org.junit.After
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito.doAnswer
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
+
+class AndroidLogRecordExporterTest {
+
+    private lateinit var sdk: OpenTelemetrySdk
+    private var previousSdk: OpenTelemetrySdk? = null
+
+    @Before
+    fun setUp() {
+        previousSdk = SplunkOpenTelemetrySdk.instance
+        sdk = OpenTelemetrySdk.builder()
+            .setTracerProvider(SdkTracerProvider.builder().build())
+            .build()
+        SplunkOpenTelemetrySdk.instance = sdk
+    }
+
+    @After
+    fun tearDown() {
+        SplunkOpenTelemetrySdk.instance = previousSdk
+        sdk.shutdown()
+    }
+
+    @Test
+    fun `session replay data is stored unchanged`() {
+        var storedPayload = ByteArray(0)
+        val storage = mock(IAgentStorage::class.java)
+        doAnswer { invocation ->
+            storedPayload = invocation.getArgument(1)
+            true
+        }.`when`(storage).writeOtelSessionReplayData(anyString(), anyByteArray())
+        val exporter = AndroidLogRecordExporter(storage, mock(IJobManager::class.java), mock(JobIdStorage::class.java))
+        val log = sessionReplayLog()
+
+        exporter.export(mutableListOf(log))
+
+        val expectedPayload = ByteArrayOutputStream().use {
+            LogsRequestMarshaler.create(listOf(log)).writeBinaryTo(it)
+            it.toByteArray()
+        }
+        assertArrayEquals(expectedPayload, storedPayload)
+    }
+
+    @Test
+    fun `crash payload contains attributes added by the span interceptor`() {
+        val storage = mock(IAgentStorage::class.java)
+        var storedPayload: ByteArray? = null
+        var interceptedSpan: SpanData? = null
+        doAnswer { invocation ->
+            storedPayload = invocation.getArgument(1)
+            true
+        }.`when`(storage).writeOtelSpanData(anyString(), anyByteArray())
+        val interceptor: (SpanData) -> SpanData = { span ->
+            interceptedSpan = span
+            object : DelegatingSpanData(span) {
+                override fun getAttributes(): Attributes = span.attributes.toBuilder()
+                    .put(AttributeKey.stringKey("crash.interceptor.test"), "interceptor-applied")
+                    .build()
+            }
+        }
+        val exporter = AndroidLogRecordExporter(
+            storage,
+            mock(IJobManager::class.java),
+            mock(JobIdStorage::class.java),
+            interceptor
+        )
+
+        exporter.export(mutableListOf(crashLog()))
+
+        val completedSpan = checkNotNull(interceptedSpan)
+        assertTrue(completedSpan.hasEnded())
+        assertEquals(completedSpan.startEpochNanos, completedSpan.endEpochNanos)
+        val serialized = String(checkNotNull(storedPayload), Charsets.ISO_8859_1)
+        assertTrue(serialized.contains("crash.interceptor.test"))
+        assertTrue(serialized.contains("interceptor-applied"))
+    }
+
+    @Test
+    fun `crash payload is not stored when the span interceptor rejects it`() {
+        val storage = mock(IAgentStorage::class.java)
+        val exporter = AndroidLogRecordExporter(
+            storage,
+            mock(IJobManager::class.java),
+            mock(JobIdStorage::class.java)
+        ) { null }
+
+        exporter.export(mutableListOf(crashLog()))
+
+        verify(storage, never()).writeOtelSpanData(anyString(), anyByteArray())
+        verify(storage, never()).addBufferedSpanId(anyString())
+    }
+
+    @Test
+    fun `crash interceptor throwables skip direct persistence`() {
+        for (failure in listOf(IllegalStateException("interceptor failed"), AssertionError("interceptor failed"))) {
+            val storage = mock(IAgentStorage::class.java)
+            val exporter = AndroidLogRecordExporter(
+                storage,
+                mock(IJobManager::class.java),
+                mock(JobIdStorage::class.java)
+            ) { throw failure }
+
+            exporter.export(mutableListOf(crashLog()))
+
+            verify(storage, never()).writeOtelSpanData(anyString(), anyByteArray())
+            verify(storage, never()).addBufferedSpanId(anyString())
+        }
+    }
+
+    @Test
+    fun `crash interceptor failure does not prevent storing the next crash record`() {
+        val storage = mock(IAgentStorage::class.java)
+        doAnswer { true }.`when`(storage).writeOtelSpanData(anyString(), anyByteArray())
+        var interceptedCount = 0
+        val exporter = AndroidLogRecordExporter(
+            storage,
+            mock(IJobManager::class.java),
+            mock(JobIdStorage::class.java)
+        ) { span ->
+            interceptedCount++
+            if (interceptedCount == 1) throw AssertionError("interceptor failed")
+            span
+        }
+
+        exporter.export(mutableListOf(crashLog(), crashLog()))
+
+        assertEquals(2, interceptedCount)
+        verify(storage, times(1)).writeOtelSpanData(anyString(), anyByteArray())
+        verify(storage, times(1)).addBufferedSpanId(anyString())
+    }
+
+    private fun sessionReplayLog(): LogRecordData = captureLog { provider ->
+        provider.get(GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME)
+            .logRecordBuilder()
+            .setBody("recording")
+            .setSeverity(Severity.INFO)
+            .setSeverityText("INFO")
+            .setAttribute(AttributeKey.stringKey("event.name"), "session_replay_data")
+            .emit()
+    }
+
+    private fun crashLog(): LogRecordData = captureLog { provider ->
+        provider.get(RumConstants.CRASH_INSTRUMENTATION_SCOPE_NAME)
+            .logRecordBuilder()
+            .setAttribute(AttributeKey.stringKey("event.name"), "device.crash")
+            .emit()
+    }
+
+    private fun captureLog(emit: (SdkLoggerProvider) -> Unit): LogRecordData {
+        val captured = mutableListOf<LogRecordData>()
+        val captureExporter = object : LogRecordExporter {
+            override fun export(logs: MutableCollection<LogRecordData>): CompletableResultCode {
+                captured.addAll(logs)
+                return CompletableResultCode.ofSuccess()
+            }
+
+            override fun flush(): CompletableResultCode = CompletableResultCode.ofSuccess()
+
+            override fun shutdown(): CompletableResultCode = CompletableResultCode.ofSuccess()
+        }
+        val provider = SdkLoggerProvider.builder()
+            .addLogRecordProcessor(SimpleLogRecordProcessor.create(captureExporter))
+            .build()
+        emit(provider)
+        provider.shutdown()
+        return captured.single()
+    }
+
+    private fun anyByteArray(): ByteArray {
+        any(ByteArray::class.java)
+        return ByteArray(0)
+    }
+}

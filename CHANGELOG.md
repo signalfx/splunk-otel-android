@@ -11,8 +11,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added `ignoreURLs` configuration for OkHttp auto and manual instrumentation. Matching requests, including redirect destinations, execute without HTTP spans or SDK-injected trace headers.
 
 ##### Fixes:
-* Refined network telemetry so the initial network state updates attributes without emitting a `network.change` event, while subsequent network transitions emit telemetry.
+* Reduced SDK installation time by reading the stored anonymous user ID and app installation ID in the background instead of waiting for them during `install`.
+
+### Version 2.4.0 - 2026-10-13
+
+##### Enhancements:
+
+* Delayed `session.start` dispatch until a span passes `spanInterceptor` or native Session Replay data is produced, preserving the original session ID and start time.
+* Refined network telemetry so the initial network state updates attributes without emitting a `network.change` event, while subsequent foreground network transitions emit telemetry. Background network changes continue updating attributes.
 * Improved network callback resilience with bounded asynchronous processing and platform-aware carrier and network subtype detection.
+* Improved storage initialization and preference persistence.
+* Cleaned up application-lifecycle listeners and cached events when instrumentation is disabled or installation is skipped. Limited pre-install caching to ten events.
+* Renamed the startup child span from `SplunkRum.initialize` to `SplunkRum.install` and expanded its timing to include more installation work. Update affected queries and filters; reported durations may increase
 
 ### Version 2.3.5 - 2026-09-08
 

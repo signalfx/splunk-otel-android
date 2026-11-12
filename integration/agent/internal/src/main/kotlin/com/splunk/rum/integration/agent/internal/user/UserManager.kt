@@ -18,25 +18,94 @@ package com.splunk.rum.integration.agent.internal.user
 
 import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.logger.Logger
+import com.splunk.rum.common.utils.thread.NamedThreadFactory
+import com.splunk.rum.integration.agent.internal.RumConstants
+import com.splunk.rum.integration.agent.internal.extentions.getOrNull
 import com.splunk.rum.integration.agent.internal.id.UserId
+import io.opentelemetry.api.common.Attributes
+import java.util.concurrent.Executor
+import java.util.concurrent.Future
+import java.util.concurrent.FutureTask
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
 interface IUserManager {
     var trackingMode: InternalUserTrackingMode
+
+    /** May wait while the user ID stored by an earlier launch is read from storage. */
     val userId: String?
+
+    /** Never waits. Returns [PENDING_USER_ID] instead of a user ID that is still being read. */
+    val userIdOrPending: String?
+        get() = userId
+
+    /** The user ID that [PENDING_USER_ID] stands for. Returns null instead of waiting when [wait] is false. */
+    fun pendingUserId(wait: Boolean): String? = null
 }
 
-class UserManager(userTrackingMode: InternalUserTrackingMode, private val agentStorage: IAgentStorage) : IUserManager {
+/** Value of the user ID span attribute until the user ID is read from storage. Never exported. */
+internal const val PENDING_USER_ID = "<pending initialization>"
+
+/**
+ * Replaces [PENDING_USER_ID] with the user ID it stands for. Without a value, the attribute is removed when
+ * [wait] is true and kept when it is false. Only debug logging passes false, because it must not block the
+ * thread that ends the span.
+ */
+fun IUserManager.resolvePendingUserId(attributes: Attributes, wait: Boolean): Attributes {
+    if (attributes.get(RumConstants.USER_ID_KEY) != PENDING_USER_ID) {
+        return attributes
+    }
+
+    val userId = pendingUserId(wait)
+
+    return when {
+        userId != null -> attributes.toBuilder().put(RumConstants.USER_ID_KEY, userId).build()
+        wait -> attributes.toBuilder().remove(RumConstants.USER_ID_KEY).build()
+        else -> attributes
+    }
+}
+
+/**
+ * Storage operations run on [storageExecutor]. The user ID stored by an earlier launch is read first, so a later
+ * tracking mode change can't delete it before it is read. Tracking mode changes that are not applied yet are
+ * merged into one storage update, so the queue stays bounded while the initial read waits.
+ */
+class UserManager(
+    userTrackingMode: InternalUserTrackingMode,
+    private val agentStorage: IAgentStorage,
+    private val storageExecutor: Executor = newStorageExecutor()
+) : IUserManager {
+
+    private val initialUserId = FutureTask(::readOrCreateUserId)
+
+    /** Null while tracking is disabled. Only [initialUserId] can still be pending. */
+    @Volatile
+    private var currentUserId: Future<String>? = null
+
+    /** The latest tracking mode change not applied to storage yet. Declared before `init`, which may set it. */
+    private val pendingStorageUpdate = AtomicReference<Runnable?>()
 
     init {
-        updateAnonymousUserIdForTrackingMode(userTrackingMode)
+        if (userTrackingMode == InternalUserTrackingMode.ANONYMOUS_TRACKING) {
+            currentUserId = initialUserId
+            storageExecutor.execute(initialUserId)
+        } else {
+            updateAnonymousUserIdForTrackingMode(userTrackingMode)
+        }
     }
 
     override val userId: String?
-        get() = when (trackingMode) {
-            InternalUserTrackingMode.NO_TRACKING -> null
-            InternalUserTrackingMode.ANONYMOUS_TRACKING -> agentStorage.readAnonymousUserId()
-        }
+        get() = currentUserId?.await()
 
+    override val userIdOrPending: String?
+        get() = currentUserId?.let { if (it.isDone) it.await() else PENDING_USER_ID }
+
+    override fun pendingUserId(wait: Boolean): String? =
+        if (wait || initialUserId.isDone) initialUserId.await() else null
+
+    @set:Synchronized
     override var trackingMode: InternalUserTrackingMode = userTrackingMode
         set(value) {
             updateAnonymousUserIdForTrackingMode(value)
@@ -47,23 +116,73 @@ class UserManager(userTrackingMode: InternalUserTrackingMode, private val agentS
         when (trackingMode) {
             InternalUserTrackingMode.NO_TRACKING -> {
                 Logger.d(TAG) { "User tracking disabled, deleting anonymous user id." }
-                agentStorage.deleteAnonymousUserId()
+                currentUserId = null
+                updateStorage { agentStorage.deleteAnonymousUserId() }
             }
-            InternalUserTrackingMode.ANONYMOUS_TRACKING -> {
-                val existingUserId = agentStorage.readAnonymousUserId()
-                if (existingUserId == null) {
-                    val newUserId = UserId.generate()
-                    agentStorage.writeAnonymousUserId(newUserId)
-                    Logger.d(TAG) { "User tracking enabled. Generated new anonymous user id: $newUserId" }
-                } else {
-                    Logger.d(TAG) { "User tracking enabled. Existing anonymous user id: $existingUserId" }
-                }
+            InternalUserTrackingMode.ANONYMOUS_TRACKING -> if (currentUserId == null) {
+                val newUserId = UserId.generate()
+                currentUserId = FutureTask { newUserId }.apply { run() }
+                updateStorage { agentStorage.writeAnonymousUserId(newUserId) }
+                Logger.d(TAG) { "User tracking enabled. Generated new anonymous user id: $newUserId" }
             }
         }
     }
 
+    /**
+     * Replaces the pending storage update. Each update sets the whole stored state, so applying only the latest
+     * one leaves storage as applying all of them would.
+     */
+    private fun updateStorage(update: Runnable) {
+        if (pendingStorageUpdate.getAndSet(update) == null) {
+            storageExecutor.execute { pendingStorageUpdate.getAndSet(null)?.run() }
+        }
+    }
+
+    private fun readOrCreateUserId(): String {
+        val existingUserId = agentStorage.readAnonymousUserId()
+        if (existingUserId != null) {
+            Logger.d(TAG) { "User tracking enabled. Existing anonymous user id: $existingUserId" }
+            return existingUserId
+        }
+
+        val newUserId = UserId.generate()
+        agentStorage.writeAnonymousUserId(newUserId)
+        Logger.d(TAG) { "User tracking enabled. Generated new anonymous user id: $newUserId" }
+        return newUserId
+    }
+
+    private fun Future<String>.await(): String? {
+        if (isDone) {
+            return getOrNull()
+        }
+
+        Logger.d(TAG, "Waiting for the anonymous user id to be read from storage.")
+        val waitStartNanos = System.nanoTime()
+        val userId = getOrNull()
+        Logger.d(TAG) {
+            val waitMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - waitStartNanos)
+            if (userId != null) {
+                "Anonymous user id read from storage after waiting $waitMillis ms."
+            } else {
+                "Stopped waiting for the anonymous user id after $waitMillis ms without a value."
+            }
+        }
+        return userId
+    }
+
     companion object {
         private const val TAG = "UserManager"
+        private const val STORAGE_THREAD_KEEP_ALIVE_SECONDS = 5L
+
+        /** Runs tasks in submission order on a single thread that ends when idle. */
+        private fun newStorageExecutor(): Executor = ThreadPoolExecutor(
+            0,
+            1,
+            STORAGE_THREAD_KEEP_ALIVE_SECONDS,
+            TimeUnit.SECONDS,
+            LinkedBlockingQueue(),
+            NamedThreadFactory("SplunkUserStorage")
+        )
     }
 }
 

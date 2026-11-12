@@ -6,6 +6,10 @@ import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.agent.common.storage.SessionId
 import io.opentelemetry.api.logs.LogRecordBuilder
 import io.opentelemetry.api.logs.Logger
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -20,6 +24,7 @@ import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
@@ -30,9 +35,11 @@ class SplunkSessionManagerTest {
     @Test
     fun `creates new session when none stored`() {
         val storage = storageMock()
-        val manager = SplunkSessionManager(storage.first)
+        val executor = Executors.newSingleThreadScheduledExecutor()
+        val manager = SplunkSessionManager(storage.first, executor)
 
         val createdId = manager.sessionId
+        executor.awaitQueuedTasks()
 
         assertNotNull(createdId)
         assertEquals(createdId, storage.second.sessionId)
@@ -122,9 +129,11 @@ class SplunkSessionManagerTest {
             sessionValidUntil = now - 1_000,
             sessionIds = listOf(SessionId("expired-session", now - 2_000))
         )
+        val executor = Executors.newSingleThreadScheduledExecutor()
 
-        val manager = SplunkSessionManager(storage)
+        val manager = SplunkSessionManager(storage, executor)
         val newId = manager.sessionId
+        executor.awaitQueuedTasks()
 
         assertNotEquals("expired-session", newId)
         assertEquals("expired-session", manager.previousSessionId)
@@ -144,7 +153,8 @@ class SplunkSessionManagerTest {
         val logger = mock(Logger::class.java)
         `when`(logger.logRecordBuilder()).thenReturn(recordBuilder)
         val emitter = SessionStartEmitter().apply { attach(logger) }
-        val manager = SplunkSessionManager(storage) { id, previousId, timestamp ->
+        val executor = Executors.newSingleThreadScheduledExecutor()
+        val manager = SplunkSessionManager(storage, executor) { id, previousId, timestamp ->
             emitter.onSessionCreated(id, previousId, timestamp)
         }
         manager.sessionListeners += object : SplunkSessionManager.SessionListener {
@@ -154,6 +164,7 @@ class SplunkSessionManagerTest {
         }
 
         val newId = manager.sessionId
+        executor.awaitQueuedTasks()
 
         verify(recordBuilder).setAttribute(SESSION_ID_KEY, newId)
         verify(recordBuilder).setAttribute(PREVIOUS_SESSION_ID_KEY, "expired-session")
@@ -208,11 +219,13 @@ class SplunkSessionManagerTest {
             sessionValidUntil = now + 10_000,
             sessionIds = listOf(SessionId("active-session", now))
         )
-        val manager = SplunkSessionManager(storage)
+        val executor = Executors.newSingleThreadScheduledExecutor()
+        val manager = SplunkSessionManager(storage, executor, executor)
         manager.sessionBackgroundTimeout = 10L
         manager.watchSessionInBackgroundValidity()
 
-        Thread.sleep(30) // allow scheduled task to fire
+        executor.schedule({}, 30, TimeUnit.MILLISECONDS).get(5, TimeUnit.SECONDS)
+        executor.awaitQueuedTasks()
 
         val newId = storage.readSessionId()
         assertNotNull(newId)
@@ -220,6 +233,113 @@ class SplunkSessionManagerTest {
         assertEquals(2, state.sessionIds.size)
         assertTrue("background validity should be cleared", state.sessionValidUntilInBackground == null)
     }
+
+    @Test
+    fun `creating a session does not read persisted session history`() {
+        val (storage, state) = storageMock(sessionIds = listOf(SessionId("persisted", 100)))
+        val executor = Executors.newSingleThreadScheduledExecutor()
+        val releaseExecutor = CountDownLatch(1)
+        executor.submit { releaseExecutor.await(5, TimeUnit.SECONDS) }
+        val manager = SplunkSessionManager(storage, executor)
+        val beforeCreation = System.currentTimeMillis()
+
+        val createdId = manager.sessionId
+        val sessionStart = manager.sessionStart
+
+        verify(storage, never()).readSessionIds()
+        assertTrue(sessionStart in beforeCreation..System.currentTimeMillis())
+
+        releaseExecutor.countDown()
+        executor.awaitQueuedTasks()
+
+        assertEquals(listOf("persisted", createdId), state.sessionIds.map { it.id })
+        assertEquals(sessionStart, state.sessionIds.last().validFrom)
+    }
+
+    @Test
+    fun `sessions created in this process are appended to persisted history in order`() {
+        val now = System.currentTimeMillis()
+        val (storage, state) = storageMock(sessionIds = listOf(SessionId("persisted", now - 2_000)))
+        val executor = Executors.newSingleThreadScheduledExecutor()
+        val manager = SplunkSessionManager(storage, executor)
+
+        val firstId = manager.sessionId
+        state.sessionValidUntil = now - 1_000
+        val secondId = manager.sessionId
+        executor.awaitQueuedTasks()
+
+        assertNotEquals(firstId, secondId)
+        assertEquals(listOf("persisted", firstId, secondId), state.sessionIds.map { it.id })
+    }
+
+    @Test
+    fun `creating a session does not start the background validity thread`() {
+        val (storage, state) = storageMock()
+        val storageExecutor = Executors.newSingleThreadExecutor()
+        val scheduler = ScheduledThreadPoolExecutor(1)
+        val manager = SplunkSessionManager(storage, storageExecutor, scheduler)
+
+        val createdId = manager.sessionId
+        storageExecutor.awaitQueuedTasks()
+
+        assertEquals(listOf(createdId), state.sessionIds.map { it.id })
+        assertEquals(0, scheduler.poolSize)
+    }
+
+    @Test
+    fun `sessionId for timestamp covers persisted and created sessions`() {
+        val (storage, _) = storageMock(sessionIds = listOf(SessionId("persisted", 100)))
+        val manager = SplunkSessionManager(storage)
+
+        val createdId = manager.sessionId
+
+        assertEquals("persisted", manager.sessionId(150))
+        assertEquals(createdId, manager.sessionId(System.currentTimeMillis()))
+    }
+
+    @Test
+    fun `sessionId for a timestamp in a created session does not wait for persisted session history`() {
+        val (storage, _) = storageMock()
+        val historyRead = CountDownLatch(1)
+        doAnswer {
+            historyRead.await(5, TimeUnit.SECONDS)
+            listOf(SessionId("persisted", 100))
+        }.`when`(storage).readSessionIds()
+        val storageExecutor = Executors.newSingleThreadExecutor()
+        val caller = Executors.newSingleThreadExecutor()
+        val manager = SplunkSessionManager(storage, storageExecutor)
+
+        try {
+            val createdId = manager.sessionId
+            val sessionId = caller.submit<String> { manager.sessionId(System.currentTimeMillis()) }
+
+            assertEquals(createdId, sessionId.get(1, TimeUnit.SECONDS))
+        } finally {
+            historyRead.countDown()
+            storageExecutor.awaitQueuedTasks()
+            caller.shutdown()
+        }
+    }
+
+    @Test
+    fun `sessionStart of a session restored from storage comes from persisted history`() {
+        val now = System.currentTimeMillis()
+        val expectedSessionStart = now - 1_000
+        val (storage, _) = storageMock(
+            sessionId = "existing-session",
+            sessionValidUntil = now + 60 * 60 * 1_000,
+            sessionValidUntilInBackground = now + 60 * 60 * 1_000,
+            sessionIds = listOf(SessionId("existing-session", expectedSessionStart))
+        )
+        val manager = SplunkSessionManager(storage)
+
+        assertEquals(expectedSessionStart, manager.sessionStart)
+    }
+
+    private fun ExecutorService.awaitQueuedTasks() {
+        submit {}.get(5, TimeUnit.SECONDS)
+    }
+
     data class StorageState(
         var sessionId: String? = null,
         var sessionValidUntil: Long? = null,
