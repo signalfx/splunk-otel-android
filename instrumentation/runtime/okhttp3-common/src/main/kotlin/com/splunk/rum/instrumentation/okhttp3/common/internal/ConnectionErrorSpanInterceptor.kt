@@ -29,14 +29,24 @@ import okhttp3.Response
  * This class is internal and is hence not for public use. Its APIs are unstable and can change at
  * any time.
  */
-class ConnectionErrorSpanInterceptor(private val instrumenter: Instrumenter<Interceptor.Chain, Response>) :
-    Interceptor {
+class ConnectionErrorSpanInterceptor @JvmOverloads constructor(
+    private val instrumenter: Instrumenter<Interceptor.Chain, Response>,
+    private val urlExclusions: UrlExclusionPolicy? = null
+) : Interceptor {
+
+    @Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val parentContext = Context.current()
+        val callContext = urlExclusions?.withNetworkInterceptorTracking(parentContext)
+            ?: return traceCall(chain, parentContext)
+
+        return callContext.makeCurrent().use { traceCall(chain, callContext) }
+    }
 
     @Suppress("NewApi") // Requires API 26 or core library desugaring in the host app.
     @Throws(IOException::class)
-    override fun intercept(chain: Interceptor.Chain): Response {
+    private fun traceCall(chain: Interceptor.Chain, parentContext: Context): Response {
         val request = chain.request()
-        val parentContext = Context.current()
         var response: Response? = null
         var error: Throwable? = null
         val startTime = Instant.now()
@@ -47,8 +57,10 @@ class ConnectionErrorSpanInterceptor(private val instrumenter: Instrumenter<Inte
             error = t
             throw t
         } finally {
-            // only create a span when there wasn't any HTTP request
-            if (HttpClientRequestResendCount.get(parentContext) == 0) {
+            // Create a call-level span only when no network span started and exclusions allow it.
+            if (HttpClientRequestResendCount.get(parentContext) == 0 &&
+                urlExclusions?.allowConnectionErrorSpan(parentContext, request) != false
+            ) {
                 if (instrumenter.shouldStart(parentContext, chain)) {
                     InstrumenterUtil.startAndEnd(
                         instrumenter,

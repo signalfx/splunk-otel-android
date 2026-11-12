@@ -22,6 +22,7 @@ import com.splunk.rum.instrumentation.okhttp3.common.internal.ConnectionErrorSpa
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpAttributesGetter
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpClientInstrumenterBuilderFactory
 import com.splunk.rum.instrumentation.okhttp3.common.internal.TracingInterceptor
+import com.splunk.rum.instrumentation.okhttp3.common.internal.UrlExclusionPolicy
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.Scope
@@ -76,9 +77,10 @@ object OkHttpSingletons {
         }
 
         val instrumenter: Instrumenter<Interceptor.Chain, Response> = instrumenterBuilder.build()
+        val urlExclusions = instrumentation.urlExclusionPredicate?.let(::UrlExclusionPolicy)
 
-        connectionErrorInterceptor = ConnectionErrorSpanInterceptor(instrumenter)
-        tracingInterceptor = TracingInterceptor(instrumenter, openTelemetry.propagators)
+        connectionErrorInterceptor = ConnectionErrorSpanInterceptor(instrumenter, urlExclusions)
+        tracingInterceptor = TracingInterceptor(instrumenter, openTelemetry.propagators, urlExclusions)
     }
 
     @JvmField

@@ -20,6 +20,7 @@ ext {
 
 android {
     namespace = "com.splunk.rum.instrumentation.okhttp3.manual"
+    sourceSets.getByName("test").java.srcDir("../okhttp3-common/src/testFixtures/kotlin")
 }
 
 dependencies {
@@ -38,4 +39,6 @@ dependencies {
     compileOnly(Dependencies.Android.annotation)
 
     testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.mockWebServer)
+    testImplementation(Dependencies.Otel.sdk)
 }

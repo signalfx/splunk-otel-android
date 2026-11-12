@@ -156,6 +156,7 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
         viewBinding.retryRequest.setOnClickListener { retryRequest() }
         viewBinding.multipleHeaders.setOnClickListener { multipleHeaders() }
         viewBinding.serverTimingHeaderInResponse.setOnClickListener { serverTimingHeaderInResponse() }
+        viewBinding.ignoreUrls.setOnClickListener { ignoreUrls() }
         viewBinding.postMarkdown.setOnClickListener { postMarkdown() }
         viewBinding.postStreaming.setOnClickListener { postStreaming() }
         viewBinding.postFile.setOnClickListener { postFile() }
@@ -179,6 +180,12 @@ class OkHttpFragment : BaseFragment<FragmentOkhttpBinding>() {
     private fun synchronousGet() {
         executeGetRequest("https://publicobject.com/helloworld.txt")
         showDoneToast(R.string.synchronous_get)
+    }
+
+    /** Demonstrates that no span is created from request URLs excluded via IgnoreURLs config */
+    private fun ignoreUrls() {
+        executeGetRequest("https://httpbin.org/anything/rum-ignored")
+        showDoneToast(R.string.ignore_urls)
     }
 
     /**
