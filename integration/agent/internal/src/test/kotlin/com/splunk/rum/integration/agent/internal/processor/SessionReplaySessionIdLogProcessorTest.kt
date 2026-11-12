@@ -28,13 +28,34 @@ import io.opentelemetry.sdk.logs.data.LogRecordData
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Answers.RETURNS_SELF
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
 class SessionReplaySessionIdLogProcessorTest {
 
     private val sessionManager = mock(ISplunkSessionManager::class.java)
+
+    @Test
+    fun `missing session ID does not crash replay log processing`() {
+        val logRecord = mock(ReadWriteLogRecord::class.java, RETURNS_SELF)
+        val logRecordData = mock(LogRecordData::class.java)
+        `when`(logRecordData.instrumentationScopeInfo).thenReturn(
+            InstrumentationScopeInfo.builder(
+                GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME
+            ).build()
+        )
+        `when`(logRecordData.timestampEpochNanos).thenReturn(1_000_000_000L)
+        `when`(logRecord.toLogRecordData()).thenReturn(logRecordData)
+        val processor = SessionReplaySessionIdLogProcessor(sessionManager)
+
+        processor.onEmit(Context.root(), logRecord)
+
+        verify(logRecord, never()).setAttribute(eq(GlobalRumConstants.SESSION_ID_KEY), anyString())
+    }
 
     @Test
     fun `passes the timestamp-resolved session id to the signal callback`() {

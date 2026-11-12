@@ -32,7 +32,7 @@ class SessionReplaySessionIdLogProcessor(
         if (logRecordData.instrumentationScopeInfo.name ==
             GlobalRumConstants.SESSION_REPLAY_INSTRUMENTATION_SCOPE_NAME
         ) {
-            val id = sessionManager.sessionId(logRecordData.timestampEpochNanos / 1_000_000)
+            val id = sessionManager.sessionId(logRecordData.timestampEpochNanos / 1_000_000) ?: return
             logRecord.setAttribute(GlobalRumConstants.SESSION_ID_KEY, id)
                 .setAttribute(RumConstants.SESSION_RUM_ID_KEY, id)
                 .setAttribute(RumConstants.SCRIPT_INSTANCE_KEY, id.take(SCRIPT_ID_LENGTH))

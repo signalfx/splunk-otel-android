@@ -29,129 +29,160 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 
 interface ISplunkSessionManager {
-    val sessionId: String
-    val sessionStart: Long
-    val sessionLastActivity: Long
-    val sessionSnapshot: SessionSnapshot
+    val sessionId: String?
+    val sessionStart: Long?
+    val sessionLastActivity: Long?
+    val sessionSnapshot: SessionSnapshot?
     val previousSessionId: String?
     val sessionListeners: MutableSet<SessionListener>
 
     fun install(application: Application)
     fun trackSessionActivity()
     fun reset()
-    fun sessionId(timestamp: Long): String
+    fun sessionId(timestamp: Long): String?
 }
 
 object NoOpSplunkSessionManager : ISplunkSessionManager {
-    override val sessionId: String = ""
-    override val sessionSnapshot: SessionSnapshot = SessionSnapshot.NO_OP
+    override val sessionId: String? = null
+    override val sessionSnapshot: SessionSnapshot? = null
     override val previousSessionId: String? = null
-    override val sessionStart: Long = 0L
-    override val sessionLastActivity: Long = 0L
+    override val sessionStart: Long? = null
+    override val sessionLastActivity: Long? = null
     override val sessionListeners: MutableSet<SessionListener> = mutableSetOf()
     override fun install(application: Application) = Unit
     override fun trackSessionActivity() = Unit
     override fun reset() = Unit
 
-    override fun sessionId(timestamp: Long): String = ""
+    override fun sessionId(timestamp: Long): String? = null
 }
 
 class SplunkSessionManager internal constructor(
     private val agentStorage: IAgentStorage,
+    private val allowBackgroundSessionCreation: Boolean,
     private val onSessionCreated: (String, String?, Long) -> Unit = { _, _, _ -> }
 ) : ISplunkSessionManager {
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val appStateObserver = AppStateObserver
 
-    private var sessionValidityWatcher: ScheduledFuture<*>? = null
+    private var backgroundGraceWatcher: ScheduledFuture<*>? = null
+    private var sessionLengthWatcher: ScheduledFuture<*>? = null
+    private var isForeground = false
 
     private val sessionIds: MutableList<SessionIdStorageData> by lazy {
         agentStorage.readSessionIds().toMutableList()
     }
 
-    override val sessionSnapshot: SessionSnapshot
+    override val sessionSnapshot: SessionSnapshot?
         @Synchronized get() {
-            val id = createNewSessionIfNeeded()
+            val id = sessionId ?: return null
             val start = sessionIds.lastOrNull { it.id == id }?.validFrom ?: System.currentTimeMillis()
             val lastActivity = agentStorage.readSessionLastActivity() ?: start
             return SessionSnapshot(id, start, lastActivity)
         }
 
-    /**
-     * The value is valid after the [install] function is called.
-     */
-    @set:Synchronized
-    override var sessionId: String
-        get() = createNewSessionIfNeeded()
-        private set(value) {
-            previousSessionId = agentStorage.readSessionId()
-            agentStorage.writeSessionId(value)
-            agentStorage.writeSessionValidUntil(System.currentTimeMillis() + maxSessionLength)
+    override val sessionId: String?
+        @Synchronized get() = if (allowBackgroundSessionCreation) {
+            createNewSessionIfNeeded()
+        } else {
+            readCurrentSessionId()
         }
 
     override var previousSessionId: String? = null
         private set
 
-    override val sessionStart: Long
-        get() = sessionSnapshot.sessionStart
+    override val sessionStart: Long?
+        get() = sessionSnapshot?.sessionStart
 
-    override val sessionLastActivity: Long
-        get() = sessionSnapshot.sessionLastActivity
+    override val sessionLastActivity: Long?
+        get() = sessionSnapshot?.sessionLastActivity
 
     override val sessionListeners: MutableSet<SessionListener> = HashSet()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal var sessionBackgroundTimeout: Long = DEFAULT_SESSION_BACKGROUND_TIMEOUT
 
-    private var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal var maxSessionLength: Long = DEFAULT_SESSION_LENGTH
 
     override fun install(application: Application) {
-        createNewSessionIfNeeded()
-
+        if (allowBackgroundSessionCreation) {
+            createNewSessionIfNeeded()
+        }
         appStateObserver.listeners.add(AppStateObserverListener())
         appStateObserver.attach(application)
+
+        if (!allowBackgroundSessionCreation && appStateObserver.hasStartedActivity) {
+            enterForeground()
+        }
     }
 
+    @Synchronized
     override fun reset() {
+        cancelBackgroundGraceWatcher()
+        cancelSessionLengthWatcher()
+        isForeground = false
+        previousSessionId = null
         clearLastSession()
     }
 
-    override fun sessionId(timestamp: Long): String = sessionIds
+    override fun sessionId(timestamp: Long): String? = sessionIds
         .filter { it.validFrom <= timestamp }
         .maxByOrNull { it.validFrom }
         ?.id
-        ?: throw IllegalArgumentException("No valid session for timestamp: $timestamp")
 
+    /** Returns a stored ID only while its deadlines are valid; never creates a session. */
+    @Synchronized
+    private fun readCurrentSessionId(): String? {
+        val savedId = agentStorage.readSessionId() ?: return null
+        val now = System.currentTimeMillis()
+        val backgroundDeadline = agentStorage.readBackgroundGraceDeadline()
+        val lengthDeadline = agentStorage.readSessionLifetimeDeadline()
+
+        if (backgroundDeadline != null && backgroundDeadline <= now) {
+            endCurrentSession(now)
+            return null
+        }
+        if (lengthDeadline == null) {
+            endCurrentSession(now)
+            return null
+        }
+        if (lengthDeadline <= now) {
+            // Let the watcher rotate a foreground session; reads must not return its expired ID.
+            if (!isForeground || !appStateObserver.hasStartedActivity) {
+                endCurrentSession(now)
+            }
+            return null
+        }
+        return savedId
+    }
+
+    /** Reuses a valid ID or creates one, including during background execution. */
     @Synchronized
     private fun createNewSessionIfNeeded(): String {
         val savedSessionId = agentStorage.readSessionId()
-        val sessionValidInBackgroundUntil = agentStorage.readSessionValidUntilInBackground()
-        val sessionValidUntil = agentStorage.readSessionValidUntil()
+        val backgroundGraceDeadline = agentStorage.readBackgroundGraceDeadline()
+        val sessionLifetimeDeadline = agentStorage.readSessionLifetimeDeadline()
         val now = System.currentTimeMillis()
 
-        val backgroundValidity = if (sessionValidInBackgroundUntil !=
-            null
-        ) {
-            sessionValidInBackgroundUntil > now
-        } else {
-            true
-        }
+        val withinBackgroundGrace = backgroundGraceDeadline == null || backgroundGraceDeadline > now
 
         val isCurrentSessionIdValid = savedSessionId != null &&
-            backgroundValidity &&
-            sessionValidUntil != null &&
-            sessionValidUntil > now
+            withinBackgroundGrace &&
+            sessionLifetimeDeadline != null &&
+            sessionLifetimeDeadline > now
 
         if (isCurrentSessionIdValid) {
             return requireNotNull(savedSessionId)
         }
 
-        deleteSessionInBackgroundValidationTime()
-        deleteSessionValidationTime()
+        clearBackgroundGraceDeadline()
+        clearSessionLifetimeDeadline()
         deleteSessionLastActivity()
 
         val newSessionId = SessionId.generate()
-        sessionId = newSessionId
+        previousSessionId = savedSessionId
+        agentStorage.writeSessionId(newSessionId)
+        agentStorage.writeSessionLifetimeDeadline(now + maxSessionLength)
         onSessionCreated(newSessionId, previousSessionId, now)
         sessionIds.add(SessionIdStorageData(newSessionId, now))
         agentStorage.writeSessionIds(sessionIds)
@@ -160,7 +191,9 @@ class SplunkSessionManager internal constructor(
     }
 
     override fun trackSessionActivity() {
-        agentStorage.writeSessionLastActivity(System.currentTimeMillis())
+        if (allowBackgroundSessionCreation || sessionId != null) {
+            agentStorage.writeSessionLastActivity(System.currentTimeMillis())
+        }
     }
 
     fun deleteSessionLastActivity() {
@@ -168,65 +201,174 @@ class SplunkSessionManager internal constructor(
     }
 
     private fun clearLastSession() {
-        deleteSessionValidationTime()
-        deleteSessionInBackgroundValidationTime()
+        clearSessionLifetimeDeadline()
+        clearBackgroundGraceDeadline()
         deleteSessionLastActivity()
         agentStorage.deleteSessionId()
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal fun watchSessionInBackgroundValidity() {
-        saveSessionInBackgroundValidationTime()
+    /** Clears the current session and notifies listeners once. */
+    @Synchronized
+    private fun endCurrentSession(timestamp: Long) {
+        if (agentStorage.readSessionId() == null) return
+        cancelSessionLengthWatcher()
+        clearLastSession()
+        previousSessionId = null
+        sessionListeners.forEachFast { it.onSessionEnded(timestamp) }
+    }
 
-        sessionValidityWatcher = executor.safeSchedule(sessionBackgroundTimeout) {
-            sessionValidityWatcher = null
+    /** Reuses a valid session or creates one when an Activity starts. */
+    @Synchronized
+    private fun enterForeground() {
+        if (!appStateObserver.hasStartedActivity) return
 
-            deleteSessionInBackgroundValidationTime()
-            deleteSessionValidationTime()
+        // Check the deadline before clearing it so an expired session is not reused.
+        val currentId = readCurrentSessionId()
+        isForeground = true
+        cancelBackgroundGraceWatcher()
+        if (currentId != null) {
+            clearBackgroundGraceDeadline()
+            return
+        }
 
-            createNewSessionIfNeeded()
+        cancelSessionLengthWatcher()
+        createForegroundSession(previousId = null)
+    }
+
+    /** Creates a session and schedules rotation at its length limit. */
+    @Synchronized
+    private fun createForegroundSession(previousId: String?) {
+        clearLastSession()
+        val timestamp = System.currentTimeMillis()
+        val newId = SessionId.generate()
+        previousSessionId = previousId
+        agentStorage.writeSessionId(newId)
+        agentStorage.writeSessionLifetimeDeadline(timestamp + maxSessionLength)
+        onSessionCreated(newId, previousId, timestamp)
+        sessionIds.add(SessionIdStorageData(newId, timestamp))
+        agentStorage.writeSessionIds(sessionIds)
+        scheduleSessionLengthWatcher(newId, maxSessionLength)
+        sessionListeners.forEachFast { it.onSessionChanged(newId, timestamp) }
+    }
+
+    private fun scheduleSessionLengthWatcher(sessionId: String, delay: Long) {
+        cancelSessionLengthWatcher()
+        sessionLengthWatcher = executor.safeSchedule(delay) {
+            rotateSessionIfNeeded(sessionId)
         }
     }
 
-    private fun cancelSessionWatcher() {
-        sessionValidityWatcher?.cancel(false)
-        sessionValidityWatcher = null
+    /** Ignores stale tasks, then rotates or ends an expired session based on Activity state. */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @Synchronized
+    internal fun rotateSessionIfNeeded(expectedId: String) {
+        if (agentStorage.readSessionId() != expectedId) return
+        val now = System.currentTimeMillis()
+        val deadline = agentStorage.readSessionLifetimeDeadline() ?: return
+        if (deadline > now) {
+            scheduleSessionLengthWatcher(expectedId, deadline - now)
+            return
+        }
+
+        if (isForeground && appStateObserver.hasStartedActivity) {
+            createForegroundSession(previousId = expectedId)
+        } else {
+            endCurrentSession(now)
+        }
     }
 
-    private fun saveSessionInBackgroundValidationTime() {
-        agentStorage.writeSessionValidUntilInBackground(System.currentTimeMillis() + sessionBackgroundTimeout)
+    private fun cancelSessionLengthWatcher() {
+        sessionLengthWatcher?.cancel(false)
+        sessionLengthWatcher = null
     }
 
-    private fun deleteSessionInBackgroundValidationTime() {
-        agentStorage.deleteSessionValidUntilInBackground()
+    /** Saves the background grace deadline and schedules its timeout. */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @Synchronized
+    internal fun scheduleBackgroundGraceExpiry() {
+        if (!allowBackgroundSessionCreation && readCurrentSessionId() == null) return
+        saveBackgroundGraceDeadline()
+
+        backgroundGraceWatcher = executor.safeSchedule(sessionBackgroundTimeout) {
+            handleBackgroundGraceExpiry()
+        }
     }
 
-    private fun deleteSessionValidationTime() {
-        agentStorage.deleteSessionValidUntil()
+    /** Enforces the grace deadline; only allowBackgroundSessionCreation=true creates a replacement. */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @Synchronized
+    internal fun handleBackgroundGraceExpiry() {
+        backgroundGraceWatcher = null
+        if (allowBackgroundSessionCreation) {
+            clearBackgroundGraceDeadline()
+            clearSessionLifetimeDeadline()
+            createNewSessionIfNeeded()
+            return
+        }
+        if (isForeground) return
+
+        val deadline = agentStorage.readBackgroundGraceDeadline() ?: return
+        val remaining = deadline - System.currentTimeMillis()
+        if (remaining > 0) {
+            backgroundGraceWatcher = executor.safeSchedule(remaining) { handleBackgroundGraceExpiry() }
+        } else {
+            readCurrentSessionId()
+        }
+    }
+
+    private fun cancelBackgroundGraceWatcher() {
+        backgroundGraceWatcher?.cancel(false)
+        backgroundGraceWatcher = null
+    }
+
+    private fun saveBackgroundGraceDeadline() {
+        agentStorage.writeBackgroundGraceDeadline(System.currentTimeMillis() + sessionBackgroundTimeout)
+    }
+
+    private fun clearBackgroundGraceDeadline() {
+        agentStorage.deleteBackgroundGraceDeadline()
+    }
+
+    private fun clearSessionLifetimeDeadline() {
+        agentStorage.deleteSessionLifetimeDeadline()
     }
 
     interface SessionListener {
         fun onSessionChanged(sessionId: String, timestamp: Long)
+
+        fun onSessionEnded(timestamp: Long) {}
     }
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {
 
         override fun onAppStarted() {
-            deleteSessionInBackgroundValidationTime()
+            if (allowBackgroundSessionCreation) clearBackgroundGraceDeadline()
         }
 
         override fun onAppBackgrounded() {
-            watchSessionInBackgroundValidity()
+            backgroundApp()
         }
 
         override fun onAppForegrounded() {
-            cancelSessionWatcher()
+            if (allowBackgroundSessionCreation) {
+                cancelBackgroundGraceWatcher()
+            } else {
+                enterForeground()
+            }
         }
 
         override fun onAppClosed() {
-            cancelSessionWatcher()
-            saveSessionInBackgroundValidationTime()
+            if (allowBackgroundSessionCreation) {
+                cancelBackgroundGraceWatcher()
+                saveBackgroundGraceDeadline()
+            }
         }
+    }
+
+    @Synchronized
+    private fun backgroundApp() {
+        isForeground = false
+        scheduleBackgroundGraceExpiry()
     }
 
     private companion object {

@@ -7,6 +7,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+##### New features:
+* Added `SessionConfiguration.allowBackgroundSessionCreation`, defaulting to `false`. Android now starts a session when an Activity starts, while `true` retains background-only session creation.
+
+##### Breaking changes:
+* With foreground-aware sessions, there may be no current session. `SessionState.id`, `start`, and `lastActivity`, `SplunkRum.getRumSessionId()`, and `ISession.metadata` are now nullable. Callers must handle `null` instead of assuming a session ID exists. Kotlin clients must be rebuilt; Java clients should add null checks.
+* Adding `allowBackgroundSessionCreation` changes the Kotlin-generated `SessionConfiguration` constructor and `copy()` JVM signatures. Rebuild separately compiled integrations that call either method.
+
+Migration: check the ID before using it, for example `SplunkRum.instance.session.state.id?.let { id -> /* use id */ }`. Check `session.metadata` for null before passing it to an integration. If your app needs the old background-only session behavior, set `SessionConfiguration(allowBackgroundSessionCreation = true)`.
+
 ##### Fixes:
 * Refined network telemetry so the initial network state updates attributes without emitting a `network.change` event, while subsequent network transitions emit telemetry.
 * Improved network callback resilience with bounded asynchronous processing and platform-aware carrier and network subtype detection.
