@@ -46,7 +46,7 @@ class SessionIdSpanProcessorTest {
     }
 
     @Test
-    fun `preserves the captured previous session id on session start`() {
+    fun `preserves the captured previous session id when the session is current`() {
         val span = mockSpan(
             Attributes.of(
                 SESSION_ID_KEY,
@@ -56,6 +56,7 @@ class SessionIdSpanProcessorTest {
             )
         )
         `when`(span.name).thenReturn(RumConstants.SESSION_START_EVENT_NAME)
+        `when`(sessionManager.sessionId).thenReturn("session-a")
         `when`(sessionManager.previousSessionId).thenReturn("session-a")
 
         processor.onStart(Context.root(), span)

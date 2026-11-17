@@ -28,14 +28,15 @@ import io.opentelemetry.sdk.trace.SpanProcessor
 class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) : SpanProcessor {
     override fun onStart(parentContext: Context, span: ReadWriteSpan) {
         val capturedSessionId = span.attributes.get(SESSION_ID_KEY)
+        val currentSessionId = sessionManager.sessionId
         if (capturedSessionId == null) {
-            sessionManager.sessionId?.let { span.setAttribute(SESSION_ID_KEY, it) }
+            currentSessionId?.let { span.setAttribute(SESSION_ID_KEY, it) }
         }
-        // Keep a delayed session.start's original session.previous_id.
-        // Other spans get session.previous_id from the session manager.
-        val isDelayedSessionStart = span.name == RumConstants.SESSION_START_EVENT_NAME &&
-            capturedSessionId != null && capturedSessionId != sessionManager.sessionId
-        if (!isDelayedSessionStart) {
+        // Keep ancestry captured with a session.start, unassigned spans default to the current session.
+        val preserveSessionStartAncestry = span.name == RumConstants.SESSION_START_EVENT_NAME &&
+            capturedSessionId != null &&
+            (span.attributes.get(PREVIOUS_SESSION_ID_KEY) != null || capturedSessionId != currentSessionId)
+        if (!preserveSessionStartAncestry) {
             span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
         }
     }

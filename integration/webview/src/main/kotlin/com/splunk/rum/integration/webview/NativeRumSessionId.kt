@@ -28,9 +28,7 @@ internal class NativeRumSessionId {
     val nativeSessionId: String
         get() = SplunkRum.instance.session.state.id ?: ""
 
-    /**
-     * Native session metadata, or null while the mobile SDK has no current session.
-     */
+    /** Base64 encoded JSON session metadata, or null when there is no current session. */
     @get:JavascriptInterface
     val nativeSessionMetadata: String?
         get() = SplunkRum.instance.session.metadata
