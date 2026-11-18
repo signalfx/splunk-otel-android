@@ -22,14 +22,17 @@ import com.splunk.rum.integration.agent.api.SplunkRum
 /**
  * Object to inject into WebViews as a JavaScript object, in order to integrate with browser RUM.
  */
-internal class NativeRumSessionId {
+internal class NativeRumSessionId(
+    private val currentId: () -> String? = { SplunkRum.instance.session.state.id },
+    private val currentMetadata: () -> String? = { SplunkRum.instance.session.metadata }
+) {
     /** An empty string while the mobile SDK has no current session. */
     @get:JavascriptInterface
     val nativeSessionId: String
-        get() = SplunkRum.instance.session.state.id ?: ""
+        get() = currentId() ?: ""
 
     /** Base64 encoded JSON session metadata, or null when there is no current session. */
     @get:JavascriptInterface
     val nativeSessionMetadata: String?
-        get() = SplunkRum.instance.session.metadata
+        get() = currentMetadata()
 }

@@ -16,6 +16,11 @@
 
 package com.splunk.rum.integration.agent.api.session
 
+/** Reports a new session, or the end of a session without a replacement. */
 interface SessionListener {
-    fun onSessionChanged(newSessionId: String, previousSessionId: String?)
+    /**
+     * [newSessionId] is null when [previousSessionId] ends without a replacement.
+     * A later session starts with a null [previousSessionId].
+     */
+    fun onSessionChanged(newSessionId: String?, previousSessionId: String?)
 }

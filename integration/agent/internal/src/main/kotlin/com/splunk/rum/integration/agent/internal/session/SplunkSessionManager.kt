@@ -213,11 +213,11 @@ class SplunkSessionManager internal constructor(
     /** Clears the current session and notifies listeners once. */
     @Synchronized
     private fun endCurrentSession(timestamp: Long) {
-        if (agentStorage.readSessionId() == null) return
+        val endedId = agentStorage.readSessionId() ?: return
         cancelSessionLengthWatcher()
         clearLastSession()
         previousSessionId = null
-        sessionListeners.forEachFast { it.onSessionEnded(timestamp) }
+        sessionListeners.forEachFast { it.onSessionEnded(endedId, timestamp) }
     }
 
     /** Reuses a valid session or creates one when an Activity starts. */
@@ -340,7 +340,7 @@ class SplunkSessionManager internal constructor(
     interface SessionListener {
         fun onSessionChanged(sessionId: String, timestamp: Long)
 
-        fun onSessionEnded(timestamp: Long) {}
+        fun onSessionEnded(sessionId: String, timestamp: Long) {}
     }
 
     private inner class AppStateObserverListener : AppStateObserver.Listener {

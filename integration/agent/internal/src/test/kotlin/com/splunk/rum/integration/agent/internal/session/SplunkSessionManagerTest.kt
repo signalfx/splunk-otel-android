@@ -331,6 +331,16 @@ class SplunkSessionManagerTest {
     fun `expired background session is cleared without a replacement`() {
         val (storage, state) = storageMock()
         val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
+        val transitions = mutableListOf<Pair<String?, String?>>()
+        manager.sessionListeners += object : SplunkSessionManager.SessionListener {
+            override fun onSessionChanged(sessionId: String, timestamp: Long) {
+                transitions += sessionId to null
+            }
+
+            override fun onSessionEnded(sessionId: String, timestamp: Long) {
+                transitions += null to sessionId
+            }
+        }
         manager.reset()
         manager.install(RuntimeEnvironment.getApplication())
         val activity = Robolectric.buildActivity(Activity::class.java).create().start().resume()
@@ -343,11 +353,18 @@ class SplunkSessionManagerTest {
         assertNull(manager.sessionId)
         assertNull(state.sessionId)
         assertEquals(1, state.sessionIds.size)
+        assertEquals(listOf(firstId to null, null to firstId), transitions)
+
+        // Repeated reads must not report the same end again.
+        assertNull(manager.sessionId)
+        assertEquals(2, transitions.size)
 
         activity.start().resume()
-        assertNotEquals(firstId, manager.sessionId)
+        val secondId = manager.sessionId
+        assertNotEquals(firstId, secondId)
         assertNull(manager.previousSessionId)
         assertEquals(2, state.sessionIds.size)
+        assertEquals(listOf(firstId to null, null to firstId, secondId to null), transitions)
         activity.pause().stop().destroy()
     }
 
