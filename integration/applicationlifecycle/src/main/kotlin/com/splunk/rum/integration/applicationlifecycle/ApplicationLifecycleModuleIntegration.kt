@@ -20,6 +20,7 @@ import android.app.Application
 import android.content.Context
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.common.utils.extensions.forEachFast
@@ -28,6 +29,7 @@ import com.splunk.rum.integration.agent.internal.module.ModuleIntegration
 import com.splunk.rum.integration.applicationlifecycle.model.AppState
 import com.splunk.rum.integration.applicationlifecycle.model.ApplicationLifecycleData
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.sdk.logs.SdkLoggerProvider
 import java.util.concurrent.TimeUnit
 
 internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<ApplicationLifecycleModuleConfiguration>(
@@ -37,8 +39,12 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     private const val TAG = "ApplicationLifecycleModuleIntegration"
     private const val MAX_CACHE_SIZE = 10
 
+    override val observesSessionChanges = true
+
     private var canReport: Boolean? = null
     private val cache: MutableList<ApplicationLifecycleData> = mutableListOf()
+    private val pendingEvents = StartupLifecycleContext()
+    private var cacheSizeAtLastClose = 0
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach() called")
@@ -58,12 +64,17 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
             canReport = true
             // A previous skipped install may have removed the listener.
             registerAppStateListener()
-            cache.forEachFast { reportEvent(it) }
+            cache.forEachIndexed { index, event ->
+                if (sessionManager.allowBackgroundSessionCreation || index >= cacheSizeAtLastClose) {
+                    reportEvent(event)
+                }
+            }
         } else {
             disableAndRemoveListener()
         }
 
         cache.clear()
+        cacheSizeAtLastClose = 0
     }
 
     private fun registerAppStateListener() {
@@ -86,9 +97,15 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         canReport = false
         AppStateObserver.listeners.removeAll { it === appStateListener }
         cache.clear()
+        cacheSizeAtLastClose = 0
+        pendingEvents.clear()
     }
 
     internal val appStateListenerReference: AppStateObserver.Listener get() = appStateListener
+
+    override fun onSessionChange(sessionId: String) {
+        if (canReport == true && !sessionManager.allowBackgroundSessionCreation) emitPendingEvents(sessionId)
+    }
 
     private val appStateListener = object : AppStateObserver.Listener {
 
@@ -103,9 +120,14 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         override fun onAppBackgrounded() {
             reportEvent(ApplicationLifecycleData(System.currentTimeMillis(), AppState.BACKGROUND))
         }
+
+        override fun onAppClosed() {
+            cacheSizeAtLastClose = cache.size
+            pendingEvents.clear()
+        }
     }
 
-    private fun reportEvent(applicationLifecycleData: ApplicationLifecycleData) {
+    internal fun reportEvent(applicationLifecycleData: ApplicationLifecycleData) {
         if (canReport == false) return
 
         val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider
@@ -117,14 +139,42 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
             return
         }
 
+        if (sessionManager.allowBackgroundSessionCreation) {
+            emitEvent(applicationLifecycleData, logger, null)
+            return
+        }
+
+        val sessionId = sessionManager.sessionId
+        if (sessionId == null) {
+            pendingEvents.hold(applicationLifecycleData)
+            // The session manager may have created a session between our read and this write.
+            sessionManager.sessionId?.let(::emitPendingEvents)
+            return
+        }
+
+        emitPendingEvents(sessionId)
+        emitEvent(applicationLifecycleData, logger, sessionId)
+    }
+
+    private fun emitPendingEvents(sessionId: String) {
+        val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider ?: return
+        pendingEvents.take().forEachFast { emitEvent(it, logger, sessionId) }
+    }
+
+    private fun emitEvent(
+        applicationLifecycleData: ApplicationLifecycleData,
+        logger: SdkLoggerProvider,
+        sessionId: String?
+    ) {
         Logger.d(TAG) { "Creating log for app lifecycle event: $applicationLifecycleData" }
-        logger.get(GlobalRumConstants.RUM_TRACER_NAME)
+        val builder = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
             .logRecordBuilder()
             .setTimestamp(applicationLifecycleData.timestamp, TimeUnit.MILLISECONDS)
             .setAttribute(GlobalRumConstants.LOG_EVENT_NAME_KEY, RumConstants.APP_LIFECYCLE_LOG_NAME)
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_LIFECYCLE)
             .setAttribute(GlobalRumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
-            .emit()
+        sessionId?.let { builder.setAttribute(SESSION_ID_KEY, it) }
+        builder.emit()
     }
 
     private val AppState.attributeValue: String
