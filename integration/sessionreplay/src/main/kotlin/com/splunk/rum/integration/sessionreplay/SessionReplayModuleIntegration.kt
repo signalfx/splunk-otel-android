@@ -159,6 +159,8 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
 
             val instance = SplunkOpenTelemetrySdk.instance ?: return false
 
+            val sessionId = sessionManager.sessionId(metadata.startUnixMs) ?: return false
+
             val index = timeIndex.getAt(metadata.startUnixMs.toInstant()) ?: 1
             timeIndex.putAt((metadata.endUnixMs - 1).toInstant(), index + 1)
 
@@ -183,8 +185,6 @@ internal object SessionReplayModuleIntegration : ModuleIntegration<SessionReplay
                 .setTimestamp(metadata.startUnixMs, TimeUnit.MILLISECONDS)
                 .setAllAttributes(attributes)
                 .emit()
-
-            val sessionId = sessionManager.sessionId(metadata.startUnixMs)
 
             if (!isRecordingForSessions.contains(sessionId)) {
                 isRecordingForSessions.add(sessionId)

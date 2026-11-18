@@ -62,8 +62,6 @@ public class JavaIntegration extends Application {
 
         SplunkRum agent = install();
 
-        agent.getRumSessionId();
-
         SplunkRum.noop();
 
         IState state = agent.getState();

@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Unreleased
 
+##### New features:
+* Added `SessionConfiguration.allowBackgroundSessionCreation` (default `false`). With `false`, the SDK creates a session when an Activity starts. Set it to `true` to retain session creation during background activity.
+
+##### Breaking changes:
+* Foreground-aware sessions can run without a current session. `SessionState.id`, `start`, `lastActivity`, and `ISession.metadata` are now nullable. Check for `null` before using them, including when passing metadata to an integration. Java callers need explicit null checks. For example, Kotlin callers can use `SplunkRum.instance.session.state.id?.let { id -> /* use id */ }`.
+* Removed the deprecated `SplunkRum.getRumSessionId()`. Use `SplunkRum.instance.session.state.id` instead and handle `null` when there is no session. Rebuild separately compiled integrations that called the removed method.
+* Adding `allowBackgroundSessionCreation` changes the Kotlin-generated `SessionConfiguration` constructor and `copy()` JVM signatures. Rebuild separately compiled integrations that call either method.
+
 ##### Fixes:
 * Refined network telemetry so the initial network state updates attributes without emitting a `network.change` event, while subsequent network transitions emit telemetry.
 * Improved network callback resilience with bounded asynchronous processing and platform-aware carrier and network subtype detection.

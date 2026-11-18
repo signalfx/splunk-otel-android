@@ -24,6 +24,8 @@ import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.context.Context
 import io.opentelemetry.sdk.trace.ReadWriteSpan
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -35,7 +37,16 @@ class SessionIdSpanProcessorTest {
     private val processor = SessionIdSpanProcessor(sessionManager)
 
     @Test
-    fun `preserves the captured previous session id on session start`() {
+    fun `does not assign a session ID when none exists`() {
+        val span = mockSpan(Attributes.empty())
+
+        processor.onStart(Context.root(), span)
+
+        verify(span, never()).setAttribute(eq(SESSION_ID_KEY), anyString())
+    }
+
+    @Test
+    fun `preserves the captured previous session id when the session is current`() {
         val span = mockSpan(
             Attributes.of(
                 SESSION_ID_KEY,
@@ -45,6 +56,7 @@ class SessionIdSpanProcessorTest {
             )
         )
         `when`(span.name).thenReturn(RumConstants.SESSION_START_EVENT_NAME)
+        `when`(sessionManager.sessionId).thenReturn("session-a")
         `when`(sessionManager.previousSessionId).thenReturn("session-a")
 
         processor.onStart(Context.root(), span)

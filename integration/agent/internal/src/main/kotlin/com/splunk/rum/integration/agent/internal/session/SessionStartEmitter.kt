@@ -28,11 +28,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Holds the `session.start` event of a newly created session until that session produces its first
- * other signal.
- *
- * A process that never produces telemetry, such as a headless start from a job, receiver or push
- * handler, therefore exports nothing at all and no session materializes for it.
+ * Holds `session.start` until emission. With `allowBackgroundSessionCreation=true`, it waits for
+ * accepted telemetry. With `false`, it is emitted when the session is created.
  */
 internal class SessionStartEmitter {
 
@@ -45,10 +42,7 @@ internal class SessionStartEmitter {
         this.logger = logger
     }
 
-    /**
-     * Holds the `session.start` event of [sessionId]. An event still held for an earlier session is
-     * dropped, because that session produced no telemetry to own it.
-     */
+    /** Replaces any pending `session.start` from an earlier session. */
     fun onSessionCreated(
         sessionId: String,
         previousSessionId: String?,
@@ -60,11 +54,8 @@ internal class SessionStartEmitter {
     }
 
     /**
-     * Emits the held event, if there is one, with the timestamp of the session it belongs to.
-     *
-     * Clearing the slot before emitting keeps the emitted record from re-entering here through the
-     * processors that call this and emitting the event twice. If emission fails, we cannot safely
-     * retry: the record may already have been queued before the failure.
+     * Emits the matching event. Clears it first to prevent reentry from emitting it twice.
+     * A failed emit is not retried because it may already be queued.
      */
     fun emitIfPending(sessionId: String? = null) {
         if (logger == null) return

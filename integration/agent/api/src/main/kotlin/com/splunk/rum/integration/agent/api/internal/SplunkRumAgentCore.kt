@@ -96,8 +96,8 @@ internal object SplunkRumAgentCore {
 
         val agentIntegration = AgentIntegration.obtainInstance(application)
 
-        // Release session.start only after a span survives the customer interceptor. This avoids
-        // creating a session containing only session.start when the first span is filtered out.
+        // With allowBackgroundSessionCreation=true, session.start waits for an accepted span.
+        // With false, it was emitted when the foreground session was created.
         val acceptedTelemetryInterceptor: (SpanData) -> SpanData? = { spanData ->
             val interceptor = agentConfiguration.spanInterceptor
             val acceptedSpan = if (interceptor == null) spanData else interceptor(spanData)

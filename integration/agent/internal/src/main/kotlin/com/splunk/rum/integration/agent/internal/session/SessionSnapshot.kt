@@ -16,12 +16,4 @@
 
 package com.splunk.rum.integration.agent.internal.session
 
-class SessionSnapshot(val sessionId: String, val sessionStart: Long, val sessionLastActivity: Long) {
-    companion object {
-        val NO_OP = SessionSnapshot(
-            sessionId = "",
-            sessionStart = 0L,
-            sessionLastActivity = 0L
-        )
-    }
-}
+class SessionSnapshot(val sessionId: String, val sessionStart: Long, val sessionLastActivity: Long)
