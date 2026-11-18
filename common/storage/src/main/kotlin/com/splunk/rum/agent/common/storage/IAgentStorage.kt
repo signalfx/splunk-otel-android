@@ -38,14 +38,14 @@ interface IAgentStorage {
     fun deleteSessionId()
 
     /** Absolute session lifetime deadline, in epoch milliseconds. */
-    fun writeSessionLifetimeDeadline(value: Long)
-    fun readSessionLifetimeDeadline(): Long?
-    fun deleteSessionLifetimeDeadline()
+    fun writeSessionValidUntil(value: Long)
+    fun readSessionValidUntil(): Long?
+    fun deleteSessionValidUntil()
 
     /** End of the background grace period, in epoch milliseconds. */
-    fun writeBackgroundGraceDeadline(value: Long)
-    fun readBackgroundGraceDeadline(): Long?
-    fun deleteBackgroundGraceDeadline()
+    fun writeSessionValidUntilInBackground(value: Long)
+    fun readSessionValidUntilInBackground(): Long?
+    fun deleteSessionValidUntilInBackground()
 
     fun writeSessionLastActivity(value: Long)
     fun readSessionLastActivity(): Long?

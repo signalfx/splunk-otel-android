@@ -111,6 +111,7 @@ class SplunkSessionManager internal constructor(
         appStateObserver.listeners.add(AppStateObserverListener())
         appStateObserver.attach(application)
 
+        // An Activity may have started before this manager installed its listener.
         if (!allowBackgroundSessionCreation && appStateObserver.hasStartedActivity) {
             enterForeground()
         }
@@ -130,13 +131,13 @@ class SplunkSessionManager internal constructor(
         .maxByOrNull { it.validFrom }
         ?.id
 
-    /** Returns a stored ID only while its deadlines are valid; never creates a session. */
+    /** Reads the current ID, rotating an expired session only while an Activity is started. */
     @Synchronized
     private fun readCurrentSessionId(): String? {
         val savedId = agentStorage.readSessionId() ?: return null
         val now = System.currentTimeMillis()
-        val backgroundDeadline = agentStorage.readBackgroundGraceDeadline()
-        val lengthDeadline = agentStorage.readSessionLifetimeDeadline()
+        val backgroundDeadline = agentStorage.readSessionValidUntilInBackground()
+        val lengthDeadline = agentStorage.readSessionValidUntil()
 
         if (backgroundDeadline != null && backgroundDeadline <= now) {
             endCurrentSession(now)
@@ -147,10 +148,12 @@ class SplunkSessionManager internal constructor(
             return null
         }
         if (lengthDeadline <= now) {
-            // Let the watcher rotate a foreground session; reads must not return its expired ID.
-            if (!isForeground || !appStateObserver.hasStartedActivity) {
-                endCurrentSession(now)
+            if (isForeground && appStateObserver.hasStartedActivity) {
+                // The watcher may run late; rotate once before returning an ID for new telemetry.
+                rotateSessionIfNeeded(savedId)
+                return agentStorage.readSessionId()
             }
+            endCurrentSession(now)
             return null
         }
         return savedId
@@ -160,8 +163,8 @@ class SplunkSessionManager internal constructor(
     @Synchronized
     private fun createNewSessionIfNeeded(): String {
         val savedSessionId = agentStorage.readSessionId()
-        val backgroundGraceDeadline = agentStorage.readBackgroundGraceDeadline()
-        val sessionLifetimeDeadline = agentStorage.readSessionLifetimeDeadline()
+        val backgroundGraceDeadline = agentStorage.readSessionValidUntilInBackground()
+        val sessionLifetimeDeadline = agentStorage.readSessionValidUntil()
         val now = System.currentTimeMillis()
 
         val withinBackgroundGrace = backgroundGraceDeadline == null || backgroundGraceDeadline > now
@@ -182,7 +185,7 @@ class SplunkSessionManager internal constructor(
         val newSessionId = SessionId.generate()
         previousSessionId = savedSessionId
         agentStorage.writeSessionId(newSessionId)
-        agentStorage.writeSessionLifetimeDeadline(now + maxSessionLength)
+        agentStorage.writeSessionValidUntil(now + maxSessionLength)
         onSessionCreated(newSessionId, previousSessionId, now)
         sessionIds.add(SessionIdStorageData(newSessionId, now))
         agentStorage.writeSessionIds(sessionIds)
@@ -232,6 +235,7 @@ class SplunkSessionManager internal constructor(
         }
 
         cancelSessionLengthWatcher()
+        // A session after a gap is separate; only a foreground rotation links to the previous ID.
         createForegroundSession(previousId = null)
     }
 
@@ -243,7 +247,7 @@ class SplunkSessionManager internal constructor(
         val newId = SessionId.generate()
         previousSessionId = previousId
         agentStorage.writeSessionId(newId)
-        agentStorage.writeSessionLifetimeDeadline(timestamp + maxSessionLength)
+        agentStorage.writeSessionValidUntil(timestamp + maxSessionLength)
         onSessionCreated(newId, previousId, timestamp)
         sessionIds.add(SessionIdStorageData(newId, timestamp))
         agentStorage.writeSessionIds(sessionIds)
@@ -264,7 +268,7 @@ class SplunkSessionManager internal constructor(
     internal fun rotateSessionIfNeeded(expectedId: String) {
         if (agentStorage.readSessionId() != expectedId) return
         val now = System.currentTimeMillis()
-        val deadline = agentStorage.readSessionLifetimeDeadline() ?: return
+        val deadline = agentStorage.readSessionValidUntil() ?: return
         if (deadline > now) {
             scheduleSessionLengthWatcher(expectedId, deadline - now)
             return
@@ -307,7 +311,7 @@ class SplunkSessionManager internal constructor(
         }
         if (isForeground) return
 
-        val deadline = agentStorage.readBackgroundGraceDeadline() ?: return
+        val deadline = agentStorage.readSessionValidUntilInBackground() ?: return
         val remaining = deadline - System.currentTimeMillis()
         if (remaining > 0) {
             backgroundGraceWatcher = executor.safeSchedule(remaining) { handleBackgroundGraceExpiry() }
@@ -322,15 +326,15 @@ class SplunkSessionManager internal constructor(
     }
 
     private fun saveBackgroundGraceDeadline() {
-        agentStorage.writeBackgroundGraceDeadline(System.currentTimeMillis() + sessionBackgroundTimeout)
+        agentStorage.writeSessionValidUntilInBackground(System.currentTimeMillis() + sessionBackgroundTimeout)
     }
 
     private fun clearBackgroundGraceDeadline() {
-        agentStorage.deleteBackgroundGraceDeadline()
+        agentStorage.deleteSessionValidUntilInBackground()
     }
 
     private fun clearSessionLifetimeDeadline() {
-        agentStorage.deleteSessionLifetimeDeadline()
+        agentStorage.deleteSessionValidUntil()
     }
 
     interface SessionListener {

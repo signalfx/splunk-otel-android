@@ -352,7 +352,7 @@ class SplunkSessionManagerTest {
     }
 
     @Test
-    fun `four hour expiry rotates only while an Activity is started`() {
+    fun `ID read rotates an expired foreground session before a late watcher runs`() {
         val (storage, state) = storageMock()
         val manager = SplunkSessionManager(storage, allowBackgroundSessionCreation = false)
         manager.reset()
@@ -361,11 +361,12 @@ class SplunkSessionManagerTest {
         val firstId = requireNotNull(manager.sessionId)
         state.sessionLifetimeDeadline = System.currentTimeMillis() - 1
 
-        assertNull("an ID read cannot rotate the session", manager.sessionId)
-        assertEquals(firstId, state.sessionId)
+        val secondId = requireNotNull(manager.sessionId)
+        assertNotEquals(firstId, secondId)
+        assertEquals(secondId, state.sessionId)
         manager.rotateSessionIfNeeded(firstId)
 
-        assertNotEquals(firstId, manager.sessionId)
+        assertEquals(secondId, manager.sessionId)
         assertEquals(firstId, manager.previousSessionId)
         assertEquals(2, state.sessionIds.size)
         activity.pause().stop().destroy()
@@ -382,6 +383,7 @@ class SplunkSessionManagerTest {
 
         activity.pause().stop()
         state.sessionLifetimeDeadline = System.currentTimeMillis() - 1
+        assertNull(manager.sessionId)
         manager.rotateSessionIfNeeded(firstId)
 
         assertNull(state.sessionId)
@@ -460,25 +462,25 @@ class SplunkSessionManagerTest {
             null
         }.`when`(storage).deleteSessionId()
 
-        `when`(storage.readSessionLifetimeDeadline()).thenAnswer { state.sessionLifetimeDeadline }
+        `when`(storage.readSessionValidUntil()).thenAnswer { state.sessionLifetimeDeadline }
         doAnswer { invocation ->
             state.sessionLifetimeDeadline = invocation.getArgument(0)
             null
-        }.`when`(storage).writeSessionLifetimeDeadline(anyLong())
+        }.`when`(storage).writeSessionValidUntil(anyLong())
         doAnswer {
             state.sessionLifetimeDeadline = null
             null
-        }.`when`(storage).deleteSessionLifetimeDeadline()
+        }.`when`(storage).deleteSessionValidUntil()
 
-        `when`(storage.readBackgroundGraceDeadline()).thenAnswer { state.backgroundGraceDeadline }
+        `when`(storage.readSessionValidUntilInBackground()).thenAnswer { state.backgroundGraceDeadline }
         doAnswer { invocation ->
             state.backgroundGraceDeadline = invocation.getArgument(0)
             null
-        }.`when`(storage).writeBackgroundGraceDeadline(anyLong())
+        }.`when`(storage).writeSessionValidUntilInBackground(anyLong())
         doAnswer {
             state.backgroundGraceDeadline = null
             null
-        }.`when`(storage).deleteBackgroundGraceDeadline()
+        }.`when`(storage).deleteSessionValidUntilInBackground()
 
         `when`(storage.readSessionLastActivity()).thenAnswer { state.sessionLastActivity }
         doAnswer { invocation ->
