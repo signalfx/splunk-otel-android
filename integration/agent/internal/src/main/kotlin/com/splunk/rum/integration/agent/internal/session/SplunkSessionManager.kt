@@ -235,7 +235,7 @@ class SplunkSessionManager internal constructor(
         }
 
         cancelSessionLengthWatcher()
-        // A session after a gap is separate; only a foreground rotation links to the previous ID.
+        // A session after a gap is separate, only a foreground rotation links to the previous ID.
         createForegroundSession(previousId = null)
     }
 
