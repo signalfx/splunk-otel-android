@@ -17,25 +17,26 @@
 package com.splunk.rum.integration.http.common.api
 
 import java.util.regex.Pattern
-import java.util.regex.PatternSyntaxException
 
 /**
  * Immutable regular expressions identifying URLs to exclude from HTTP instrumentation.
  *
- * Patterns are compiled during construction. A URL is ignored when any pattern finds a match
- * anywhere in its complete, encoded URL string. Matching is case sensitive unless a pattern uses
- * an inline flag such as `(?i)`. An empty set excludes nothing; an empty expression matches every URL.
+ * Compile patterns before construction using [Pattern.compile]. A URL is ignored when any pattern
+ * finds a match anywhere in its complete, encoded URL string. An empty collection excludes
+ * nothing; an empty expression matches every URL.
  * Prefer simple patterns without nested repetition to avoid expensive matching on request threads.
  *
- * The supplied set is copied, so subsequent changes to it cannot affect installed instrumentation.
+ * The supplied patterns are copied, so subsequent changes to the input collection cannot affect installed instrumentation.
  * Instances can be shared safely between module configurations.
  *
- * @param patterns Regular expression strings to compile using Android's [Pattern] implementation.
- * @throws PatternSyntaxException If any pattern is invalid. No partially valid rule set is created.
+ * @param patterns Precompiled regular expressions for URLs to exclude.
  */
-class IgnoreURLs @JvmOverloads constructor(patterns: Set<String> = emptySet()) {
-    private val patternStrings = patterns.toSet()
-    private val compiledPatterns = patternStrings.map(Pattern::compile)
+class IgnoreURLs @JvmOverloads constructor(patterns: Collection<Pattern> = emptyList()) {
+    // Match with one Pattern per distinct regex and flag combination, copied from the caller's collection.
+    private val compiledPatterns = patterns.distinctBy { it.pattern() to it.flags() }
+
+    // Compare rule sets by regex and flags, independent of Pattern identity or input order.
+    private val patternValues = compiledPatterns.map { it.pattern() to it.flags() }.toSet()
 
     /** Returns whether any expression finds a match in [url]. */
     fun matches(url: String): Boolean = compiledPatterns.any { it.matcher(url).find() }
@@ -43,7 +44,7 @@ class IgnoreURLs @JvmOverloads constructor(patterns: Set<String> = emptySet()) {
     /** Returns whether this rule set contains no patterns. */
     fun isEmpty(): Boolean = compiledPatterns.isEmpty()
 
-    override fun equals(other: Any?): Boolean = other is IgnoreURLs && patternStrings == other.patternStrings
+    override fun equals(other: Any?): Boolean = other is IgnoreURLs && patternValues == other.patternValues
 
-    override fun hashCode(): Int = patternStrings.hashCode()
+    override fun hashCode(): Int = patternValues.hashCode()
 }

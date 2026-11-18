@@ -43,6 +43,7 @@ import com.splunk.rum.integration.sessionreplay.extension.sessionReplay
 import com.splunk.rum.integration.slowrendering.SlowRenderingModuleConfiguration
 import io.opentelemetry.sdk.trace.data.SpanData
 import java.time.Duration
+import java.util.regex.Pattern
 
 /**
  * Application class responsible for initializing and configuring the Splunk RUM agent
@@ -118,7 +119,7 @@ class App : Application() {
         capturedResponseHeaders = listOf("Date", "Content-Type", "Content-Length")
     )
 
-    private val okHttpIgnoreURLs = IgnoreURLs(setOf("^https://httpbin\\.org/anything/rum-ignored$"))
+    private val okHttpIgnoreURLs = IgnoreURLs(listOf(Pattern.compile("^https://httpbin\\.org/anything/rum-ignored$")))
 
     private val okHttp3AutoModuleConfiguration = OkHttp3AutoModuleConfiguration(
         isEnabled = true,
