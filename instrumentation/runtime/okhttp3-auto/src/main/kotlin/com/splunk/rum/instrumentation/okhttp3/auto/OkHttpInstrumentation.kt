@@ -33,6 +33,12 @@ class OkHttpInstrumentation {
         mutableListOf()
 
     /**
+     * Internal URL exclusion predicate, configured before [install]. Matching requests execute
+     * without HTTP spans or injected trace headers. Each redirect destination is checked separately.
+     */
+    var urlExclusionPredicate: ((String) -> Boolean)? = null
+
+    /**
      * Configures the HTTP request headers that will be captured as span attributes.
      */
     var capturedRequestHeaders: List<String> = listOf()

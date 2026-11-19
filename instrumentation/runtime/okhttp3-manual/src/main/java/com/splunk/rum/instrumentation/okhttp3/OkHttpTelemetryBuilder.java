@@ -18,6 +18,7 @@ package com.splunk.rum.instrumentation.okhttp3;
 
 import com.splunk.rum.instrumentation.okhttp3.internal.Experimental;
 import com.splunk.rum.instrumentation.okhttp3.common.internal.OkHttpClientInstrumenterBuilderFactory;
+import kotlin.jvm.functions.Function1;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.api.incubator.builder.internal.DefaultHttpClientInstrumenterBuilder;
 import io.opentelemetry.instrumentation.api.instrumenter.AttributesExtractor;
@@ -38,6 +39,7 @@ public final class OkHttpTelemetryBuilder {
 
   private final DefaultHttpClientInstrumenterBuilder<Interceptor.Chain, Response> builder;
   private final OpenTelemetry openTelemetry;
+  private Function1<? super String, Boolean> urlExclusionPredicate;
 
   OkHttpTelemetryBuilder(OpenTelemetry openTelemetry) {
     builder = OkHttpClientInstrumenterBuilderFactory.create(openTelemetry);
@@ -75,6 +77,16 @@ public final class OkHttpTelemetryBuilder {
   }
 
   /**
+   * Configures the internal URL exclusion predicate before building this instrumentation.
+   * Matching network requests execute without creating HTTP spans or injecting trace headers.
+   * Each redirect destination is evaluated independently. A null predicate excludes nothing.
+   */
+  public OkHttpTelemetryBuilder setUrlExclusionPredicate(Function1<? super String, Boolean> predicate) {
+    this.urlExclusionPredicate = predicate;
+    return this;
+  }
+
+  /**
    * Configures recognized HTTP request methods.
    *
    * <p>By default, recognizes methods from <a
@@ -101,6 +113,6 @@ public final class OkHttpTelemetryBuilder {
 
   /** Returns a new instance with the configured settings. */
   public OkHttpTelemetry build() {
-    return new OkHttpTelemetry(builder.build(), openTelemetry.getPropagators());
+    return new OkHttpTelemetry(builder.build(), openTelemetry.getPropagators(), urlExclusionPredicate);
   }
 }

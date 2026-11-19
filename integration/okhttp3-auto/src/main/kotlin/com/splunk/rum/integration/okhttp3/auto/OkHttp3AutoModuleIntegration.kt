@@ -39,6 +39,10 @@ internal object OkHttp3AutoModuleIntegration : ModuleIntegration<OkHttp3AutoModu
         if (moduleConfiguration.isEnabled) {
             // Installing OkHttp3 auto-instrumentation
             OkHttpInstrumentation().apply {
+                moduleConfiguration.ignoreURLs?.takeUnless { it.isEmpty() }?.let { rules ->
+                    urlExclusionPredicate = rules::matches
+                }
+
                 moduleConfiguration.capturedRequestHeaders
                     .takeIf { it.isNotEmpty() }
                     ?.let { capturedRequestHeaders = it }

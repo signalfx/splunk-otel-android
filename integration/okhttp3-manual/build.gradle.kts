@@ -23,6 +23,8 @@ android {
 }
 
 dependencies {
+    api(project(":integration:http-common"))
+
     implementation(project(":integration:agent:api"))
     implementation(project(":integration:agent:internal"))
     implementation(project(":instrumentation:runtime:okhttp3-manual"))

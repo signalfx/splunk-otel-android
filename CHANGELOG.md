@@ -8,6 +8,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Unreleased
 
 ##### Enhancements:
+* Added `ignoreURLs` configuration for OkHttp auto and manual instrumentation. Matching requests, including redirect destinations, execute without HTTP spans or SDK-injected trace headers.
+
+##### Breaking changes:
+* **Binary compatibility: OkHttp module configurations**: adding the optional `ignoreURLs` property changes the Kotlin-generated default-argument constructor and `copy()` signatures of `OkHttp3AutoModuleConfiguration` and `OkHttp3ManualModuleConfiguration`. Existing Kotlin and Java constructor calls remain source compatible. Previously compiled Kotlin code that uses constructor defaults, or previously compiled Kotlin or Java code that calls `copy()`, must be rebuilt against this release to avoid `NoSuchMethodError`. Java callers of `copy()` must also pass the new `ignoreURLs` argument when recompiling.
+
+##### Fixes:
 * Reduced SDK installation time by reading the stored anonymous user ID and app installation ID in the background instead of waiting for them during `install`.
 
 ### Version 2.4.0 - 2026-10-13

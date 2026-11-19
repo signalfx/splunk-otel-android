@@ -28,15 +28,20 @@ import okhttp3.Response
  * This class is internal and is hence not for public use. Its APIs are unstable and can change at
  * any time.
  */
-class TracingInterceptor(
+class TracingInterceptor @JvmOverloads constructor(
     private val instrumenter: Instrumenter<Interceptor.Chain, Response>,
-    private val propagators: ContextPropagators
+    private val propagators: ContextPropagators,
+    private val urlExclusions: UrlExclusionPolicy? = null
 ) : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
         val parentContext = Context.current()
+
+        if (urlExclusions?.markNetworkInterceptorReachedAndCheckExclusion(parentContext, request) == true) {
+            return chain.proceed(request)
+        }
 
         if (!instrumenter.shouldStart(parentContext, chain)) {
             return chain.proceed(chain.request())

@@ -45,6 +45,7 @@ object Dependencies {
         private const val mockitoVersion = "5.4.0"
 
         const val junit = "junit:junit:$junitVersion"
+        const val mockWebServer = "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
         const val androidXTestCore = "androidx.test:core:$androidXTestCoreVersion"
         const val androidXTestJunit = "androidx.test.ext:junit:$androidXTestJunitVersion"
         const val androidXTestRunner = "androidx.test:runner:$androidXTestRunnerVersion"
