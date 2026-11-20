@@ -8,11 +8,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Unreleased
 
 ##### New features:
-* Added `SessionConfiguration.allowBackgroundSessionCreation` (default `false`). With `false`, the SDK creates a session when an Activity starts. Set it to `true` to retain session creation during background activity.
+* Added `SessionConfiguration.allowBackgroundSessionCreation` (default `true`), which preserves background session creation. Set it to `false` to create sessions only after an Activity starts.
+* The Android WebView bridge returns `""` for its session ID and `null` for session metadata while no mobile session exists. Both getters return current values when a session starts or ends.
 
 ##### Breaking changes:
 * Foreground-aware sessions can run without a current session. `SessionState.id`, `start`, `lastActivity`, and `ISession.metadata` are now nullable. Check for `null` before using them, including when passing metadata to an integration. Java callers need explicit null checks. For example, Kotlin callers can use `SplunkRum.instance.session.state.id?.let { id -> /* use id */ }`.
 * Removed the deprecated `SplunkRum.getRumSessionId()`. Use `SplunkRum.instance.session.state.id` instead and handle `null` when there is no session. Rebuild separately compiled integrations that called the removed method.
+* `SessionListener.onSessionChanged` now accepts a nullable new ID. It reports `(null, A)` when A ends without a replacement, `(B, null)` when B starts after a gap, and `(B, A)` when A rotates to B. Update listeners to handle the null case. Java callers need an explicit null check, which the compiler may not require.
 * Adding `allowBackgroundSessionCreation` changes the Kotlin-generated `SessionConfiguration` constructor and `copy()` JVM signatures. Rebuild separately compiled integrations that call either method.
 
 ##### Fixes:

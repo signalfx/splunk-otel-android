@@ -25,4 +25,7 @@ android {
 
 dependencies {
     implementation(project(":integration:agent:api"))
+
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.robolectric)
 }

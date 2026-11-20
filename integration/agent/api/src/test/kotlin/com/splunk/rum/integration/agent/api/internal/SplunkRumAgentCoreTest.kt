@@ -25,9 +25,11 @@ import com.splunk.rum.agent.common.storage.IAgentStorage
 import com.splunk.rum.common.storage.extensions.noBackupFilesDirCompat
 import com.splunk.rum.integration.agent.api.AgentConfiguration
 import com.splunk.rum.integration.agent.api.EndpointConfiguration
+import com.splunk.rum.integration.agent.api.session.SessionListener
 import com.splunk.rum.integration.agent.common.attributes.MutableAttributes
 import com.splunk.rum.integration.agent.internal.AgentIntegration
 import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.integration.agent.internal.user.IUserManager
 import java.io.File
 import java.util.concurrent.atomic.AtomicReference
@@ -176,6 +178,30 @@ class SplunkRumAgentCoreTest {
         installSplunkRumAgent()
 
         assertNull(System.getProperty(contextStorageProviderProperty))
+    }
+
+    @Test
+    fun `public listener reports session end and next start`() {
+        val internalListeners = mutableSetOf<SplunkSessionManager.SessionListener>()
+        val transitions = mutableListOf<Pair<String?, String?>>()
+        val listener = object : SessionListener {
+            override fun onSessionChanged(newSessionId: String?, previousSessionId: String?) {
+                transitions += newSessionId to previousSessionId
+            }
+        }
+        `when`(mockSessionManager.sessionListeners).thenReturn(internalListeners)
+        `when`(mockAgentConfig.session.listeners).thenReturn(listOf(listener))
+
+        installSplunkRumAgent()
+
+        val forwardingListener = internalListeners.single()
+        forwardingListener.onSessionChanged("A", 1L)
+        forwardingListener.onSessionEnded("A", 2L)
+        forwardingListener.onSessionChanged("B", 3L)
+        `when`(mockSessionManager.previousSessionId).thenReturn("B")
+        forwardingListener.onSessionChanged("C", 4L)
+
+        assertEquals(listOf("A" to null, null to "A", "B" to null, "C" to "B"), transitions)
     }
 
     @Test

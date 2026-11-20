@@ -21,8 +21,8 @@ import com.splunk.rum.common.logger.Logger
 data class SessionConfiguration @JvmOverloads constructor(
     val samplingRate: Double = 1.0,
     val listeners: List<SessionListener> = emptyList(),
-    /** Whether background-only execution may create a session. Defaults to false. */
-    val allowBackgroundSessionCreation: Boolean = false
+    /** Whether background-only execution may create a session. Defaults to true. */
+    val allowBackgroundSessionCreation: Boolean = true
 ) {
     init {
         if (samplingRate !in 0.0..1.0) {

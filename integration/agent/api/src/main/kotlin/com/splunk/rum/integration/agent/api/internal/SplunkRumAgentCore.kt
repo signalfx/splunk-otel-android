@@ -148,6 +148,12 @@ internal object SplunkRumAgentCore {
                     )
                 }
             }
+
+            override fun onSessionEnded(sessionId: String, timestamp: Long) {
+                agentConfiguration.session.listeners.forEachFast {
+                    it.onSessionChanged(newSessionId = null, previousSessionId = sessionId)
+                }
+            }
         }
 
         agentIntegration.install(application, openTelemetry, sessionManager, moduleConfigurations, globalAttributes)
