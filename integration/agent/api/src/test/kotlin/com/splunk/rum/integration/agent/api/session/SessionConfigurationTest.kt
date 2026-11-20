@@ -23,14 +23,14 @@ import org.junit.Test
 class SessionConfigurationTest {
 
     @Test
-    fun `background-only sessions are disabled by default`() {
-        assertFalse(SessionConfiguration().allowBackgroundSessionCreation)
+    fun `background-only sessions are enabled by default`() {
+        assertTrue(SessionConfiguration().allowBackgroundSessionCreation)
     }
 
     @Test
-    fun `background-only sessions can be requested`() {
-        val configuration = SessionConfiguration(allowBackgroundSessionCreation = true)
+    fun `foreground-aware sessions can be requested`() {
+        val configuration = SessionConfiguration(allowBackgroundSessionCreation = false)
 
-        assertTrue(configuration.allowBackgroundSessionCreation)
+        assertFalse(configuration.allowBackgroundSessionCreation)
     }
 }

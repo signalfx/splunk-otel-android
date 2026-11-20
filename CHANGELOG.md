@@ -8,7 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Unreleased
 
 ##### New features:
-* Added `SessionConfiguration.allowBackgroundSessionCreation` (default `false`). With `false`, the SDK creates a session when an Activity starts. Set it to `true` to retain session creation during background activity.
+* Added `SessionConfiguration.allowBackgroundSessionCreation` (default `true`), which preserves background session creation. Set it to `false` to create sessions only after an Activity starts.
 * The Android WebView bridge returns `""` for its session ID and `null` for session metadata while no mobile session exists. Both getters return current values when a session starts or ends.
 
 ##### Breaking changes:
