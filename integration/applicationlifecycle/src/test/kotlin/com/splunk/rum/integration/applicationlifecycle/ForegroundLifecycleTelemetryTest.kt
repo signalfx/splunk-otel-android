@@ -126,6 +126,21 @@ class ForegroundLifecycleTelemetryTest {
         manager.sessionListeners.forEach { it.onSessionChanged("B", 5_000L) }
         assertEquals(3, exported.size)
 
+        manager.currentId = null
+        ApplicationLifecycleModuleIntegration.reportEvent(ApplicationLifecycleData(6_000L, AppState.CREATED))
+        ApplicationLifecycleModuleIntegration.reportEvent(ApplicationLifecycleData(7_000L, AppState.FOREGROUND))
+        ApplicationLifecycleModuleIntegration.reportEvent(ApplicationLifecycleData(8_000L, AppState.BACKGROUND))
+        manager.currentId = "C"
+        manager.predecessorId = null
+        manager.sessionListeners.forEach { it.onSessionChanged("C", 9_000L) }
+        assertEquals(3, exported.size)
+
+        ApplicationLifecycleModuleIntegration.reportEvent(ApplicationLifecycleData(10_000L, AppState.FOREGROUND))
+        assertEquals(4, exported.size)
+        assertEquals("C", exported.last().attributes.get(SESSION_ID_KEY))
+        assertEquals("foreground", exported.last().attributes.get(APP_STATE_KEY))
+        assertEquals(10_000L, TimeUnit.NANOSECONDS.toMillis(exported.last().timestampEpochNanos))
+
         provider.shutdown().join(5, TimeUnit.SECONDS)
     }
 }

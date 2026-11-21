@@ -67,4 +67,19 @@ class PreInstallLifecycleCacheTest {
         assertEquals(listOf(created, foreground), cache.eventsToReport(allowBackgroundSessionCreation = false))
         assertEquals(earlierEvents, cache.eventsToReport(allowBackgroundSessionCreation = true))
     }
+
+    @Test
+    fun `backgrounding without closing discards the old foreground attempt`() {
+        val cache = PreInstallLifecycleCache()
+        val created = ApplicationLifecycleData(1_000L, AppState.CREATED)
+        val foreground = ApplicationLifecycleData(2_000L, AppState.FOREGROUND)
+        val background = ApplicationLifecycleData(3_000L, AppState.BACKGROUND)
+
+        cache.add(created)
+        cache.add(foreground)
+        cache.add(background)
+
+        assertEquals(emptyList<ApplicationLifecycleData>(), cache.eventsToReport(false))
+        assertEquals(listOf(created, foreground, background), cache.eventsToReport(true))
+    }
 }

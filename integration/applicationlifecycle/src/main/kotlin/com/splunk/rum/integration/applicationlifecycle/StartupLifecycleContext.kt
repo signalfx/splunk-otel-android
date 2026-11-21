@@ -29,7 +29,7 @@ internal class StartupLifecycleContext {
         when (event.appState) {
             AppState.CREATED -> created = event
             AppState.FOREGROUND -> foreground = event
-            AppState.BACKGROUND -> Unit
+            AppState.BACKGROUND -> clear()
         }
     }
 
