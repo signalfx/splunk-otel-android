@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.APP_START_SPAN_NAME
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.RumConstants
@@ -32,11 +33,13 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
         if (capturedSessionId == null) {
             currentSessionId?.let { span.setAttribute(SESSION_ID_KEY, it) }
         }
-        // Keep ancestry captured with a session.start, unassigned spans default to the current session.
+        // Startup spans already carry the previous ID of their assigned session.
+        val preserveStartupAncestry = capturedSessionId != null &&
+            (span.name == APP_START_SPAN_NAME || span.name == INSTALL_SPAN_NAME)
         val preserveSessionStartAncestry = span.name == RumConstants.SESSION_START_EVENT_NAME &&
             capturedSessionId != null &&
             (span.attributes.get(PREVIOUS_SESSION_ID_KEY) != null || capturedSessionId != currentSessionId)
-        if (!preserveSessionStartAncestry) {
+        if (!preserveStartupAncestry && !preserveSessionStartAncestry) {
             span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
         }
     }
@@ -46,4 +49,8 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
     override fun onEnd(span: ReadableSpan) = Unit
 
     override fun isEndRequired(): Boolean = false
+
+    private companion object {
+        const val INSTALL_SPAN_NAME = "SplunkRum.install"
+    }
 }

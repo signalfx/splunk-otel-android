@@ -18,27 +18,28 @@ package com.splunk.rum.integration.applicationlifecycle
 
 import com.splunk.rum.integration.applicationlifecycle.model.ApplicationLifecycleData
 
-/** Caches lifecycle events until installation and marks where the last Activity closed. */
+/** Keeps pre-install events for background coverage and the latest foreground attempt. */
 internal class PreInstallLifecycleCache {
 
     private val events = mutableListOf<ApplicationLifecycleData>()
-    private var firstEventIndexAfterLastClose = 0
+    private val foregroundEvents = StartupLifecycleContext()
 
     fun add(event: ApplicationLifecycleData) {
+        foregroundEvents.hold(event)
         if (events.size < MAX_CACHE_SIZE) events += event
     }
 
     fun markAppClosed() {
-        firstEventIndexAfterLastClose = events.size
+        foregroundEvents.clear()
     }
 
-    /** Without background sessions, report only events recorded after the last Activity closed. */
+    /** Returns the pending CREATED and FOREGROUND events even if the ten event cache is full. */
     fun eventsToReport(allowBackgroundSessionCreation: Boolean): List<ApplicationLifecycleData> =
-        events.drop(if (allowBackgroundSessionCreation) 0 else firstEventIndexAfterLastClose)
+        if (allowBackgroundSessionCreation) events.toList() else foregroundEvents.take()
 
     fun clear() {
         events.clear()
-        firstEventIndexAfterLastClose = 0
+        foregroundEvents.clear()
     }
 
     private companion object {

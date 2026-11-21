@@ -30,27 +30,27 @@ class StartupSessionContextTest {
         val context = StartupSessionContext()
 
         context.onForeground(null)
-        context.onSessionCreated("A")
-        context.onSessionCreated("B") // A rotated before first draw.
+        context.onSessionCreated(StartupSession("A", null))
+        context.onSessionCreated(StartupSession("B", "A")) // A rotated before first draw.
 
-        assertEquals("A", context.sessionIdForStart())
+        assertEquals(StartupSession("A", null), context.sessionForStart())
         context.onStartReported()
-        assertNull(context.sessionIdForStart())
+        assertNull(context.sessionForStart())
 
-        context.onForeground("B")
-        assertEquals("B", context.sessionIdForStart())
+        context.onForeground(StartupSession("B", "A"))
+        assertEquals(StartupSession("B", "A"), context.sessionForStart())
     }
 
     @Test
     fun abandonedAttemptCannotGiveItsSessionToALaterLaunch() {
         val context = StartupSessionContext()
 
-        context.onForeground("A")
+        context.onForeground(StartupSession("A", null))
         context.onBackground()
-        assertNull(context.sessionIdForStart())
+        assertNull(context.sessionForStart())
 
         context.onForeground(null)
-        context.onSessionCreated("B")
-        assertEquals("B", context.sessionIdForStart())
+        context.onSessionCreated(StartupSession("B", null))
+        assertEquals(StartupSession("B", null), context.sessionForStart())
     }
 }

@@ -16,46 +16,48 @@
 
 package com.splunk.rum.integration.startup
 
+internal data class StartupSession(val id: String, val previousId: String?)
+
 /** Holds the session chosen at foreground until the matching App Start finishes. */
 internal class StartupSessionContext {
-    private var firstSessionId: String? = null
-    private var foregroundSessionId: String? = null
+    private var firstSession: StartupSession? = null
+    private var foregroundSession: StartupSession? = null
     private var waitingForSession = false
     private var firstStartReported = false
 
     @Synchronized
-    fun onForeground(sessionId: String?) {
-        waitingForSession = sessionId == null
-        if (sessionId != null) setForegroundSession(sessionId)
+    fun onForeground(session: StartupSession?) {
+        waitingForSession = session == null
+        if (session != null) setForegroundSession(session)
     }
 
     @Synchronized
-    fun onSessionCreated(sessionId: String) {
-        if (waitingForSession || (!firstStartReported && firstSessionId == null)) {
-            setForegroundSession(sessionId)
+    fun onSessionCreated(session: StartupSession) {
+        if (waitingForSession || (!firstStartReported && firstSession == null)) {
+            setForegroundSession(session)
             waitingForSession = false
         }
     }
 
     @Synchronized
-    fun sessionIdForStart(): String? = if (firstStartReported) foregroundSessionId else firstSessionId
+    fun sessionForStart(): StartupSession? = if (firstStartReported) foregroundSession else firstSession
 
     @Synchronized
     fun onStartReported() {
         firstStartReported = true
-        firstSessionId = null
-        foregroundSessionId = null
+        firstSession = null
+        foregroundSession = null
     }
 
     @Synchronized
     fun onBackground() {
-        if (!firstStartReported) firstSessionId = null
-        foregroundSessionId = null
+        if (!firstStartReported) firstSession = null
+        foregroundSession = null
         waitingForSession = false
     }
 
-    private fun setForegroundSession(sessionId: String) {
-        foregroundSessionId = sessionId
-        if (!firstStartReported && firstSessionId == null) firstSessionId = sessionId
+    private fun setForegroundSession(session: StartupSession) {
+        foregroundSession = session
+        if (!firstStartReported && firstSession == null) firstSession = session
     }
 }

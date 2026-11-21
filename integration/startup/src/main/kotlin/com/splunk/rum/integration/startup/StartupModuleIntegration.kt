@@ -21,6 +21,7 @@ import android.content.Context
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.extensions.toInstant
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.AppStateObserver
@@ -82,17 +83,22 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         configuredBackgroundCreation = sessionManager.allowBackgroundSessionCreation
         foregroundAwareMode = !configuredBackgroundCreation
         sessionManagerReady = true
-        if (foregroundAwareMode) sessionManager.sessionId?.let(startupSession::onForeground)
+        if (foregroundAwareMode) currentSession()?.let(startupSession::onForeground)
     }
 
     override fun onSessionChange(sessionId: String) {
-        if (foregroundAwareMode) startupSession.onSessionCreated(sessionId)
+        if (foregroundAwareMode) {
+            startupSession.onSessionCreated(StartupSession(sessionId, sessionManager.previousSessionId))
+        }
     }
+
+    private fun currentSession(): StartupSession? =
+        sessionManager.sessionId?.let { StartupSession(it, sessionManager.previousSessionId) }
 
     private val appStateListener = object : AppStateObserver.Listener {
         override fun onAppForegrounded() {
             if (foregroundAwareMode) {
-                startupSession.onForeground(if (sessionManagerReady) sessionManager.sessionId else null)
+                startupSession.onForeground(if (sessionManagerReady) currentSession() else null)
             }
         }
 
@@ -171,8 +177,8 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             return
         }
 
-        val assignedSessionId = if (foregroundAwareMode) startupSession.sessionIdForStart() else null
-        if (foregroundAwareMode && assignedSessionId == null) {
+        val assignedSession = if (foregroundAwareMode) startupSession.sessionForStart() else null
+        if (foregroundAwareMode && assignedSession == null) {
             Logger.d(TAG) { "Skipping App Start without a foreground session" }
             return
         }
@@ -191,11 +197,14 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         val builder = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
             .spanBuilder(RumConstants.APP_START_SPAN_NAME)
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
-        assignedSessionId?.let { builder.setAttribute(SESSION_ID_KEY, it) }
+        assignedSession?.let { session ->
+            builder.setAttribute(SESSION_ID_KEY, session.id)
+            session.previousId?.let { builder.setAttribute(PREVIOUS_SESSION_ID_KEY, it) }
+        }
         val span = builder.startSpan()
 
         if (shouldReportInitialization) {
-            reportInstallSpan(span, provider, assignedSessionId)
+            reportInstallSpan(span, provider, assignedSession)
         }
 
         // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
@@ -211,16 +220,16 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         Logger.d(TAG) { "reportEventInternal() - span sent successfully for: $name" }
     }
 
-    private fun reportInstallSpan(appStartSpan: Span, provider: SdkTracerProvider, sessionId: String?) {
+    private fun reportInstallSpan(appStartSpan: Span, provider: SdkTracerProvider, session: StartupSession?) {
         if (AgentIntegration.installEndElapsed == null) {
-            AgentIntegration.onInstallTimingComplete = { emitInstallSpan(appStartSpan, provider, sessionId) }
+            AgentIntegration.onInstallTimingComplete = { emitInstallSpan(appStartSpan, provider, session) }
             Logger.d(TAG) { "reportInstallSpan() - installEndElapsed not yet available, deferring" }
             return
         }
-        emitInstallSpan(appStartSpan, provider, sessionId)
+        emitInstallSpan(appStartSpan, provider, session)
     }
 
-    private fun emitInstallSpan(appStartSpan: Span, provider: SdkTracerProvider, sessionId: String?) {
+    private fun emitInstallSpan(appStartSpan: Span, provider: SdkTracerProvider, session: StartupSession?) {
         val modules = modules.values
 
         val firstInitialization =
@@ -259,7 +268,10 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             .spanBuilder(RumConstants.APP_START_INSTALL_SPAN_NAME)
             .setParent(OtelContext.current().with(appStartSpan))
             .setStartTimestamp(installStartTimestamp, TimeUnit.MILLISECONDS)
-        sessionId?.let { builder.setAttribute(SESSION_ID_KEY, it) }
+        session?.let { captured ->
+            builder.setAttribute(SESSION_ID_KEY, captured.id)
+            captured.previousId?.let { builder.setAttribute(PREVIOUS_SESSION_ID_KEY, it) }
+        }
         val installSpan = builder.startSpan()
 
         installSpan.setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_START)

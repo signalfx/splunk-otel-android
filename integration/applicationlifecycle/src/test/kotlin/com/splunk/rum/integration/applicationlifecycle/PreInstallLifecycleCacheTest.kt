@@ -44,4 +44,27 @@ class PreInstallLifecycleCacheTest {
             cache.eventsToReport(allowBackgroundSessionCreation = true)
         )
     }
+
+    @Test
+    fun `full event cache cannot hide the next foreground attempt`() {
+        val cache = PreInstallLifecycleCache()
+        val earlierEvents = mutableListOf<ApplicationLifecycleData>()
+        repeat(5) { attempt ->
+            val created = ApplicationLifecycleData(attempt * 2L, AppState.CREATED)
+            val foreground = ApplicationLifecycleData(attempt * 2L + 1L, AppState.FOREGROUND)
+            cache.add(created)
+            cache.add(foreground)
+            earlierEvents += created
+            earlierEvents += foreground
+            cache.markAppClosed()
+        }
+
+        val created = ApplicationLifecycleData(100L, AppState.CREATED)
+        val foreground = ApplicationLifecycleData(101L, AppState.FOREGROUND)
+        cache.add(created)
+        cache.add(foreground)
+
+        assertEquals(listOf(created, foreground), cache.eventsToReport(allowBackgroundSessionCreation = false))
+        assertEquals(earlierEvents, cache.eventsToReport(allowBackgroundSessionCreation = true))
+    }
 }
