@@ -37,14 +37,11 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
 ) {
 
     private const val TAG = "ApplicationLifecycleModuleIntegration"
-    private const val MAX_CACHE_SIZE = 10
-
     override val observesSessionChanges = true
 
     private var canReport: Boolean? = null
-    private val cache: MutableList<ApplicationLifecycleData> = mutableListOf()
+    private val preInstallEvents = PreInstallLifecycleCache()
     private val pendingEvents = StartupLifecycleContext()
-    private var cacheSizeAtLastClose = 0
 
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach() called")
@@ -64,17 +61,12 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
             canReport = true
             // A previous skipped install may have removed the listener.
             registerAppStateListener()
-            cache.forEachIndexed { index, event ->
-                if (sessionManager.allowBackgroundSessionCreation || index >= cacheSizeAtLastClose) {
-                    reportEvent(event)
-                }
-            }
+            preInstallEvents.eventsToReport(sessionManager.allowBackgroundSessionCreation).forEachFast(::reportEvent)
         } else {
             disableAndRemoveListener()
         }
 
-        cache.clear()
-        cacheSizeAtLastClose = 0
+        preInstallEvents.clear()
     }
 
     private fun registerAppStateListener() {
@@ -96,8 +88,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
     private fun removeListenerAndClearCache() {
         canReport = false
         AppStateObserver.listeners.removeAll { it === appStateListener }
-        cache.clear()
-        cacheSizeAtLastClose = 0
+        preInstallEvents.clear()
         pendingEvents.clear()
     }
 
@@ -122,7 +113,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         }
 
         override fun onAppClosed() {
-            cacheSizeAtLastClose = cache.size
+            preInstallEvents.markAppClosed()
             pendingEvents.clear()
         }
     }
@@ -133,9 +124,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider
 
         if (logger == null || canReport == null) {
-            if (cache.size < MAX_CACHE_SIZE) {
-                cache += applicationLifecycleData
-            }
+            preInstallEvents.add(applicationLifecycleData)
             return
         }
 
