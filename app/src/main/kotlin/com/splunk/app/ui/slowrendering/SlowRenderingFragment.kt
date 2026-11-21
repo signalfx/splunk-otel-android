@@ -38,9 +38,10 @@ import java.util.Random
 /**
  * Fragment for simulating UI rendering performance issues such as slow or frozen frames.
  *
- * This fragment provides buttons to start two types of rendering tests:
+ * This fragment provides buttons to start rendering tests:
  * - Slow render: Mildly expensive drawing to simulate minor frame drops.
  * - Frozen render: Very expensive drawing to simulate frozen UI.
+ * - Frozen layout: A single expensive measure pass followed by a simple draw.
  */
 class SlowRenderingFragment : BaseFragment<FragmentSlowRenderingBinding>() {
 
@@ -55,6 +56,7 @@ class SlowRenderingFragment : BaseFragment<FragmentSlowRenderingBinding>() {
         with(viewBinding) {
             slowRender.setOnClickListener { simulateSlowRender() }
             frozenRender.setOnClickListener { simulateFrozenRender() }
+            frozenLayout.setOnClickListener { simulateFrozenLayout(it) }
         }
     }
 
@@ -76,6 +78,30 @@ class SlowRenderingFragment : BaseFragment<FragmentSlowRenderingBinding>() {
         color = Color.RED,
         refreshIntervalMs = FROZEN_REFRESH_INTERVAL_MS
     )
+
+    private fun simulateFrozenLayout(button: View) {
+        val rootView = requireActivity().window.decorView
+            .findViewById<ViewGroup>(android.R.id.content)
+        val measureView = object : View(requireContext()) {
+            private var measured = false
+
+            override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+                if (!measured) {
+                    measured = true
+                    SystemClock.sleep(FROZEN_RENDER_DELAY_MS)
+                    post {
+                        rootView.removeView(this)
+                        button.isEnabled = true
+                    }
+                }
+                super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+            }
+        }
+        // Adding a visible view schedules a frame while keeping its draw work minimal.
+        measureView.setBackgroundColor(Color.RED)
+        button.isEnabled = false
+        rootView.addView(measureView, 1, 1)
+    }
 
     /**
      * Creates and attaches a custom [SlowRenderView] to simulate poor rendering performance.

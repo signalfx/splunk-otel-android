@@ -125,17 +125,18 @@ class SlowRenderListenerTest {
     }
 
     @Test
-    fun `aggregates and classifies slow and frozen frames into spans on pause`() {
+    fun `classifies frames by total duration and reports counts on pause`() {
         val listener = newListener()
         val window = mock(Window::class.java)
         val activity = activity(window)
 
         val perActivityListener = resumeAndCapture(listener, window, activity)
 
-        // 2 slow, 1 frozen, 1 normal (ignored).
-        perActivityListener.onFrameMetricsAvailable(window, frame(20), 0)
-        perActivityListener.onFrameMetricsAvailable(window, frame(30), 0)
-        perActivityListener.onFrameMetricsAvailable(window, frame(800), 0)
+        // Fast drawing can still be slow. A frame at the frozen threshold remains slow.
+        perActivityListener.onFrameMetricsAvailable(window, frame(25, drawDurationMs = 5), 0)
+        perActivityListener.onFrameMetricsAvailable(window, frame(700, drawDurationMs = 30), 0)
+        // A frozen frame contributes only to the frozen count, even if its draw time is slow.
+        perActivityListener.onFrameMetricsAvailable(window, frame(800, drawDurationMs = 30), 0)
         perActivityListener.onFrameMetricsAvailable(window, frame(5), 0)
 
         listener.onActivityPaused(activity)
@@ -248,12 +249,21 @@ class SlowRenderListenerTest {
         return captor.value
     }
 
-    private fun frame(durationMs: Long, firstDrawFrame: Long = 0): FrameMetrics =
-        frameWithRawDuration(TimeUnit.MILLISECONDS.toNanos(durationMs), firstDrawFrame)
+    private fun frame(totalDurationMs: Long, firstDrawFrame: Long = 0, drawDurationMs: Long = 0): FrameMetrics =
+        frameWithRawDuration(
+            totalDurationNs = TimeUnit.MILLISECONDS.toNanos(totalDurationMs),
+            firstDrawFrame = firstDrawFrame,
+            drawDurationNs = TimeUnit.MILLISECONDS.toNanos(drawDurationMs)
+        )
 
-    private fun frameWithRawDuration(drawDurationNs: Long, firstDrawFrame: Long = 0): FrameMetrics {
+    private fun frameWithRawDuration(
+        totalDurationNs: Long,
+        firstDrawFrame: Long = 0,
+        drawDurationNs: Long = 0
+    ): FrameMetrics {
         val frameMetrics = mock(FrameMetrics::class.java)
         `when`(frameMetrics.getMetric(FrameMetrics.FIRST_DRAW_FRAME)).thenReturn(firstDrawFrame)
+        `when`(frameMetrics.getMetric(FrameMetrics.TOTAL_DURATION)).thenReturn(totalDurationNs)
         `when`(frameMetrics.getMetric(FrameMetrics.DRAW_DURATION)).thenReturn(drawDurationNs)
         return frameMetrics
     }
