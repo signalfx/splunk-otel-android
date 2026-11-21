@@ -19,6 +19,7 @@ package com.splunk.rum.integration.applicationlifecycle
 import android.app.Application
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.APP_STATE_KEY
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.integration.agent.internal.AgentIntegration
@@ -38,6 +39,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,11 +53,12 @@ class ForegroundLifecycleTelemetryTest {
     private val manager = object : ISplunkSessionManager {
         override val allowBackgroundSessionCreation = false
         var currentId: String? = null
+        var predecessorId: String? = null
         override val sessionId: String? get() = currentId
         override val sessionStart: Long? get() = null
         override val sessionLastActivity: Long? get() = null
         override val sessionSnapshot: SessionSnapshot? get() = null
-        override val previousSessionId: String? get() = null
+        override val previousSessionId: String? get() = predecessorId
         override val sessionListeners = mutableSetOf<SplunkSessionManager.SessionListener>()
         override fun install(application: Application) = Unit
         override fun trackSessionActivity() = Unit
@@ -108,13 +111,20 @@ class ForegroundLifecycleTelemetryTest {
         assertEquals(listOf("A", "A"), exported.map { it.attributes.get(SESSION_ID_KEY) })
         assertEquals(listOf(1_000L, 2_000L), exported.map { TimeUnit.NANOSECONDS.toMillis(it.timestampEpochNanos) })
         assertEquals(listOf("created", "foreground"), exported.map { it.attributes.get(APP_STATE_KEY) })
+        exported.forEach { assertNull(it.attributes.get(PREVIOUS_SESSION_ID_KEY)) }
+
+        manager.predecessorId = "A"
+        manager.currentId = "B"
+        ApplicationLifecycleModuleIntegration.reportEvent(ApplicationLifecycleData(3_500L, AppState.BACKGROUND))
+        assertEquals("B", exported.last().attributes.get(SESSION_ID_KEY))
+        assertEquals("A", exported.last().attributes.get(PREVIOUS_SESSION_ID_KEY))
 
         manager.currentId = null
         ApplicationLifecycleModuleIntegration.reportEvent(ApplicationLifecycleData(4_000L, AppState.CREATED))
         ApplicationLifecycleModuleIntegration.appStateListenerReference.onAppClosed()
         manager.currentId = "B"
         manager.sessionListeners.forEach { it.onSessionChanged("B", 5_000L) }
-        assertEquals(2, exported.size)
+        assertEquals(3, exported.size)
 
         provider.shutdown().join(5, TimeUnit.SECONDS)
     }

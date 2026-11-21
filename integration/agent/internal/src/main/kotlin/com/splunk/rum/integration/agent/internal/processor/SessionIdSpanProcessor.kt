@@ -33,13 +33,15 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
         if (capturedSessionId == null) {
             currentSessionId?.let { span.setAttribute(SESSION_ID_KEY, it) }
         }
-        // Startup spans already carry the previous ID of their assigned session.
-        val preserveStartupAncestry = capturedSessionId != null &&
-            (span.name == APP_START_SPAN_NAME || span.name == INSTALL_SPAN_NAME)
+        // These SDK signals capture their session ancestry before the span starts.
+        val preserveAssignedAncestry = capturedSessionId != null && when (span.name) {
+            APP_START_SPAN_NAME, INSTALL_SPAN_NAME, LIFECYCLE_SPAN_NAME -> true
+            else -> false
+        }
         val preserveSessionStartAncestry = span.name == RumConstants.SESSION_START_EVENT_NAME &&
             capturedSessionId != null &&
             (span.attributes.get(PREVIOUS_SESSION_ID_KEY) != null || capturedSessionId != currentSessionId)
-        if (!preserveStartupAncestry && !preserveSessionStartAncestry) {
+        if (!preserveAssignedAncestry && !preserveSessionStartAncestry) {
             span.setAttribute(PREVIOUS_SESSION_ID_KEY, sessionManager.previousSessionId)
         }
     }
@@ -52,5 +54,6 @@ class SessionIdSpanProcessor(private val sessionManager: ISplunkSessionManager) 
 
     private companion object {
         const val INSTALL_SPAN_NAME = "SplunkRum.install"
+        const val LIFECYCLE_SPAN_NAME = "device.app.lifecycle"
     }
 }

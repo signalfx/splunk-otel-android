@@ -20,6 +20,7 @@ import android.app.Application
 import android.content.Context
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.AppStateObserver
@@ -129,7 +130,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         }
 
         if (sessionManager.allowBackgroundSessionCreation) {
-            emitEvent(applicationLifecycleData, logger, null)
+            emitEvent(applicationLifecycleData, logger, null, null)
             return
         }
 
@@ -142,18 +143,20 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
         }
 
         emitPendingEvents(sessionId)
-        emitEvent(applicationLifecycleData, logger, sessionId)
+        emitEvent(applicationLifecycleData, logger, sessionId, sessionManager.previousSessionId)
     }
 
     private fun emitPendingEvents(sessionId: String) {
         val logger = SplunkOpenTelemetrySdk.instance?.sdkLoggerProvider ?: return
-        pendingEvents.take().forEachFast { emitEvent(it, logger, sessionId) }
+        val previousId = sessionManager.previousSessionId
+        pendingEvents.take().forEachFast { emitEvent(it, logger, sessionId, previousId) }
     }
 
     private fun emitEvent(
         applicationLifecycleData: ApplicationLifecycleData,
         logger: SdkLoggerProvider,
-        sessionId: String?
+        sessionId: String?,
+        previousSessionId: String?
     ) {
         Logger.d(TAG) { "Creating log for app lifecycle event: $applicationLifecycleData" }
         val builder = logger.get(GlobalRumConstants.RUM_TRACER_NAME)
@@ -163,6 +166,7 @@ internal object ApplicationLifecycleModuleIntegration : ModuleIntegration<Applic
             .setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_LIFECYCLE)
             .setAttribute(GlobalRumConstants.APP_STATE_KEY, applicationLifecycleData.appState.attributeValue)
         sessionId?.let { builder.setAttribute(SESSION_ID_KEY, it) }
+        previousSessionId?.let { builder.setAttribute(PREVIOUS_SESSION_ID_KEY, it) }
         builder.emit()
     }
 

@@ -98,6 +98,35 @@ class SessionStartConversionTest {
         assertStartSpan(span)
     }
 
+    @Test
+    fun `delayed lifecycle log keeps the first session without a predecessor`() = withSdk { sdk, collector ->
+        sdk.sdkLoggerProvider.get(RUM_TRACER_NAME).logRecordBuilder()
+            .setAttribute(LOG_EVENT_NAME_KEY, "device.app.lifecycle")
+            .setAttribute(SESSION_ID_KEY, "session-a")
+            .emit()
+
+        flushLogs(sdk)
+
+        val span = collector.spans.single()
+        assertEquals("session-a", span.attributes.get(SESSION_ID_KEY))
+        assertNull(span.attributes.get(PREVIOUS_SESSION_ID_KEY))
+    }
+
+    @Test
+    fun `delayed lifecycle log keeps its captured predecessor`() = withSdk { sdk, collector ->
+        sdk.sdkLoggerProvider.get(RUM_TRACER_NAME).logRecordBuilder()
+            .setAttribute(LOG_EVENT_NAME_KEY, "device.app.lifecycle")
+            .setAttribute(SESSION_ID_KEY, "session-a")
+            .setAttribute(PREVIOUS_SESSION_ID_KEY, "session-before-a")
+            .emit()
+
+        flushLogs(sdk)
+
+        val span = collector.spans.single()
+        assertEquals("session-a", span.attributes.get(SESSION_ID_KEY))
+        assertEquals("session-before-a", span.attributes.get(PREVIOUS_SESSION_ID_KEY))
+    }
+
     private fun flushLogs(sdk: OpenTelemetrySdk) {
         val result = sdk.sdkLoggerProvider.forceFlush().join(5, TimeUnit.SECONDS)
         assertTrue("Log conversion should complete", result.isSuccess)
