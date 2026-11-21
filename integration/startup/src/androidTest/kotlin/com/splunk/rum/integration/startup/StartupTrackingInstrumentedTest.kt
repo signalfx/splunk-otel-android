@@ -21,7 +21,14 @@ import android.app.Instrumentation
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
+import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.integration.agent.internal.AgentIntegration
+import com.splunk.rum.integration.agent.internal.processor.SessionIdSpanProcessor
+import com.splunk.rum.integration.agent.internal.session.ISplunkSessionManager
+import com.splunk.rum.integration.agent.internal.session.SessionSnapshot
+import com.splunk.rum.integration.agent.internal.session.SplunkSessionManager
 import com.splunk.rum.startup.ApplicationStartupTimekeeper
 import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.sdk.OpenTelemetrySdk
@@ -74,10 +81,31 @@ class StartupTrackingInstrumentedTest {
 
     private lateinit var tracerProvider: SdkTracerProvider
 
+    private val sessionManager = object : ISplunkSessionManager {
+        override val allowBackgroundSessionCreation = false
+        var currentId: String? = null
+        override val sessionId: String? get() = currentId
+        override val sessionStart: Long? get() = if (currentId == null) null else 1L
+        override val sessionLastActivity: Long? get() = if (currentId == null) null else 1L
+        override val sessionSnapshot: SessionSnapshot?
+            get() = currentId?.let { SessionSnapshot(it, 1L, 1L) }
+        override var previousSessionId: String? = null
+        override val sessionListeners = mutableSetOf<SplunkSessionManager.SessionListener>()
+        override fun install(application: Application) {
+            // A started Activity was already observed before this late SDK install.
+            currentId = "session-A"
+            sessionListeners.forEach { it.onSessionChanged("session-A", System.currentTimeMillis()) }
+        }
+        override fun trackSessionActivity() = Unit
+        override fun reset() = Unit
+        override fun sessionId(timestamp: Long): String? = currentId
+    }
+
     @Before
     fun setUp() {
         exportedSpans.clear()
         tracerProvider = SdkTracerProvider.builder()
+            .addSpanProcessor(SessionIdSpanProcessor(sessionManager))
             .addSpanProcessor(SimpleSpanProcessor.create(collectingExporter))
             .build()
         SplunkOpenTelemetrySdk.instance = OpenTelemetrySdk.builder()
@@ -114,6 +142,7 @@ class StartupTrackingInstrumentedTest {
         AgentIntegration.instance.install(
             application,
             SplunkOpenTelemetrySdk.instance!!,
+            sessionManager,
             listOf(StartupModuleConfiguration()),
             Attributes.empty()
         )
@@ -122,6 +151,8 @@ class StartupTrackingInstrumentedTest {
 
         val coldStart = appStartSpans().single()
         assertEquals(RumConstants.APP_START_TYPE_COLD, coldStart.startType())
+        assertEquals("session-A", coldStart.attributes.get(SESSION_ID_KEY))
+        assertNull(coldStart.attributes.get(PREVIOUS_SESSION_ID_KEY))
 
         assertTrue(
             "Install span should not be emitted before install timing completes",
@@ -131,6 +162,10 @@ class StartupTrackingInstrumentedTest {
             "Install span emission should be deferred until install timing completes",
             AgentIntegration.onInstallTimingComplete
         )
+
+        sessionManager.currentId = "session-B"
+        sessionManager.previousSessionId = "session-A"
+        sessionManager.sessionListeners.forEach { it.onSessionChanged("session-B", System.currentTimeMillis()) }
 
         completeInstallTiming(installEndElapsed)
         waitForIdle()
@@ -144,6 +179,8 @@ class StartupTrackingInstrumentedTest {
         assertEquals("Install span should only be reported once", 1, installSpans.size)
 
         val installSpan = installSpans.single()
+        assertEquals("session-A", installSpan.attributes.get(SESSION_ID_KEY))
+        assertNull(installSpan.attributes.get(PREVIOUS_SESSION_ID_KEY))
         assertEquals(
             "SplunkRum.install should be child of AppStart",
             coldStart.spanId,
@@ -169,7 +206,16 @@ class StartupTrackingInstrumentedTest {
             "Install span should have per-module events",
             installSpan.events.isNotEmpty()
         )
+        assertTrue(
+            installSpan.attributes.get(RumConstants.APP_START_CONFIG_SETTINGS_KEY)
+                ?.contains("allowBackgroundSessionCreation:false") == true
+        )
 
+        AppStateObserver.listeners.forEach { it.onAppBackgrounded() }
+        AppStateObserver.listeners.forEach { it.onAppForegrounded() }
+        sessionManager.currentId = "session-C"
+        sessionManager.previousSessionId = "session-B"
+        sessionManager.sessionListeners.forEach { it.onSessionChanged("session-C", System.currentTimeMillis()) }
         reportHotStart()
         waitForIdle()
 
@@ -178,6 +224,26 @@ class StartupTrackingInstrumentedTest {
         assertEquals(
             listOf(RumConstants.APP_START_TYPE_COLD, RumConstants.APP_START_TYPE_HOT),
             appStarts.map { it.startType() }
+        )
+        assertEquals(listOf("session-A", "session-B"), appStarts.map { it.attributes.get(SESSION_ID_KEY) })
+        assertEquals(listOf(null, "session-A"), appStarts.map { it.attributes.get(PREVIOUS_SESSION_ID_KEY) })
+
+        AppStateObserver.listeners.forEach { it.onAppBackgrounded() }
+        sessionManager.currentId = null
+        sessionManager.previousSessionId = null
+        reportHotStart()
+        waitForIdle()
+        assertEquals("No App Start should be emitted without a session", 2, appStartSpans().size)
+
+        AppStateObserver.listeners.forEach { it.onAppForegrounded() }
+        sessionManager.currentId = "session-D"
+        sessionManager.sessionListeners.forEach { it.onSessionChanged("session-D", System.currentTimeMillis()) }
+        reportWarmStart()
+        waitForIdle()
+
+        assertEquals(
+            listOf("session-A", "session-B", "session-D"),
+            appStartSpans().map { it.attributes.get(SESSION_ID_KEY) }
         )
 
         assertEquals("Install span should still only be reported once after hot start", 1, installSpans().size)
@@ -203,6 +269,14 @@ class StartupTrackingInstrumentedTest {
         val startTimestamp = endTimestamp - START_DURATION_MILLIS
         ApplicationStartupTimekeeper.listeners.forEach {
             it.onHotStarted(startTimestamp, endTimestamp, START_DURATION_MILLIS)
+        }
+    }
+
+    private fun reportWarmStart() {
+        val endTimestamp = System.currentTimeMillis()
+        val startTimestamp = endTimestamp - START_DURATION_MILLIS
+        ApplicationStartupTimekeeper.listeners.forEach {
+            it.onWarmStarted(startTimestamp, endTimestamp, START_DURATION_MILLIS)
         }
     }
 

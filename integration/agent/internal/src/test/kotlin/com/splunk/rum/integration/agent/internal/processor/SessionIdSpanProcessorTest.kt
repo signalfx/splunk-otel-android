@@ -16,6 +16,7 @@
 
 package com.splunk.rum.integration.agent.internal.processor
 
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.APP_START_SPAN_NAME
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.integration.agent.internal.RumConstants
@@ -89,6 +90,38 @@ class SessionIdSpanProcessorTest {
         processor.onStart(Context.root(), span)
 
         verify(span).setAttribute(PREVIOUS_SESSION_ID_KEY, "session-before")
+    }
+
+    @Test
+    fun `keeps a startup span's captured ancestry after its session rotates`() {
+        `when`(sessionManager.sessionId).thenReturn("session-b")
+        `when`(sessionManager.previousSessionId).thenReturn("session-a")
+
+        for (name in listOf(APP_START_SPAN_NAME, "SplunkRum.install")) {
+            val span = mockSpan(
+                Attributes.of(SESSION_ID_KEY, "session-a", PREVIOUS_SESSION_ID_KEY, "session-before-a")
+            )
+            `when`(span.name).thenReturn(name)
+
+            processor.onStart(Context.root(), span)
+
+            verify(span, never()).setAttribute(PREVIOUS_SESSION_ID_KEY, "session-a")
+        }
+    }
+
+    @Test
+    fun `does not invent a predecessor for the first startup session`() {
+        `when`(sessionManager.sessionId).thenReturn("session-b")
+        `when`(sessionManager.previousSessionId).thenReturn("session-a")
+
+        for (name in listOf(APP_START_SPAN_NAME, "SplunkRum.install")) {
+            val span = mockSpan(Attributes.of(SESSION_ID_KEY, "session-a"))
+            `when`(span.name).thenReturn(name)
+
+            processor.onStart(Context.root(), span)
+
+            verify(span, never()).setAttribute(PREVIOUS_SESSION_ID_KEY, "session-a")
+        }
     }
 
     private fun mockSpan(attributes: Attributes): ReadWriteSpan {

@@ -29,6 +29,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 
 interface ISplunkSessionManager {
+    val allowBackgroundSessionCreation: Boolean
     val sessionId: String?
     val sessionStart: Long?
     val sessionLastActivity: Long?
@@ -43,6 +44,7 @@ interface ISplunkSessionManager {
 }
 
 object NoOpSplunkSessionManager : ISplunkSessionManager {
+    override val allowBackgroundSessionCreation = false
     override val sessionId: String? = null
     override val sessionSnapshot: SessionSnapshot? = null
     override val previousSessionId: String? = null
@@ -58,7 +60,7 @@ object NoOpSplunkSessionManager : ISplunkSessionManager {
 
 class SplunkSessionManager internal constructor(
     private val agentStorage: IAgentStorage,
-    private val allowBackgroundSessionCreation: Boolean,
+    override val allowBackgroundSessionCreation: Boolean,
     private val onSessionCreated: (String, String?, Long) -> Unit = { _, _, _ -> }
 ) : ISplunkSessionManager {
     private val executor = Executors.newSingleThreadScheduledExecutor()

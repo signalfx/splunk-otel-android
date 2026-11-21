@@ -21,8 +21,10 @@ import android.content.Context
 import com.splunk.rum.agent.common.otel.SplunkOpenTelemetrySdk
 import com.splunk.rum.agent.common.otel.extensions.toInstant
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SESSION_ID_KEY
+import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.common.logger.Logger
-import com.splunk.rum.common.utils.extensions.forEachFast
+import com.splunk.rum.common.utils.AppStateObserver
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.toSplunkString
 import com.splunk.rum.integration.agent.internal.AgentIntegration
@@ -42,9 +44,20 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
     private const val TAG = "StartupIntegration"
 
+    override val observesSessionChanges = true
+
     private val lock = Any()
 
-    private val cache: MutableList<StartupData> = mutableListOf()
+    private val cache: MutableList<CachedStart> = mutableListOf()
+    private val startupSession = StartupSessionContext()
+
+    @Volatile
+    private var foregroundAwareMode = false
+
+    @Volatile
+    private var sessionManagerReady = false
+
+    private var configuredBackgroundCreation = false
 
     @Volatile
     private var isInitializationReported = false
@@ -55,6 +68,9 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
     override fun onAttach(context: Context) {
         Logger.d(TAG, "onAttach() - adding listener to ApplicationStartupTimekeeper")
         ApplicationStartupTimekeeper.listeners += applicationStartupTimekeeperListener
+        if (appStateListener !in AppStateObserver.listeners) {
+            AppStateObserver.listeners += appStateListener
+        }
     }
 
     override fun onInstall(
@@ -63,13 +79,42 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         moduleConfigurations: List<ModuleConfiguration>
     ) {
         Logger.d(TAG, "onInstall()")
+        configuredBackgroundCreation = sessionManager.allowBackgroundSessionCreation
+        foregroundAwareMode = !configuredBackgroundCreation
+        sessionManagerReady = true
+        if (foregroundAwareMode) currentSession()?.let(startupSession::onForeground)
+    }
+
+    override fun onSessionChange(sessionId: String) {
+        if (foregroundAwareMode) {
+            startupSession.onSessionCreated(StartupSession(sessionId, sessionManager.previousSessionId))
+        }
+    }
+
+    private fun currentSession(): StartupSession? =
+        sessionManager.sessionId?.let { StartupSession(it, sessionManager.previousSessionId) }
+
+    private val appStateListener = object : AppStateObserver.Listener {
+        override fun onAppForegrounded() {
+            if (foregroundAwareMode) {
+                startupSession.onForeground(if (sessionManagerReady) currentSession() else null)
+            }
+        }
+
+        override fun onAppBackgrounded() {
+            startupSession.onBackground()
+        }
+
+        override fun onAppClosed() {
+            startupSession.onBackground()
+        }
     }
 
     override fun onPostInstall() {
         super.onPostInstall()
         Logger.d(TAG, "onPostInstall()")
 
-        val cachedEvents: List<StartupData>
+        val cachedEvents: List<CachedStart>
 
         synchronized(lock) {
             cachedEvents = cache.toList()
@@ -79,9 +124,17 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
         if (cachedEvents.isNotEmpty()) {
             Logger.d(TAG) { "Processing deferred cache (size: ${cachedEvents.size})" }
-            cachedEvents.forEachFast {
-                Logger.d(TAG) { "Processing cached event: ${it.name}" }
-                reportEventInternal(it.startTimestamp, it.endTimestamp, it.name)
+            val pendingSession = if (foregroundAwareMode) startupSession.sessionForStart() else null
+            cachedEvents.forEachIndexed { index, cached ->
+                val event = cached.data
+                Logger.d(TAG) { "Processing cached event: ${event.name}" }
+                // Before installation, only the latest start can belong to the pending foreground attempt.
+                val session = cached.session ?: pendingSession.takeIf {
+                    cached.beforeSessionManager && index == cachedEvents.lastIndex
+                }
+                if (!foregroundAwareMode || session != null) {
+                    reportEventInternal(event.startTimestamp, event.endTimestamp, event.name, session)
+                }
             }
         }
 
@@ -115,7 +168,11 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         synchronized(lock) {
             if (!isInstallComplete) {
                 Logger.d(TAG) { "reportEvent() - install not complete, caching event: $name" }
-                cache += StartupData(startTimestamp, endTimestamp, name)
+                cache += CachedStart(
+                    StartupData(startTimestamp, endTimestamp, name),
+                    if (foregroundAwareMode) startupSession.sessionForStart() else null,
+                    !sessionManagerReady
+                )
                 return
             }
         }
@@ -124,10 +181,21 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         reportEventInternal(startTimestamp, endTimestamp, name)
     }
 
-    private fun reportEventInternal(startTimestamp: Long, endTimestamp: Long, name: String) {
+    private fun reportEventInternal(
+        startTimestamp: Long,
+        endTimestamp: Long,
+        name: String,
+        cachedSession: StartupSession? = null
+    ) {
         val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
         if (provider == null) {
             Logger.e(TAG, "reportEventInternal() - SDK not ready")
+            return
+        }
+
+        val assignedSession = if (foregroundAwareMode) cachedSession ?: startupSession.sessionForStart() else null
+        if (foregroundAwareMode && assignedSession == null) {
+            Logger.d(TAG) { "Skipping App Start without a foreground session" }
             return
         }
 
@@ -142,13 +210,17 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             }
         }
 
-        val span = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
+        val builder = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
             .spanBuilder(RumConstants.APP_START_SPAN_NAME)
             .setStartTimestamp(startTimestamp, TimeUnit.MILLISECONDS)
-            .startSpan()
+        assignedSession?.let { session ->
+            builder.setAttribute(SESSION_ID_KEY, session.id)
+            session.previousId?.let { builder.setAttribute(PREVIOUS_SESSION_ID_KEY, it) }
+        }
+        val span = builder.startSpan()
 
         if (shouldReportInitialization) {
-            reportInstallSpan(span, provider)
+            reportInstallSpan(span, provider, assignedSession)
         }
 
         // Actual screen.name as set by SplunkInternalGlobalAttributeSpanProcessor is overwritten here to set it to
@@ -159,19 +231,21 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             .setAttribute(RumConstants.APP_START_TYPE_KEY, name)
             .end(endTimestamp.toInstant())
 
+        if (foregroundAwareMode) assignedSession?.let(startupSession::onStartReported)
+
         Logger.d(TAG) { "reportEventInternal() - span sent successfully for: $name" }
     }
 
-    private fun reportInstallSpan(appStartSpan: Span, provider: SdkTracerProvider) {
+    private fun reportInstallSpan(appStartSpan: Span, provider: SdkTracerProvider, session: StartupSession?) {
         if (AgentIntegration.installEndElapsed == null) {
-            AgentIntegration.onInstallTimingComplete = { emitInstallSpan(appStartSpan, provider) }
+            AgentIntegration.onInstallTimingComplete = { emitInstallSpan(appStartSpan, provider, session) }
             Logger.d(TAG) { "reportInstallSpan() - installEndElapsed not yet available, deferring" }
             return
         }
-        emitInstallSpan(appStartSpan, provider)
+        emitInstallSpan(appStartSpan, provider, session)
     }
 
-    private fun emitInstallSpan(appStartSpan: Span, provider: SdkTracerProvider) {
+    private fun emitInstallSpan(appStartSpan: Span, provider: SdkTracerProvider, session: StartupSession?) {
         val modules = modules.values
 
         val firstInitialization =
@@ -206,19 +280,25 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
                 "endTimestamp: $installEndTimestamp, duration: ${installEndTimestamp - installStartTimestamp}ms"
         }
 
-        val installSpan = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
+        val builder = provider.get(GlobalRumConstants.RUM_TRACER_NAME)
             .spanBuilder(RumConstants.APP_START_INSTALL_SPAN_NAME)
             .setParent(OtelContext.current().with(appStartSpan))
             .setStartTimestamp(installStartTimestamp, TimeUnit.MILLISECONDS)
-            .startSpan()
+        session?.let { captured ->
+            builder.setAttribute(SESSION_ID_KEY, captured.id)
+            captured.previousId?.let { builder.setAttribute(PREVIOUS_SESSION_ID_KEY, it) }
+        }
+        val installSpan = builder.startSpan()
 
         installSpan.setAttribute(GlobalRumConstants.COMPONENT_KEY, RumConstants.COMPONENT_APP_START)
             .setAttribute(GlobalRumConstants.SCREEN_NAME_KEY, GlobalRumConstants.DEFAULT_SCREEN_NAME)
 
-        val resources = modules.joinToString(",", "[", "]") {
+        val moduleSettings = modules.map {
             it.configuration?.toSplunkString()
                 ?: "${it.name}.enabled:true"
         }
+        val resources = (moduleSettings + "allowBackgroundSessionCreation:$configuredBackgroundCreation")
+            .joinToString(",", "[", "]")
 
         installSpan.setAttribute(RumConstants.APP_START_CONFIG_SETTINGS_KEY, resources)
 
@@ -242,4 +322,10 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
         installSpan.end(installEndTimestamp, TimeUnit.MILLISECONDS)
     }
+
+    private data class CachedStart(
+        val data: StartupData,
+        val session: StartupSession?,
+        val beforeSessionManager: Boolean
+    )
 }
