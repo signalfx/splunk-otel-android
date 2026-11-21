@@ -43,10 +43,10 @@ internal class StartupSessionContext {
     fun sessionForStart(): StartupSession? = if (firstStartReported) foregroundSession else firstSession
 
     @Synchronized
-    fun onStartReported() {
+    fun onStartReported(session: StartupSession) {
         firstStartReported = true
-        firstSession = null
-        foregroundSession = null
+        if (firstSession == session) firstSession = null
+        if (foregroundSession == session) foregroundSession = null
     }
 
     @Synchronized

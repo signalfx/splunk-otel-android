@@ -34,7 +34,7 @@ class StartupSessionContextTest {
         context.onSessionCreated(StartupSession("B", "A")) // A rotated before first draw.
 
         assertEquals(StartupSession("A", null), context.sessionForStart())
-        context.onStartReported()
+        context.onStartReported(StartupSession("A", null))
         assertNull(context.sessionForStart())
 
         context.onForeground(StartupSession("B", "A"))
@@ -52,5 +52,21 @@ class StartupSessionContextTest {
         context.onForeground(null)
         context.onSessionCreated(StartupSession("B", null))
         assertEquals(StartupSession("B", null), context.sessionForStart())
+    }
+
+    @Test
+    fun reportingAnEarlierCachedStartKeepsTheLaterForegroundSession() {
+        val context = StartupSessionContext()
+        val first = StartupSession("A", null)
+        val second = StartupSession("B", "A")
+
+        context.onForeground(first)
+        context.onBackground()
+        context.onForeground(second)
+        context.onStartReported(first)
+
+        assertEquals(second, context.sessionForStart())
+        context.onStartReported(second)
+        assertNull(context.sessionForStart())
     }
 }

@@ -25,7 +25,6 @@ import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.PREVIOUS_SES
 import com.splunk.rum.agent.common.otel.internal.GlobalRumConstants.SESSION_ID_KEY
 import com.splunk.rum.common.logger.Logger
 import com.splunk.rum.common.utils.AppStateObserver
-import com.splunk.rum.common.utils.extensions.forEachFast
 import com.splunk.rum.integration.agent.common.module.ModuleConfiguration
 import com.splunk.rum.integration.agent.common.module.toSplunkString
 import com.splunk.rum.integration.agent.internal.AgentIntegration
@@ -49,7 +48,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
     private val lock = Any()
 
-    private val cache: MutableList<StartupData> = mutableListOf()
+    private val cache: MutableList<CachedStart> = mutableListOf()
     private val startupSession = StartupSessionContext()
 
     @Volatile
@@ -115,7 +114,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         super.onPostInstall()
         Logger.d(TAG, "onPostInstall()")
 
-        val cachedEvents: List<StartupData>
+        val cachedEvents: List<CachedStart>
 
         synchronized(lock) {
             cachedEvents = cache.toList()
@@ -125,9 +124,17 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
         if (cachedEvents.isNotEmpty()) {
             Logger.d(TAG) { "Processing deferred cache (size: ${cachedEvents.size})" }
-            cachedEvents.forEachFast {
-                Logger.d(TAG) { "Processing cached event: ${it.name}" }
-                reportEventInternal(it.startTimestamp, it.endTimestamp, it.name)
+            val pendingSession = if (foregroundAwareMode) startupSession.sessionForStart() else null
+            cachedEvents.forEachIndexed { index, cached ->
+                val event = cached.data
+                Logger.d(TAG) { "Processing cached event: ${event.name}" }
+                // Before installation, only the latest start can belong to the pending foreground attempt.
+                val session = cached.session ?: pendingSession.takeIf {
+                    cached.beforeSessionManager && index == cachedEvents.lastIndex
+                }
+                if (!foregroundAwareMode || session != null) {
+                    reportEventInternal(event.startTimestamp, event.endTimestamp, event.name, session)
+                }
             }
         }
 
@@ -161,7 +168,11 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         synchronized(lock) {
             if (!isInstallComplete) {
                 Logger.d(TAG) { "reportEvent() - install not complete, caching event: $name" }
-                cache += StartupData(startTimestamp, endTimestamp, name)
+                cache += CachedStart(
+                    StartupData(startTimestamp, endTimestamp, name),
+                    if (foregroundAwareMode) startupSession.sessionForStart() else null,
+                    !sessionManagerReady
+                )
                 return
             }
         }
@@ -170,14 +181,19 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
         reportEventInternal(startTimestamp, endTimestamp, name)
     }
 
-    private fun reportEventInternal(startTimestamp: Long, endTimestamp: Long, name: String) {
+    private fun reportEventInternal(
+        startTimestamp: Long,
+        endTimestamp: Long,
+        name: String,
+        cachedSession: StartupSession? = null
+    ) {
         val provider = SplunkOpenTelemetrySdk.instance?.sdkTracerProvider
         if (provider == null) {
             Logger.e(TAG, "reportEventInternal() - SDK not ready")
             return
         }
 
-        val assignedSession = if (foregroundAwareMode) startupSession.sessionForStart() else null
+        val assignedSession = if (foregroundAwareMode) cachedSession ?: startupSession.sessionForStart() else null
         if (foregroundAwareMode && assignedSession == null) {
             Logger.d(TAG) { "Skipping App Start without a foreground session" }
             return
@@ -215,7 +231,7 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
             .setAttribute(RumConstants.APP_START_TYPE_KEY, name)
             .end(endTimestamp.toInstant())
 
-        if (foregroundAwareMode) startupSession.onStartReported()
+        if (foregroundAwareMode) assignedSession?.let(startupSession::onStartReported)
 
         Logger.d(TAG) { "reportEventInternal() - span sent successfully for: $name" }
     }
@@ -306,4 +322,10 @@ internal object StartupModuleIntegration : ModuleIntegration<StartupModuleConfig
 
         installSpan.end(installEndTimestamp, TimeUnit.MILLISECONDS)
     }
+
+    private data class CachedStart(
+        val data: StartupData,
+        val session: StartupSession?,
+        val beforeSessionManager: Boolean
+    )
 }
