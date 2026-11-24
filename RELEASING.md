@@ -22,7 +22,7 @@ Follow these steps to perform a release:
    - Commit the changes to the `release/X.Y.Z` branch.
 
 5. **Update the issue template**
-   - In the [bug report issue template](https://github.com/signalfx/splunk-otel-android/blob/develop/.github/ISSUE_TEMPLATE/bug.yml), ensure that the newly released version is **added to the top of the list** in the `Agent Version` section.
+   - In the [bug report issue template](.github/ISSUE_TEMPLATE/bug.yml), ensure that the newly released version is **added to the top of the list** in the `Agent Version` section.
    - Commit this change to the `release/X.Y.Z` branch.
 
 6. **Create a release PR**

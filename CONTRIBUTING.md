@@ -73,7 +73,7 @@ repository](https://help.github.com/articles/fork-a-repo/) and [creating a pull
 request](https://help.github.com/articles/creating-a-pull-request/).
 
 Before your contribution can be accepted, you will be asked to sign our
-[Splunk Contributor License Agreement (CLA)](https://github.com/splunk/cla-agreement/blob/main/CLA.md).
+[Splunk Contributor License Agreement (CLA)](https://raw.githubusercontent.com/splunk/cla-agreement/main/CLA.md).
 
 ## Finding contributions to work on
 
