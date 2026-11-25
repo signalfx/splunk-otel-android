@@ -5,16 +5,16 @@
 
 ## Documentation
 
-- [Install the Splunk RUM Android Agent](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/install-the-splunk-rum-android-agent)
-- [Record Android Sessions](https://help.splunk.com/en/splunk-observability-cloud/monitor-end-user-experience/real-user-monitoring/replay-user-sessions/record-android-sessions)
-- [Troubleshoot Android Instrumentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/troubleshoot-android-instrumentation)
+- [Install the Splunk RUM Android Agent](https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-mobile-applications-for-splunk-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/install-the-splunk-rum-android-agent)
+- [Record Android Sessions](https://help.splunk.com/en/splunk-observability-cloud/digital-experience-monitoring/real-user-monitoring/replay-user-sessions/record-android-sessions)
+- [Troubleshoot Android Instrumentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-mobile-applications-for-splunk-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/troubleshoot-android-instrumentation)
 
 # Overview
 
 The Splunk Android SDK provides comprehensive Real User Monitoring capabilities for Android applications.
 Built on OpenTelemetry, it features a modular architecture that allows you to include only the instrumentations and features that you need.
 
-For official documentation on the Splunk OTel Instrumentation for Android, see [Instrument Android applications for Splunk RUM](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
+For official documentation on the Splunk OTel Instrumentation for Android, see [Instrument Android applications for Splunk RUM](https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-mobile-applications-for-splunk-rum/instrument-android-applications-for-splunk-rum).
 
 ## Modules Overview
 
@@ -37,7 +37,7 @@ The agent is composed of several modules, each responsible for a specific type o
 
 ## Getting Started
 
-For complete setup instructions with code examples and advanced configuration options, please refer to the [official documentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications).
+For complete setup instructions with code examples and advanced configuration options, please refer to the [official documentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-mobile-applications-for-splunk-rum/instrument-android-applications-for-splunk-rum).
 
 #### Requirements
 * Android API Level 24 is the default minimum supported version. However, API Levels 21, 22, and 23 can also be supported by enabling the forceEnableOnLowerApi to true in the AgentConfiguration
@@ -48,7 +48,7 @@ For complete setup instructions with code examples and advanced configuration op
 
 API levels 24 to 25 require core library desugaring activated
 
-See [Activate desugaring in your application](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications/install-the-android-rum-agent#dce84133fa87f4b1089e140d36b1fee4e__enable-desugaring)
+See [Activate desugaring in your application](https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-mobile-applications-for-splunk-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/install-the-splunk-rum-android-agent#activate-desugaring-in-your-application-0)
 
 #### 2. Specify Java 8 Compatability
 
@@ -185,7 +185,7 @@ not required at runtime:
 ## Troubleshooting
 
 For troubleshooting issues with the Splunk OpenTelemetry instrumentation of Android, see
-[Troubleshoot Android instrumentation for Splunk Observability Cloud](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/troubleshoot-android-instrumentation)
+[Troubleshoot Android instrumentation for Splunk Observability Cloud](https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-mobile-applications-for-splunk-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-version-2.0.0-and-above/troubleshoot-android-instrumentation)
 in the official documentation.
 
 # License

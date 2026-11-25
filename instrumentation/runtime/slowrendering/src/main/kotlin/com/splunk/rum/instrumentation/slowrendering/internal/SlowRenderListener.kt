@@ -36,7 +36,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 /**
- * Polls each resumed activity's frame render durations on a background [HandlerThread] and reports
+ * Polls each resumed activity's total frame durations on a background [HandlerThread] and reports
  * slow/frozen frame counts as spans, on the [pollInterval] and on pause.
  */
 // FrameMetrics needs API 24; install() guards on SDK_INT before creating this listener.
@@ -145,7 +145,7 @@ internal class SlowRenderListener internal constructor(
         private val lock = Any()
 
         @Volatile
-        private var drawDurationHistogram = SparseIntArray()
+        private var frameDurationHistogram = SparseIntArray()
 
         val activityName: String
             get() = activity.componentName.flattenToShortString()
@@ -160,22 +160,22 @@ internal class SlowRenderListener internal constructor(
                 return
             }
 
-            val drawDurationsNs = frameMetrics.getMetric(FrameMetrics.DRAW_DURATION)
+            val totalDurationNs = frameMetrics.getMetric(FrameMetrics.TOTAL_DURATION)
             // Ignore negative durations.
-            if (drawDurationsNs >= 0) {
+            if (totalDurationNs >= 0) {
                 synchronized(lock) {
                     // Round to nearest ms (as FrameMetricsAggregator does).
-                    val durationMs = ((drawDurationsNs + NANOS_ROUNDING_VALUE) / NANOS_PER_MS).toInt()
-                    val oldValue = drawDurationHistogram.get(durationMs)
-                    drawDurationHistogram.put(durationMs, oldValue + 1)
+                    val durationMs = ((totalDurationNs + NANOS_ROUNDING_VALUE) / NANOS_PER_MS).toInt()
+                    val oldValue = frameDurationHistogram.get(durationMs)
+                    frameDurationHistogram.put(durationMs, oldValue + 1)
                 }
             }
         }
 
         fun resetMetrics(): SparseIntArray {
             synchronized(lock) {
-                val metrics = drawDurationHistogram
-                drawDurationHistogram = SparseIntArray()
+                val metrics = frameDurationHistogram
+                frameDurationHistogram = SparseIntArray()
                 return metrics
             }
         }

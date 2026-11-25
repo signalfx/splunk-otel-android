@@ -14,6 +14,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * **Binary compatibility: OkHttp module configurations**: adding the optional `ignoreURLs` property changes the Kotlin-generated default-argument constructor and `copy()` signatures of `OkHttp3AutoModuleConfiguration` and `OkHttp3ManualModuleConfiguration`. Existing Kotlin and Java constructor calls remain source compatible. Previously compiled Kotlin code that uses constructor defaults, or previously compiled Kotlin or Java code that calls `copy()`, must be rebuilt against this release to avoid `NoSuchMethodError`. Java callers of `copy()` must also pass the new `ignoreURLs` argument when recompiling.
 
 ##### Fixes:
+* Slow and frozen frame counts now use total Android frame duration, including time spent in layout and other rendering stages. Counts can shift after upgrading because they previously used only draw time.
 * Reduced SDK installation time by reading the stored anonymous user ID and app installation ID in the background instead of waiting for them during `install`.
 
 ### Version 2.4.0 - 2026-10-13
@@ -308,7 +309,7 @@ This version is succeeded by a patch release: Users should use 1.3.1 instead of 
 
 This is the first version of `splunk-otel-android` that is based on the upstream version of
 `opentelemetry-android`. Please note that this requires an additional project dependency,
-as [documented here](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-android-applications/install-the-android-rum-agent).
+as [documented here](https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-mobile-applications-for-splunk-rum/instrument-android-applications-for-splunk-rum/splunk-rum-android-agent-versions-below-2.0.0/install-the-android-rum-agent-for-splunk-rum).
 
 * Depend on upstream [opentelemetry-android](https://github.com/open-telemetry/opentelemetry-android) (#640)
 * Depend on updated java semantic conventions (#658)
