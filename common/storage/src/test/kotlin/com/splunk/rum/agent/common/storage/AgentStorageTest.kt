@@ -130,6 +130,13 @@ class AgentStorageTest {
     }
 
     @Test
+    fun `isPreferencesReady observes the shared preferences load`() {
+        storage.readAppInstallationId()
+
+        assertTrue(storage.isPreferencesReady)
+    }
+
+    @Test
     fun `readAppInstallationId returns stored value`() {
         val expectedId = "6ba7b8109dad11d180b400c04fd430c8"
 
